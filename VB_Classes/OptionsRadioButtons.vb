@@ -2,6 +2,12 @@
 Public Class OptionsRadioButtons
     Public check() As RadioButton
     Public Sub Setup(ocvb As AlgorithmData, caller As String, count As Int32)
+        Me.SetDesktopLocation(midFormX + ocvb.radioOffset.X, applocation.Top + applocation.Height + ocvb.radioOffset.Y)
+        ocvb.radioOffset.X += offsetIncr
+        ocvb.radioOffset.Y += offsetIncr
+        If ocvb.radioOffset.X > offsetMax Then ocvb.radioOffset.X = 0
+        If ocvb.radioOffset.Y > offsetMax Then ocvb.radioOffset.Y = 0
+
         ReDim check(count - 1)
         Me.Text = caller + " Radio Options"
         For i = 0 To check.Count - 1
@@ -10,12 +16,5 @@ Public Class OptionsRadioButtons
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
         Me.Show()
-    End Sub
-    Private Sub OptionsRadioButtons_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(midFormX + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
-        radioOffset.X += offsetIncr
-        radioOffset.Y += offsetIncr
-        If radioOffset.X > offsetMax Then radioOffset.X = 0
-        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
     End Sub
 End Class

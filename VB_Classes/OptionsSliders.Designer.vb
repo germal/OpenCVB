@@ -27,24 +27,26 @@ Partial Class OptionsSliders
         '
         'FlowLayoutPanel1
         '
+        Me.FlowLayoutPanel1.AutoSize = True
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(12, 12)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(895, 316)
         Me.FlowLayoutPanel1.TabIndex = 0
         '
-        'OptionsSlider
+        'OptionsSliders
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(919, 340)
+        Me.ClientSize = New System.Drawing.Size(923, 350)
         Me.Controls.Add(Me.FlowLayoutPanel1)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "OptionsSlider"
+        Me.Name = "OptionsSliders"
         Me.Text = "OptionsSlider"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

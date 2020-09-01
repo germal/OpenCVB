@@ -9,6 +9,15 @@ Public Class OptionsSliders
     Dim defaultHeight = 260
     Dim defaultWidth = 630
     Public Sub Setup(ocvb As AlgorithmData, caller As String, Optional count As Integer = 4)
+        Me.Width = defaultWidth
+        Me.Height = defaultHeight
+
+        'Me.SetDesktopLocation(applocation.Left + ocvb.slidersOffset.X, applocation.Top + applocation.Height + ocvb.slidersOffset.Y)
+        'ocvb.slidersOffset.X += offsetIncr
+        'ocvb.slidersOffset.Y += offsetIncr
+        'If ocvb.slidersOffset.X > offsetMax Then ocvb.slidersOffset.X = 0
+        'If ocvb.slidersOffset.Y > offsetMax Then ocvb.slidersOffset.Y = 0
+
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)
@@ -53,17 +62,6 @@ Public Class OptionsSliders
     Private Sub TrackBar_ValueChanged(sender As Object, e As EventArgs)
         countLabel(sender.tag).Text = CStr(trackbar(sender.tag).Value)
     End Sub
-    Private Sub OptionsSlider_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Width = defaultWidth
-        Me.Height = defaultHeight
-        Me.SetDesktopLocation(applocation.Left + slidersOffset.X, applocation.Top + applocation.Height + slidersOffset.Y)
-        If Me.Visible Then
-            slidersOffset.X += offsetIncr
-            slidersOffset.Y += offsetIncr
-            If slidersOffset.X > offsetMax Then slidersOffset.X = 0
-            If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
-        End If
-    End Sub
     Private Function lookupAlgorithm(caller As String) As Integer
         For i = 0 To callerNames.Length - 1
             If callerNames(i) = caller Then
@@ -73,12 +71,12 @@ Public Class OptionsSliders
         Next
         Return 0
     End Function
-    Public Sub SetVisible(standalone As Boolean)
-        If standalone = False Then
-            slidersOffset.X -= offsetIncr
-            slidersOffset.Y -= offsetIncr
-            If slidersOffset.X < 0 Then slidersOffset.X = offsetMax
-            If slidersOffset.Y < 0 Then slidersOffset.Y = offsetMax
-        End If
+
+    Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.SetDesktopLocation(applocation.Left + ocvbX.slidersOffset.X, applocation.Top + applocation.Height + ocvbX.slidersOffset.Y)
+        ocvbX.slidersOffset.X += offsetIncr
+        ocvbX.slidersOffset.Y += offsetIncr
+        If ocvbX.slidersOffset.X > offsetMax Then ocvbX.slidersOffset.X = 0
+        If ocvbX.slidersOffset.Y > offsetMax Then ocvbX.slidersOffset.Y = 0
     End Sub
 End Class

@@ -4,7 +4,8 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class TTtext
     Public text As String
-
+    Public ttdefaultX = 40
+    Public ttdefaultY = 10
     Public picTag = 2
     Public x As Int32
     Public y As Int32
@@ -79,6 +80,13 @@ Public Class ocvbClass : Implements IDisposable
             If ocvb.callTrace.Contains(callStack) = False Then ocvb.callTrace.Add(callStack)
         End If
         fontsize = ocvb.color.Width / 1280
+
+        src = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
+
+        sliders = New OptionsSliders
+        sliders.Visible = True
 
         topCameraPoint = New cv.Point(ocvb.color.Height, ocvb.color.Height)
         sideCameraPoint = New cv.Point((ocvb.color.Width - ocvb.color.Height) / 2, ocvb.color.Height - (ocvb.color.Width - ocvb.color.Height) / 2)
@@ -172,9 +180,6 @@ Public Class ocvbClass : Implements IDisposable
         Marshal.Copy(array.GetData(Of Single), 0, mat.Data, mat.Total)
     End Sub
     Public Sub New()
-        src = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(colorRows, colorCols, cv.MatType.CV_8UC3, 0)
         algorithm = Me
         label1 = caller
         For i = 0 To rColors.Length - 1

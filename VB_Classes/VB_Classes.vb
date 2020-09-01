@@ -2,17 +2,14 @@ Imports cv = OpenCvSharp
 Imports System.Drawing
 Imports System.IO
 Module Algorithm_Module
+    Public ocvbX As AlgorithmData
     ' these are all global settings that are updated by individual algorithms.  
     Public Const offsetIncr = 25
     Public Const offsetMax = 150
     Public applocation As New cv.Rect
-    Public slidersOffset As cv.Point
-    Public radioOffset As cv.Point
     Public midFormX As Integer
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
-    Public colorCols As Integer
-    Public colorRows As Integer
 
     Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in OptionDialog.vb the same way!
     Public Const T265Camera As Int32 = 1 ' Must be defined in OptionDialog.vb the same way!
@@ -35,15 +32,10 @@ Module Algorithm_Module
         b = a
         a = temp
     End Sub
-
-    Public Const resLow = 0 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const resMed = 1 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const resHigh = 2 ' Must be defined in OptionsDialog.vb the same way!
 End Module
 
 Public Class ActiveClass : Implements IDisposable
     Public ocvb As AlgorithmData
-
     Dim algoList As New algorithmList
     Dim ActiveAlgorithm As Object
     Public Structure Extrinsics_VB
@@ -84,13 +76,12 @@ Public Class ActiveClass : Implements IDisposable
         Dim CPU_FrameTime As Double
         Dim intrinsicsLeft As intrinsics_VB
         Dim intrinsicsRight As intrinsics_VB
-        Dim resolution As Integer
+        Dim resolution As cv.Size
         Dim minimizeMemoryFootprint As Boolean
         Dim OpenCV_Version_ID As String
         Dim OpenCVfullPath As String
         Dim PythonExe As String
         Dim ShowConsoleLog As Boolean
-        Dim speedFactor As Integer
         Dim testAllRunning As Boolean
         Dim transformationMatrix() As Single
         Dim useRecordedData As Boolean
@@ -106,17 +97,14 @@ Public Class ActiveClass : Implements IDisposable
         Dim fileStarted As Boolean
         Dim initialStartSetting As Boolean
     End Structure
-    Public Sub New(parms As algorithmParameters, _width As Integer, _height As Integer, location As cv.Rect)
-        slidersOffset = New cv.Point(0, 0)
-        radioOffset = New cv.Point(0, 0)
+    Public Sub New(parms As algorithmParameters, location As cv.Rect)
         Randomize() ' just in case anyone uses VB.Net's Rnd
-        ocvb = New AlgorithmData(parms, _width, _height)
+        ocvb = New AlgorithmData(parms, location)
+        ocvbX = ocvb
         UpdateHostLocation(location)
         If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
-        colorRows = ocvb.color.Rows
-        colorCols = ocvb.color.Cols
         ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)
         If ActiveAlgorithm Is Nothing Then
             MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +

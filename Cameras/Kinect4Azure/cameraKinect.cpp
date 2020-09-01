@@ -49,7 +49,7 @@ private:
 	const int32_t TIMEOUT_IN_MS = 1000;
 	size_t infraredSize = 0;
 	k4a_image_t point_cloud = NULL;
-	int colorRows = 0, colorCols = 0, colorBuffSize = 0;
+	int colorRows = 720, colorCols = 1280, colorBuffSize = 1280*720;
 	k4a_image_t depthInColor;
 public:
 	~KinectCamera()
@@ -72,9 +72,6 @@ public:
 
 			k4a_device_get_calibration(device, config.depth_mode, config.color_resolution, &calibration);
 
-			colorRows = calibration.color_camera_calibration.resolution_height;
-			colorCols = calibration.color_camera_calibration.resolution_width;
-			colorBuffSize = colorRows * colorCols;
 			pointCloudBuffSize = colorBuffSize * 3 * (int) sizeof(int16_t);
 
 			k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, colorCols, colorRows, colorCols * (int)sizeof(int16_t), &depthInColor);

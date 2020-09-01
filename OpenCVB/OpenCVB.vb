@@ -47,7 +47,6 @@ Public Class OpenCVB
 
     Dim LastX As Int32
     Dim LastY As Int32
-    Dim mediumResolution As Boolean
     Dim mouseClickFlag As Boolean
     Dim mouseClickPoint As New cv.Point
     Dim mousePicTag As Integer
@@ -65,7 +64,8 @@ Public Class OpenCVB
     Dim picLabels() = {"RGB", "Depth", "", ""}
     Dim camWidth As Int32 = 1280, camHeight As Int32 = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
-    Dim fastSize As cv.Size
+    Public resolutionXY = New cv.Size(1280, 720)
+    Public resolutionSetting As Integer = 1
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
@@ -316,16 +316,17 @@ Public Class OpenCVB
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
+                            If resolutionSetting = OptionsDialog.lowRes Then tt.y -= 7 ' Fine-tuning the lowRes text.  Default y is too big but good at other resolutions.
                             If TTtextData(i).picTag = 3 Then
-                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                                    g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio + camPic(0).Width, tt.y * ratio)
-                            Else
-                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                                Else
+                                    g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio, tt.y * ratio)
+                                End If
+                                maxline -= 1
+                                If maxline <= 0 Then Exit For
                             End If
-                            maxline -= 1
-                            If maxline <= 0 Then Exit For
-                        End If
                     Next
                 End If
             Catch ex As Exception
@@ -747,7 +748,7 @@ Public Class OpenCVB
                 mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
             End If
             Dim resizeFactor = camWidth / camPic(0).Width
-            mousePoint *= resizeFactor * If(mediumResolution, 0.5, 1)
+            mousePoint *= resizeFactor * OptionsDialog.resolutionResizeFactor
 
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
@@ -831,8 +832,7 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
         SaveSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
 
-        Dim details = CStr(camWidth) + "x" + CStr(camHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " Resolution="
-        If optionsForm.mediumResolution.Checked Then details += "Medium" Else details += "High"
+        Dim details = CStr(camWidth) + "x" + CStr(camHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " Resolution=" + optionsForm.resolutionName
         picLabels(0) = "Input " + details
         picLabels(1) = "Depth " + details
     End Sub
@@ -901,7 +901,9 @@ Public Class OpenCVB
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' if mediumResolution is active and all the algorithms are covered, then switch to high res or vice versa...
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            optionsForm.mediumResolution.Checked = Not optionsForm.mediumResolution.Checked
+            If optionsForm.LowResolution.Checked Then optionsForm.mediumResolution.Checked = True
+            If optionsForm.mediumResolution.Checked Then optionsForm.HighResolution.Checked = True
+            If optionsForm.HighResolution.Checked Then optionsForm.LowResolution.Checked = True
             saveLayout()
         End If
 
@@ -950,6 +952,7 @@ Public Class OpenCVB
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
+            optionsForm.ChangeResolution()
             optionsForm.TestEnableNumPy()
             If saveCurrentCamera <> optionsForm.cameraIndex Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
@@ -979,15 +982,13 @@ Public Class OpenCVB
 
         Dim parms As New VB_Classes.ActiveClass.algorithmParameters
         ReDim parms.IMU_RotationMatrix(9 - 1)
-        mediumResolution = optionsForm.mediumResolution.Checked
 
         saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
         parms.activeAlgorithm = AvailableAlgorithms.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
-        If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then mediumResolution = False
-        fastSize = If(mediumResolution, New cv.Size(camWidth / 2, camHeight / 2), New cv.Size(camWidth, camHeight))
+        If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then OptionsDialog.HighResolution.checked = True
 
-        parms.resolution = If(mediumResolution, OptionsDialog.resMed, OptionsDialog.resHigh)
+        parms.resolution = resolutionXY
         parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
         parms.cameraName = camera.deviceName
 
@@ -1003,11 +1004,10 @@ Public Class OpenCVB
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
 
-        If parms.resolution = OptionsDialog.resMed Then parms.speedFactor = 2 Else parms.speedFactor = 1
-
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
-        imgResult = New cv.Mat(New cv.Size(fastSize.Width * 2, fastSize.Height), cv.MatType.CV_8UC3, 0)
+        Dim imgSize = New cv.Size(CInt(resolutionXY.width * 2), CInt(resolutionXY.Height))
+        imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
 
@@ -1035,9 +1035,10 @@ Public Class OpenCVB
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
-            Dim saveLowResSetting As Boolean = parms.resolution
+            Dim saveResolution = parms.resolution
 
-            Dim task = New VB_Classes.ActiveClass(parms, camWidth / parms.speedFactor, camHeight / parms.speedFactor, New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
+            Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+            Dim task = New VB_Classes.ActiveClass(parms, myLocation)
             textDesc = task.ocvb.desc
             openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
             openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
@@ -1053,11 +1054,6 @@ Public Class OpenCVB
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)
 
             If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(parms.activeAlgorithm + "," + CStr(totalBytesOfMemoryUsed))
-
-            ' Here we check to see if the algorithm constructor changed mediumResolution.
-            If task.ocvb.parms.resolution <> saveLowResSetting Then
-                If task.ocvb.parms.resolution = OptionsDialog.resMed Then task.ocvb.parms.speedFactor = 2 Else task.ocvb.parms.speedFactor = 1
-            End If
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
             If task.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then
@@ -1112,11 +1108,11 @@ Public Class OpenCVB
             SyncLock bufferLock
                 camera.newImagesAvailable = False
 
-                If mediumResolution Then
-                    task.ocvb.color = camera.color.Resize(fastSize)
-                    task.ocvb.RGBDepth = camera.RGBDepth.Resize(fastSize)
-                    task.ocvb.leftView = camera.leftView.Resize(fastSize)
-                    task.ocvb.rightView = camera.rightView.Resize(fastSize)
+                If resolutionXY.width <> 1280 Then
+                    task.ocvb.color = camera.color.Resize(resolutionXY)
+                    task.ocvb.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
+                    task.ocvb.leftView = camera.leftView.Resize(resolutionXY)
+                    task.ocvb.rightView = camera.rightView.Resize(resolutionXY)
                 Else
                     task.ocvb.color = camera.color
                     task.ocvb.RGBDepth = camera.RGBDepth

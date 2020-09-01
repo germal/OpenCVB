@@ -32,10 +32,13 @@ Public Class AlgorithmData
     Public parentRoot As String
     Public parentAlgorithm As String
     Public callTrace As New List(Of String)
-    Public Sub New(parms As ActiveClass.algorithmParameters, width As Integer, height As Integer)
-        color = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        result = New cv.Mat(height, width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+
+    Public slidersOffset As New cv.Point(0, 5)
+    Public radioOffset As New cv.Point(0, 5)
+    Public Sub New(parms As ActiveClass.algorithmParameters, location As cv.Rect)
+        color = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        RGBDepth = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        result = New cv.Mat(parms.resolution.Height, parms.resolution.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         TTtextData = New List(Of TTtext)
     End Sub
     Public Sub trueText(tt As TTtext)

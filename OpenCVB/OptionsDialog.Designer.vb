@@ -25,8 +25,8 @@ Partial Class OptionsDialog
         Me.CameraGroup = New System.Windows.Forms.GroupBox()
         Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
-        Me.AccurateProcessing = New System.Windows.Forms.RadioButton()
+        Me.LowResolution = New System.Windows.Forms.RadioButton()
+        Me.HighResolution = New System.Windows.Forms.RadioButton()
         Me.mediumResolution = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
@@ -78,8 +78,8 @@ Partial Class OptionsDialog
         '
         'GroupBox1
         '
-        Me.GroupBox1.Controls.Add(Me.RadioButton1)
-        Me.GroupBox1.Controls.Add(Me.AccurateProcessing)
+        Me.GroupBox1.Controls.Add(Me.LowResolution)
+        Me.GroupBox1.Controls.Add(Me.HighResolution)
         Me.GroupBox1.Controls.Add(Me.mediumResolution)
         Me.GroupBox1.Location = New System.Drawing.Point(21, 303)
         Me.GroupBox1.Name = "GroupBox1"
@@ -88,28 +88,27 @@ Partial Class OptionsDialog
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Resolution"
         '
-        'RadioButton1
+        'LowResolution
         '
-        Me.RadioButton1.AutoSize = True
-        Me.RadioButton1.Enabled = False
-        Me.RadioButton1.Location = New System.Drawing.Point(17, 25)
-        Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(210, 24)
-        Me.RadioButton1.TabIndex = 2
-        Me.RadioButton1.TabStop = True
-        Me.RadioButton1.Text = "320x180 - Low resolution"
-        Me.RadioButton1.UseVisualStyleBackColor = True
+        Me.LowResolution.AutoSize = True
+        Me.LowResolution.Location = New System.Drawing.Point(17, 25)
+        Me.LowResolution.Name = "LowResolution"
+        Me.LowResolution.Size = New System.Drawing.Size(210, 24)
+        Me.LowResolution.TabIndex = 2
+        Me.LowResolution.TabStop = True
+        Me.LowResolution.Text = "320x180 - Low resolution"
+        Me.LowResolution.UseVisualStyleBackColor = True
         '
-        'AccurateProcessing
+        'HighResolution
         '
-        Me.AccurateProcessing.AutoSize = True
-        Me.AccurateProcessing.Location = New System.Drawing.Point(18, 85)
-        Me.AccurateProcessing.Name = "AccurateProcessing"
-        Me.AccurateProcessing.Size = New System.Drawing.Size(223, 24)
-        Me.AccurateProcessing.TabIndex = 1
-        Me.AccurateProcessing.TabStop = True
-        Me.AccurateProcessing.Text = "1280x720 - High resolution"
-        Me.AccurateProcessing.UseVisualStyleBackColor = True
+        Me.HighResolution.AutoSize = True
+        Me.HighResolution.Location = New System.Drawing.Point(18, 85)
+        Me.HighResolution.Name = "HighResolution"
+        Me.HighResolution.Size = New System.Drawing.Size(223, 24)
+        Me.HighResolution.TabIndex = 1
+        Me.HighResolution.TabStop = True
+        Me.HighResolution.Text = "1280x720 - High resolution"
+        Me.HighResolution.UseVisualStyleBackColor = True
         '
         'mediumResolution
         '
@@ -334,7 +333,7 @@ Partial Class OptionsDialog
     Friend WithEvents CameraGroup As GroupBox
     Friend WithEvents SnapToGrid As CheckBox
     Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents AccurateProcessing As RadioButton
+    Friend WithEvents HighResolution As RadioButton
     Friend WithEvents mediumResolution As RadioButton
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowLabels As CheckBox
@@ -354,6 +353,6 @@ Partial Class OptionsDialog
     Friend WithEvents Label4 As Label
     Friend WithEvents fontInfo As Label
     Friend WithEvents FontDialog1 As FontDialog
-    Friend WithEvents RadioButton1 As RadioButton
+    Friend WithEvents LowResolution As RadioButton
     Friend WithEvents EnableNumPy As CheckBox
 End Class

@@ -3,7 +3,12 @@
 Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
-    Public Sub Setup(caller As String)
+    Public Sub Setup(ocvb As AlgorithmData, caller As String)
+        Me.SetDesktopLocation(midFormX + ocvb.radioOffset.X, applocation.Top + applocation.Height + ocvb.radioOffset.Y)
+        ocvb.radioOffset.X += offsetIncr
+        ocvb.radioOffset.Y += offsetIncr
+        If ocvb.radioOffset.X > offsetMax Then ocvb.radioOffset.X = 0
+        If ocvb.radioOffset.Y > offsetMax Then ocvb.radioOffset.Y = 0
         Me.Text = caller + " CheckBox Options"
         Me.Show() ' only the first one   gets to be visible...
     End Sub
@@ -17,13 +22,6 @@ Public Class OptionsKeyboardInput
     End Sub
     Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles keyboardCheckbox.CheckedChanged
         My.Computer.Keyboard.SendKeys(vbTab, True) ' shift focus to the textbox...
-    End Sub
-    Private Sub OptionsKeyboardInput_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(midFormX + radioOffset.X, applocation.Top + applocation.Height + radioOffset.Y)
-        radioOffset.X += offsetIncr
-        radioOffset.Y += offsetIncr
-        If radioOffset.X > offsetMax Then radioOffset.X = 0
-        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
     End Sub
     Private Sub TextBox1_LostFocus(sender As Object, e As EventArgs) Handles TextBox1.LostFocus
         keyboardCheckbox.Checked = False

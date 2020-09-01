@@ -322,7 +322,7 @@ Public Class Puzzle_Solver
             End If
         Next
         Static saveRadioIndex As Integer
-        Static saveResolution As Integer
+        Static saveResolution As cv.Size
         Static xxOffset As Integer
         Static xyOffset As Integer
         Static yxOffset As Integer
@@ -331,7 +331,14 @@ Public Class Puzzle_Solver
             Dim factor = 1
             saveRadioIndex = radioIndex
             saveResolution = ocvb.parms.resolution
-            If ocvb.parms.resolution = resMed Then factor = 2
+            Select Case ocvb.parms.resolution.Width
+                Case 180
+                    factor = 4
+                Case 360
+                    factor = 2
+                Case 720
+                    factor = 1
+            End Select
             If radio.check(0).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 256 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 180 / factor
@@ -357,7 +364,6 @@ Public Class Puzzle_Solver
             puzzle.src = src
             puzzle.Run(ocvb)
             roilist = puzzle.grid.roiList.ToArray
-            If ocvb.parms.resolution = resMed Then fontsize -= 0.3
         End If
 
         dst1 = puzzle.dst1

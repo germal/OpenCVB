@@ -36,7 +36,6 @@ Public Class Voxels_Basics_MT
         maxDepth = trim.sliders.trackbar(1).Value
 
         grid.Run(ocvb)
-        Console.WriteLine("ocvb.RGBDepth " + CStr(ocvb.RGBDepth.Width) + " gridmask.width = " + CStr(grid.gridMask.Width))
 
         Static saveVoxelCount As Int32 = -1
         If saveVoxelCount <> grid.roiList.Count Then
@@ -51,14 +50,13 @@ Public Class Voxels_Basics_MT
             Dim roi = grid.roiList(i)
             Dim count = trim.Mask(roi).CountNonZero()
             If count > 0 Then
-                voxels(i) = computeMedian(depth32f(roi), trim.Mask(roi), count, bins, minDepth, maxDepth)
+                voxels(i) = computeMedian(depth32f(roi), trim.Mask(roi), count, bins, minDepth, maxDepth) * 255 / (maxZ * 1000)
             Else
                 voxels(i) = 0
             End If
         End Sub)
         voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_64F, voxels)
         If check.Box(0).Checked Then
-            Console.WriteLine("checkbox ocvb.RGBDepth " + CStr(ocvb.RGBDepth.Width) + " gridmask.width = " + CStr(grid.gridMask.Width) + " src.width = " + CStr(src.Width))
             dst1 = ocvb.RGBDepth.Clone()
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow

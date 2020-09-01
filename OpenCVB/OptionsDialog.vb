@@ -1,7 +1,10 @@
-﻿Imports System.IO
+﻿Imports cv = OpenCvSharp
+Imports System.IO
 Imports Numpy
 Imports py = Python.Runtime
 Public Class OptionsDialog
+    Dim numPyEnabled As Boolean = False
+
     Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
     Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in VB_Classes.vb the same way!
     Public Const T265Camera As Int32 = 1 ' Must be defined in VB_Classes.vb the same way!
@@ -11,16 +14,19 @@ Public Class OptionsDialog
     Public Const L515 As Int32 = 5 ' Must be defined in VB_Classes.vb the same way!
     Public Const D455 As Int32 = 6 ' Must be defined in VB_Classes.vb the same way!
 
-    Public Const resLow = 0 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const resMed = 1 ' Must be defined in OptionsDialog.vb the same way!
-    Public Const resHigh = 2 ' Must be defined in OptionsDialog.vb the same way!
-
     Public cameraDeviceCount(D455) As Int32
     Public cameraRadioButton(D455) As RadioButton
     Public cameraTotalCount As Integer = 0
-    Dim numPyEnabled As Boolean = False
+
+    Public Const lowRes = 0
+    Public Const medRes = 1
+    Public Const highRes = 2
+
+    Public resolutionResizeFactor As Single = 1
+    Public resolutionName As String = "High"
+
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
-        SaveSetting("OpenCVB", "FastAccurate", "FastAccurate", mediumResolution.Checked)
+        SaveSetting("OpenCVB", "resolutionXY", "resolutionXY", OpenCVB.resolutionSetting)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
 
         SaveSetting("OpenCVB", "ShowLabels", "ShowLabels", ShowLabels.Checked)
@@ -43,6 +49,25 @@ Public Class OptionsDialog
         For i = 0 To cameraRadioButton.Count - 1
             If cameraDeviceCount(i) > 0 Then cameraRadioButton(i).Enabled = True
         Next
+    End Sub
+    Public Sub ChangeResolution()
+        Select Case OpenCVB.resolutionSetting
+            Case 0
+                LowResolution.Checked = True
+                OpenCVB.resolutionXY = New cv.Size(320, 180)
+                resolutionResizeFactor = 0.25
+                resolutionName = "Low"
+            Case 1
+                mediumResolution.Checked = True
+                OpenCVB.resolutionXY = New cv.Size(640, 360)
+                resolutionResizeFactor = 0.5
+                resolutionName = "Medium"
+            Case 2
+                HighResolution.Checked = True
+                OpenCVB.resolutionXY = New cv.Size(1280, 720)
+                resolutionResizeFactor = 1
+                resolutionName = "High"
+        End Select
     End Sub
     Public Sub TestEnableNumPy()
         If EnableNumPy.Checked Then
@@ -70,11 +95,8 @@ Public Class OptionsDialog
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
 
-        If GetSetting("OpenCVB", "FastAccurate", "FastAccurate", True) Then
-            mediumResolution.Checked = True
-        Else
-            AccurateProcessing.Checked = True
-        End If
+        OpenCVB.resolutionSetting = GetSetting("OpenCVB", "resolutionXY", "resolutionXY", medRes)
+        ChangeResolution()
 
         cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", D435i)
         cameraRadioButton(cameraIndex).Checked = True
@@ -142,5 +164,14 @@ Public Class OptionsDialog
             fontInfo.Font = FontDialog1.Font
             fontInfo.Text = FontDialog1.Font.Name + " with size = " + CStr(fontInfo.Font.Size)
         End If
+    End Sub
+    Private Sub HighResolution_CheckedChanged(sender As Object, e As EventArgs) Handles HighResolution.CheckedChanged
+        OpenCVB.resolutionSetting = highRes
+    End Sub
+    Private Sub mediumResolution_CheckedChanged(sender As Object, e As EventArgs) Handles mediumResolution.CheckedChanged
+        OpenCVB.resolutionSetting = medRes
+    End Sub
+    Private Sub LowResolution_CheckedChanged(sender As Object, e As EventArgs) Handles LowResolution.CheckedChanged
+        OpenCVB.resolutionSetting = lowRes
     End Sub
 End Class
