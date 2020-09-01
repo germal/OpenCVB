@@ -29,12 +29,14 @@ Public Class Voxels_Basics_MT
         ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
+        If ocvb.RGBDepth.Width <> grid.gridMask.Width Then Exit Sub ' This is only needed during a 'Test All' run - a threading issue I don't understand.
         trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         minDepth = trim.sliders.trackbar(0).Value
         maxDepth = trim.sliders.trackbar(1).Value
 
         grid.Run(ocvb)
+        Console.WriteLine("ocvb.RGBDepth " + CStr(ocvb.RGBDepth.Width) + " gridmask.width = " + CStr(grid.gridMask.Width))
 
         Static saveVoxelCount As Int32 = -1
         If saveVoxelCount <> grid.roiList.Count Then
@@ -44,10 +46,8 @@ Public Class Voxels_Basics_MT
 
         Dim bins = sliders.trackbar(0).Value
         Dim depth32f = getDepth32f(ocvb)
-        ' putting the calcHist into a parallel.for (inside computeMedian below) seems to cause a memory leak.  Avoiding it here...
-        'Parallel.For(0, grid.roiList.Count,
-        'Sub(i)
-        For i = 0 To grid.roiList.Count - 1
+        Parallel.For(0, grid.roiList.Count,
+        Sub(i)
             Dim roi = grid.roiList(i)
             Dim count = trim.Mask(roi).CountNonZero()
             If count > 0 Then
@@ -55,10 +55,10 @@ Public Class Voxels_Basics_MT
             Else
                 voxels(i) = 0
             End If
-        Next
-        'End Sub)
+        End Sub)
         voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_64F, voxels)
-        If check.Box(0).Checked Then ' do they want to display results?
+        If check.Box(0).Checked Then
+            Console.WriteLine("checkbox ocvb.RGBDepth " + CStr(ocvb.RGBDepth.Width) + " gridmask.width = " + CStr(grid.gridMask.Width) + " src.width = " + CStr(src.Width))
             dst1 = ocvb.RGBDepth.Clone()
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow

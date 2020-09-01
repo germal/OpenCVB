@@ -1108,8 +1108,8 @@ Public Class OpenCVB
             End While
 
             ' bring the data into the algorithm task.
+            If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
             SyncLock bufferLock
-                If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
                 camera.newImagesAvailable = False
 
                 If mediumResolution Then
