@@ -66,7 +66,7 @@ Public Class Entropy_Highest_MT
             Next
         End If
 
-        Dim entropyMap = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32F)
+        Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Parallel.For(0, grid.roiList.Count,
          Sub(i)
              entropies(i).Run(src(grid.roiList(i)))
@@ -91,9 +91,10 @@ Public Class Entropy_Highest_MT
         Dim tmp = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy))
         cv.Cv2.MinMaxLoc(tmp, minval, maxval)
 
-        bestContrast = grid.roiList(maxIndex)
         dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst1.Rectangle(bestContrast, cv.Scalar.Red, 4)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        bestContrast = grid.roiList(maxIndex)
+        If standalone Then dst1.Rectangle(bestContrast, cv.Scalar.Red, 4)
         label2 = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
 End Class
@@ -111,16 +112,20 @@ Public Class Entropy_FAST
         setCaller(ocvb)
         fast = New FAST_Basics(ocvb)
         entropy = New Entropy_Highest_MT(ocvb)
+
+        label1 = "Output of Fast_Basics, input to entropy calculation"
+        label2 = "Lighter color is higher entropy, Red marks highest"
         desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        fast.src = ocvb.color
+        fast.src = src
         fast.Run(ocvb)
 
         entropy.src = fast.dst1
         entropy.Run(ocvb)
         dst1 = entropy.dst1
         dst2 = entropy.dst2
+        dst2.Rectangle(entropy.bestContrast, cv.Scalar.Red, 4)
     End Sub
 End Class
 

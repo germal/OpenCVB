@@ -56,6 +56,7 @@ Public Class VBparent : Implements IDisposable
     Public desc As String
     Public Sub setCaller(ocvb As VBocvb)
         caller = Me.GetType.Name
+        label1 = caller
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
         Dim callStack = ""
@@ -179,7 +180,6 @@ Public Class VBparent : Implements IDisposable
     End Sub
     Public Sub New()
         algorithm = Me
-        label1 = caller
         For i = 0 To rColors.Length - 1
             rColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255))
             scalarColors(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
