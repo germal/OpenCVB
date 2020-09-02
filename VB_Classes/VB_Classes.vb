@@ -6,7 +6,6 @@ Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
     Public Const offsetIncr = 25
     Public Const offsetMax = 150
-    Public applocation As New cv.Rect
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
@@ -115,7 +114,7 @@ Public Class ActiveTask : Implements IDisposable
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
     End Sub
     Public Sub UpdateHostLocation(location As cv.Rect)
-        applocation = location
+        ocvbX.applocation = location
     End Sub
     Public Sub RunAlgorithm()
         Try

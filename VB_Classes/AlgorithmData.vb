@@ -33,6 +33,7 @@ Public Class AlgorithmData
     Public parentAlgorithm As String
     Public callTrace As New List(Of String)
 
+    Public appLocation As cv.Rect
     Public slidersOffset As New cv.Point(0, 5)
     Public radioOffset As New cv.Point(0, 5)
     Public Sub New(parms As ActiveTask.algParms, location As cv.Rect)

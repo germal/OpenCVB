@@ -29,7 +29,7 @@ Public Class OptionsKeyboardInput
     End Sub
 
     Private Sub OptionsKeyboardInput_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(applocation.X + applocation.Width / 2 + ocvbX.radioOffset.X, applocation.Top + applocation.Height + ocvbX.radioOffset.Y)
+        Me.SetDesktopLocation(ocvbX.appLocation.X + ocvbX.appLocation.Width / 2 + ocvbX.radioOffset.X, ocvbX.appLocation.Top + ocvbX.appLocation.Height + ocvbX.radioOffset.Y)
         ocvbX.radioOffset.X += offsetIncr
         ocvbX.radioOffset.Y += offsetIncr
         If ocvbX.radioOffset.X > offsetMax Then ocvbX.radioOffset.X = 0
