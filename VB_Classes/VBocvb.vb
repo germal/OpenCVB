@@ -50,6 +50,22 @@ Public Class VBocvb
     Public fileStarted As Boolean
     Public initialStartSetting As Boolean
 
+
+
+    Public IMU_Barometer As Single
+    Public IMU_Magnetometer As cv.Point3f
+    Public IMU_Temperature As Single
+    Public IMU_TimeStamp As Double
+    Public IMU_Rotation As System.Numerics.Quaternion
+    Public IMU_Translation As cv.Point3f
+    Public IMU_Acceleration As cv.Point3f
+    Public IMU_Velocity As cv.Point3f
+    Public IMU_AngularAcceleration As cv.Point3f
+    Public IMU_AngularVelocity As cv.Point3f
+    Public IMU_FrameTime As Double
+    Public CPU_TimeStamp As Double
+    Public CPU_FrameTime As Double
+
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))

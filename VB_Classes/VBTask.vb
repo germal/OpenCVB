@@ -45,29 +45,13 @@ Public Class ActiveTask : Implements IDisposable
         Public externalPythonInvocation As Boolean
         Public ShowConsoleLog As Boolean
         Public NumPyEnabled As Boolean
-        Public IMU_Present As Boolean
         Public intrinsicsLeft As intrinsics_VB
         Public intrinsicsRight As intrinsics_VB
         Public extrinsics As Extrinsics_VB
         Public testAllRunning As Boolean
-
-
-
-        Public IMU_Barometer As Single
-        Public IMU_Magnetometer As cv.Point3f
-        Public IMU_Temperature As Single
-        Public IMU_TimeStamp As Double
-        Public IMU_Rotation As System.Numerics.Quaternion
         Public IMU_RotationMatrix() As Single
+        Public IMU_Present As Boolean
         Public IMU_RotationVector As cv.Point3f
-        Public IMU_Translation As cv.Point3f
-        Public IMU_Acceleration As cv.Point3f
-        Public IMU_Velocity As cv.Point3f
-        Public IMU_AngularAcceleration As cv.Point3f
-        Public IMU_AngularVelocity As cv.Point3f
-        Public IMU_FrameTime As Double
-        Public CPU_TimeStamp As Double
-        Public CPU_FrameTime As Double
 
         Public Const Kinect4AzureCam As Int32 = 0
         Public Const T265Camera As Int32 = 1

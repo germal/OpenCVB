@@ -988,6 +988,9 @@ Public Class OpenCVB
 
         Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.IMU_RotationMatrix(9 - 1)
+        parms.IMU_Present = camera.IMU_Present
+        parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
+        parms.IMU_RotationVector = camera.IMU_RotationVector
 
         saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
@@ -1017,7 +1020,6 @@ Public Class OpenCVB
             cameraTaskHandle.Start()
         End If
 
-        parms.IMU_Present = camera.IMU_Present
         parms.intrinsicsLeft = camera.intrinsicsLeft_VB
         parms.intrinsicsRight = camera.intrinsicsRight_VB
         parms.extrinsics = camera.Extrinsics_VB
@@ -1119,22 +1121,19 @@ Public Class OpenCVB
                 task.ocvb.pointCloud = camera.PointCloud
                 task.ocvb.depth16 = camera.depth16
                 task.ocvb.transformationMatrix = camera.transformationMatrix
-                task.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
-                task.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
-                task.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
-                task.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer
-                task.ocvb.parms.IMU_Temperature = camera.IMU_Temperature
-                task.ocvb.parms.IMU_Rotation = camera.IMU_Rotation
-                task.ocvb.parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
-                task.ocvb.parms.IMU_RotationVector = camera.IMU_RotationVector
-                task.ocvb.parms.IMU_Translation = camera.IMU_Translation
-                task.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
-                task.ocvb.parms.IMU_Velocity = camera.IMU_Velocity
-                task.ocvb.parms.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                task.ocvb.parms.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                task.ocvb.parms.IMU_FrameTime = camera.IMU_FrameTime
-                task.ocvb.parms.CPU_TimeStamp = camera.CPU_TimeStamp
-                task.ocvb.parms.CPU_FrameTime = camera.CPU_FrameTime
+                task.ocvb.IMU_TimeStamp = camera.IMU_TimeStamp
+                task.ocvb.IMU_Barometer = camera.IMU_Barometer
+                task.ocvb.IMU_Magnetometer = camera.IMU_Magnetometer
+                task.ocvb.IMU_Temperature = camera.IMU_Temperature
+                task.ocvb.IMU_Rotation = camera.IMU_Rotation
+                task.ocvb.IMU_Translation = camera.IMU_Translation
+                task.ocvb.IMU_Acceleration = camera.IMU_Acceleration
+                task.ocvb.IMU_Velocity = camera.IMU_Velocity
+                task.ocvb.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                task.ocvb.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                task.ocvb.IMU_FrameTime = camera.IMU_FrameTime
+                task.ocvb.CPU_TimeStamp = camera.CPU_TimeStamp
+                task.ocvb.CPU_FrameTime = camera.CPU_FrameTime
             End SyncLock
 
             task.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))

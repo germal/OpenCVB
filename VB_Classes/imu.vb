@@ -19,19 +19,19 @@ Public Class IMU_Basics
         If ocvb.parms.IMU_Present Then
             Dim alpha As Double = sliders.trackbar(0).Value / 1000
             If ocvb.frameCount = 0 Then
-                lastTimeStamp = ocvb.parms.IMU_TimeStamp
+                lastTimeStamp = ocvb.IMU_TimeStamp
             Else
-                gyroAngle = ocvb.parms.IMU_AngularVelocity
-                Dim dt_gyro = (ocvb.parms.IMU_TimeStamp - lastTimeStamp) / 1000
+                gyroAngle = ocvb.IMU_AngularVelocity
+                Dim dt_gyro = (ocvb.IMU_TimeStamp - lastTimeStamp) / 1000
                 If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.D435i Then dt_gyro /= 1000 ' different units in the timestamp?
-                lastTimeStamp = ocvb.parms.IMU_TimeStamp
+                lastTimeStamp = ocvb.IMU_TimeStamp
                 gyroAngle = gyroAngle * dt_gyro
                 theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
             End If
 
             ' NOTE: Initialize the angle around the y-axis to zero.
-            Dim accelAngle = New cv.Point3f(Math.Atan2(ocvb.parms.IMU_Acceleration.X, Math.Sqrt(ocvb.parms.IMU_Acceleration.Y * ocvb.parms.IMU_Acceleration.Y + ocvb.parms.IMU_Acceleration.Z * ocvb.parms.IMU_Acceleration.Z)), 0,
-                                                Math.Atan2(ocvb.parms.IMU_Acceleration.Y, ocvb.parms.IMU_Acceleration.Z))
+            Dim accelAngle = New cv.Point3f(Math.Atan2(ocvb.IMU_Acceleration.X, Math.Sqrt(ocvb.IMU_Acceleration.Y * ocvb.IMU_Acceleration.Y + ocvb.IMU_Acceleration.Z * ocvb.IMU_Acceleration.Z)), 0,
+                                                Math.Atan2(ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z))
             If ocvb.frameCount = 0 Then
                 theta = accelAngle
             Else
@@ -42,10 +42,10 @@ Public Class IMU_Basics
                 theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
             End If
             If standalone Then
-                flow.msgs.Add("ts = " + Format(ocvb.parms.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(ocvb.parms.IMU_Acceleration.X, "#0.00") +
-                              " y = " + Format(ocvb.parms.IMU_Acceleration.Y, "#0.00") + " z = " + Format(ocvb.parms.IMU_Acceleration.Z, "#0.00") + vbTab +
-                              " Motion (rads/sec) pitch = " + Format(ocvb.parms.IMU_AngularVelocity.X, "#0.00") +
-                              " Yaw = " + Format(ocvb.parms.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(ocvb.parms.IMU_AngularVelocity.Z, "#0.00"))
+                flow.msgs.Add("ts = " + Format(ocvb.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(ocvb.IMU_Acceleration.X, "#0.00") +
+                              " y = " + Format(ocvb.IMU_Acceleration.Y, "#0.00") + " z = " + Format(ocvb.IMU_Acceleration.Z, "#0.00") + vbTab +
+                              " Motion (rads/sec) pitch = " + Format(ocvb.IMU_AngularVelocity.X, "#0.00") +
+                              " Yaw = " + Format(ocvb.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(ocvb.IMU_AngularVelocity.Z, "#0.00"))
             End If
             label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         Else
@@ -75,9 +75,9 @@ Public Class IMU_Stabilizer
         If ocvb.parms.IMU_Present Then
             Dim borderCrop = 5
             Dim vert_Border = borderCrop * ocvb.color.Rows / ocvb.color.Cols
-            Dim dx = ocvb.parms.IMU_AngularVelocity.X
-            Dim dy = ocvb.parms.IMU_AngularVelocity.Y
-            Dim da = ocvb.parms.IMU_AngularVelocity.Z
+            Dim dx = ocvb.IMU_AngularVelocity.X
+            Dim dy = ocvb.IMU_AngularVelocity.Y
+            Dim da = ocvb.IMU_AngularVelocity.Z
             Dim sx = 1 ' assume no scaling is taking place.
             Dim sy = 1 ' assume no scaling is taking place.
 
@@ -127,13 +127,13 @@ Public Class IMU_Magnetometer
         desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.IMU_Magnetometer = New cv.Point3f Then
+        If ocvb.IMU_Magnetometer = New cv.Point3f Then
             ocvb.trueText(New TTtext("The IMU for this camera does not have Magnetometer readings.", 10, 125))
         Else
-            ocvb.trueText(New TTtext("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.parms.IMU_Magnetometer.X) + vbCrLf +
-                                                  "Uncalibrated IMU Magnetometer reading:  y = " + CStr(ocvb.parms.IMU_Magnetometer.Y) + vbCrLf +
-                                                  "Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.parms.IMU_Magnetometer.Z), 10, 60))
-            plot.plotData = New cv.Scalar(ocvb.parms.IMU_Magnetometer.X, ocvb.parms.IMU_Magnetometer.Y, ocvb.parms.IMU_Magnetometer.Z)
+            ocvb.trueText(New TTtext("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.IMU_Magnetometer.X) + vbCrLf +
+                                                  "Uncalibrated IMU Magnetometer reading:  y = " + CStr(ocvb.IMU_Magnetometer.Y) + vbCrLf +
+                                                  "Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.IMU_Magnetometer.Z), 10, 60))
+            plot.plotData = New cv.Scalar(ocvb.IMU_Magnetometer.X, ocvb.IMU_Magnetometer.Y, ocvb.IMU_Magnetometer.Z)
             plot.Run(ocvb)
             label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
@@ -151,11 +151,11 @@ Public Class IMU_Barometer
         desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.IMU_Barometer = 0 Then
+        If ocvb.IMU_Barometer = 0 Then
             ocvb.trueText(New TTtext("The IMU for this camera does not have barometric pressure.", 10, 125))
         Else
-            ocvb.trueText(New TTtext("Barometric pressure is " + CStr(ocvb.parms.IMU_Barometer) + " hectopascal." + vbCrLf +
-                                                  "Barometric pressure is " + Format(ocvb.parms.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
+            ocvb.trueText(New TTtext("Barometric pressure is " + CStr(ocvb.IMU_Barometer) + " hectopascal." + vbCrLf +
+                                                  "Barometric pressure is " + Format(ocvb.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
         End If
     End Sub
 End Class
@@ -171,8 +171,8 @@ Public Class IMU_Temperature
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present Then
-            ocvb.trueText(New TTtext("IMU Temperature is " + Format(ocvb.parms.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
-                                                  "IMU Temperature is " + Format(ocvb.parms.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
+            ocvb.trueText(New TTtext("IMU Temperature is " + Format(ocvb.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
+                                                  "IMU Temperature is " + Format(ocvb.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
         End If
     End Sub
 End Class
@@ -202,12 +202,12 @@ Public Class IMU_FrameTime
         desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static IMUanchor As Integer = ocvb.parms.IMU_FrameTime
+        Static IMUanchor As Integer = ocvb.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
         ' there can be some errant times at startup.
-        If ocvb.parms.IMU_FrameTime > plot.maxScale Or ocvb.parms.IMU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
+        If ocvb.IMU_FrameTime > plot.maxScale Or ocvb.IMU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
         Static imuTotalTime As Double
-        imuTotalTime += ocvb.parms.IMU_FrameTime
+        imuTotalTime += ocvb.IMU_FrameTime
         If imuTotalTime = 0 Then
             Static allZeroCount As Integer
             allZeroCount += 1
@@ -226,31 +226,31 @@ Public Class IMU_FrameTime
             End If
         Next
 
-        Dim imuFrameTime = CInt(ocvb.parms.IMU_FrameTime)
+        Dim imuFrameTime = CInt(ocvb.IMU_FrameTime)
         If IMUanchor <> 0 Then imuFrameTime = imuFrameTime Mod IMUanchor
         Dim minDelay = sliders.trackbar(0).Value
         IMUtoCaptureEstimate = IMUanchor - imuFrameTime + minDelay
         If IMUtoCaptureEstimate > IMUanchor Then IMUtoCaptureEstimate -= IMUanchor
         If IMUtoCaptureEstimate < minDelay Then IMUtoCaptureEstimate = minDelay
 
-        Static sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
-        If ocvb.frameCount Mod 10 = 0 Then sampledIMUFrameTime = ocvb.parms.IMU_FrameTime
+        Static sampledIMUFrameTime = ocvb.IMU_FrameTime
+        If ocvb.frameCount Mod 10 = 0 Then sampledIMUFrameTime = ocvb.IMU_FrameTime
 
-        histogramIMU(CInt(ocvb.parms.IMU_FrameTime)) += 1
+        histogramIMU(CInt(ocvb.IMU_FrameTime)) += 1
 
         If standalone Then
-            ocvb.trueText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
-                                                  "CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00") + vbCrLf +
+            ocvb.trueText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.IMU_TimeStamp, "00") + vbCrLf +
+                                                  "CPU TimeStamp (ms) " + Format(ocvb.CPU_TimeStamp, "00") + vbCrLf +
                                                   "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
                                                   " IMUanchor = " + Format(IMUanchor, "00") +
-                                                  " latest = " + Format(ocvb.parms.IMU_FrameTime, "00.00") + vbCrLf +
+                                                  " latest = " + Format(ocvb.IMU_FrameTime, "00.00") + vbCrLf +
                                                   "IMUtoCapture (ms, sampled, in red) " + Format(IMUtoCaptureEstimate, "00") + vbCrLf + vbCrLf +
                                                   "IMU Frame Time = Blue" + vbCrLf +
                                                   "Host Frame Time = Green" + vbCrLf +
                                                   "IMU Total Delay = Red" + vbCrLf +
                                                   "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often", 10, 40))
 
-            plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, ocvb.parms.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
+            plot.plotData = New cv.Scalar(ocvb.IMU_FrameTime, ocvb.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
             plot.Run(ocvb)
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
@@ -297,10 +297,10 @@ Public Class IMU_HostFrameTimes
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static CPUanchor As Integer = ocvb.parms.CPU_FrameTime
+        Static CPUanchor As Integer = ocvb.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
         ' there can be some errant times at startup.
-        If ocvb.parms.CPU_FrameTime > plot.maxScale Or ocvb.parms.CPU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
+        If ocvb.CPU_FrameTime > plot.maxScale Or ocvb.CPU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
 
         Dim maxval = Integer.MinValue
         For i = 0 To hist.Count - 1
@@ -310,31 +310,31 @@ Public Class IMU_HostFrameTimes
             End If
         Next
 
-        Dim cpuFrameTime = CInt(ocvb.parms.CPU_FrameTime)
+        Dim cpuFrameTime = CInt(ocvb.CPU_FrameTime)
         If CPUanchor <> 0 Then cpuFrameTime = cpuFrameTime Mod CPUanchor
         Dim minDelay = sliders.trackbar(0).Value
         HostInterruptDelayEstimate = CPUanchor - cpuFrameTime + minDelay
         If HostInterruptDelayEstimate > CPUanchor Then HostInterruptDelayEstimate -= CPUanchor
         If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = minDelay
 
-        Static sampledCPUFrameTime = ocvb.parms.CPU_FrameTime
-        If ocvb.frameCount Mod 10 = 0 Then sampledCPUFrameTime = ocvb.parms.CPU_FrameTime
+        Static sampledCPUFrameTime = ocvb.CPU_FrameTime
+        If ocvb.frameCount Mod 10 = 0 Then sampledCPUFrameTime = ocvb.CPU_FrameTime
 
-        hist(CInt(ocvb.parms.CPU_FrameTime)) += 1
+        hist(CInt(ocvb.CPU_FrameTime)) += 1
 
         If standalone Then
-            ocvb.trueText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.parms.IMU_TimeStamp, "00") + vbCrLf +
-                                                  "CPU TimeStamp (ms) " + Format(ocvb.parms.CPU_TimeStamp, "00") + vbCrLf +
+            ocvb.trueText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.IMU_TimeStamp, "00") + vbCrLf +
+                                                  "CPU TimeStamp (ms) " + Format(ocvb.CPU_TimeStamp, "00") + vbCrLf +
                                                   "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
                                                   " CPUanchor = " + Format(CPUanchor, "00") +
-                                                  " latest = " + Format(ocvb.parms.CPU_FrameTime, "00.00") + vbCrLf +
+                                                  " latest = " + Format(ocvb.CPU_FrameTime, "00.00") + vbCrLf +
                                                   "Host Interrupt Delay (ms, sampled, in red) " + Format(HostInterruptDelayEstimate, "00") + vbCrLf + vbCrLf +
                                                   "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
                                                   "Green" + vbTab + "Host Frame Time" + vbCrLf +
                                                   "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
                                                   "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often", 10, 40))
 
-            plot.plotData = New cv.Scalar(ocvb.parms.IMU_FrameTime, ocvb.parms.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
+            plot.plotData = New cv.Scalar(ocvb.IMU_FrameTime, ocvb.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
             plot.Run(ocvb)
 
             If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
@@ -447,9 +447,9 @@ Public Class IMU_GVector
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim gx = ocvb.parms.IMU_Acceleration.X
-        Dim gy = ocvb.parms.IMU_Acceleration.Y
-        Dim gz = ocvb.parms.IMU_Acceleration.Z
+        Dim gx = ocvb.IMU_Acceleration.X
+        Dim gy = ocvb.IMU_Acceleration.Y
+        Dim gz = ocvb.IMU_Acceleration.Z
 
         angleX = Math.Atan2(gy, gx) + cv.Cv2.PI / 2
         angleY = Math.Atan2(gx, gy) - cv.Cv2.PI / 2
@@ -517,9 +517,9 @@ Public Class IMU_IsCameraLevel
         desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim gx = ocvb.parms.IMU_Acceleration.X
-        Dim gy = ocvb.parms.IMU_Acceleration.Y
-        Dim gz = ocvb.parms.IMU_Acceleration.Z
+        Dim gx = ocvb.IMU_Acceleration.X
+        Dim gy = ocvb.IMU_Acceleration.Y
+        Dim gz = ocvb.IMU_Acceleration.Z
 
         angleX = (Math.Atan2(gy, gx) + cv.Cv2.PI / 2) * 57.2958
         angleY = (Math.Atan2(gx, gy) - cv.Cv2.PI / 2) * 57.2958
