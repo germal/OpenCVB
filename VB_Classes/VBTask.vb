@@ -41,15 +41,14 @@ Public Class ActiveTask : Implements IDisposable
         Public FOV As Single()
     End Structure
     Public Structure algParms
+        ' these are parameters needed early in the task initialization, either by the algorithm constructor or the VBparent initialization or
+        ' one-time only constants needed by the algorithms.
         Public cameraIndex As Integer
         Public PythonExe As String
         Public useRecordedData As Boolean
-        Public externalPythonInvocation As Boolean
+        Public externalPythonInvocation As Boolean ' OpenCVB was initialized remotely...
         Public ShowConsoleLog As Boolean
         Public NumPyEnabled As Boolean
-        Public intrinsicsLeft As intrinsics_VB
-        Public intrinsicsRight As intrinsics_VB
-        Public extrinsics As Extrinsics_VB
         Public testAllRunning As Boolean
         Public IMU_RotationMatrix() As Single
         Public IMU_Present As Boolean

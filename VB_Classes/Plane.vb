@@ -26,18 +26,18 @@ Module Plane_Exports
     End Function
 
     Public Function getWorldCoordinates(ocvb As VBocvb, p As cv.Point3f) As cv.Point3f
-        Dim x = (p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx
-        Dim y = (p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy
+        Dim x = (p.X - ocvb.intrinsicsLeft.ppx) / ocvb.intrinsicsLeft.fx
+        Dim y = (p.Y - ocvb.intrinsicsLeft.ppy) / ocvb.intrinsicsLeft.fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
     Public Function getWorldCoordinatesD(ocvb As VBocvb, p As cv.Point3f) As cv.Point3f
-        Dim x = CDbl((p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx)
-        Dim y = CDbl((p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy)
+        Dim x = CDbl((p.X - ocvb.intrinsicsLeft.ppx) / ocvb.intrinsicsLeft.fx)
+        Dim y = CDbl((p.Y - ocvb.intrinsicsLeft.ppy) / ocvb.intrinsicsLeft.fy)
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
     Public Function getWorldCoordinatesD6(ocvb As VBocvb, p As cv.Point3f) As cv.Vec6f
-        Dim x = CDbl((p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx)
-        Dim y = CDbl((p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy)
+        Dim x = CDbl((p.X - ocvb.intrinsicsLeft.ppx) / ocvb.intrinsicsLeft.fx)
+        Dim y = CDbl((p.Y - ocvb.intrinsicsLeft.ppy) / ocvb.intrinsicsLeft.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
     End Function
     ' compute plane equation from the worlddepth points.

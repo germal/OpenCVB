@@ -64,6 +64,9 @@ Public Class VBocvb
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
 
+    Public intrinsicsLeft As New ActiveTask.intrinsics_VB
+    Public intrinsicsRight As New ActiveTask.intrinsics_VB
+    Public extrinsics As New ActiveTask.Extrinsics_VB
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))

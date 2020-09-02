@@ -25,17 +25,17 @@ Public Class FishEye_Rectified
         t265Rect = New cv.Rect(42, 0, 763, 720) ' the T265 left/right views were clipped to fit in the 1280x720 image that is used throughout opencvb.
         t265Original = New cv.Rect(42, 0, 848, 800) ' the T265 left/right views were clipped to fit in the 1280x720 image that is used throughout opencvb.
 
-        'undistortSetup(ocvb, kMatRight, dMatRight, rMatRight, pMatRight, maxDisp, stereo_height_px, ocvb.parms.intrinsicsRight)
+        'undistortSetup(ocvb, kMatRight, dMatRight, rMatRight, pMatRight, maxDisp, stereo_height_px, ocvb.intrinsicsRight)
 
-        Dim kright() As Double = {ocvb.parms.intrinsicsRight.fx, 0, ocvb.parms.intrinsicsRight.ppx, 0, ocvb.parms.intrinsicsRight.fy,
-                                                          ocvb.parms.intrinsicsRight.ppy, 0, 0, 1}
-        Dim dright() As Double = {ocvb.parms.intrinsicsRight.coeffs(0), ocvb.parms.intrinsicsRight.coeffs(1),
-                                 ocvb.parms.intrinsicsRight.coeffs(2), ocvb.parms.intrinsicsRight.coeffs(3)}
+        Dim kright() As Double = {ocvb.intrinsicsRight.fx, 0, ocvb.intrinsicsRight.ppx, 0, ocvb.intrinsicsRight.fy,
+                                                          ocvb.intrinsicsRight.ppy, 0, 0, 1}
+        Dim dright() As Double = {ocvb.intrinsicsRight.coeffs(0), ocvb.intrinsicsRight.coeffs(1),
+                                 ocvb.intrinsicsRight.coeffs(2), ocvb.intrinsicsRight.coeffs(3)}
         Dim pright() As Double = {stereo_focal_px, 0, stereo_cx, 0, 0, stereo_focal_px, stereo_cy, 0, 0, 0, 1, 0}
 
-        Dim r = ocvb.parms.extrinsics.rotation
+        Dim r = ocvb.extrinsics.rotation
         Dim rright() As Double = {r(0), r(1), r(2), r(3), r(4), r(5), r(6), r(7), r(8)}
-        pright(3) = ocvb.parms.extrinsics.translation(0) * stereo_focal_px
+        pright(3) = ocvb.extrinsics.translation(0) * stereo_focal_px
 
         kMatRight = New cv.Mat(3, 3, cv.MatType.CV_64FC1, kright)
         dMatRight = New cv.Mat(1, 4, cv.MatType.CV_64FC1, dright)

@@ -45,7 +45,7 @@ Public Class OpenGL_Basics
         End If
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
-            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy, ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
+            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.intrinsicsLeft.fx, ocvb.intrinsicsLeft.fy, ocvb.intrinsicsLeft.ppx, ocvb.intrinsicsLeft.ppy,
                                                 src.Width, src.Height, src.ElemSize * src.Total,
                                                 dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                                 ocvb.IMU_AngularVelocity.X, ocvb.IMU_AngularVelocity.Y, ocvb.IMU_AngularVelocity.Z,

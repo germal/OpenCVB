@@ -1018,10 +1018,6 @@ Public Class OpenCVB
             cameraTaskHandle.Start()
         End If
 
-        parms.intrinsicsLeft = camera.intrinsicsLeft_VB
-        parms.intrinsicsRight = camera.intrinsicsRight_VB
-        parms.extrinsics = camera.Extrinsics_VB
-
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
@@ -1049,6 +1045,10 @@ Public Class OpenCVB
             openFileFilter = task.ocvb.openFileFilter
             openFileDialogName = task.ocvb.openFileDialogName
             openfileDialogTitle = task.ocvb.openFileDialogTitle
+
+            task.ocvb.intrinsicsLeft = camera.intrinsicsLeft_VB
+            task.ocvb.intrinsicsRight = camera.intrinsicsRight_VB
+            task.ocvb.extrinsics = camera.Extrinsics_VB
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName + vbCrLf + vbCrLf)
