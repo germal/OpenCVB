@@ -19,6 +19,7 @@ Public Class OpenCVB
     Dim AlgorithmCount As Int32
     Dim AlgorithmTestCount As Int32
     Dim algorithmTaskHandle As Thread
+    Dim saveAlgorithmName As String
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
     Dim camera As Object
@@ -838,7 +839,7 @@ Public Class OpenCVB
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopCameraThread = True
-        algorithmTaskHandle.Abort()
+        saveAlgorithmName = ""
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         Application.DoEvents()
         camera.closePipe()
@@ -949,7 +950,7 @@ Public Class OpenCVB
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
         TestAllTimer.Enabled = False
-        algorithmTaskHandle.Abort()
+        saveAlgorithmName = ""
 
         Dim saveCurrentCamera = optionsForm.cameraIndex
 
@@ -1022,6 +1023,7 @@ Public Class OpenCVB
         parms.extrinsics = camera.Extrinsics_VB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
+        saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
 
@@ -1094,7 +1096,7 @@ Public Class OpenCVB
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
             While 1
-                If algName <> algorithmTaskHandle.Name Then Exit Sub ' pause will stop the current algorithm as well.
+                If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While
