@@ -18,7 +18,7 @@ Public Class PyStream_Basics
 
         ' Was this class invoked directly?  Then just run something that works with RGB and depth...
         If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
+            ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
         End If
 
         memMap = New Python_MemMap(ocvb)

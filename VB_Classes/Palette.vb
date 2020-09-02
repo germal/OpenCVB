@@ -304,7 +304,7 @@ Public Class Palette_ColorMap
                                              12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
                 label1 = "ColorMap = " + mapNames(i)
 
-                Static cMapDir As New DirectoryInfo(ocvb.parms.OpenCVfullPath + "/../../../modules/imgproc/doc/pics/colormaps")
+                Static cMapDir As New DirectoryInfo(ocvb.HomeDir + "OpenCV/modules/imgproc/doc/pics/colormaps")
                 Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")
                 If mapFile.Exists Then
                     Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
@@ -369,7 +369,7 @@ Public Class Palette_DepthColorMap
         holes.Run(ocvb)
         dst1.SetTo(0, holes.holeMask)
 
-        Dim r As New cv.Rect(100, 0, 255, 1)
+        Dim r As New cv.Rect(0, 0, Math.Min(dst2.Width, 255), 1)
         For i = 0 To dst2.Height - 1
             r.Y = i
             dst2(r) = gradientColorMap

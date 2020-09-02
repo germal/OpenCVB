@@ -283,7 +283,7 @@ Public Class CComp_Shapes
     Dim shapes As cv.Mat
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        shapes = New cv.Mat(ocvb.parms.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
+        shapes = New cv.Mat(ocvb.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."

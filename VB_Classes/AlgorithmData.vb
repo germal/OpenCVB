@@ -35,11 +35,12 @@ Public Class AlgorithmData
     Public appLocation As cv.Rect
     Public slidersOffset As New cv.Point(0, 5)
     Public radioOffset As New cv.Point(0, 5)
-    Public initParms As ActiveTask.initParms
-    Public Sub New(parms As ActiveTask.algParms, location As cv.Rect)
-        color = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        RGBDepth = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        result = New cv.Mat(parms.resolution.Height, parms.resolution.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+    Public description As String
+    Public HomeDir As String
+    Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
+        color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        RGBDepth = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        result = New cv.Mat(resolution.Height, resolution.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         TTtextData = New List(Of TTtext)
     End Sub
     Public Sub trueText(tt As TTtext)

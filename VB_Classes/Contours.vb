@@ -209,7 +209,7 @@ Public Class Contours_RemoveLines
         desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim tmp = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/invoice.jpg")
+        Dim tmp = cv.Cv2.ImRead(ocvb.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
         dst1(dstRect) = tmp.Resize(dstSize)

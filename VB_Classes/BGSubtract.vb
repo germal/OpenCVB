@@ -350,7 +350,7 @@ Public Class BGSubtract_Video
         bgfg = New BGSubtract_Basics_CPP(ocvb)
 
         video = New Video_Basics(ocvb)
-        video.srcVideo = ocvb.parms.HomeDir + "Data/vtest.avi"
+        video.srcVideo = ocvb.HomeDir + "Data/vtest.avi"
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -415,7 +415,7 @@ Public Class BGSubtract_Synthetic_CPP
             Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
 
             synthPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                                ocvb.parms.HomeDir + "Data/baboon.jpg",
+                                                ocvb.HomeDir + "Data/baboon.jpg",
                                                 amplitude / 100, magnitude, waveSpeed / 100, objectSpeed)
             handleSrc.Free()
         End If

@@ -10,7 +10,7 @@ Public Class Bitmap_ToMat
         desc = "Convert a color and grayscale bitmap to a cv.Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim bitmap = New Bitmap(ocvb.parms.HomeDir + "Data/lena.jpg")
+        Dim bitmap = New Bitmap(ocvb.homeDir + "Data/lena.jpg")
         dst1 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)

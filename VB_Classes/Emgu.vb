@@ -40,10 +40,10 @@ Imports cv = OpenCvSharp
 '            ocvb.trueText(New TTtext("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
 '                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
 '        Else
-'            Dim lena = New cv.Mat(ocvb.parms.HomeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
+'            Dim lena = New cv.Mat(ocvb.homeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
 '            Dim data(lena.Rows * lena.Cols * lena.ElemSize) As Byte
-'            Emgu_Classes.FaceDetection.Detect(ocvb.parms.HomeDir + "Data\\Lena.jpg",
-'                                              ocvb.parms.HomeDir + "Data\\haarcascade_frontalface_alt.xml", data)
+'            Emgu_Classes.FaceDetection.Detect(ocvb.homeDir + "Data\\Lena.jpg",
+'                                              ocvb.homeDir + "Data\\haarcascade_frontalface_alt.xml", data)
 '            Dim tmp = New cv.Mat(lena.Rows, lena.Cols, cv.MatType.CV_8UC3, data)
 '            tmp = tmp.Resize(New cv.Size(dst1.Rows, dst1.Rows))
 '            dst1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp

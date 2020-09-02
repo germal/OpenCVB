@@ -55,7 +55,6 @@ Public Class OpenCVB
     Dim mousePoint As New cv.Point
     Dim myBrush = New SolidBrush(System.Drawing.Color.White)
     Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
-    Dim OpenCVfullPath As String
     Dim openCVKeywords As New List(Of String)
     Dim OptionsBringToFront As Boolean
     Dim optionsForm As OptionsDialog
@@ -224,7 +223,6 @@ Public Class OpenCVB
         Else
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
         End If
-        OpenCVfullPath = HomeDir.FullName + "OpenCV\Build\bin\Release\"
 
         For i = 0 To VB_Classes.ActiveTask.algParms.MyntD1000
             If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
@@ -992,19 +990,14 @@ Public Class OpenCVB
         ReDim parms.IMU_RotationMatrix(9 - 1)
 
         saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
-        parms.algName = AvailableAlgorithms.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
-        If parms.algName.Contains("OpenGL") Or parms.algName.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
+        If AvailableAlgorithms.Text.Contains("OpenGL") Or AvailableAlgorithms.Text.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
 
-        parms.resolution = resolutionXY
         parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
 
         parms.PythonExe = optionsForm.PythonExeName.Text
-        parms.HomeDir = HomeDir.FullName
 
-        parms.OpenCVfullPath = OpenCVfullPath
         parms.transformationMatrix = camera.transformationmatrix
-        parms.OpenCV_Version_ID = Environment.GetEnvironmentVariable("OpenCV_Version")
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.externalPythonInvocation = externalPythonInvocation
@@ -1042,11 +1035,11 @@ Public Class OpenCVB
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
-            Dim saveResolution = parms.resolution
+            Dim algName = saveAlgorithmName
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, myLocation)
-            textDesc = task.ocvb.initParms.description
+            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, HomeDir.FullName, myLocation)
+            textDesc = task.ocvb.description
             openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
             openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
             openFileinitialStartSetting = task.ocvb.parms.initialStartSetting
@@ -1057,10 +1050,10 @@ Public Class OpenCVB
             openFileDialogName = task.ocvb.parms.openFileDialogName
             openfileDialogTitle = task.ocvb.parms.openFileDialogTitle
 
-            Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.algName + vbCrLf + vbCrLf)
+            Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName + vbCrLf + vbCrLf)
 
-            If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(parms.algName + "," + CStr(totalBytesOfMemoryUsed))
+            If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
             If task.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then
@@ -1075,10 +1068,10 @@ Public Class OpenCVB
             frameCount = 0 ' restart the count...
             If task.ocvb.parms.NumPyEnabled Then
                 Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ and https://github.com/SciSharp/Numpy.NET (see multi-threading (Must read!))
-                    Run(task)
+                    Run(task, algName)
                 End Using
             Else
-                Run(task)
+                Run(task, algName)
             End If
 
             ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
@@ -1097,15 +1090,13 @@ Public Class OpenCVB
 
             task.Dispose()
             frameCount = 0
-            If parms.testAllRunning Then
-                Console.WriteLine(vbTab + "Ending " + parms.algName)
-            End If
+            If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
     End Sub
-    Private Sub Run(task As VB_Classes.ActiveTask)
+    Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
             While 1
-                If task.ocvb.parms.algName <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
+                If algName <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While

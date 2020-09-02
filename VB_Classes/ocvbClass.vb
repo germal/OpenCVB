@@ -82,9 +82,9 @@ Public Class ocvbClass : Implements IDisposable
         End If
         fontsize = ocvb.color.Width / 1280
 
-        src = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(ocvb.parms.resolution, cv.MatType.CV_8UC3, 0)
+        src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
 
         topCameraPoint = New cv.Point(ocvb.color.Height, ocvb.color.Height)
         sideCameraPoint = New cv.Point((ocvb.color.Width - ocvb.color.Height) / 2, ocvb.color.Height - (ocvb.color.Width - ocvb.color.Height) / 2)

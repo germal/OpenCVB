@@ -322,16 +322,16 @@ Public Class Puzzle_Solver
             End If
         Next
         Static saveRadioIndex As Integer
-        Static saveResolution As cv.Size
+        Static saveResolutionWidth As Integer
         Static xxOffset As Integer
         Static xyOffset As Integer
         Static yxOffset As Integer
         Static yyOffset As Integer
-        If check.Box(0).Checked Or ocvb.parms.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolution <> ocvb.parms.resolution Then
+        If check.Box(0).Checked Or ocvb.parms.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> ocvb.color.Width Then
             Dim factor = 1
             saveRadioIndex = radioIndex
-            saveResolution = ocvb.parms.resolution
-            Select Case ocvb.parms.resolution.Width
+            saveResolutionWidth = ocvb.color.Width
+            Select Case ocvb.color.Width
                 Case 180
                     factor = 4
                 Case 360

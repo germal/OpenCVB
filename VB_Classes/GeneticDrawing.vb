@@ -39,7 +39,7 @@ Public Class GeneticDrawing_Basics
         gradient = New Gradient_CartToPolar(ocvb)
 
         For i = 0 To brushes.Count - 1
-            brushes(i) = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            brushes(i) = cv.Cv2.ImRead(ocvb.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Next
 
         mats = New Mat_4to1(ocvb)
@@ -146,7 +146,7 @@ Public Class GeneticDrawing_Basics
             stage = 0
 
             If standalone Then
-                src = If(check.Box(0).Checked, ocvb.color.Clone, cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                src = If(check.Box(0).Checked, ocvb.color.Clone, cv.Cv2.ImRead(ocvb.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
             check.Box(0).Checked = False
 
@@ -283,8 +283,8 @@ Public Class GeneticDrawing_Photo
         setCaller(ocvb)
 
         ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "Data\"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.parms.HomeDir + "Data/GeneticDrawingExample.jpg")
+        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "Data\"
+        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.homeDir + "Data/GeneticDrawingExample.jpg")
         ocvb.parms.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         ocvb.parms.openFileFilterIndex = 1
         ocvb.parms.openFileDialogTitle = "Select an image file to create a paint version"

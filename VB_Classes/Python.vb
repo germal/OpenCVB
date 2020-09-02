@@ -70,7 +70,7 @@ Public Class Python_Run
     Dim tryCount As Int32
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/PythonPackages.py"
+        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
@@ -110,7 +110,7 @@ Public Class Python_MemMap
         Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_MemMap.py"
+            ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/Python_MemMap.py"
         End If
 
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length
@@ -160,7 +160,7 @@ Public Class Python_SurfaceBlit
         PipeTaskIndex += 1
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
-        ocvb.PythonFileName = ocvb.parms.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
+        ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalPythonInvocation Then

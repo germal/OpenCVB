@@ -10,8 +10,8 @@ Public Class Video_Basics
         setCaller(ocvb)
 
         ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
+        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "/Data/"
+        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.homeDir + "Data\CarsDrivingUnderBridge.mp4")
         ocvb.parms.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
         ocvb.parms.openFileFilterIndex = 1
         ocvb.parms.openFileDialogTitle = "Select a video file for input"
@@ -149,7 +149,7 @@ Public Class Video_MinRect
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         video = New Video_Basics(ocvb)
-        video.srcVideo = ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4"
+        video.srcVideo = ocvb.homeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
         bgSub = New BGSubtract_MOG(ocvb)

@@ -16,8 +16,8 @@ Public Class Face_Haar_LBP
     Dim lbpCascade As cv.CascadeClassifier
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        haarCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/haarcascade_frontalface_default.xml")
-        lbpCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/lbpcascade_frontalface.xml")
+        haarCascade = New cv.CascadeClassifier(ocvb.homeDir + "Data/haarcascade_frontalface_default.xml")
+        lbpCascade = New cv.CascadeClassifier(ocvb.homeDir + "Data/lbpcascade_frontalface.xml")
         desc = "Detect faces in the video stream."
         label1 = "Faces detected with Haar"
         label2 = "Faces detected with LBP"
@@ -37,7 +37,7 @@ Public Class Face_Haar_Alt
     Dim haarCascade As cv.CascadeClassifier
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        haarCascade = New cv.CascadeClassifier(ocvb.parms.HomeDir + "Data/haarcascade_frontalface_alt.xml")
+        haarCascade = New cv.CascadeClassifier(ocvb.homeDir + "Data/haarcascade_frontalface_alt.xml")
         desc = "Detect faces Haar_alt database."
         label1 = "Faces detected with Haar_Alt"
     End Sub

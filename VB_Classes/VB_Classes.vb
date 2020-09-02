@@ -39,54 +39,48 @@ Public Class ActiveTask : Implements IDisposable
         Public coeffs As Single()
         Public FOV As Single()
     End Structure
-    Public Structure initParms
-        Public description As String
-    End Structure
     Public Structure algParms
-        Dim algName As Object
         Public cameraIndex As Integer
-        Dim externalPythonInvocation As Boolean
-        Dim extrinsics As Extrinsics_VB
-        Dim HomeDir As String
-        Dim VBTestInterface As Object
-        Dim IMU_Barometer As Single
-        Dim IMU_Magnetometer As cv.Point3f
-        Dim IMU_Present As Boolean
-        Dim IMU_Temperature As Single
-        Dim IMU_TimeStamp As Double
-        Dim IMU_Rotation As System.Numerics.Quaternion
-        Dim IMU_RotationMatrix() As Single
-        Dim IMU_RotationVector As cv.Point3f
-        Dim IMU_Translation As cv.Point3f
-        Dim IMU_Acceleration As cv.Point3f
-        Dim IMU_Velocity As cv.Point3f
-        Dim IMU_AngularAcceleration As cv.Point3f
-        Dim IMU_AngularVelocity As cv.Point3f
-        Dim IMU_FrameTime As Double
-        Dim CPU_TimeStamp As Double
-        Dim CPU_FrameTime As Double
-        Dim intrinsicsLeft As intrinsics_VB
-        Dim intrinsicsRight As intrinsics_VB
-        Dim resolution As cv.Size
-        Dim minimizeMemoryFootprint As Boolean
-        Dim OpenCV_Version_ID As String
-        Dim OpenCVfullPath As String
-        Dim PythonExe As String
-        Dim ShowConsoleLog As Boolean
-        Dim testAllRunning As Boolean
-        Dim transformationMatrix() As Single
-        Dim useRecordedData As Boolean
-        Dim NumPyEnabled As Boolean
+        Public PythonExe As String
+        Public transformationMatrix() As Single
+        Public useRecordedData As Boolean
+        Public testAllRunning As Boolean
+        Public externalPythonInvocation As Boolean
+        Public ShowConsoleLog As Boolean
+        Public NumPyEnabled As Boolean
+        Public IMU_Present As Boolean
+        Public intrinsicsLeft As intrinsics_VB
+        Public intrinsicsRight As intrinsics_VB
+        Public extrinsics As Extrinsics_VB
 
-        Dim openFileDialogRequested As Boolean
-        Dim openFileInitialDirectory As String
-        Dim openFileFilter As String
-        Dim openFileFilterIndex As Integer
-        Dim openFileDialogName As String
-        Dim openFileDialogTitle As String
-        Dim openFileSliderPercent As Single
-        Dim fileStarted As Boolean
-        Dim initialStartSetting As Boolean
+
+        Public VBTestInterface As Object
+        Public IMU_Barometer As Single
+        Public IMU_Magnetometer As cv.Point3f
+        Public IMU_Temperature As Single
+        Public IMU_TimeStamp As Double
+        Public IMU_Rotation As System.Numerics.Quaternion
+        Public IMU_RotationMatrix() As Single
+        Public IMU_RotationVector As cv.Point3f
+        Public IMU_Translation As cv.Point3f
+        Public IMU_Acceleration As cv.Point3f
+        Public IMU_Velocity As cv.Point3f
+        Public IMU_AngularAcceleration As cv.Point3f
+        Public IMU_AngularVelocity As cv.Point3f
+        Public IMU_FrameTime As Double
+        Public CPU_TimeStamp As Double
+        Public CPU_FrameTime As Double
+        Public minimizeMemoryFootprint As Boolean
+
+        Public openFileDialogRequested As Boolean
+        Public openFileInitialDirectory As String
+        Public openFileFilter As String
+        Public openFileFilterIndex As Integer
+        Public openFileDialogName As String
+        Public openFileDialogTitle As String
+        Public openFileSliderPercent As Single
+        Public fileStarted As Boolean
+        Public initialStartSetting As Boolean
 
         Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in OptionDialog.vb the same way!
         Public Const T265Camera As Int32 = 1 ' Must be defined in OptionDialog.vb the same way!
@@ -96,25 +90,26 @@ Public Class ActiveTask : Implements IDisposable
         Public Const L515 As Int32 = 5 ' Must be defined in OptionDialog.vb the same way!
         Public Const D455 As Int32 = 6 ' Must be defined in OptionDialog.vb the same way!
     End Structure
-    Public Sub New(parms As algParms, location As cv.Rect)
+    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
         Randomize() ' just in case anyone uses VB.Net's Rnd
-        ocvb = New AlgorithmData(parms, location)
+        ocvb = New AlgorithmData(resolution, parms, location)
         ocvbX = ocvb
         UpdateHostLocation(location)
-        If LCase(parms.algName).EndsWith(".py") Then ocvb.PythonFileName = parms.algName
+        If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
         ocvb.PythonExe = parms.PythonExe
+        ocvb.HomeDir = homeDir
         ocvb.parms = parms
-        algorithmObject = algoList.createAlgorithm(ocvb, parms.algName)
+        algorithmObject = algoList.createAlgorithm(ocvb, algName)
         If algorithmObject Is Nothing Then
-            MsgBox("The algorithm: " + parms.algName + " was not found in the algorithmList.vb code." + vbCrLf +
+            MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Problem likely originated with the UIindexer.")
         End If
-        If algorithmObject Is Nothing And parms.algName.EndsWith(".py") Then
-            parms.algName = parms.algName.Substring(0, Len(parms.algName) - 3)
-            algorithmObject = algoList.createAlgorithm(ocvb, parms.algName)
+        If algorithmObject Is Nothing And algName.EndsWith(".py") Then
+            algName = algName.Substring(0, Len(algName) - 3)
+            algorithmObject = algoList.createAlgorithm(ocvb, algName)
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
-        ocvb.initParms.description = algorithmObject.desc
+        ocvb.description = algorithmObject.desc
     End Sub
     Public Sub UpdateHostLocation(location As cv.Rect)
         ocvbX.appLocation = location

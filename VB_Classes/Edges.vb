@@ -182,7 +182,7 @@ Public Class Edges_RandomForest_CPP
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
         If ocvb.frameCount = 5 Then
-            Dim modelInfo = New FileInfo(ocvb.parms.HomeDir + "Data/model.yml.gz")
+            Dim modelInfo = New FileInfo(ocvb.homeDir + "Data/model.yml.gz")
             EdgesPtr = Edges_RandomForest_Open(modelInfo.FullName)
         End If
         If ocvb.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.

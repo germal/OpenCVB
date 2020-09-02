@@ -13,7 +13,7 @@ Public Class DNN_Test
         desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim modelFile As New FileInfo(ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel")
+        Dim modelFile As New FileInfo(ocvb.homeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
             ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
             Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
@@ -23,9 +23,9 @@ Public Class DNN_Test
             responseStream.CopyTo(memory)
             File.WriteAllBytes(modelFile.FullName, memory.ToArray)
         End If
-        net = Net.ReadNetFromCaffe(ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt")
+        net = Net.ReadNetFromCaffe(ocvb.homeDir + "Data/bvlc_googlenet.prototxt")
 
-        Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
+        Dim image = cv.Cv2.ImRead(ocvb.homeDir + "Data/space_shuttle.jpg")
         dst2 = image.Resize(dst2.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
@@ -47,13 +47,13 @@ Public Class DNN_Caffe_CS
         label2 = "Input Image"
         desc = "Download and use a Caffe database"
 
-        Dim protoTxt = ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt"
-        Dim modelFile = ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel"
-        Dim synsetWords = ocvb.parms.HomeDir + "Data/synset_words.txt"
+        Dim protoTxt = ocvb.homeDir + "Data/bvlc_googlenet.prototxt"
+        Dim modelFile = ocvb.homeDir + "Data/bvlc_googlenet.caffemodel"
+        Dim synsetWords = ocvb.homeDir + "Data/synset_words.txt"
         caffeCS = New CS_Classes.DNN(protoTxt, modelFile, synsetWords)
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        Dim image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/space_shuttle.jpg")
+        Dim image = cv.Cv2.ImRead(ocvb.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
         dst2 = image.Resize(dst2.Size())
         ocvb.trueText(New TTtext(str, 10, 100))
@@ -93,9 +93,9 @@ Public Class DNN_Basics
         dnnHeight = ocvb.color.Height
         crop = New cv.Rect(ocvb.color.Width / 2 - dnnWidth / 2, ocvb.color.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-        Dim infoText As New FileInfo(ocvb.parms.HomeDir + "Data/MobileNetSSD_deploy.prototxt")
+        Dim infoText As New FileInfo(ocvb.homeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
-            Dim infoModel As New FileInfo(ocvb.parms.HomeDir + "Data/MobileNetSSD_deploy.caffemodel")
+            Dim infoModel As New FileInfo(ocvb.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
             If infoModel.Exists Then
                 net = CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
                 dnnPrepared = True

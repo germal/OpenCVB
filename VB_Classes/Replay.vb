@@ -78,8 +78,8 @@ Public Class Replay_Record
         setCaller(ocvb)
 
         ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.HomeDir + "Recording.ocvb")
+        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "/Data/"
+        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.homeDir + "Recording.ocvb")
         ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         ocvb.parms.openFileFilterIndex = 1
         ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"
@@ -166,8 +166,8 @@ Public Class Replay_Play
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.parms.HomeDir + "/Data/"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.HomeDir + "Recording.ocvb")
+        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "/Data/"
+        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.homeDir + "Recording.ocvb")
         ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         ocvb.parms.openFileFilterIndex = 1
         ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"

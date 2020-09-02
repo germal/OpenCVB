@@ -39,9 +39,9 @@ Public Class Retina_Basics_CPP
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
             If fileinfo.Exists Then
-                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", ocvb.parms.HomeDir + "data/RetinaDefaultParameters.xml")
+                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", ocvb.homeDir + "data/RetinaDefaultParameters.xml")
                 startInfo.FileName = "wordpad.exe"
-                startInfo.Arguments = ocvb.parms.HomeDir + "Data/RetinaDefaultParameters.xml"
+                startInfo.Arguments = ocvb.homeDir + "Data/RetinaDefaultParameters.xml"
                 Process.Start(startInfo)
             Else
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")

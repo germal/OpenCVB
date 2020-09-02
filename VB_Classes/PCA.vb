@@ -62,7 +62,7 @@ Public Class PCA_DrawImage
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         pca = New PCA_Basics(ocvb)
-        image = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/pca_test1.jpg")
+        image = cv.Cv2.ImRead(ocvb.homeDir + "Data/pca_test1.jpg")
         desc = "Use PCA to find the principle direction of an object."
         label1 = "Original image"
         label2 = "PCA Output"
