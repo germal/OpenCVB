@@ -89,9 +89,9 @@ Public Class DNN_Basics
             ReDim kalman(i).output(4 - 1)
         Next
 
-        dnnWidth = ocvb.color.Height ' height is always smaller than width...
-        dnnHeight = ocvb.color.Height
-        crop = New cv.Rect(ocvb.color.Width / 2 - dnnWidth / 2, ocvb.color.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
+        dnnWidth = src.Height ' height is always smaller than width...
+        dnnHeight = src.Height
+        crop = New cv.Rect(src.Width / 2 - dnnWidth / 2, src.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
         Dim infoText As New FileInfo(ocvb.homeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
@@ -111,17 +111,17 @@ Public Class DNN_Basics
         If dnnPrepared Then
             Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
             Dim meanVal = CSng(sliders.trackbar(1).Value)
-            Dim inputBlob = CvDnn.BlobFromImage(ocvb.color(crop), inScaleFactor, New cv.Size(300, 300), meanVal, False)
-            ocvb.color.CopyTo(dst2)
-            ocvb.color(crop).CopyTo(dst1(crop))
+            Dim inputBlob = CvDnn.BlobFromImage(src(crop), inScaleFactor, New cv.Size(300, 300), meanVal, False)
+            src.CopyTo(dst2)
+            src(crop).CopyTo(dst1(crop))
             net.SetInput(inputBlob, "data")
 
             Dim detection = net.Forward("detection_out")
             Dim detectionMat = New cv.Mat(detection.Size(2), detection.Size(3), cv.MatType.CV_32F, detection.Data)
 
             Dim confidenceThreshold = sliders.trackbar(2).Value / 100
-            Dim rows = ocvb.color(crop).Rows
-            Dim cols = ocvb.color(crop).Cols
+            Dim rows = src(crop).Rows
+            Dim cols = src(crop).Cols
             label2 = ""
 
             Dim kPoints As New List(Of cv.Point)

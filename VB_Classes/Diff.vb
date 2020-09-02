@@ -16,7 +16,7 @@ Public Class Diff_Basics
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
             dst2 = dst2.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
-            dst1 = ocvb.color.Clone().SetTo(0, dst2)
+            dst1 = src.Clone().SetTo(0, dst2)
         End If
         lastFrame = gray.Clone()
     End Sub
@@ -51,7 +51,7 @@ Public Class Diff_UnstableDepthAndColor
         cv.Cv2.BitwiseNot(depth.dst2, unstableDepth)
         If unstableColor.Channels = 3 Then unstableColor = unstableColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.BitwiseOr(unstableColor, unstableDepth, mask)
-        dst1 = ocvb.color.Clone()
+        dst1 = src.Clone()
         dst1.SetTo(0, mask)
         label2 = "Unstable depth/color mask"
         dst2 = mask

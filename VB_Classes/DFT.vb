@@ -128,8 +128,8 @@ Public Class DFT_ButterworthFilter_MT
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
-        sliders.setupTrackBar(1, "DFT B Filter - Order", 1, ocvb.color.Rows, 2)
+        sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, src.Rows, src.Rows)
+        sliders.setupTrackBar(1, "DFT B Filter - Order", 1, src.Rows, 2)
 
         radio.Setup(ocvb, caller, 6)
         radio.check(0).Text = "DFT Flags ComplexOutput"
@@ -146,7 +146,7 @@ Public Class DFT_ButterworthFilter_MT
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        dft.src = ocvb.color
+        dft.src = src
         dft.Run(ocvb)
 
         Static radius As Int32

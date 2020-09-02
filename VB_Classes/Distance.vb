@@ -21,7 +21,7 @@ Public Class Distance_Basics
         dst2 = foreground.dst1
         Dim fg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.bgr2gray)
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim DistanceType = cv.DistanceTypes.L2
         If radio.check(0).Checked Then DistanceType = cv.DistanceTypes.C
         If radio.check(1).Checked Then DistanceType = cv.DistanceTypes.L1

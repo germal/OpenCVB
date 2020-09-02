@@ -117,10 +117,10 @@ Public Class DilateErode_OpenClose
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(an * 2 + 1, an * 2 + 1), New cv.Point(an, an))
         If n < 0 Then
             cv.Cv2.MorphologyEx(ocvb.RGBDepth, dst2, cv.MorphTypes.Open, element)
-            cv.Cv2.MorphologyEx(ocvb.color, dst1, cv.MorphTypes.Open, element)
+            cv.Cv2.MorphologyEx(src, dst1, cv.MorphTypes.Open, element)
         Else
             cv.Cv2.MorphologyEx(ocvb.RGBDepth, dst2, cv.MorphTypes.Close, element)
-            cv.Cv2.MorphologyEx(ocvb.color, dst1, cv.MorphTypes.Close, element)
+            cv.Cv2.MorphologyEx(src, dst1, cv.MorphTypes.Close, element)
         End If
     End Sub
 End Class

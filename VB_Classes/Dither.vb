@@ -116,8 +116,8 @@ Public Class Dither_Basics
         Dim pixels(dst1.Total * dst1.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1
-            Dim src = Choose(i + 1, ocvb.color, ocvb.RGBDepth)
-            Marshal.Copy(src.Data, pixels, 0, pixels.Length)
+            Dim copySrc = Choose(i + 1, src, ocvb.RGBDepth)
+            Marshal.Copy(copySrc.Data, pixels, 0, pixels.Length)
             Select Case radioIndex
                 Case 0
                     ditherBayer16(hpixels.AddrOfPinnedObject, w, h)
@@ -169,9 +169,9 @@ Public Class Dither_Basics
                     ditherSierra(hpixels.AddrOfPinnedObject, w, h)
             End Select
             If i = 0 Then
-                dst1 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC3, pixels).Clone()
+                dst1 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_8UC3, pixels).Clone()
             Else
-                dst2 = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_8UC3, pixels).Clone()
+                dst2 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_8UC3, pixels).Clone()
             End If
         Next
         hpixels.Free()

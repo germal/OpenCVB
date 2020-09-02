@@ -81,14 +81,14 @@ Public Class VBparent : Implements IDisposable
             standalone = False
             If ocvb.callTrace.Contains(callStack) = False Then ocvb.callTrace.Add(callStack)
         End If
-        fontsize = ocvb.color.Width / 1280
+        fontsize = src.Width / 1280
 
         src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 
-        topCameraPoint = New cv.Point(ocvb.color.Height, ocvb.color.Height)
-        sideCameraPoint = New cv.Point((ocvb.color.Width - ocvb.color.Height) / 2, ocvb.color.Height - (ocvb.color.Width - ocvb.color.Height) / 2)
+        topCameraPoint = New cv.Point(src.Height, src.Height)
+        sideCameraPoint = New cv.Point((src.Width - src.Height) / 2, src.Height - (src.Width - src.Height) / 2)
     End Sub
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
     Public Const QUAD1 = 1

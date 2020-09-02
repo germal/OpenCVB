@@ -121,8 +121,8 @@ Public Class Plot_OverTime
         Dim pixelHeight = CInt(sliders.trackbar(0).Value)
         Dim pixelWidth = CInt(sliders.trackbar(1).Value)
         If ocvb.frameCount = 0 Then dst1.SetTo(0)
-        If columnIndex + pixelWidth >= ocvb.color.Width Then
-            dst1.ColRange(columnIndex, ocvb.color.Width).SetTo(backColor)
+        If columnIndex + pixelWidth >= src.Width Then
+            dst1.ColRange(columnIndex, src.Width).SetTo(backColor)
             columnIndex = 0
         End If
         dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
@@ -161,7 +161,7 @@ Public Class Plot_OverTime
         Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)
         For i = 0 To plotCount - 1
             Dim y = 1 - (plotData.Item(i) - minScale) / (maxScale - minScale)
-            y *= ocvb.color.Height - 1
+            y *= src.Height - 1
             Dim c As New cv.Point(columnIndex - pixelWidth, y - pixelHeight)
             Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
             Select Case i
