@@ -66,10 +66,10 @@ Public Class OptionsSliders
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth
         Me.Height = defaultHeight
-        Me.SetDesktopLocation(ocvbX.appLocation.Left + ocvbX.slidersOffset.X, ocvbX.appLocation.Top + ocvbX.appLocation.Height + ocvbX.slidersOffset.Y)
-        ocvbX.slidersOffset.X += offsetIncr
-        ocvbX.slidersOffset.Y += offsetIncr
-        If ocvbX.slidersOffset.X > offsetMax Then ocvbX.slidersOffset.X = 0
-        If ocvbX.slidersOffset.Y > offsetMax Then ocvbX.slidersOffset.Y = 0
+        Me.SetDesktopLocation(appLocation.Left + slidersOffset.X, appLocation.Top + appLocation.Height + slidersOffset.Y)
+        slidersOffset.X += offsetIncr
+        slidersOffset.Y += offsetIncr
+        If slidersOffset.X > offsetMax Then slidersOffset.X = 0
+        If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
     End Sub
 End Class

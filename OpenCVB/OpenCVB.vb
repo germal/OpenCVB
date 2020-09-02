@@ -316,7 +316,7 @@ Public Class OpenCVB
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
-                            If resolutionSetting = OptionsDialog.lowRes Then tt.y -= 7 ' Fine-tuning the lowRes text.  Default y is too big but good at other resolutions.
+                            ' If resolutionSetting = OptionsDialog.lowRes Then tt.y -= 7 ' Fine-tuning the lowRes text.  Default y is too big but good at other resolutions.
                             If TTtextData(i).picTag = 3 Then
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio + camPic(0).Width, tt.y * ratio)

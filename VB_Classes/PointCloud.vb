@@ -764,22 +764,26 @@ Public Class PointCloud_BothViews
         Dim topActive = If(standalone, True, (activeView = QUAD0 Or activeView = QUAD2))
         Dim sideActive = If(standalone, True, (activeView = QUAD1 Or activeView = QUAD3))
 
+        Dim widthInfo As String = ""
         If vwTop.Count And topActive Then
             minIndex = setDetails(ocvb.mouseClickPoint, vwTop)
             Dim rView = vwTop.Values(minIndex).rectView
-            detailPoint = New cv.Point(rView.X, rView.Y)
+            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwTop.Values(minIndex).rectFront
-            Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
 
-            If detailPoint.X = 0 And detailPoint.Y = 0 Then detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             minDepth = maxZ * (topCameraPoint.Y - rView.Y - rView.Height) / src.Height
             maxDepth = maxZ * (topCameraPoint.Y - rView.Y) / src.Height
-            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
-                     CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
+            Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
+            If pixelPerMeter > 0 Then
+                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
+            End If
+            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
+
             roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
             vw = vwTop
             If showDetails Then
-                ocvb.trueText(New TTtext(detailText, detailPoint, If(standalone, 2, 3)))
+                ocvb.TTtextData.Clear()
+                ocvb.trueText(New TTtext(detailText, detailPoint, camPicIndex:=If(standalone, 2, 3)))
                 If standalone Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
             End If
         End If
@@ -787,14 +791,17 @@ Public Class PointCloud_BothViews
         If vwSide.Count And sideActive Then
             minIndex = setDetails(ocvb.mouseClickPoint, vwSide)
             Dim rView = vwSide.Values(minIndex).rectView
-            detailPoint = New cv.Point(rView.X, rView.Y)
+            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwSide.Values(minIndex).rectFront
-            Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
-
             minDepth = maxZ * (rView.X - sideCameraPoint.X) / src.Height
             maxDepth = maxZ * (rView.X + rView.Width - sideCameraPoint.X) / src.Height
-            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " +
-                             CStr(rView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
+
+            Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
+            If pixelPerMeter > 0 Then
+                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
+            End If
+            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m & " + widthInfo
+
             roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
             vw = vwSide
             If showDetails Then

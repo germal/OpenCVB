@@ -673,6 +673,7 @@ Public Class Kalman_PointTracker
 
         knn.queryPoints = New List(Of cv.Point2f)(queryPoints)
         knn.Run(ocvb)
+        If knn.matchedPoints Is Nothing Then Exit Sub
 
         For i = 0 To knn.matchedPoints.Count - 1
             If knn.matchedPoints(i).X < 0 Then

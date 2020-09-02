@@ -50,8 +50,6 @@ Public Class VBocvb
     Public fileStarted As Boolean
     Public initialStartSetting As Boolean
 
-
-
     Public IMU_Barometer As Single
     Public IMU_Magnetometer As cv.Point3f
     Public IMU_Temperature As Single

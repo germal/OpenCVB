@@ -11,10 +11,10 @@ Public Class OptionsCombo
     End Sub
 
     Private Sub OptionsCombo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(ocvbX.radioOffset.X, ocvbX.radioOffset.Y)
-        ocvbX.radioOffset.X += offsetIncr
-        ocvbX.radioOffset.Y += offsetIncr
-        If ocvbX.radioOffset.X > offsetMax Then ocvbX.radioOffset.X = 0
-        If ocvbX.radioOffset.Y > offsetMax Then ocvbX.radioOffset.Y = 0
+        Me.SetDesktopLocation(radioOffset.X, radioOffset.Y)
+        radioOffset.X += offsetIncr
+        radioOffset.Y += offsetIncr
+        If radioOffset.X > offsetMax Then radioOffset.X = 0
+        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
     End Sub
 End Class

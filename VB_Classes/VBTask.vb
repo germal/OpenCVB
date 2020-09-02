@@ -1,7 +1,9 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 Module Algorithm_Module
-    Public ocvbX As VBocvb
+    Public appLocation As cv.Rect
+    Public radioOffset As cv.Point
+    Public slidersOffset As cv.Point
     ' these are all global settings that are updated by individual algorithms.  
     Public Const offsetIncr = 25
     Public Const offsetMax = 150
@@ -65,7 +67,6 @@ Public Class ActiveTask : Implements IDisposable
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New VBocvb(resolution, parms, location)
         ocvb.testAllRunning = parms.testAllRunning
-        ocvbX = ocvb
         UpdateHostLocation(location)
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
         ocvb.PythonExe = parms.PythonExe
@@ -80,7 +81,9 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.description = algorithmObject.desc
     End Sub
     Public Sub UpdateHostLocation(location As cv.Rect)
-        ocvbX.appLocation = location
+        appLocation = location
+        radioOffset = New cv.Point
+        slidersOffset = New cv.Point
     End Sub
     Public Sub RunAlgorithm()
         Try
