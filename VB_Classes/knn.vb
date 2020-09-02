@@ -295,7 +295,7 @@ Public Class KNN_Cluster2D
         sliders.setupTrackBar(0, "KNN - number of cities", 10, 1000, 100)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Demo Mode (continuous update)"
-        If ocvb.parms.testAllRunning Then check.Box(0).Checked = True
+        If ocvb.testAllRunning Then check.Box(0).Checked = True
 
         desc = "Use knn to cluster cities as preparation for a solution to the traveling salesman problem."
     End Sub

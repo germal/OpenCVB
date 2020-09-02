@@ -42,9 +42,7 @@ Public Class ActiveTask : Implements IDisposable
     Public Structure algParms
         Public cameraIndex As Integer
         Public PythonExe As String
-        Public transformationMatrix() As Single
         Public useRecordedData As Boolean
-        Public testAllRunning As Boolean
         Public externalPythonInvocation As Boolean
         Public ShowConsoleLog As Boolean
         Public NumPyEnabled As Boolean
@@ -52,9 +50,10 @@ Public Class ActiveTask : Implements IDisposable
         Public intrinsicsLeft As intrinsics_VB
         Public intrinsicsRight As intrinsics_VB
         Public extrinsics As Extrinsics_VB
+        Public testAllRunning As Boolean
 
 
-        Public VBTestInterface As Object
+
         Public IMU_Barometer As Single
         Public IMU_Magnetometer As cv.Point3f
         Public IMU_Temperature As Single
@@ -82,17 +81,18 @@ Public Class ActiveTask : Implements IDisposable
         Public fileStarted As Boolean
         Public initialStartSetting As Boolean
 
-        Public Const Kinect4AzureCam As Int32 = 0 ' Must be defined in OptionDialog.vb the same way!
-        Public Const T265Camera As Int32 = 1 ' Must be defined in OptionDialog.vb the same way!
-        Public Const StereoLabsZED2 As Int32 = 2 ' Must be defined in OptionDialog.vb the same way!
-        Public Const MyntD1000 As Int32 = 3 ' Must be defined in OptionDialog.vb the same way!
-        Public Const D435i As Int32 = 4 ' Must be defined in OptionDialog.vb the same way!
-        Public Const L515 As Int32 = 5 ' Must be defined in OptionDialog.vb the same way!
-        Public Const D455 As Int32 = 6 ' Must be defined in OptionDialog.vb the same way!
+        Public Const Kinect4AzureCam As Int32 = 0
+        Public Const T265Camera As Int32 = 1
+        Public Const StereoLabsZED2 As Int32 = 2
+        Public Const MyntD1000 As Int32 = 3
+        Public Const D435i As Int32 = 4
+        Public Const L515 As Int32 = 5
+        Public Const D455 As Int32 = 6
     End Structure
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New AlgorithmData(resolution, parms, location)
+        ocvb.testAllRunning = parms.testAllRunning
         ocvbX = ocvb
         UpdateHostLocation(location)
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName

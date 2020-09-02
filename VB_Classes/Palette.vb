@@ -369,7 +369,7 @@ Public Class Palette_DepthColorMap
         holes.Run(ocvb)
         dst1.SetTo(0, holes.holeMask)
 
-        Dim r As New cv.Rect(0, 0, Math.Min(dst2.Width, 255), 1)
+        Dim r As New cv.Rect(0, 0, 255, 1)
         For i = 0 To dst2.Height - 1
             r.Y = i
             dst2(r) = gradientColorMap

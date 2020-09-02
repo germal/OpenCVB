@@ -997,7 +997,6 @@ Public Class OpenCVB
 
         parms.PythonExe = optionsForm.PythonExeName.Text
 
-        parms.transformationMatrix = camera.transformationmatrix
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
         parms.testAllRunning = TestAllButton.Text = "Stop Test"
         parms.externalPythonInvocation = externalPythonInvocation
@@ -1119,8 +1118,8 @@ Public Class OpenCVB
                 End If
                 task.ocvb.pointCloud = camera.PointCloud
                 task.ocvb.depth16 = camera.depth16
+                task.ocvb.transformationMatrix = camera.transformationMatrix
                 task.ocvb.parms.IMU_Acceleration = camera.IMU_Acceleration
-                task.ocvb.parms.transformationMatrix = camera.transformationMatrix
                 task.ocvb.parms.IMU_TimeStamp = camera.IMU_TimeStamp
                 task.ocvb.parms.IMU_Barometer = camera.IMU_Barometer
                 task.ocvb.parms.IMU_Magnetometer = camera.IMU_Magnetometer

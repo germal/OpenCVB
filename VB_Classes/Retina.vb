@@ -55,12 +55,12 @@ Public Class Retina_Basics_CPP
             ReDim srcData(src.Total * src.ElemSize - 1)
             useLogSampling = check.Box(0).Checked
             samplingFactor = sliders.trackbar(0).Value
-            If ocvb.parms.testAllRunning = False Then Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
+            If ocvb.testAllRunning = False Then Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim magnoPtr As IntPtr = 0
-        If ocvb.parms.testAllRunning = False Then
+        If ocvb.testAllRunning = False Then
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else

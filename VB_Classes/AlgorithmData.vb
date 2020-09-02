@@ -37,6 +37,10 @@ Public Class AlgorithmData
     Public radioOffset As New cv.Point(0, 5)
     Public description As String
     Public HomeDir As String
+    Public testAllRunning As Boolean
+    Public transformationMatrix() As Single
+
+
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))

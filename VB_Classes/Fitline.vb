@@ -131,7 +131,7 @@ Public Class Fitline_RawInput
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
-            If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
+            If ocvb.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
             Dim dotSize = 2
             Dim width = ocvb.color.Width

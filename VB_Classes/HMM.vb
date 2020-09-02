@@ -22,12 +22,12 @@ Public Class HMM_Example_CPP
     Dim HMM As IntPtr = 0
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        If ocvb.parms.testAllRunning = False Then HMM = HMM_Open()
+        If ocvb.testAllRunning = False Then HMM = HMM_Open()
         label1 = "Text output with explanation will appear in the Visual Studio output."
         desc = "Simple test of Hidden Markov Model - text output"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.testAllRunning Then
+        If ocvb.testAllRunning Then
             ocvb.trueText(New TTtext("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.", 10, 60))
             Exit Sub
         End If

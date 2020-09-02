@@ -30,7 +30,7 @@ Module Python_Module
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it
-        If ocvb.parms.testAllRunning Then
+        If ocvb.testAllRunning Then
             For Each p In Process.GetProcesses
                 If p.ProcessName.ToUpper.Contains("PYTHON") Then
                     Try

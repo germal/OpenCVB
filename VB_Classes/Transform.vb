@@ -115,7 +115,7 @@ Public Class Transform_Affine3D
         Static pc2 As cv.Mat
         Static affineTransform As cv.Mat
 
-        If ocvb.parms.testAllRunning Then
+        If ocvb.testAllRunning Then
             If ocvb.frameCount = 30 Then check.Box(0).Checked = True
             If ocvb.frameCount = 60 Then check.Box(1).Checked = True
         End If

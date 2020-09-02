@@ -13,8 +13,8 @@ Public Class TransformationMatrix_Basics
         desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
-        If ocvb.parms.transformationMatrix IsNot Nothing Then
-            Dim t = ocvb.parms.transformationMatrix
+        If ocvb.transformationMatrix IsNot Nothing Then
+            Dim t = ocvb.transformationMatrix
             Dim mul = sliders.trackbar(0).Value
             topLocations.Add(New cv.Point3d(-t(12) * mul + dst1.Width / 2,
                                             -t(13) * mul + dst1.Height / 2,

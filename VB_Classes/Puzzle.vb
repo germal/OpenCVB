@@ -327,7 +327,7 @@ Public Class Puzzle_Solver
         Static xyOffset As Integer
         Static yxOffset As Integer
         Static yyOffset As Integer
-        If check.Box(0).Checked Or ocvb.parms.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> ocvb.color.Width Then
+        If check.Box(0).Checked Or ocvb.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> ocvb.color.Width Then
             Dim factor = 1
             saveRadioIndex = radioIndex
             saveResolutionWidth = ocvb.color.Width

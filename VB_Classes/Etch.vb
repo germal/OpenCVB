@@ -17,7 +17,7 @@ Public Class Etch_ASketch
         check.Box(0).Text = "Etch_ASketch clean slate"
         check.Box(1).Text = "Demo mode"
         check.Box(1).Checked = True
-        If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
+        If ocvb.testAllRunning Then check.Box(1).Checked = True
 
         keys = New Keyboard_Basics(ocvb)
 
