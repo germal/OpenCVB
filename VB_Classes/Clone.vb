@@ -142,9 +142,11 @@ Public Class Clone_Eagle
         radio.check(2).Checked = True
 
         sourceImage = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/CloneSource.png")
+        sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * src.Width / 1280, sourceImage.Height * src.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
         mask = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/Clonemask.png")
+        mask = mask.Resize(New cv.Size(mask.Width * src.Width / 1280, mask.Height * src.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
         dst2.SetTo(0)
