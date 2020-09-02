@@ -19,7 +19,7 @@ Public Class KLT_Basics
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
-        ocvb.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
+        desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static prevGray As New cv.Mat
@@ -90,7 +90,7 @@ Public Class KLT_OpticalFlow
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         klt = New KLT_Basics(ocvb)
-        ocvb.desc = "KLT optical flow - needs more work"
+        desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         klt.src = src

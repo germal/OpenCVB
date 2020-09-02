@@ -26,7 +26,7 @@ End Module
 Public Class ActiveTask : Implements IDisposable
     Public ocvb As AlgorithmData
     Dim algoList As New algorithmList
-    Dim ActiveAlgorithm As Object
+    Dim algorithmObject As Object
     Public Structure Extrinsics_VB
         Public rotation As Single()
         Public translation As Single()
@@ -39,10 +39,12 @@ Public Class ActiveTask : Implements IDisposable
         Public coeffs As Single()
         Public FOV As Single()
     End Structure
+    Public Structure initParms
+        Public description As String
+    End Structure
     Public Structure algParms
-        Dim activeAlgorithm As Object
+        Dim algName As Object
         Public cameraIndex As Integer
-        Dim cameraName As String
         Dim externalPythonInvocation As Boolean
         Dim extrinsics As Extrinsics_VB
         Dim HomeDir As String
@@ -99,22 +101,23 @@ Public Class ActiveTask : Implements IDisposable
         ocvb = New AlgorithmData(parms, location)
         ocvbX = ocvb
         UpdateHostLocation(location)
-        If LCase(parms.activeAlgorithm).EndsWith(".py") Then ocvb.PythonFileName = parms.activeAlgorithm
+        If LCase(parms.algName).EndsWith(".py") Then ocvb.PythonFileName = parms.algName
         ocvb.PythonExe = parms.PythonExe
         ocvb.parms = parms
-        ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)
-        If ActiveAlgorithm Is Nothing Then
-            MsgBox("The algorithm: " + parms.activeAlgorithm + " was not found in the algorithmList.vb code." + vbCrLf +
+        algorithmObject = algoList.createAlgorithm(ocvb, parms.algName)
+        If algorithmObject Is Nothing Then
+            MsgBox("The algorithm: " + parms.algName + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Problem likely originated with the UIindexer.")
         End If
-        If ActiveAlgorithm Is Nothing And parms.activeAlgorithm.EndsWith(".py") Then
-            parms.activeAlgorithm = parms.activeAlgorithm.Substring(0, Len(parms.activeAlgorithm) - 3)
-            ActiveAlgorithm = algoList.createAlgorithm(ocvb, parms.activeAlgorithm)
+        If algorithmObject Is Nothing And parms.algName.EndsWith(".py") Then
+            parms.algName = parms.algName.Substring(0, Len(parms.algName) - 3)
+            algorithmObject = algoList.createAlgorithm(ocvb, parms.algName)
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
+        ocvb.initParms.description = algorithmObject.desc
     End Sub
     Public Sub UpdateHostLocation(location As cv.Rect)
-        ocvbX.applocation = location
+        ocvbX.appLocation = location
     End Sub
     Public Sub RunAlgorithm()
         Try
@@ -126,13 +129,13 @@ Public Class ActiveTask : Implements IDisposable
                 End If
                 recordedData.Run(ocvb)
             End If
-            ActiveAlgorithm.NextFrame(ocvb)
+            algorithmObject.NextFrame(ocvb)
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         If recordedData IsNot Nothing Then recordedData.Dispose()
-        If ActiveAlgorithm IsNot Nothing Then ActiveAlgorithm.Dispose()
+        If algorithmObject IsNot Nothing Then algorithmObject.Dispose()
     End Sub
 End Class

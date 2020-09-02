@@ -6,7 +6,7 @@ Public Class Covariance_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
-        ocvb.desc = "Calculate the covariance of random depth data points."
+        desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim covariance As New cv.Mat, mean = New cv.Mat
@@ -49,7 +49,7 @@ Public Class Covariance_Test
         setCaller(ocvb)
 
         covar = New Covariance_Basics(ocvb)
-        ocvb.desc = "Test the covariance basics algorithm."
+        desc = "Test the covariance basics algorithm."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}

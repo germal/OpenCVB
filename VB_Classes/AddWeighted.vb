@@ -7,7 +7,7 @@ Public Class AddWeighted_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Weight", 0, 100, 50)
-        ocvb.desc = "Add 2 images with specified weights."
+        desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then

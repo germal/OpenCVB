@@ -7,7 +7,7 @@ Public Class xPhoto_Bm3dDenoise
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Denoise image with block matching and filtering."
+        desc = "Denoise image with block matching and filtering."
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
@@ -31,7 +31,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Denoise the depth image with block matching and filtering."
+        desc = "Denoise the depth image with block matching and filtering."
         label2 = "Difference from Input"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -84,7 +84,7 @@ Public Class xPhoto_OilPaint_CPP
 
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
-        ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
+        desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim colorCode As Int32 = cv.ColorConversionCodes.BGR2GRAY

@@ -13,7 +13,7 @@ Public Class IMU_Basics
 
         flow = New Font_FlowText(ocvb)
 
-        ocvb.desc = "Read and display the IMU coordinates"
+        desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Present Then
@@ -67,7 +67,7 @@ Public Class IMU_Stabilizer
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(3 - 1)
-        ocvb.desc = "Stabilize the image with the IMU data."
+        desc = "Stabilize the image with the IMU data."
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
     End Sub
@@ -124,7 +124,7 @@ Public Class IMU_Magnetometer
         plot.maxScale = 10
         plot.minScale = -10
 
-        ocvb.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
+        desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Magnetometer = New cv.Point3f Then
@@ -148,7 +148,7 @@ Public Class IMU_Barometer
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Get the barometric pressure from the IMU (if available)"
+        desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Barometer = 0 Then
@@ -167,7 +167,7 @@ Public Class IMU_Temperature
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Get the temperature of the IMU (if available)"
+        desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.IMU_Present Then
@@ -199,7 +199,7 @@ Public Class IMU_FrameTime
         sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
-        ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
+        desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static IMUanchor As Integer = ocvb.parms.IMU_FrameTime
@@ -294,7 +294,7 @@ Public Class IMU_HostFrameTimes
         sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
-        ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
+        desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static CPUanchor As Integer = ocvb.parms.CPU_FrameTime
@@ -379,7 +379,7 @@ Public Class IMU_TotalDelay
 
         label1 = "Timing data - total (white) right image"
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
-        ocvb.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
+        desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         host.Run(ocvb)
@@ -444,7 +444,7 @@ Public Class IMU_GVector
             kalman = New Kalman_Basics(ocvb)
             ReDim kalman.input(6 - 1)
         End If
-        ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
+        desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gx = ocvb.parms.IMU_Acceleration.X
@@ -514,7 +514,7 @@ Public Class IMU_IsCameraLevel
         If standalone Then flow = New Font_FlowText(ocvb)
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is a 20/10 or 2 degrees from 0...
-        ocvb.desc = "Answer the question: Is the camera level?"
+        desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gx = ocvb.parms.IMU_Acceleration.X

@@ -163,7 +163,7 @@ Public Class PointCloud_Colorize
 
         label1 = "Colorize mask for top down view"
         label2 = "Colorize mask for side view"
-        ocvb.desc = "Create the colorizeMat's used for projections"
+        desc = "Create the colorizeMat's used for projections"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
     End Sub
@@ -191,7 +191,7 @@ Public Class PointCloud_Raw_CPP
         foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
-        ocvb.desc = "Project the depth data onto a top view and side view."
+        desc = "Project the depth data onto a top view and side view."
 
         cPtr = SimpleProjectionOpen()
     End Sub
@@ -249,7 +249,7 @@ Public Class PointCloud_Raw
         foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
-        ocvb.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
+        desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
 
         cPtr = SimpleProjectionOpen()
     End Sub
@@ -310,7 +310,7 @@ Public Class PointCloud_TopView
         hist = New Histogram_2D_TopView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
 
-        ocvb.desc = "Display the histogram with and without adjusting for gravity"
+        desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
@@ -341,7 +341,7 @@ Public Class PointCloud_SideView
         hist = New Histogram_2D_SideView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
 
-        ocvb.desc = "Display the histogram with and without adjusting for gravity"
+        desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)
@@ -375,7 +375,7 @@ Public Class PointCloud_Objects_TopView
             sliders.Setup(ocvb, caller, 1)
             sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
         End If
-        ocvb.desc = "Validate the formula for pixel width as a function of distance"
+        desc = "Validate the formula for pixel width as a function of distance"
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
@@ -458,7 +458,7 @@ Public Class PointCloud_Objects_SideView
             sliders.Setup(ocvb, caller, 1)
             sliders.setupTrackBar(0, "Distance from camera in mm", 1, 4000, 1500)
         End If
-        ocvb.desc = "Validate the formula for pixel height as a function of distance"
+        desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
@@ -545,7 +545,7 @@ Public Class PointCloud_Kalman_TopView
         pTrack = New Kalman_PointTracker(ocvb)
         view = New PointCloud_TopView(ocvb)
 
-        ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
+        desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
@@ -597,7 +597,7 @@ Public Class PointCloud_Kalman_SideView
         view = New PointCloud_SideView(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
 
-        ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
+        desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
@@ -649,7 +649,7 @@ Public Class PointCloud_BackProject
         mats = New Mat_4to1(ocvb)
         label1 = "Click any quadrant below to enlarge it"
         label2 = "Click any centroid to display details"
-        ocvb.desc = "Backproject the selected object"
+        desc = "Backproject the selected object"
     End Sub
 
     Public Sub Run(ocvb As AlgorithmData)
@@ -703,7 +703,7 @@ Public Class PointCloud_BothViews
         backMat = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
         backMatMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
 
-        ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
+        desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Private Function setDetails(detailPoint As cv.Point, vw As SortedList(Of Integer, viewObject)) As Integer
         Dim minIndex As Integer = 0
@@ -841,7 +841,7 @@ Public Class PointCloud_WallsFloorsCeilings
         both = New PointCloud_BothViews(ocvb)
         label1 = "Top View: wall candidates in red"
         label2 = "Side View: floors/ceiling candidates in red"
-        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
+        desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")

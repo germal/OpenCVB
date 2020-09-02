@@ -22,7 +22,7 @@ Public Class Video_Basics
 
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
         label1 = fileInfo.Name
-        ocvb.desc = "Show a video file"
+        desc = "Show a video file"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim fileInfo = New FileInfo(ocvb.parms.openFileDialogName)
@@ -65,7 +65,7 @@ Public Class Video_CarCounting
 
         flow = New Font_FlowText(ocvb)
 
-        ocvb.desc = "Count cars in a video file"
+        desc = "Count cars in a video file"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
@@ -122,7 +122,7 @@ Public Class Video_CarCComp
 
         video = New Video_Basics(ocvb)
 
-        ocvb.desc = "Outline cars with a rectangle"
+        desc = "Outline cars with a rectangle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
@@ -153,7 +153,7 @@ Public Class Video_MinRect
         video.Run(ocvb)
 
         bgSub = New BGSubtract_MOG(ocvb)
-        ocvb.desc = "Find area of car outline - example of using minAreaRect"
+        desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         video.Run(ocvb)
@@ -184,7 +184,7 @@ Public Class Video_MinCircle
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         input = New Video_MinRect(ocvb)
-        ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
+        desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         input.Run(ocvb)

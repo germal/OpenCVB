@@ -8,7 +8,7 @@ Public Class Pencil_Basics
         sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "Pencil Sigma_r", 1, 100, 7)
         sliders.setupTrackBar(2, "Pencil Shade Factor", 1, 200, 40)
-        ocvb.desc = "Convert image to a pencil sketch - Painterly Effect"
+        desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim sigma_s = sliders.trackbar(0).Value
@@ -28,7 +28,7 @@ Public Class Pencil_Manual
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
-        ocvb.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
+        desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

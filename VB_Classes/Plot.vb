@@ -15,7 +15,7 @@ Public Class Plot_Basics
 
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
-        ocvb.desc = "Plot data provided in src Mat"
+        desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.src = src
@@ -45,7 +45,7 @@ Public Class Plot_Basics_CPP
     Public srcY() As Double
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
+        desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim maxX As Double = Double.MinValue
@@ -112,7 +112,7 @@ Public Class Plot_OverTime
         sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
         sliders.setupTrackBar(2, "Plot (time) Font Size x10", 1, 20, 10)
-        ocvb.desc = "Plot an input variable over time"
+        desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -207,7 +207,7 @@ Public Class Plot_Histogram
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Font Size x10", 1, 20, 10)
-        ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
+        desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then
@@ -289,7 +289,7 @@ Public Class Plot_Depth
 
         plot = New Plot_Basics_CPP(ocvb)
 
-        ocvb.desc = "Show depth using OpenCV's plot format with variable bins."
+        desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         hist.Run(ocvb)

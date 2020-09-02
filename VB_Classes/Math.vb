@@ -7,7 +7,7 @@ Public Class Math_Subtract
         sliders.setupTrackBar(0, "Red", 0, 255, 255)
         sliders.setupTrackBar(1, "Green", 0, 255, 255)
         sliders.setupTrackBar(2, "Blue", 0, 255, 255)
-        ocvb.desc = "Invert the image colors using subtract"
+        desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
@@ -52,7 +52,7 @@ Public Class Math_Median_CDF
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
-        ocvb.desc = "Compute the src image median"
+        desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -86,7 +86,7 @@ Public Class Math_DepthMeanStdev
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         minMax = New Depth_Stable(ocvb)
-        ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
+        desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         minMax.src = src
@@ -118,7 +118,7 @@ Public Class Math_RGBCorrelation
         flow = New Font_FlowText(ocvb)
 
         corr = New MatchTemplate_Basics(ocvb)
-        ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
+        desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim split = src.Split()

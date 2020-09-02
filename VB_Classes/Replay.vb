@@ -85,7 +85,7 @@ Public Class Replay_Record
         ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"
         ocvb.parms.initialStartSetting = False
 
-        ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
+        desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static bytesTotal As Int64
@@ -173,7 +173,7 @@ Public Class Replay_Play
         ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"
         ocvb.parms.initialStartSetting = True
 
-        ocvb.desc = "Playback a file recorded by OpenCVB"
+        desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static bytesTotal As Int64
@@ -251,7 +251,7 @@ Public Class Replay_OpenGL
         setCaller(ocvb)
         ogl = New OpenGL_Callbacks(ocvb)
         replay = New Replay_Play(ocvb)
-        ocvb.desc = "Replay a recorded session with OpenGL"
+        desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         replay.Run(ocvb)

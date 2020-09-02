@@ -53,6 +53,7 @@ Public Class ocvbClass : Implements IDisposable
     Public sideCameraPoint As cv.Point
     Public Const MAXZ_DEFAULT = 4
     Public maxZ As Single = MAXZ_DEFAULT
+    Public desc As String
     Public Sub setCaller(ocvb As AlgorithmData)
         caller = Me.GetType.Name
         Dim stackTrace = Environment.StackTrace

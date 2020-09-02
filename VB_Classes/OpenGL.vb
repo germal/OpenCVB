@@ -34,7 +34,7 @@ Public Class OpenGL_Basics
     Dim openGLWidth = 1500
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Create an OpenGL window and update it with images"
+        desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As AlgorithmData)
         Dim timeConversionUnits As Double = 1000
@@ -157,7 +157,7 @@ Public Class OpenGL_Options
         setCaller(ocvb)
         OpenGL = New OpenGL_Basics(ocvb)
         setOpenGLsliders(ocvb, caller, sliders)
-        ocvb.desc = "Adjust point size and FOV in OpenGL"
+        desc = "Adjust point size and FOV in OpenGL"
         label1 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -195,7 +195,7 @@ Public Class OpenGL_Callbacks
         setCaller(ocvb)
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-        ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
+        desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ogl.src = src
@@ -223,7 +223,7 @@ Public Class OpenGL_IMU
         ogl.sliders.trackbar(2).Value = 0 ' yaw
         ogl.sliders.trackbar(3).Value = 0 ' roll
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud in this example.
-        ocvb.desc = "Show how to use IMU coordinates in OpenGL"
+        desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         imu.Run(ocvb)
@@ -274,7 +274,7 @@ Public Class OpenGL_3Ddata
         ogl.OpenGL.src = dst1.Clone() ' only need to set this once.
 
         label1 = "Input to Histogram 3D"
-        ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
+        desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim bins = sliders.trackbar(0).Value
@@ -317,7 +317,7 @@ Public Class OpenGL_Draw3D
         ogl.sliders.trackbar(10).Value = -30
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
-        ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
+        desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         circle.Run(ocvb)
@@ -344,7 +344,7 @@ Public Class OpenGL_Voxels
 
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Voxels"
-        ocvb.desc = "Show the voxel representation in OpenGL"
+        desc = "Show the voxel representation in OpenGL"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         voxels.src = src
@@ -384,7 +384,7 @@ Public Class OpenGL_GravityTransform
         radio.check(3).Text = "No rotation"
         radio.check(2).Checked = True
 
-        ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
+        desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If radio.check(0).Checked Then

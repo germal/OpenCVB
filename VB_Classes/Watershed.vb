@@ -6,7 +6,7 @@ Public Class Watershed_Basics
         setCaller(ocvb)
         label1 = "Draw with left-click to select region."
         label2 = "Mask for watershed (selected regions)."
-        ocvb.desc = "Watershed API experiment.  Draw on the image to test."
+        desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
@@ -62,7 +62,7 @@ Public Class Watershed_DepthAuto
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         watershed = New Watershed_Basics(ocvb)
-        ocvb.desc = "Watershed the depth image using shadow, close, and far points."
+        desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst1 = ocvb.RGBDepth / 64
@@ -102,7 +102,7 @@ Public Class Watershed_RGBSimpleAuto
         watershed = New Watershed_Basics(ocvb)
         watershed.markerMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        ocvb.desc = "Watershed the depth image using shadow, close, and far points."
+        desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         watershed.src = src
@@ -133,7 +133,7 @@ Public Class Watershed_RGBDepthAuto
         watershed = New Watershed_Basics(ocvb)
         watershed.markerMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        ocvb.desc = "Watershed the depth image using shadow, close, and far points."
+        desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         watershed.src = ocvb.RGBDepth

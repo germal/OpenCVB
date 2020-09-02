@@ -84,7 +84,7 @@ Public Class Delaunay_Basics
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Use Delaunay to subdivide an image into triangles."
+        desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
@@ -113,7 +113,7 @@ Public Class Delaunay_GoodFeatures
         setCaller(ocvb)
         features = New Features_GoodFeatures(ocvb)
         label2 = "Voronoi facets of delauney good features"
-        ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
+        desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         features.src = src
@@ -143,7 +143,7 @@ Public Class Delauney_Subdiv2D
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label2 = "Voronoi facets for the same subdiv2D"
-        ocvb.desc = "Generate random points and divide the image around those points."
+        desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
@@ -200,7 +200,7 @@ Public Class Delauney_Coverage
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
         label1 = "Coverage of space"
-        ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
+        desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)

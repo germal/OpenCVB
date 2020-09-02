@@ -10,7 +10,7 @@ Public Class LUT_Gray
         sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
         sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
         sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
-        ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
+        desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
@@ -42,7 +42,7 @@ Public Class LUT_Color
         paletteMap = rColors
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
-        ocvb.desc = "Build and use a custom color palette - Painterly Effect"
+        desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim reduction = sliders.trackbar(0).Value
@@ -71,7 +71,7 @@ Public Class LUT_Basics
         For i = 0 To paletteMap.Count - 1
             paletteMap(i) = i
         Next
-        ocvb.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
+        desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)

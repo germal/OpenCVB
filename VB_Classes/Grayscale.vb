@@ -7,7 +7,7 @@ Public Class Grayscale_Basics
         check.Box(0).Text = "Use OpenCV to create grayscale image"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
+        desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
         label1 = "Grayscale_Basics"
         label2 = ""
     End Sub

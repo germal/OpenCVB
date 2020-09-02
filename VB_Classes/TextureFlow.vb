@@ -8,7 +8,7 @@ Public Class TextureFlow_Basics
         sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
 
-        ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
+        desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim TFdelta = sliders.trackbar(0).Value
@@ -39,7 +39,7 @@ Public Class TextureFlow_Depth
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         texture = New TextureFlow_Basics(ocvb)
-        ocvb.desc = "Display texture flow in the depth data"
+        desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         texture.src = ocvb.RGBDepth

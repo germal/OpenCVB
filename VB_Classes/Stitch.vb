@@ -8,7 +8,7 @@ Public Class Stitch_Basics
         sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)
         sliders.setupTrackBar(1, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
         sliders.setupTrackBar(2, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
-        ocvb.desc = "Stitch together random parts of a color image."
+        desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim mats As New List(Of cv.Mat)

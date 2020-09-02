@@ -6,7 +6,7 @@ Public Class KAZE_KeypointsKAZE_CS
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Find keypoints using KAZE algorithm."
+        desc = "Find keypoints using KAZE algorithm."
         label1 = "KAZE key points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -26,7 +26,7 @@ Public Class KAZE_KeypointsAKAZE_CS
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Find keypoints using AKAZE algorithm."
+        desc = "Find keypoints using AKAZE algorithm."
         label1 = "AKAZE key points"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -49,7 +49,7 @@ Public Class KAZE_Sample_CS
         setCaller(ocvb)
         box = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(ocvb.parms.HomeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
-        ocvb.desc = "Match keypoints in 2 photos."
+        desc = "Match keypoints in 2 photos."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim result = CS_Kaze.Run(box, box_in_scene)
@@ -67,7 +67,7 @@ Public Class KAZE_Match_CS
         setCaller(ocvb)
         red = New LeftRightView_Basics(ocvb)
         red.sliders.trackbar(0).Value = 45
-        ocvb.desc = "Match keypoints in the left and right images."
+        desc = "Match keypoints in the left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         red.Run(ocvb)
@@ -92,7 +92,7 @@ Public Class KAZE_LeftAligned_CS
         sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
         sliders.setupTrackBar(1, "When matching, max possible distance", 1, 200, 100)
 
-        ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
+        desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         CS_KazeLeft.GetKeypoints(ocvb.leftView)

@@ -7,7 +7,7 @@ Public Class DilateErode_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
-        ocvb.desc = "Dilate and Erode the RGB and Depth image."
+        desc = "Dilate and Erode the RGB and Depth image."
 
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Dilate/Erode shape: Cross"
@@ -64,7 +64,7 @@ Public Class DilateErode_DepthSeed
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DepthSeed flat depth", 1, 200, 100)
         sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
-        ocvb.desc = "Erode depth to build a depth mask for inrange data."
+        desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim iterations = dilate.sliders.trackbar(1).Value
@@ -104,7 +104,7 @@ Public Class DilateErode_OpenClose
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
-        ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
+        desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim n = sliders.trackbar(0).Value

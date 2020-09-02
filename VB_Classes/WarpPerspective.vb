@@ -9,7 +9,7 @@ Public Class WarpPerspective_Basics
         sliders.setupTrackBar(0, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
         sliders.setupTrackBar(1, "Warped Height", 0, ocvb.color.Rows, ocvb.color.Rows - 50)
         sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
-        ocvb.desc = "Use WarpPerspective to transform input images."
+        desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(src.Width, src.Height)}

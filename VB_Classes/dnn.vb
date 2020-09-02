@@ -10,7 +10,7 @@ Public Class DNN_Test
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label2 = "Input Image"
-        ocvb.desc = "Download and use a Caffe database"
+        desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim modelFile As New FileInfo(ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel")
@@ -45,7 +45,7 @@ Public Class DNN_Caffe_CS
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label2 = "Input Image"
-        ocvb.desc = "Download and use a Caffe database"
+        desc = "Download and use a Caffe database"
 
         Dim protoTxt = ocvb.parms.HomeDir + "Data/bvlc_googlenet.prototxt"
         Dim modelFile = ocvb.parms.HomeDir + "Data/bvlc_googlenet.caffemodel"
@@ -104,7 +104,7 @@ Public Class DNN_Basics
         If dnnPrepared = False Then
             ocvb.trueText(New TTtext("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
         End If
-        ocvb.desc = "Use OpenCV's dnn from Caffe file."
+        desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

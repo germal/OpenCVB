@@ -21,7 +21,7 @@ Public Class Surf_Basics_CS
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
 
-        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
+        desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
@@ -58,7 +58,7 @@ Public Class Surf_Basics
 
         surf = New Surf_Basics_CS(ocvb)
 
-        ocvb.desc = "Use left and right views to match points in horizontal slices."
+        desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then fisheye.Run(ocvb)
@@ -86,7 +86,7 @@ Public Class Surf_DrawMatchManual_CS
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
 
-        ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
+        desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         surf.src = src

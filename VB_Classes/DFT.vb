@@ -29,7 +29,7 @@ Public Class DFT_Basics
         mats = New Mat_4to1(ocvb)
         mats.noLines = True
 
-        ocvb.desc = "Explore the Discrete Fourier Transform."
+        desc = "Explore the Discrete Fourier Transform."
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
@@ -87,7 +87,7 @@ Public Class DFT_Inverse
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         mats = New Mat_2to1(ocvb)
-        ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
+        desc = "Take the inverse of the Discrete Fourier Transform."
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -141,7 +141,7 @@ Public Class DFT_ButterworthFilter_MT
         radio.check(0).Checked = True
 
         dft = New DFT_Basics(ocvb)
-        ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
+        desc = "Use the Butterworth filter on a DFT image - color image input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
@@ -205,7 +205,7 @@ Public Class DFT_ButterworthDepth
         setCaller(ocvb)
         bfilter = New DFT_ButterworthFilter_MT(ocvb)
 
-        ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
+        desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub

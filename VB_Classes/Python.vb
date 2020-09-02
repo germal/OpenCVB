@@ -78,7 +78,7 @@ Public Class Python_Run
         Else
             StartPython(ocvb, "")
         End If
-        ocvb.desc = "Run Python app: " + pythonApp.Name
+        desc = "Run Python app: " + pythonApp.Name
         label1 = ""
         label2 = ""
     End Sub
@@ -126,7 +126,7 @@ Public Class Python_MemMap
             End If
             Dim pythonApp = New FileInfo(ocvb.PythonFileName)
             label1 = "No output for Python_MemMap - see Python console"
-            ocvb.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
+            desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -169,7 +169,7 @@ Public Class Python_SurfaceBlit
             PythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
         End If
         If PythonReady Then pipe.WaitForConnection()
-        ocvb.desc = "Stream data to Python_SurfaceBlit Python script."
+        desc = "Stream data to Python_SurfaceBlit Python script."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If PythonReady Then

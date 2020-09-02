@@ -10,7 +10,6 @@ Public Class AlgorithmData
     Public leftView As cv.Mat
     Public rightView As cv.Mat
 
-    Public desc As String
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public frameCount As Int32 = 0
@@ -36,6 +35,7 @@ Public Class AlgorithmData
     Public appLocation As cv.Rect
     Public slidersOffset As New cv.Point(0, 5)
     Public radioOffset As New cv.Point(0, 5)
+    Public initParms As ActiveTask.initParms
     Public Sub New(parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(parms.resolution.Height, parms.resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))

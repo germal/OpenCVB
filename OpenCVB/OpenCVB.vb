@@ -992,13 +992,12 @@ Public Class OpenCVB
         ReDim parms.IMU_RotationMatrix(9 - 1)
 
         saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
-        parms.activeAlgorithm = AvailableAlgorithms.Text
+        parms.algName = AvailableAlgorithms.Text
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
-        If parms.activeAlgorithm.Contains("OpenGL") Or parms.activeAlgorithm.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
+        If parms.algName.Contains("OpenGL") Or parms.algName.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
 
         parms.resolution = resolutionXY
         parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
-        parms.cameraName = camera.deviceName
 
         parms.PythonExe = optionsForm.PythonExeName.Text
         parms.HomeDir = HomeDir.FullName
@@ -1047,7 +1046,7 @@ Public Class OpenCVB
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
             Dim task = New VB_Classes.ActiveTask(parms, myLocation)
-            textDesc = task.ocvb.desc
+            textDesc = task.ocvb.initParms.description
             openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
             openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
             openFileinitialStartSetting = task.ocvb.parms.initialStartSetting
@@ -1058,10 +1057,10 @@ Public Class OpenCVB
             openFileDialogName = task.ocvb.parms.openFileDialogName
             openfileDialogTitle = task.ocvb.parms.openFileDialogTitle
 
-            Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.activeAlgorithm + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.activeAlgorithm + vbCrLf + vbCrLf)
+            Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + parms.algName + vbCrLf + vbCrLf)
 
-            If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(parms.activeAlgorithm + "," + CStr(totalBytesOfMemoryUsed))
+            If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(parms.algName + "," + CStr(totalBytesOfMemoryUsed))
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
             If task.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then
@@ -1099,14 +1098,14 @@ Public Class OpenCVB
             task.Dispose()
             frameCount = 0
             If parms.testAllRunning Then
-                Console.WriteLine(vbTab + "Ending " + parms.activeAlgorithm)
+                Console.WriteLine(vbTab + "Ending " + parms.algName)
             End If
         End SyncLock
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask)
         While 1
             While 1
-                If task.ocvb.parms.activeAlgorithm <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
+                If task.ocvb.parms.algName <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While

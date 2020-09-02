@@ -14,7 +14,7 @@ Public Class LineDetector_Basics
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
-        ocvb.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim vectors = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -226,7 +226,7 @@ Public Class lineDetector_FLD_CPP
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
-        ocvb.desc = "Basics for a Fast Line Detector"
+        desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         sortedLines.Clear()
@@ -270,7 +270,7 @@ Public Class LineDetector_3D_LongestLine
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
-        ocvb.desc = "Identify planes using the lines present in the rgb image."
+        desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -304,7 +304,7 @@ Public Class LineDetector_3D_FLD_MT
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
-        ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
+        desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -346,7 +346,7 @@ Public Class LineDetector_3D_FitLineZ
         check.Box(1).Text = "Display only the longest line"
         check.Box(1).Checked = True
 
-        ocvb.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
+        desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -453,7 +453,7 @@ Public Class lineDetector_FLD
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
-        ocvb.desc = "A Fast Line Detector"
+        desc = "A Fast Line Detector"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         lines.Clear()

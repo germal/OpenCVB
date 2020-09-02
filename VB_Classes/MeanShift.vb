@@ -9,7 +9,7 @@ Public Class MeanShift_Basics
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
         label1 = "Draw anywhere to start mean shift tracking."
-        ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
+        desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If standalone Then usingDrawRect = True
@@ -54,7 +54,7 @@ Public Class MeanShift_Depth
         ms = New MeanShift_Basics(ocvb)
         blob = New Depth_Foreground(ocvb)
         label1 = "Draw anywhere to start mean shift tracking."
-        ocvb.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
+        desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If ocvb.drawRect.Width > 0 Then
@@ -94,7 +94,7 @@ Public Class MeanShift_PyrFilter
         sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
-        ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
+        desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim spatialRadius = sliders.trackbar(0).Value
@@ -128,7 +128,7 @@ Public Class Meanshift_TopObjects
             cams(i) = New MeanShift_Basics(ocvb)
             cams(i).rectangleEdgeWidth = 8
         Next
-        ocvb.desc = "Track - tracking algorithm"
+        desc = "Track - tracking algorithm"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         blob.src = src

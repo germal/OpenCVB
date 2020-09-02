@@ -15,7 +15,7 @@ Public Class CComp_Basics
         sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 10)
         sliders.setupTrackBar(1, "CComp Min Area", 0, src.Width * src.Height, 500)
 
-        ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
+        desc = "Draw bounding boxes around RGB binarized connected Components"
         label1 = "CComp binary"
         label2 = "Blob Rectangles and centroids"
     End Sub
@@ -84,7 +84,7 @@ Public Class CComp_EdgeMask
 
         ccomp = New CComp_ColorDepth(ocvb)
 
-        ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
+        desc = "Isolate Color connected components after applying the Edge Mask"
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
@@ -110,7 +110,7 @@ Public Class CComp_ColorDepth
 
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
-        ocvb.desc = "Color connected components based on their depth"
+        desc = "Color connected components based on their depth"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -137,7 +137,7 @@ Public Class CComp_Image
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Connect components throughout the image"
+        desc = "Connect components throughout the image"
         label1 = "Connected Components colored with Mean Depth"
         label2 = "Mask binary+otsu to help compute mean depth"
     End Sub
@@ -188,7 +188,7 @@ Public Class CComp_InRange_MT
         sliders.setupTrackBar(1, "InRange Max Depth", 150, 10000, 3000)
         sliders.setupTrackBar(2, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
-        ocvb.desc = "Connected components in specific ranges"
+        desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
@@ -241,7 +241,7 @@ Public Class CComp_InRange
         sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
-        ocvb.desc = "Connect components in specific ranges"
+        desc = "Connect components in specific ranges"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -286,7 +286,7 @@ Public Class CComp_Shapes
         shapes = New cv.Mat(ocvb.parms.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
-        ocvb.desc = "Use connected components to isolate objects in image."
+        desc = "Use connected components to isolate objects in image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -334,7 +334,7 @@ Public Class CComp_OverlappingRectangles
 
         label1 = "Input Image with all ccomp rectangles"
         label2 = "Unique rectangles (largest to smallest) colored by size"
-        ocvb.desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
+        desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ccomp.src = src

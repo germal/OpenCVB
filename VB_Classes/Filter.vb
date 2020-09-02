@@ -4,7 +4,7 @@ Public Class Filter_Laplacian
     Inherits ocvbClass
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Use a filter to approximate the Laplacian derivative."
+        desc = "Use a filter to approximate the Laplacian derivative."
         label1 = "Sharpened image using Filter2D output"
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
@@ -33,7 +33,7 @@ Public Class Filter_NormalizedKernel
         radio.check(3).Text = "MinMax"
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
-        ocvb.desc = "Create a normalized kernel and use it."
+        desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
@@ -66,7 +66,7 @@ Public Class Filter_Normalized2D
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Filter_Normalized2D kernel size", 1, 21, 3)
-        ocvb.desc = "Create and apply a normalized kernel."
+        desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = If(standalone, (ocvb.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
@@ -93,7 +93,7 @@ Public Class Filter_SepFilter2D
         sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
         sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)
         label1 = "Gaussian Blur result"
-        ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
+        desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim xDim = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

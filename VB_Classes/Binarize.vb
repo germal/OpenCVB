@@ -16,7 +16,7 @@ Public Class Binarize_Basics
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
 
-        ocvb.desc = "Binarize an image using Threshold with OTSU."
+        desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -58,7 +58,7 @@ Public Class Binarize_OTSU
 
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         label2 = "Histograms correspond to images on the left"
-        ocvb.desc = "Binarize an image using Threshold with OTSU."
+        desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         dst2.SetTo(0)
@@ -100,7 +100,7 @@ Public Class Binarize_Niblack_Sauvola
         sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
         sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
 
-        ocvb.desc = "Binarize an image using Niblack and Sauvola"
+        desc = "Binarize an image using Niblack and Sauvola"
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
@@ -129,7 +129,7 @@ Public Class Binarize_Niblack_Nick
         sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
         sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
 
-        ocvb.desc = "Binarize an image using Niblack and Nick"
+        desc = "Binarize an image using Niblack and Nick"
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
@@ -161,7 +161,7 @@ Public Class Binarize_Bernson
         label1 = "Binarize Bernson (Draw Enabled)"
 
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
-        ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+        desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim kernelSize = sliders.trackbar(0).Value
@@ -197,7 +197,7 @@ Public Class Binarize_Bernson_MT
         sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
         sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
 
-        ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+        desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)

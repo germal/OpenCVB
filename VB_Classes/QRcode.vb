@@ -15,7 +15,7 @@ Public Class QRcode_Basics
             qrInput1 = qrInput1.Resize(New cv.Size(120, 160))
             qrInput2 = qrInput2.Resize(New cv.Size(120, 160))
         End If
-        ocvb.desc = "Read a QR code"
+        desc = "Read a QR code"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))

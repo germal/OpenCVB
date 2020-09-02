@@ -11,7 +11,7 @@ Imports cv = OpenCvSharp
 '    Inherits ocvbClass
 '    Public Sub New(ocvb As AlgorithmData)
 '        setCaller(ocvb)
-'        ocvb.desc = "Test a sample EMGU usage."
+'        desc = "Test a sample EMGU usage."
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        Dim data(ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize) As Byte
@@ -33,7 +33,7 @@ Imports cv = OpenCvSharp
 '    Inherits ocvbClass
 '    Public Sub New(ocvb As AlgorithmData)
 '        setCaller(ocvb)
-'        ocvb.desc = "Use the simplest possible face detector in Emgu examples."
+'        desc = "Use the simplest possible face detector in Emgu examples."
 '    End Sub
 '    Public Sub Run(ocvb As AlgorithmData)
 '        If ocvb.parms.testAllRunning Then

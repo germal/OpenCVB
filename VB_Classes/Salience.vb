@@ -28,7 +28,7 @@ Public Class Salience_Basics_CPP
         sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
 
         salience = Salience_Open()
-        ocvb.desc = "Show results of Salience algorithm when using C++"
+        desc = "Show results of Salience algorithm when using C++"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -55,7 +55,7 @@ Public Class Salience_Basics_MT
         salience = New Salience_Basics_CPP(ocvb)
         salience.sliders.trackbar(1).Value = 2
 
-        ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
+        desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

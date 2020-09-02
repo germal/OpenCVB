@@ -48,7 +48,7 @@ Public Class Sound_ToPCM
         ocvb.parms.openFileDialogTitle = "Select an audio file to analyze"
         ocvb.parms.initialStartSetting = True
 
-        ocvb.desc = "Load an audio file, play it, and convert to PCM"
+        desc = "Load an audio file, play it, and convert to PCM"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         If inputFileName <> ocvb.parms.openFileDialogName Then
@@ -136,7 +136,7 @@ Public Class Sound_SignalGenerator
         player = New WaveOut
         player.Init(wGen)
 
-        ocvb.desc = "Generate sound with a sine waveform."
+        desc = "Generate sound with a sine waveform."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static radioIndex As Integer
@@ -207,7 +207,7 @@ Public Class Sound_Display
         check.Box(0).Checked = True
 
         label2 = "Black shows approximately what is currently playing"
-        ocvb.desc = "Display a sound buffer in several styles"
+        desc = "Display a sound buffer in several styles"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Static useGenerated As Boolean

@@ -4,7 +4,7 @@ Public Class Remap_Basics
     Public direction = 3 ' default to remap horizontally and vertically
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Use remap to reflect an image in 4 directions."
+        desc = "Use remap to reflect an image in 4 directions."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
@@ -47,7 +47,7 @@ Public Class Remap_Flip
     Public direction = 0
     Public Sub New(ocvb As AlgorithmData)
         setCaller(ocvb)
-        ocvb.desc = "Use flip to remap an image."
+        desc = "Use flip to remap an image."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",

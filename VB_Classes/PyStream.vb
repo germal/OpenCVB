@@ -29,7 +29,7 @@ Public Class PyStream_Basics
             pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
         End If
         If pythonReady Then pipeImages.WaitForConnection()
-        ocvb.desc = "General purpose class to pipe RGB and Depth to Python scripts."
+        desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         Dim depth32f = getDepth32f(ocvb)
