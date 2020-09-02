@@ -43,7 +43,7 @@ Public Class OptionsDialog
             If cameraDeviceCount(i) > 0 Then cameraRadioButton(i).Enabled = True
         Next
     End Sub
-    Public Sub ChangeResolution()
+    Public Sub saveResolution()
         Select Case OpenCVB.resolutionSetting
             Case 0
                 LowResolution.Checked = True
@@ -89,7 +89,7 @@ Public Class OptionsDialog
         Next
 
         OpenCVB.resolutionSetting = GetSetting("OpenCVB", "resolutionXY", "resolutionXY", medRes)
-        ChangeResolution()
+        saveResolution()
 
         cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.D435i)
         cameraRadioButton(cameraIndex).Checked = True

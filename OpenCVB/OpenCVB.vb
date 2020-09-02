@@ -777,6 +777,7 @@ Public Class OpenCVB
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         If TestAllButton.Text = "Test All" Then
+            AlgorithmTestCount = 0
             TestAllButton.Text = "Stop Test"
             TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/StopTest.png")
             If logActive Then logAlgorithms = New StreamWriter("C:\Temp\logAlgorithms.csv")
@@ -829,6 +830,7 @@ Public Class OpenCVB
                   "/" + Format(fps, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set)"
     End Sub
     Private Sub saveLayout()
+        optionsForm.saveResolution()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
         SaveSetting("OpenCVB", "OpenCVBTop", "OpenCVBTop", Me.Top)
         SaveSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
@@ -901,11 +903,15 @@ Public Class OpenCVB
     End Sub
 
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        ' if mediumResolution is active and all the algorithms are covered, then switch to high res or vice versa...
+        ' run at all the different resolutions...
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            If optionsForm.LowResolution.Checked Then optionsForm.mediumResolution.Checked = True
-            If optionsForm.mediumResolution.Checked Then optionsForm.HighResolution.Checked = True
-            If optionsForm.HighResolution.Checked Then optionsForm.LowResolution.Checked = True
+            If optionsForm.LowResolution.Checked Then
+                optionsForm.mediumResolution.Checked = True
+            ElseIf optionsForm.mediumResolution.Checked Then
+                optionsForm.HighResolution.Checked = True
+            ElseIf optionsForm.HighResolution.Checked Then
+                optionsForm.LowResolution.Checked = True
+            End If
             saveLayout()
         End If
 
@@ -954,7 +960,7 @@ Public Class OpenCVB
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
-            optionsForm.ChangeResolution()
+            optionsForm.saveResolution()
             optionsForm.TestEnableNumPy()
             If saveCurrentCamera <> optionsForm.cameraIndex Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
