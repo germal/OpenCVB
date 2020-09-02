@@ -1,17 +1,17 @@
 Imports cv = OpenCvSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Public Class ORB_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public keypoints() As cv.KeyPoint
     Dim orb As cv.ORB
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
 
         desc = "Find keypoints using ORB"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(sliders.trackbar(0).Value)
         keypoints = orb.Detect(src)

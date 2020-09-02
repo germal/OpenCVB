@@ -1,16 +1,16 @@
 Imports cv = OpenCvSharp
 Public Class BRISK_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public Brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
         desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         src.CopyTo(dst1)
         Dim keyPoints = Brisk.Detect(src)
 

@@ -2,7 +2,7 @@ Imports System.Numerics
 Imports cv = OpenCvSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot
-    Inherits ocvbClass
+    Inherits VBparent
     Public startX As Single = -2
     Public endX As Single = 2
     Public startY As Single = -1.5
@@ -10,7 +10,7 @@ Public Class Fractal_Mandelbrot
     Public saveIterations As Integer
     Public incrX As Single
     Public incrY As Single
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
@@ -32,7 +32,7 @@ Public Class Fractal_Mandelbrot
             dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
         Next
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim iterations = sliders.trackbar(0).Value
         If saveIterations <> iterations Then
             saveIterations = iterations
@@ -49,14 +49,14 @@ End Class
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mandel As Fractal_Mandelbrot
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mandel = New Fractal_Mandelbrot(ocvb)
         desc = "Run a multi-threaded version of the Mandalbrot algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim iterations = mandel.sliders.trackbar(0).Value
         Parallel.For(0, src.Height,
         Sub(y)
@@ -73,16 +73,16 @@ End Class
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_MandelbrotZoom
-    Inherits ocvbClass
+    Inherits VBparent
     Public mandel As Fractal_Mandelbrot
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mandel = New Fractal_Mandelbrot(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reset to original Mandelbrot"
         desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim iterations = mandel.sliders.trackbar(0).Value
 
         If check.Box(0).Checked Then
@@ -122,17 +122,17 @@ End Class
 
 
 Public Class Fractal_MandelbrotZoomColor
-    Inherits ocvbClass
+    Inherits VBparent
     Public mandel As Fractal_MandelbrotZoom
     Public palette As Palette_ColorMap
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mandel = New Fractal_MandelbrotZoom(ocvb)
         palette = New Palette_ColorMap(ocvb)
         palette.radio.check(5).Checked = True
         desc = "Classic Mandelbrot in color"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         mandel.Run(ocvb)
         palette.src = mandel.dst1
         palette.Run(ocvb)
@@ -151,11 +151,11 @@ End Class
 ' http://www.malinc.se/m/JuliaSets.php
 ' https://www.geeksforgeeks.org/julia-fractal-set-in-c-c-using-graphics/
 Public Class Fractal_Julia
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mandel As Fractal_MandelbrotZoomColor
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mandel = New Fractal_MandelbrotZoomColor(ocvb)
         label2 = "Mouse selects different Julia Sets - zoom for detail"
@@ -171,7 +171,7 @@ Public Class Fractal_Julia
         If depth < max / 4 Then Return 0
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static savedMouse = New cv.Point(-1, -1)
         If savedMouse <> ocvb.mousePoint Or mandel.mandel.check.Box(0).Checked Then
             savedMouse = ocvb.mousePoint

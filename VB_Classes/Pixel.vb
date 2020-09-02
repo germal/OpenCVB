@@ -3,9 +3,9 @@ Imports System.Collections.Generic
 Imports System.Runtime.InteropServices
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
 Public Class Pixel_GetSet
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
 
@@ -13,7 +13,7 @@ Public Class Pixel_GetSet
         label2 = "Click any quadrant at left to view it below"
         desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""

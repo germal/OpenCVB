@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
 Public Class Solve_ByMat
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)
@@ -26,12 +26,12 @@ End Class
 
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
 Public Class Solve_ByArray
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)

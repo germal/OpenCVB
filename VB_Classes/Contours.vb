@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 
 Public Class Contours_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public rotatedRect As Draw_rotatedRectangles
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 5)
         radio.Text = "Retrieval Mode Options"
@@ -27,7 +27,7 @@ Public Class Contours_Basics
         desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim retrievalMode As cv.RetrievalModes
         Dim ApproximationMode As cv.ContourApproximationModes
         For i = 0 To radio.check.Count - 1
@@ -87,9 +87,9 @@ End Class
 
 
 Public Class Contours_FindandDraw
-    Inherits ocvbClass
+    Inherits VBparent
     Dim rotatedRect As Draw_rotatedRectangles
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.trackbar(0).Value = 5
@@ -97,7 +97,7 @@ Public Class Contours_FindandDraw
         label2 = "FindandDraw output"
         desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         rotatedRect.src = src
         rotatedRect.Run(ocvb)
@@ -119,16 +119,16 @@ End Class
 
 
 Public Class Contours_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Public trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         trim = New Depth_InRange(ocvb)
         desc = "Find and draw the contour of the depth foreground."
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         dst1 = trim.dst1
@@ -150,15 +150,15 @@ End Class
 
 
 Public Class Contours_RGB
-    Inherits ocvbClass
+    Inherits VBparent
     Dim trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         trim = New Depth_InRange(ocvb)
         desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -197,8 +197,8 @@ End Class
 
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
 Public Class Contours_RemoveLines
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller, 3)
         sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
@@ -208,7 +208,7 @@ Public Class Contours_RemoveLines
         label2 = "Original with horizontal/vertical lines removed"
         desc = "Remove the lines from an invoice image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim tmp = cv.Cv2.ImRead(ocvb.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)

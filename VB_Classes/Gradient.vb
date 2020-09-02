@@ -3,15 +3,15 @@ Imports Numpy
 Imports py = Python.Runtime
 Imports System.Runtime.InteropServices
 Public Class Gradient_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sobel = New Edges_Sobel(ocvb)
         desc = "Use phase to compute gradient"
         label2 = "Phase Output"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         sobel.src = src
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
@@ -30,15 +30,15 @@ End Class
 
 
 Public Class Gradient_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sobel = New Edges_Sobel(ocvb)
         desc = "Use phase to compute gradient on depth image"
         label2 = "Phase Output"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.drawRect.Width > 0 Then sobel.src = ocvb.RGBDepth(ocvb.drawRect) Else sobel.src = ocvb.RGBDepth.Clone()
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
@@ -59,16 +59,16 @@ End Class
 
 
 Public Class Gradient_Flatland
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grade As Gradient_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grade = New Gradient_Basics(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
         desc = "Reduced grayscale shows isobars in depth."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
         dst1 = ocvb.RGBDepth.Clone()
         dst1 /= reductionFactor
@@ -87,11 +87,11 @@ End Class
 
 ' https://github.com/anopara/genetic-drawing
 Public Class Gradient_CartToPolar
-    Inherits ocvbClass
+    Inherits VBparent
     Public basics As Gradient_Basics
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         basics = New Gradient_Basics(ocvb)
         basics.sobel.sliders.trackbar(0).Value = 1
@@ -102,7 +102,7 @@ Public Class Gradient_CartToPolar
         label2 = "CartToPolar Angle Output"
         desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run(ocvb)
 
@@ -125,11 +125,11 @@ End Class
 
 ' https://github.com/SciSharp/Numpy.NET
 Public Class Gradient_NumPy
-    Inherits ocvbClass
+    Inherits VBparent
     Public gradient As Gradient_Basics
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         gradient = New Gradient_Basics(ocvb)
         gradient.sobel.sliders.trackbar(0).Value = 1
@@ -141,7 +141,7 @@ Public Class Gradient_NumPy
         label2 = "CartToPolar Angle Output"
         desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
         gradient.Run(ocvb)
 

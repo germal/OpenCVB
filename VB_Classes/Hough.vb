@@ -39,9 +39,9 @@ End Module
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 Public Class Hough_Circles
-    Inherits ocvbClass
+    Inherits VBparent
     Dim circles As Draw_Circles
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         circles = New Draw_Circles(ocvb)
         circles.sliders.trackbar(0).Value = 3
@@ -49,7 +49,7 @@ Public Class Hough_Circles
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         circles.src = src
         circles.Run(ocvb)
         dst1 = circles.dst1
@@ -70,10 +70,10 @@ End Class
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Lines
-    Inherits ocvbClass
+    Inherits VBparent
     Dim edges As Edges_Canny
     Public segments() As cv.LineSegmentPolar
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         edges = New Edges_Canny(ocvb)
 
@@ -85,7 +85,7 @@ Public Class Hough_Lines
         desc = "Use Houghlines to find lines in the image."
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         edges.src = src.Clone()
         edges.Run(ocvb)
 
@@ -116,10 +116,10 @@ End Class
 
 
 Public Class Hough_Lines_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim edges As Edges_Canny
     Public grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "rho", 1, 100, 1)
@@ -139,7 +139,7 @@ Public Class Hough_Lines_MT
         label2 = "Hough_Lines_MT"
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
         edges.src = src

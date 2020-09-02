@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Laplacian_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
@@ -10,7 +10,7 @@ Public Class Laplacian_Basics
         sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
         desc = "Laplacian filter - the second derivative."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim scale = sliders.trackbar(1).Value / 100
@@ -30,8 +30,8 @@ End Class
 
 ' https://docs.opencv.org/3.2.0/de/db2/laplace_8cpp-example.html
 Public Class Laplacian_Blur
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
@@ -45,7 +45,7 @@ Public Class Laplacian_Blur
         radio.check(0).Checked = True
         desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim scale = sliders.trackbar(1).Value / 100
@@ -76,8 +76,8 @@ End Class
 
 ' http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299
 Public Class Laplacian_PyramidFilter
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller, 6)
         sliders.setupTrackBar(0, "Sharpest", 0, 10, 1)
@@ -88,7 +88,7 @@ Public Class Laplacian_PyramidFilter
         sliders.setupTrackBar(5, "Saturate", 0, 10, 1)
         desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim levelMat(sliders.trackbar.Length - 1) As cv.Mat
         Dim img As New cv.Mat
         src.ConvertTo(img, cv.MatType.CV_32F)

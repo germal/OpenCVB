@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Grayscale_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use OpenCV to create grayscale image"
@@ -11,7 +11,7 @@ Public Class Grayscale_Basics
         label1 = "Grayscale_Basics"
         label2 = ""
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If check.Box(0).Checked Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else

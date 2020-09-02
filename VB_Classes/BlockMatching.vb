@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Public Class BlockMatching_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
@@ -15,7 +15,7 @@ Public Class BlockMatching_Basics
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.Kinect4AzureCam Then
             ocvb.trueText(New TTtext("For the Kinect 4 Azure camera, the left and right views are the same.", 10, 50))
         End If

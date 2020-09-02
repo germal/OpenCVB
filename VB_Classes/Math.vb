@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Math_Subtract
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Red", 0, 255, 255)
@@ -9,7 +9,7 @@ Public Class Math_Subtract
         sliders.setupTrackBar(2, "Blue", 0, 255, 255)
         desc = "Invert the image colors using subtract"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         tmp.SetTo(New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value))
         cv.Cv2.Subtract(tmp, src, dst1)
@@ -43,18 +43,18 @@ End Module
 
 
 Public Class Math_Median_CDF
-    Inherits ocvbClass
+    Inherits VBparent
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
     Public bins As Int32 = 10
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
         desc = "Compute the src image median"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then bins = sliders.trackbar(0).Value
 
@@ -81,14 +81,14 @@ End Class
 
 
 Public Class Math_DepthMeanStdev
-    Inherits ocvbClass
+    Inherits VBparent
     Dim minMax As Depth_Stable
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         minMax = New Depth_Stable(ocvb)
         desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         minMax.src = src
         minMax.Run(ocvb)
         Dim mean As Single = 0, stdev As Single = 0
@@ -110,17 +110,17 @@ End Class
 
 
 Public Class Math_RGBCorrelation
-    Inherits ocvbClass
+    Inherits VBparent
     Dim flow As Font_FlowText
     Dim corr As MatchTemplate_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         flow = New Font_FlowText(ocvb)
 
         corr = New MatchTemplate_Basics(ocvb)
         desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim split = src.Split()
         corr.sample1 = split(0)
         corr.sample2 = split(1)

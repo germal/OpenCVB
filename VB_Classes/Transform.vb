@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Transform_Resize
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
         desc = "Resize an image based on the slider value."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim resizeFactor = sliders.trackbar(0).Value / 100
         Dim w = CInt(resizeFactor * src.Width)
         Dim h = CInt(resizeFactor * src.Height)
@@ -28,8 +28,8 @@ End Class
 
 
 Public Class Transform_Rotate
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle", 0, 360, 30)
@@ -38,7 +38,7 @@ Public Class Transform_Rotate
         sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
         desc = "Rotate and scale and image based on the slider values."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
@@ -50,8 +50,8 @@ End Class
 
 
 Public Class Transform_Sort
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Ascending"
@@ -61,7 +61,7 @@ Public Class Transform_Sort
         radio.check(3).Text = "EveryRow"
         desc = "Sort the pixels of a grayscale image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -77,8 +77,8 @@ End Class
 
 
 Public Class Transform_SortReshape
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Ascending"
@@ -86,7 +86,7 @@ Public Class Transform_SortReshape
         radio.check(1).Text = "Descending"
         desc = "Sort the pixels of a grayscale image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -101,15 +101,15 @@ End Class
 
 
 Public Class Transform_Affine3D
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Check to snap the first point cloud"
         check.Box(1).Text = "Check to snap the second point cloud"
         desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ocvb.trueText(New TTtext("Use the check boxes to snapshot the different point clouds", 10, 50))
         Static pc1 As cv.Mat
         Static pc2 As cv.Mat

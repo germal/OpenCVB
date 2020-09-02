@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/37492663/how-to-use-magnitude-and-absdiff-opencv-functions-to-compute-distances
 Public Class Vector_Magnitude
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Compute Euclidian and Manhattan Distance on a single vector."
         label1 = "Vector Magnitude"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim cVector() As Single = {1, 4, 4, 8}
         ocvb.trueText(New TTtext("Original vector = " + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ", " + CStr(cVector(2)) + ", " + CStr(cVector(3)), 10, 30))
         Dim coordinates As New cv.Mat(1, 4, cv.MatType.CV_32F, cVector)

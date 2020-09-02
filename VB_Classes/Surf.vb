@@ -4,12 +4,12 @@ Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_Basics_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Public CS_SurfBasics As New CS_SurfBasics
     Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
@@ -23,7 +23,7 @@ Public Class Surf_Basics_CS
 
         desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
             fisheye.Run(ocvb)
             srcLeft = fisheye.leftView
@@ -49,10 +49,10 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
@@ -60,7 +60,7 @@ Public Class Surf_Basics
 
         desc = "Use left and right views to match points in horizontal slices."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then fisheye.Run(ocvb)
 
         surf.src = src
@@ -76,9 +76,9 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_DrawMatchManual_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim surf As Surf_Basics_CS
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         surf = New Surf_Basics_CS(ocvb)
         surf.CS_SurfBasics.drawPoints = False
@@ -88,7 +88,7 @@ Public Class Surf_DrawMatchManual_CS
 
         desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         surf.src = src
         surf.Run(ocvb)
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

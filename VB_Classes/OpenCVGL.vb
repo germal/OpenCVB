@@ -21,11 +21,11 @@ End Module
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class OpenCVGL_Image_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim imu As IMU_Basics
     Dim rgbData(0) As Byte
     Dim pointCloudData(0) As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         imu = New IMU_Basics(ocvb)
 
@@ -41,7 +41,7 @@ Public Class OpenCVGL_Image_CPP
         End If
         desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.testAllRunning Then
             ' It runs fine but after several cycles, it will fail with an external exception.
             ' Only happens on 'Test All' runs.  Runs fine otherwise.

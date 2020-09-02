@@ -25,7 +25,7 @@ Module recordPlaybackCommon
         Public cloudHeight As Int32
         Public cloudElemsize As Int32
     End Structure
-    Public Sub writeHeader(ocvb As AlgorithmData, binWrite As BinaryWriter)
+    Public Sub writeHeader(ocvb As VBocvb, binWrite As BinaryWriter)
         binWrite.Write(ocvb.color.Width)
         binWrite.Write(ocvb.color.Height)
         binWrite.Write(ocvb.color.ElemSize)
@@ -65,7 +65,7 @@ End Module
 
 
 Public Class Replay_Record
-    Inherits ocvbClass
+    Inherits VBparent
     Dim binWrite As BinaryWriter
     Dim recordingActive As Boolean
     Dim colorBytes() As Byte
@@ -74,7 +74,7 @@ Public Class Replay_Record
     Dim cloudBytes() As Byte
     Dim maxBytes As Single = 20000000000
     Dim recordingFilename As FileInfo
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         ocvb.parms.openFileDialogRequested = True
@@ -87,7 +87,7 @@ Public Class Replay_Record
 
         desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
         If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
@@ -153,7 +153,7 @@ End Class
 
 
 Public Class Replay_Play
-    Inherits ocvbClass
+    Inherits VBparent
     Dim binRead As BinaryReader
     Dim playbackActive As Boolean
     Dim colorBytes() As Byte
@@ -163,7 +163,7 @@ Public Class Replay_Play
     Dim fh As New fileHeader
     Dim fs As FileStream
     Dim recordingFilename As FileInfo
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         ocvb.parms.openFileDialogRequested = True
         ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "/Data/"
@@ -175,7 +175,7 @@ Public Class Replay_Play
 
         desc = "Playback a file recorded by OpenCVB"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
         If recordingFilename.Exists = False Then ocvb.trueText(New TTtext("File not found: " + recordingFilename.FullName, 10, 125))
@@ -244,16 +244,16 @@ End Class
 
 
 Public Class Replay_OpenGL
-    Inherits ocvbClass
+    Inherits VBparent
     Dim ogl As OpenGL_Callbacks
     Dim replay As Replay_Play
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         ogl = New OpenGL_Callbacks(ocvb)
         replay = New Replay_Play(ocvb)
         desc = "Replay a recorded session with OpenGL"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         replay.Run(ocvb)
         ogl.src = ocvb.color
         ogl.Run(ocvb)

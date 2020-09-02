@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 Imports CS_Classes
 Public Class Blur_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize As Int32 = sliders.trackbar(0).Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
@@ -26,15 +26,15 @@ End Class
 
 
 Public Class Blur_Gaussian_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Dim blur As Blur_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
         desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
@@ -53,15 +53,15 @@ End Class
 
 
 Public Class Blur_Median_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim CS_BlurMedian As New CS_BlurMedian
     Dim blur As Blur_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
@@ -80,14 +80,14 @@ End Class
 
 
 Public Class Blur_Homogeneous
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blur As Blur_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
         desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -108,14 +108,14 @@ End Class
 
 
 Public Class Blur_Median
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blur As Blur_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
         desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -136,14 +136,14 @@ End Class
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=bilateralfilter
 ' https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
 Public Class Blur_Bilateral
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blur As Blur_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
         desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -161,11 +161,11 @@ End Class
 
 
 Public Class Blur_PlusHistogram
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mat2to1 As Mat_2to1
     Dim blur As Blur_Bilateral
     Dim myhist As Histogram_EqualizeGray
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mat2to1 = New Mat_2to1(ocvb)
 
@@ -176,7 +176,7 @@ Public Class Blur_PlusHistogram
         label2 = "Top is before equalize, Bottom is after Equalize"
         desc = "Compound algorithms Blur and Histogram"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         myhist.src = src
         myhist.Run(ocvb)
 
@@ -201,9 +201,9 @@ End Class
 
 
 Public Class Blur_TopoMap
-    Inherits ocvbClass
+    Inherits VBparent
     Dim gradient As Gradient_CartToPolar
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         gradient = New Gradient_CartToPolar(ocvb)
@@ -216,7 +216,7 @@ Public Class Blur_TopoMap
         label1 = "Image Gradient"
         desc = "Create a topo map from the blurred image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static savePercent As Single
         Static nextPercent As Single
         If savePercent <> sliders.trackbar(0).Value Then

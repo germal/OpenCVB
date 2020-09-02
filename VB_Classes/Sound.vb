@@ -5,7 +5,7 @@ Imports NAudio.Wave.SampleProviders.SignalGeneratorType
 ' https://archive.codeplex.com/?p=naudio
 ' http://ismir2002.ismir.net/proceedings/02-FP04-2.pdf
 Public Class Sound_ToPCM
-    Inherits ocvbClass
+    Inherits VBparent
     Public reader As MediaFoundationReader
     Dim memData As WaveBuffer
     Dim pcmData8() As Short
@@ -18,7 +18,7 @@ Public Class Sound_ToPCM
     Public stereo As Boolean
     Public bpp16 As Boolean
     Public pcmDuration As Double ' in seconds.
-    Private Sub LoadSoundData(ocvb As AlgorithmData)
+    Private Sub LoadSoundData(ocvb As VBocvb)
         Dim tmp(reader.Length - 1) As Byte
         Dim count = reader.Read(tmp, 0, tmp.Length)
         stereo = reader.WaveFormat.Channels = 2
@@ -37,7 +37,7 @@ Public Class Sound_ToPCM
         End If
         pcmDuration = reader.TotalTime.TotalSeconds
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         ocvb.parms.openFileDialogRequested = True
@@ -50,7 +50,7 @@ Public Class Sound_ToPCM
 
         desc = "Load an audio file, play it, and convert to PCM"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If inputFileName <> ocvb.parms.openFileDialogName Then
             inputFileName = ocvb.parms.openFileDialogName
             Dim fileinfo = New FileInfo(inputFileName)
@@ -103,7 +103,7 @@ End Class
 
 ' https://github.com/naudio/sinegenerator-sample
 Public Class Sound_SignalGenerator
-    Inherits ocvbClass
+    Inherits VBparent
     Dim player As NAudio.Wave.IWavePlayer
     Dim wGen As New NAudio.Wave.SampleProviders.SignalGenerator
     Public pcm32f As New cv.Mat
@@ -113,7 +113,7 @@ Public Class Sound_SignalGenerator
     Dim pcmData() As Single
     Dim generatedSamplesPerSecond As Integer = 44100
     Dim startTime As Date
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller, 5)
@@ -138,7 +138,7 @@ Public Class Sound_SignalGenerator
 
         desc = "Generate sound with a sine waveform."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static radioIndex As Integer
         If ocvb.parms.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
             radio.check(radioIndex).Checked = False Then
@@ -188,11 +188,11 @@ End Class
 
 
 Public Class Sound_Display
-    Inherits ocvbClass
+    Inherits VBparent
     Dim sound As Object
     Public pcm32f As cv.Mat
     Public starttime As Date
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         radio.Setup(ocvb, caller, 4)
@@ -209,7 +209,7 @@ Public Class Sound_Display
         label2 = "Black shows approximately what is currently playing"
         desc = "Display a sound buffer in several styles"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static useGenerated As Boolean
         If useGenerated <> check.Box(0).Checked Or sound Is Nothing Then
             useGenerated = check.Box(0).Checked

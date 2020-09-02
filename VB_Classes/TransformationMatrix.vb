@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class TransformationMatrix_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim topLocations As New List(Of cv.Point3d)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
@@ -12,7 +12,7 @@ Public Class TransformationMatrix_Basics
         label2 = "View from side of the camera"
         desc = "Show the contents of the transformation matrix"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.transformationMatrix IsNot Nothing Then
             Dim t = ocvb.transformationMatrix
             Dim mul = sliders.trackbar(0).Value

@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Font_OpenCV
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Display different font options available in OpenCV"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 30 Then Exit Sub
         Dim hersheyFont = Choose(ocvb.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
                                  cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
@@ -29,12 +29,12 @@ End Class
 
 
 Public Class Font_TrueType
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Display different TrueType fonts"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
@@ -47,13 +47,13 @@ End Class
 
 
 Public Class Font_FlowText
-    Inherits ocvbClass
+    Inherits VBparent
     Public msgs As New List(Of String)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Show TrueType text flowing through an image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText(ocvb)' to the class constructor.")

@@ -16,7 +16,7 @@ End Module
 
 ' http://stackoverflow.com/questions/19761526/how-to-do-inverse-dft-in-opencv
 Public Class DFT_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mats As Mat_4to1
     Public magnitude As New cv.Mat
     Public spectrum As New cv.Mat
@@ -24,7 +24,7 @@ Public Class DFT_Basics
     Public gray As cv.Mat
     Public rows As Int32
     Public cols As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
         mats.noLines = True
@@ -33,7 +33,7 @@ Public Class DFT_Basics
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)
@@ -82,15 +82,15 @@ End Class
 
 ' http://opencvexamples.blogspot.com/
 Public Class DFT_Inverse
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mats As Mat_2to1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mats = New Mat_2to1(ocvb)
         desc = "Take the inverse of the Discrete Fourier Transform."
         label1 = "Image after Inverse DFT"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -123,9 +123,9 @@ End Class
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthFilter_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Public dft As DFT_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, ocvb.color.Rows, ocvb.color.Rows)
@@ -145,7 +145,7 @@ Public Class DFT_ButterworthFilter_MT
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dft.src = ocvb.color
         dft.Run(ocvb)
 
@@ -199,9 +199,9 @@ End Class
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthDepth
-    Inherits ocvbClass
+    Inherits VBparent
     Dim bfilter As DFT_ButterworthFilter_MT
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bfilter = New DFT_ButterworthFilter_MT(ocvb)
 
@@ -209,7 +209,7 @@ Public Class DFT_ButterworthDepth
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         'bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
         dst1 = bfilter.dst1

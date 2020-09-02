@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Captcha
-    Inherits ocvbClass
+    Inherits VBparent
     Const charHeight = 100
     Const charWidth = 80
     Const captchaLength = 8
     Dim rng As New System.Random
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Use OpenCV to build a captcha Turing test."
     End Sub
@@ -59,7 +59,7 @@ Public Class WarpAffine_Captcha
         cv.Cv2.WarpPerspective(charImage, charImage, perpectiveTranx, New cv.Size(charImage.Cols, charImage.Rows), cv.InterpolationFlags.Cubic,
                                cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
         Dim charactersSize = characters.Length / characters(0).Length
 
@@ -88,8 +88,8 @@ End Class
 
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle", 0, 360, 10)
@@ -98,7 +98,7 @@ Public Class WarpAffine_Basics
 
         desc = "Use WarpAffine to transform input images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim warpFlag = getInterpolationRadioButtons(radio)
 
         Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)
@@ -119,9 +119,9 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_3Points
-    Inherits ocvbClass
+    Inherits VBparent
     Dim triangle As Area_MinTriangle_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         triangle = New Area_MinTriangle_CPP(ocvb)
         triangle.sliders.trackbar(0).Value = 20
@@ -131,7 +131,7 @@ Public Class WarpAffine_3Points
         label1 = "Triangles define the affine transform"
         label2 = "Image with affine transform applied"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static M As New cv.Mat
         If ocvb.frameCount Mod 60 = 0 Then
             Dim triangles(1) As cv.Mat
@@ -194,16 +194,16 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
 Public Class WarpAffine_4Points
-    Inherits ocvbClass
+    Inherits VBparent
     Dim rect As Area_MinRect
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         rect = New Area_MinRect(ocvb)
 
         desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         label1 = "Color image with perspective transform applied"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static M As New cv.Mat
         If ocvb.frameCount Mod 60 = 0 Then
 

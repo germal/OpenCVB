@@ -4,10 +4,10 @@ Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Sift_Basics_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim siftCS As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
@@ -21,7 +21,7 @@ Public Class Sift_Basics_CS
 
         desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim doubleSize As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
@@ -42,13 +42,13 @@ End Class
 
 
 Public Class Sift_Basics_CS_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics_CS
     Dim fisheye As FishEye_Rectified
     Dim numPointSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
@@ -67,7 +67,7 @@ Public Class Sift_Basics_CS_MT
 
         desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim leftView As cv.Mat
         Dim rightView As cv.Mat
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then

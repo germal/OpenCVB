@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellAuto_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public i18 As New List(Of String)
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim input(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         i18.Add("00011110 Rule 30 (chaotic)")
         i18.Add("00110110 Rule 54")
@@ -58,7 +58,7 @@ Public Class CellAuto_Basics
         Next
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             src = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             src.Set(Of Byte)(0, src.Width / 2, 1)
@@ -81,7 +81,7 @@ End Class
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellAuto_Life
-    Inherits ocvbClass
+    Inherits VBparent
     Dim random As Random_Points
     Dim grid As cv.Mat
     Dim nextgrid As cv.Mat
@@ -109,7 +109,7 @@ Public Class CellAuto_Life
         End If
         Return CountNeighbors
     End Function
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New cv.Mat(src.Height / factor, src.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
@@ -120,7 +120,7 @@ Public Class CellAuto_Life
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         desc = "Use OpenCV to implement the Game of Life"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static savePointCount As Integer
         Static randomSlider = findSlider("Random Pixel Count")
         If randomSlider.Value <> savePointCount Or generation = 0 Then
@@ -182,9 +182,9 @@ End Class
 
 ' https://natureofcode.com/book/chapter-7-cellular-automata/
 Public Class CellAuto_LifeColor
-    Inherits ocvbClass
+    Inherits VBparent
     Dim game As CellAuto_Life
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         game = New CellAuto_Life(ocvb)
         game.backColor = cv.Scalar.White
@@ -193,7 +193,7 @@ Public Class CellAuto_LifeColor
         label1 = "Births are blue, deaths are red"
         desc = "Game of Life but with color added"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         game.Run(ocvb)
         dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst1.Clone
@@ -217,10 +217,10 @@ End Class
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellAuto_LifePopulation
-    Inherits ocvbClass
+    Inherits VBparent
     Dim plot As Plot_OverTime
     Dim game As CellAuto_Life
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         game = New CellAuto_Life(ocvb)
 
@@ -231,7 +231,7 @@ Public Class CellAuto_LifePopulation
 
         desc = "Show Game of Life display with plot of population"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         game.Run(ocvb)
         dst1 = game.dst1
 
@@ -248,11 +248,11 @@ End Class
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellAuto_Basics_MP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim cell As CellAuto_Basics
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         cell = New CellAuto_Basics(ocvb)
@@ -260,7 +260,7 @@ Public Class CellAuto_Basics_MP
 
         desc = "Multi-threaded version of CellAuto_Basics"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.src.Set(Of Byte)(0, cell.src.Width / 2, 1)
@@ -292,9 +292,9 @@ End Class
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellAuto_All256
-    Inherits ocvbClass
+    Inherits VBparent
     Dim cell As CellAuto_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         cell = New CellAuto_Basics(ocvb)
         cell.combo.Visible = False ' won't need this...
@@ -311,7 +311,7 @@ Public Class CellAuto_All256
         Next
         Return outstr
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 
@@ -340,9 +340,9 @@ End Class
 
 
 Public Class CellAuto_MultiPoint
-    Inherits ocvbClass
+    Inherits VBparent
     Dim cell As CellAuto_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         cell = New CellAuto_Basics(ocvb)
@@ -350,7 +350,7 @@ Public Class CellAuto_MultiPoint
         cell.check.Box(0).Checked = False ' just the one pattern.
         desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
         Static pt1 = 0
         Static pt2 = cell.src.Width / 2

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
     Public bins As Integer = 50
@@ -11,7 +11,7 @@ Public Class Histogram_Basics
     Public backColor = cv.Scalar.Gray
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 256)
@@ -20,7 +20,7 @@ Public Class Histogram_Basics
 
         desc = "Plot histograms for up to 3 channels."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         bins = sliders.trackbar(0).Value
 
         Dim thickness = sliders.trackbar(1).Value
@@ -130,9 +130,9 @@ End Module
 
 
 Public Class Histogram_NormalizeGray
-    Inherits ocvbClass
+    Inherits VBparent
     Public histogram As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
@@ -145,7 +145,7 @@ Public Class Histogram_NormalizeGray
         check.Box(0).Checked = True
         desc = "Create a histogram of a normalized image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         histogram.src = src
         If check.Box(0).Checked Then
             cv.Cv2.Normalize(histogram.src, histogram.src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
@@ -162,18 +162,18 @@ End Class
 
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/histograms.html
 Public Class Histogram_2D_HueSaturation
-    Inherits ocvbClass
+    Inherits VBparent
     Public histogram As New cv.Mat
     Public hsv As cv.Mat
 
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         desc = "Create a histogram for hue and saturation."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
         Dim hbins = sliders.trackbar(0).Value
         Dim sbins = sliders.trackbar(1).Value
@@ -194,14 +194,14 @@ End Class
 
 
 Public Class Histogram_KalmanSmoothed
-    Inherits ocvbClass
+    Inherits VBparent
     Public mask As New cv.Mat
 
     Public histogram As New cv.Mat
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         plotHist = New Plot_Histogram(ocvb)
         plotHist.minRange = 0
@@ -214,7 +214,7 @@ Public Class Histogram_KalmanSmoothed
         label2 = "Histogram - x=bins/y=count"
         desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static splitIndex As Int32 = -1
         Static colorName As String
         If standalone Then
@@ -259,10 +259,10 @@ End Class
 
 
 Public Class Histogram_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Public trim As Depth_InRange
     Public plotHist As Plot_Histogram
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         plotHist = New Plot_Histogram(ocvb)
 
@@ -272,7 +272,7 @@ Public Class Histogram_Depth
 
         desc = "Show depth data as a histogram."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)
         plotHist.minRange = trim.sliders.trackbar(0).Value
@@ -295,7 +295,7 @@ End Class
 
 
 Public Class Histogram_DepthValleys
-    Inherits ocvbClass
+    Inherits VBparent
     Dim kalman As Kalman_Basics
     Dim hist As Histogram_Depth
     Public rangeBoundaries As New List(Of cv.Point)
@@ -323,7 +323,7 @@ Public Class Histogram_DepthValleys
             cv.Cv2.Rectangle(img, barRect, plotColors(i), -1)
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         hist = New Histogram_Depth(ocvb)
         hist.trim.sliders.trackbar(1).Value = 5000 ' depth to 5 meters.
@@ -333,7 +333,7 @@ Public Class Histogram_DepthValleys
 
         desc = "Identify valleys in the Depth histogram."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
         ReDim kalman.input(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1
@@ -397,14 +397,14 @@ End Class
 
 
 Public Class Histogram_DepthClusters
-    Inherits ocvbClass
+    Inherits VBparent
     Public valleys As Histogram_DepthValleys
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         valleys = New Histogram_DepthValleys(ocvb)
         desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         valleys.Run(ocvb)
         dst1 = valleys.dst1
 
@@ -428,10 +428,10 @@ End Class
 
 
 Public Class Histogram_2D_XZ_YZ
-    Inherits ocvbClass
+    Inherits VBparent
     Dim trim As Depth_InRange
     Dim xyz As Mat_ImageXYZ_MT
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         xyz = New Mat_ImageXYZ_MT(ocvb)
 
@@ -446,7 +446,7 @@ Public Class Histogram_2D_XZ_YZ
         desc = "Create a 2D histogram for depth in XZ and YZ."
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
         Dim zbins = sliders.trackbar(2).Value
@@ -475,8 +475,8 @@ End Class
 
 
 Public Class Histogram_ProjectionOptions
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram threshold", 0, 1000, 3)
@@ -494,7 +494,7 @@ Public Class Histogram_ProjectionOptions
 
         desc = "The options for the histogram projections with and without using the gravity vector"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ocvb.trueText(New TTtext("This algorithm only has options used by several other algorithms", 10, 50))
     End Sub
 End Class
@@ -506,7 +506,7 @@ End Class
 
 
 Public Class Histogram_2D_TopView
-    Inherits ocvbClass
+    Inherits VBparent
     Public histOpts As Histogram_ProjectionOptions
     Public trimPC As Object
     Dim trimPCStatic As Depth_PointCloudInRange
@@ -516,7 +516,7 @@ Public Class Histogram_2D_TopView
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
     Public useIMU As Boolean = False
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         trimPCGravity = New Depth_PointCloudInRange_IMU(ocvb)
         trimPCStatic = New Depth_PointCloudInRange(ocvb)
@@ -529,7 +529,7 @@ Public Class Histogram_2D_TopView
         label1 = "XZ (Top Down View)"
         desc = "Create a 2D histogram for depth in XZ (a top down view.)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim histSize() = {src.Height, src.Width}
 
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
@@ -567,7 +567,7 @@ End Class
 
 
 Public Class Histogram_2D_SideView
-    Inherits ocvbClass
+    Inherits VBparent
     Public trimPC As Object
     Public histOpts As Histogram_ProjectionOptions
     Dim trimPCStatic As Depth_PointCloudInRange
@@ -577,7 +577,7 @@ Public Class Histogram_2D_SideView
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
     Public useIMU As Boolean = False
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         trimPCGravity = New Depth_PointCloudInRange_IMU(ocvb)
@@ -592,7 +592,7 @@ Public Class Histogram_2D_SideView
         label1 = "YZ (Side View)"
         desc = "Create a 2D histogram for depth in YZ (Side View.)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim histSize() = {src.Height, src.Width}
 
         Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
@@ -635,13 +635,13 @@ End Class
 
 ' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeColor
-    Inherits ocvbClass
+    Inherits VBparent
     Public kalmanEq As Histogram_KalmanSmoothed
     Public kalman As Histogram_KalmanSmoothed
     Dim mats As Mat_2to1
     Public displayHist As Boolean = False
     Public channel = 2
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         kalmanEq = New Histogram_KalmanSmoothed(ocvb)
         kalmanEq.sliders.trackbar(0).Value = 40
@@ -654,7 +654,7 @@ Public Class Histogram_EqualizeColor
         desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         kalman.sliders.trackbar(0).Value = kalmanEq.sliders.trackbar(0).Value
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
@@ -691,10 +691,10 @@ End Class
 
 'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeGray
-    Inherits ocvbClass
+    Inherits VBparent
     Public histogramEq As Histogram_KalmanSmoothed
     Public histogram As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         histogramEq = New Histogram_KalmanSmoothed(ocvb)
 
@@ -704,7 +704,7 @@ Public Class Histogram_EqualizeGray
         label2 = "After EqualizeHist"
         desc = "Create an equalized histogram of the grayscale image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         histogram.sliders.trackbar(0).Value = histogramEq.sliders.trackbar(0).Value
         histogram.kalman.check.Box(0).Checked = histogramEq.kalman.check.Box(0).Checked
 
@@ -724,9 +724,9 @@ End Class
 
 ' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_Equalize255
-    Inherits ocvbClass
+    Inherits VBparent
     Dim eqHist As Histogram_EqualizeColor
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         eqHist = New Histogram_EqualizeColor(ocvb)
@@ -743,7 +743,7 @@ Public Class Histogram_Equalize255
         label2 = "Upper plot is before equalization.  Bottom is after."
         desc = "Reproduce the results of the hist.py example with existing algorithms"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         For i = 0 To 3 - 1
             If radio.check(i).Checked Then eqHist.channel = i
         Next
@@ -759,9 +759,9 @@ End Class
 
 
 Public Class Histogram_Simple
-    Inherits ocvbClass
+    Inherits VBparent
     Public plotHist As Plot_Histogram
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         plotHist = New Plot_Histogram(ocvb)
 
@@ -770,7 +770,7 @@ Public Class Histogram_Simple
 
         desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         plotHist.bins = sliders.trackbar(0).Value
 
@@ -795,10 +795,10 @@ End Class
 
 
 Public Class Histogram_ColorsAndGray
-    Inherits ocvbClass
+    Inherits VBparent
     Dim histogram As Histogram_KalmanSmoothed
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
 
@@ -818,7 +818,7 @@ Public Class Histogram_ColorsAndGray
         label2 = "Click any quadrant at left to view it below"
         desc = "Create a histogram of a normalized image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
         split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
@@ -846,9 +846,9 @@ End Class
 
 
 Public Class Histogram_BackProjectionPeak
-    Inherits ocvbClass
+    Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         hist = New Histogram_KalmanSmoothed(ocvb)
@@ -857,7 +857,7 @@ Public Class Histogram_BackProjectionPeak
         desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         label2 = "Grayscale Histogram"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.src = src
         hist.Run(ocvb)
         dst2 = hist.dst1
@@ -887,9 +887,9 @@ End Class
 
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjectionGrayscale
-    Inherits ocvbClass
+    Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         hist = New Histogram_KalmanSmoothed(ocvb)
 
@@ -899,7 +899,7 @@ Public Class Histogram_BackProjectionGrayscale
         label2 = "Histogram - yellow is selected for backprojection"
         desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.src = src
         hist.Run(ocvb)
         dst2 = hist.dst1
@@ -944,9 +944,9 @@ End Class
 
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjection2D
-    Inherits ocvbClass
+    Inherits VBparent
     Dim hist As Histogram_2D_HueSaturation
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         hist = New Histogram_2D_HueSaturation(ocvb)
@@ -955,7 +955,7 @@ Public Class Histogram_BackProjection2D
         label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
         label2 = "Backprojection of detected hue and saturation."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.src = src
         hist.Run(ocvb)
         dst1 = hist.dst1
@@ -1004,11 +1004,11 @@ End Class
 
 
 Public Class Histogram_HueSaturation2DPlot
-    Inherits ocvbClass
+    Inherits VBparent
     Dim hueSat As Brightness_Hue
     Dim hist2d As Histogram_BackProjection2D
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         hueSat = New Brightness_Hue(ocvb)
@@ -1018,7 +1018,7 @@ Public Class Histogram_HueSaturation2DPlot
         label2 = "Click any quadrant at left to view it below"
         desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hueSat.src = src
         hueSat.Run(ocvb)
         mats.mat(0) = hueSat.dst1

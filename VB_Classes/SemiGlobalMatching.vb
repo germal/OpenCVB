@@ -23,11 +23,11 @@ End Module
 '    Dim leftData(1 - 1) As Byte
 '    Dim rightData(1 - 1) As Byte
 '    Dim cPtr As IntPtr
-'    Public Sub New(ocvb As AlgorithmData)
+'    Public Sub New(ocvb As VBocvb)
 '        setCaller(ocvb)
 '        desc = "Find depth using the semi-global matching algorithm."
 '    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
+'    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.frameCount < 10 Then Exit Sub
 '        If ocvb.parms.cameraIndex = Kinect4AzureCam Then
 '            ocvb.trueText(New TTtext("The left and right views are identical with the Microsoft Kinect 4 Azure camera.", 10, 60))

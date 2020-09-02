@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_Options
-    Inherits ocvbClass
+    Inherits VBparent
     Public kernelType = cv.ML.SVM.KernelTypes.Rbf
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public points() As cv.Point2f
     Public responses() As Integer
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller, 8)
@@ -69,7 +69,7 @@ Public Class SVM_Options
     Public Function f(x As Double) As Double
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ReDim points(sliders.trackbar(0).Value)
         ReDim responses(points.Length - 1)
         For i = 0 To points.Length - 1
@@ -94,9 +94,9 @@ End Class
 
 
 Public Class SVM_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         svmOptions = New SVM_Options(ocvb)
         desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
@@ -104,7 +104,7 @@ Public Class SVM_Basics
         label2 = "Results - line is ground truth"
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         svmOptions.Run(ocvb) ' update any options specified in the interface.
         dst1 = svmOptions.dst1
 
@@ -145,9 +145,9 @@ End Class
 
 
 Public Class SVM_Random
-    Inherits ocvbClass
+    Inherits VBparent
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         svmOptions = New SVM_Options(ocvb)
         svmOptions.sliders.trackbar(1).Value = 15
@@ -160,7 +160,7 @@ Public Class SVM_Random
         label1 = "SVM Training data"
         desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         svmOptions.Run(ocvb)
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
@@ -230,13 +230,13 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_TestCase
-    Inherits ocvbClass
+    Inherits VBparent
     Dim labels() As Int32 = {1, -1, -1, -1}
     Dim trainData(,) As Single = {{501, 50}, {255, 50}, {501, 255}, {50, 200}}
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
@@ -248,7 +248,7 @@ Public Class SVM_TestCase
 
         desc = "Text book example on SVM"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(0)
         svmOptions.Run(ocvb)

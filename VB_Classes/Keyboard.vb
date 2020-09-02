@@ -1,18 +1,18 @@
 
 Imports cv = OpenCvSharp
 Public Class Keyboard_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public input As New List(Of String)
     Dim flow As Font_FlowText
     Public checkKeys As New OptionsKeyboardInput
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         checkKeys.Setup(ocvb, caller)
         flow = New Font_FlowText(ocvb)
         label1 = "Keyboard data will flow to algorithm"
         desc = "Test the keyboard interface available to all algorithms"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Input = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
         If standalone Then

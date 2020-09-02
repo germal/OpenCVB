@@ -12,14 +12,14 @@ Imports System.Text.RegularExpressions
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
     Dim plot As Plot_Histogram
     Dim benford As Benford_NormalizedImage
     Dim weight As AddWeighted_Basics
     Dim use99 As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         plot = New Plot_Histogram(ocvb)
         If standalone Then benford = New Benford_NormalizedImage(ocvb)
@@ -40,7 +40,7 @@ Public Class Benford_Basics
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             benford.src = src
             benford.Run(ocvb)
@@ -109,16 +109,16 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_NormalizedImage
-    Inherits ocvbClass
+    Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         benford = New Benford_Basics(ocvb)
 
         desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -137,9 +137,9 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_NormalizedImage99
-    Inherits ocvbClass
+    Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         benford = New Benford_Basics(ocvb)
@@ -147,7 +147,7 @@ Public Class Benford_NormalizedImage99
 
         desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -166,9 +166,9 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_JPEG
-    Inherits ocvbClass
+    Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         benford = New Benford_Basics(ocvb)
@@ -178,7 +178,7 @@ Public Class Benford_JPEG
 
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
@@ -195,9 +195,9 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_JPEG99
-    Inherits ocvbClass
+    Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         benford = New Benford_Basics(ocvb)
@@ -208,7 +208,7 @@ Public Class Benford_JPEG99
 
         desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -227,9 +227,9 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_PNG
-    Inherits ocvbClass
+    Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         benford = New Benford_Basics(ocvb)
@@ -239,7 +239,7 @@ Public Class Benford_PNG
 
         desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         benford.src = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
@@ -256,14 +256,14 @@ End Class
 
 
 Public Class Benford_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         benford = New Benford_Basics(ocvb)
         desc = "Apply Benford to the depth data"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         benford.src = getDepth32f(ocvb)
         benford.Run(ocvb)
         dst1 = benford.dst1
@@ -276,14 +276,14 @@ End Class
 
 
 Public Class Benford_DepthRGB
-    Inherits ocvbClass
+    Inherits VBparent
     Public benford As Benford_JPEG
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         benford = New Benford_JPEG(ocvb)
         desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim jpeg = ocvb.RGBDepth.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, benford.sliders.trackbar(0).Value})
         benford.src = ocvb.RGBDepth
         benford.Run(ocvb)

@@ -8,7 +8,7 @@ Public Class OptionsSliders
     Public countLabel() As Label
     Dim defaultHeight = 260
     Dim defaultWidth = 630
-    Public Sub Setup(ocvb As AlgorithmData, caller As String, Optional count As Integer = 4)
+    Public Sub Setup(ocvb As VBocvb, caller As String, Optional count As Integer = 4)
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)

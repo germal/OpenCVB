@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 
 Public Class DilateErode_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 5)
@@ -16,7 +16,7 @@ Public Class DilateErode_Basics
         radio.check(3).Text = "Dilate/Erode shape: None"
         radio.check(0).Checked = True
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim iterations = sliders.trackbar(1).Value
         Dim kernelsize = sliders.trackbar(0).Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
@@ -55,9 +55,9 @@ End Class
 
 
 Public Class DilateErode_DepthSeed
-    Inherits ocvbClass
+    Inherits VBparent
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
 
@@ -66,7 +66,7 @@ Public Class DilateErode_DepthSeed
         sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
         desc = "Erode depth to build a depth mask for inrange data."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim iterations = dilate.sliders.trackbar(1).Value
         Dim kernelsize = If(dilate.sliders.trackbar(0).Value Mod 2, dilate.sliders.trackbar(0).Value, dilate.sliders.trackbar(0).Value + 1)
         Dim morphShape = cv.MorphShapes.Cross
@@ -93,8 +93,8 @@ End Class
 
 
 Public Class DilateErode_OpenClose
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Open/Close shape: Cross"
@@ -106,7 +106,7 @@ Public Class DilateErode_OpenClose
         sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
         desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim n = sliders.trackbar(0).Value
         Dim an As Int32 = If(n > 0, n, -n)
         Dim morphShape = cv.MorphShapes.Rect

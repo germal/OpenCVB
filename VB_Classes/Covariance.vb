@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class Covariance_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim random As Random_Points
     Public samples As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
         desc = "Calculate the covariance of random depth data points."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim covariance As New cv.Mat, mean = New cv.Mat
         dst2.SetTo(0)
         If standalone Then
@@ -43,15 +43,15 @@ End Class
 
 ' http://answers.opencv.org/question/31228/how-to-use-function-calccovarmatrix/
 Public Class Covariance_Test
-    Inherits ocvbClass
+    Inherits VBparent
     Dim covar As Covariance_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         covar = New Covariance_Basics(ocvb)
         desc = "Test the covariance basics algorithm."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
         covar.samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
         covar.Run(ocvb)

@@ -1,15 +1,15 @@
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public src1 As New cv.Mat
     Public src2 As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Weight", 0, 100, 50)
         desc = "Add 2 images with specified weights."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             src1 = src
             src2 = ocvb.RGBDepth

@@ -16,12 +16,12 @@ End Module
 
 'https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
 Public Class Retina_Basics_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim Retina As IntPtr = 0
     Dim startInfo As New ProcessStartInfo
     Dim magnoData(0) As Byte
     Dim srcData(0) As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
@@ -34,7 +34,7 @@ Public Class Retina_Basics_CPP
         label2 = "Retina Magno"
         desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
@@ -88,9 +88,9 @@ End Class
 
 
 Public Class Retina_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Dim retina As Retina_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         retina = New Retina_Basics_CPP(ocvb)
 
@@ -98,7 +98,7 @@ Public Class Retina_Depth
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         dst2 = retina.dst2

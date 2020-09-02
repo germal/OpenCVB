@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class KNN_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim knn As KNN_BasicsManyToOne
     Dim emax As EMax_Centroids
     Public matchedPoints() As cv.Point2f
     Public unmatchedPoints As New List(Of cv.Point2f)
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If standalone Then
             emax = New EMax_Centroids(ocvb)
@@ -27,7 +27,7 @@ Public Class KNN_Basics
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
         desc = "Use KNN to match points 1 for 1"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             trainingPoints = New List(Of cv.Point2f)(emax.centroids)
             emax.Run(ocvb)
@@ -112,14 +112,14 @@ End Class
 
 
 Public Class KNN_BasicsManyToOne
-    Inherits ocvbClass
+    Inherits VBparent
     Dim randomTrain As Random_Points
     Dim randomQuery As Random_Points
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
     Public neighbors As New cv.Mat
     Dim knn As cv.ML.KNearest
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         If standalone Then
@@ -135,7 +135,7 @@ Public Class KNN_BasicsManyToOne
         knn = cv.ML.KNearest.Create()
         desc = "Test knn with random points in the image.  Find the nearest to a random point."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim trainData As cv.Mat
         Dim queries As cv.Mat
         dst1.SetTo(cv.Scalar.Black)
@@ -182,10 +182,10 @@ End Class
 
 
 Public Class KNN_CentroidsEMax
-    Inherits ocvbClass
+    Inherits VBparent
     Public emax As EMax_Centroids
     Public basics As KNN_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         emax = New EMax_Centroids(ocvb)
         basics = New KNN_Basics(ocvb)
@@ -194,7 +194,7 @@ Public Class KNN_CentroidsEMax
         label2 = "Current image without correcting colors"
         desc = "Map the current centroids to the previous generation to match the color used."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
 
         emax.Run(ocvb)
@@ -229,10 +229,10 @@ End Class
 
 
 Public Class KNN_Test
-    Inherits ocvbClass
+    Inherits VBparent
     Public grid As Thread_Grid
     Dim knn As KNN_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -247,7 +247,7 @@ Public Class KNN_Test
         label1 = knn.label2
         desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
         knn.queryPoints.Clear()
@@ -272,7 +272,7 @@ End Class
 
 
 Public Class KNN_Cluster2D
-    Inherits ocvbClass
+    Inherits VBparent
     Dim knn As KNN_Point2d
     Public cityPositions() As cv.Point
     Public cityOrder() As Int32
@@ -286,7 +286,7 @@ Public Class KNN_Cluster2D
             result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 2)
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         knn = New KNN_Point2d(ocvb)
         knn.sliders.Visible = False
@@ -342,7 +342,7 @@ Public Class KNN_Cluster2D
         Next
         If hitBlack Then closedRegions -= hitBlack
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ' If they changed Then number of elements in the set
         Static demoModeCheck = findCheckBox("Demo Mode")
         Static cityCountSlider = findSlider("KNN - number of cities")
@@ -381,13 +381,13 @@ End Class
 
 
 Public Class KNN_Point2d
-    Inherits ocvbClass
+    Inherits VBparent
     Public querySet() As cv.Point2f
     Public responseSet() As Int32
     Public lastSet() As cv.Point2f ' default usage: find and connect points in 2D for this number of points.
     Public findXnearest As Int32
     Dim knn As cv.ML.KNearest
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 50, 10)
@@ -397,7 +397,7 @@ Public Class KNN_Point2d
         label1 = "Yellow=Queries, Blue=Best Responses"
         knn = cv.ML.KNearest.Create()
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             ReDim lastSet(sliders.trackbar(0).Value - 1)
             ReDim querySet(sliders.trackbar(0).Value - 1)
@@ -447,12 +447,12 @@ End Class
 
 
 Public Class KNN_Point3d
-    Inherits ocvbClass
+    Inherits VBparent
     Public querySet() As cv.Point3f
     Public responseSet() As Int32
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public findXnearest As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
@@ -462,7 +462,7 @@ Public Class KNN_Point3d
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim maxDepth As Int32 = 4000 ' this is an arbitrary max dept    h
         Dim knn = cv.ML.KNearest.Create()
         If standalone Then
@@ -523,13 +523,13 @@ End Class
 
 
 Public Class KNN_ClusterNoisyLine
-    Inherits ocvbClass
+    Inherits VBparent
     Public noisyLine As Fitline_RawInput
     Public cityOrder() As Int32
     Public knn As KNN_Point2d
     Dim numberofCities As Int32
     Public findXnearest As Int32 = 2
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         noisyLine = New Fitline_RawInput(ocvb)
         knn = New KNN_Point2d(ocvb)
@@ -537,7 +537,7 @@ Public Class KNN_ClusterNoisyLine
 
         desc = "Use KNN to cluster the output of noisyline class."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static linePointCount As Int32
         Static lineNoise As Int32
         Static highlight As Boolean

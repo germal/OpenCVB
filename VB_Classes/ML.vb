@@ -57,11 +57,11 @@ End Module
 
 
 Public Class ML_FillRGBDepth_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim shadow As Depth_Holes
     Dim grid As Thread_Grid
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
         grid = New Thread_Grid(ocvb)
@@ -75,7 +75,7 @@ Public Class ML_FillRGBDepth_MT
         label2 = ""
         desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
         grid.Run(ocvb)
         Dim depth32f = getDepth32f(ocvb)
@@ -94,10 +94,10 @@ End Class
 
 
 Public Class ML_FillRGBDepth
-    Inherits ocvbClass
+    Inherits VBparent
     Dim shadow As Depth_Holes
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
@@ -110,7 +110,7 @@ Public Class ML_FillRGBDepth
         label2 = "ML filled shadow"
         desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
         Dim minLearnCount = sliders.trackbar(0).Value
         ocvb.RGBDepth.CopyTo(dst1)
@@ -124,11 +124,11 @@ End Class
 
 
 Public Class ML_DepthFromColor_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
@@ -148,7 +148,7 @@ Public Class ML_DepthFromColor_MT
         label2 = "Mask of color and depth input"
         desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
         Dim depth32f = getDepth32f(ocvb)
@@ -193,12 +193,12 @@ End Class
 
 
 Public Class ML_DepthFromColor
-    Inherits ocvbClass
+    Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
@@ -215,7 +215,7 @@ Public Class ML_DepthFromColor
         label2 = "Click any quadrant at left to view it below"
         desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
         mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -273,12 +273,12 @@ End Class
 
 
 Public Class ML_DepthFromXYColor
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
@@ -295,7 +295,7 @@ Public Class ML_DepthFromXYColor
         label1 = "Predicted Depth"
         desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
         mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -369,11 +369,11 @@ End Class
 
 
 Public Class ML_EdgeDepth_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
@@ -393,7 +393,7 @@ Public Class ML_EdgeDepth_MT
         label2 = "Predicted Depth"
         desc = "Use RGB to predict depth near edges."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
         Dim depth32f = getDepth32f(ocvb)
@@ -448,7 +448,7 @@ End Class
 '    Dim rtree = cv.ML.RTrees.Create()
 '    Public predictions As New cv.Mat
 '    Dim emax As EMax_Centroids
-'    Public Sub New(ocvb As AlgorithmData)
+'    Public Sub New(ocvb As VBocvb)
 '        setCaller(ocvb)
 
 '        If standalone Then
@@ -467,7 +467,7 @@ End Class
 '        tmp.ConvertTo(vec, cv.MatType.CV_8UC3)
 '        Return New cv.Vec3b(vec.Get(Of Byte)(0, 0), vec.Get(Of Byte)(0, 1), vec.Get(Of Byte)(0, 2))
 '    End Function
-'    Public Sub Run(ocvb As AlgorithmData)
+'    Public Sub Run(ocvb As VBocvb)
 '        Static lastColors As New cv.Mat
 '        If standalone Then
 '            emax.Run(ocvb)

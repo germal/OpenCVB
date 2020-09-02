@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Public trim As Depth_InRange
     Public grid As Thread_Grid
     Public voxels() As Double
     Public voxelMat As cv.Mat
     Public minDepth As Double
     Public maxDepth As Double
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Display intermediate results"
@@ -28,7 +28,7 @@ Public Class Voxels_Basics_MT
         label2 = "Voxels labeled with their median distance"
         desc = "Use multi-threading to get median depth values as voxels."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.RGBDepth.Width <> grid.gridMask.Width Then Exit Sub ' This is only needed during a 'Test All' run - a threading issue I don't understand.
         trim.src = getDepth32f(ocvb)
         trim.Run(ocvb)

@@ -2,11 +2,11 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Public Class Plot_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Basics
     Public plotCount As Int32 = 3
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         hist = New Histogram_Basics(ocvb)
         hist.plotRequested = True
@@ -17,7 +17,7 @@ Public Class Plot_Basics
         label2 = "Same Data but using OpenCV C++ plot"
         desc = "Plot data provided in src Mat"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.src = src
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(ocvb)
@@ -40,14 +40,14 @@ End Class
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
 Public Class Plot_Basics_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Public srcX() As Double
     Public srcY() As Double
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim maxX As Double = Double.MinValue
         Dim minX As Double = Double.MaxValue
         Dim maxY As Double = Double.MinValue
@@ -89,7 +89,7 @@ End Class
 
 
 Public Class Plot_OverTime
-    Inherits ocvbClass
+    Inherits VBparent
     Public plotData As cv.Scalar
     Public plotCount As Int32 = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
@@ -102,7 +102,7 @@ Public Class Plot_OverTime
     Public lastXdelta As New List(Of cv.Scalar)
     Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reset the plot scale"
@@ -115,7 +115,7 @@ Public Class Plot_OverTime
         desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
         Dim pixelHeight = CInt(sliders.trackbar(0).Value)
@@ -196,20 +196,20 @@ End Class
 
 
 Public Class Plot_Histogram
-    Inherits ocvbClass
+    Inherits VBparent
     Public hist As New cv.Mat
     Public bins As Int32 = 50
     Public minRange As Int32 = 0
     Public maxRange As Int32 = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public fixedMaxVal As Integer
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Font Size x10", 1, 20, 10)
         desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {bins}
@@ -277,10 +277,10 @@ End Module
 
 
 Public Class Plot_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         hist = New Histogram_Depth(ocvb)
         hist.sliders.trackbar(0).Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
@@ -291,7 +291,7 @@ Public Class Plot_Depth
 
         desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
         Dim inRangeMin = hist.trim.sliders.trackbar(0).Value
         Dim inRangeMax = hist.trim.sliders.trackbar(1).Value

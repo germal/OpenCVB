@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Blob_Input
-    Inherits ocvbClass
+    Inherits VBparent
     Dim rectangles As Draw_rotatedRectangles
     Dim circles As Draw_Circles
     Dim ellipses As Draw_Ellipses
     Dim poly As Draw_Polygon
     Dim Mats As Mat_4to1
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         rectangles = New Draw_rotatedRectangles(ocvb)
         circles = New Draw_Circles(ocvb)
@@ -31,7 +31,7 @@ Public Class Blob_Input
         label2 = "Click any quadrant at left to view it below"
         desc = "Test simple Blob Detector."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         rectangles.src = src
         rectangles.Run(ocvb)
         Mats.mat(0) = rectangles.dst1
@@ -57,10 +57,10 @@ End Class
 
 
 Public Class Blob_Detector_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim input As Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         input = New Blob_Input(ocvb)
         input.updateFrequency = 1 ' it is pretty fast but sloppy...
@@ -79,7 +79,7 @@ Public Class Blob_Detector_CS
 
         label1 = "Blob_Detector_CS Input"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim blobParams = New cv.SimpleBlobDetector.Params
         blobParams.FilterByArea = check.Box(0).Checked
         blobParams.FilterByCircularity = check.Box(1).Checked
@@ -110,9 +110,9 @@ End Class
 
 
 Public Class Blob_RenderBlobs
-    Inherits ocvbClass
+    Inherits VBparent
     Dim input As Blob_Input
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         input = New Blob_Input(ocvb)
         input.updateFrequency = 1
@@ -121,7 +121,7 @@ Public Class Blob_RenderBlobs
         label1 = "Input blobs"
         label2 = "Showing only the largest blob in test data"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 100 = 0 Then
             input.src = src
             input.Run(ocvb)
@@ -153,11 +153,11 @@ End Class
 
 
 Public Class Blob_DepthClusters
-    Inherits ocvbClass
+    Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         shadow = New Depth_Holes(ocvb)
@@ -171,7 +171,7 @@ Public Class Blob_DepthClusters
         label2 = "Backprojection of identified histogram depth clusters."
         desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
         histBlobs.src = shadow.dst1
         histBlobs.Run(ocvb)
@@ -190,7 +190,7 @@ End Class
 
 
 Public Class Blob_Rectangles
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blobs As Blob_Largest
     Dim kalman() As Kalman_Basics
     Private Class CompareRect : Implements IComparer(Of cv.Rect)
@@ -201,12 +201,12 @@ Public Class Blob_Rectangles
             Return 1
         End Function
     End Class
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blobs = New Blob_Largest(ocvb)
         desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         blobs.Run(ocvb)
         dst1 = src.Clone()
         dst2 = blobs.dst2
@@ -244,13 +244,13 @@ End Class
 
 
 Public Class Blob_Largest
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blobs As Blob_DepthClusters
     Public rects As List(Of cv.Rect)
     Public masks As List(Of cv.Mat)
     Public kalman As Kalman_Basics
     Public blobIndex As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(4 - 1)
@@ -258,7 +258,7 @@ Public Class Blob_Largest
         blobs = New Blob_DepthClusters(ocvb)
         desc = "Gather all the blob data and display the largest."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         blobs.Run(ocvb)
         dst2 = blobs.dst2
         rects = blobs.flood.fBasics.maskRects
@@ -283,15 +283,15 @@ End Class
 
 
 Public Class Blob_LargestDepthCluster
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blobs As Blob_DepthClusters
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blobs = New Blob_DepthClusters(ocvb)
 
         desc = "Display only the largest depth cluster (might not be contiguous.)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         blobs.src = src
         blobs.Run(ocvb)
         dst2 = blobs.dst2

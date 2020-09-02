@@ -3,12 +3,12 @@ Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Public Class EMax_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public samples As cv.Mat
     Public labels As cv.Mat
     Public grid As Thread_Grid
     Public regionCount As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show EMax input in output"
@@ -32,9 +32,9 @@ Public Class EMax_Basics
 
         desc = "OpenCV expectation maximization example."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
-            ocvb.trueText(New TTtext("The EMax ocvbClass fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
+            ocvb.trueText(New TTtext("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                                     "The C++ version works fine (EMax_Basics_CPP) and the 2 are functionally identical.", 20, 100))
             Exit Sub
         End If
@@ -118,11 +118,11 @@ End Module
 
 
 Public Class EMax_Basics_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Public basics As EMax_Basics
     Dim inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         basics = New EMax_Basics(ocvb)
 
@@ -131,7 +131,7 @@ Public Class EMax_Basics_CPP
         label2 = "Emax regions around clusters"
         desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         basics.Run(ocvb)
         dst1 = basics.dst1
         Dim srcCount = basics.sliders.trackbar(0).Value
@@ -180,12 +180,12 @@ End Class
 
 
 Public Class EMax_Centroids
-    Inherits ocvbClass
+    Inherits VBparent
     Public emaxCPP As EMax_Basics_CPP
     Public stepsize = 50
     Public centroids As New List(Of cv.Point2f)
     Public rects As New List(Of cv.Rect)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         emaxCPP = New EMax_Basics_CPP(ocvb)
@@ -193,7 +193,7 @@ Public Class EMax_Centroids
 
         desc = "Get the Emax cluster centroids using floodfill "
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim lastImage = emaxCPP.dst2.Clone()
         emaxCPP.Run(ocvb)
         dst1 = emaxCPP.dst2.Clone
@@ -233,15 +233,15 @@ End Class
 
 
 Public Class EMax_ConsistentColor
-    Inherits ocvbClass
+    Inherits VBparent
     Dim knn As KNN_CentroidsEMax
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         knn = New KNN_CentroidsEMax(ocvb)
         desc = "Same as KNN_Centroids - to show consistent EMax color regions"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         knn.basics.trainingPoints = New List(Of cv.Point2f)(knn.emax.centroids)
         knn.Run(ocvb)
         dst1 = knn.dst1.Clone()

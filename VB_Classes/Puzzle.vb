@@ -218,14 +218,14 @@ End Module
 
 ' https://github.com/nemanja-m/gaps
 Public Class Puzzle_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public grid As Thread_Grid
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
     Dim gridWidthSlider As System.Windows.Forms.TrackBar
     Dim gridHeightSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         gridWidthSlider = findSlider("ThreadGrid Width")
@@ -240,7 +240,7 @@ Public Class Puzzle_Basics
         Dim r As Random = New Random()
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static width As Int32
         Static height As Int32
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or ocvb.frameCount = 0 Or restartRequested Then
@@ -276,12 +276,12 @@ End Class
 
 
 Public Class Puzzle_Solver
-    Inherits ocvbClass
+    Inherits VBparent
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         puzzle = New Puzzle_Basics(ocvb)
 
@@ -308,7 +308,7 @@ Public Class Puzzle_Solver
         Next
         Return bfit
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static saveWidth As Integer
         If src.Width <> saveWidth Then
             check.Box(0).Checked = True

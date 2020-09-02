@@ -3,13 +3,13 @@ Imports System.Threading
 
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public connectedComponents As Object
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public drawRectangles As Boolean = True
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 10)
@@ -26,7 +26,7 @@ Public Class CComp_Basics
             Next
         Next
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim threshold = sliders.trackbar(0).Value
@@ -75,10 +75,10 @@ End Class
 
 
 Public Class CComp_EdgeMask
-    Inherits ocvbClass
+    Inherits VBparent
     Dim ccomp As CComp_ColorDepth
     Dim edges As Edges_DepthAndColor
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         edges = New Edges_DepthAndColor(ocvb)
 
@@ -88,7 +88,7 @@ Public Class CComp_EdgeMask
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         edges.src = src
         edges.Run(ocvb)
         dst1 = edges.dst1
@@ -102,8 +102,8 @@ End Class
 
 
 Public Class CComp_ColorDepth
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
@@ -112,7 +112,7 @@ Public Class CComp_ColorDepth
         label2 = "Binary image using threshold binary+Otsu"
         desc = "Color connected components based on their depth"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -134,14 +134,14 @@ End Class
 
 
 Public Class CComp_Image
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Connect components throughout the image"
         label1 = "Connected Components colored with Mean Depth"
         label2 = "Mask binary+otsu to help compute mean depth"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
@@ -180,8 +180,8 @@ End Class
 
 
 Public Class CComp_InRange_MT
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
@@ -191,7 +191,7 @@ Public Class CComp_InRange_MT
         desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.trackbar(0).Value
@@ -234,8 +234,8 @@ End Class
 
 
 Public Class CComp_InRange
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
@@ -243,7 +243,7 @@ Public Class CComp_InRange
 
         desc = "Connect components in specific ranges"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Int32 = sliders.trackbar(0).Value
@@ -279,16 +279,16 @@ End Class
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
 Public Class CComp_Shapes
-    Inherits ocvbClass
+    Inherits VBparent
     Dim shapes As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         shapes = New cv.Mat(ocvb.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
@@ -321,10 +321,10 @@ End Class
 
 
 Public Class CComp_OverlappingRectangles
-    Inherits ocvbClass
+    Inherits VBparent
     Dim ccomp As CComp_Basics
     Dim overlap As Draw_OverlappingRectangles
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         ccomp = New CComp_Basics(ocvb)
@@ -336,7 +336,7 @@ Public Class CComp_OverlappingRectangles
         label2 = "Unique rectangles (largest to smallest) colored by size"
         desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ccomp.src = src
         ccomp.Run(ocvb)
         dst1 = ccomp.dst2

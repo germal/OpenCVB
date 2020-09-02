@@ -2,20 +2,20 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public good As Features_GoodFeatures
     Public inputFeat As New List(Of cv.Point2f)
     Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
 
         desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If ocvb.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -114,10 +114,10 @@ End Class
 
 
 Public Class Stabilizer_BriskFeatures
-    Inherits ocvbClass
+    Inherits VBparent
     Dim brisk As BRISK_Basics
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         stabilizer = New Stabilizer_Basics(ocvb)
 
@@ -126,7 +126,7 @@ Public Class Stabilizer_BriskFeatures
 
         desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         src.CopyTo(brisk.src)
         brisk.Run(ocvb)
         stabilizer.inputFeat = brisk.features ' supply the features to track with Optical Flow
@@ -142,10 +142,10 @@ End Class
 
 
 Public Class Stabilizer_HarrisFeatures
-    Inherits ocvbClass
+    Inherits VBparent
     Dim harris As Harris_Detector_CPP
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         stabilizer = New Stabilizer_Basics(ocvb)
 
@@ -153,7 +153,7 @@ Public Class Stabilizer_HarrisFeatures
 
         desc = "Stabilize the video stream using Harris detector features"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         harris.src = src
         harris.Run(ocvb)
         stabilizer.inputFeat = harris.FeaturePoints ' supply the features to track with Optical Flow
@@ -182,17 +182,17 @@ Module Stabilizer_Basics_Module
     End Function
 End Module
 Public Class Stabilizer_Basics_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim srcData() As Byte
     Dim handleSrc As GCHandle
     Dim sPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         ReDim srcData(src.Total * src.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
         desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ocvb.trueText(New TTtext("this algorithm is not stable.", 10, 100))
         'Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         'handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -217,10 +217,10 @@ End Class
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_SideBySide
-    Inherits ocvbClass
+    Inherits VBparent
     Dim original As Stabilizer_Basics
     Dim basics As Stabilizer_HarrisFeatures
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         original = New Stabilizer_Basics(ocvb)
         basics = New Stabilizer_HarrisFeatures(ocvb)
@@ -228,7 +228,7 @@ Public Class Stabilizer_SideBySide
         label1 = "Stabilizer_Basic (VB.Net)"
         label2 = "Stabilizer_HarrisFeatures"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         original.src = src
         original.Run(ocvb)
         dst1 = original.dst1

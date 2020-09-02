@@ -2,8 +2,8 @@
 
 Imports cv = OpenCvSharp
 Public Class LUT_Gray
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
@@ -12,7 +12,7 @@ Public Class LUT_Gray
         sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
         desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
         sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
         sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
@@ -35,16 +35,16 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class LUT_Color
-    Inherits ocvbClass
+    Inherits VBparent
     Public paletteMap(256) As cv.Vec3b
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         paletteMap = rColors
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
         desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim reduction = sliders.trackbar(0).Value
         If standalone Then
             src /= reduction
@@ -64,16 +64,16 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 ' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 Public Class LUT_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public paletteMap(256 - 1) As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         For i = 0 To paletteMap.Count - 1
             paletteMap(i) = i
         Next
         desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
         dst1 = src.LUT(lut)
         If standalone Then dst2 = lut.Resize(src.Size())

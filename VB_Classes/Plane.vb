@@ -25,17 +25,17 @@ Module Plane_Exports
         Return New cv.Point3f(product.X / magnitude, product.Y / magnitude, product.Z / magnitude)
     End Function
 
-    Public Function getWorldCoordinates(ocvb As AlgorithmData, p As cv.Point3f) As cv.Point3f
+    Public Function getWorldCoordinates(ocvb As VBocvb, p As cv.Point3f) As cv.Point3f
         Dim x = (p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx
         Dim y = (p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
-    Public Function getWorldCoordinatesD(ocvb As AlgorithmData, p As cv.Point3f) As cv.Point3f
+    Public Function getWorldCoordinatesD(ocvb As VBocvb, p As cv.Point3f) As cv.Point3f
         Dim x = CDbl((p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx)
         Dim y = CDbl((p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy)
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
-    Public Function getWorldCoordinatesD6(ocvb As AlgorithmData, p As cv.Point3f) As cv.Vec6f
+    Public Function getWorldCoordinatesD6(ocvb As VBocvb, p As cv.Point3f) As cv.Vec6f
         Dim x = CDbl((p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx)
         Dim y = CDbl((p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
@@ -95,9 +95,9 @@ End Module
 
 
 Public Class Plane_Detect
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -108,7 +108,7 @@ Public Class Plane_Detect
         desc = "Identify planes in each segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
@@ -170,9 +170,9 @@ End Class
 
 
 Public Class Plane_DetectDebug
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -183,7 +183,7 @@ Public Class Plane_DetectDebug
         desc = "Debug code to identify planes in just one segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 

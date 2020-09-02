@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class Reduction_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction factor", 1, 255, 64)
         label1 = "Reduced color image."
         desc = "Reduction: a simple way to get KMeans with much less work"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = src / sliders.trackbar(0).Value ' can be any mat type...
         dst1 *= sliders.trackbar(0).Value
     End Sub
@@ -21,10 +21,10 @@ End Class
 
 
 Public Class Reduction_Edges
-    Inherits ocvbClass
+    Inherits VBparent
     Dim edges As Edges_Laplacian
     Dim kReduce As Reduction_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         edges = New Edges_Laplacian(ocvb)
@@ -33,7 +33,7 @@ Public Class Reduction_Edges
         label2 = "Laplacian edges of reduced image"
         desc = "The simplest kmeans is to just reduce the resolution."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         kReduce.src = src
         kReduce.Run(ocvb)
         dst1 = kReduce.dst1.Clone
@@ -48,16 +48,16 @@ End Class
 
 
 Public Class Reduction_Floodfill
-    Inherits ocvbClass
+    Inherits VBparent
     Public bflood As Floodfill_Identifiers
     Public kReduce As Reduction_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bflood = New Floodfill_Identifiers(ocvb)
         kReduce = New Reduction_Basics(ocvb)
         desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         kReduce.src = src
         kReduce.Run(ocvb)
 
@@ -74,11 +74,11 @@ End Class
 
 
 Public Class Reduction_KNN
-    Inherits ocvbClass
+    Inherits VBparent
     Dim kReduce As Reduction_Basics
     Dim bflood As FloodFill_Black
     Dim pTrack As Kalman_PointTracker
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bflood = New FloodFill_Black(ocvb)
         kReduce = New Reduction_Basics(ocvb)
@@ -86,7 +86,7 @@ Public Class Reduction_KNN
         pTrack = New Kalman_PointTracker(ocvb)
         desc = "Use KNN with reduction to consistently identify regions and color them."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         kReduce.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         kReduce.Run(ocvb)
 

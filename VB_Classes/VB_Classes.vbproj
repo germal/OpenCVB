@@ -134,7 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
-    <Compile Include="AlgorithmData.vb" />
+    <Compile Include="VBocvb.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="AlphaChannel.vb" />
     <Compile Include="Aruco.vb" />
@@ -308,8 +308,8 @@
     <Compile Include="Tracker.vb" />
     <Compile Include="TransformationMatrix.vb" />
     <Compile Include="Undistort.vb" />
-    <Compile Include="ocvbClass.vb" />
-    <Compile Include="VB_Classes.vb" />
+    <Compile Include="VBparent.vb" />
+    <Compile Include="VBTask.vb" />
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
     </Compile>

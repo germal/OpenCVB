@@ -3,10 +3,10 @@ Imports System.Windows.Forms
 
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
 Public Class OilPaint_Pointilism
-    Inherits ocvbClass
+    Inherits VBparent
     Dim randomMask As cv.Mat
     Dim myRNG As New cv.RNG
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
@@ -19,7 +19,7 @@ Public Class OilPaint_Pointilism
         ocvb.drawRect = New cv.Rect(ocvb.color.Cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.Cols * 2 / 8, ocvb.color.Rows * 2 / 8)
         desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = src
         Dim img = src(ocvb.drawRect)
         Static saveDrawRect As New cv.Rect
@@ -80,17 +80,17 @@ End Class
 
 
 Public Class OilPaint_ColorProbability
-    Inherits ocvbClass
+    Inherits VBparent
     Public color_probability() As Single
     Public km As kMeans_RGBFast
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         km = New kMeans_RGBFast(ocvb)
         km.sliders.trackbar(0).Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.trackbar(0).Value - 1)
         desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         km.src = src
         km.Run(ocvb)
         dst1 = km.dst1
@@ -119,8 +119,8 @@ End Class
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Manual
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
@@ -128,7 +128,7 @@ Public Class OilPaint_Manual
         desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
 
@@ -176,9 +176,9 @@ End Class
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Manual_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim oilPaint As New CS_Classes.OilPaintManual
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
@@ -189,7 +189,7 @@ Public Class OilPaint_Manual_CS
 
         ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = ocvb.drawRect
@@ -207,10 +207,10 @@ End Class
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Cartoon
-    Inherits ocvbClass
+    Inherits VBparent
     Dim oil As OilPaint_Manual_CS
     Dim laplacian As Edges_Laplacian
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         laplacian = New Edges_Laplacian(ocvb)
 
@@ -221,7 +221,7 @@ Public Class OilPaint_Cartoon
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim roi = ocvb.drawRect
         laplacian.src = src
         laplacian.Run(ocvb)

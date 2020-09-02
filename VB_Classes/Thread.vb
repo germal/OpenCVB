@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Collections.Concurrent
 
 Public Class Thread_Grid
-    Inherits ocvbClass
+    Inherits VBparent
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
     Public gridMask As cv.Mat
@@ -23,7 +23,7 @@ Public Class Thread_Grid
             End If
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         src = ocvb.color
         sliders.Setup(ocvb, caller)
@@ -35,7 +35,7 @@ Public Class Thread_Grid
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
         desc = "Create a grid for use with parallel.ForEach."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static lastWidth As Int32
         Static lastHeight As Int32
         Static lastBorder As Int32
@@ -103,9 +103,9 @@ End Class
 
 
 Public Class Thread_GridTest
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -115,7 +115,7 @@ Public Class Thread_GridTest
         label1 = ""
         desc = "Validation test for thread_grid algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
         Dim mean = cv.Cv2.Mean(src)
 

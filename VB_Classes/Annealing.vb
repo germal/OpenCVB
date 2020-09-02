@@ -18,7 +18,7 @@ End Module
 
 
 Public Class Annealing_Basics_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Public numberOfCities As Int32 = 25
     Public restartComputation As Boolean
     Public msg As String
@@ -30,7 +30,7 @@ Public Class Annealing_Basics_CPP
     Public closed As Boolean
     Public circularPattern As Boolean = True
     Dim saPtr As IntPtr
-    Public Sub drawMap(ocvb As AlgorithmData)
+    Public Sub drawMap(ocvb As VBocvb)
         dst1.SetTo(0)
         For i = 0 To cityOrder.Length - 1
             dst1.Circle(cityPositions(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
@@ -39,7 +39,7 @@ Public Class Annealing_Basics_CPP
         cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), cv.HersheyFonts.HersheyComplex, fontsize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), cv.HersheyFonts.HersheyComplex, fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub setup(ocvb As AlgorithmData)
+    Public Sub setup(ocvb As VBocvb)
         ReDim cityOrder(numberOfCities - 1)
 
         Dim radius = src.Rows * 0.45
@@ -66,12 +66,12 @@ Public Class Annealing_Basics_CPP
         hCityPosition.Free()
         closed = False
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         setup(ocvb)
         desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If closed = True Then Exit Sub
         If standalone Then
             If ocvb.frameCount = 0 Then
@@ -109,7 +109,7 @@ End Class
 
 
 Public Class Annealing_CPP_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim random As Random_Points
     Dim anneal() As Annealing_Basics_CPP
     Dim mats As Mat_4to1
@@ -121,7 +121,7 @@ Public Class Annealing_CPP_MT
             Return 1
         End Function
     End Class
-    Private Sub setup(ocvb As AlgorithmData)
+    Private Sub setup(ocvb As VBocvb)
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = sliders.trackbar(0).Value
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
@@ -145,7 +145,7 @@ Public Class Annealing_CPP_MT
         startTime = Now
     End Sub
 
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
         random.sliders.Visible = False
@@ -171,7 +171,7 @@ Public Class Annealing_CPP_MT
 
         desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
         Static CityCountSlider = findSlider("Anneal Number of Cities")
         If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
@@ -238,11 +238,11 @@ End Class
 
 
 Public Class Annealing_Options
-    Inherits ocvbClass
+    Inherits VBparent
     Dim random As Random_Points
     Public anneal As Annealing_Basics_CPP
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
         Static randomSlider = findSlider("Random Pixel Count")
@@ -267,7 +267,7 @@ Public Class Annealing_Options
         anneal.Open()
         desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static randomSlider = findSlider("Random Pixel Count")
         Dim numberOfCities = randomSlider.Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?

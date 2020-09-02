@@ -81,8 +81,8 @@ End Module
 
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
 Public Class Dither_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
@@ -98,7 +98,7 @@ Public Class Dither_Basics
 
         desc = "Explore all the varieties of dithering"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim radioIndex As Integer
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then radioIndex = i

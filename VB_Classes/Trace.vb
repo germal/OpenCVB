@@ -18,14 +18,14 @@ End Module
 
 ' https://github.com/opencv/opencv/wiki/Profiling-OpenCV-Applications
 Public Class Trace_OpenCV_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim Trace_OpenCV As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         Trace_OpenCV = Trace_OpenCV_Open()
         desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)

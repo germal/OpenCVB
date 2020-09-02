@@ -1,10 +1,10 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HOGSample.vb
 Public Class HOG_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold", 0, 100, 0)
@@ -28,7 +28,7 @@ Public Class HOG_Basics
             dst1.Rectangle(r.TopLeft, r.BottomRight, cv.Scalar.Red, 3, cv.LineTypes.Link8, 0)
         Next rect
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())
 

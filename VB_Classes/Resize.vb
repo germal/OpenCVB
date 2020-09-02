@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Resize_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public newSize As cv.Size
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
@@ -13,7 +13,7 @@ Public Class Resize_Basics
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim resizeFlag = getInterpolationRadioButtons(radio)
         if standalone Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
@@ -35,9 +35,9 @@ End Class
 
 
 Public Class Resize_Percentage
-    Inherits ocvbClass
+    Inherits VBparent
     Public resizeOptions As Resize_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         resizeOptions = New Resize_Basics(ocvb)
 
@@ -46,7 +46,7 @@ Public Class Resize_Percentage
 
         desc = "Resize by a percentage of the image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)
         Dim resizePercent = sliders.trackbar(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)

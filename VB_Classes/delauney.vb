@@ -81,12 +81,12 @@ End Module
 
 
 Public Class Delaunay_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim rect = New cv.Rect(0, 0, src.Width, src.Height)
 
@@ -107,15 +107,15 @@ End Class
 
 
 Public Class Delaunay_GoodFeatures
-    Inherits ocvbClass
+    Inherits VBparent
     Dim features As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         features = New Features_GoodFeatures(ocvb)
         label2 = "Voronoi facets of delauney good features"
         desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         features.src = src
         features.Run(ocvb)
 
@@ -138,14 +138,14 @@ End Class
 
 ' https://github.com/shimat/opencvsharp/wiki/Subdiv2D
 Public Class Delauney_Subdiv2D
-    Inherits ocvbClass
+    Inherits VBparent
     Public updateFrequency As Integer = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label2 = "Voronoi facets for the same subdiv2D"
         desc = "Generate random points and divide the image around those points."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
         Dim rand As New Random()
         dst1.SetTo(0)
@@ -191,9 +191,9 @@ End Class
 
 
 Public Class Delauney_Coverage
-    Inherits ocvbClass
+    Inherits VBparent
     Dim delauney As Delauney_Subdiv2D
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         delauney = New Delauney_Subdiv2D(ocvb)
         delauney.updateFrequency = 1
@@ -202,7 +202,7 @@ Public Class Delauney_Coverage
         label1 = "Coverage of space"
         desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)
         delauney.src = src
         delauney.Run(ocvb)

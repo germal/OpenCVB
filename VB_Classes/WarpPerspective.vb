@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 
 ' http://opencvexamples.blogspot.com/
 Public Class WarpPerspective_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Warped Width", 0, ocvb.color.Cols, ocvb.color.Cols - 50)
@@ -11,7 +11,7 @@ Public Class WarpPerspective_Basics
         sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
         desc = "Use WarpPerspective to transform input images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(src.Width, src.Height)}
         Dim pts() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)}
 

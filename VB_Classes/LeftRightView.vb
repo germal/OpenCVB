@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class LeftRightView_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
@@ -20,7 +20,7 @@ Public Class LeftRightView_Basics
                 sliders.trackbar(0).Value = 0
         End Select
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = ocvb.leftView
         dst2 = ocvb.rightView
 
@@ -35,9 +35,9 @@ End Class
 
 
 Public Class LeftRightView_CompareUndistorted
-    Inherits ocvbClass
+    Inherits VBparent
     Public fisheye As FishEye_Rectified
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
@@ -61,7 +61,7 @@ Public Class LeftRightView_CompareUndistorted
         End Select
         desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim sliceY = sliders.trackbar(1).Value
         Dim slideHeight = sliders.trackbar(2).Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
@@ -93,9 +93,9 @@ End Class
 
 
 Public Class LeftRightView_CompareRaw
-    Inherits ocvbClass
+    Inherits VBparent
     Dim lrView As LeftRightView_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
@@ -118,7 +118,7 @@ Public Class LeftRightView_CompareRaw
         lrView.sliders.Hide()
         desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         lrView.Run(ocvb)
 
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
@@ -140,10 +140,10 @@ End Class
 
 
 Public Class LeftRightView_Features
-    Inherits ocvbClass
+    Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         features = New Features_GoodFeatures(ocvb)
 
@@ -153,7 +153,7 @@ Public Class LeftRightView_Features
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         lrView.Run(ocvb)
 
         features.src = lrView.dst2
@@ -176,10 +176,10 @@ End Class
 
 
 Public Class LeftRightView_Palettized
-    Inherits ocvbClass
+    Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Dim palette As Palette_ColorMap
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         lrView = New LeftRightView_Basics(ocvb)
         palette = New Palette_ColorMap(ocvb)
@@ -188,7 +188,7 @@ Public Class LeftRightView_Palettized
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         lrView.Run(ocvb)
 
         palette.src = lrView.dst1
@@ -205,10 +205,10 @@ End Class
 
 
 Public Class LeftRightView_BRISK
-    Inherits ocvbClass
+    Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Add color to the 8-bit infrared images."
         label1 = "Infrared Left Image"
@@ -219,7 +219,7 @@ Public Class LeftRightView_BRISK
 
         lrView = New LeftRightView_Basics(ocvb)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         lrView.Run(ocvb)
         brisk.src = lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         brisk.Run(ocvb)

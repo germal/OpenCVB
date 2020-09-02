@@ -7,10 +7,10 @@ Imports System.IO.Pipes
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         plotHist = New Plot_Histogram(ocvb)
         plotHist.sliders.Visible = False
@@ -25,7 +25,7 @@ Public Class CamShift_Basics
         label2 = "Histogram of targeted region (hue only)"
         desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static roi As New cv.Rect
         Static vMinLast As Int32
         Static vMaxLast As Int32
@@ -74,17 +74,17 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Foreground
-    Inherits ocvbClass
+    Inherits VBparent
     Dim camshift As CamShift_Basics
     Dim fore As Depth_Foreground
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         camshift = New CamShift_Basics(ocvb)
         fore = New Depth_Foreground(ocvb)
         label1 = "Automatically finding the head - top of nearest object"
         desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim restartRequested As Boolean
         Static depthMin As Int32
         Static depthMax As Int32
@@ -111,10 +111,10 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_Object
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blob = New Blob_DepthClusters(ocvb)
 
@@ -124,7 +124,7 @@ Public Class Camshift_Object
         label2 = "Backprojection of depth clusters masked with hue"
         desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         blob.Run(ocvb)
         dst2 = blob.dst2.Clone()
 
@@ -148,11 +148,11 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_TopObjects
-    Inherits ocvbClass
+    Inherits VBparent
     Dim blob As Blob_DepthClusters
     Dim cams(4 - 1) As CamShift_Basics
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
 
@@ -166,7 +166,7 @@ Public Class Camshift_TopObjects
         sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
         desc = "Track - Tracker Algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         blob.Run(ocvb)
         dst1 = blob.dst2
 

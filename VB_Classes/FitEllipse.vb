@@ -13,17 +13,17 @@ End Module
 
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Basics_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim area As Area_MinTriangle_CPP
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         area = New Area_MinTriangle_CPP(ocvb)
 
         label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"
         desc = "Use FitEllipse to draw around a set of points"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         area.Run(ocvb)  ' get some random clusters of points
         dst1.SetTo(0)
         If area.srcPoints.Count >= 5 Then

@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class imShow_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         cv.Cv2.ImShow("color", ocvb.color)
     End Sub
 End Class

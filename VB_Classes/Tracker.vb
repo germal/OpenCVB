@@ -1,17 +1,17 @@
 Imports cv = OpenCvSharp
 Public Class Tracker_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public tracker As cv.Tracking.MultiTracker
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
     Public trackerIndex As Int32 = 5 ' trackerMIL by default...
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
         desc = "Track an object using cv.Tracking API - tracker algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ocvb.trueText(New TTtext("Draw a rectangle around object to be tracked.", 10, 140))
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
@@ -59,13 +59,13 @@ End Class
 
 
 Public Class Tracker_MultiObject
-    Inherits ocvbClass
+    Inherits VBparent
     Dim trackers As New List(Of Tracker_Basics)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Track any number of objects simultaneously - tracker algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.drawRect.Width <> 0 Then
             Dim tr = New Tracker_Basics(ocvb)
             tr.src = src
@@ -95,9 +95,9 @@ End Class
 
 
 Public Class Tracker_Methods
-    Inherits ocvbClass
+    Inherits VBparent
     Dim tracker As Tracker_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         tracker = New Tracker_Basics(ocvb)
 
@@ -115,7 +115,7 @@ Public Class Tracker_Methods
 
         desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static saveMethod As Int32
 
         For i = 0 To radio.check.Count - 1

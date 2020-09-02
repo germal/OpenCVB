@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class intrinsicsLeft_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Show the depth camera intrinsicsLeft."
         label2 = "ppx/ppy location"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim ttStart = 40
         Dim ttStr As String = "Width = " + CStr(ocvb.color.Width) + vbTab + " height = " + CStr(ocvb.color.Height) + vbCrLf
         ttStr += "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy) + vbCrLf

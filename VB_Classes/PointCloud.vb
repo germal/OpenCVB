@@ -66,7 +66,7 @@ End Module
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_Colorize
-    Inherits ocvbClass
+    Inherits VBparent
     Dim palette As Palette_Gradient
     Public rect As cv.Rect
     Public shift As Integer
@@ -74,7 +74,7 @@ Public Class PointCloud_Colorize
     Dim arcSize As Integer
     Public startangle As Integer
 
-    Public Function CameraLocationBot(ocvb As AlgorithmData, dst As cv.Mat) As cv.Mat
+    Public Function CameraLocationBot(ocvb As VBocvb, dst As cv.Mat) As cv.Mat
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
@@ -105,7 +105,7 @@ Public Class PointCloud_Colorize
 
         Return dst
     End Function
-    Public Function CameraLocationSide(ocvb As AlgorithmData, ByRef dst As cv.Mat) As cv.Mat
+    Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat) As cv.Mat
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
@@ -138,7 +138,7 @@ Public Class PointCloud_Colorize
 
         Return dst
     End Function
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         centroidRadius = src.Width / 100
@@ -165,7 +165,7 @@ Public Class PointCloud_Colorize
         label2 = "Colorize mask for side view"
         desc = "Create the colorizeMat's used for projections"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
     End Sub
 End Class
 
@@ -173,12 +173,12 @@ End Class
 
 
 Public Class PointCloud_Raw_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -195,7 +195,7 @@ Public Class PointCloud_Raw_CPP
 
         cPtr = SimpleProjectionOpen()
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
         foreground.Run(ocvb)
 
@@ -231,12 +231,12 @@ End Class
 
 
 Public Class PointCloud_Raw
-    Inherits ocvbClass
+    Inherits VBparent
     Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -253,7 +253,7 @@ Public Class PointCloud_Raw
 
         cPtr = SimpleProjectionOpen()
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
         foreground.Run(ocvb)
 
@@ -297,10 +297,10 @@ End Class
 
 
 Public Class PointCloud_TopView
-    Inherits ocvbClass
+    Inherits VBparent
     Public hist As Histogram_2D_TopView
     Public cMats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         cMats = New PointCloud_Colorize(ocvb)
@@ -312,7 +312,7 @@ Public Class PointCloud_TopView
 
         desc = "Display the histogram with and without adjusting for gravity"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU?.Checked Then
@@ -328,10 +328,10 @@ End Class
 
 
 Public Class PointCloud_SideView
-    Inherits ocvbClass
+    Inherits VBparent
     Public hist As Histogram_2D_SideView
     Public cMats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         cMats = New PointCloud_Colorize(ocvb)
@@ -343,7 +343,7 @@ Public Class PointCloud_SideView
 
         desc = "Display the histogram with and without adjusting for gravity"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU?.Checked Then
@@ -361,11 +361,11 @@ End Class
 
 
 Public Class PointCloud_Objects_TopView
-    Inherits ocvbClass
+    Inherits VBparent
     Public measure As PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Dim cmats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         If standalone Then cmats = New PointCloud_Colorize(ocvb)
@@ -378,7 +378,7 @@ Public Class PointCloud_Objects_TopView
         desc = "Validate the formula for pixel width as a function of distance"
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measure.Run(ocvb)
@@ -444,11 +444,11 @@ End Class
 
 
 Public Class PointCloud_Objects_SideView
-    Inherits ocvbClass
+    Inherits VBparent
     Public measure As PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Dim cmats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         If standalone Then cmats = New PointCloud_Colorize(ocvb)
@@ -460,7 +460,7 @@ Public Class PointCloud_Objects_SideView
         End If
         desc = "Validate the formula for pixel height as a function of distance"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
         Dim drawLines = showRectanglesCheck.checked
 
@@ -530,13 +530,13 @@ End Class
 
 
 Public Class PointCloud_Kalman_TopView
-    Inherits ocvbClass
+    Inherits VBparent
     Public pTrack As Kalman_PointTracker
     Public flood As Floodfill_Identifiers
     Public view As PointCloud_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         If standalone Then cmats = New PointCloud_Colorize(ocvb)
@@ -547,7 +547,7 @@ Public Class PointCloud_Kalman_TopView
 
         desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
@@ -582,13 +582,13 @@ End Class
 
 
 Public Class PointCloud_Kalman_SideView
-    Inherits ocvbClass
+    Inherits VBparent
     Public flood As Floodfill_Identifiers
     Public view As PointCloud_SideView
     Public pTrack As Kalman_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         If standalone Then cmats = New PointCloud_Colorize(ocvb)
@@ -600,7 +600,7 @@ Public Class PointCloud_Kalman_SideView
         desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
@@ -639,10 +639,10 @@ End Class
 
 
 Public Class PointCloud_BackProject
-    Inherits ocvbClass
+    Inherits VBparent
     Dim both As PointCloud_BothViews
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         both = New PointCloud_BothViews(ocvb)
@@ -652,7 +652,7 @@ Public Class PointCloud_BackProject
         desc = "Backproject the selected object"
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.mouseClickFlag Then
             ' lower left image is the mat_4to1
             If ocvb.mousePicTag = 2 Then
@@ -681,7 +681,7 @@ End Class
 
 
 Public Class PointCloud_BothViews
-    Inherits ocvbClass
+    Inherits VBparent
     Public topPixel As PointCloud_Objects_TopView
     Public sidePixel As PointCloud_Objects_SideView
     Dim levelCheck As IMU_IsCameraLevel
@@ -691,7 +691,7 @@ Public Class PointCloud_BothViews
     Public vwTop As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Public vwSide As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
     Dim cmats As PointCloud_Colorize
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
@@ -718,7 +718,7 @@ Public Class PointCloud_BothViews
         Next
         Return minIndex
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
@@ -828,13 +828,13 @@ End Class
 
 
 Public Class PointCloud_WallsFloorsCeilings
-    Inherits ocvbClass
+    Inherits VBparent
     Dim both As PointCloud_BothViews
     Dim lDetect As lineDetector_FLD
     Dim dilate As DilateErode_Basics
     Public walls As List(Of cv.Vec4f)
     Public floorsCeilings As List(Of cv.Vec4f)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
         lDetect = New lineDetector_FLD(ocvb)
@@ -843,7 +843,7 @@ Public Class PointCloud_WallsFloorsCeilings
         label2 = "Side View: floors/ceiling candidates in red"
         desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
         If ocvb.frameCount = 0 Then showRectanglesCheck.checked = False
         Static checkIMU = findCheckBox("Use IMU gravity vector")

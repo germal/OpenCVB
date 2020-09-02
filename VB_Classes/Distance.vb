@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 
 Public Class Distance_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim foreground As kMeans_Depth_FG_BG
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "C"
@@ -16,7 +16,7 @@ Public Class Distance_Basics
         label2 = "Input mask to distance transformm"
         desc = "Distance algorithm basics."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         foreground.Run(ocvb)
         dst2 = foreground.dst1
         Dim fg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)

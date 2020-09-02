@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Exterior
-	Inherits ocvbClass
+	Inherits VBparent
 	Dim hull As Hull_Basics
 	Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
 		Dim spline As New List(Of cv.Point)
@@ -38,7 +38,7 @@ Public Class Smoothing_Exterior
 		spline.Add(spoints(spoints.Count - 2))
 		Return spline
 	End Function
-	Public Sub New(ocvb As AlgorithmData)
+	Public Sub New(ocvb As VBocvb)
 		setCaller(ocvb)
 		hull = New Hull_Basics(ocvb)
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
@@ -50,7 +50,7 @@ Public Class Smoothing_Exterior
 		label2 = ""
 		desc = "Smoothing the line connecting a series of points."
 	End Sub
-	Public Sub Run(ocvb As AlgorithmData)
+	Public Sub Run(ocvb As VBocvb)
 		If ocvb.frameCount Mod 30 Then Exit Sub
 
 		hull.src = src
@@ -71,7 +71,7 @@ End Class
 
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Interior
-	Inherits ocvbClass
+	Inherits VBparent
 	Dim hull As Hull_Basics
 	Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
 		'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
@@ -111,7 +111,7 @@ Public Class Smoothing_Interior
 		Return nl
 	End Function
 
-	Public Sub New(ocvb As AlgorithmData)
+	Public Sub New(ocvb As VBocvb)
 		setCaller(ocvb)
 		hull = New Hull_Basics(ocvb)
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
@@ -125,7 +125,7 @@ Public Class Smoothing_Interior
 		label2 = ""
 		desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
-	Public Sub Run(ocvb As AlgorithmData)
+	Public Sub Run(ocvb As VBocvb)
 		If ocvb.frameCount Mod 30 Then Exit Sub
 
 		hull.src = src

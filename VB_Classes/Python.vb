@@ -4,7 +4,7 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 
 Module Python_Module
-    Public Function checkPythonPackage(ocvb As AlgorithmData, packageName As String) As Boolean
+    Public Function checkPythonPackage(ocvb As VBocvb, packageName As String) As Boolean
         ' make sure that opencv-python and numpy are installed on this system.
         If ocvb.PythonExe = "" Then
             ocvb.trueText(New TTtext("Python is not present and needs to be installed." + vbCrLf +
@@ -25,7 +25,7 @@ Module Python_Module
         Return True
     End Function
 
-    Public Function StartPython(ocvb As AlgorithmData, arguments As String) As Boolean
+    Public Function StartPython(ocvb As VBocvb, arguments As String) As Boolean
         If checkPythonPackage(ocvb, "numpy") = False Or checkPythonPackage(ocvb, "cv2") = False Then Return False
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
@@ -66,9 +66,9 @@ End Module
 
 
 Public Class Python_Run
-    Inherits ocvbClass
+    Inherits VBparent
     Dim tryCount As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
@@ -82,7 +82,7 @@ Public Class Python_Run
         label1 = ""
         label2 = ""
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If pyStream IsNot Nothing Then
             pyStream.src = src
             pyStream.Run(ocvb)
@@ -101,13 +101,13 @@ End Class
 
 
 Public Class Python_MemMap
-    Inherits ocvbClass
+    Inherits VBparent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
     Public memMapValues(49) As Double ' more than we need - buffer for growth
     Public memMapbufferSize As Int32
-        Public Sub New(ocvb As AlgorithmData)
+        Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If ocvb.PythonFileName Is Nothing Then
             ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/Python_MemMap.py"
@@ -129,7 +129,7 @@ Public Class Python_MemMap
             desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         if standalone Then memMapValues(0) = ocvb.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
@@ -141,14 +141,14 @@ End Class
 
 
 Public Class Python_SurfaceBlit
-    Inherits ocvbClass
+    Inherits VBparent
     Dim memMap As Python_MemMap
     Dim pipeName As String
     Dim pipe As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
     Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         ' this Python script requires pygame to be present...
         If checkPythonPackage(ocvb, "pygame") = False Then
@@ -171,7 +171,7 @@ Public Class Python_SurfaceBlit
         If PythonReady Then pipe.WaitForConnection()
         desc = "Stream data to Python_SurfaceBlit Python script."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If PythonReady Then
             Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
             For i = 0 To memMap.memMapValues.Length - 1

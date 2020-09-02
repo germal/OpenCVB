@@ -31,12 +31,12 @@ End Module
 '    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
 '    Dim defaultBVector() As Double = {12, 7, 7, 13}
 '    Dim input As cv.Mat
-'    Public Sub New(ocvb As AlgorithmData)
+'    Public Sub New(ocvb As VBocvb)
 '        setCaller(ocvb)
 '        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
 '        desc = "Manually invert a matrix"
 '    End Sub
-'    Public Sub Run(ocvb As AlgorithmData)
+'    Public Sub Run(ocvb As VBocvb)
 '        If input.Width <> input.Height Then
 '            ocvb.trueText(New TTtext("The src matrix must be square!", 10, 60))
 '            Exit Sub
@@ -57,15 +57,15 @@ End Module
 
 
 Public Class MatrixInverse_OpenCV
-    Inherits ocvbClass
+    Inherits VBparent
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Dim input As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         desc = "Use OpenCV to invert a matrix"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If Input.Width <> Input.Height Then
             ocvb.trueText(New TTtext("The input matrix must be square!", 10, 60))
             Exit Sub

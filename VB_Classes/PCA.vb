@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
         desc = "Reconstruct a video stream as a composite of X images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static images(7) As cv.Mat
         Static images32f(images.Length) As cv.Mat
         Dim index = ocvb.frameCount Mod images.Length
@@ -37,14 +37,14 @@ End Class
 
 
 Public Class PCA_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Dim pca As PCA_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         pca = New PCA_Basics(ocvb)
         desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         pca.src = ocvb.RGBDepth
         pca.Run(ocvb)
         dst1 = pca.dst1
@@ -56,10 +56,10 @@ End Class
 
 ' https://docs.opencv.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
 Public Class PCA_DrawImage
-    Inherits ocvbClass
+    Inherits VBparent
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         pca = New PCA_Basics(ocvb)
         image = cv.Cv2.ImRead(ocvb.homeDir + "Data/pca_test1.jpg")
@@ -80,7 +80,7 @@ Public Class PCA_DrawImage
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
         img.Line(p, q, color, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = image.Resize(dst1.Size())
         Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex = Nothing

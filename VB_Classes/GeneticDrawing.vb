@@ -9,7 +9,7 @@ Public Structure DNAentry
 End Structure
 ' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public gradient As Gradient_CartToPolar
     Public minBrushRange = New cv.Rangef(0.1, 0.3)
     Public maxBrushRange = New cv.Rangef(0.3, 0.7)
@@ -28,7 +28,7 @@ Public Class GeneticDrawing_Basics
     Dim imgStage As cv.Mat
     Public mats As Mat_4to1
     Dim brushPercent As Integer
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         check.Setup(ocvb, caller, 2)
@@ -125,7 +125,7 @@ Public Class GeneticDrawing_Basics
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         brushPercent = sliders.trackbar(3).Value
         stageTotal = sliders.trackbar(1).Value
         generationTotal = sliders.trackbar(0).Value
@@ -226,9 +226,9 @@ End Class
 
 ' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Color
-    Inherits ocvbClass
+    Inherits VBparent
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         gDraw(0) = New GeneticDrawing_Basics(ocvb)
@@ -238,7 +238,7 @@ Public Class GeneticDrawing_Color
         label1 = "Intermediate results - original+2 partial+Mag"
         desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim split() As cv.Mat
         split = cv.Cv2.Split(src)
 
@@ -276,10 +276,10 @@ End Class
 
 
 Public Class GeneticDrawing_Photo
-    Inherits ocvbClass
+    Inherits VBparent
     Dim gDraw As GeneticDrawing_Color
     Dim inputFileName As String
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         ocvb.parms.openFileDialogRequested = True
@@ -293,7 +293,7 @@ Public Class GeneticDrawing_Photo
 
         desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If inputFileName <> ocvb.parms.openFileDialogName Or ocvb.frameCount = 0 Then
             Dim fileinfo = New FileInfo(ocvb.parms.openFileDialogName)
             If fileinfo.Exists = False Then

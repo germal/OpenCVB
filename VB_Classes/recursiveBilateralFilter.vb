@@ -16,17 +16,17 @@ End Module
 
 ' https://github.com/ufoym
 Public Class RecursiveBilateralFilter_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim srcData(0) As Byte
     Dim rbf As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)
         rbf = RecursiveBilateralFilter_Open()
         desc = "Apply the recursive bilateral filter"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If srcData.Length <> src.Total * src.ElemSize Then ReDim srcData(src.Total * src.ElemSize - 1)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)

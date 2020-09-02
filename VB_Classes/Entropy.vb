@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 ' http://areshopencv.blogspot.com/2011/12/computing-entropy-of-image.html
 Public Class Entropy_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim flow As Font_FlowText
     Dim hist As Histogram_Basics
     Dim simple = New Entropy_Simple
     Public entropy As Single
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         flow = New Font_FlowText(ocvb)
 
@@ -14,7 +14,7 @@ Public Class Entropy_Basics
 
         desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         simple.bins = hist.sliders.trackbar(0).Value
         simple.run(src)
         entropy = 0
@@ -37,12 +37,12 @@ End Class
 
 
 Public Class Entropy_Highest_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim entropies(0) As Entropy_Simple
     Dim hist As Histogram_Basics
     Public grid As Thread_Grid
     Public bestContrast As cv.Rect
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         grid = New Thread_Grid(ocvb)
@@ -56,7 +56,7 @@ Public Class Entropy_Highest_MT
         label1 = "Highest entropy marked with red rectangle"
         desc = "Find the highest entropy section of the color image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
         If entropies.Length <> grid.roiList.Count Then
@@ -104,16 +104,16 @@ End Class
 
 
 Public Class Entropy_FAST
-    Inherits ocvbClass
+    Inherits VBparent
     Dim fast As FAST_Basics
     Dim entropy As Entropy_Highest_MT
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         fast = New FAST_Basics(ocvb)
         entropy = New Entropy_Highest_MT(ocvb)
         desc = "Use FAST markings to add to entropy"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         fast.src = ocvb.color
         fast.Run(ocvb)
 

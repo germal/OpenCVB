@@ -2,10 +2,10 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim bgfs As IntPtr
     Public currMethod As Int32 = -1
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 7)
         radio.check(0).Text = "GMG"
@@ -18,7 +18,7 @@ Public Class BGSubtract_Basics_CPP
         radio.check(4).Checked = True ' mog2 appears to be the best...
         desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 If currMethod = i Then
@@ -53,8 +53,8 @@ End Class
 
 
 Public Class BGSubtract_MotionDetect_MT
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
@@ -67,7 +67,7 @@ Public Class BGSubtract_MotionDetect_MT
         label2 = "Only Motion Added"
         desc = "Detect Motion for use with background subtraction"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
@@ -108,9 +108,9 @@ End Class
 
 
 Public Class BGSubtract_Basics_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
 
@@ -120,7 +120,7 @@ Public Class BGSubtract_Basics_MT
         label2 = "Only Motion Added"
         desc = "Detect Motion in the color image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
@@ -141,10 +141,10 @@ End Class
 
 
 Public Class BGSubtract_Depth_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim shadow As Depth_Holes
     Dim bgsub As BGSubtract_Basics_MT
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bgsub = New BGSubtract_Basics_MT(ocvb)
         shadow = New Depth_Holes(ocvb)
@@ -152,7 +152,7 @@ Public Class BGSubtract_Depth_MT
         label1 = "Depth data input"
         label2 = "Accumulated depth image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb) ' get where depth is zero
         bgsub.src = ocvb.RGBDepth
         bgsub.Run(ocvb)
@@ -165,10 +165,10 @@ End Class
 
 
 Public Class BGSubtract_MOG
-    Inherits ocvbClass
+    Inherits VBparent
     Dim MOG As cv.BackgroundSubtractorMOG
     Public gray As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
@@ -176,7 +176,7 @@ Public Class BGSubtract_MOG
         MOG = cv.BackgroundSubtractorMOG.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -191,10 +191,10 @@ End Class
 
 
 Public Class BGSubtract_MOG2
-    Inherits ocvbClass
+    Inherits VBparent
     Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
@@ -202,7 +202,7 @@ Public Class BGSubtract_MOG2
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         desc = "Subtract background using a mixture of Gaussians"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("MOG Learn Rate")
         MOG2.Apply(src, dst1, learnRateSlider.Value / 1000)
@@ -212,10 +212,10 @@ End Class
 
 
 Public Class BGSubtract_GMG_KNN
-    Inherits ocvbClass
+    Inherits VBparent
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Learn Rate", 1, 1000, 1)
@@ -224,7 +224,7 @@ Public Class BGSubtract_GMG_KNN
         knn = cv.BackgroundSubtractorKNN.Create()
         desc = "GMG and KNN API's to subtract background"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount < 120 Then
             ocvb.trueText(New TTtext("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(ocvb.frameCount), 10, 60))
         Else
@@ -243,11 +243,11 @@ End Class
 
 
 Public Class BGSubtract_MOG_RGBDepth
-    Inherits ocvbClass
+    Inherits VBparent
     Public gray As New cv.Mat
     Dim MOGDepth As cv.BackgroundSubtractorMOG
     Dim MOGRGB As cv.BackgroundSubtractorMOG
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "MOG Learn Rate x1000", 0, 1000, 10)
@@ -258,7 +258,7 @@ Public Class BGSubtract_MOG_RGBDepth
         label1 = "Unstable color"
         desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("Learn Rate")
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
@@ -272,10 +272,10 @@ End Class
 
 
 Public Class BGSubtract_MOG_Retina
-    Inherits ocvbClass
+    Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bgSub = New BGSubtract_MOG(ocvb)
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
@@ -287,7 +287,7 @@ Public Class BGSubtract_MOG_Retina
         label2 = "Difference from retina depth motion."
         desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         bgSub.src = retina.dst2.Clone()
@@ -301,14 +301,14 @@ End Class
 
 
 Public Class BGSubtract_DepthOrColorMotion
-    Inherits ocvbClass
+    Inherits VBparent
     Public motion As Diff_UnstableDepthAndColor
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         motion = New Diff_UnstableDepthAndColor(ocvb)
         desc = "Detect motion with both depth and color changes"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         motion.src = src.Clone()
         motion.Run(ocvb)
         dst1 = motion.dst1
@@ -342,10 +342,10 @@ End Module
 
 
 Public Class BGSubtract_Video
-    Inherits ocvbClass
+    Inherits VBparent
     Dim bgfg As BGSubtract_Basics_CPP
     Dim video As Video_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bgfg = New BGSubtract_Basics_CPP(ocvb)
 
@@ -353,7 +353,7 @@ Public Class BGSubtract_Video
         video.srcVideo = ocvb.HomeDir + "Data/vtest.avi"
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         video.Run(ocvb)
         dst2 = video.dst1
         bgfg.src = dst2
@@ -385,10 +385,10 @@ End Module
 
 
 Public Class BGSubtract_Synthetic_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim synthPtr As IntPtr
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Synthetic Amplitude x100", 1, 400, 200)
@@ -398,7 +398,7 @@ Public Class BGSubtract_Synthetic_CPP
         label1 = "Synthetic background/foreground image."
         desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount < 10 Then Exit Sub ' darker images at the start?
         If amplitude <> sliders.trackbar(0).Value Or magnitude <> sliders.trackbar(1).Value Or waveSpeed <> sliders.trackbar(2).Value Or
             objectSpeed <> sliders.trackbar(3).Value Then
@@ -433,17 +433,17 @@ End Class
 
 
 Public Class BGSubtract_Synthetic
-    Inherits ocvbClass
+    Inherits VBparent
     Dim bgfg As BGSubtract_Basics_CPP
     Dim synth As BGSubtract_Synthetic_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bgfg = New BGSubtract_Basics_CPP(ocvb)
 
         synth = New BGSubtract_Synthetic_CPP(ocvb)
         desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         synth.src = src
         synth.Run(ocvb)
         dst2 = synth.dst1

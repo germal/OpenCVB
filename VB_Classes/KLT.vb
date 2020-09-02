@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
 Public Class KLT_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public inputPoints() As cv.Point2f
     Public status As New cv.Mat
     Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
@@ -21,7 +21,7 @@ Public Class KLT_Basics
 
         desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static prevGray As New cv.Mat
 
         If check.Box(1).Checked Or ocvb.frameCount Mod 25 = 0 Then
@@ -84,15 +84,15 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py
 Public Class KLT_OpticalFlow
-    Inherits ocvbClass
+    Inherits VBparent
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         klt = New KLT_Basics(ocvb)
         desc = "KLT optical flow - needs more work"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         klt.src = src
         klt.Run(ocvb)
         If ocvb.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then

@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public zone() As cv.Rect = Nothing
     Public region()() As cv.Point = Nothing
     Dim saveParms() As Int32
     Dim mser As cv.MSER
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller, 9)
 
@@ -29,7 +29,7 @@ Public Class MSER_Basics
         ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
         desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim delta = sliders.trackbar(0).Value
         Dim minArea = sliders.trackbar(1).Value
         Dim maxArea = sliders.trackbar(2).Value
@@ -82,7 +82,7 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Synthetic
-    Inherits ocvbClass
+    Inherits VBparent
     Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Int32, color() As Int32, n As Int32)
         For i = 0 To n - 1
             img.Rectangle(New cv.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
@@ -96,11 +96,11 @@ Public Class MSER_Synthetic
             img.FloodFill(p0, color(i))
         Next
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -124,10 +124,10 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_TestSynthetic
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mser As MSER_Basics
     Dim synth As MSER_Synthetic
-    Private Function testSynthetic(ocvb As AlgorithmData, img As cv.Mat, pass2Only As Boolean, delta As Int32) As String
+    Private Function testSynthetic(ocvb As VBocvb, img As cv.Mat, pass2Only As Boolean, delta As Int32) As String
         mser.check.Box(0).Checked = pass2Only
         mser.sliders.trackbar(0).Value = delta
         mser.src = img
@@ -145,7 +145,7 @@ Public Class MSER_TestSynthetic
         Next
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mser = New MSER_Basics(ocvb)
         mser.sliders.trackbar(0).Value = 10
@@ -160,7 +160,7 @@ Public Class MSER_TestSynthetic
         label1 = "Output image from MSER"
         desc = "Test MSER with the synthetic image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         synth.Run(ocvb)
         dst1 = synth.dst1.Clone()
         dst2 = synth.dst1
@@ -174,10 +174,10 @@ End Class
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
 Public Class MSER_CPPStyle
-    Inherits ocvbClass
+    Inherits VBparent
     Dim gray As cv.Mat
     Dim image As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
@@ -185,7 +185,7 @@ Public Class MSER_CPPStyle
         image = cv.Cv2.ImRead(ocvb.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim mser = cv.MSER.Create()
         Dim msers()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
@@ -214,15 +214,15 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
 Public Class MSER_Contours
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mser As MSER_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mser = New MSER_Basics(ocvb)
         mser.sliders.trackbar(1).Value = 4000
         desc = "Use MSER but show the contours of each region."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         mser.src = src
         mser.Run(ocvb)
 

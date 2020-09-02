@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Concat_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = "Horizontal concatenation"
         label2 = "Vertical concatenation"
         desc = "Concatenate 2 images - horizontally and vertically"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(src, ocvb.RGBDepth, tmp)
         dst1 = tmp.Resize(src.Size())
@@ -20,9 +20,9 @@ End Class
 
 
 Public Class Concat_4way
-    Inherits ocvbClass
+    Inherits VBparent
     Public img(3) As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         For i = 0 To img.Length - 1
             img(i) = New cv.Mat
@@ -30,7 +30,7 @@ Public Class Concat_4way
         label1 = "Color/RGBDepth/Left/Right views"
         desc = "Concatenate 4 images - horizontally and vertically"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         if standalone Then
             img(0) = src
             img(1) = ocvb.RGBDepth

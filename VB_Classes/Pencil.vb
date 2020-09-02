@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Pencil_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
@@ -10,7 +10,7 @@ Public Class Pencil_Basics
         sliders.setupTrackBar(2, "Pencil Shade Factor", 1, 200, 40)
         desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         Dim shadowFactor = sliders.trackbar(2).Value / 1000
@@ -23,14 +23,14 @@ End Class
 
 ' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
 Public Class Pencil_Manual
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
         desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         cv.Cv2.BitwiseNot(src, grayinv)

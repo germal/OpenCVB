@@ -5,9 +5,9 @@ Imports System.Runtime.InteropServices
 
 
 Public Class LineDetector_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "LineDetector thickness of line", 1, 20, 2)
@@ -16,7 +16,7 @@ Public Class LineDetector_Basics
         label1 = "Manually drawn"
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim vectors = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         src.CopyTo(dst2)
@@ -55,7 +55,7 @@ Module fastLineDetector_Exports
     Public Function lineDetector_Lines() As IntPtr
     End Function
 
-    Public Sub find3DLineSegment(ocvb As AlgorithmData, dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Int32)
+    Public Sub find3DLineSegment(ocvb As VBocvb, dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Int32)
         Dim pt1 = New cv.Point(aa(0), aa(1))
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
@@ -210,9 +210,9 @@ End Module
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
 Public Class lineDetector_FLD_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller, 6)
@@ -228,7 +228,7 @@ Public Class lineDetector_FLD_CPP
         check.Box(0).Checked = True
         desc = "Basics for a Fast Line Detector"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         sortedLines.Clear()
 
         Dim length_threshold = sliders.trackbar(0).Value
@@ -260,9 +260,9 @@ End Class
 
 
 Public Class LineDetector_3D_LongestLine
-    Inherits ocvbClass
+    Inherits VBparent
     Dim lines As lineDetector_FLD_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
@@ -273,7 +273,7 @@ Public Class LineDetector_3D_LongestLine
         desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
@@ -294,9 +294,9 @@ End Class
 
 
 Public Class LineDetector_3D_FLD_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim lines As lineDetector_FLD_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
@@ -307,7 +307,7 @@ Public Class LineDetector_3D_FLD_MT
         desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
@@ -330,9 +330,9 @@ End Class
 
 
 Public Class LineDetector_3D_FitLineZ
-    Inherits ocvbClass
+    Inherits VBparent
     Dim linesFLD As lineDetector_FLD_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         linesFLD = New lineDetector_FLD_CPP(ocvb)
 
@@ -349,7 +349,7 @@ Public Class LineDetector_3D_FitLineZ
         desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
         label2 = ""
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
         Dim useX As Boolean = check.Box(0).Checked
         linesFLD.src = src
@@ -437,9 +437,9 @@ End Class
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
 Public Class lineDetector_FLD
-    Inherits ocvbClass
+    Inherits VBparent
     Public lines As New List(Of cv.Vec4f)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller, 6)
@@ -455,7 +455,7 @@ Public Class lineDetector_FLD
         check.Box(0).Checked = True
         desc = "A Fast Line Detector"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         lines.Clear()
 
         Dim length_threshold = sliders.trackbar(0).Value

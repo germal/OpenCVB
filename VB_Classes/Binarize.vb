@@ -5,20 +5,20 @@ Imports OpenCvSharp.XImgProc
 ' https://www.learnopencv.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
 Public Class Binarize_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public thresholdType = cv.ThresholdTypes.Otsu
     Public minRange = 0
     Public maxRange = 255
     Public histogram As cv.Mat
     Public meanScalar As cv.Scalar
     Dim blur As Blur_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         blur = New Blur_Basics(ocvb)
 
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         If standalone Then meanScalar = cv.Cv2.Mean(src)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -42,12 +42,12 @@ End Class
 
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Dim plotHist As Plot_Histogram
     Dim binarize As Binarize_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         binarize = New Binarize_Basics(ocvb)
 
@@ -60,7 +60,7 @@ Public Class Binarize_OTSU
         label2 = "Histograms correspond to images on the left"
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst2.SetTo(0)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         binarize.meanScalar = cv.Cv2.Mean(src)
@@ -91,8 +91,8 @@ End Class
 
 
 Public Class Binarize_Niblack_Sauvola
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
@@ -104,7 +104,7 @@ Public Class Binarize_Niblack_Sauvola
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -121,8 +121,8 @@ End Class
 
 
 Public Class Binarize_Niblack_Nick
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
@@ -133,7 +133,7 @@ Public Class Binarize_Niblack_Nick
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -150,8 +150,8 @@ End Class
 
 
 Public Class Binarize_Bernson
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
@@ -163,7 +163,7 @@ Public Class Binarize_Bernson
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
         desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -182,9 +182,9 @@ End Class
 
 
 Public Class Binarize_Bernson_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -200,7 +200,7 @@ Public Class Binarize_Bernson_MT
         desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 

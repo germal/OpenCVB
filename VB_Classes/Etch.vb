@@ -1,16 +1,16 @@
 
 Imports cv = OpenCvSharp
 Public Class Etch_ASketch
-    Inherits ocvbClass
+    Inherits VBparent
     Dim keys As Keyboard_Basics
     Dim slateColor = New cv.Scalar(122, 122, 122)
     Dim black As New cv.Vec3b(0, 0, 0)
     Dim cursor As cv.Point
     Dim ms_rng As New System.Random
-    Private Function randomCursor(ocvb As AlgorithmData)
+    Private Function randomCursor(ocvb As VBocvb)
         Return New cv.Point(ms_rng.Next(0, ocvb.color.Width), ms_rng.Next(0, ocvb.color.Height))
     End Function
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         check.Setup(ocvb, caller, 2)
@@ -25,7 +25,7 @@ Public Class Etch_ASketch
         dst1.SetTo(slateColor)
         desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         keys.Run(ocvb)
         Dim Input = New List(Of String)(keys.input)
 

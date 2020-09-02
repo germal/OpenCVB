@@ -4,11 +4,11 @@ Imports System.Runtime.InteropServices
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
 Public Class WarpModel_Input
-    Inherits ocvbClass
+    Inherits VBparent
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 12)
         radio.check(0).Text = "building.jpg"
@@ -31,7 +31,7 @@ Public Class WarpModel_Input
         sobel = New Edges_Sobel(ocvb)
         desc = "Import the misaligned input."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim img As New cv.Mat
         For i = 0 To radio.check.Count - 1
             Dim nextRadio = radio.check(i)
@@ -82,7 +82,7 @@ End Module
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_FindTransformECC_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Public input As WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
@@ -92,7 +92,7 @@ Public Class WarpModel_FindTransformECC_CPP
     Public rgb2 As New cv.Mat
     Public warpMode As Integer
     Public aligned As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         cPtr = WarpModel_Open()
 
@@ -107,7 +107,7 @@ Public Class WarpModel_FindTransformECC_CPP
 
         desc = "Use FindTransformECC to align 2 images"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         input.src = src
         input.Run(ocvb)
         dst1 = input.dst1
@@ -181,15 +181,15 @@ End Class
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_AlignImages
-    Inherits ocvbClass
+    Inherits VBparent
     Dim ecc As WarpModel_FindTransformECC_CPP
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         ecc = New WarpModel_FindTransformECC_CPP(ocvb)
 
         desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
             If ecc.input.check.Box(0).Checked Then

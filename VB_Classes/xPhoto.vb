@@ -4,14 +4,14 @@ Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
 Public Class xPhoto_Bm3dDenoise
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Denoise image with block matching and filtering."
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst1)
@@ -28,13 +28,13 @@ End Class
 
 
 Public Class xPhoto_Bm3dDenoiseDepthImage
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Denoise the depth image with block matching and filtering."
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
@@ -66,9 +66,9 @@ End Module
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
 Public Class xPhoto_OilPaint_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim xPhoto_OilPaint As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
@@ -86,7 +86,7 @@ Public Class xPhoto_OilPaint_CPP
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim colorCode As Int32 = cv.ColorConversionCodes.BGR2GRAY
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then

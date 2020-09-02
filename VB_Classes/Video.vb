@@ -2,11 +2,11 @@ Imports cv = OpenCvSharp
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public srcVideo As String
     Public image As New cv.Mat
     Public captureVideo As New cv.VideoCapture
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         ocvb.parms.openFileDialogRequested = True
@@ -24,7 +24,7 @@ Public Class Video_Basics
         label1 = fileInfo.Name
         desc = "Show a video file"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim fileInfo = New FileInfo(ocvb.parms.openFileDialogName)
         If srcVideo <> ocvb.parms.openFileDialogName Then
             If fileInfo.Exists = False Then
@@ -53,11 +53,11 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCounting
-    Inherits ocvbClass
+    Inherits VBparent
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bgSub = New BGSubtract_MOG(ocvb)
 
@@ -67,7 +67,7 @@ Public Class Video_CarCounting
 
         desc = "Count cars in a video file"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         video.Run(ocvb)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
@@ -110,11 +110,11 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCComp
-    Inherits ocvbClass
+    Inherits VBparent
     Dim cc As CComp_Basics
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bgSub = New BGSubtract_MOG(ocvb)
 
@@ -124,7 +124,7 @@ Public Class Video_CarCComp
 
         desc = "Outline cars with a rectangle"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         video.Run(ocvb)
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
@@ -142,11 +142,11 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_MinRect
-    Inherits ocvbClass
+    Inherits VBparent
     Public video As Video_Basics
     Public bgSub As BGSubtract_MOG
     Public contours As cv.Point()()
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         video = New Video_Basics(ocvb)
         video.srcVideo = ocvb.homeDir + "Data/CarsDrivingUnderBridge.mp4"
@@ -155,7 +155,7 @@ Public Class Video_MinRect
         bgSub = New BGSubtract_MOG(ocvb)
         desc = "Find area of car outline - example of using minAreaRect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         video.Run(ocvb)
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
@@ -179,14 +179,14 @@ End Class
 
 
 Public Class Video_MinCircle
-    Inherits ocvbClass
+    Inherits VBparent
     Dim input As Video_MinRect
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         input = New Video_MinRect(ocvb)
         desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         input.Run(ocvb)
         dst1 = input.dst1
         dst2 = input.dst2

@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
@@ -12,7 +12,7 @@ Public Class Corners_Harris
         desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static color As New cv.Mat
         Static gray As New cv.Mat
         Static mc As New cv.Mat
@@ -57,9 +57,9 @@ End Class
 
 
 Public Class Corners_SubPix
-    Inherits ocvbClass
+    Inherits VBparent
     Public good As Features_GoodFeatures
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
         sliders.Setup(ocvb, caller)
@@ -67,7 +67,7 @@ Public Class Corners_SubPix
         label1 = "Output of GoodFeatures"
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         good.src = src
         good.Run(ocvb)
         If good.goodFeatures.Count = 0 Then Exit Sub ' no good features right now...
@@ -89,9 +89,9 @@ End Class
 
 
 Public Class Corners_PreCornerDetect
-    Inherits ocvbClass
+    Inherits VBparent
     Dim median As Math_Median_CDF
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         median = New Math_Median_CDF(ocvb)
         sliders.Setup(ocvb, caller)
@@ -99,7 +99,7 @@ Public Class Corners_PreCornerDetect
 
         desc = "Use PreCornerDetect to find features in the image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ksize = sliders.trackbar(0).Value
         If ksize Mod 2 = 0 Then ksize += 1
@@ -128,8 +128,8 @@ End Module
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_ShiTomasi_CPP
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
@@ -139,7 +139,7 @@ Public Class Corners_ShiTomasi_CPP
         desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim data(src.Total - 1) As Byte
 
         Dim blocksize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

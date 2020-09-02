@@ -13,8 +13,8 @@ Module Quaternion_module
 End Module
 
 Public Class Quaterion_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller, 8)
@@ -30,7 +30,7 @@ Public Class Quaterion_Basics
 
         desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
                                     CSng(sliders.trackbar(2).Value / 100), CSng(sliders.trackbar(3).Value / 100))
         Dim q2 = New Quaternion(CSng(sliders.trackbar(4).Value / 100), CSng(sliders.trackbar(5).Value / 100),
@@ -48,9 +48,9 @@ End Class
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
 Public Class Quaterion_IMUPrediction
-    Inherits ocvbClass
+    Inherits VBparent
     Dim host As IMU_HostFrameTimes
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         host = New IMU_HostFrameTimes(ocvb)
 
@@ -59,7 +59,7 @@ Public Class Quaterion_IMUPrediction
         desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         host.Run(ocvb)
 
         Dim dt = host.HostInterruptDelayEstimate

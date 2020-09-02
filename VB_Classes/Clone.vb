@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public colorChangeValues As cv.Vec3f
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         label1 = "Clone result - draw anywhere to clone a region"
@@ -14,7 +14,7 @@ Public Class Clone_Basics
         desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         ocvb.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         If ocvb.drawRect = New cv.Rect Then
             mask.SetTo(255)
@@ -39,9 +39,9 @@ End Class
 
 
 Public Class Clone_ColorChange
-    Inherits ocvbClass
+    Inherits VBparent
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
@@ -54,7 +54,7 @@ Public Class Clone_ColorChange
         label2 = "Mask used for clone"
         desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
         clone.Run(ocvb)
@@ -67,9 +67,9 @@ End Class
 
 
 Public Class Clone_IlluminationChange
-    Inherits ocvbClass
+    Inherits VBparent
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
@@ -81,7 +81,7 @@ Public Class Clone_IlluminationChange
         label2 = "Mask used for clone"
         desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
         clone.Run(ocvb)
@@ -95,9 +95,9 @@ End Class
 
 
 Public Class Clone_TextureFlattening
-    Inherits ocvbClass
+    Inherits VBparent
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         clone = New Clone_Basics(ocvb)
 
@@ -109,7 +109,7 @@ Public Class Clone_TextureFlattening
         label2 = "mask used for clone"
         desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
         clone.Run(ocvb)
@@ -127,13 +127,13 @@ End Class
 ' https://www.learnopencv.com/seamless-cloning-using-opencv-python-cpp/
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Eagle
-    Inherits ocvbClass
+    Inherits VBparent
     Dim sourceImage As cv.Mat
     Dim mask As cv.Mat
     Dim srcROI As cv.Rect
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
@@ -158,7 +158,7 @@ Public Class Clone_Eagle
         label2 = "Source image and source mask."
         desc = "Clone an eagle into the video stream."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = src.Clone()
         If ocvb.mouseClickFlag Then
             pt = ocvb.mouseClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
@@ -184,8 +184,8 @@ End Class
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
 Public Class Clone_Seamless
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Seamless Normal Clone"
@@ -196,7 +196,7 @@ Public Class Clone_Seamless
         label2 = "Mask for Clone"
         desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
         If ocvb.drawRect = New cv.Rect Then

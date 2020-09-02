@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 'https://gist.github.com/kendricktan/93f0da88d0b25087d751ed2244cf770c
 'https://medium.com/@anuj_shah/through-the-eyes-of-gabor-filter-17d1fdb3ac97
 Public Class Gabor_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public gKernel As cv.Mat
     Public ksize As Double
     Public Sigma As Double
@@ -11,7 +11,7 @@ Public Class Gabor_Basics
     Public lambda As Double
     Public gamma As Double
     Public phaseOffset As Double
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller, 6)
@@ -24,7 +24,7 @@ Public Class Gabor_Basics
 
         desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             ksize = sliders.trackbar(0).Value * 2 + 1
             Sigma = sliders.trackbar(1).Value
@@ -45,10 +45,10 @@ End Class
 
 
 Public Class Gabor_Basics_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
     Dim gabor(31) As Gabor_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label2 = "The 32 kernels used"
         grid = New Thread_Grid(ocvb)
@@ -68,7 +68,7 @@ Public Class Gabor_Basics_MT
         gabor(0).sliders.Visible = True
         desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         For i = 0 To gabor.Count - 1
             gabor(i).ksize = gabor(0).sliders.trackbar(0).Value * 2 + 1
             gabor(i).Sigma = gabor(0).sliders.trackbar(1).Value

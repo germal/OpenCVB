@@ -96,7 +96,7 @@ Module IndexMain
                     Dim split As String() = Regex.Split(line, "\W+")
                     ' next line must be "Inherits ocvbClass"
                     Dim line2 = Trim(nextFile.ReadLine())
-                    If LCase(line2) = "inherits ocvbclass" Then
+                    If LCase(line2) = "inherits VBparent" Then
                         classname = split(2) ' public class <classname>
                     End If
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)

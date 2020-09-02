@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module undistort_Mats
-    Public Sub undistortSetup(ocvb As AlgorithmData, ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
+    Public Sub undistortSetup(ocvb As VBocvb, ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
                        maxDisp As Int32, stereo_height_px As Int32, intrinsics As ActiveTask.intrinsics_VB)
         Dim kLeft(8) As Double
         Dim rLeft(8) As Double
@@ -57,14 +57,14 @@ End Module
 
 ' https://stackoverflow.com/questions/26602981/correct-barrel-distortion-in-opencv-manually-without-chessboard-image
 Public Class Undistort_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim leftViewMap1 As New cv.Mat
     Dim leftViewMap2 As New cv.Mat
     Dim saveK As Int32, saveD As Int32, saveR As Int32, saveP As Int32
     Dim maxDisp As Int32
     Dim stereo_cx As Int32
     Dim stereo_cy As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
@@ -84,7 +84,7 @@ Public Class Undistort_Basics
         label1 = "Left Image with sliders applied"
         desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat
         Static kMat As cv.Mat, dMat As cv.Mat
         Dim rawWidth = ocvb.leftView.Width

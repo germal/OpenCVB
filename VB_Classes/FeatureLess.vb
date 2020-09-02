@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Featureless_Basics_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Public edges As Edges_Canny
     Public grid As Thread_Grid
     Public regionCount As Int32
     Public mask As New cv.Mat
     Public objects As New List(Of cv.Mat)
     Public objectSize As New List(Of Int32)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
@@ -28,7 +28,7 @@ Public Class Featureless_Basics_MT
         label1 = "Featureless regions with mask in depth color"
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
         edges.src = src
@@ -80,9 +80,9 @@ End Class
 
 
 Public Class FeatureLess_Prediction
-    Inherits ocvbClass
+    Inherits VBparent
     Dim fLess As Featureless_Basics_MT
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
@@ -91,7 +91,7 @@ Public Class FeatureLess_Prediction
 
         desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         fLess.src = src
         fLess.Run(ocvb)
         dst1 = fLess.dst1
@@ -164,9 +164,9 @@ End Class
 
 
 Public Class Featureless_DCT_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim dct As DCT_FeatureLess_MT
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         dct = New DCT_FeatureLess_MT(ocvb)
 
@@ -174,7 +174,7 @@ Public Class Featureless_DCT_MT
         label2 = "Largest FeatureLess Region"
     End Sub
 
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dct.src = src
         dct.Run(ocvb)
         dst1 = dct.dst1

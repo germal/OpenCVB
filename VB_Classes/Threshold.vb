@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Threshold_LaplacianFilter
-    Inherits ocvbClass
+    Inherits VBparent
     Dim edges As Filter_Laplacian
     Dim trim As Depth_InRange
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         trim = New Depth_InRange(ocvb)
         edges = New Filter_Laplacian(ocvb)
@@ -12,7 +12,7 @@ Public Class Threshold_LaplacianFilter
         label1 = "Foreground Input"
         desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         edges.src = src
         edges.Run(ocvb)
         dst2 = edges.dst2

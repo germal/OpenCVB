@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Sharpen_UnsharpMask
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
@@ -10,7 +10,7 @@ Public Class Sharpen_UnsharpMask
         desc = "Sharpen an image - Painterly Effect"
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim blurred As New cv.Mat
         Dim sigma As Double = sliders.trackbar(0).Value / 100
         Dim threshold As Double = sliders.trackbar(1).Value
@@ -29,15 +29,15 @@ End Class
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Sharpen_DetailEnhance
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "DetailEnhance Sigma_r", 1, 100, 7)
         desc = "Enhance detail on an image - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
@@ -49,15 +49,15 @@ End Class
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Sharpen_Stylize
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "Stylize Sigma_r", 1, 100, 7)
         desc = "Stylize an image - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)

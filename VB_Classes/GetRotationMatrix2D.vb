@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons(ocvb As AlgorithmData, caller As String, radio As OptionsRadioButtons, radioName As String)
+    Public Sub SetInterpolationRadioButtons(ocvb As VBocvb, caller As String, radio As OptionsRadioButtons, radioName As String)
         radio.Setup(ocvb, caller, 7)
         radio.check(0).Text = radioName + " with Area"
         radio.check(1).Text = radioName + " with Cubic flag"
@@ -31,11 +31,11 @@ End Module
 
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class GetRotationMatrix2D_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
@@ -43,7 +43,7 @@ Public Class GetRotationMatrix2D_Basics
 
         desc = "Rotate a rectangle of a specified angle"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         warpFlag = getInterpolationRadioButtons(radio)
 
         Dim angle = sliders.trackbar(0).Value
@@ -59,9 +59,9 @@ End Class
 
 
 Public Class GetRotationMatrix2D_Box
-    Inherits ocvbClass
+    Inherits VBparent
     Dim rotation As GetRotationMatrix2D_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         rotation = New GetRotationMatrix2D_Basics(ocvb)
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
@@ -70,7 +70,7 @@ Public Class GetRotationMatrix2D_Box
         label2 = "Same Rectangle in the new warped perspective"
         desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         rotation.src = src
         rotation.Run(ocvb)
         dst2 = dst1.Clone()

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Encode_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
@@ -11,7 +11,7 @@ Public Class Encode_Basics
         label1 = "absDiff with original"
         label2 = "Original decompressed"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim buf(ocvb.color.Width * ocvb.color.Height * ocvb.color.ElemSize) As Byte
         Dim encodeParams() As Int32 = {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value}
 
@@ -31,8 +31,8 @@ End Class
 
 
 Public Class Encode_Options
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
@@ -50,7 +50,7 @@ Public Class Encode_Options
         desc = "Encode options that affect quality."
         label1 = "absDiff with original image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim buf(ocvb.color.Width * ocvb.color.Height * ocvb.color.ElemSize) As Byte
         Dim encodeOption As Int32
         For i = 0 To radio.check.Count - 1

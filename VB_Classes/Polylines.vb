@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Polylines_IEnumerableExample
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Polyline closed if checked"
@@ -11,7 +11,7 @@ Public Class Polylines_IEnumerableExample
         sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
         desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
@@ -32,14 +32,14 @@ End Class
 ' VB.Net implementation of the browse example in OpenCV.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
 Public Class Polylines_Random
-    Inherits ocvbClass
+    Inherits VBparent
     Dim zoomFactor = 4
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
         desc = "Create a random procedural image - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 150 = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random

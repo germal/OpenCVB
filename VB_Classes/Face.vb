@@ -11,10 +11,10 @@ End Module
 
 ' https://docs.opencv.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
 Public Class Face_Haar_LBP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim haarCascade As cv.CascadeClassifier
     Dim lbpCascade As cv.CascadeClassifier
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         haarCascade = New cv.CascadeClassifier(ocvb.homeDir + "Data/haarcascade_frontalface_default.xml")
         lbpCascade = New cv.CascadeClassifier(ocvb.homeDir + "Data/lbpcascade_frontalface.xml")
@@ -22,7 +22,7 @@ Public Class Face_Haar_LBP
         label1 = "Faces detected with Haar"
         label2 = "Faces detected with LBP"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = ocvb.color.Clone()
         detectFace(dst1, haarCascade)
         dst2 = ocvb.color.Clone()
@@ -33,15 +33,15 @@ End Class
 
 
 Public Class Face_Haar_Alt
-    Inherits ocvbClass
+    Inherits VBparent
     Dim haarCascade As cv.CascadeClassifier
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         haarCascade = New cv.CascadeClassifier(ocvb.homeDir + "Data/haarcascade_frontalface_alt.xml")
         desc = "Detect faces Haar_alt database."
         label1 = "Faces detected with Haar_Alt"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = ocvb.color.Clone()
         detectFace(dst1, haarCascade)
     End Sub

@@ -5,7 +5,7 @@ Imports System.IO.Pipes
 Imports System.IO
 
 Module VTK_Common
-    Public Sub vtkInstructions(ocvb As AlgorithmData)
+    Public Sub vtkInstructions(ocvb As VBocvb)
         ocvb.trueText(New TTtext("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
                                              "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
                                              "Step 2) Build VTK for both Debug and Release" + vbCrLf +
@@ -14,7 +14,7 @@ Module VTK_Common
     End Sub
 End Module
 Public Class VTK_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim pipeName As String ' this is name of pipe to the VTK task.  It is dynamic and increments.
     Dim startInfo As New ProcessStartInfo
     Dim hglobal As IntPtr
@@ -39,13 +39,13 @@ Public Class VTK_Basics
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         Dispose() ' make sure there wasn't an old VTKWindow sitting around...
         desc = "Create VTK window and update it with images"
     End Sub
-    Private Sub memMapUpdate(ocvb As AlgorithmData)
+    Private Sub memMapUpdate(ocvb As VBocvb)
         ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapSysData.Length - 1
             ' only change this if you are changing the data in the VTK C++ code at the same time...
@@ -57,7 +57,7 @@ Public Class VTK_Basics
             memMapValues(i) = memMapUserData(i - memMapSysData.Length)
         Next
     End Sub
-    Private Sub startVTKWindow(ocvb As AlgorithmData)
+    Private Sub startVTKWindow(ocvb As VBocvb)
         ' first setup the named pipe that will be used to feed data to the VTK window
         pipeName = "VTKImages" + CStr(vtkTaskIndex)
         vtkTaskIndex += 1
@@ -75,7 +75,7 @@ Public Class VTK_Basics
         memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
         pipe.WaitForConnection()
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If vtkPresent = False Then
             vtkInstructions(ocvb)
             Exit Sub
@@ -123,11 +123,11 @@ End Class
 
 
 Public Class VTK_Histogram3D
-    Inherits ocvbClass
+    Inherits VBparent
     Dim vtk As VTK_Basics
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
@@ -144,7 +144,7 @@ Public Class VTK_Histogram3D
         random = New Random_NormalDist(ocvb)
         desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If vtk.vtkPresent = False Then
             vtkInstructions(ocvb)
             Exit Sub

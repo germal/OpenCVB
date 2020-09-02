@@ -5,14 +5,14 @@ Imports System.Linq
 Imports System.IO
 
 Public Class DNN_Test
-    Inherits ocvbClass
+    Inherits VBparent
     Dim net As Net
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label2 = "Input Image"
         desc = "Download and use a Caffe database"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim modelFile As New FileInfo(ocvb.homeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
             ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
@@ -40,9 +40,9 @@ End Class
 
 
 Public Class DNN_Caffe_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim caffeCS As CS_Classes.DNN
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label2 = "Input Image"
         desc = "Download and use a Caffe database"
@@ -52,7 +52,7 @@ Public Class DNN_Caffe_CS
         Dim synsetWords = ocvb.homeDir + "Data/synset_words.txt"
         caffeCS = New CS_Classes.DNN(protoTxt, modelFile, synsetWords)
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim image = cv.Cv2.ImRead(ocvb.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
         dst2 = image.Resize(dst2.Size())
@@ -66,7 +66,7 @@ End Class
 
 ' https://github.com/twMr7/rscvdnn
 Public Class DNN_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim net As Net
     Dim dnnPrepared As Boolean
     Dim crop As cv.Rect
@@ -76,7 +76,7 @@ Public Class DNN_Basics
     Public rect As cv.Rect
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DNN Scale Factor", 1, 10000, 78)
@@ -107,7 +107,7 @@ Public Class DNN_Basics
         desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If dnnPrepared Then
             Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
             Dim meanVal = CSng(sliders.trackbar(1).Value)

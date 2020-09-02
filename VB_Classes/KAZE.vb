@@ -2,14 +2,14 @@ Imports cv = OpenCvSharp
 Imports System.Collections.Generic
 
 Public Class KAZE_KeypointsKAZE_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Find keypoints using KAZE algorithm."
         label1 = "KAZE key points"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
@@ -22,14 +22,14 @@ End Class
 
 
 Public Class KAZE_KeypointsAKAZE_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Find keypoints using AKAZE algorithm."
         label1 = "AKAZE key points"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
@@ -41,17 +41,17 @@ End Class
 
 
 Public Class KAZE_Sample_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim box As New cv.Mat
     Dim box_in_scene As New cv.Mat
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         box = cv.Cv2.ImRead(ocvb.homeDir + "Data/box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(ocvb.homeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
         desc = "Match keypoints in 2 photos."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim result = CS_Kaze.Run(box, box_in_scene)
         dst1 = result.Resize(ocvb.color.Size())
     End Sub
@@ -60,16 +60,16 @@ End Class
 
 
 Public Class KAZE_Match_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim red As LeftRightView_Basics
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         red = New LeftRightView_Basics(ocvb)
         red.sliders.trackbar(0).Value = 45
         desc = "Match keypoints in the left and right images."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         red.Run(ocvb)
         dst1 = red.dst1
         dst2 = red.dst2
@@ -83,10 +83,10 @@ End Class
 
 
 Public Class KAZE_LeftAligned_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
@@ -94,7 +94,7 @@ Public Class KAZE_LeftAligned_CS
 
         desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         CS_KazeLeft.GetKeypoints(ocvb.leftView)
         CS_KazeRight.GetKeypoints(ocvb.rightView)
 

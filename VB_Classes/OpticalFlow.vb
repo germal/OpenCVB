@@ -62,7 +62,7 @@ End Module
 
 
 Public Class OpticalFlow_DenseOptions
-    Inherits ocvbClass
+    Inherits VBparent
 
     Public pyrScale As Single
     Public levels As Int32
@@ -72,7 +72,7 @@ Public Class OpticalFlow_DenseOptions
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Int32
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 5)
         radio.check(0).Text = "FarnebackGaussian"
@@ -93,7 +93,7 @@ Public Class OpticalFlow_DenseOptions
         label1 = "No output - just option settings..."
         desc = "Use dense optical flow algorithm options"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
         levels = sliders.trackbar(1).Value
         winSize = sliders.trackbar(2).Value
@@ -119,14 +119,14 @@ End Class
 
 
 Public Class OpticalFlow_DenseBasics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         flow = New OpticalFlow_DenseOptions(ocvb)
         desc = "Use dense optical flow algorithm  "
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -147,12 +147,12 @@ End Class
 
 
 Public Class OpticalFlow_DenseBasics_MT
-    Inherits ocvbClass
+    Inherits VBparent
 
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -170,7 +170,7 @@ Public Class OpticalFlow_DenseBasics_MT
 
         desc = "MultiThread dense optical flow algorithm  "
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static oldGray As New cv.Mat
 
         If ocvb.frameCount > 0 Then
@@ -211,7 +211,7 @@ End Class
 
 
 Public Class OpticalFlow_Sparse
-    Inherits ocvbClass
+    Inherits VBparent
 
     Public features As New List(Of cv.Point2f)
 
@@ -219,7 +219,7 @@ Public Class OpticalFlow_Sparse
     Dim lastFrame As cv.Mat
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         good = New Features_GoodFeatures(ocvb)
 
@@ -250,7 +250,7 @@ Public Class OpticalFlow_Sparse
             errScale.Set(Of Double)(i, 0, (1 - gainScale) * f1err.Get(Of Double)(i, 0))
         Next
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst1 = src.Clone()
         dst2 = src.Clone()
 

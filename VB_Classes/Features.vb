@@ -2,9 +2,9 @@ Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
 Public Class Features_GoodFeatures
-    Inherits ocvbClass
+    Inherits VBparent
     Public goodFeatures As New List(Of cv.Point2f)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of Points", 10, 1000, 200)
@@ -13,7 +13,7 @@ Public Class Features_GoodFeatures
 
         desc = "Find good features to track in an RGB image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.trackbar(0).Value
         Dim quality = sliders.trackbar(1).Value / 100
@@ -34,11 +34,11 @@ End Class
 
 
 Public Class Features_PointTracker
-    Inherits ocvbClass
+    Inherits VBparent
     Dim features As Features_GoodFeatures
     Dim pTrack As Kalman_PointTracker
     Dim rRadius = 10
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         features = New Features_GoodFeatures(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
@@ -50,7 +50,7 @@ Public Class Features_PointTracker
         label2 = "Good features with Kalman"
         desc = "Find good features and track them"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
 
         features.src = src
         features.Run(ocvb)

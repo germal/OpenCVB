@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
 Public Class GrabCut_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim contours As Contours_Depth
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         contours = New Contours_Depth(ocvb)
 
@@ -13,7 +13,7 @@ Public Class GrabCut_Basics
 
         desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         contours.src = src
         contours.Run(ocvb)
         dst2 = contours.dst2

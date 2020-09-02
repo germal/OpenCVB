@@ -1,9 +1,9 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class FAST_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public keypoints() As cv.KeyPoint
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold", 0, 200, 15)
@@ -13,7 +13,7 @@ Public Class FAST_Basics
 
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.CopyTo(dst1)
         keypoints = cv.Cv2.FAST(src, sliders.trackbar(0).Value, If(check.Box(0).Checked, True, False))
@@ -30,10 +30,10 @@ End Class
 
 
 Public Class FAST_Centroid
-    Inherits ocvbClass
+    Inherits VBparent
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(1) ' 2 elements - cv.point
@@ -41,7 +41,7 @@ Public Class FAST_Centroid
         fast = New FAST_Basics(ocvb)
         desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         fast.src = src
         fast.Run(ocvb)
         dst1 = fast.dst1

@@ -3,14 +3,14 @@ Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Public Class PyStream_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim pipeName As String
     Dim pipeImages As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
     Dim depthBuffer(1) As Byte
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
@@ -31,7 +31,7 @@ Public Class PyStream_Basics
         If pythonReady Then pipeImages.WaitForConnection()
         desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim depth32f = getDepth32f(ocvb)
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1

@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
 Public Class Stitch_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)
@@ -10,7 +10,7 @@ Public Class Stitch_Basics
         sliders.setupTrackBar(2, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
         desc = "Stitch together random parts of a color image."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim mats As New List(Of cv.Mat)
         Dim imageCount = sliders.trackbar(0).Value
         Dim width = sliders.trackbar(1).Value

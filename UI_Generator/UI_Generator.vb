@@ -46,7 +46,7 @@ Module UI_GeneratorMain
                 sIndex += 1
                 fileName = fileinfo.FullName
             Else
-                If fileName.EndsWith("ocvbClass.vb") = False Then
+                If fileName.EndsWith("VBparent.vb") = False Then
                     Dim nextFile As New System.IO.StreamReader(fileName)
                     While nextFile.Peek() <> -1
                         Dim line = Trim(nextFile.ReadLine())
@@ -56,13 +56,13 @@ Module UI_GeneratorMain
                                 If Len(line) > 0 Then CodeLineCount += 1
                                 If LCase(line).StartsWith("public class") Then
                                     Dim split As String() = Regex.Split(line, "\W+")
-                                    ' next line must be "Inherits ocvbClass"
+                                    ' next line must be "Inherits VBparent"
                                     Dim line2 = Trim(nextFile.ReadLine())
                                     CodeLineCount += 1
                                     If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
-                                    If LCase(line2) = "inherits ocvbclass" Then className = split(2) ' public class <classname>
+                                    If LCase(line2) = "inherits vbparent" Then className = split(2) ' public class <classname>
                                 End If
-                                If LCase(line).StartsWith("public sub new(ocvb as algorithmdata") Then
+                                If LCase(line).StartsWith("public sub new(ocvb as vbocvb") Then
                                     sortedNames.Add(className, sIndex)
                                     sIndex += 1
                                 End If
@@ -99,7 +99,7 @@ Module UI_GeneratorMain
         sw.WriteLine("end module")
         sw.WriteLine("Public Class algorithmList")
 
-        sw.WriteLine("Public Function createAlgorithm(ocvb As AlgorithmData, algorithmName as string) As Object")
+        sw.WriteLine("Public Function createAlgorithm(ocvb As VBocvb, algorithmName as string) As Object")
         sw.WriteLine(vbTab + "redim callerSliderCounts(" + CStr(cleanNames.Count - 1) + ")")
         sw.WriteLine(vbTab + "redim callerCheckboxCounts(" + CStr(cleanNames.Count - 1) + ")")
         sw.WriteLine("Select Case ucase(algorithmName)")

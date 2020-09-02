@@ -28,10 +28,10 @@ End Module
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
 Public Class Harris_Features_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -46,7 +46,7 @@ Public Class Harris_Features_CPP
         Harris_Features = Harris_Features_Open()
         label2 = "RGB overlaid with Harris result"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim threshold = sliders.trackbar(0).Value / 10000
@@ -75,12 +75,12 @@ End Class
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
 Public Class Harris_Detector_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim srcData() As Byte
     Dim ptCount(1) As Int32
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
@@ -90,7 +90,7 @@ Public Class Harris_Detector_CPP
         ReDim srcData(ocvb.color.Total - 1)
         Harris_Detector = Harris_Detector_Open()
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim qualityLevel = sliders.trackbar(0).Value / 100

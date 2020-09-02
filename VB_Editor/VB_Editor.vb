@@ -22,7 +22,7 @@ Module VB_EditorMain
 
     Private Function insertLine(line As String) As Boolean
         Static insideRunFunction As Boolean
-        If Trim(line) = "Public Sub Run(ocvb As AlgorithmData)" Then insideRunFunction = True
+        If Trim(line) = "Public Sub Run(ocvb As VBocvb)" Then insideRunFunction = True
         If Trim(line) = "End Sub" And insideRunFunction Then
             'Console.WriteLine(vbTab + vbTab + "MyBase.Finish(ocvb)")
             changeLines += 1

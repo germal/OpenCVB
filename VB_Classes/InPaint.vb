@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
 Public Class InPaint_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
@@ -17,7 +17,7 @@ Public Class InPaint_Basics
         desc = "Create a flaw in an image and then use inPaint to mask it."
         label2 = "Repaired Image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
         If ocvb.frameCount Mod 100 Then Exit Sub
@@ -36,9 +36,9 @@ End Class
 
 
 Public Class InPaint_Noise
-    Inherits ocvbClass
+    Inherits VBparent
     Dim noise As Draw_Noise
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         noise = New Draw_Noise(ocvb)
 
@@ -50,7 +50,7 @@ Public Class InPaint_Noise
         desc = "Create noise in an image and then use inPaint to remove it."
         label2 = "Repaired Image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.src = src
         noise.Run(ocvb) ' create some noise in the result1 image.

@@ -39,16 +39,16 @@ End Module
 
 
 Public Class Draw_rectangles
-    Inherits ocvbClass
+    Inherits VBparent
     Public updateFrequency = 30
     Public drawRotatedRectangles As Boolean
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
         desc = "Draw the requested number of rotated rectangles."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -73,18 +73,18 @@ End Class
 
 
 Public Class Draw_Noise
-    Inherits ocvbClass
+    Inherits VBparent
     Public maxNoiseWidth As Int32 = 3
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
         desc = "Add Noise to the color image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         maxNoiseWidth = sliders.trackbar(1).Value
         src.CopyTo(dst1)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
@@ -104,15 +104,15 @@ End Class
 
 
 Public Class Draw_rotatedRectangles
-    Inherits ocvbClass
+    Inherits VBparent
     Public rect As Draw_rectangles
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         rect = New Draw_rectangles(ocvb)
         rect.drawRotatedRectangles = True
         desc = "Draw the requested number of rectangles."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         rect.src = src
         rect.Run(ocvb)
         dst1 = rect.dst1
@@ -122,15 +122,15 @@ End Class
 
 
 Public Class Draw_Ellipses
-    Inherits ocvbClass
+    Inherits VBparent
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
         desc = "Draw the requested number of ellipses."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -147,15 +147,15 @@ End Class
 
 
 Public Class Draw_Circles
-    Inherits ocvbClass
+    Inherits VBparent
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
         desc = "Draw the requested number of circles."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -171,15 +171,15 @@ End Class
 
 
 Public Class Draw_Line
-    Inherits ocvbClass
+    Inherits VBparent
     Public updateFrequency = 30
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
         desc = "Draw the requested number of Lines."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.White)
         For i = 0 To sliders.trackbar(0).Value - 1
@@ -195,8 +195,8 @@ End Class
 
 
 Public Class Draw_Polygon
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
@@ -208,7 +208,7 @@ Public Class Draw_Polygon
         radio.check(1).Text = "Polygon Filled"
         radio.check(0).Checked = True
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -251,12 +251,12 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class Draw_RngImage
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Use RNG to draw the same set of shapes every time"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
         dst1.SetTo(cv.Scalar.White)
@@ -292,8 +292,8 @@ End Class
 
 
 Public Class Draw_SymmetricalShapes
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
@@ -310,7 +310,7 @@ Public Class Draw_SymmetricalShapes
         check.Box(4).Checked = True
         desc = "Generate shapes programmatically"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static rotateAngle As Single = 0
         Static fillColor = cv.Scalar.Red
         If check.Box(4).Checked Then
@@ -365,7 +365,7 @@ End Class
 
 
 Public Class Draw_ClipLine
-    Inherits ocvbClass
+    Inherits VBparent
     Dim flow As Font_FlowText
     Dim kalman As Kalman_Basics
     Dim lastRect As cv.Rect
@@ -380,7 +380,7 @@ Public Class Draw_ClipLine
         rect = initRandomRect(dst2.Width, dst2.Height, 25)
         If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         flow = New Font_FlowText(ocvb)
@@ -390,7 +390,7 @@ Public Class Draw_ClipLine
 
         desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         dst2 = src
         kalman.input = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(ocvb)
@@ -424,7 +424,7 @@ End Class
 
 
 Public Class Draw_Arc
-    Inherits ocvbClass
+    Inherits VBparent
     Dim kalman As Kalman_Basics
     Dim saveArcAngle As Integer
     Dim saveMargin As Integer
@@ -436,7 +436,7 @@ Public Class Draw_Arc
 
     Dim colorIndex As Integer
     Dim thickness As Integer
-    Private Sub setup(ocvb As AlgorithmData)
+    Private Sub setup(ocvb As VBocvb)
         saveMargin = sliders.trackbar(0).Value ' work in the middle of the image.
 
         rect = initRandomRect(dst1.Width, dst1.Height, saveMargin)
@@ -448,7 +448,7 @@ Public Class Draw_Arc
 
         kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
@@ -466,7 +466,7 @@ Public Class Draw_Arc
 
         desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If kalman.check.Box(0).Checked Then
             kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             kalman.Run(ocvb)
@@ -500,14 +500,14 @@ End Class
 
 
 Public Class Draw_OverlappingRectangles
-    Inherits ocvbClass
+    Inherits VBparent
     Dim flood As Floodfill_Identifiers
     Public inputRects As New List(Of cv.Rect)
     Public inputMasks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public sortedMasks As New SortedList(Of cv.Rect, cv.Mat)(New CompareMasks)
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         If standalone Then flood = New Floodfill_Identifiers(ocvb)
@@ -532,7 +532,7 @@ Public Class Draw_OverlappingRectangles
         Next
         Return True
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             flood.src = src
             flood.Run(ocvb)

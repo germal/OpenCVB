@@ -7,19 +7,19 @@ Module MinTriangle_Exports
 End Module
 
 Public Class Area_MinTriangle_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim numberOfPoints As Int32
     Public srcPoints() As cv.Point2f
     Public srcData() As Byte
     Public dstData() As Byte
     Public triangle As cv.Mat
-    Private Sub setup(ocvb As AlgorithmData)
+    Private Sub setup(ocvb As VBocvb)
         numberOfPoints = sliders.trackbar(0).Value
         ReDim srcPoints(numberOfPoints)
         ReDim srcData(numberOfPoints * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' input is a list of points.
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
@@ -27,7 +27,7 @@ Public Class Area_MinTriangle_CPP
         setup(ocvb)
         desc = "Find minimum containing triangle for a set of points."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup(ocvb)
@@ -61,15 +61,15 @@ End Class
 
 
 Public Class Area_MinRect
-    Inherits ocvbClass
+    Inherits VBparent
     Dim numberOfPoints As Integer
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
-    Private Sub setup(ocvb As AlgorithmData, _numberOfPoints As Integer)
+    Private Sub setup(ocvb As VBocvb, _numberOfPoints As Integer)
         numberOfPoints = _numberOfPoints
         ReDim srcPoints(numberOfPoints)
     End Sub
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -80,7 +80,7 @@ Public Class Area_MinRect
 
         desc = "Find minimum containing rectangle for a set of points."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup(ocvb, pointCountSlider.value)
@@ -103,9 +103,9 @@ End Class
 
 
 Public Class Area_MinMotionRect
-    Inherits ocvbClass
+    Inherits VBparent
     Dim bgSub As BGSubtract_MOG
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bgSub = New BGSubtract_MOG(ocvb)
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
@@ -125,7 +125,7 @@ Public Class Area_MinMotionRect
         Next
         Return gray
     End Function
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         bgSub.src = src
         bgSub.Run(ocvb)
         Dim gray As cv.Mat
@@ -142,14 +142,14 @@ End Class
 
 
 Public Class Area_FindNonZero
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = "Coordinates of non-zero points"
         label2 = "Non-zero original points"
         desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
         For i = 0 To srcPoints.Length - 1

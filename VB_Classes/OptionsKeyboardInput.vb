@@ -3,7 +3,7 @@
 Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
-    Public Sub Setup(ocvb As AlgorithmData, caller As String)
+    Public Sub Setup(ocvb As VBocvb, caller As String)
         Me.Text = caller + " CheckBox Options"
         Me.Show() ' only the first one   gets to be visible...
     End Sub

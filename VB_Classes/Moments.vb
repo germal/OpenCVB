@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Moments_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Public inputMask As cv.Mat
     Public centroid As cv.Point2f
     Dim foreground As kMeans_Depth_FG_BG
@@ -8,7 +8,7 @@ Public Class Moments_Basics
     Public offsetPt As cv.Point
     Public kalman As Kalman_Basics
     Public useKalman As Boolean = True
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         If standalone Then foreground = New kMeans_Depth_FG_BG(ocvb)
@@ -19,7 +19,7 @@ Public Class Moments_Basics
         label1 = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the provided mask file."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If standalone Then
             foreground.Run(ocvb)
             dst1 = foreground.dst1
@@ -46,10 +46,10 @@ End Class
 
 
 Public Class Moments_CentroidKalman
-    Inherits ocvbClass
+    Inherits VBparent
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(2 - 1) ' 2 elements - cv.point
@@ -59,7 +59,7 @@ Public Class Moments_CentroidKalman
         label1 = "Red dot = Kalman smoothed centroid"
         desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         foreground.Run(ocvb)
         dst1 = foreground.dst1
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

@@ -3,12 +3,12 @@ Imports OpenCvSharp.Aruco.CvAruco
 
 ' https://github.com/shimat/opencvsharp_samples/blob/master/SamplesCS/Samples/ArucoSample.cs
 Public Class Aruco_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Show how to use the Aruco markers and rotate the image accordingly."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim tmp = cv.Cv2.ImRead(ocvb.HomeDir + "Data/aruco_markers_photo.jpg")
         Static detectorParameters = cv.Aruco.DetectorParameters.Create()
         detectorParameters.CornerRefinementMethod = cv.Aruco.CornerRefineMethod.Subpix
@@ -29,15 +29,15 @@ End Class
 
 
 Public Class Aruco_CS
-    Inherits ocvbClass
+    Inherits VBparent
     Dim aruco As New CS_Classes.Aruco_Detect
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = "Original Image with marker ID's"
         label2 = "Normalized image after WarpPerspective."
         desc = "Testing the Aruco marker detection in C#"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim tmp = cv.Cv2.ImRead(ocvb.HomeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)
         dst1 = aruco.detectedMarkers.Resize(src.Size())

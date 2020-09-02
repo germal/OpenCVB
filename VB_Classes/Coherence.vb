@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
@@ -12,7 +12,7 @@ Public Class Coherence_Basics
         label1 = "Coherence - draw rectangle to apply"
         desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
         Dim blend = sliders.trackbar(1).Value / 10
         Dim str_sigma = sliders.trackbar(2).Value * 2 + 1
@@ -72,14 +72,14 @@ End Class
 
 
 Public Class Coherence_Depth
-    Inherits ocvbClass
+    Inherits VBparent
     Dim coherent As Coherence_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         coherent = New Coherence_Basics(ocvb)
         desc = "Find coherent lines in the depth image - Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         coherent.src = ocvb.RGBDepth
         coherent.Run(ocvb)
         dst1 = coherent.dst1

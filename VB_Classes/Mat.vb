@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Mat_Repeat
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Use the repeat method to replicate data."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst1 = small.Repeat(10, 10)
         small = ocvb.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -16,9 +16,9 @@ End Class
 
 
 Public Class Mat_PointToMat
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mask As Random_Points
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mask = New Random_Points(ocvb)
         mask.plotPoints = True
@@ -26,7 +26,7 @@ Public Class Mat_PointToMat
         label2 = "Random_Points points after format change"
         desc = "Convert pointf3 into a mat of points"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         mask.Run(ocvb) ' generates a set of points
         dst1 = mask.dst1
         Dim rows = mask.Points.Length
@@ -43,15 +43,15 @@ End Class
 
 
 Public Class Mat_MatToPoint
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mask As Random_Points
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mask = New Random_Points(ocvb)
         desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim points(src.Total - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
         Dim index As Int32 = 0
@@ -71,14 +71,14 @@ End Class
 
 
 Public Class Mat_Transpose
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Transpose a Mat and show results."
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim trColor = src.T()
         dst1 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
         Dim trBack = dst1.T()
@@ -90,14 +90,14 @@ End Class
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
 Public Class Mat_Tricks
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
         desc = "Show some Mat tricks."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim mat = src.Resize(New cv.Size(200, 200))
         Dim x = 40
         Dim y = 80
@@ -114,14 +114,14 @@ End Class
 
 
 Public Class Mat_4to1
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Dim mat3 As cv.Mat
     Dim mat4 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
     Public noLines As Boolean ' if they want lines or not...
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mat1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -133,7 +133,7 @@ Public Class Mat_4to1
         label2 = "Click any quadrant at left to view it below"
         desc = "Use one Mat for up to 4 images"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static nSize = New cv.Size(ocvb.color.Width / 2, ocvb.color.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
@@ -163,12 +163,12 @@ End Class
 
 
 Public Class Mat_2to1
-    Inherits ocvbClass
+    Inherits VBparent
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Public mat() = {mat1, mat2}
     Public noLines As Boolean ' if they want lines or not...
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mat1 = New cv.Mat(New cv.Size(ocvb.color.Rows, ocvb.color.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -178,7 +178,7 @@ Public Class Mat_2to1
         label1 = ""
         desc = "Fill a Mat with 2 images"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static nSize = New cv.Size(ocvb.color.Width, ocvb.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -203,11 +203,11 @@ End Class
 
 
 Public Class Mat_ImageXYZ_MT
-    Inherits ocvbClass
+    Inherits VBparent
     Dim grid As Thread_Grid
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -226,7 +226,7 @@ Public Class Mat_ImageXYZ_MT
 
         desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
         Dim depth32f = getDepth32f(ocvb)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -246,13 +246,13 @@ End Class
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
 Public Class Mat_RowColRange
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = "BitwiseNot of RowRange and ColRange"
         desc = "Perform operation on a range of cols and/or Rows."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
         dst1 = src
@@ -266,13 +266,13 @@ End Class
 
 
 Public Class Mat_Managed
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         label1 = "Color change is in the managed cv.vec3b array"
         desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Static autoRand As New Random()
         Static img(src.Total) As cv.Vec3b
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)

@@ -3,8 +3,8 @@ Imports System.Runtime.InteropServices
 Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
 Public Class Edges_Canny
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Canny threshold1", 1, 255, 50)
@@ -15,7 +15,7 @@ Public Class Edges_Canny
         label1 = "Canny using L1 Norm"
         label2 = "Canny using L2 Norm"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim threshold1 As Int32 = sliders.trackbar(0).Value
         Dim threshold2 As Int32 = sliders.trackbar(1).Value
         Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
@@ -28,11 +28,11 @@ End Class
 
 
 Public Class Edges_DepthAndColor
-    Inherits ocvbClass
+    Inherits VBparent
     Dim shadow As Depth_Holes
     Dim canny As Edges_Canny
     Dim dilate As DilateErode_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
         dilate.radio.check(2).Checked = True
@@ -47,7 +47,7 @@ Public Class Edges_DepthAndColor
         label1 = "Edges in color and depth after dilate"
         label2 = "Edges in color and depth no dilate"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         canny.src = src
         canny.Run(ocvb)
         shadow.Run(ocvb)
@@ -68,8 +68,8 @@ End Class
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Edges_Laplacian
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
@@ -77,7 +77,7 @@ Public Class Edges_Laplacian
         label2 = "Laplacian of Depth Image"
         desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
 
@@ -95,15 +95,15 @@ End Class
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_Scharr
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
         label2 = "x field + y field in CV_32F format"
         desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
@@ -116,8 +116,8 @@ End Class
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Edges_Preserving
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Edge RecurseFilter"
@@ -131,7 +131,7 @@ Public Class Edges_Preserving
         label2 = "Edge preserving blur for RGB depth image above"
         desc = "OpenCV's edge preserving filter."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
@@ -165,10 +165,10 @@ End Module
 
 '  https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
 Public Class Edges_RandomForest_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim rgbData() As Byte
     Dim EdgesPtr As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
@@ -177,7 +177,7 @@ Public Class Edges_RandomForest_CPP
         ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount < 100 Then ocvb.trueText(New TTtext("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100))
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
@@ -205,10 +205,10 @@ End Class
 
 
 Public Class Edges_LeftView
-    Inherits ocvbClass
+    Inherits VBparent
     Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         red = New LeftRightView_Basics(ocvb)
         sobel = New Edges_Sobel(ocvb)
@@ -218,7 +218,7 @@ Public Class Edges_LeftView
         label1 = "Edges in Left Image"
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         red.Run(ocvb)
         Dim leftView = red.dst1
         sobel.src = red.dst2
@@ -234,8 +234,8 @@ End Class
 
 
 Public Class Edges_ResizeAdd
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Border Vertical in Pixels", 1, 20, 5)
@@ -246,7 +246,7 @@ Public Class Edges_ResizeAdd
         label1 = "Edges found with just resizing"
         label2 = "Found edges added to grayscale image source."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
                             New cv.Range(sliders.trackbar(1).Value, gray.Cols - sliders.trackbar(1).Value))
@@ -261,8 +261,8 @@ End Class
 
 
 Public Class Edges_DCTfrequency
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 32)
@@ -271,7 +271,7 @@ Public Class Edges_DCTfrequency
         label2 = "Mask for the isolated frequencies"
         desc = "Find edges by removing all the highest frequencies."
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -310,9 +310,9 @@ End Module
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
 Public Class Edges_Deriche_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim Edges_Deriche As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Deriche Alpha", 1, 400, 100)
@@ -321,7 +321,7 @@ Public Class Edges_Deriche_CPP
         label2 = "Image enhanced with Deriche results"
         desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
@@ -351,16 +351,16 @@ End Class
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_Sobel
-    Inherits ocvbClass
+    Inherits VBparent
     Public grayX As cv.Mat
     Public grayY As cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
         desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

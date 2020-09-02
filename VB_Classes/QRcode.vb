@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 Public Class QRcode_Basics
-    Inherits ocvbClass
+    Inherits VBparent
     Dim qrDecoder As New cv.QRCodeDetector
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         Dim fileInfo = New FileInfo(ocvb.homeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
@@ -17,7 +17,7 @@ Public Class QRcode_Basics
         End If
         desc = "Read a QR code"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))
         Dim y = msRNG.Next(0, src.Height - Math.Max(qrInput1.Height, qrInput2.Height))
         If CInt(ocvb.frameCount / 50) Mod 2 = 0 Then

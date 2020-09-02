@@ -8,12 +8,12 @@ End Module
 
 
 Public Class Rodrigues_ValidateKinect
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.Kinect4AzureCam Then
             dst2.SetTo(0)
             ocvb.trueText(New TTtext("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140))
@@ -34,12 +34,12 @@ End Class
 
 
 Public Class Rodrigues_ValidateVector
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.StereoLabsZED2 And
             ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.T265Camera Then
             dst2.SetTo(0)
@@ -81,12 +81,12 @@ End Class
 
 
 Public Class Rodrigues_RotationMatrix
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim rot = ocvb.parms.IMU_RotationMatrix
         Dim output As String = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
         For i = 0 To 2
@@ -113,12 +113,12 @@ End Class
 
 
 Public Class Rodrigues_Extrinsics
-    Inherits ocvbClass
-    Public Sub New(ocvb As AlgorithmData)
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim rot = ocvb.parms.extrinsics.rotation
         Dim output As String = "Extrinsics Rotation Matrix" + vbCrLf
         For i = 0 To 2
