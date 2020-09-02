@@ -40,6 +40,15 @@ Public Class VBocvb
     Public testAllRunning As Boolean
     Public transformationMatrix() As Single
 
+    Public openFileDialogRequested As Boolean
+    Public openFileInitialDirectory As String
+    Public openFileFilter As String
+    Public openFileFilterIndex As Integer
+    Public openFileDialogName As String
+    Public openFileDialogTitle As String
+    Public openFileSliderPercent As Single
+    Public fileStarted As Boolean
+    Public initialStartSetting As Boolean
 
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))

@@ -40,21 +40,21 @@ Public Class Sound_ToPCM
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "Data\"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", "")
-        ocvb.parms.openFileFilter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
-        ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileDialogTitle = "Select an audio file to analyze"
-        ocvb.parms.initialStartSetting = True
+        ocvb.openFileDialogRequested = True
+        ocvb.openFileInitialDirectory = ocvb.HomeDir + "Data\"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", "")
+        ocvb.openFileFilter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
+        ocvb.openFileFilterIndex = 1
+        ocvb.openFileDialogTitle = "Select an audio file to analyze"
+        ocvb.initialStartSetting = True
 
         desc = "Load an audio file, play it, and convert to PCM"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If inputFileName <> ocvb.parms.openFileDialogName Then
-            inputFileName = ocvb.parms.openFileDialogName
+        If inputFileName <> ocvb.openFileDialogName Then
+            inputFileName = ocvb.openFileDialogName
             Dim fileinfo = New FileInfo(inputFileName)
-            If fileinfo.Exists And ocvb.parms.fileStarted Then
+            If fileinfo.Exists And ocvb.fileStarted Then
                 Close()
 
                 reader = New MediaFoundationReader(fileinfo.FullName)
@@ -82,8 +82,8 @@ Public Class Sound_ToPCM
                 startTime = Now
             End If
         End If
-        If ocvb.parms.fileStarted Then
-            ocvb.parms.openFileSliderPercent = (Now - startTime).TotalSeconds / pcmDuration
+        If ocvb.fileStarted Then
+            ocvb.openFileSliderPercent = (Now - startTime).TotalSeconds / pcmDuration
         Else
             inputFileName = ""
             player?.Stop()
@@ -140,7 +140,7 @@ Public Class Sound_SignalGenerator
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static radioIndex As Integer
-        If ocvb.parms.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
+        If ocvb.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
             radio.check(radioIndex).Checked = False Then
             If pcmDuration <> sliders.trackbar(4).Value Then
                 pcmDuration = sliders.trackbar(4).Value
@@ -173,8 +173,8 @@ Public Class Sound_SignalGenerator
         End If
         If standalone Then ocvb.trueText(New TTtext("Requested sound data is in the pcm32f cv.Mat", 10, 50))
 
-        ocvb.parms.openFileSliderPercent = ((Now - startTime).TotalSeconds Mod pcmDuration) / pcmDuration
-        If ocvb.parms.openFileSliderPercent >= 0.99 Then ocvb.parms.openFileSliderPercent = 0
+        ocvb.openFileSliderPercent = ((Now - startTime).TotalSeconds Mod pcmDuration) / pcmDuration
+        If ocvb.openFileSliderPercent >= 0.99 Then ocvb.openFileSliderPercent = 0
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -224,7 +224,7 @@ Public Class Sound_Display
             starttime = Now
         End If
 
-        If check.Box(0).Checked Or ocvb.parms.fileStarted Then
+        If check.Box(0).Checked Or ocvb.fileStarted Then
             sound.Run(ocvb)
 
             Dim halfHeight As Integer = dst1.Height / 2
@@ -295,14 +295,14 @@ Public Class Sound_Display
             End Select
         End If
         If check.Box(0).Checked = False Then
-            ocvb.parms.openFileSliderPercent = If(ocvb.parms.fileStarted, (Now - starttime).TotalSeconds / sound.pcmduration, 0)
+            ocvb.openFileSliderPercent = If(ocvb.fileStarted, (Now - starttime).TotalSeconds / sound.pcmduration, 0)
             ' when playing back an audio file, restart at the beginning when it is over...
-            If ocvb.parms.openFileSliderPercent > 0.99 Or ocvb.parms.fileStarted = False Then
+            If ocvb.openFileSliderPercent > 0.99 Or ocvb.fileStarted = False Then
                 sound.close()
                 sound = Nothing ' this will restart the audio
             End If
         End If
-        Dim x = dst1.Width * ocvb.parms.openFileSliderPercent
+        Dim x = dst1.Width * ocvb.openFileSliderPercent
         dst1.Line(New cv.Point(x, 0), New cv.Point(x, dst1.Height), cv.Scalar.Black, 2)
     End Sub
 End Class

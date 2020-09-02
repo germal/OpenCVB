@@ -1039,15 +1039,15 @@ Public Class OpenCVB
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
             Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, HomeDir.FullName, myLocation)
             textDesc = task.ocvb.description
-            openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
-            openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
-            openFileinitialStartSetting = task.ocvb.parms.initialStartSetting
-            task.ocvb.parms.fileStarted = task.ocvb.parms.initialStartSetting
-            openFileStarted = task.ocvb.parms.initialStartSetting
-            openFileFilterIndex = task.ocvb.parms.openFileFilterIndex
-            openFileFilter = task.ocvb.parms.openFileFilter
-            openFileDialogName = task.ocvb.parms.openFileDialogName
-            openfileDialogTitle = task.ocvb.parms.openFileDialogTitle
+            openFileInitialDirectory = task.ocvb.openFileInitialDirectory
+            openFileDialogRequested = task.ocvb.openFileDialogRequested
+            openFileinitialStartSetting = task.ocvb.initialStartSetting
+            task.ocvb.fileStarted = task.ocvb.initialStartSetting
+            openFileStarted = task.ocvb.initialStartSetting
+            openFileFilterIndex = task.ocvb.openFileFilterIndex
+            openFileFilter = task.ocvb.openFileFilter
+            openFileDialogName = task.ocvb.openFileDialogName
+            openfileDialogTitle = task.ocvb.openFileDialogTitle
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName + vbCrLf + vbCrLf)
@@ -1159,7 +1159,7 @@ Public Class OpenCVB
                 If mouseClickFlag Then task.ocvb.mouseClickPoint = mousePoint
                 mouseClickFlag = False
 
-                task.ocvb.parms.fileStarted = openFileStarted ' UI may have stopped play.
+                task.ocvb.fileStarted = openFileStarted ' UI may have stopped play.
 
                 task.RunAlgorithm()
 
@@ -1170,23 +1170,23 @@ Public Class OpenCVB
                 End If
 
                 If openFileDialogName <> "" Then
-                    If openFileDialogName <> task.ocvb.parms.openFileDialogName Or openFileStarted <> task.ocvb.parms.fileStarted Then
-                        task.ocvb.parms.fileStarted = openFileStarted
-                        task.ocvb.parms.openFileDialogName = openFileDialogName
+                    If openFileDialogName <> task.ocvb.openFileDialogName Or openFileStarted <> task.ocvb.fileStarted Then
+                        task.ocvb.fileStarted = openFileStarted
+                        task.ocvb.openFileDialogName = openFileDialogName
                     End If
-                    openfileSliderPercent = task.ocvb.parms.openFileSliderPercent
+                    openfileSliderPercent = task.ocvb.openFileSliderPercent
                 End If
 
-                Static inputFile As String = task.ocvb.parms.openFileDialogName
-                If inputFile <> task.ocvb.parms.openFileDialogName Then
-                    inputFile = task.ocvb.parms.openFileDialogName
-                    openFileInitialDirectory = task.ocvb.parms.openFileInitialDirectory
-                    openFileDialogRequested = task.ocvb.parms.openFileDialogRequested
+                Static inputFile As String = task.ocvb.openFileDialogName
+                If inputFile <> task.ocvb.openFileDialogName Then
+                    inputFile = task.ocvb.openFileDialogName
+                    openFileInitialDirectory = task.ocvb.openFileInitialDirectory
+                    openFileDialogRequested = task.ocvb.openFileDialogRequested
                     openFileinitialStartSetting = True ' if the file playing changes while the algorithm is running, automatically start playing the new file.
-                    openFileFilterIndex = task.ocvb.parms.openFileFilterIndex
-                    openFileFilter = task.ocvb.parms.openFileFilter
-                    openFileDialogName = task.ocvb.parms.openFileDialogName
-                    openfileDialogTitle = task.ocvb.parms.openFileDialogTitle
+                    openFileFilterIndex = task.ocvb.openFileFilterIndex
+                    openFileFilter = task.ocvb.openFileFilter
+                    openFileDialogName = task.ocvb.openFileDialogName
+                    openfileDialogTitle = task.ocvb.openFileDialogTitle
                 End If
 
                 picLabels(2) = task.ocvb.label1

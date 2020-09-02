@@ -68,17 +68,6 @@ Public Class ActiveTask : Implements IDisposable
         Public IMU_FrameTime As Double
         Public CPU_TimeStamp As Double
         Public CPU_FrameTime As Double
-        Public minimizeMemoryFootprint As Boolean
-
-        Public openFileDialogRequested As Boolean
-        Public openFileInitialDirectory As String
-        Public openFileFilter As String
-        Public openFileFilterIndex As Integer
-        Public openFileDialogName As String
-        Public openFileDialogTitle As String
-        Public openFileSliderPercent As Single
-        Public fileStarted As Boolean
-        Public initialStartSetting As Boolean
 
         Public Const Kinect4AzureCam As Int32 = 0
         Public Const T265Camera As Int32 = 1
@@ -103,10 +92,6 @@ Public Class ActiveTask : Implements IDisposable
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Problem likely originated with the UIindexer.")
         End If
-        If algorithmObject Is Nothing And algName.EndsWith(".py") Then
-            algName = algName.Substring(0, Len(algName) - 3)
-            algorithmObject = algoList.createAlgorithm(ocvb, algName)
-        End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
         ocvb.description = algorithmObject.desc
     End Sub
@@ -116,7 +101,7 @@ Public Class ActiveTask : Implements IDisposable
     Public Sub RunAlgorithm()
         Try
             If ocvb.parms.useRecordedData Then
-                Dim recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
+                Dim recordingFilename = New FileInfo(ocvb.openFileDialogName)
                 If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
                     ocvb.trueText(New TTtext("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125))
                     Exit Sub

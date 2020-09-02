@@ -77,25 +77,25 @@ Public Class Replay_Record
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "/Data/"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.homeDir + "Recording.ocvb")
-        ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
-        ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"
-        ocvb.parms.initialStartSetting = False
+        ocvb.openFileDialogRequested = True
+        ocvb.openFileInitialDirectory = ocvb.HomeDir + "/Data/"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.HomeDir + "Recording.ocvb")
+        ocvb.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
+        ocvb.openFileFilterIndex = 1
+        ocvb.openFileDialogTitle = "Select an OpenCVB bag file to create"
+        ocvb.initialStartSetting = False
 
         desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static bytesTotal As Int64
-        recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
+        recordingFilename = New FileInfo(ocvb.openFileDialogName)
         If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
             ocvb.trueText(New TTtext("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125))
             Exit Sub
         End If
 
-        If ocvb.parms.fileStarted Then
+        If ocvb.fileStarted Then
             If recordingActive = False Then
                 bytesPerColor = ocvb.color.Total * ocvb.color.ElemSize
                 bytesPerRGBDepth = ocvb.RGBDepth.Total * ocvb.RGBDepth.ElemSize
@@ -128,10 +128,10 @@ Public Class Replay_Record
                 bytesTotal += cloudBytes.Length
 
                 If bytesTotal >= maxBytes Then
-                    ocvb.parms.fileStarted = False
+                    ocvb.fileStarted = False
                     recordingActive = False
                 Else
-                    ocvb.parms.openFileSliderPercent = bytesTotal / maxBytes
+                    ocvb.openFileSliderPercent = bytesTotal / maxBytes
                 End If
             End If
         Else
@@ -165,21 +165,21 @@ Public Class Replay_Play
     Dim recordingFilename As FileInfo
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "/Data/"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.homeDir + "Recording.ocvb")
-        ocvb.parms.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
-        ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileDialogTitle = "Select an OpenCVB bag file to create"
-        ocvb.parms.initialStartSetting = True
+        ocvb.openFileDialogRequested = True
+        ocvb.openFileInitialDirectory = ocvb.HomeDir + "/Data/"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.HomeDir + "Recording.ocvb")
+        ocvb.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
+        ocvb.openFileFilterIndex = 1
+        ocvb.openFileDialogTitle = "Select an OpenCVB bag file to create"
+        ocvb.initialStartSetting = True
 
         desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static bytesTotal As Int64
-        recordingFilename = New FileInfo(ocvb.parms.openFileDialogName)
+        recordingFilename = New FileInfo(ocvb.openFileDialogName)
         If recordingFilename.Exists = False Then ocvb.trueText(New TTtext("File not found: " + recordingFilename.FullName, 10, 125))
-        If ocvb.parms.fileStarted And recordingFilename.Exists Then
+        If ocvb.fileStarted And recordingFilename.Exists Then
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then
                 colorBytes = binRead.ReadBytes(bytesPerColor)
@@ -206,7 +206,7 @@ Public Class Replay_Play
                     playbackActive = False
                     bytesTotal = 0
                 End If
-                ocvb.parms.openFileSliderPercent = bytesTotal / recordingFilename.Length
+                ocvb.openFileSliderPercent = bytesTotal / recordingFilename.Length
                 dst1 = ocvb.color.Clone()
                 dst2 = ocvb.RGBDepth.Clone()
             Else

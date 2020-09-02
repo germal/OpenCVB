@@ -282,20 +282,20 @@ Public Class GeneticDrawing_Photo
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "Data\"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.homeDir + "Data/GeneticDrawingExample.jpg")
-        ocvb.parms.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
-        ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileDialogTitle = "Select an image file to create a paint version"
-        ocvb.parms.initialStartSetting = True
-        ocvb.parms.openFileSliderPercent = -1
+        ocvb.openFileDialogRequested = True
+        ocvb.openFileInitialDirectory = ocvb.HomeDir + "Data/"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.HomeDir + "Data/GeneticDrawingExample.jpg")
+        ocvb.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
+        ocvb.openFileFilterIndex = 1
+        ocvb.openFileDialogTitle = "Select an image file to create a paint version"
+        ocvb.initialStartSetting = True
+        ocvb.openFileSliderPercent = -1
 
         desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If inputFileName <> ocvb.parms.openFileDialogName Or ocvb.frameCount = 0 Then
-            Dim fileinfo = New FileInfo(ocvb.parms.openFileDialogName)
+        If inputFileName <> ocvb.openFileDialogName Or ocvb.frameCount = 0 Then
+            Dim fileinfo = New FileInfo(ocvb.openFileDialogName)
             If fileinfo.Exists = False Then
                 label1 = "No input file.  Use dialogbox below..."
                 Exit Sub
@@ -306,7 +306,7 @@ Public Class GeneticDrawing_Photo
                 label1 = "Input file must be RGB 3-channel image!"
                 Exit Sub
             End If
-            inputFileName = ocvb.parms.openFileDialogName
+            inputFileName = ocvb.openFileDialogName
 
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color(ocvb)

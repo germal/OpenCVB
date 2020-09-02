@@ -9,15 +9,15 @@ Public Class Video_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        ocvb.parms.openFileDialogRequested = True
-        ocvb.parms.openFileInitialDirectory = ocvb.homeDir + "/Data/"
-        ocvb.parms.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.homeDir + "Data\CarsDrivingUnderBridge.mp4")
-        ocvb.parms.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
-        ocvb.parms.openFileFilterIndex = 1
-        ocvb.parms.openFileDialogTitle = "Select a video file for input"
-        ocvb.parms.initialStartSetting = False
+        ocvb.openFileDialogRequested = True
+        ocvb.openFileInitialDirectory = ocvb.HomeDir + "/Data/"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
+        ocvb.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
+        ocvb.openFileFilterIndex = 1
+        ocvb.openFileDialogTitle = "Select a video file for input"
+        ocvb.initialStartSetting = False
 
-        Dim fileInfo = New FileInfo(ocvb.parms.openFileDialogName)
+        Dim fileInfo = New FileInfo(ocvb.openFileDialogName)
         srcVideo = fileInfo.FullName
 
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
@@ -25,14 +25,14 @@ Public Class Video_Basics
         desc = "Show a video file"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim fileInfo = New FileInfo(ocvb.parms.openFileDialogName)
-        If srcVideo <> ocvb.parms.openFileDialogName Then
+        Dim fileInfo = New FileInfo(ocvb.openFileDialogName)
+        If srcVideo <> ocvb.openFileDialogName Then
             If fileInfo.Exists = False Then
                 ocvb.trueText(New TTtext("File not found: " + fileInfo.FullName, 10, 125))
                 Exit Sub
             End If
-            srcVideo = ocvb.parms.openFileDialogName
-            captureVideo = New cv.VideoCapture(ocvb.parms.openFileDialogName)
+            srcVideo = ocvb.openFileDialogName
+            captureVideo = New cv.VideoCapture(ocvb.openFileDialogName)
         End If
         captureVideo.Read(image)
         If image.Empty() Then
@@ -41,7 +41,7 @@ Public Class Video_Basics
             captureVideo.Read(image)
         End If
 
-        ocvb.parms.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
+        ocvb.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
         If image.Empty() = False Then dst1 = image.Resize(ocvb.color.Size())
     End Sub
 End Class
