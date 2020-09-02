@@ -44,7 +44,7 @@ Public Class LeftRightView_CompareUndistorted
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 0)
         sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar(2, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 50)
+        sliders.setupTrackBar(2, "Slice Height", 1, (ocvb.color.Rows - 100) / 2, 30)
 
         Select Case ocvb.parms.cameraIndex
             Case VB_Classes.ActiveTask.algParms.D435i, VB_Classes.ActiveTask.algParms.StereoLabsZED2
