@@ -212,7 +212,7 @@ Public Class IMU_FrameTime
             Static allZeroCount As Integer
             allZeroCount += 1
             If allZeroCount > 20 Then
-                ocvb.trueText(New TTtext("Is IMU present?  No IMU FrameTimes", 10, 40))
+                ocvb.trueText(New TTtext("Is IMU present?  No IMU FrameTimes", 10, 10))
                 allZeroCount = Integer.MinValue ' don't show message again.
             End If
             Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
@@ -248,7 +248,7 @@ Public Class IMU_FrameTime
                                                   "IMU Frame Time = Blue" + vbCrLf +
                                                   "Host Frame Time = Green" + vbCrLf +
                                                   "IMU Total Delay = Red" + vbCrLf +
-                                                  "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often", 10, 40))
+                                                  "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often", 10, 10))
 
             plot.plotData = New cv.Scalar(ocvb.IMU_FrameTime, ocvb.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
             plot.Run(ocvb)
@@ -265,7 +265,7 @@ Public Class IMU_FrameTime
                     Next
                     allText += outStr + vbCrLf
                 Next
-                ocvb.trueText(New TTtext(allText, 10, 180))
+                ocvb.trueText(New TTtext(allText, 10, src.Height / 2))
             End If
         End If
     End Sub
@@ -332,7 +332,7 @@ Public Class IMU_HostFrameTimes
                                                   "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
                                                   "Green" + vbTab + "Host Frame Time" + vbCrLf +
                                                   "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
-                                                  "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often", 10, 40))
+                                                  "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often", 10, 10))
 
             plot.plotData = New cv.Scalar(ocvb.IMU_FrameTime, ocvb.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
             plot.Run(ocvb)
@@ -407,7 +407,7 @@ Public Class IMU_TotalDelay
                                               "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
                                               "Green" + vbTab + "Host Frame Time" + vbCrLf +
                                               "Red" + vbTab + "Host+IMU Total Delay (latency)" + vbCrLf +
-                                              "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)", 10, 40))
+                                              "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)", 10, 10))
 
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
         plot.Run(ocvb)
@@ -482,7 +482,7 @@ Public Class IMU_GVector
             If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then
                 outStr += vbCrLf + "Camera appears to be moving because the gravity vector is not 9.8.  Results may not be valid." + vbCrLf
             End If
-            ocvb.trueText(New TTtext(outStr, 10, 40))
+            ocvb.trueText(New TTtext(outStr, 10, 10))
 
             ' validate the result
             Dim valstr = "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +

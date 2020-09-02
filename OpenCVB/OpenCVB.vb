@@ -19,7 +19,6 @@ Public Class OpenCVB
     Dim AlgorithmCount As Int32
     Dim AlgorithmTestCount As Int32
     Dim algorithmTaskHandle As Thread
-    Dim saveAlgorithmName As String
     Dim border As Int32 = 6
     Dim BothFirstAndLastReady As Boolean
     Dim camera As Object
@@ -316,7 +315,6 @@ Public Class OpenCVB
                     For i = 0 To TTtextData.Count - 1
                         Dim tt = TTtextData(i)
                         If tt IsNot Nothing Then
-                            ' If resolutionSetting = OptionsDialog.lowRes Then tt.y -= 7 ' Fine-tuning the lowRes text.  Default y is too big but good at other resolutions.
                             If TTtextData(i).picTag = 3 Then
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio + camPic(0).Width, tt.y * ratio)
@@ -840,7 +838,7 @@ Public Class OpenCVB
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopCameraThread = True
-        saveAlgorithmName = "" ' this will stop the current algorithm.
+        algorithmTaskHandle.Abort()
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         Application.DoEvents()
         camera.closePipe()
@@ -951,7 +949,7 @@ Public Class OpenCVB
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
         TestAllTimer.Enabled = False
-        saveAlgorithmName = "" ' this will shut down the currently running algorithm
+        algorithmTaskHandle.Abort()
 
         Dim saveCurrentCamera = optionsForm.cameraIndex
 
@@ -992,7 +990,6 @@ Public Class OpenCVB
         parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
         parms.IMU_RotationVector = camera.IMU_RotationVector
 
-        saveAlgorithmName = AvailableAlgorithms.Text ' to share with the camera task...
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
         If AvailableAlgorithms.Text.Contains("OpenGL") Or AvailableAlgorithms.Text.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
 
@@ -1025,8 +1022,7 @@ Public Class OpenCVB
         parms.extrinsics = camera.Extrinsics_VB
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
-        algorithmTaskHandle.Name = saveAlgorithmName
-        algorithmTaskHandle.Priority = ThreadPriority.Lowest
+        algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
 
         ActivateTimer.Enabled = True
@@ -1036,7 +1032,8 @@ Public Class OpenCVB
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
-            Dim algName = saveAlgorithmName
+            Dim algName = algorithmTaskHandle.Name
+            If algName = "" Then Exit Sub
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
             Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, HomeDir.FullName, myLocation)
@@ -1097,7 +1094,7 @@ Public Class OpenCVB
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
             While 1
-                If algName <> saveAlgorithmName Then Exit Sub ' pause will stop the current algorithm as well.
+                If algName <> algorithmTaskHandle.Name Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While
