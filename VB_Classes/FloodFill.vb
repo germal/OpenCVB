@@ -21,7 +21,7 @@ Public Class FloodFill_Basics
         sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar(3, "Step Size", 1, ocvb.color.Cols / 2, 20)
+        sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 20)
 
         label1 = "Input image to floodfill"
         desc = "Use floodfill to build image segments in a grayscale image."

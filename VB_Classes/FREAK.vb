@@ -15,9 +15,9 @@ Public Class FREAK_Basics
 
         Dim freak = cv.XFeatures2D.FREAK.Create()
         Dim fDesc = New cv.Mat
-        freak.Compute(ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY), orb.keypoints, fDesc)
+        freak.Compute(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), orb.keypoints, fDesc)
 
-        dst1 = ocvb.color.Clone()
+        dst1 = src.Clone()
 
         For Each kpt In orb.keypoints
             Dim r = kpt.Size / 2

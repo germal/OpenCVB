@@ -297,8 +297,8 @@ Public Class Draw_SymmetricalShapes
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
-        sliders.setupTrackBar(1, "Radius 1", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 4)
-        sliders.setupTrackBar(2, "Radius 2", 1, ocvb.color.Rows / 2, ocvb.color.Rows / 8)
+        sliders.setupTrackBar(1, "Radius 1", 1, src.Rows / 2, src.Rows / 4)
+        sliders.setupTrackBar(2, "Radius 2", 1, src.Rows / 2, src.Rows / 8)
         sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
 
         check.Setup(ocvb, caller, 5)
@@ -412,7 +412,7 @@ Public Class Draw_ClipLine
         Static hitCount = 0
         hitCount += If(clipped, 1, 0)
         ocvb.trueText(New TTtext("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
-                     CInt(ocvb.color.Width / 2), 200))
+                     CInt(src.Width / 2), 200))
         If r = rect Then setup()
         flow.Run(ocvb)
     End Sub
@@ -455,7 +455,7 @@ Public Class Draw_Arc
         ReDim kalman.input(7 - 1)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, ocvb.color.Width / 8, ocvb.color.Width / 16)
+        sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, src.Width / 8, src.Width / 16)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "Draw Full Ellipse"
         radio.check(1).Text = "Draw Filled Arc"

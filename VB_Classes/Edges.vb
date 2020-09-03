@@ -135,9 +135,9 @@ Public Class Edges_Preserving
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
-            cv.Cv2.EdgePreservingFilter(ocvb.color, dst1, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(src, dst1, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(ocvb.color, dst1, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(src, dst1, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
         If radio.check(0).Checked Then
             cv.Cv2.EdgePreservingFilter(ocvb.RGBDepth, dst2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
@@ -174,7 +174,7 @@ Public Class Edges_RandomForest_CPP
         sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
 
         desc = "Detect edges using structured forests - Opencv Contrib"
-        ReDim rgbData(ocvb.color.Total * ocvb.color.ElemSize - 1)
+        ReDim rgbData(src.Total * src.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -186,12 +186,12 @@ Public Class Edges_RandomForest_CPP
             EdgesPtr = Edges_RandomForest_Open(modelInfo.FullName)
         End If
         If ocvb.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.
-            Marshal.Copy(ocvb.color.Data, rgbData, 0, rgbData.Length)
+            Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
             Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
-            Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), ocvb.color.Rows, ocvb.color.Cols)
+            Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleRGB.Free() ' free the pinned memory...
 
-            dst2 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Close()
@@ -322,7 +322,6 @@ Public Class Edges_Deriche_CPP
         desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)

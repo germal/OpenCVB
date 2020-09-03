@@ -146,7 +146,7 @@ Public Class GeneticDrawing_Basics
             stage = 0
 
             If standalone Then
-                src = If(check.Box(0).Checked, ocvb.color.Clone, cv.Cv2.ImRead(ocvb.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                src = If(check.Box(0).Checked, src.Clone, cv.Cv2.ImRead(ocvb.HomeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
             check.Box(0).Checked = False
 

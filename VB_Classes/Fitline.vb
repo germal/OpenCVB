@@ -134,8 +134,8 @@ Public Class Fitline_RawInput
             If ocvb.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
             Dim dotSize = 2
-            Dim width = ocvb.color.Width
-            Dim height = ocvb.color.Height
+            Dim width = src.Width
+            Dim height = src.Height
 
             points.Clear()
             For i = 0 To sliders.trackbar(0).Value - 1

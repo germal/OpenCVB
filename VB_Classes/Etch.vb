@@ -8,7 +8,7 @@ Public Class Etch_ASketch
     Dim cursor As cv.Point
     Dim ms_rng As New System.Random
     Private Function randomCursor(ocvb As VBocvb)
-        Return New cv.Point(ms_rng.Next(0, ocvb.color.Width), ms_rng.Next(0, ocvb.color.Height))
+        Return New cv.Point(ms_rng.Next(0, src.Width), ms_rng.Next(0, src.Height))
     End Function
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -58,8 +58,8 @@ Public Class Etch_ASketch
             End Select
             If cursor.X < 0 Then cursor.X = 0
             If cursor.Y < 0 Then cursor.Y = 0
-            If cursor.X >= ocvb.color.Width Then cursor.X = ocvb.color.Width - 1
-            If cursor.Y >= ocvb.color.Height Then cursor.Y = ocvb.color.Height - 1
+            If cursor.X >= src.Width Then cursor.X = src.Width - 1
+            If cursor.Y >= src.Height Then cursor.Y = src.Height - 1
             dst1.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black)
         Next
         If check.Box(1).Checked Then

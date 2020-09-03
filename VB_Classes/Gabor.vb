@@ -54,8 +54,8 @@ Public Class Gabor_Basics_MT
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = ocvb.color.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
-        gridHeightSlider.Value = ocvb.color.Height / 4
+        gridWidthSlider.Value = src.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
+        gridHeightSlider.Value = src.Height / 4
 
         grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
         grid.sliders.Visible = False
@@ -79,7 +79,7 @@ Public Class Gabor_Basics_MT
         Next
 
         Dim accum = src.Clone()
-        Dim dst32f = New cv.Mat(ocvb.color.Height, ocvb.color.Width, cv.MatType.CV_32F, 0)
+        Dim dst32f = New cv.Mat(src.Height, src.Width, cv.MatType.CV_32F, 0)
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)

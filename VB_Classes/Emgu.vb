@@ -14,14 +14,14 @@ Imports cv = OpenCvSharp
 '        desc = "Test a sample EMGU usage."
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
-'        Dim data(ocvb.color.Rows * ocvb.color.Cols * ocvb.color.ElemSize) As Byte
+'        Dim data(src.Rows * src.Cols * src.ElemSize) As Byte
 '        If ocvb.testAllRunning  Then
 '            ocvb.trueText(New TTtext("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
 '                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
 '        Else
-'            Emgu_Classes.DrawSubdivision.Draw(ocvb.color.Rows, ocvb.color.Cols, 20, data)
+'            Emgu_Classes.DrawSubdivision.Draw(src.Rows, src.Cols, 20, data)
 '            ' why not just have Draw return a Mat from Emgu?  Because an Emgu Mat is not an OpenCVSharp Mat!  But this works...
-'            dst1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, data)
+'            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, data)
 '        End If
 '    End Sub
 'End Class

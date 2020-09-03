@@ -56,7 +56,7 @@ Public Class FishEye_Rectified
             Dim tmp = ocvb.rightView.Resize(ocvb.pointCloud.Size())
             Dim rightTmp = New cv.Mat(t265Original.Height, t265Original.Width, cv.MatType.CV_8U, 255) ' 848, 800
             tmp(t265Rect).CopyTo(rightTmp(New cv.Rect((848 - 763) / 2, (800 - 720) / 2, t265Rect.Width, t265Rect.Height)))
-            rightView = rightTmp.Remap(rightViewMap1, rightViewMap2, cv.InterpolationFlags.Linear).Resize(ocvb.color.Size())
+            rightView = rightTmp.Remap(rightViewMap1, rightViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
         Else
             label1 = "Left View (no fisheye lens present)"
             label2 = "Right View (no fisheye lens present)"
