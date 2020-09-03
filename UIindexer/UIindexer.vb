@@ -50,8 +50,8 @@ Module IndexMain
         End While
         srAPI.Close()
 
-        ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive!
-        Dim ocvbKeywords() As String = {"testAllRunning", "mouseClickPoint", "mousePoint", "mouseClickFlag", "resolution", "mousePicTag"}
+        ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive and sorted!
+        Dim ocvbKeywords() As String = {"mouseClickPoint", "mouseClickFlag", "mousePicTag", "mousePoint", "resolution", "testAllRunning"}
         For i = 0 To ocvbKeywords.Length - 1
             apiListLCase.Add(LCase(ocvbKeywords(i))) ' no "(" in the lower case edition - these are not function calls.
             apiList.Add(ocvbKeywords(i) + "(")
@@ -94,9 +94,9 @@ Module IndexMain
                 If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")
-                    ' next line must be "Inherits ocvbClass"
+                    ' next line must be "Inherits VBparent"
                     Dim line2 = Trim(nextFile.ReadLine())
-                    If LCase(line2) = "inherits VBparent" Then
+                    If line2 = "Inherits VBparent" Then
                         classname = split(2) ' public class <classname>
                     End If
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)
@@ -198,6 +198,12 @@ Module IndexMain
             sw.Write("," + OpenGLnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
+
+        For i = 0 To ocvbKeywords.Count - 1
+            sw.Write("<OpenCVB - " + ocvbKeywords(i) + ">,")
+            Dim j = sortedNames.IndexOfKey(ocvbKeywords(i))
+            sw.WriteLine(sortedNames.ElementAt(j).Value)
+        Next
 
         sw.Write("<Painterly>")
         For i = 0 To Painterly.Count - 1

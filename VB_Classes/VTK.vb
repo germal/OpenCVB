@@ -7,10 +7,10 @@ Imports System.IO
 Module VTK_Common
     Public Sub vtkInstructions(ocvb As VBocvb)
         ocvb.trueText(New TTtext("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
-                                             "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
-                                             "Step 2) Build VTK for both Debug and Release" + vbCrLf +
-                                             "Step 3) Build OpenCV for both Debug and Release" + vbCrLf +
-                                             "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125))
+                      "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
+                      "Step 2) Build VTK for both Debug and Release" + vbCrLf +
+                      "Step 3) Build OpenCV for both Debug and Release" + vbCrLf +
+                      "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125))
     End Sub
 End Module
 Public Class VTK_Basics
