@@ -97,7 +97,7 @@ Public Class Undistort_Basics
 
             maxDisp = sliders.trackbar(3).Value
             Dim stereo_height_px = sliders.trackbar(2).Value
-            undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.intrinsicsLeft)
+            undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
 
             ' the intrinsic coeff's on the Intel RS2 series are always zero.  Here we just make up some numbers so we can show the impact.
             If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.D435i Then

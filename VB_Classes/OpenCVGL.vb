@@ -61,7 +61,7 @@ Public Class OpenCVGL_Image_CPP
         Dim eye As New cv.Vec3f(sliders.trackbar(8).Value, sliders.trackbar(9).Value, sliders.trackbar(10).Value)
         Dim zTrans = sliders.trackbar(7).Value / 100
 
-        OpenCVGL_Image_Control(ocvb.intrinsicsLeft.ppx, ocvb.intrinsicsLeft.ppy, ocvb.intrinsicsLeft.fx, ocvb.intrinsicsLeft.fy,
+        OpenCVGL_Image_Control(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
                                FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, src.Width, src.Height)
 
         Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize

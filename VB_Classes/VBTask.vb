@@ -54,6 +54,10 @@ Public Class ActiveTask : Implements IDisposable
         Public IMU_Present As Boolean
         Public IMU_RotationVector As cv.Point3f
 
+        Public intrinsicsLeft As intrinsics_VB
+        Public intrinsicsRight As intrinsics_VB
+        Public extrinsics As Extrinsics_VB
+
         Public Const Kinect4AzureCam As Int32 = 0
         Public Const T265Camera As Int32 = 1
         Public Const StereoLabsZED2 As Int32 = 2

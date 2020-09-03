@@ -9,17 +9,17 @@ Public Class intrinsicsLeft_Basics
     Public Sub Run(ocvb As VBocvb)
         Dim ttStart = 40
         Dim ttStr As String = "Width = " + CStr(ocvb.color.Width) + vbTab + " height = " + CStr(ocvb.color.Height) + vbCrLf
-        ttStr += "fx = " + CStr(ocvb.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.intrinsicsLeft.fy) + vbCrLf
-        ttStr += "ppx = " + CStr(ocvb.intrinsicsLeft.ppx) + vbTab + " ppy = " + CStr(ocvb.intrinsicsLeft.ppy) + vbCrLf + vbCrLf
-        For i = 0 To ocvb.intrinsicsLeft.coeffs.Length - 1
-            ttStr += "coeffs(" + CStr(i) + ") = " + Format(ocvb.intrinsicsLeft.coeffs(i), "#0.000") + "   " + vbCrLf
+        ttStr += "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy) + vbCrLf
+        ttStr += "ppx = " + CStr(ocvb.parms.intrinsicsLeft.ppx) + vbTab + " ppy = " + CStr(ocvb.parms.intrinsicsLeft.ppy) + vbCrLf + vbCrLf
+        For i = 0 To ocvb.parms.intrinsicsLeft.coeffs.Length - 1
+            ttStr += "coeffs(" + CStr(i) + ") = " + Format(ocvb.parms.intrinsicsLeft.coeffs(i), "#0.000") + "   " + vbCrLf
         Next
-        If ocvb.intrinsicsLeft.FOV IsNot Nothing Then
-            If ocvb.intrinsicsLeft.FOV(0) = 0 Then
+        If ocvb.parms.intrinsicsLeft.FOV IsNot Nothing Then
+            If ocvb.parms.intrinsicsLeft.FOV(0) = 0 Then
                 ttStr += "Approximate FOV in x = " + CStr(hFOVangles(ocvb.parms.cameraIndex)) + vbCrLf +
                          "Approximate FOV in y = " + CStr(vFOVangles(ocvb.parms.cameraIndex)) + vbCrLf
             Else
-                ttStr += "FOV in x = " + CStr(ocvb.intrinsicsLeft.FOV(0)) + vbCrLf + "FOV in y = " + CStr(ocvb.intrinsicsLeft.FOV(1)) + vbCrLf
+                ttStr += "FOV in x = " + CStr(ocvb.parms.intrinsicsLeft.FOV(0)) + vbCrLf + "FOV in y = " + CStr(ocvb.parms.intrinsicsLeft.FOV(1)) + vbCrLf
             End If
         Else
             ttStr += "Approximate FOV in x = " + CStr(hFOVangles(ocvb.parms.cameraIndex)) + vbCrLf +
@@ -31,7 +31,7 @@ Public Class intrinsicsLeft_Basics
         dst2.Line(New cv.Point(src.Width / 2, 0), New cv.Point(src.Width / 2, src.Height), cv.Scalar.White, 1)
         dst2.Line(New cv.Point(0, src.Height / 2), New cv.Point(src.Width, src.Height / 2), cv.Scalar.White, 1)
 
-        Dim nextline = "(" + CStr(ocvb.intrinsicsLeft.ppx) + ", " + CStr(ocvb.intrinsicsLeft.ppy) + ")"
+        Dim nextline = "(" + CStr(ocvb.parms.intrinsicsLeft.ppx) + ", " + CStr(ocvb.parms.intrinsicsLeft.ppy) + ")"
         Dim ttLocation = New cv.Point(CInt(src.Width / 2) + 20, CInt(src.Height / 2) + 40)
         cv.Cv2.PutText(dst2, nextLine, ttLocation, cv.HersheyFonts.HersheyComplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 

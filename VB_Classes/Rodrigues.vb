@@ -119,14 +119,14 @@ Public Class Rodrigues_Extrinsics
         desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim rot = ocvb.extrinsics.rotation
+        Dim rot = ocvb.parms.extrinsics.rotation
         Dim output As String = "Extrinsics Rotation Matrix" + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(rot(i * 3), "#0.00") + vbTab + Format(rot(i * 3 + 1), "#0.00") + vbTab + Format(rot(i * 3 + 2), "#0.00") + vbCrLf
         Next
         ocvb.trueText(New TTtext(output, 10, 90))
 
-        Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.extrinsics.rotation)
+        Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.extrinsics.rotation)
         Dim src As New cv.Mat
         src32f.ConvertTo(src, cv.MatType.CV_64F)
         Dim Jacobian As New cv.Mat(9, 3, src.Type, 0)
