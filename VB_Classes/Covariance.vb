@@ -21,12 +21,12 @@ Public Class Covariance_Basics
         Dim samples2 = samples.Reshape(2)
         cv.Cv2.CalcCovarMatrix(samples, covariance, mean, cv.CovarFlags.Cols)
         Dim overallMean = samples2.Mean()
-        ocvb.trueText(New TTtext("Covar(0, 0), Covar(0, 1)" + vbTab + Format(covariance.Get(Of Double)(0, 0), "#0.0") + vbTab +
-                     Format(covariance.Get(Of Double)(0, 1), "#0.0"), 20, 60))
-        ocvb.trueText(New TTtext("Covar(1 0), Covar(1, 1)" + vbTab + Format(covariance.Get(Of Double)(1, 0), "#0.0") + vbTab +
-                     Format(covariance.Get(Of Double)(1, 1), "#0.0"), 20, 90))
-        ocvb.trueText(New TTtext("Mean X, Mean Y" + vbTab + vbTab + Format(overallMean(0), "#0.00") + vbTab + vbTab +
-                     Format(overallMean(1), "#0.00"), 20, 120))
+        Dim output = "Covar(0, 0), Covar(0, 1)" + vbTab + Format(covariance.Get(Of Double)(0, 0), "#0.0") + vbTab +
+                      Format(covariance.Get(Of Double)(0, 1), "#0.0") + vbCrLf
+        output += "Covar(1 0), Covar(1, 1)" + vbTab + Format(covariance.Get(Of Double)(1, 0), "#0.0") + vbTab +
+                   Format(covariance.Get(Of Double)(1, 1), "#0.0") + vbCrLf
+        output += "Mean X, Mean Y" + vbTab + vbTab + Format(overallMean(0), "#0.00") + vbTab + vbTab +
+                     Format(overallMean(1), "#0.00") + vbCrLf
         If standalone Then
             Dim newCenter = New cv.Point(overallMean(0), overallMean(1))
             Static lastCenter = newCenter
@@ -34,8 +34,9 @@ Public Class Covariance_Basics
             dst2.Circle(lastCenter, 5, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
             dst2.Line(newCenter, lastCenter, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
             lastCenter = newCenter
-            ocvb.trueText(New TTtext("Yellow is last center, red is the current center", 20, 150))
+            output += "Yellow is last center, red is the current center"
         End If
+        ocvb.trueText(New TTtext(output, 20, 60))
     End Sub
 End Class
 

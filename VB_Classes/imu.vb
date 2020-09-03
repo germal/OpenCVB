@@ -239,16 +239,16 @@ Public Class IMU_FrameTime
         histogramIMU(CInt(ocvb.IMU_FrameTime)) += 1
 
         If standalone Then
-            ocvb.trueText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.IMU_TimeStamp, "00") + vbCrLf +
-                                                  "CPU TimeStamp (ms) " + Format(ocvb.CPU_TimeStamp, "00") + vbCrLf +
-                                                  "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
-                                                  " IMUanchor = " + Format(IMUanchor, "00") +
-                                                  " latest = " + Format(ocvb.IMU_FrameTime, "00.00") + vbCrLf +
-                                                  "IMUtoCapture (ms, sampled, in red) " + Format(IMUtoCaptureEstimate, "00") + vbCrLf + vbCrLf +
-                                                  "IMU Frame Time = Blue" + vbCrLf +
-                                                  "Host Frame Time = Green" + vbCrLf +
-                                                  "IMU Total Delay = Red" + vbCrLf +
-                                                  "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often", 10, 10))
+            Dim output = "IMU_TimeStamp (ms) " + Format(ocvb.IMU_TimeStamp, "00") + vbCrLf +
+                        "CPU TimeStamp (ms) " + Format(ocvb.CPU_TimeStamp, "00") + vbCrLf +
+                        "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
+                        " IMUanchor = " + Format(IMUanchor, "00") +
+                        " latest = " + Format(ocvb.IMU_FrameTime, "00.00") + vbCrLf +
+                        "IMUtoCapture (ms, sampled, in red) " + Format(IMUtoCaptureEstimate, "00") + vbCrLf + vbCrLf +
+                        "IMU Frame Time = Blue" + vbCrLf +
+                        "Host Frame Time = Green" + vbCrLf +
+                        "IMU Total Delay = Red" + vbCrLf +
+                        "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(ocvb.IMU_FrameTime, ocvb.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
             plot.Run(ocvb)
@@ -257,16 +257,15 @@ Public Class IMU_FrameTime
 
             Dim plotLastX = sliders.trackbar(1).Value
             If plot.lastXdelta.Count > plotLastX Then
-                Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1
-                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " Host Frame Time", " IMUtoCapture ms", " IMU Center time") + vbTab
+                    output += "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " Host Frame Time", " IMUtoCapture ms", " IMU Center time") + vbTab
                     For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
-                        outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
+                        output += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
                     Next
-                    allText += outStr + vbCrLf
+                    output += vbCrLf
                 Next
-                ocvb.trueText(New TTtext(allText, 10, src.Height / 2))
             End If
+            ocvb.trueText(New TTtext(output, 10, 50))
         End If
     End Sub
 End Class
@@ -323,16 +322,16 @@ Public Class IMU_HostFrameTimes
         hist(CInt(ocvb.CPU_FrameTime)) += 1
 
         If standalone Then
-            ocvb.trueText(New TTtext("IMU_TimeStamp (ms) " + Format(ocvb.IMU_TimeStamp, "00") + vbCrLf +
-                                                  "CPU TimeStamp (ms) " + Format(ocvb.CPU_TimeStamp, "00") + vbCrLf +
-                                                  "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
-                                                  " CPUanchor = " + Format(CPUanchor, "00") +
-                                                  " latest = " + Format(ocvb.CPU_FrameTime, "00.00") + vbCrLf +
-                                                  "Host Interrupt Delay (ms, sampled, in red) " + Format(HostInterruptDelayEstimate, "00") + vbCrLf + vbCrLf +
-                                                  "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
-                                                  "Green" + vbTab + "Host Frame Time" + vbCrLf +
-                                                  "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
-                                                  "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often", 10, 10))
+            Dim output = "IMU_TimeStamp (ms) " + Format(ocvb.IMU_TimeStamp, "00") + vbCrLf +
+                         "CPU TimeStamp (ms) " + Format(ocvb.CPU_TimeStamp, "00") + vbCrLf +
+                         "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
+                         " CPUanchor = " + Format(CPUanchor, "00") +
+                         " latest = " + Format(ocvb.CPU_FrameTime, "00.00") + vbCrLf +
+                         "Host Interrupt Delay (ms, sampled, in red) " + Format(HostInterruptDelayEstimate, "00") + vbCrLf + vbCrLf +
+                         "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
+                         "Green" + vbTab + "Host Frame Time" + vbCrLf +
+                         "Red" + vbTab + "Host Total Delay (latency)" + vbCrLf +
+                         "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(ocvb.IMU_FrameTime, ocvb.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
             plot.Run(ocvb)
@@ -341,16 +340,15 @@ Public Class IMU_HostFrameTimes
 
             Dim plotLastX = sliders.trackbar(1).Value
             If plot.lastXdelta.Count > plotLastX Then
-                Dim allText As String = ""
                 For i = 0 To plot.plotCount - 1
-                    Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " Host Frametime", " Host Delay ms", " CPUanchor FT") + vbTab
+                    output += "Last " + CStr(plotLastX) + Choose(i + 1, " IMU FrameTime", " Host Frametime", " Host Delay ms", " CPUanchor FT") + vbTab
                     For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
-                        outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
+                        output += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
                     Next
-                    allText += outStr + vbCrLf
+                    output += vbCrLf
                 Next
-                ocvb.trueText(New TTtext(allText, 10, 180))
             End If
+            ocvb.trueText(New TTtext(output, 10, 50))
         End If
     End Sub
 End Class
@@ -400,30 +398,29 @@ Public Class IMU_TotalDelay
             sampledSmooth = kalman.stateResult
         End If
 
-        ocvb.trueText(New TTtext("Estimated host delay (ms, sampled) " + Format(sampledCPUDelay, "00") + vbCrLf +
-                                              "Estimated IMU delay (ms, sampled) " + Format(sampledIMUDelay, "00") + vbCrLf +
-                                              "Estimated Total delay (ms, sampled) " + Format(sampledTotalDelay, "00") + vbCrLf +
-                                              "Estimated Total delay Smoothed (ms, sampled, in White) " + Format(sampledSmooth, "00") + vbCrLf + vbCrLf +
-                                              "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
-                                              "Green" + vbTab + "Host Frame Time" + vbCrLf +
-                                              "Red" + vbTab + "Host+IMU Total Delay (latency)" + vbCrLf +
-                                              "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)", 10, 10))
+        Dim output = "Estimated host delay (ms, sampled) " + Format(sampledCPUDelay, "00") + vbCrLf +
+                     "Estimated IMU delay (ms, sampled) " + Format(sampledIMUDelay, "00") + vbCrLf +
+                     "Estimated Total delay (ms, sampled) " + Format(sampledTotalDelay, "00") + vbCrLf +
+                     "Estimated Total delay Smoothed (ms, sampled, in White) " + Format(sampledSmooth, "00") + vbCrLf + vbCrLf +
+                     "Blue" + vbTab + "IMU Frame Time" + vbCrLf +
+                     "Green" + vbTab + "Host Frame Time" + vbCrLf +
+                     "Red" + vbTab + "Host+IMU Total Delay (latency)" + vbCrLf +
+                     "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + vbCrLf + vbCrLf + vbCrLf
 
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
         plot.Run(ocvb)
 
         Dim plotLastX = 25
         If plot.lastXdelta.Count > plotLastX Then
-            Dim allText As String = ""
             For i = 0 To plot.plotCount - 1
-                Dim outStr = "Last " + CStr(plotLastX) + Choose(i + 1, " IMU Delay ", " Host Delay", " Total Delay ms", " Smoothed Total") + vbTab
+                output += "Last " + CStr(plotLastX) + Choose(i + 1, " IMU Delay ", " Host Delay", " Total Delay ms", " Smoothed Total") + vbTab
                 For j = plot.lastXdelta.Count - plotLastX - 1 To plot.lastXdelta.Count - 1
-                    outStr += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
+                    output += Format(plot.lastXdelta.Item(j).Item(i), "00") + ", "
                 Next
-                allText += outStr + vbCrLf
+                output += vbCrLf
             Next
-            ocvb.trueText(New TTtext(allText, 10, 180))
         End If
+        ocvb.trueText(New TTtext(output, 10, 50))
     End Sub
 End Class
 
@@ -480,18 +477,19 @@ Public Class IMU_GVector
             outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf + vbCrLf
             ' if there is any significant acceleration other than gravity, it will be detected here.
             If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then
-                outStr += vbCrLf + "Camera appears to be moving because the gravity vector is not 9.8.  Results may not be valid." + vbCrLf
+                outStr += "Camera appears to be moving because the gravity vector is not 9.8.  Results may not be valid." + vbCrLf
+            Else
+                outStr += vbCrLf
             End If
-            ocvb.trueText(New TTtext(outStr, 10, 10))
 
             ' validate the result
-            Dim valstr = "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +
+            outStr += vbCrLf + "sqrt (" + vbTab + Format(gx, "#0.0000") + "*" + Format(gx, "#0.0000") + vbTab +
                             vbTab + Format(gy, "#0.0000") + "*" + Format(gy, "#0.0000") + vbTab +
                             vbTab + Format(gz, "#0.0000") + "*" + Format(gz, "#0.0000") + " ) = " + vbTab +
                             vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
                             "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-            ocvb.trueText(New TTtext(valstr, 10, 200))
+            ocvb.trueText(New TTtext(outStr, 10, 50))
         End If
     End Sub
 End Class

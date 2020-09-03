@@ -745,7 +745,7 @@ Public Class PointCloud_BothViews
                 End If
             End If
 
-            Dim pad = src.Width / 15
+            Dim pad = CInt(src.Width / 15)
             ocvb.trueText(New TTtext(accMsg1 + vbCrLf + instructions, New cv.Point(10, src.Height - pad)))
             ocvb.trueText(New TTtext(accMsg2 + vbCrLf + instructions, New cv.Point(10, src.Height - pad), 3))
         End If
@@ -782,7 +782,6 @@ Public Class PointCloud_BothViews
             roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
             vw = vwTop
             If showDetails Then
-                ocvb.TTtextData.Clear()
                 ocvb.trueText(New TTtext(detailText, detailPoint, camPicIndex:=If(standalone, 2, 3)))
                 If standalone Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
             End If

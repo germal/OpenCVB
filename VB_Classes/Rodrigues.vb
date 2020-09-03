@@ -24,9 +24,11 @@ Public Class Rodrigues_ValidateKinect
         Dim msg = Marshal.PtrToStringAnsi(out)
         Dim split As String() = msg.Split(vbLf)
 
+        Dim output As String = ""
         For i = 0 To split.Length - 1
-            ocvb.trueText(New TTtext(split(i), 10, 90 + i * 20))
+            output += split(i) + vbCrLf
         Next
+        ocvb.trueText(New TTtext(output, 10, 50))
     End Sub
 End Class
 
@@ -43,36 +45,34 @@ Public Class Rodrigues_ValidateVector
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.StereoLabsZED2 And
             ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.T265Camera Then
             dst2.SetTo(0)
-            ocvb.trueText(New TTtext("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation", 10, 140))
+            ocvb.trueText(New TTtext("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation", 10, 50))
             Exit Sub
         End If
 
         Dim rot = ocvb.parms.IMU_RotationMatrix
-        Dim output As String = "IMU Rotation Matrix for Zed 2 camera" + vbCrLf
+        Dim output = "IMU Rotation Matrix for Zed 2 camera" + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
         Next
-        ocvb.trueText(New TTtext(output, 10, 90))
 
         Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.IMU_RotationMatrix)
         Dim dst1 As New cv.Mat(3, 1, src.Type)
         cv.Cv2.Rodrigues(src, dst1)
 
-        output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
+        output += vbCrLf + "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
-        ocvb.trueText(New TTtext(output, 10, 150))
 
-        output = "Rotation Vector from IMU: " + vbCrLf
+        output += vbCrLf + "Rotation Vector from IMU: " + vbCrLf
         output += vbTab + Format(ocvb.parms.IMU_RotationVector.X, "#0.000000000") + vbTab
         output += vbTab + Format(ocvb.parms.IMU_RotationVector.Y, "#0.000000000") + vbTab
         output += vbTab + Format(ocvb.parms.IMU_RotationVector.Z, "#0.000000000") + vbTab
-        ocvb.trueText(New TTtext(output, 10, 190))
 
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            ocvb.trueText(New TTtext("The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector.", 10, 220))
+            output += "The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector."
         End If
+        ocvb.trueText(New TTtext(output, 10, 50))
     End Sub
 End Class
 
@@ -88,21 +88,20 @@ Public Class Rodrigues_RotationMatrix
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim rot = ocvb.parms.IMU_RotationMatrix
-        Dim output As String = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
+        Dim output = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
         Next
-        ocvb.trueText(New TTtext(output, 10, 90))
 
         Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.IMU_RotationMatrix)
         Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
         cv.Cv2.Rodrigues(src, dst1)
 
-        output = "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
+        output += vbCrLf + "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
-        ocvb.trueText(New TTtext(output, 10, 150))
+        ocvb.trueText(New TTtext(output, 10, 50))
     End Sub
 End Class
 
@@ -124,7 +123,6 @@ Public Class Rodrigues_Extrinsics
         For i = 0 To 2
             output += vbTab + Format(rot(i * 3), "#0.00") + vbTab + Format(rot(i * 3 + 1), "#0.00") + vbTab + Format(rot(i * 3 + 2), "#0.00") + vbCrLf
         Next
-        ocvb.trueText(New TTtext(output, 10, 90))
 
         Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.extrinsics.rotation)
         Dim src As New cv.Mat
@@ -133,11 +131,11 @@ Public Class Rodrigues_Extrinsics
         Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
         cv.Cv2.Rodrigues(src, dst1)
 
-        output = "Extrinsic Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
+        output += "Extrinsic Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
-        ocvb.trueText(New TTtext(output, 10, 150))
+        ocvb.trueText(New TTtext(output, 10, 40))
     End Sub
 End Class
 

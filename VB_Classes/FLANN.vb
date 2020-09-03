@@ -24,15 +24,17 @@ Public Class FLANN_Test
                 Dim dists() As Single = Nothing
                 nnIndex.KnnSearch(queries, indices, dists, knn, New cv.Flann.SearchParams(32))
 
-                For i As Integer = 0 To knn - 1
+                Dim output = ""
+                For i = 0 To knn - 1
                     Dim index As Integer = indices(i)
                     Dim dist As Single = dists(i)
                     Dim pt As New cv.Point2f(features.Get(Of Single)(index, 0), features.Get(Of Single)(index, 1))
-                    ocvb.trueText(New TTtext(String.Format("No.{0}" & vbTab, i), 10 + i * 30, 30 + i * 15))
-                    ocvb.trueText(New TTtext(String.Format("index:{0}", index), 10 + i * 30, 30 + i * 15 + 30))
-                    ocvb.trueText(New TTtext(String.Format("distance:{0}", dist), 10 + i * 30, 30 + i * 15 + 60))
-                    ocvb.trueText(New TTtext(String.Format("data:({0}, {1})", pt.X, pt.Y), 10, 30 + i * 15 + 90))
+                    output += String.Format("No.{0}" & vbTab, i) + vbCrLf
+                    output += String.Format("index:{0}", index) + vbCrLf
+                    output += String.Format("distance:{0}", dist) + vbCrLf
+                    output += String.Format("data:({0}, {1})", pt.X, pt.Y) + vbCrLf
                 Next i
+                ocvb.trueText(New TTtext(output, 10, 50))
             End Using
         End Using
     End Sub
@@ -40,43 +42,82 @@ End Class
 
 
 
+' https://docs.opencv.org/3.4/d5/d6f/tutorial_feature_flann_matcher.html
 Public Class FLANN_Basics
     Inherits VBparent
     Dim random As Random_Points
+    Dim qArray() As cv.Point2f
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
+        random.Run(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Query Count", 1, 10000, 10)
+        sliders.setupTrackBar(0, "Query count", 1, 100, 1)
+        sliders.setupTrackBar(1, "Match count", 1, 100, 1)
+        sliders.setupTrackBar(2, "Search check count", 1, 1000, 1)
+        sliders.setupTrackBar(3, "EPS X100", 0, 100, 0)
+
+        check.Setup(ocvb, caller, 2)
+        check.Box(0).Text = "Search params sorted"
+        check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
+        check.Box(1).Checked = True
+
+        ReDim qArray(sliders.trackbar(0).Value - 1)
+        For i = 0 To sliders.trackbar(0).Value - 1
+            qArray(i) = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+        Next
 
         desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
-        label1 = "Yellow is query, Nearest points blue"
+        label1 = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        random.Run(ocvb) ' fill result1 with random points in x and y range of the image.
+        Dim reuseData = check.Box(1).Checked
+        If reuseData = False Then random.Run(ocvb) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
 
-        Dim knnCount = sliders.trackbar(0).Value
-        dst1.SetTo(0)
-        ' knnSearch
-        Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(4))
+        Dim matchCount = Math.Min(sliders.trackbar(1).Value, random.Points2f.Length - 1)
+        Dim queryCount = sliders.trackbar(0).Value
+        dst1.SetTo(cv.Scalar.White)
+        For i = 0 To features.Rows - 1
+            Dim pt = random.Points(i)
+            cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+        Next
+
+        If reuseData = False Then
+            For i = 0 To queryCount - 1
+                qArray(i) = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
+            Next
+        End If
+        Dim queries As New cv.Mat(queryCount, 2, cv.MatType.CV_32F, qArray)
+
+        Dim searchCheck = sliders.trackbar(2).Value
+        Dim eps = sliders.trackbar(3).Value / 100
+
+        Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(matchCount))
             Dim indices() As Integer = Nothing
             Dim distances() As Single = Nothing
-            For i = 0 To knnCount - 1
-                Dim query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-                query.Set(Of cv.Point2f)(0, 0, New cv.Point2f(random.Points2f(i).X, random.Points2f(i).Y))
-                Dim displayCount = 3
-                nnIndex.KnnSearch(query, indices, distances, displayCount, New cv.Flann.SearchParams(32)) ' 4 nearest neighbors
+            For i = 0 To queryCount - 1
+                Dim pt1 = queries.Get(Of cv.Point2f)(i)
+                Dim query As New cv.Mat(1, 2, cv.MatType.CV_32F, pt1)
+                nnIndex.KnnSearch(query, indices, distances, matchCount, New cv.Flann.SearchParams(searchCheck, eps, check.Box(0).Checked))
 
-                Dim pt2 = random.Points2f(i)
-                For j = 0 To displayCount - 1
-                    Dim pt1 = random.Points(indices(j))
-                    cv.Cv2.Circle(dst1, pt1, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                    dst1.Line(pt1, pt2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                For j = 0 To matchCount - 1
+                    Dim index = indices(j)
+                    If index >= 0 And index < random.Points2f.Length Then
+                        Dim pt2 = random.Points(index)
+                        dst1.Line(pt1, pt2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                    End If
                 Next
-                cv.Cv2.Circle(dst1, pt2, 5, cv.Scalar.GreenYellow, -1, cv.LineTypes.AntiAlias, 0)
+                cv.Cv2.Circle(dst1, pt1, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
             Next
         End Using
+
+        Dim output = "FLANN does not appear to be working (perhaps it is my problem) but to show this:" + vbCrLf
+        output += "Set query count to 1 and set to reuse the same data - now set as the defaults." + vbCrLf
+        output += "The query (in red) is often not picking the nearest blue point." + vbCrLf
+        output += "To test further, set the match count to a higher value and observe it will often switch blue dots." + vbCrLf
+        output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf
+        ocvb.trueText(New TTtext(output, 10, 50, 3))
     End Sub
 End Class
