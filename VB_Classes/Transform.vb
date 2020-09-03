@@ -110,7 +110,7 @@ Public Class Transform_Affine3D
         desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        ocvb.trueText(New TTtext("Use the check boxes to snapshot the different point clouds", 10, 50))
+        Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
         Static pc1 As cv.Mat
         Static pc2 As cv.Mat
         Static affineTransform As cv.Mat
@@ -123,14 +123,14 @@ Public Class Transform_Affine3D
         If check.Box(0).Checked Then
             pc1 = ocvb.pointCloud.Clone()
             check.Box(0).Checked = False
-            ocvb.trueText(New TTtext("First point cloud captured", 10, 50))
+            output += "First point cloud captured" + vbCrLf
             affineTransform = Nothing
         End If
 
         If check.Box(1).Checked Then
             pc2 = ocvb.pointCloud.Clone()
             check.Box(1).Checked = False
-            ocvb.trueText(New TTtext("Second point cloud captured", 10, 70))
+            output += "Second point cloud captured" + vbCrLf
             affineTransform = Nothing
         End If
 
@@ -147,16 +147,16 @@ Public Class Transform_Affine3D
         End If
 
         If affineTransform IsNot Nothing Then
-            ocvb.trueText(New TTtext("Affine Transform 3D results:", 10, 90))
+            output += "Affine Transform 3D results:" + vbCrLf
             For i = 0 To 3 - 1
-                Dim outstr = ""
                 For j = 0 To 4 - 1
-                    outstr += Format(affineTransform.Get(Of Double)(i, j), "0.000") + vbTab
+                    output += Format(affineTransform.Get(Of Double)(i, j), "0.000") + vbTab
                 Next
-                ocvb.trueText(New TTtext(outstr, 10, 110 + i * 25))
+                output += vbCrLf
             Next
-            ocvb.trueText(New TTtext("0" + vbTab + "0" + vbTab + "0" + vbTab + "1", 10, 80 + 4 * 25))
+            output += "0" + vbTab + "0" + vbTab + "0" + vbTab + "1" + vbCrLf
         End If
+        ocvb.trueText(New TTtext(output, 10, 50))
     End Sub
 End Class
 
