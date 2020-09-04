@@ -90,9 +90,9 @@ Public Class Watershed_RGBSimpleAuto
         dst2.SetTo(0)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
-        Dim topRight = New cv.Rect(ocvb.color.cols - 100, 0, 100, 100)
-        Dim botLeft = New cv.Rect(0, ocvb.color.Rows - 100, 100, 100)
-        Dim botRight = New cv.Rect(ocvb.color.cols - 100, ocvb.color.Rows - 100, 100, 100)
+        Dim topRight = New cv.Rect(src.Cols - 100, 0, 100, 100)
+        Dim botLeft = New cv.Rect(0, src.Rows - 100, 100, 100)
+        Dim botRight = New cv.Rect(src.Cols - 100, src.Rows - 100, 100, 100)
 
         cv.Cv2.Rectangle(dst2, topLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
         cv.Cv2.Rectangle(dst2, topRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
@@ -121,9 +121,9 @@ Public Class Watershed_RGBDepthAuto
         setCaller(ocvb)
 
         Dim topLeft = New cv.Rect(0, 0, 100, 100)
-        Dim topRight = New cv.Rect(ocvb.color.cols - 100, 0, 100, 100)
-        Dim botLeft = New cv.Rect(0, ocvb.color.Rows - 100, 100, 100)
-        Dim botRight = New cv.Rect(ocvb.color.cols - 100, ocvb.color.Rows - 100, 100, 100)
+        Dim topRight = New cv.Rect(src.Cols - 100, 0, 100, 100)
+        Dim botLeft = New cv.Rect(0, src.Rows - 100, 100, 100)
+        Dim botRight = New cv.Rect(src.Cols - 100, src.Rows - 100, 100, 100)
 
         cv.Cv2.Rectangle(dst2, topLeft, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)
         cv.Cv2.Rectangle(dst2, topRight, cv.Scalar.All(255), -1, cv.LineTypes.AntiAlias)

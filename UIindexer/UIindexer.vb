@@ -51,7 +51,7 @@ Module IndexMain
         srAPI.Close()
 
         ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive and sorted!
-        Dim ocvbKeywords() As String = {"mouseClickPoint", "mouseClickFlag", "mousePicTag", "mousePoint", "resolution", "testAllRunning"}
+        Dim ocvbKeywords() As String = {"mouseClickPoint", "mouseClickFlag", "mousePicTag", "mousePoint", "testAllRunning"}
         For i = 0 To ocvbKeywords.Length - 1
             apiListLCase.Add(LCase(ocvbKeywords(i))) ' no "(" in the lower case edition - these are not function calls.
             apiList.Add(ocvbKeywords(i) + "(")

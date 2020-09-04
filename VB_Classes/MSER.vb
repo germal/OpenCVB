@@ -114,8 +114,8 @@ Public Class MSER_Synthetic
         addNestedRectangles(img, New cv.Point(410, 10), width, color3, 13)
         addNestedCircles(img, New cv.Point(600, 600), width, color4, 13)
 
-        img = img.Resize(New cv.Size(ocvb.color.Rows, ocvb.color.Rows))
-        dst1(New cv.Rect(0, 0, ocvb.color.Rows, ocvb.color.Rows)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        img = img.Resize(New cv.Size(src.Rows, src.Rows))
+        dst1(New cv.Rect(0, 0, src.Rows, src.Rows)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 

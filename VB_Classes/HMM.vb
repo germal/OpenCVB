@@ -31,7 +31,6 @@ Public Class HMM_Example_CPP
             ocvb.trueText(New TTtext("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.", 10, 60))
             Exit Sub
         End If
-        Dim src = ocvb.color
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)

@@ -8,7 +8,7 @@ Public Class intrinsicsLeft_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim ttStart = 40
-        Dim ttStr As String = "Width = " + CStr(ocvb.color.Width) + vbTab + " height = " + CStr(ocvb.color.Height) + vbCrLf
+        Dim ttStr As String = "Width = " + CStr(src.Width) + vbTab + " height = " + CStr(src.Height) + vbCrLf
         ttStr += "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy) + vbCrLf
         ttStr += "ppx = " + CStr(ocvb.parms.intrinsicsLeft.ppx) + vbTab + " ppy = " + CStr(ocvb.parms.intrinsicsLeft.ppy) + vbCrLf + vbCrLf
         For i = 0 To ocvb.parms.intrinsicsLeft.coeffs.Length - 1

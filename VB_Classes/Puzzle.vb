@@ -230,8 +230,8 @@ Public Class Puzzle_Basics
         grid = New Thread_Grid(ocvb)
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = ocvb.color.Cols / 10
-        gridHeightSlider.Value = ocvb.color.Rows / 8
+        gridWidthSlider.Value = src.Cols / 10
+        gridHeightSlider.Value = src.Rows / 8
 
         grid.Run(ocvb)
         desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
@@ -327,11 +327,11 @@ Public Class Puzzle_Solver
         Static xyOffset As Integer
         Static yxOffset As Integer
         Static yyOffset As Integer
-        If check.Box(0).Checked Or ocvb.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> ocvb.color.Width Then
+        If check.Box(0).Checked Or ocvb.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> src.Width Then
             Dim factor = 1
             saveRadioIndex = radioIndex
-            saveResolutionWidth = ocvb.color.Width
-            Select Case ocvb.color.Width
+            saveResolutionWidth = src.Width
+            Select Case src.Width
                 Case 180
                     factor = 4
                 Case 360

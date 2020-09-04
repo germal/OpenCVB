@@ -42,7 +42,7 @@ Public Class Video_Basics
         End If
 
         ocvb.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
-        If image.Empty() = False Then dst1 = image.Resize(ocvb.color.Size())
+        If image.Empty() = False Then dst1 = image.Resize(src.Size())
     End Sub
 End Class
 

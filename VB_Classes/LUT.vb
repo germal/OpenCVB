@@ -19,7 +19,7 @@ Public Class LUT_Gray
         sliders.sLabels(3).Text = "LUT " + CStr(sliders.trackbar(2).Value) + " through 255"
         Dim splits = {sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value, 255}
         Dim vals = {0, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, 255}
-        Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
         Dim splitIndex As Int32
         For i = 0 To 255

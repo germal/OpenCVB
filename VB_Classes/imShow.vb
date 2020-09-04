@@ -6,7 +6,7 @@ Public Class imShow_Basics
         desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        cv.Cv2.ImShow("color", ocvb.color)
+        cv.Cv2.ImShow("color", src)
     End Sub
 End Class
 

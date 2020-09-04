@@ -268,7 +268,7 @@ Public Class Histogram_Depth
 
         trim = New Depth_InRange(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram Depth Bins", 2, ocvb.color.Cols, 50)
+        sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
 
         desc = "Show depth data as a histogram."
     End Sub
@@ -439,8 +439,8 @@ Public Class Histogram_2D_XZ_YZ
         trim.sliders.trackbar(1).Value = 1500 ' up to x meters away
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram X bins", 1, ocvb.color.Cols, 30)
-        sliders.setupTrackBar(1, "Histogram Y bins", 1, ocvb.color.Rows, 30)
+        sliders.setupTrackBar(0, "Histogram X bins", 1, src.Cols, 30)
+        sliders.setupTrackBar(1, "Histogram Y bins", 1, src.Rows, 30)
         sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
 
         desc = "Create a 2D histogram for depth in XZ and YZ."
@@ -766,7 +766,7 @@ Public Class Histogram_Simple
         plotHist = New Plot_Histogram(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 2, ocvb.color.Cols, 50)
+        sliders.setupTrackBar(0, "Histogram Bins", 2, src.Cols, 50)
 
         desc = "Build a simple and reusable histogram for grayscale images."
     End Sub

@@ -11,7 +11,7 @@ Public Class QRcode_Basics
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(ocvb.homeDir + "Data/QRCode2.png")
         If fileInfo.Exists Then qrInput2 = cv.Cv2.ImRead(fileInfo.FullName)
-        If ocvb.color.Width < 480 Then ' for the smallest configurations the default size can be too big!
+        If src.Width < 480 Then ' for the smallest configurations the default size can be too big!
             qrInput1 = qrInput1.Resize(New cv.Size(120, 160))
             qrInput2 = qrInput2.Resize(New cv.Size(120, 160))
         End If

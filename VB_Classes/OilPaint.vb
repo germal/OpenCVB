@@ -16,7 +16,7 @@ Public Class OilPaint_Pointilism
         radio.check(1).Text = "Use Circular stroke"
         radio.check(1).Checked = True
 
-        ocvb.drawRect = New cv.Rect(ocvb.color.Cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.Cols * 2 / 8, ocvb.color.Rows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
         desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -126,7 +126,7 @@ Public Class OilPaint_Manual
         sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
-        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim filtersize = sliders.trackbar(0).Value
@@ -187,7 +187,7 @@ Public Class OilPaint_Manual_CS
         desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
-        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value
@@ -215,7 +215,7 @@ Public Class OilPaint_Cartoon
         laplacian = New Edges_Laplacian(ocvb)
 
         oil = New OilPaint_Manual_CS(ocvb)
-        ocvb.drawRect = New cv.Rect(ocvb.color.cols * 3 / 8, ocvb.color.Rows * 3 / 8, ocvb.color.cols * 2 / 8, ocvb.color.Rows * 2 / 8)
+        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
 
         desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         label1 = "OilPaint_Cartoon"

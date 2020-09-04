@@ -700,8 +700,8 @@ Public Class PointCloud_BothViews
 
         levelCheck = New IMU_IsCameraLevel(ocvb)
 
-        backMat = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC3)
-        backMatMask = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_8UC1)
+        backMat = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        backMatMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
 
         desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
@@ -809,7 +809,7 @@ Public Class PointCloud_BothViews
             End If
         End If
 
-        backMat = ocvb.color
+        backMat = src
         If vw.Count > 0 Then
             If roi.X + roi.Width > src.Width Then roi.Width = src.Width - roi.X
             If roi.Y + roi.Height > src.Height Then roi.Height = src.Height - roi.Y

@@ -67,8 +67,8 @@ Public Class ML_FillRGBDepth_MT
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = ocvb.color.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        gridHeightSlider.Value = ocvb.color.Rows / 4
+        gridWidthSlider.Value = src.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        gridHeightSlider.Value = src.Rows / 4
 
         shadow = New Depth_Holes(ocvb)
         label1 = "ML filled shadow"

@@ -34,7 +34,7 @@ Public Class Palette_LinearPolar
         SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "LinearPolar radius", 0, ocvb.color.Cols, ocvb.color.Cols / 2)
+        sliders.setupTrackBar(0, "LinearPolar radius", 0, src.Cols, src.Cols / 2)
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1.SetTo(0)
@@ -428,14 +428,14 @@ Public Class Palette_Consistency
             emax.Run(ocvb)
             src = emax.dst2
         End If
-        Dim size = New cv.Size(ocvb.color.Width / 4, ocvb.color.Height / 4)
+        Dim size = New cv.Size(src.Width / 4, src.Height / 4)
         Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
         img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         hist.src = img
         hist.Run(ocvb)
-        If standalone Then dst2 = hist.dst1.Resize(ocvb.color.Size)
+        If standalone Then dst2 = hist.dst1.Resize(src.Size)
 
         Dim histogram = hist.plotHist.hist
         Dim orderedByCount As New SortedList(Of Single, Integer)(New CompareHistCounts)
@@ -454,7 +454,7 @@ Public Class Palette_Consistency
 
         lut.src = img
         lut.Run(ocvb)
-        dst1 = lut.dst1.Resize(ocvb.color.Size())
+        dst1 = lut.dst1.Resize(src.Size())
     End Sub
 End Class
 
@@ -497,7 +497,7 @@ End Class
 '            emax.Run(ocvb)
 '            src = emax.dst2
 '        End If
-'        Dim size = New cv.Size(CInt(ocvb.color.Width / scaleFactor), CInt(ocvb.color.Height / scaleFactor))
+'        Dim size = New cv.Size(CInt(src.Width / scaleFactor), CInt(src.Height / scaleFactor))
 '        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
 '        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

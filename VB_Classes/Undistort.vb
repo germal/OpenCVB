@@ -74,7 +74,7 @@ Public Class Undistort_Basics
         Else
             sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
         End If
-        sliders.setupTrackBar(2, "undistort stereo height", 1, ocvb.color.Rows, ocvb.color.Rows)
+        sliders.setupTrackBar(2, "undistort stereo height", 1, src.Rows, src.Rows)
         sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 
         check.Setup(ocvb, caller, 1)

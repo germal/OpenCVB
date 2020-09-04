@@ -188,8 +188,8 @@ Public Class kMeans_XYDepth
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
-        Dim w = ocvb.color.Cols / 4
-        Dim h = ocvb.color.Rows / 4
+        Dim w = src.Cols / 4
+        Dim h = src.Rows / 4
         ocvb.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         label1 = "Draw rectangle anywhere..."
         label2 = "Currently selected region"
@@ -262,8 +262,8 @@ Public Class kMeans_LAB
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         label1 = "kMeans_LAB - draw to select region"
-        Dim w = ocvb.color.Cols / 4
-        Dim h = ocvb.color.Rows / 4
+        Dim w = src.Cols / 4
+        Dim h = src.Rows / 4
         ocvb.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
     End Sub

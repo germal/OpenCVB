@@ -74,7 +74,7 @@ Public Class IMU_Stabilizer
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present Then
             Dim borderCrop = 5
-            Dim vert_Border = borderCrop * ocvb.color.Rows / ocvb.color.Cols
+            Dim vert_Border = borderCrop * src.Rows / src.Cols
             Dim dx = ocvb.IMU_AngularVelocity.X
             Dim dy = ocvb.IMU_AngularVelocity.Y
             Dim da = ocvb.IMU_AngularVelocity.Z
@@ -95,10 +95,10 @@ Public Class IMU_Stabilizer
             smoothedMat.Set(Of Double)(0, 2, dx)
             smoothedMat.Set(Of Double)(1, 2, dy)
 
-            Dim smoothedFrame = ocvb.color.WarpAffine(smoothedMat, ocvb.color.Size())
+            Dim smoothedFrame = src.WarpAffine(smoothedMat, src.Size())
             smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-            dst1 = smoothedFrame.Resize(ocvb.color.Size())
-            cv.Cv2.Subtract(ocvb.color, dst1, dst2)
+            dst1 = smoothedFrame.Resize(src.Size())
+            cv.Cv2.Subtract(src, dst1, dst2)
 
             dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
             Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")

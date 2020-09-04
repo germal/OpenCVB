@@ -123,7 +123,7 @@ Public Class Mat_4to1
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        mat1 = New cv.Mat(ocvb.color.Rows, ocvb.color.Cols, cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
@@ -134,7 +134,7 @@ Public Class Mat_4to1
         desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static nSize = New cv.Size(ocvb.color.Width / 2, ocvb.color.Height / 2)
+        Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -146,7 +146,7 @@ Public Class Mat_4to1
             mat4 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
-        If mat(0).Channels <> dst1.Channels Then dst1 = New cv.Mat(ocvb.color.Size(), mat(0).Type, 0)
+        If mat(0).Channels <> dst1.Channels Then dst1 = New cv.Mat(src.Size(), mat(0).Type, 0)
         For i = 0 To 4 - 1
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
             If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
@@ -170,7 +170,7 @@ Public Class Mat_2to1
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        mat1 = New cv.Mat(New cv.Size(ocvb.color.Rows, ocvb.color.Cols), cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(New cv.Size(src.Rows, src.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
         dst1 = dst2
@@ -179,7 +179,7 @@ Public Class Mat_2to1
         desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static nSize = New cv.Size(ocvb.color.Width, ocvb.color.Height / 2)
+        Static nSize = New cv.Size(src.Width, src.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then
@@ -188,7 +188,7 @@ Public Class Mat_2to1
             mat = {mat1, mat2}
         End If
         dst1.SetTo(0)
-        If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(ocvb.color.Size(), mat(0).type)
+        If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(src.Size(), mat(0).type)
         For i = 0 To 1
             Dim roi = Choose(i + 1, roiTop, roibot)
             If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
@@ -215,7 +215,7 @@ Public Class Mat_ImageXYZ_MT
         gridWidthSlider.Value = 32
         gridHeightSlider.Value = 32
 
-        xyDepth = New cv.Mat(ocvb.color.Size(), cv.MatType.CV_32FC3, 0)
+        xyDepth = New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
         Dim xyz As New cv.Point3f
         For xyz.Y = 0 To xyDepth.Height - 1
             For xyz.X = 0 To xyDepth.Width - 1

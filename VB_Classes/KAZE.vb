@@ -53,7 +53,7 @@ Public Class KAZE_Sample_CS
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim result = CS_Kaze.Run(box, box_in_scene)
-        dst1 = result.Resize(ocvb.color.Size())
+        dst1 = result.Resize(src.Size())
     End Sub
 End Class
 

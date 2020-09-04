@@ -158,8 +158,8 @@ Public Class OpticalFlow_DenseBasics_MT
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         Static gridBorderSlider = findSlider("ThreadGrid Border")
-        gridWidthSlider.Value = ocvb.color.Cols / 4
-        gridHeightSlider.Value = ocvb.color.Rows / 4
+        gridWidthSlider.Value = src.Cols / 4
+        gridHeightSlider.Value = src.Rows / 4
         gridHeightSlider.Value = 5
 
         flow = New OpticalFlow_DenseOptions(ocvb)
