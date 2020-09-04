@@ -43,7 +43,8 @@ Public Class WarpModel_Input
                 Exit For
             End If
         Next
-        Dim r() = {New cv.Rect(0, 0, img.Width, img.Height / 3), New cv.Rect(0, img.Height / 3, img.Width, img.Height / 3), New cv.Rect(0, 2 * img.Height / 3, img.Width, img.Height / 3)}
+        Dim r() = {New cv.Rect(0, 0, img.Width, img.Height / 3), New cv.Rect(0, img.Height / 3, img.Width, img.Height / 3),
+                   New cv.Rect(0, 2 * img.Height / 3, img.Width, img.Height / 3)}
         For i = 0 To r.Count - 1
             If check.Box(0).Checked Then
                 sobel.src = img(r(i))
@@ -52,6 +53,14 @@ Public Class WarpModel_Input
             End If
             rgb(i) = img(r(i))
         Next
+
+        If src.Width < rgb(0).Width Or src.Height < rgb(0).Height Then
+            For i = 0 To rgb.Count - 1
+                Dim sz = New cv.Size(src.Width * rgb(i).Height / rgb(i).Width, src.Height)
+                r(i) = New cv.Rect(0, 0, sz.Width, sz.Height)
+                rgb(i) = rgb(i).Resize(sz)
+            Next
+        End If
         Dim merged As New cv.Mat
         cv.Cv2.Merge(rgb, merged)
         dst1.SetTo(0)
