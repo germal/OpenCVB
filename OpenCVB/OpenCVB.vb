@@ -839,7 +839,6 @@ Public Class OpenCVB
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopCameraThread = True
-        algorithmTaskHandle.Abort()
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         Application.DoEvents()
         camera.closePipe()
