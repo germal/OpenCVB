@@ -1099,6 +1099,7 @@ Public Class OpenCVB
                 If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
+                If stopCameraThread Then Exit Sub
             End While
 
             ' bring the data into the algorithm task.
