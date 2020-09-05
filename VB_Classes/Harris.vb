@@ -34,21 +34,22 @@ Public Class Harris_Features_CPP
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(ocvb, caller, 5)
         sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
         sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
-        sliders.setupTrackBar(2, "Harris aperture", 1, 33, 21)
-        sliders.setupTrackBar(3,  "Harris Parameter", 1, 100, 1)
+        sliders.setupTrackBar(2, "Harris aperture", 1, 31, 21)
+        sliders.setupTrackBar(3, "Harris Parameter", 1, 100, 1)
+        sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
 
         desc = "Use Harris feature detectors to identify interesting points."
 
         ReDim srcData(src.Total - 1)
         Harris_Features = Harris_Features_Open()
-        label2 = "RGB overlaid with Harris result"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
+        Dim input = src.Clone()
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Marshal.Copy(input.Data, srcData, 0, srcData.Length)
         Dim threshold = sliders.trackbar(0).Value / 10000
         Dim neighborhood = sliders.trackbar(1).Value
         If neighborhood Mod 2 = 0 Then neighborhood += 1
@@ -63,7 +64,9 @@ Public Class Harris_Features_CPP
         Dim gray32f = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
         gray32f.ConvertTo(dst1, cv.MatType.CV_8U)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.AddWeighted(dst1, 0.5, src, 0.5, 0, dst2)
+        Dim weight = sliders.trackbar(4).Value / 100
+        cv.Cv2.AddWeighted(dst1, weight, src, 1 - weight, 0, dst2)
+        label2 = "RGB overlaid with Harris result. Weight = " + Format(weight, "0%")
     End Sub
     Public Sub Close()
         Harris_Features_Close(Harris_Features)
