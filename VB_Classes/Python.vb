@@ -146,7 +146,6 @@ Public Class Python_SurfaceBlit
     Dim pipeName As String
     Dim pipe As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
-    Dim pointCloudBuffer(1) As Byte
     Dim PythonReady As Boolean
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -173,9 +172,8 @@ Public Class Python_SurfaceBlit
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If PythonReady Then
-            Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
             For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize, pcSize, src.Rows, src.Cols)
+                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
             Next
             memMap.Run(ocvb)
 
@@ -186,7 +184,6 @@ Public Class Python_SurfaceBlit
             If pipe.IsConnected Then
                 On Error Resume Next
                 pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
-                If pipe.IsConnected Then pipe.Write(pointCloudBuffer, 0, pcSize)
             End If
             ocvb.trueText(New TTtext("Blit works fine when run inline but fails with Python callback." + vbCrLf +
                                                   "See 'Python_SurfaceBlit_PS.py' for the surfaceBlit failure", 10, 60))

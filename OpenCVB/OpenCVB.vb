@@ -839,6 +839,7 @@ Public Class OpenCVB
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopCameraThread = True
+        saveAlgorithmName = ""
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         Application.DoEvents()
         camera.closePipe()
@@ -1095,10 +1096,9 @@ Public Class OpenCVB
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
             While 1
-                If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
+                If saveAlgorithmName <> algName Or saveAlgorithmName = "" Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
-                If stopCameraThread Then Exit Sub
             End While
 
             ' bring the data into the algorithm task.
