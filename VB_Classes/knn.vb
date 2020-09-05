@@ -16,8 +16,10 @@ Public Class KNN_Basics
         sliders.setupTrackBar(0, "Query count", 1, 100, 10)
         sliders.setupTrackBar(1, "Train count", 1, 100, 20)
 
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Reuse the same training data"
+        If standalone Then
+            check.Setup(ocvb, caller, 1)
+            check.Box(0).Text = "Reuse the same training data"
+        End If
 
         randomTrain = New Random_Points(ocvb)
         randomTrain.sliders.Visible = False
@@ -31,7 +33,7 @@ Public Class KNN_Basics
     Public Sub Run(ocvb As VBocvb)
         Dim queryCount = sliders.trackbar(0).Value
         Dim trainCount = sliders.trackbar(1).Value
-        Dim reuseData = check.Box(0).Checked
+        Dim reuseData = If(check.Box Is Nothing, False, check.Box(0).Checked)
 
         dst1.SetTo(cv.Scalar.Black)
 
@@ -84,7 +86,7 @@ Public Class KNN_1_to_1
         setCaller(ocvb)
 
         basics = New KNN_Basics(ocvb)
-        basics.useRandomData = True
+        If standalone Then basics.useRandomData = True
         basics.sliders.trackbar(2).Enabled = False
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below.
 

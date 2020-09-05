@@ -81,11 +81,11 @@ Public Class VBparent : Implements IDisposable
             standalone = False
             If ocvb.callTrace.Contains(callStack) = False Then ocvb.callTrace.Add(callStack)
         End If
-        fontsize = src.Width / 1280
 
         src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+        fontsize = src.Width / 1280
 
         topCameraPoint = New cv.Point(src.Height, src.Height)
         sideCameraPoint = New cv.Point((src.Width - src.Height) / 2, src.Height - (src.Width - src.Height) / 2)
