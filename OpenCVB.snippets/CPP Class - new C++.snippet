@@ -65,14 +65,14 @@ End Module
 '//}
 
 Public Class AnyName_CPP
-    Inherits ocvbClass
+    Inherits VBparent
     Dim anyname As IntPtr
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 		    anyname = Anyname_Open()
-        setDescription(ocvb, "New class description")
+        desc = "New class description"
 	  End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         Dim src = ocvb.color
         Dim srcData(src.Total * src.ElemSize) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)

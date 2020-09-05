@@ -1,12 +1,167 @@
 Imports cv = OpenCvSharp
 Public Class KNN_Basics
     Inherits VBparent
-    Dim knn As KNN_BasicsManyToOne
-    Dim emax As EMax_Centroids
-    Public matchedPoints() As cv.Point2f
-    Public unmatchedPoints As New List(Of cv.Point2f)
+    Dim randomTrain As Random_Points
+    Dim randomQuery As Random_Points
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
+    Public neighbors As New cv.Mat
+    Public useRandomData As Boolean
+    Public desiredMatches = 1
+    Dim knn As cv.ML.KNearest
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Query count", 1, 100, 10)
+        sliders.setupTrackBar(1, "Train count", 1, 100, 20)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Reuse the same training data"
+
+        randomTrain = New Random_Points(ocvb)
+        randomTrain.sliders.Visible = False
+        randomQuery = New Random_Points(ocvb)
+        randomQuery.sliders.Visible = False
+
+        label1 = "White=TrainingData, Red=queries"
+        knn = cv.ML.KNearest.Create()
+        desc = "Test knn with random points in the image.  Find the nearest n points."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim queryCount = sliders.trackbar(0).Value
+        Dim trainCount = sliders.trackbar(1).Value
+        Dim reuseData = check.Box(0).Checked
+
+        dst1.SetTo(cv.Scalar.Black)
+
+        If standalone Or useRandomData Then
+            If reuseData = False Then
+                randomTrain.sliders.trackbar(0).Value = trainCount
+                randomTrain.Run(ocvb)
+
+                randomQuery.sliders.trackbar(0).Value = queryCount
+                randomQuery.Run(ocvb)
+            End If
+            trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
+            queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
+        End If
+        ' The first generation may not have any training data, only queries.  (Queries move to training on subsequent generations.)
+        If trainingPoints.Count = 0 Then trainingPoints = New List(Of cv.Point2f)(queryPoints)
+
+        Dim queries = New cv.Mat(queryPoints.Count, 2, cv.MatType.CV_32F, queryPoints.ToArray)
+        Dim trainData = New cv.Mat(trainingPoints.Count, 2, cv.MatType.CV_32F, trainingPoints.ToArray)
+
+        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
+        For i = 0 To trainData.Rows - 1
+            response.Set(Of Integer)(i, 0, i)
+            cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+        Next
+        knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+        knn.FindNearest(queries, desiredMatches, New cv.Mat, neighbors)
+
+        If standalone Then
+            For i = 0 To neighbors.Rows - 1
+                Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
+                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+                Dim pt = trainData.Get(Of cv.Point2f)(neighbors.Get(Of Single)(i, 0), 0)
+                dst1.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNN_1_to_1
+    Inherits VBparent
+    Public matchedPoints() As cv.Point2f
+    Public unmatchedPoints As New List(Of cv.Point2f)
+    Public basics As KNN_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        basics = New KNN_Basics(ocvb)
+        basics.useRandomData = True
+        basics.sliders.trackbar(2).Enabled = False
+        basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below.
+
+        label1 = "White=TrainingData, Red=queries, yellow=unmatched"
+        desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        basics.Run(ocvb)
+        dst1 = basics.dst1
+
+        ReDim matchedPoints(basics.queryPoints.Count - 1)
+        Dim neighborOffset(basics.queryPoints.Count - 1) As Integer
+        For i = 0 To matchedPoints.Count - 1
+            matchedPoints(i) = basics.trainingPoints(basics.neighbors.Get(Of Single)(i, 0))
+        Next
+
+        ' map the points 1 to 1: find duplicate best fits, choose which is better.
+        ' loser must relinquish the training data element And use its next neighbor
+        Dim changedNeighbors As Boolean = True
+        While changedNeighbors
+            changedNeighbors = False
+            For i = 0 To matchedPoints.Count - 1
+                Dim m1 = matchedPoints(i)
+                For j = i + 1 To matchedPoints.Count - 1
+                    Dim m2 = matchedPoints(j)
+                    If m1.X = -1 Or m2.X = -1 Then Continue For
+                    If m1 = m2 Then
+                        changedNeighbors = True
+                        Dim pt1 = basics.queryPoints(i)
+                        Dim pt2 = basics.queryPoints(j)
+                        Dim distance1 = Math.Sqrt((pt1.X - m1.X) * (pt1.X - m1.X) + (pt1.Y - m1.Y) * (pt1.Y - m1.Y))
+                        Dim distance2 = Math.Sqrt((pt2.X - m1.X) * (pt2.X - m1.X) + (pt2.Y - m1.Y) * (pt2.Y - m1.Y))
+                        Dim ij = If(distance1 > distance2, i, j)
+                        Dim unresolved = True
+                        If ij < neighborOffset.Length Then
+                            If neighborOffset(ij) < basics.neighbors.Rows - 1 Then
+                                neighborOffset(ij) += 1
+                                Dim index = basics.neighbors.Get(Of Single)(neighborOffset(ij))
+                                If index < basics.trainingPoints.Count And index >= 0 Then
+                                    unresolved = False
+                                    matchedPoints(ij) = basics.trainingPoints(index)
+                                End If
+                            End If
+                        End If
+                        If unresolved Then
+                            matchedPoints(ij) = New cv.Point2f(-1, -1)
+                            Exit For
+                        End If
+                    End If
+                Next
+            Next
+        End While
+
+        unmatchedPoints.Clear()
+        For i = 0 To matchedPoints.Count - 1
+            Dim mpt = matchedPoints(i)
+            Dim qPoint = basics.queryPoints(i)
+            If mpt.X >= 0 Then
+                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+                dst1.Line(mpt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Else
+                unmatchedPoints.Add(qPoint)
+                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_Emax
+    Inherits VBparent
+    Public knn As KNN_1_to_1
+    Dim emax As EMax_Centroids
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If standalone Then
@@ -22,161 +177,29 @@ Public Class KNN_Basics
         check.Box(1).Checked = True
         check.Box(2).Checked = True
 
-        knn = New KNN_BasicsManyToOne(ocvb)
+        knn = New KNN_1_to_1(ocvb)
+        knn.basics.useRandomData = False
+
         label1 = "Output from Emax"
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
-        desc = "Use KNN to match points 1 for 1"
+        desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
-            trainingPoints = New List(Of cv.Point2f)(emax.centroids)
+            knn.basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
             emax.Run(ocvb)
-            queryPoints = New List(Of cv.Point2f)(emax.centroids)
-            dst1 = emax.dst1
+            knn.basics.queryPoints = New List(Of cv.Point2f)(emax.centroids)
         End If
 
-        knn.trainingPoints = New List(Of cv.Point2f)(trainingPoints)
-        knn.queryPoints = New List(Of cv.Point2f)(queryPoints)
         knn.Run(ocvb)
-
-        If knn.trainingPoints.Count = 0 Then Exit Sub ' first generation has no training data, only queries.
-
-        ReDim matchedPoints(queryPoints.Count - 1)
-        Dim neighborOffset(queryPoints.Count - 1) As Integer
-        For i = 0 To matchedPoints.Count - 1
-            matchedPoints(i) = knn.trainingPoints(knn.neighbors.Get(Of Single)(i, 0))
-            neighborOffset(i) = 0
-        Next
-
-        Static mapOneToOneCheck = findCheckBox("Map queries to training data 1:1")
-        If mapOneToOneCheck.Checked Then
-            ' map the points 1 to 1: find duplicate best fits, choose which is better, loser must relinquish the training data element and use the next neighbor
-            Dim changedNeighbors As Boolean = True
-            While changedNeighbors
-                changedNeighbors = False
-                For i = 0 To matchedPoints.Count - 1
-                    Dim m1 = matchedPoints(i)
-                    For j = i + 1 To matchedPoints.Count - 1
-                        Dim m2 = matchedPoints(j)
-                        If m1 = m2 And m1.X <> -1 And m2.X <> -1 Then
-                            changedNeighbors = True
-                            Dim pt1 = knn.queryPoints(i)
-                            Dim pt2 = knn.queryPoints(j)
-                            Dim distance1 = Math.Sqrt((pt1.X - m1.X) * (pt1.X - m1.X) + (pt1.Y - m1.Y) * (pt1.Y - m1.Y))
-                            Dim distance2 = Math.Sqrt((pt2.X - m1.X) * (pt2.X - m1.X) + (pt2.Y - m1.Y) * (pt2.Y - m1.Y))
-                            Dim ij = If(distance1 > distance2, i, j)
-                            Dim unresolved = True
-                            If ij < neighborOffset.Length Then
-                                If neighborOffset(ij) < knn.neighbors.Rows - 1 Then
-                                    neighborOffset(ij) += 1
-                                    Dim index = knn.neighbors.Get(Of Single)(neighborOffset(ij))
-                                    If index < knn.trainingPoints.Count And index >= 0 Then
-                                        unresolved = False
-                                        matchedPoints(ij) = knn.trainingPoints(index)
-                                    End If
-                                End If
-                            End If
-                            If unresolved Then
-                                matchedPoints(ij) = New cv.Point2f(-1, -1)
-                                Exit For
-                            End If
-                        End If
-                    Next
-                Next
-            End While
-        End If
-
-        If standalone Then dst2 = dst1.Clone Else dst2.SetTo(0)
-        unmatchedPoints.Clear()
-        Static displayQueryCheckbox = findCheckBox("Display queries")
-        Dim showQuery = displayQueryCheckbox.checked
-        Static displayLastQueryCheckbox = findCheckBox("Display training input")
-        Dim showLastQuery = displayLastQueryCheckbox.checked
-        For i = 0 To queryPoints.Count - 1
-            If showQuery Then cv.Cv2.Circle(dst2, queryPoints(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-            If matchedPoints(i).X >= 0 Then
-                If showLastQuery Then
-                    cv.Cv2.Circle(dst2, matchedPoints(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-                    dst2.Line(matchedPoints(i), queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-                End If
-            Else
-                unmatchedPoints.Add(queryPoints(i))
-                cv.Cv2.Circle(dst2, queryPoints(i), 10, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias, 0)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-Public Class KNN_BasicsManyToOne
-    Inherits VBparent
-    Dim randomTrain As Random_Points
-    Dim randomQuery As Random_Points
-    Public trainingPoints As New List(Of cv.Point2f)
-    Public queryPoints As New List(Of cv.Point2f)
-    Public neighbors As New cv.Mat
-    Dim knn As cv.ML.KNearest
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-
         If standalone Then
-            randomTrain = New Random_Points(ocvb)
-            randomTrain.sliders.sLabels(0).Text = "Training input count"
-            randomTrain.sliders.trackbar(0).Maximum = 100
-            randomQuery = New Random_Points(ocvb)
-            randomQuery.sliders.sLabels(0).Text = "Query input count"
-            randomQuery.sliders.trackbar(0).Maximum = 100
-        End If
-
-        label1 = "White=TrainingData, Red=queries"
-        knn = cv.ML.KNearest.Create()
-        desc = "Test knn with random points in the image.  Find the nearest to a random point."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim trainData As cv.Mat
-        Dim queries As cv.Mat
-        dst1.SetTo(cv.Scalar.Black)
-
-        If standalone Then
-            Dim trainCountSlider = randomTrain.sliders.trackbar(0)
-            Dim trainCount = Math.Floor(trainCountSlider.Value / 2)
-            randomTrain.Run(ocvb)
-            trainData = New cv.Mat(trainCount, 2, cv.MatType.CV_32F, randomTrain.Points2f).Clone()
-
-            Static queryCountSlider = randomQuery.sliders.trackbar(0)
-            Dim queryCount = Math.Floor(queryCountSlider.value / 2)
-            randomQuery.Run(ocvb)
-            queries = New cv.Mat(queryCount, 2, cv.MatType.CV_32F, randomQuery.Points2f)
+            dst1 = emax.dst1 + knn.dst1
+            dst2 = knn.dst1
         Else
-            queries = New cv.Mat(queryPoints.Count, 2, cv.MatType.CV_32F, queryPoints.ToArray)
-            trainData = New cv.Mat(trainingPoints.Count, 2, cv.MatType.CV_32F, trainingPoints.ToArray)
+            dst1 = knn.dst1
         End If
-
-        If trainData.Rows = 0 Then Exit Sub ' first generation has no training data, only queries.
-
-        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
-        For i = 0 To trainData.Rows - 1
-            response.Set(Of Integer)(i, 0, i)
-            cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-        Next
-        knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
-
-        Dim desiredMatches = trainData.Rows
-
-        knn.FindNearest(queries, desiredMatches, New cv.Mat, neighbors)
-
-        For i = 0 To neighbors.Rows - 1
-            Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
-            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-            Dim pt = trainData.Get(Of cv.Point2f)(neighbors.Get(Of Single)(i, 0), 0)
-            dst1.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-        Next
     End Sub
 End Class
-
 
 
 
@@ -184,30 +207,30 @@ End Class
 Public Class KNN_CentroidsEMax
     Inherits VBparent
     Public emax As EMax_Centroids
-    Public basics As KNN_Basics
+    Public knnEmax As KNN_Emax
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         emax = New EMax_Centroids(ocvb)
-        basics = New KNN_Basics(ocvb)
+        knnEmax = New KNN_Emax(ocvb)
 
-        label1 = "Query is Red, nearest is white, unmatched is yellow"
-        label2 = "Current image without correcting colors"
+        label1 = "Colors are much more consistent across generations"
+        label2 = "Raw EMax output with random coloring."
         desc = "Map the current centroids to the previous generation to match the color used."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If standalone Then basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
+        If standalone Then knnEmax.knn.basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
 
         emax.Run(ocvb)
 
-        basics.queryPoints = New List(Of cv.Point2f)(emax.centroids)
-        basics.Run(ocvb)
+        knnEmax.knn.basics.queryPoints = New List(Of cv.Point2f)(emax.centroids)
+        knnEmax.Run(ocvb)
 
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim rect As New cv.Rect
         Static lastImage = emax.emaxCPP.dst2.Clone
         dst1 = emax.emaxCPP.dst2.Clone()
-        If basics.matchedPoints IsNot Nothing Then ' no centroids are matched on the first pass.
-            For Each pt In basics.matchedPoints
+        If knnEmax.knn.matchedPoints IsNot Nothing Then ' no centroids are matched on the first pass.
+            For Each pt In knnEmax.knn.matchedPoints
                 If pt.X >= 0 Then
                     Dim nextVec = lastImage.Get(Of cv.Vec3b)(pt.Y, pt.X)
                     Dim nextColor = New cv.Scalar(nextVec.item0, nextVec.item1, nextVec.item2)
@@ -217,10 +240,6 @@ Public Class KNN_CentroidsEMax
         End If
         lastImage = dst1.Clone
         dst2 = emax.emaxCPP.dst2
-
-        Static displayQueryCheckbox = findCheckBox("Display queries")
-        Static displayLastQueryCheckbox = findCheckBox("Display training input")
-        If displayQueryCheckbox.checked Or displayLastQueryCheckbox.Checked Then cv.Cv2.BitwiseOr(dst1, basics.dst2, dst1)
     End Sub
 End Class
 
@@ -258,9 +277,8 @@ Public Class KNN_Test
         Next
 
         If ocvb.frameCount > 0 Then
-            knn.dst1.SetTo(cv.Scalar.Beige)
             knn.Run(ocvb)
-            dst1 = knn.dst1
+            dst1 = knn.dst2
         End If
         knn.trainingPoints = New List(Of cv.Point2f)(knn.queryPoints)
     End Sub
@@ -593,4 +611,3 @@ Public Class KNN_ClusterNoisyLine
         End If
     End Sub
 End Class
-

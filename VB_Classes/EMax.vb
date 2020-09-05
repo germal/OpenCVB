@@ -8,6 +8,8 @@ Public Class EMax_Basics
     Public labels As cv.Mat
     Public grid As Thread_Grid
     Public regionCount As Int32
+    Public gridWidthSlider As System.Windows.Forms.TrackBar
+    Public gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
@@ -19,10 +21,10 @@ Public Class EMax_Basics
         sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
 
         grid = New Thread_Grid(ocvb)
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = src.Width / 3
-        gridHeightSlider.Value = src.Height / 3
+        gridWidthSlider = findSlider("ThreadGrid Width")
+        gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = src.Width / 2
+        gridHeightSlider.Value = src.Height / 2
 
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "EMax matrix type Spherical"
@@ -35,7 +37,7 @@ Public Class EMax_Basics
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
             ocvb.trueText(New TTtext("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
-                                    "The C++ version works fine (EMax_Basics_CPP) and the 2 are functionally identical.", 20, 100))
+                                    "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100))
             Exit Sub
         End If
 
@@ -117,7 +119,7 @@ End Module
 
 
 
-Public Class EMax_Basics_CPP
+Public Class EMax_CPP
     Inherits VBparent
     Public basics As EMax_Basics
     Dim inputDataMask As cv.Mat
@@ -163,7 +165,7 @@ Public Class EMax_Basics_CPP
         If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
         Static showInputCheck = findCheckBox("Show EMax input in output")
-        If showInputCheck.Checked Then
+        If showInputCheck?.Checked Then
             inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst1.CopyTo(dst2, inputDataMask)
         End If
@@ -181,14 +183,14 @@ End Class
 
 Public Class EMax_Centroids
     Inherits VBparent
-    Public emaxCPP As EMax_Basics_CPP
+    Public emaxCPP As EMax_CPP
     Public stepsize = 50
     Public centroids As New List(Of cv.Point2f)
     Public rects As New List(Of cv.Rect)
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        emaxCPP = New EMax_Basics_CPP(ocvb)
+        emaxCPP = New EMax_CPP(ocvb)
         emaxCPP.Run(ocvb)
 
         desc = "Get the Emax cluster centroids using floodfill "
@@ -221,29 +223,8 @@ Public Class EMax_Centroids
         Next
         If standalone Then
             For i = 0 To centroids.Count - 1
-                cv.Cv2.Circle(dst1, centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+                dst1.Circle(centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class EMax_ConsistentColor
-    Inherits VBparent
-    Dim knn As KNN_CentroidsEMax
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-
-        knn = New KNN_CentroidsEMax(ocvb)
-        desc = "Same as KNN_Centroids - to show consistent EMax color regions"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        knn.basics.trainingPoints = New List(Of cv.Point2f)(knn.emax.centroids)
-        knn.Run(ocvb)
-        dst1 = knn.dst1.Clone()
     End Sub
 End Class

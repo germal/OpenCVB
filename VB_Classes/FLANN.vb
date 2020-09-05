@@ -50,7 +50,6 @@ Public Class FLANN_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
-        random.Run(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Query count", 1, 100, 1)
@@ -63,17 +62,12 @@ Public Class FLANN_Basics
         check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
         check.Box(1).Checked = True
 
-        ReDim qArray(sliders.trackbar(0).Value - 1)
-        For i = 0 To sliders.trackbar(0).Value - 1
-            qArray(i) = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
-        Next
-
         desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         label1 = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim reuseData = check.Box(1).Checked
-        If reuseData = False Then random.Run(ocvb) ' fill result1 with random points in x and y range of the image.
+        If reuseData = False Or ocvb.frameCount = 0 Then random.Run(ocvb) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
 
         Dim matchCount = Math.Min(sliders.trackbar(1).Value, random.Points2f.Length - 1)
@@ -84,7 +78,8 @@ Public Class FLANN_Basics
             cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
         Next
 
-        If reuseData = False Then
+        If reuseData = False Or ocvb.frameCount = 0 Then
+            ReDim qArray(sliders.trackbar(0).Value - 1)
             For i = 0 To queryCount - 1
                 qArray(i) = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
             Next
@@ -117,7 +112,9 @@ Public Class FLANN_Basics
         output += "Set query count to 1 and set to reuse the same data - now set as the defaults." + vbCrLf
         output += "The query (in red) is often not picking the nearest blue point." + vbCrLf
         output += "To test further, set the match count to a higher value and observe it will often switch blue dots." + vbCrLf
-        output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf
+        output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf + vbCrLf
+        output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4."
+        output += "Perhaps FLANN is only good enough to find a group of neighbors.  Use with caution."
         ocvb.trueText(New TTtext(output, 10, 50, 3))
     End Sub
 End Class

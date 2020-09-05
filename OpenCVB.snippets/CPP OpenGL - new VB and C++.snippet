@@ -11,15 +11,15 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
 Public Class OpenGL_MyOpenGLtest 
-    Inherits ocvbClass
+    Inherits VBparent
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As AlgorithmData)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 		    ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_MyOpenGLtest"
-        setDescription(ocvb, "New class description")
+        desc = "New class description"
     End Sub
-    Public Sub Run(ocvb As AlgorithmData)
+    Public Sub Run(ocvb As VBocvb)
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
     End Sub

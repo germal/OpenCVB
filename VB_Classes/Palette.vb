@@ -401,7 +401,7 @@ End Class
 
 Public Class Palette_Consistency
     Inherits VBparent
-    Dim emax As EMax_Basics_CPP
+    Dim emax As EMax_CPP
     Public hist As Histogram_Simple
     Dim lut As LUT_Basics
     Private Class CompareHistCounts : Implements IComparer(Of Single)
@@ -412,7 +412,7 @@ Public Class Palette_Consistency
     End Class
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        emax = New EMax_Basics_CPP(ocvb)
+        emax = New EMax_CPP(ocvb)
         emax.basics.sliders.trackbar(1).Value = 15
 
         hist = New Histogram_Simple(ocvb)
@@ -466,7 +466,7 @@ End Class
 
 'Public Class Palette_ConsistentCentroid_3PointOnly
 '    Inherits ocvbClass
-'    Dim emax As EMax_Basics_CPP
+'    Dim emax As EMax_CPP
 '    Dim lut As LUT_Basics
 '    Dim flood As Floodfill_Identifiers
 '    Dim knn As knn_Basics
@@ -474,7 +474,7 @@ End Class
 '    Dim moment() As Moments_Basics
 '    Public Sub New(ocvb As VBocvb)
 '        setCaller(ocvb)
-'        emax = New EMax_Basics_CPP(ocvb)
+'        emax = New EMax_CPP(ocvb)
 '        emax.basics.sliders.trackbar(1).Value = 15
 '        emax.showInput = False
 
