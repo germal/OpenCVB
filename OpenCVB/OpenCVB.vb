@@ -1033,6 +1033,7 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
+            If saveAlgorithmName = "" Then Exit Sub ' shutting down the app...
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
             Dim algName = algorithmTaskHandle.Name
