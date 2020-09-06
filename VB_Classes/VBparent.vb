@@ -4,8 +4,6 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class TTtext
     Public text As String
-    Public ttdefaultX = 40
-    Public ttdefaultY = 10
     Public picTag = 2
     Public x As Int32
     Public y As Int32
@@ -20,12 +18,6 @@ Public Class TTtext
     End Sub
     Public Sub New(_text As String, _x As Integer, _y As Integer)
         setup(_text, _x, _y, 2)
-    End Sub
-    Public Sub New(_text As String, pt As cv.Point, camPicIndex As Integer)
-        setup(_text, pt.X, pt.Y, camPicIndex)
-    End Sub
-    Public Sub New(_text As String, pt As cv.Point)
-        setup(_text, pt.X, pt.Y, 2)
     End Sub
 End Class
 Public Class VBparent : Implements IDisposable

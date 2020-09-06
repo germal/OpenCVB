@@ -28,7 +28,7 @@ Public Class HMM_Example_CPP
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.testAllRunning Then
-            ocvb.trueText(New TTtext("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.", 10, 60))
+            ocvb.trueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
         End If
         Dim srcData(src.Total * src.ElemSize - 1) As Byte

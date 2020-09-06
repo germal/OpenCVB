@@ -156,7 +156,7 @@ Public Class Transform_Affine3D
             Next
             output += "0" + vbTab + "0" + vbTab + "0" + vbTab + "1" + vbCrLf
         End If
-        ocvb.trueText(New TTtext(output, 10, 50))
+        ocvb.trueText(output)
     End Sub
 End Class
 

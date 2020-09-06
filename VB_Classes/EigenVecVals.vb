@@ -44,7 +44,7 @@ Public Class EigenVecVals_Basics
             Next
             nextLine += " = " + vbTab + "0.0" + vbCrLf
         Next
-        ocvb.trueText(New TTtext(nextLine, 10, 80))
+        ocvb.trueText(nextLine, 10, 80)
     End Sub
 End Class
 

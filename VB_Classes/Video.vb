@@ -28,7 +28,7 @@ Public Class Video_Basics
         Dim fileInfo = New FileInfo(ocvb.openFileDialogName)
         If srcVideo <> ocvb.openFileDialogName Then
             If fileInfo.Exists = False Then
-                ocvb.trueText(New TTtext("File not found: " + fileInfo.FullName, 10, 125))
+                ocvb.trueText("File not found: " + fileInfo.FullName, 10, 125)
                 Exit Sub
             End If
             srcVideo = ocvb.openFileDialogName

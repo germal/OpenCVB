@@ -12,7 +12,7 @@ Public Class Tracker_Basics
         desc = "Track an object using cv.Tracking API - tracker algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        ocvb.trueText(New TTtext("Draw a rectangle around object to be tracked.", 10, 140))
+        ocvb.trueText("Draw a rectangle around object to be tracked.", 10, 140)
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             If tracker IsNot Nothing Then tracker.Dispose()

@@ -88,7 +88,7 @@ Public Class Sound_ToPCM
             inputFileName = ""
             player?.Stop()
         End If
-        If standalone Then ocvb.trueText(New TTtext("Requested sound data is in the pcm32f cv.Mat", 10, 50))
+        If standalone Then ocvb.trueText("Requested sound data is in the pcm32f cv.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -171,7 +171,7 @@ Public Class Sound_SignalGenerator
             pcm32f = New cv.Mat(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
             player.Play()
         End If
-        If standalone Then ocvb.trueText(New TTtext("Requested sound data is in the pcm32f cv.Mat", 10, 50))
+        If standalone Then ocvb.trueText("Requested sound data is in the pcm32f cv.Mat")
 
         ocvb.openFileSliderPercent = ((Now - startTime).TotalSeconds Mod pcmDuration) / pcmDuration
         If ocvb.openFileSliderPercent >= 0.99 Then ocvb.openFileSliderPercent = 0

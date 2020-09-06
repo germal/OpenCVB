@@ -19,9 +19,9 @@ Public Class Aruco_Basics
         Dim rejectedPoints()() As cv.Point2f = Nothing
         ' this fails!  Cannot cast a Mat to an InputArray!  Bug?
         ' cv.Aruco.CvAruco.DetectMarkers(tmp, dictionary, corners, ids, detectorParameters, rejectedPoints)
-        ocvb.trueText(New TTtext("This algorithm is currently failing in VB.Net (works in C#)." + vbCrLf +
+        ocvb.trueText("This algorithm is currently failing in VB.Net (works in C#)." + vbCrLf +
                                                   "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
-                                                  "To see the correct output, use Aruco_CS.", 10, 140))
+                                                  "To see the correct output, use Aruco_CS.", 10, 140)
     End Sub
 End Class
 

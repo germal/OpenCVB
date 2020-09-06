@@ -2,7 +2,7 @@
 Module VB_EditorMain
     Dim changeLines As Integer
     Private Function makeChange(line As String) As String
-        If line.Contains("setDescription(ocvb, ") Then
+        If line.Contains("") Then
             Console.WriteLine(line)
             line = line.Replace("setDescription(ocvb, ", "desc = ")
             line = Mid(line, 1, Len(line) - 1)

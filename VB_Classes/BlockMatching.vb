@@ -17,7 +17,7 @@ Public Class BlockMatching_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.Kinect4AzureCam Then
-            ocvb.trueText(New TTtext("For the Kinect 4 Azure camera, the left and right views are the same.", 10, 50))
+            ocvb.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
         End If
 
         Dim numDisparity = sliders.trackbar(0).Value * 16 ' must be a multiple of 16

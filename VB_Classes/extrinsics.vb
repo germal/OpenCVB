@@ -16,7 +16,7 @@ Public Class Extrinsics_Basics
 
         nextline += Format(ocvb.parms.extrinsics.rotation(6), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(7), fmt) + vbTab +
                        Format(ocvb.parms.extrinsics.rotation(8), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(2), fmt) + vbCrLf
-        ocvb.trueText(New TTtext(nextLine, 10, 40))
+        ocvb.trueText(nextline)
     End Sub
 End Class
 

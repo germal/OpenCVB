@@ -16,7 +16,7 @@ Public Class Rodrigues_ValidateKinect
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.Kinect4AzureCam Then
             dst2.SetTo(0)
-            ocvb.trueText(New TTtext("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140))
+            ocvb.trueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
             Exit Sub
         End If
 
@@ -28,7 +28,7 @@ Public Class Rodrigues_ValidateKinect
         For i = 0 To split.Length - 1
             output += split(i) + vbCrLf
         Next
-        ocvb.trueText(New TTtext(output, 10, 50))
+        ocvb.trueText(output)
     End Sub
 End Class
 
@@ -45,7 +45,7 @@ Public Class Rodrigues_ValidateVector
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.StereoLabsZED2 And
             ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.T265Camera Then
             dst2.SetTo(0)
-            ocvb.trueText(New TTtext("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation", 10, 50))
+            ocvb.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
             Exit Sub
         End If
 
@@ -72,7 +72,7 @@ Public Class Rodrigues_ValidateVector
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
             output += "The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector."
         End If
-        ocvb.trueText(New TTtext(output, 10, 50))
+        ocvb.trueText(output)
     End Sub
 End Class
 
@@ -101,7 +101,7 @@ Public Class Rodrigues_RotationMatrix
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
-        ocvb.trueText(New TTtext(output, 10, 50))
+        ocvb.trueText(output)
     End Sub
 End Class
 
@@ -135,7 +135,7 @@ Public Class Rodrigues_Extrinsics
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
-        ocvb.trueText(New TTtext(output, 10, 40))
+        ocvb.trueText(output)
     End Sub
 End Class
 

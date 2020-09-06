@@ -21,9 +21,9 @@ Public Class NumPy_FFT
             sb.AppendFormat("FFT output of above 1-dimensional vector" + vbCrLf + "{0:N}", y)
             Dim inverse = np.fft.ifft(y)
             sb.AppendFormat(vbCrLf + vbCrLf + "Inverse FFT output" + "{0:N}" + vbCrLf + vbCrLf + "Should reflect original input above", inverse)
-            ocvb.trueText(New TTtext(sb.ToString, 10, 60))
+            ocvb.trueText(sb.ToString)
         Else
-            ocvb.trueText(New TTtext("Enable Embedded NumPy in the OptionsDialog", 10, 60))
+            ocvb.trueText("Enable Embedded NumPy in the OptionsDialog")
         End If
     End Sub
 End Class
@@ -43,7 +43,7 @@ Public Class NumPy_EmbeddedTest_CS
         If ocvb.parms.NumPyEnabled Then
             embed.Run()
         Else
-            ocvb.trueText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60))
+            ocvb.trueText("Enable Embedded NumPy/Python in the Global OptionsDialog")
         End If
     End Sub
 End Class
@@ -69,7 +69,7 @@ Public Class NumPy_EmbeddedMat_CS
             Dim cmd = "from time import time,ctime" ' + vbCrLf + "Console.Writeline('Today is',ctime(time()))" + vbCrLf
             embed.Run(src, cmd)
         Else
-            ocvb.trueText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60))
+            ocvb.trueText("Enable Embedded NumPy/Python in the Global OptionsDialog")
         End If
     End Sub
 End Class
@@ -92,7 +92,7 @@ Public Class NumPy_CmdLine
         If ocvb.parms.NumPyEnabled Then
             embed.Run()
         Else
-            ocvb.trueText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60))
+            ocvb.trueText("Enable Embedded NumPy/Python in the Global OptionsDialog")
         End If
     End Sub
 End Class
@@ -117,7 +117,7 @@ Public Class NumPy_EmbeddedCmd
                       "def __init__(*args): InteractiveConsole.__init__(*args)" + vbCrLf + "a = 0" + vbCrLf + "code = 'a = 1; print(a)'" + vbCrLf +
                       "console = Console()" + vbCrLf + "console.runcode(code)" + vbCrLf + "print(a)")
         Else
-            ocvb.trueText(New TTtext("Enable Embedded NumPy/Python in the Global OptionsDialog", 10, 60))
+            ocvb.trueText("Enable Embedded NumPy/Python in the Global OptionsDialog")
         End If
     End Sub
 End Class

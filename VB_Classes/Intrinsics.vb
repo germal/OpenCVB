@@ -25,7 +25,7 @@ Public Class intrinsicsLeft_Basics
             ttStr += "Approximate FOV in x = " + CStr(hFOVangles(ocvb.parms.cameraIndex)) + vbCrLf +
                      "Approximate FOV in y = " + CStr(vFOVangles(ocvb.parms.cameraIndex)) + vbCrLf
         End If
-        ocvb.trueText(New TTtext(ttStr, 10, 50))
+        ocvb.trueText(ttStr)
 
         dst2.SetTo(0)
         dst2.Line(New cv.Point(src.Width / 2, 0), New cv.Point(src.Width / 2, src.Height), cv.Scalar.White, 1)

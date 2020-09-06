@@ -80,7 +80,7 @@ Public Class FishEye_Raw
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.T265Camera Then
-            ocvb.trueText(New TTtext("Only the T265 camera is has FishEye images at this point.", 10, 100))
+            ocvb.trueText("Only the T265 camera is has FishEye images at this point.", 10, 100)
             Exit Sub
         End If
         label1 = "Left Fisheye Image"

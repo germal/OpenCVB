@@ -178,13 +178,13 @@ Public Class WarpAffine_3Points
                 dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
         End If
-        ocvb.trueText(New TTtext("M defined as: " + vbCrLf +
+        ocvb.trueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +
                       Format(M.Get(Of Double)(1, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(1, 1), "#0.00") + vbTab +
-                      Format(M.Get(Of Double)(1, 2), "#0.00"), 10, 60))
+                      Format(M.Get(Of Double)(1, 2), "#0.00"))
     End Sub
 End Class
 
@@ -236,7 +236,7 @@ Public Class WarpAffine_4Points
             Next
         End If
 
-        ocvb.trueText(New TTtext("M defined as: " + vbCrLf +
+        ocvb.trueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +
@@ -245,7 +245,7 @@ Public Class WarpAffine_4Points
                       Format(M.Get(Of Double)(1, 2), "#0.00") + vbCrLf +
                       Format(M.Get(Of Double)(2, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(2, 1), "#0.00") + vbTab +
-                      Format(M.Get(Of Double)(2, 2), "#0.00") + vbCrLf, 10, 60))
+                      Format(M.Get(Of Double)(2, 2), "#0.00") + vbCrLf)
         Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
         dst1.Circle(center, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         center = New cv.Point2f(50, src.Height / 2)

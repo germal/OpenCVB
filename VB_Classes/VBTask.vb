@@ -93,7 +93,7 @@ Public Class ActiveTask : Implements IDisposable
             If ocvb.parms.useRecordedData Then
                 Dim recordingFilename = New FileInfo(ocvb.openFileDialogName)
                 If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
-                    ocvb.trueText(New TTtext("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125))
+                    ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
                     Exit Sub
                 End If
                 recordedData.Run(ocvb)

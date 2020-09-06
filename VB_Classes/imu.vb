@@ -16,41 +16,41 @@ Public Class IMU_Basics
         desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.IMU_Present Then
-            Dim alpha As Double = sliders.trackbar(0).Value / 1000
-            If ocvb.frameCount = 0 Then
-                lastTimeStamp = ocvb.IMU_TimeStamp
-            Else
-                gyroAngle = ocvb.IMU_AngularVelocity
-                Dim dt_gyro = (ocvb.IMU_TimeStamp - lastTimeStamp) / 1000
-                If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.D435i Then dt_gyro /= 1000 ' different units in the timestamp?
-                lastTimeStamp = ocvb.IMU_TimeStamp
-                gyroAngle = gyroAngle * dt_gyro
-                theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
-            End If
-
-            ' NOTE: Initialize the angle around the y-axis to zero.
-            Dim accelAngle = New cv.Point3f(Math.Atan2(ocvb.IMU_Acceleration.X, Math.Sqrt(ocvb.IMU_Acceleration.Y * ocvb.IMU_Acceleration.Y + ocvb.IMU_Acceleration.Z * ocvb.IMU_Acceleration.Z)), 0,
-                                                Math.Atan2(ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z))
-            If ocvb.frameCount = 0 Then
-                theta = accelAngle
-            Else
-                ' Apply the Complementary Filter:
-                '  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
-                '  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
-                theta.X = theta.X * alpha + accelAngle.X * (1 - alpha)
-                theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
-            End If
-            If standalone Then
-                flow.msgs.Add("ts = " + Format(ocvb.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(ocvb.IMU_Acceleration.X, "#0.00") +
-                              " y = " + Format(ocvb.IMU_Acceleration.Y, "#0.00") + " z = " + Format(ocvb.IMU_Acceleration.Z, "#0.00") + vbTab +
-                              " Motion (rads/sec) pitch = " + Format(ocvb.IMU_AngularVelocity.X, "#0.00") +
-                              " Yaw = " + Format(ocvb.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(ocvb.IMU_AngularVelocity.Z, "#0.00"))
-            End If
-            label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
-        Else
-            If ocvb.frameCount = 0 Then flow.msgs.Add("No IMU present on this device")
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+            Exit Sub
         End If
+        Dim alpha As Double = sliders.trackbar(0).Value / 1000
+        If ocvb.frameCount = 0 Then
+            lastTimeStamp = ocvb.IMU_TimeStamp
+        Else
+            gyroAngle = ocvb.IMU_AngularVelocity
+            Dim dt_gyro = (ocvb.IMU_TimeStamp - lastTimeStamp) / 1000
+            If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.D435i Then dt_gyro /= 1000 ' different units in the timestamp?
+            lastTimeStamp = ocvb.IMU_TimeStamp
+            gyroAngle = gyroAngle * dt_gyro
+            theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
+        End If
+
+        ' NOTE: Initialize the angle around the y-axis to zero.
+        Dim accelAngle = New cv.Point3f(Math.Atan2(ocvb.IMU_Acceleration.X, Math.Sqrt(ocvb.IMU_Acceleration.Y * ocvb.IMU_Acceleration.Y + ocvb.IMU_Acceleration.Z * ocvb.IMU_Acceleration.Z)), 0,
+                                                    Math.Atan2(ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z))
+        If ocvb.frameCount = 0 Then
+            theta = accelAngle
+        Else
+            ' Apply the Complementary Filter:
+            '  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
+            '  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
+            theta.X = theta.X * alpha + accelAngle.X * (1 - alpha)
+            theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
+        End If
+        If standalone Then
+            flow.msgs.Add("ts = " + Format(ocvb.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(ocvb.IMU_Acceleration.X, "#0.00") +
+                                  " y = " + Format(ocvb.IMU_Acceleration.Y, "#0.00") + " z = " + Format(ocvb.IMU_Acceleration.Z, "#0.00") + vbTab +
+                                  " Motion (rads/sec) pitch = " + Format(ocvb.IMU_AngularVelocity.X, "#0.00") +
+                                  " Yaw = " + Format(ocvb.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(ocvb.IMU_AngularVelocity.Z, "#0.00"))
+        End If
+        label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         flow.Run(ocvb)
     End Sub
 End Class
@@ -72,40 +72,40 @@ Public Class IMU_Stabilizer
         label2 = "Difference from Color Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.IMU_Present Then
-            Dim borderCrop = 5
-            Dim vert_Border = borderCrop * src.Rows / src.Cols
-            Dim dx = ocvb.IMU_AngularVelocity.X
-            Dim dy = ocvb.IMU_AngularVelocity.Y
-            Dim da = ocvb.IMU_AngularVelocity.Z
-            Dim sx = 1 ' assume no scaling is taking place.
-            Dim sy = 1 ' assume no scaling is taking place.
-
-            kalman.input = {dx, dy, da}
-            kalman.Run(ocvb)
-            dx = kalman.output(0)
-            dy = kalman.output(1)
-            da = kalman.output(2)
-
-            Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
-            smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
-            smoothedMat.Set(Of Double)(0, 1, sx * -Math.Sin(da))
-            smoothedMat.Set(Of Double)(1, 0, sy * Math.Sin(da))
-            smoothedMat.Set(Of Double)(1, 1, sy * Math.Cos(da))
-            smoothedMat.Set(Of Double)(0, 2, dx)
-            smoothedMat.Set(Of Double)(1, 2, dy)
-
-            Dim smoothedFrame = src.WarpAffine(smoothedMat, src.Size())
-            smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-            dst1 = smoothedFrame.Resize(src.Size())
-            cv.Cv2.Subtract(src, dst1, dst2)
-
-            dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
-            Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
-            ocvb.trueText(New TTtext(Text, 10, 100))
-        Else
-            ocvb.trueText(New TTtext("No IMU present on this RealSense device", 20, 100))
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+            Exit Sub
         End If
+        Dim borderCrop = 5
+        Dim vert_Border = borderCrop * src.Rows / src.Cols
+        Dim dx = ocvb.IMU_AngularVelocity.X
+        Dim dy = ocvb.IMU_AngularVelocity.Y
+        Dim da = ocvb.IMU_AngularVelocity.Z
+        Dim sx = 1 ' assume no scaling is taking place.
+        Dim sy = 1 ' assume no scaling is taking place.
+
+        kalman.input = {dx, dy, da}
+        kalman.Run(ocvb)
+        dx = kalman.output(0)
+        dy = kalman.output(1)
+        da = kalman.output(2)
+
+        Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
+        smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
+        smoothedMat.Set(Of Double)(0, 1, sx * -Math.Sin(da))
+        smoothedMat.Set(Of Double)(1, 0, sy * Math.Sin(da))
+        smoothedMat.Set(Of Double)(1, 1, sy * Math.Cos(da))
+        smoothedMat.Set(Of Double)(0, 2, dx)
+        smoothedMat.Set(Of Double)(1, 2, dy)
+
+        Dim smoothedFrame = src.WarpAffine(smoothedMat, src.Size())
+        smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
+        dst1 = smoothedFrame.Resize(src.Size())
+        cv.Cv2.Subtract(src, dst1, dst2)
+
+        dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
+        Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
+        ocvb.trueText(Text)
     End Sub
 End Class
 
@@ -128,11 +128,11 @@ Public Class IMU_Magnetometer
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.IMU_Magnetometer = New cv.Point3f Then
-            ocvb.trueText(New TTtext("The IMU for this camera does not have Magnetometer readings.", 10, 125))
+            ocvb.trueText("The IMU for this camera does not have Magnetometer readings.")
         Else
-            ocvb.trueText(New TTtext("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.IMU_Magnetometer.X) + vbCrLf +
+            ocvb.trueText("Uncalibrated IMU Magnetometer reading:  x = " + CStr(ocvb.IMU_Magnetometer.X) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  y = " + CStr(ocvb.IMU_Magnetometer.Y) + vbCrLf +
-                                                  "Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.IMU_Magnetometer.Z), 10, 60))
+                                                  "Uncalibrated IMU Magnetometer reading:  z = " + CStr(ocvb.IMU_Magnetometer.Z))
             plot.plotData = New cv.Scalar(ocvb.IMU_Magnetometer.X, ocvb.IMU_Magnetometer.Y, ocvb.IMU_Magnetometer.Z)
             plot.Run(ocvb)
             label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
@@ -152,10 +152,10 @@ Public Class IMU_Barometer
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.IMU_Barometer = 0 Then
-            ocvb.trueText(New TTtext("The IMU for this camera does not have barometric pressure.", 10, 125))
+            ocvb.trueText("The IMU for this camera does not have barometric pressure.")
         Else
-            ocvb.trueText(New TTtext("Barometric pressure is " + CStr(ocvb.IMU_Barometer) + " hectopascal." + vbCrLf +
-                                                  "Barometric pressure is " + Format(ocvb.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.", 10, 60))
+            ocvb.trueText("Barometric pressure is " + CStr(ocvb.IMU_Barometer) + " hectopascal." + vbCrLf +
+                                                  "Barometric pressure is " + Format(ocvb.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.")
         End If
     End Sub
 End Class
@@ -170,9 +170,11 @@ Public Class IMU_Temperature
         desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.IMU_Present Then
-            ocvb.trueText(New TTtext("IMU Temperature is " + Format(ocvb.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
-                                                  "IMU Temperature is " + Format(ocvb.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.", 10, 60))
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+        Else
+            ocvb.trueText("IMU Temperature is " + Format(ocvb.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
+                                                  "IMU Temperature is " + Format(ocvb.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
         End If
     End Sub
 End Class
@@ -202,6 +204,11 @@ Public Class IMU_FrameTime
         desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+            Exit Sub
+        End If
+
         Static IMUanchor As Integer = ocvb.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
         ' there can be some errant times at startup.
@@ -212,7 +219,7 @@ Public Class IMU_FrameTime
             Static allZeroCount As Integer
             allZeroCount += 1
             If allZeroCount > 20 Then
-                ocvb.trueText(New TTtext("Is IMU present?  No IMU FrameTimes", 10, 10))
+                ocvb.trueText("Is IMU present?  No IMU FrameTimes")
                 allZeroCount = Integer.MinValue ' don't show message again.
             End If
             Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
@@ -265,7 +272,7 @@ Public Class IMU_FrameTime
                     output += vbCrLf
                 Next
             End If
-            ocvb.trueText(New TTtext(output, 10, 50))
+            ocvb.trueText(output)
         End If
     End Sub
 End Class
@@ -296,6 +303,11 @@ Public Class IMU_HostFrameTimes
         desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+            Exit Sub
+        End If
+
         Static CPUanchor As Integer = ocvb.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
         ' there can be some errant times at startup.
@@ -348,7 +360,7 @@ Public Class IMU_HostFrameTimes
                     output += vbCrLf
                 Next
             End If
-            ocvb.trueText(New TTtext(output, 10, 50))
+            ocvb.trueText(output)
         End If
     End Sub
 End Class
@@ -380,6 +392,11 @@ Public Class IMU_TotalDelay
         desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+            Exit Sub
+        End If
+
         host.Run(ocvb)
         imu.Run(ocvb)
         Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
@@ -420,7 +437,7 @@ Public Class IMU_TotalDelay
                 output += vbCrLf
             Next
         End If
-        ocvb.trueText(New TTtext(output, 10, 50))
+        ocvb.trueText(output)
     End Sub
 End Class
 
@@ -444,6 +461,11 @@ Public Class IMU_GVector
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+            Exit Sub
+        End If
+
         Dim gx = ocvb.IMU_Acceleration.X
         Dim gy = ocvb.IMU_Acceleration.Y
         Dim gz = ocvb.IMU_Acceleration.Z
@@ -489,7 +511,7 @@ Public Class IMU_GVector
                             vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
                             "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-            ocvb.trueText(New TTtext(outStr, 10, 50))
+            ocvb.trueText(outStr)
         End If
     End Sub
 End Class
@@ -515,6 +537,11 @@ Public Class IMU_IsCameraLevel
         desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("No IMU present on this device")
+            Exit Sub
+        End If
+
         Dim gx = ocvb.IMU_Acceleration.X
         Dim gy = ocvb.IMU_Acceleration.Y
         Dim gz = ocvb.IMU_Acceleration.Z

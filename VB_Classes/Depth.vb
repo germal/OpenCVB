@@ -300,7 +300,7 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
-        ocvb.trueText(New TTtext("OpenGL data prepared.", 10, 50))
+        ocvb.trueText("OpenGL data prepared.")
     End Sub
     Public Sub Close()
         xyzFrame.Dispose()
@@ -350,7 +350,7 @@ Public Class Depth_WorldXYZ_MT
                 Next
             Next
         End Sub)
-        ocvb.trueText(New TTtext("OpenGL data prepared.", 10, 50))
+        ocvb.trueText("OpenGL data prepared.")
     End Sub
 End Class
 
@@ -1327,7 +1327,7 @@ Public Class Depth_PointCloudInRange_IMU
         split = tSplit
 
         If ocvb.parms.IMU_Present = False Then
-            ocvb.trueText(New TTtext("IMU unavailable (?) for this camera", 10, 50))
+            ocvb.trueText("IMU unavailable (?) for this camera")
         Else
             imu.Run(ocvb)
             If zRotation Then

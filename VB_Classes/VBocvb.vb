@@ -69,7 +69,8 @@ Public Class VBocvb
         result = New cv.Mat(resolution.Height, resolution.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         TTtextData = New List(Of TTtext)
     End Sub
-    Public Sub trueText(tt As TTtext)
-        TTtextData.Add(tt)
+    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
+        Dim str As New TTtext(text, x, y, picTag)
+        TTtextData.Add(str)
     End Sub
 End Class

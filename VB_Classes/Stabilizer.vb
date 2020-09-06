@@ -67,7 +67,7 @@ Public Class Stabilizer_Basics
             Dim saveDX = dx, saveDY = dy, saveDA = da
 
             Dim text = "Original dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
-            ocvb.trueText(New TTtext(text, 10, 50))
+            ocvb.trueText(text)
 
             Dim sx = ds_x, sy = ds_y
 
@@ -85,7 +85,7 @@ Public Class Stabilizer_Basics
             If Math.Abs(da) > 50 Then da = saveDA
 
             text = "dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
-            ocvb.trueText(New TTtext(text, 10, 100))
+            ocvb.trueText(text, 10, 100)
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
             smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
@@ -193,7 +193,7 @@ Public Class Stabilizer_Basics_CPP
         desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        ocvb.trueText(New TTtext("this algorithm is not stable.", 10, 100))
+        ocvb.trueText("this algorithm is not stable.", 10, 100)
         'Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         'handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         'Dim imagePtr = Stabilizer_Basics_Run(sPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)

@@ -178,7 +178,7 @@ Public Class Edges_RandomForest_CPP
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.frameCount < 100 Then ocvb.trueText(New TTtext("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100))
+        If ocvb.frameCount < 100 Then ocvb.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
         If ocvb.frameCount = 5 Then

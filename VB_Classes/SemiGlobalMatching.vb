@@ -30,7 +30,7 @@ End Module
 '    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.frameCount < 10 Then Exit Sub
 '        If ocvb.parms.cameraIndex = Kinect4AzureCam Then
-'            ocvb.trueText(New TTtext("The left and right views are identical with the Microsoft Kinect 4 Azure camera.", 10, 60))
+'            ocvb.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera."))
 '            Exit Sub
 '        End If
 

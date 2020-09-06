@@ -34,7 +34,7 @@ Public Class FLANN_Test
                     output += String.Format("distance:{0}", dist) + vbCrLf
                     output += String.Format("data:({0}, {1})", pt.X, pt.Y) + vbCrLf
                 Next i
-                ocvb.trueText(New TTtext(output, 10, 50))
+                ocvb.trueText(output)
             End Using
         End Using
     End Sub
@@ -115,6 +115,6 @@ Public Class FLANN_Basics
         output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf + vbCrLf
         output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4."
         output += "Perhaps FLANN is only good enough to find a group of neighbors.  Use with caution."
-        ocvb.trueText(New TTtext(output, 10, 50, 3))
+        ocvb.trueText(output, 10, 50, 3)
     End Sub
 End Class

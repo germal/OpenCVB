@@ -38,8 +38,8 @@ Public Class Font_TrueType
         Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        ocvb.trueText(New TTtext("TrueType Font is currently set to " + fontName + " with size = " + CStr(fontSize) + vbCrLf +
-                                   "Use the Settings button above to change the font name and size.", 10, 50))
+        ocvb.trueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(fontSize) + vbCrLf +
+                                   "Use the Settings button above to change the font name and size.")
     End Sub
 End Class
 
@@ -64,12 +64,12 @@ Public Class Font_FlowText
         Static lastCount As Int32
 
         Dim maxlines = 22
-        Dim firstLine = If(msgs.Count - maxLines < 0, 0, msgs.Count - maxLines)
+        Dim firstLine = If(msgs.Count - maxlines < 0, 0, msgs.Count - maxlines)
         Dim fullText As String = ""
         For i = firstLine To msgs.Count - 1
             fullText += msgs(i) + vbCrLf
         Next
-        ocvb.trueText(New TTtext(fullText, 10, 20))
+        ocvb.trueText(fullText, 10, 20)
 
         If msgs.Count >= maxLines Then
             Dim index As Int32

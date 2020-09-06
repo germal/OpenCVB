@@ -26,9 +26,9 @@ Public Class Stitch_Basics
 
         'If ocvb.testAllRunning  Then
         ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.
-        ocvb.trueText(New TTtext("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
-                                     "Skipping it during a 'Test All' just so all the other tests can be exercised.", 10, 60))
-            Exit Sub
+        ocvb.trueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
+                                     "Skipping it during a 'Test All' just so all the other tests can be exercised.")
+        Exit Sub
         'End If
 
         Dim stitcher = cv.Stitcher.Create(cv.Stitcher.Mode.Scans)

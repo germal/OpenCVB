@@ -156,7 +156,7 @@ Public Class Gradient_NumPy
             Numpy.np.power(npMag, exponent, npMag)
             NumPyFloatToMat(npMag, dst1)
         Else
-            ocvb.trueText(New TTtext("Enable Embedded NumPy in the OptionsDialog", 10, 60))
+            ocvb.trueText("Enable Embedded NumPy in the OptionsDialog")
         End If
     End Sub
 End Class

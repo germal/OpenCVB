@@ -7,8 +7,8 @@ Module Python_Module
     Public Function checkPythonPackage(ocvb As VBocvb, packageName As String) As Boolean
         ' make sure that opencv-python and numpy are installed on this system.
         If ocvb.PythonExe = "" Then
-            ocvb.trueText(New TTtext("Python is not present and needs to be installed." + vbCrLf +
-                                                  "Get Python 3.7+ with Visual Studio's Install app.", 10, 60))
+            ocvb.trueText("Python is not present and needs to be installed." + vbCrLf +
+                                                  "Get Python 3.7+ with Visual Studio's Install app.")
             Return False
         End If
         Dim pythonFileInfo = New FileInfo(ocvb.PythonExe)
@@ -17,10 +17,10 @@ Module Python_Module
         Dim packageFiles = packageFolder.GetDirectories(packageName, IO.SearchOption.TopDirectoryOnly)
 
         If packageFiles.Count = 0 Then
-            ocvb.trueText(New TTtext("Python is present but the packages needed by this Python script are not present." + vbCrLf +
+            ocvb.trueText("Python is present but the packages needed by this Python script are not present." + vbCrLf +
                                                   "Use the PythonPackages.py script to show which imports are missing.'" + vbCrLf +
                                                   "Go to the Visual Studio menu 'Tools/Python/Python Environments'" + vbCrLf +
-                                                  "Select 'Packages' in the combo box and search for packages required by this script.", 10, 60))
+                                                  "Select 'Packages' in the combo box and search for packages required by this script.")
         End If
         Return True
     End Function
@@ -54,7 +54,7 @@ Module Python_Module
             If ocvb.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             If p.Start() = False Then MsgBox("The Python script " + pythonApp.Name + " failed to start")
         Else
-            ocvb.trueText(New TTtext(pythonApp.FullName + " is missing.", 10, 60))
+            ocvb.trueText(pythonApp.FullName + " is missing.")
             Return False
         End If
         Return True
@@ -70,7 +70,7 @@ Public Class Python_Run
     Dim tryCount As Int32
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/PythonPackages.py"
+        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.HomeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
@@ -107,10 +107,10 @@ Public Class Python_MemMap
     Dim memMapPtr As IntPtr
     Public memMapValues(49) As Double ' more than we need - buffer for growth
     Public memMapbufferSize As Int32
-        Public Sub New(ocvb As VBocvb)
+    Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/Python_MemMap.py"
+            ocvb.PythonFileName = ocvb.HomeDir + "VB_Classes/Python/Python_MemMap.py"
         End If
 
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length
@@ -120,7 +120,7 @@ Public Class Python_MemMap
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length - 1)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
 
-        if standalone Then
+        If standalone Then
             If ocvb.parms.externalPythonInvocation = False Then
                 StartPython(ocvb, "--MemMapLength=" + CStr(memMapbufferSize))
             End If
@@ -130,7 +130,7 @@ Public Class Python_MemMap
         End If
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        if standalone Then memMapValues(0) = ocvb.frameCount
+        If standalone Then memMapValues(0) = ocvb.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub
@@ -159,7 +159,7 @@ Public Class Python_SurfaceBlit
         PipeTaskIndex += 1
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
-        ocvb.PythonFileName = ocvb.homeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
+        ocvb.PythonFileName = ocvb.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalPythonInvocation Then
@@ -185,10 +185,10 @@ Public Class Python_SurfaceBlit
                 On Error Resume Next
                 pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
             End If
-            ocvb.trueText(New TTtext("Blit works fine when run inline but fails with Python callback." + vbCrLf +
-                                                  "See 'Python_SurfaceBlit_PS.py' for the surfaceBlit failure", 10, 60))
+            ocvb.trueText("Blit works fine when run inline but fails with Python callback." + vbCrLf +
+                                                  "See 'Python_SurfaceBlit_PS.py' for the surfaceBlit failure")
         Else
-            ocvb.trueText(New TTtext("Python is not available", 10, 60))
+            ocvb.trueText("Python is not available")
         End If
     End Sub
 End Class

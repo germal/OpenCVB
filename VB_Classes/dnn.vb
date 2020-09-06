@@ -29,7 +29,7 @@ Public Class DNN_Test
         dst2 = image.Resize(dst2.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
-        ocvb.trueText(New TTtext("This example is not working.  Forward fails with 'blobs.size() != 0'.", 10, 100))
+        ocvb.trueText("This example is not working.  Forward fails with 'blobs.size() != 0'.", 10, 100)
         'Dim prob = net.Forward("prob") ' <--- this fails in VB.Net but works in C# (below)
         ' finish this ...
     End Sub
@@ -47,16 +47,16 @@ Public Class DNN_Caffe_CS
         label2 = "Input Image"
         desc = "Download and use a Caffe database"
 
-        Dim protoTxt = ocvb.homeDir + "Data/bvlc_googlenet.prototxt"
-        Dim modelFile = ocvb.homeDir + "Data/bvlc_googlenet.caffemodel"
-        Dim synsetWords = ocvb.homeDir + "Data/synset_words.txt"
+        Dim protoTxt = ocvb.HomeDir + "Data/bvlc_googlenet.prototxt"
+        Dim modelFile = ocvb.HomeDir + "Data/bvlc_googlenet.caffemodel"
+        Dim synsetWords = ocvb.HomeDir + "Data/synset_words.txt"
         caffeCS = New CS_Classes.DNN(protoTxt, modelFile, synsetWords)
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim image = cv.Cv2.ImRead(ocvb.homeDir + "Data/space_shuttle.jpg")
+        Dim image = cv.Cv2.ImRead(ocvb.HomeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
         dst2 = image.Resize(dst2.Size())
-        ocvb.trueText(New TTtext(str, 10, 100))
+        ocvb.trueText(str, 10, 100)
     End Sub
 End Class
 
@@ -93,16 +93,16 @@ Public Class DNN_Basics
         dnnHeight = src.Height
         crop = New cv.Rect(src.Width / 2 - dnnWidth / 2, src.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-        Dim infoText As New FileInfo(ocvb.homeDir + "Data/MobileNetSSD_deploy.prototxt")
+        Dim infoText As New FileInfo(ocvb.HomeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
-            Dim infoModel As New FileInfo(ocvb.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
+            Dim infoModel As New FileInfo(ocvb.HomeDir + "Data/MobileNetSSD_deploy.caffemodel")
             If infoModel.Exists Then
                 net = CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
                 dnnPrepared = True
             End If
         End If
         If dnnPrepared = False Then
-            ocvb.trueText(New TTtext("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100))
+            ocvb.trueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
         End If
         desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
@@ -168,7 +168,7 @@ Public Class DNN_Basics
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
                     dst2.Rectangle(rect, cv.Scalar.Black, -1)
-                    ocvb.trueText(New TTtext(nextName, CInt(rect.X), CInt(rect.Y), 3))
+                    ocvb.trueText(nextName, CInt(rect.X), CInt(rect.Y), 3)
                 End If
             Next
 

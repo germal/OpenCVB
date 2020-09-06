@@ -91,7 +91,7 @@ Public Class Replay_Record
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(ocvb.openFileDialogName)
         If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
-            ocvb.trueText(New TTtext("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125))
+            ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
             Exit Sub
         End If
 
@@ -178,7 +178,7 @@ Public Class Replay_Play
     Public Sub Run(ocvb As VBocvb)
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(ocvb.openFileDialogName)
-        If recordingFilename.Exists = False Then ocvb.trueText(New TTtext("File not found: " + recordingFilename.FullName, 10, 125))
+        If recordingFilename.Exists = False Then ocvb.trueText("File not found: " + recordingFilename.FullName, 10, 125)
         If ocvb.fileStarted And recordingFilename.Exists Then
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then

@@ -243,10 +243,12 @@ Public Class OpenCVB
                     cameraD435i.cameraName = deviceName
                 Case "Intel RealSense L515"
                     cameraL515 = New CameraRS2
+                    cameraL515.IMU_Present = False ' no IMU!!!
                     cameraL515.cameraName = deviceName
                 Case "Intel RealSense T265"
                     cameraT265 = New CameraT265
-                    cameraL515.cameraName = deviceName
+                    cameraT265.IMU_Present = True
+                    cameraT265.cameraName = deviceName
             End Select
         Next
         cameraKinect = New CameraKinect

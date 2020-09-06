@@ -6,11 +6,11 @@ Imports System.IO
 
 Module VTK_Common
     Public Sub vtkInstructions(ocvb As VBocvb)
-        ocvb.trueText(New TTtext("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
+        ocvb.trueText("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
                       "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
                       "Step 2) Build VTK for both Debug and Release" + vbCrLf +
                       "Step 3) Build OpenCV for both Debug and Release" + vbCrLf +
-                      "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125))
+                      "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125)
     End Sub
 End Module
 Public Class VTK_Basics
@@ -86,7 +86,7 @@ Public Class VTK_Basics
         If ocvb.frameCount <> 0 Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then
-                ocvb.trueText(New TTtext("The VTK process appears to have stopped.", 20, 100))
+                ocvb.trueText("The VTK process appears to have stopped.", 20, 100)
             End If
         End If
 
