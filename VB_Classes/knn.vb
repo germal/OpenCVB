@@ -7,6 +7,7 @@ Public Class KNN_Basics
     Public queryPoints As New List(Of cv.Point2f)
     Public neighbors As New cv.Mat
     Public useRandomData As Boolean
+    Public testMode As Boolean
     Public desiredMatches = 1
     Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As VBocvb)
@@ -31,18 +32,16 @@ Public Class KNN_Basics
         desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim queryCount = sliders.trackbar(0).Value
-        Dim trainCount = sliders.trackbar(1).Value
         Dim reuseData = If(check.Box Is Nothing, False, check.Box(0).Checked)
 
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Or useRandomData Then
             If reuseData = False Then
-                randomTrain.sliders.trackbar(0).Value = trainCount
+                randomTrain.sliders.trackbar(0).Value = sliders.trackbar(1).Value
                 randomTrain.Run(ocvb)
 
-                randomQuery.sliders.trackbar(0).Value = queryCount
+                randomQuery.sliders.trackbar(0).Value = sliders.trackbar(0).Value
                 randomQuery.Run(ocvb)
             End If
             trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
@@ -62,7 +61,7 @@ Public Class KNN_Basics
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         knn.FindNearest(queries, desiredMatches, New cv.Mat, neighbors)
 
-        If standalone Then
+        If standalone Or testMode Then
             For i = 0 To neighbors.Rows - 1
                 Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
                 cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
@@ -264,8 +263,12 @@ Public Class KNN_Test
         gridHeightSlider.Value = 100
 
         knn = New KNN_Basics(ocvb)
+        knn.sliders.Visible = False
+        knn.testMode = True
 
-        label1 = knn.label2
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Show grid mask"
+
         desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -278,11 +281,55 @@ Public Class KNN_Test
             knn.queryPoints.Add(pt)
         Next
 
-        If ocvb.frameCount > 0 Then
-            knn.Run(ocvb)
-            dst1 = knn.dst2
-        End If
+        knn.Run(ocvb)
+        dst1 = knn.dst1
         knn.trainingPoints = New List(Of cv.Point2f)(knn.queryPoints)
+        label1 = knn.label1
+        If check.Box(0).Checked Then dst1.SetTo(cv.Scalar.White, grid.gridMask)
+    End Sub
+End Class
+
+
+
+
+
+Public Class KNN_Test_1_to_1
+    Inherits VBparent
+    Public grid As Thread_Grid
+    Dim knn As KNN_1_to_1
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
+        gridHeightSlider.Minimum = 50
+        gridWidthSlider.Value = 100
+        gridHeightSlider.Value = 100
+
+        knn = New KNN_1_to_1(ocvb)
+        knn.basics.sliders.Visible = False
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Show grid mask"
+
+        desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        grid.Run(ocvb)
+
+        knn.basics.queryPoints.Clear()
+        For i = 0 To grid.roiList.Count - 1
+            Dim roi = grid.roiList.ElementAt(i)
+            Dim pt = New cv.Point2f(roi.X + msRNG.Next(roi.Width), roi.Y + msRNG.Next(roi.Height))
+            knn.basics.queryPoints.Add(pt)
+        Next
+
+        knn.Run(ocvb)
+        dst1 = knn.dst1
+        knn.basics.trainingPoints = New List(Of cv.Point2f)(knn.basics.queryPoints)
+        label1 = knn.label1
+        If check.Box(0).Checked Then dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
 

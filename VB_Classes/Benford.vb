@@ -46,6 +46,7 @@ Public Class Benford_Basics
             benford.Run(ocvb)
             dst1 = benford.dst1
             dst2 = benford.dst2
+            label2 = benford.label2
             Exit Sub
         End If
 
@@ -98,7 +99,7 @@ Public Class Benford_Basics
         weight.Run(ocvb)
         dst1 = weight.dst1
 
-        label2 = CStr(weightSlider.Value) + "% actual distribution vs. " + CStr(100 - weightSlider.Value) + "% Benford distribution"
+        label2 = "AddWeighted: " + CStr(weightSlider.Value) + "% actual vs. " + CStr(100 - weightSlider.Value) + "% Benford distribution"
     End Sub
 End Class
 
@@ -267,6 +268,7 @@ Public Class Benford_Depth
         benford.src = getDepth32f(ocvb)
         benford.Run(ocvb)
         dst1 = benford.dst1
+        label1 = benford.label2
     End Sub
 End Class
 
@@ -289,5 +291,6 @@ Public Class Benford_DepthRGB
         benford.Run(ocvb)
         dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
         dst2 = benford.dst2
+        label2 = benford.label2
     End Sub
 End Class
