@@ -18,8 +18,15 @@ Public Class Coherence_Basics
         Dim str_sigma = sliders.trackbar(2).Value * 2 + 1
         Dim eigenKernelSize = sliders.trackbar(3).Value * 2 + 1
 
-        Dim side = 512
-        If src.Height < side Then side = 256
+        Dim side As Integer
+        Select Case src.Height
+            Case 180
+                side = 128
+            Case 360
+                side = 256
+            Case 720
+                side = 512
+        End Select
         Dim xoffset = src.Width / 2 - side / 2
         Dim yoffset = src.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
