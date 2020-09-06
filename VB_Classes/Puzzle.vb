@@ -293,10 +293,10 @@ Public Class Puzzle_Solver
 
         check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Reshuffle pieces"
-        check.Box(1).Text = "Show only the poor correlation coefficients"
+        check.Box(1).Text = "Show poor correlation coefficients"
         check.Box(2).Text = "Clean display (no grid or correlations)"
         check.Box(0).Checked = True
-        check.Box(1).Checked = True
+        check.Box(1).Checked = False
 
         desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
@@ -310,6 +310,11 @@ Public Class Puzzle_Solver
     End Function
     Public Sub Run(ocvb As VBocvb)
         Static saveWidth As Integer
+        If src.Height = 180 Then ' can't support the smaller tiles are the low resolution.
+            radio.check(1).Enabled = False
+            radio.check(2).Enabled = False
+            radio.check(0).Checked = True
+        End If
         If src.Width <> saveWidth Then
             check.Box(0).Checked = True
             saveWidth = src.Width
@@ -331,33 +336,38 @@ Public Class Puzzle_Solver
             Dim factor = 1
             saveRadioIndex = radioIndex
             saveResolutionWidth = src.Width
-            Select Case src.Width
+            Select Case src.Height
                 Case 180
                     factor = 4
+                    fontsize = 0.4
                 Case 360
                     factor = 2
+                    fontsize = 0.7
                 Case 720
                     factor = 1
+                    fontsize = 1.8
             End Select
             If radio.check(0).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 256 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 180 / factor
-                fontsize = 0.9
+                fontsize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value * 3 / 4
             ElseIf radio.check(1).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 128 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 90 / factor
-                fontsize = 0.7
+                fontsize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 3
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value * 3 / 4
             Else
                 puzzle.grid.sliders.trackbar(0).Value = 64 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 90 / factor
-                fontsize = 0.5
+                fontsize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             End If
+            puzzle.grid.src = src
+            puzzle.grid.Run(ocvb)
             xyOffset = puzzle.grid.sliders.trackbar(1).Value * 9 / 10
             yyOffset = puzzle.grid.sliders.trackbar(1).Value / 2
             puzzle.restartRequested = True
@@ -438,7 +448,7 @@ Public Class Puzzle_Solver
                         left = dst2(tileRight).Col(0)
                         cv.Cv2.MatchTemplate(right, left, tmp, cv.TemplateMatchModes.CCoeffNormed)
                         Dim correlationRight = tmp.Get(Of Single)(0, 0)
-                        If check.Box(1).Checked = False Or correlationRight < 0.9 Then
+                        If check.Box(1).Checked And correlationRight < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + yxOffset, y + yyOffset),
                                        cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                         End If
@@ -451,7 +461,7 @@ Public Class Puzzle_Solver
                         cv.Cv2.MatchTemplate(bottom, top, tmp, cv.TemplateMatchModes.CCoeffNormed)
                         Dim correlationBottom = tmp.Get(Of Single)(0, 0)
 
-                        If check.Box(1).Checked = False Or correlationBottom < 0.9 Then
+                        If check.Box(1).Checked And correlationBottom < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + xxOffset, y + xyOffset),
                                        cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                         End If
@@ -467,7 +477,7 @@ Public Class Puzzle_Solver
         check.Box(0).Checked = False
 
         label1 = "Input to puzzle solver"
-        label2 = "Solution with edge correlations (ambiguities possible)"
+        label2 = If(check.Box(1).Checked, "Poor correlations shown (ambiguities possible)", "Solution (ambiguities possible)")
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
     End Sub
 End Class

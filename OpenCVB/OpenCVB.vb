@@ -901,7 +901,9 @@ Public Class OpenCVB
 
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' run at all the different resolutions...
-        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
+        Dim specialSingleCount = AvailableAlgorithms.Items.Count = 1
+        If specialSingleCount Then saveAlgorithmName = "" ' stop the current algorith which we will restart below (only 1 algorithm in the list.)
+        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Or specialSingleCount Then
             If optionsForm.LowResolution.Checked Then
                 optionsForm.mediumResolution.Checked = True
             ElseIf optionsForm.mediumResolution.Checked Then
@@ -912,27 +914,26 @@ Public Class OpenCVB
             saveLayout()
         End If
 
-        Static changeCameras As Integer
-        If AvailableAlgorithms.Items.Count = 1 Then changeCameras += 1
-        ' after sweeping through low and high resolution, sweep through the cameras as well...
-        If (AlgorithmTestCount Mod (AvailableAlgorithms.Items.Count * 2) = 0 And AlgorithmTestCount > 0) Or changeCameras >= 2 Then
-            changeCameras = 0
-            Dim cameraIndex = optionsForm.cameraIndex
-            Dim saveCameraIndex = optionsForm.cameraIndex
-            cameraIndex += 1
-            If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-            For i = 0 To optionsForm.cameraRadioButton.Count - 1
-                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                    Exit For
-                Else
-                    cameraIndex += 1
-                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+        If optionsForm.LowResolution.Checked Then ' only change cameras when in low resolution.
+            ' after sweeping through low to high resolution, sweep through the cameras as well...
+            If (AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0) Then
+                Dim cameraIndex = optionsForm.cameraIndex
+                Dim saveCameraIndex = optionsForm.cameraIndex
+                cameraIndex += 1
+                If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                For i = 0 To optionsForm.cameraRadioButton.Count - 1
+                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                        Exit For
+                    Else
+                        cameraIndex += 1
+                        If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                    End If
+                Next
+                If saveCameraIndex <> cameraIndex Then
+                    optionsForm.cameraIndex = cameraIndex
+                    RestartCamera()
                 End If
-            Next
-            If saveCameraIndex <> cameraIndex Then
-                optionsForm.cameraIndex = cameraIndex
-                RestartCamera()
             End If
         End If
 
@@ -1102,8 +1103,8 @@ Public Class OpenCVB
             End While
 
             ' bring the data into the algorithm task.
-            If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
             SyncLock bufferLock
+                If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
                 camera.newImagesAvailable = False
 
                 If resolutionXY.width <> 1280 Then

@@ -98,15 +98,10 @@ Public Class Mat_Tricks
         desc = "Show some Mat tricks."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim mat = src.Resize(New cv.Size(200, 200))
-        Dim x = 40
-        Dim y = 80
-        dst1(x, x + mat.Width, y, y + mat.Height) = mat
-
-        dst2 = src.EmptyClone.SetTo(0)
-        x = 20
-        y = 40
-        dst2(x, x + mat.Width, y, y + mat.Height) = mat.T
+        Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
+        Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
+        dst1(roi) = mat
+        dst2(roi) = mat.T
     End Sub
 End Class
 
