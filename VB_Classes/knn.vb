@@ -46,6 +46,8 @@ Public Class KNN_Basics
             End If
             trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
             queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
+        Else
+            If queryPoints.Count = 0 Then Exit Sub ' nothing to do on this generation...
         End If
         ' The first generation may not have any training data, only queries.  (Queries move to training on subsequent generations.)
         If trainingPoints.Count = 0 Then trainingPoints = New List(Of cv.Point2f)(queryPoints)
