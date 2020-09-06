@@ -241,7 +241,7 @@ Public Class Plot_Histogram
                 cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
             Next
             Dim fontSlider = findSlider("Histogram Font Size x10")
-            AddPlotScale(dst1, 0, maxVal, fontSlider.Value / 10)
+            AddPlotScale(dst1, 0, maxVal, fontsize * 2)
         End If
     End Sub
 End Class

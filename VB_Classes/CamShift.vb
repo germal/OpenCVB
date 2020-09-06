@@ -128,18 +128,21 @@ Public Class Camshift_Object
         blob.Run(ocvb)
         dst2 = blob.dst2.Clone()
 
-        Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
-        If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
-            ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+
+        If blob.flood.fBasics.masks.Count > 0 Then
+            Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
+            If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
+                ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+            End If
+            If camshift.trackBox.Size.Width < 50 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+            camshift.src = src
+            camshift.Run(ocvb)
+            dst1 = camshift.dst1
+            Dim mask = camshift.dst1.ConvertScaleAbs(255)
+            cv.Cv2.BitwiseNot(mask, mask)
+            dst2.SetTo(0, mask)
+            If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         End If
-        If camshift.trackBox.Size.Width < 50 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
-        camshift.src = src
-        camshift.Run(ocvb)
-        dst1 = camshift.dst1
-        Dim mask = camshift.dst1.ConvertScaleAbs(255)
-        cv.Cv2.BitwiseNot(mask, mask)
-        dst2.SetTo(0, mask)
-        If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
