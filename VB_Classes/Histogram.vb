@@ -16,7 +16,6 @@ Public Class Histogram_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 256)
         sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
-        sliders.setupTrackBar(2, "Histogram Font Size x10", 1, 20, 10)
 
         desc = "Plot histograms for up to 3 channels."
     End Sub
@@ -50,7 +49,7 @@ Public Class Histogram_Basics
 
         If standalone Or plotRequested Then
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-            AddPlotScale(dst1, 0, maxVal, sliders.trackbar(2).Value / 10)
+            AddPlotScale(dst1, 0, maxVal, fontsize * 2)
             label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
         End If
     End Sub

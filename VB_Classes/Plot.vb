@@ -111,7 +111,6 @@ Public Class Plot_OverTime
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
-        sliders.setupTrackBar(2, "Plot (time) Font Size x10", 1, 20, 10)
         desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
@@ -187,7 +186,7 @@ Public Class Plot_OverTime
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
         If standalone Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, sliders.trackbar(2).Value / 10)
+        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, fontsize * 2)
     End Sub
 End Class
 
@@ -205,8 +204,6 @@ Public Class Plot_Histogram
     Public fixedMaxVal As Integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram Font Size x10", 1, 20, 10)
         desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -240,7 +237,6 @@ Public Class Plot_Histogram
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
                 cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
             Next
-            Dim fontSlider = findSlider("Histogram Font Size x10")
             AddPlotScale(dst1, 0, maxVal, fontsize * 2)
         End If
     End Sub

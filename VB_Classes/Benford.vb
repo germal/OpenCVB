@@ -53,8 +53,6 @@ Public Class Benford_Basics
         Dim weightSlider = findSlider("Weight")
         If ocvb.frameCount = 0 Then
             If weightSlider IsNot Nothing Then weightSlider.Value = 75
-            Dim fontSlider = findSlider("Histogram Font Size x10")
-            fontSlider.Value = 8
         End If
 
         src = src.Reshape(1, src.Width * src.Height)
