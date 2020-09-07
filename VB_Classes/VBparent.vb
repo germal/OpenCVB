@@ -190,6 +190,10 @@ Public Class VBparent : Implements IDisposable
     End Function
     Public Sub NextFrame(ocvb As VBocvb)
         If standalone Then src = ocvb.color
+        If src.Width <> dst1.Width Or src.Width <> dst2.Width Then
+            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        End If
         If ocvb.drawRect.Width <> 0 Then ocvb.drawRect = validateRect(ocvb.drawRect)
         algorithm.Run(ocvb)
         If standalone And src.Width > 0 Then
