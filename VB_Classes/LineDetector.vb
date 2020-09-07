@@ -1,12 +1,9 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
-
-
-
 Public Class LineDetector_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
+    Public lines As cv.Vec4f()
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
@@ -17,12 +14,12 @@ Public Class LineDetector_Basics
         desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim vectors = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        lines = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         src.CopyTo(dst2)
         Dim thickness = sliders.trackbar(0).Value
 
-        For Each v In vectors
+        For Each v In lines
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
                    v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
@@ -32,7 +29,7 @@ Public Class LineDetector_Basics
         Next
         If standalone Then
             label2 = "Drawn with DrawSegment (thickness=1)"
-            ld.DrawSegments(dst2, vectors, False)
+            ld.DrawSegments(dst2, lines, False)
         End If
     End Sub
 End Class
@@ -486,6 +483,13 @@ Public Class lineDetector_FLD
                     lines.Add(New cv.Vec4f(pts(i), pts(i + 1), pts(i + 2), pts(i + 3)))
                 Next
             End If
+        End If
+        If standalone Then
+            For j = 0 To lines.Count - 1 Step 4
+                Dim v = lines(j)
+                Dim pt1 = New cv.Point(v(0), v(1))
+                dst1.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+            Next
         End If
     End Sub
 End Class

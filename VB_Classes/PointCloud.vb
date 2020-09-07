@@ -835,14 +835,14 @@ End Class
 Public Class PointCloud_WallsFloorsCeilings
     Inherits VBparent
     Dim both As PointCloud_BothViews
-    Dim lDetect As lineDetector_FLD
+    Dim lDetect As LineDetector_Basics
     Dim dilate As DilateErode_Basics
-    Public walls As List(Of cv.Vec4f)
-    Public floorsCeilings As List(Of cv.Vec4f)
+    Public walls As cv.Vec4f()
+    Public floorsCeilings As cv.Vec4f()
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
-        lDetect = New lineDetector_FLD(ocvb)
+        lDetect = New LineDetector_Basics(ocvb)
         both = New PointCloud_BothViews(ocvb)
         label1 = "Top View: wall candidates in red"
         label2 = "Side View: floors/ceiling candidates in red"
@@ -858,6 +858,8 @@ Public Class PointCloud_WallsFloorsCeilings
         dst1 = both.dst1
         dst2 = both.dst2
 
+        Static thicknessSlider = findSlider("LineDetector thickness of line")
+
         For i = 0 To 1
             Dim dst = Choose(i + 1, dst1, dst2)
             dilate.src = dst
@@ -869,7 +871,7 @@ Public Class PointCloud_WallsFloorsCeilings
             For j = 0 To vec4.Count - 1 Step 4
                 Dim v = vec4(j)
                 Dim pt1 = New cv.Point(v(0), v(1))
-                dst.line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+                dst.line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Red, thicknessSlider.value, cv.LineTypes.AntiAlias)
             Next
         Next
     End Sub

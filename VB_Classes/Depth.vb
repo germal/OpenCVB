@@ -1327,7 +1327,7 @@ Public Class Depth_PointCloudInRange_IMU
         split = tSplit
 
         If ocvb.parms.IMU_Present = False Then
-            ocvb.trueText("IMU unavailable (?) for this camera")
+            ocvb.trueText("IMU unavailable for this camera")
         Else
             imu.Run(ocvb)
             If zRotation Then
