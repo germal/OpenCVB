@@ -107,3 +107,27 @@ Public Class Reduction_KNN
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Reduction_Depth
+    Inherits VBparent
+    Dim reduction As Reduction_Basics
+    Dim colorizer As Depth_Colorizer_CPP
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        reduction = New Reduction_Basics(ocvb)
+        colorizer = New Depth_Colorizer_CPP(ocvb)
+        desc = "Use reduction to smooth depth data"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        getDepth32f(ocvb).ConvertTo(reduction.src, cv.MatType.CV_32S)
+        reduction.Run(ocvb)
+        reduction.dst1.ConvertTo(colorizer.src, cv.MatType.CV_32F)
+        colorizer.Run(ocvb)
+        dst1 = colorizer.dst1
+    End Sub
+End Class
