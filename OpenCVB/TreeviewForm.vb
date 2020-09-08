@@ -48,6 +48,9 @@ Public Class TreeviewForm
     End Function
     Public Sub updateTree()
         Dim tv = TreeView1
+        For i = 0 To OpenCVB.callTrace.Count - 1
+            Console.WriteLine(OpenCVB.callTrace(i))
+        Next
         tv.Nodes.Clear()
         Dim rootcall = Trim(OpenCVB.callTrace(0))
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
@@ -70,6 +73,10 @@ Public Class TreeviewForm
                         Else
                             Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
                             node = getNode(tv, parent)
+                            If node Is Nothing Then
+                                node = tv.Nodes.Add(split(nodeLevel))
+                                node.Tag = parent
+                            End If
                             node = node.Nodes.Add(split(nodeLevel + 1))
                         End If
                     Else

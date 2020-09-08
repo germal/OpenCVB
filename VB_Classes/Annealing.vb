@@ -126,15 +126,13 @@ Public Class Annealing_CPP_MT
         randomSlider.Value = sliders.trackbar(0).Value
         random.Run(ocvb) ' get the city positions (may or may not be used below.)
 
-        anneal(0) = New Annealing_Basics_CPP(ocvb)
-        anneal(0).numberOfCities = sliders.trackbar(0).Value
-        anneal(0).circularPattern = check.Box(2).Checked
-        If check.Box(2).Checked = False Then anneal(0).cityPositions = random.Points2f.Clone()
-        anneal(0).setup(ocvb)
-        anneal(0).Open() ' this will initialize the C++ copy of the city positions.
-        For i = 1 To anneal.Length - 1
+        Dim numberofCities = sliders.trackbar(0).Value
+        Dim circles = check.Box(2).Checked
+        For i = 0 To anneal.Length - 1
             anneal(i) = New Annealing_Basics_CPP(ocvb)
-            anneal(i).numberOfCities = sliders.trackbar(0).Value
+            anneal(i).numberOfCities = numberofCities
+            anneal(i).cityPositions = random.Points2f.Clone()
+            anneal(i).circularPattern = circles
             anneal(i).setup(ocvb)
             anneal(i).cityPositions = anneal(0).cityPositions.Clone() ' duplicate for all threads - working on the same set of points.
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
@@ -184,7 +182,6 @@ Public Class Annealing_CPP_MT
                     allClosed = False
                 End If
             End Sub)
-
 
         ' find the best result and start all the others with it.
         Dim minEnergy As Single = Single.MaxValue
