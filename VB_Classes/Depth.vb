@@ -1322,8 +1322,9 @@ Public Class Depth_PointCloudInRange_IMU
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
         maxMeters = histOpts.sliders.trackbar(1).Value / 1000
-        Dim tSplit = cv.Cv2.Split(ocvb.pointCloud)
+        Dim tSplit = cv.Cv2.Split(src)
         split = tSplit
 
         If ocvb.parms.IMU_Present = False Then

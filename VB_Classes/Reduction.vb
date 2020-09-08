@@ -124,10 +124,38 @@ Public Class Reduction_Depth
         desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        getDepth32f(ocvb).ConvertTo(reduction.src, cv.MatType.CV_32S)
+        If src.Type <> cv.MatType.CV_32F Then src = getDepth32f(ocvb)
+        src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run(ocvb)
         reduction.dst1.ConvertTo(colorizer.src, cv.MatType.CV_32F)
         colorizer.Run(ocvb)
         dst1 = colorizer.dst1
+        dst2 = colorizer.src
+    End Sub
+End Class
+
+
+
+
+
+Public Class Reduction_PointCloud
+    Inherits VBparent
+    Dim reduction As Reduction_Depth
+    Dim newPointCloud As New cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        reduction = New Reduction_Depth(ocvb)
+        desc = "Use reduction to smooth depth data"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim split() = ocvb.pointCloud.Split()
+        split(2) *= 1000 ' convert to mm's
+        split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1
+
+        reduction.dst2.ConvertTo(split(2), cv.MatType.CV_32F)
+        split(2) /= 1000
+        cv.Cv2.Merge(split, newPointCloud)
     End Sub
 End Class

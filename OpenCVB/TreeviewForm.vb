@@ -46,15 +46,13 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
+    Dim titleStr = " - Click on any node to review the algorithm's input and output."
     Public Sub updateTree()
         Dim tv = TreeView1
-        For i = 0 To OpenCVB.callTrace.Count - 1
-            Console.WriteLine(OpenCVB.callTrace(i))
-        Next
         tv.Nodes.Clear()
         Dim rootcall = Trim(OpenCVB.callTrace(0))
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
-        Me.Text = title + " - Click on any node to review the algorithm's input and output."
+        Me.Text = title + titleStr
         Dim n = tv.Nodes.Add(title)
         n.Tag = rootcall
 
@@ -89,11 +87,12 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
         tv.ExpandAll()
-        Me.Height = If(entryCount > 10, entryCount * 19, Me.Height)
+        Me.Height = If(entryCount > 10, entryCount * 22, Me.Height)
+        If Me.Height > 1200 Then Me.Height = 1200 ' when too big, use the scroll bar.
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Dim firstEntry = OpenCVB.callTrace(0)
         firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
-        If Me.Text.StartsWith(firstEntry) = False Then updateTree()
+        If Me.Text = firstEntry + titleStr = False Then updateTree()
     End Sub
 End Class
