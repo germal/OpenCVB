@@ -73,7 +73,7 @@ Partial Class OptionsDialog
         Me.SnapToGrid.Name = "SnapToGrid"
         Me.SnapToGrid.Size = New System.Drawing.Size(354, 24)
         Me.SnapToGrid.TabIndex = 2
-        Me.SnapToGrid.Text = "Snap to Grid (Resizes to 360x640 for display)"
+        Me.SnapToGrid.Text = "Snap to Grid (Resizes to 640x360 for display)"
         Me.SnapToGrid.UseVisualStyleBackColor = True
         '
         'GroupBox1

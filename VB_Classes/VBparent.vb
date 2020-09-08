@@ -61,7 +61,7 @@ Public Class VBparent : Implements IDisposable
                 Dim split() = partLine.Split("\")
                 partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
                 If Not (partLine.StartsWith("VBparent") Or partLine.StartsWith("ActiveTask")) Then
-                    callStack = partLine + " " + callStack
+                    callStack = partLine + "\" + callStack
                 End If
             End If
         Next

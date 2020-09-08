@@ -835,6 +835,44 @@ End Class
 Public Class PointCloud_WallsFloorsCeilings
     Inherits VBparent
     Dim both As PointCloud_BothViews
+    Dim lDetect As lineDetector_FLD_CPP
+    Public walls As cv.Vec4f()
+    Public floorsCeilings As cv.Vec4f()
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        lDetect = New lineDetector_FLD_CPP(ocvb)
+        both = New PointCloud_BothViews(ocvb)
+        label1 = "Top View: wall candidates in red"
+        label2 = "Side View: floors/ceiling candidates in red"
+        desc = "Use the top down view to detect walls with a line detector algorithm"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
+        If ocvb.frameCount = 0 Then showRectanglesCheck.checked = False
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If ocvb.frameCount = 0 Then checkIMU.checked = True
+        both.src = src
+        both.Run(ocvb)
+        dst1 = both.dst1
+        dst2 = both.dst2
+
+        lDetect.src = dst1
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1.Clone
+        lDetect.src = dst2
+        lDetect.Run(ocvb)
+        dst2 = lDetect.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_WallsFloorsCeilingsFaster
+    Inherits VBparent
+    Dim both As PointCloud_BothViews
     Dim lDetect As LineDetector_Basics
     Dim dilate As DilateErode_Basics
     Public walls As cv.Vec4f()
@@ -858,7 +896,7 @@ Public Class PointCloud_WallsFloorsCeilings
         dst1 = both.dst1
         dst2 = both.dst2
 
-        Static thicknessSlider = findSlider("LineDetector thickness of line")
+        Static thicknessSlider = findSlider("Line thickness")
 
         For i = 0 To 1
             Dim dst = Choose(i + 1, dst1, dst2)

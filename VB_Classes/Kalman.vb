@@ -505,7 +505,7 @@ Public Class Kalman_Centroids
         dst2 = knn.emax.emaxCPP.dst2
 
         ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
-        Dim trainingPoints = New List(Of cv.Point2f)(knn.knnEmax.knn.basics.trainingPoints)
+        Dim trainingPoints = New List(Of cv.Point2f)(knn.knnEmax.knn.basics.knnQT.trainingPoints)
         If kalman.Length < trainingPoints.Count Then
             ReDim kalman(trainingPoints.Count + 10) ' pad a little to keep more info
             For i = 0 To kalman.Count - 1
@@ -536,7 +536,7 @@ Public Class Kalman_Centroids
         End If
 
         Dim matchedPoints = New List(Of cv.Point2f)(knn.knnEmax.knn.matchedPoints)
-        Dim queryPoints = New List(Of cv.Point2f)(knn.knnEmax.knn.basics.queryPoints)
+        Dim queryPoints = New List(Of cv.Point2f)(knn.knnEmax.knn.basics.knnQT.queryPoints)
         For i = 0 To matchedPoints.Count - 1
             If matchedPoints(i).X < 0 Then
                 For j = 0 To kalman.Count - 1
@@ -641,24 +641,24 @@ Public Class Kalman_PointTracker
         End If
         Dim kalmanActive = useKalmanCheck?.Checked
 
-        knn.basics.trainingPoints.Clear()
+        knn.basics.knnQT.trainingPoints.Clear()
         For i = 0 To kalman.Count - 1
-            If kalman(i).input(0) >= 0 Then knn.basics.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+            If kalman(i).input(0) >= 0 Then knn.basics.knnQT.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
         Next
 
         If newObjects.Count > 0 Then
             ' when the queries outnumber the trainingpoints and we are 1:1, some new queries can appear.
             Dim qIndex As Integer
-            For i = knn.basics.trainingPoints.Count To kalman.Count - 1
+            For i = knn.basics.knnQT.trainingPoints.Count To kalman.Count - 1
                 If qIndex >= newObjects.Count Then Exit For
-                knn.basics.trainingPoints.Add(newObjects(qIndex))
+                knn.basics.knnQT.trainingPoints.Add(newObjects(qIndex))
                 kalman(i).input = {newObjects(qIndex).X, newObjects(qIndex).Y, 0, 0, 0, 0}
                 qIndex += 1
                 If qIndex >= kalman.Count Then Exit Sub ' we don't have enough kalman filters to handle this level of queries so restart
             Next
         End If
 
-        knn.basics.queryPoints = New List(Of cv.Point2f)(queryPoints)
+        knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
         knn.Run(ocvb)
 
         If knn.matchedPoints Is Nothing Then Exit Sub
@@ -666,7 +666,7 @@ Public Class Kalman_PointTracker
             If knn.matchedPoints(i).X < 0 Then
                 For j = 0 To kalman.Count - 1
                     If kalman(j).input(0) < 0 Then
-                        kalman(j).input = {knn.basics.queryPoints(i).X, knn.basics.queryPoints(i).Y, 0, 0, 0, 0}
+                        kalman(j).input = {knn.basics.knnQT.queryPoints(i).X, knn.basics.knnQT.queryPoints(i).Y, 0, 0, 0, 0}
                         Exit For
                     End If
                 Next
@@ -677,8 +677,8 @@ Public Class Kalman_PointTracker
         Dim matched As Boolean
         Dim rect = New cv.Rect
         viewObjects.Clear()
-        For i = 0 To knn.basics.trainingPoints.Count - 1
-            Dim pt1 = knn.basics.trainingPoints(i)
+        For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
+            Dim pt1 = knn.basics.knnQT.trainingPoints(i)
             For j = 0 To knn.matchedPoints.Count - 1
                 matched = False
                 Dim pt2 = knn.matchedPoints(j)
@@ -686,7 +686,7 @@ Public Class Kalman_PointTracker
                     matched = True
                     kalmanAging(i) = 10 ' if not found for x generations, then stop reporting this kalman filter.
                     rect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
-                    Dim qpt = knn.basics.queryPoints(j)
+                    Dim qpt = knn.basics.knnQT.queryPoints(j)
                     For k = 0 To queryRects.Count - 1
                         If queryPoints(k) = qpt Then
                             rect = queryRects(k)
@@ -694,11 +694,11 @@ Public Class Kalman_PointTracker
                             Exit For
                         End If
                     Next
-                    kalman(i).input = {knn.basics.queryPoints(j).X, knn.basics.queryPoints(j).Y, rect.X, rect.Y, rect.Width, rect.Height}
+                    kalman(i).input = {knn.basics.knnQT.queryPoints(j).X, knn.basics.knnQT.queryPoints(j).Y, rect.X, rect.Y, rect.Width, rect.Height}
                     If kalmanActive Then
                         kalman(i).Run(ocvb)
                     Else
-                        kalman(i).output = {knn.basics.queryPoints(j).X, knn.basics.queryPoints(j).Y, rect.X, rect.Y, rect.Width, rect.Height}
+                        kalman(i).output = {knn.basics.knnQT.queryPoints(j).X, knn.basics.knnQT.queryPoints(j).Y, rect.X, rect.Y, rect.Width, rect.Height}
                     End If
                     Exit For
                 End If

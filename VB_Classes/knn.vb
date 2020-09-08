@@ -1,59 +1,98 @@
 Imports cv = OpenCvSharp
-Public Class KNN_Basics
+
+Public Class KNN_QueryTrain
     Inherits VBparent
-    Dim randomTrain As Random_Points
-    Dim randomQuery As Random_Points
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
-    Public neighbors As New cv.Mat
-    Public useRandomData As Boolean
-    Public testMode As Boolean
-    Public desiredMatches = 1
-    Dim knn As cv.ML.KNearest
+    Public randomTrain As Random_Points
+    Public randomQuery As Random_Points
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Query count", 1, 100, 10)
-        sliders.setupTrackBar(1, "Train count", 1, 100, 20)
-
-        If standalone Then
-            check.Setup(ocvb, caller, 1)
-            check.Box(0).Text = "Reuse the same training data"
-        End If
+        sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
+        sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
+        sliders.setupTrackBar(2, "KNN k nearest points", 1, 5, 1)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Reuse the training and query data"
 
         randomTrain = New Random_Points(ocvb)
         randomTrain.sliders.Visible = False
         randomQuery = New Random_Points(ocvb)
         randomQuery.sliders.Visible = False
 
+        label1 = "Random training points"
+        label2 = "Random query points"
+        desc = "Create a set of random query and training points within the image."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static reuseCheck = findCheckBox("Reuse the training and query data")
+        Dim reuseData = reuseCheck.Checked
+        If reuseData = False Then
+            Static trainSlider = findSlider("KNN Train count")
+            randomTrain.sliders.trackbar(0).Value = trainSlider.Value
+            randomTrain.Run(ocvb)
+
+            Static querySlider = findSlider("KNN Query count")
+            randomQuery.sliders.trackbar(0).Value = querySlider.Value
+            randomQuery.Run(ocvb)
+        End If
+        trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
+        queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
+
+        If standalone Then
+            dst1.SetTo(cv.Scalar.White)
+            dst2.SetTo(cv.Scalar.White)
+            For i = 0 To randomTrain.Points2f.Count - 1
+                Dim pt = randomTrain.Points2f(i)
+                cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+            Next
+            For i = 0 To randomQuery.Points2f.Count - 1
+                Dim pt = randomQuery.Points2f(i)
+                cv.Cv2.Circle(dst2, pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KNN_Basics
+    Inherits VBparent
+    Public neighbors As New cv.Mat
+    Public useRandomData As Boolean
+    Public testMode As Boolean
+    Public desiredMatches = 1
+    Public knn As cv.ML.KNearest
+    Public knnQT As KNN_QueryTrain
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        knnQT = New KNN_QueryTrain(ocvb)
+
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim reuseData = If(check.Box Is Nothing, False, check.Box(0).Checked)
-
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Or useRandomData Then
-            If reuseData = False Then
-                randomTrain.sliders.trackbar(0).Value = sliders.trackbar(1).Value
-                randomTrain.Run(ocvb)
-
-                randomQuery.sliders.trackbar(0).Value = sliders.trackbar(0).Value
-                randomQuery.Run(ocvb)
-            End If
-            trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
-            queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
+            knnQT.Run(ocvb)
+            knnQT.trainingPoints = New List(Of cv.Point2f)(knnQT.randomTrain.Points2f)
+            knnQT.queryPoints = New List(Of cv.Point2f)(knnQT.randomQuery.Points2f)
         Else
-            If queryPoints.Count = 0 Then Exit Sub ' nothing to do on this generation...
+            If knnQT.queryPoints.Count = 0 Then Exit Sub ' nothing to do on this generation...
         End If
         ' The first generation may not have any training data, only queries.  (Queries move to training on subsequent generations.)
-        If trainingPoints.Count = 0 Then trainingPoints = New List(Of cv.Point2f)(queryPoints)
+        If knnQT.trainingPoints.Count = 0 Then knnQT.trainingPoints = New List(Of cv.Point2f)(knnQT.queryPoints)
 
-        Dim queries = New cv.Mat(queryPoints.Count, 2, cv.MatType.CV_32F, queryPoints.ToArray)
-        Dim trainData = New cv.Mat(trainingPoints.Count, 2, cv.MatType.CV_32F, trainingPoints.ToArray)
+        Dim queries = New cv.Mat(knnQT.queryPoints.Count, 2, cv.MatType.CV_32F, knnQT.queryPoints.ToArray)
+        Dim trainData = New cv.Mat(knnQT.trainingPoints.Count, 2, cv.MatType.CV_32F, knnQT.trainingPoints.ToArray)
 
         Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
         For i = 0 To trainData.Rows - 1
@@ -88,7 +127,6 @@ Public Class KNN_1_to_1
 
         basics = New KNN_Basics(ocvb)
         If standalone Then basics.useRandomData = True
-        basics.sliders.trackbar(2).Enabled = False
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below.
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
@@ -98,10 +136,10 @@ Public Class KNN_1_to_1
         basics.Run(ocvb)
         dst1 = basics.dst1
 
-        ReDim matchedPoints(basics.queryPoints.Count - 1)
-        Dim neighborOffset(basics.queryPoints.Count - 1) As Integer
+        ReDim matchedPoints(basics.knnQT.queryPoints.Count - 1)
+        Dim neighborOffset(basics.knnQT.queryPoints.Count - 1) As Integer
         For i = 0 To matchedPoints.Count - 1
-            matchedPoints(i) = basics.trainingPoints(basics.neighbors.Get(Of Single)(i, 0))
+            matchedPoints(i) = basics.knnQT.trainingPoints(basics.neighbors.Get(Of Single)(i, 0))
         Next
 
         ' map the points 1 to 1: find duplicate best fits, choose which is better.
@@ -116,8 +154,8 @@ Public Class KNN_1_to_1
                     If m1.X = -1 Or m2.X = -1 Then Continue For
                     If m1 = m2 Then
                         changedNeighbors = True
-                        Dim pt1 = basics.queryPoints(i)
-                        Dim pt2 = basics.queryPoints(j)
+                        Dim pt1 = basics.knnQT.queryPoints(i)
+                        Dim pt2 = basics.knnQT.queryPoints(j)
                         Dim distance1 = Math.Sqrt((pt1.X - m1.X) * (pt1.X - m1.X) + (pt1.Y - m1.Y) * (pt1.Y - m1.Y))
                         Dim distance2 = Math.Sqrt((pt2.X - m1.X) * (pt2.X - m1.X) + (pt2.Y - m1.Y) * (pt2.Y - m1.Y))
                         Dim ij = If(distance1 > distance2, i, j)
@@ -126,9 +164,9 @@ Public Class KNN_1_to_1
                             If neighborOffset(ij) < basics.neighbors.Rows - 1 Then
                                 neighborOffset(ij) += 1
                                 Dim index = basics.neighbors.Get(Of Single)(neighborOffset(ij))
-                                If index < basics.trainingPoints.Count And index >= 0 Then
+                                If index < basics.knnQT.trainingPoints.Count And index >= 0 Then
                                     unresolved = False
-                                    matchedPoints(ij) = basics.trainingPoints(index)
+                                    matchedPoints(ij) = basics.knnQT.trainingPoints(index)
                                 End If
                             End If
                         End If
@@ -144,7 +182,7 @@ Public Class KNN_1_to_1
         unmatchedPoints.Clear()
         For i = 0 To matchedPoints.Count - 1
             Dim mpt = matchedPoints(i)
-            Dim qPoint = basics.queryPoints(i)
+            Dim qPoint = basics.knnQT.queryPoints(i)
             If mpt.X >= 0 Then
                 cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
                 dst1.Line(mpt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
@@ -189,9 +227,9 @@ Public Class KNN_Emax
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
-            knn.basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
+            knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
             emax.Run(ocvb)
-            knn.basics.queryPoints = New List(Of cv.Point2f)(emax.centroids)
+            knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.centroids)
         End If
 
         knn.Run(ocvb)
@@ -221,11 +259,11 @@ Public Class KNN_CentroidsEMax
         desc = "Map the current centroids to the previous generation to match the color used."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If standalone Then knnEmax.knn.basics.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
+        If standalone Then knnEmax.knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
 
         emax.Run(ocvb)
 
-        knnEmax.knn.basics.queryPoints = New List(Of cv.Point2f)(emax.centroids)
+        knnEmax.knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.centroids)
         knnEmax.Run(ocvb)
 
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
@@ -276,16 +314,16 @@ Public Class KNN_Test
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
-        knn.queryPoints.Clear()
+        knn.knnQT.queryPoints.Clear()
         For i = 0 To grid.roiList.Count - 1
             Dim roi = grid.roiList.ElementAt(i)
             Dim pt = New cv.Point2f(roi.X + msRNG.Next(roi.Width), roi.Y + msRNG.Next(roi.Height))
-            knn.queryPoints.Add(pt)
+            knn.knnQT.queryPoints.Add(pt)
         Next
 
         knn.Run(ocvb)
         dst1 = knn.dst1
-        knn.trainingPoints = New List(Of cv.Point2f)(knn.queryPoints)
+        knn.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.knnQT.queryPoints)
         label1 = knn.label1
         If check.Box(0).Checked Then dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
@@ -320,20 +358,21 @@ Public Class KNN_Test_1_to_1
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
-        knn.basics.queryPoints.Clear()
+        knn.basics.knnQT.queryPoints.Clear()
         For i = 0 To grid.roiList.Count - 1
             Dim roi = grid.roiList.ElementAt(i)
             Dim pt = New cv.Point2f(roi.X + msRNG.Next(roi.Width), roi.Y + msRNG.Next(roi.Height))
-            knn.basics.queryPoints.Add(pt)
+            knn.basics.knnQT.queryPoints.Add(pt)
         Next
 
         knn.Run(ocvb)
         dst1 = knn.dst1
-        knn.basics.trainingPoints = New List(Of cv.Point2f)(knn.basics.queryPoints)
+        knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.basics.knnQT.queryPoints)
         label1 = knn.label1
         If check.Box(0).Checked Then dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
+
 
 
 
@@ -388,23 +427,20 @@ Public Class KNN_Cluster2D
         drawMap(result)
         Dim tmp As cv.Mat
         tmp = result.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim black As New cv.Vec3b(0, 0, 0)
-        Dim white As New cv.Vec3b(0, 0, 0)
         Dim hitBlack As Int32
         For y = 0 To result.Rows - 1
             For x = 0 To result.Cols - 1
                 Dim blackTest = result.Get(Of cv.Vec3b)(y, x)
-                If blackTest = black Then
-                    If rColors(closedRegions Mod rColors.Length) = black Then
+                If blackTest = cv.Scalar.Black Then
+                    If rColors(closedRegions Mod rColors.Length) = cv.Scalar.Black Then
                         hitBlack += 1
                         closedRegions += 1 ' skip the randomly generated black color as that is our key.
                     End If
                     Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), rColors(closedRegions Mod rColors.Length))
                     If byteCount > 10 Then closedRegions += 1 ' there are fake regions due to anti-alias like features that appear when drawing.
                 End If
-                Dim whiteTest = tmp.Get(Of Byte)(y, x)
-                If whiteTest = 255 Then
-                    cv.Cv2.FloodFill(tmp, New cv.Point(x, y), black)
+                If tmp.Get(Of Byte)(y, x) = 255 Then
+                    cv.Cv2.FloodFill(tmp, New cv.Point(x, y), cv.Scalar.Black)
                     totalClusters += 1
                 End If
             Next
@@ -415,6 +451,7 @@ Public Class KNN_Cluster2D
         ' If they changed Then number of elements in the set
         Static demoModeCheck = findCheckBox("Demo Mode")
         Static cityCountSlider = findSlider("KNN - number of cities")
+
         If cityCountSlider.Value <> numberOfCities Or demoModeCheck.Checked Then
             numberOfCities = cityCountSlider.Value
             knn.findXnearest = numberOfCities
@@ -430,13 +467,15 @@ Public Class KNN_Cluster2D
             Next
 
             ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
-            ReDim knn.lastSet(numberOfCities - 1)
-            ReDim knn.querySet(numberOfCities - 1)
+            Dim trainingSlider = findSlider("KNN Train count")
+            Dim querySlider = findSlider("KNN Query count")
+            knn.knn.knnQT.trainingPoints.Clear()
+            knn.knn.knnQT.queryPoints.Clear()
             For i = 0 To numberOfCities - 1
-                knn.lastSet(i) = New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y))
-                knn.querySet(i) = New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y))
+                knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
+                knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
             Next
-            knn.Run(ocvb) ' run only one time.
+            knn.Run(ocvb)
             dst1.SetTo(0)
             totalClusters = 0
             closedRegions = 0
@@ -451,66 +490,49 @@ End Class
 
 Public Class KNN_Point2d
     Inherits VBparent
-    Public querySet() As cv.Point2f
+    Public knn As KNN_Basics
+    Public findXnearest As Integer = 1
     Public responseSet() As Int32
-    Public lastSet() As cv.Point2f ' default usage: find and connect points in 2D for this number of points.
-    Public findXnearest As Int32
-    Dim knn As cv.ML.KNearest
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "knn Query Points", 1, 50, 10)
-        sliders.setupTrackBar(1, "knn k nearest points", 1, 5, 1)
 
-        desc = "Use KNN to connect 2D points."
+        knn = New KNN_Basics(ocvb)
+        If standalone Then knn.useRandomData = True
+
+        desc = "Use KNN to find n matching points for each query."
         label1 = "Yellow=Queries, Blue=Best Responses"
-        knn = cv.ML.KNearest.Create()
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
-            ReDim lastSet(sliders.trackbar(0).Value - 1)
-            ReDim querySet(sliders.trackbar(0).Value - 1)
-            For i = 0 To lastSet.Count - 1
-                lastSet(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
+            dst1.SetTo(0)
+            For i = 0 To knn.knnQT.trainingPoints.Count - 1
+                cv.Cv2.Circle(dst1, knn.knnQT.trainingPoints(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
             Next
-
-            For i = 0 To querySet.Count - 1
-                querySet(i) = New cv.Point2f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows))
-            Next
+            Static nearestCountSlider = findSlider("KNN k nearest points")
+            findXnearest = nearestCountSlider.Value
         End If
-        Dim responses(lastSet.Length - 1) As Int32
-        For i = 0 To responses.Length - 1
-            responses(i) = i
-        Next
 
-        Dim trainData = New cv.Mat(lastSet.Length, 2, cv.MatType.CV_32F, lastSet)
-        knn.Train(trainData, cv.ML.SampleTypes.RowSample, New cv.Mat(responses.Length, 1, cv.MatType.CV_32S, responses))
+        knn.Run(ocvb)
 
+        ReDim responseSet(knn.knnQT.queryPoints.Count * findXnearest - 1)
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        dst1.SetTo(0)
-        If standalone Then
-            For i = 0 To lastSet.Count - 1
-                cv.Cv2.Circle(dst1, lastSet(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-            Next
-        End If
-
-        If standalone Then findXnearest = sliders.trackbar(1).Value
-        ReDim responseSet(querySet.Length * findXnearest - 1)
-        For i = 0 To querySet.Count - 1
-            query.Set(Of cv.Point2f)(0, 0, querySet(i))
-            knn.FindNearest(query, findXnearest, results, neighbors)
-            For j = 0 To findXnearest - 1
-                responseSet(i * findXnearest + j) = CInt(neighbors.Get(Of Single)(0, j))
+        For i = 0 To knn.knnQT.queryPoints.Count - 1
+            query.Set(Of cv.Point2f)(0, 0, knn.knnQT.queryPoints(i))
+            knn.knn.FindNearest(query, findXnearest, results, neighbors)
+            For j = 0 To neighbors.Cols - 1
+                Dim index = neighbors.Get(Of Single)(0, j)
+                responseSet(i * findXnearest + j) = CInt(index)
             Next
             If standalone Then
                 For j = 0 To findXnearest - 1
-                    dst1.Line(lastSet(responseSet(i * findXnearest + j)), querySet(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    cv.Cv2.Circle(dst1, querySet(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 Next
             End If
         Next
     End Sub
 End Class
+
 
 
 
@@ -585,80 +607,5 @@ Public Class KNN_Point3d
                 Next
             End If
         Next
-    End Sub
-End Class
-
-
-
-
-Public Class KNN_ClusterNoisyLine
-    Inherits VBparent
-    Public noisyLine As Fitline_RawInput
-    Public cityOrder() As Int32
-    Public knn As KNN_Point2d
-    Dim numberofCities As Int32
-    Public findXnearest As Int32 = 2
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        noisyLine = New Fitline_RawInput(ocvb)
-        knn = New KNN_Point2d(ocvb)
-        knn.sliders.Visible = False
-
-        desc = "Use KNN to cluster the output of noisyline class."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static linePointCount As Int32
-        Static lineNoise As Int32
-        Static highlight As Boolean
-        ' If the number of elements in the set changes, then recompute...
-        If (noisyLine.sliders.trackbar(0).Value + noisyLine.sliders.trackbar(1).Value) <> numberofCities Or noisyLine.sliders.trackbar(2).Value <> lineNoise Or
-            noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked = True Then
-
-            linePointCount = noisyLine.sliders.trackbar(1).Value
-            lineNoise = noisyLine.sliders.trackbar(2).Value
-            highlight = noisyLine.check.Box(0).Checked
-            noisyLine.check.Box(1).Checked = True
-            numberofCities = noisyLine.sliders.trackbar(0).Value + linePointCount
-            ReDim cityOrder(numberofCities - 1)
-            noisyLine.Run(ocvb)
-            dst1 = noisyLine.dst1
-
-            knn.findXnearest = findXnearest
-
-            ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
-            ReDim knn.lastSet(numberofCities - 1)
-            ReDim knn.querySet(numberofCities - 1)
-            For i = 0 To numberofCities - 1
-                knn.lastSet(i) = noisyLine.points(i)
-                knn.querySet(i) = noisyLine.points(i)
-            Next
-            knn.Run(ocvb) ' run only one time.
-            dst2.SetTo(0)
-            For i = 0 To numberofCities - 1
-                Dim nearestCity = knn.responseSet(i * knn.findXnearest + 1)
-                cityOrder(i) = nearestCity
-            Next
-
-            ' draw the map
-            For i = 0 To cityOrder.Length - 1
-                dst2.Circle(noisyLine.points(i), 5, cv.Scalar.White, -1)
-                dst2.Line(noisyLine.points(i), noisyLine.points(cityOrder(i)), cv.Scalar.White, 2)
-            Next
-
-            Dim tmp As cv.Mat
-            tmp = dst2.Clone()
-            Dim black As New cv.Vec3b(0, 0, 0)
-            Dim totalClusters As Int32
-            For y = 0 To tmp.Rows - 1
-                For x = 0 To tmp.Cols - 1
-                    If tmp.Get(Of Byte)(y, x) = 255 Then
-                        Dim byteCount = cv.Cv2.FloodFill(tmp, New cv.Point(x, y), black)
-                        totalClusters += 1
-                    End If
-                Next
-            Next
-            label2 = "knn clusters total=" + CStr(totalClusters)
-            label1 = "Input points = " + CStr(numberofCities)
-        End If
     End Sub
 End Class

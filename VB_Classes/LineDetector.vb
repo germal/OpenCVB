@@ -7,7 +7,7 @@ Public Class LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "LineDetector thickness of line", 1, 20, 2)
+        sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
@@ -238,13 +238,11 @@ Public Class lineDetector_FLD_CPP
 
         src.CopyTo(dst1)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim cols = src.Width
-        Dim rows = src.Height
         Dim data(src.Total - 1) As Byte
 
         Marshal.Copy(src.Data, data, 0, data.Length)
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
-        Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
+        Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, src.Height, src.Width, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
         If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.trackbar(3).Value)

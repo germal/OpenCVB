@@ -32,7 +32,7 @@ Public Class TreeviewForm
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
         For Each tn In tNode.Nodes
-            If tn.Text = name Then Return tn
+            If tn.Tag = name Then Return tn
             Dim rnode = FindRecursive(tn, name)
             If rnode IsNot Nothing Then Return rnode
         Next
@@ -40,50 +40,53 @@ Public Class TreeviewForm
     End Function
     Private Function getNode(tv As TreeView, name As String) As TreeNode
         For Each n In tv.Nodes
-            If n.text = name Then Return n
+            If n.tag = name Then Return n
             Dim rnode = FindRecursive(n, name)
             If rnode IsNot Nothing Then Return rnode
         Next
         Return Nothing
     End Function
-    Private Function modifyCallTrace(calls As List(Of String), name As String) As List(Of String)
-        Dim result As New List(Of String)
-        For i = 0 To calls.Count - 1
-            If calls(i).StartsWith(name) Then result.Add(Trim(Mid(name, Len(name) + 1)))
-        Next
-        Return result
-    End Function
     Public Sub updateTree()
         Dim tv = TreeView1
         tv.Nodes.Clear()
         Dim rootcall = Trim(OpenCVB.callTrace(0))
-        Me.Text = rootcall + " - Click on any node to review the algorithm's input and output."
-        tv.Nodes.Add(rootcall)
+        Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
+        Me.Text = title + " - Click on any node to review the algorithm's input and output."
+        Dim n = tv.Nodes.Add(title)
+        n.Tag = rootcall
 
+        Dim entryCount = 1
         For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
             Dim alldone = True
             For i = 1 To OpenCVB.callTrace.Count - 1
-                Dim split() = OpenCVB.callTrace(i).Split
+                Dim fullname = OpenCVB.callTrace(i)
+                Dim split() = fullname.Split("\")
                 If split.Count = nodeLevel + 3 Then
                     alldone = False
-                    Dim node = getNode(tv, split(nodeLevel))
+                    Dim node = getNode(tv, fullname)
                     If node Is Nothing Then
                         If nodeLevel = 0 Then
-                            tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel))
+                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
                         Else
-                            node = getNode(tv, split(nodeLevel - 1))
-                            node.Nodes.Add(split(nodeLevel))
+                            Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
+                            node = getNode(tv, parent)
+                            node = node.Nodes.Add(split(nodeLevel + 1))
                         End If
                     Else
-                        node.Nodes.Add(split(nodeLevel + 1))
+                        node = node.Nodes.Add(split(nodeLevel))
                     End If
+                    entryCount += 1
+                    node.Tag = fullname
                 End If
             Next
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
         tv.ExpandAll()
+        Me.Height = If(entryCount > 10, entryCount * 19, Me.Height)
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If Me.Text.StartsWith(OpenCVB.callTrace(0)) = False Then updateTree()
+        Dim firstEntry = OpenCVB.callTrace(0)
+        firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
+        If Me.Text.StartsWith(firstEntry) = False Then updateTree()
     End Sub
 End Class
