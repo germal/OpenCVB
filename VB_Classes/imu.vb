@@ -454,10 +454,8 @@ Public Class IMU_GVector
     Public angleZ As Single ' in radians.
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        If standalone Then
-            kalman = New Kalman_Basics(ocvb)
-            ReDim kalman.input(6 - 1)
-        End If
+        kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.input(6 - 1)
         desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -474,19 +472,17 @@ Public Class IMU_GVector
         angleY = Math.Atan2(gx, gy) - cv.Cv2.PI / 2
         angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
-        If standalone Then
-            kalman.input = {gx, gy, gz, angleX, angleY, angleZ}
+        kalman.input = {gx, gy, gz, angleX, angleY, angleZ}
 
-            If kalman.check.Box(0).Checked Then
-                kalman.Run(ocvb)
-                gx = kalman.output(0)
-                gy = kalman.output(1)
-                gz = kalman.output(2)
+        If kalman.check.Box(0).Checked Then
+            kalman.Run(ocvb)
+            gx = kalman.output(0)
+            gy = kalman.output(1)
+            gz = kalman.output(2)
 
-                angleX = kalman.output(3)
-                angleY = kalman.output(4)
-                angleZ = kalman.output(5)
-            End If
+            angleX = kalman.output(3)
+            angleY = kalman.output(4)
+            angleZ = kalman.output(5)
         End If
 
         If standalone Then
