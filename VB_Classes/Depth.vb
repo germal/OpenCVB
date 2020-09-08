@@ -1318,11 +1318,11 @@ Public Class Depth_PointCloudInRange_IMU
         imu = New IMU_GVector(ocvb)
 
         If standalone Then histOpts = New Histogram_ProjectionOptions(ocvb)
-        label2 = "Mask for depth values that are in-range"
+        label1 = "Mask for depth values that are in-range"
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud.Resize(src.Size)
         maxMeters = histOpts.sliders.trackbar(1).Value / 1000
         Dim tSplit = cv.Cv2.Split(src)
         split = tSplit
