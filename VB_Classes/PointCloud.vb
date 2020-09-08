@@ -598,7 +598,6 @@ Public Class PointCloud_Kalman_SideView
 
         desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
-
     Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000

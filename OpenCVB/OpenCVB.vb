@@ -399,10 +399,22 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-        TreeViewDialog = New TreeviewForm
-        TreeViewDialog.updateTree()
-        TreeViewDialog.Show()
-        TreeViewDialog.TreeviewForm_Resize(sender, e)
+        Dim openForm As Boolean
+        If TreeViewDialog Is Nothing Then
+            openForm = True
+        Else
+            If TreeViewDialog.TreeView1.IsDisposed Then openForm = True
+        End If
+
+        If openForm Then
+            TreeViewDialog = New TreeviewForm
+            TreeViewDialog.updateTree()
+            TreeViewDialog.Show()
+            TreeViewDialog.TreeviewForm_Resize(sender, e)
+        Else
+            TreeViewDialog.Show()
+            TreeViewDialog.BringToFront()
+        End If
     End Sub
     Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
