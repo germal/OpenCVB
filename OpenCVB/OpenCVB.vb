@@ -398,6 +398,12 @@ Public Class OpenCVB
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
+    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        TreeViewDialog = New TreeviewForm
+        TreeViewDialog.updateTree()
+        TreeViewDialog.Show()
+        TreeViewDialog.TreeviewForm_Resize(sender, e)
+    End Sub
     Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
         If camPic(2) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
@@ -1235,12 +1241,6 @@ Public Class OpenCVB
             End If
             frameCount += 1
         End While
-    End Sub
-    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-        TreeViewDialog = New TreeviewForm
-        TreeViewDialog.updateTree()
-        TreeViewDialog.Show()
-        TreeViewDialog.TreeviewForm_Resize(sender, e)
     End Sub
 End Class
 

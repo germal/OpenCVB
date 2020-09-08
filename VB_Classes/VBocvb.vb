@@ -33,8 +33,6 @@ Public Class VBocvb
     Public callTrace As New List(Of String)
 
     Public appLocation As cv.Rect
-    Public slidersOffset As New cv.Point(0, 5)
-    Public radioOffset As New cv.Point(0, 5)
     Public description As String
     Public HomeDir As String
     Public testAllRunning As Boolean

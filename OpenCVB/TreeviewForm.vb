@@ -23,11 +23,17 @@ Public Class TreeviewForm
     Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Dim split() = Me.Text.Split()
         OpenCVB.AvailableAlgorithms.Text = split(0)
+        SaveSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
+        SaveSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
     End Sub
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If botDistance = 0 Then botDistance = Me.Height - Label1.Top
         Label1.Top = Me.Height - botDistance
         TreeView1.Height = Label1.Top - 5
+    End Sub
+    Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
+        Me.Left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
+        Me.Top = GetSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -88,11 +94,19 @@ Public Class TreeviewForm
         Next
         tv.ExpandAll()
         Me.Height = If(entryCount > 10, entryCount * 22, Me.Height)
-        If Me.Height > 1200 Then Me.Height = 1200 ' when too big, use the scroll bar.
+        If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Dim firstEntry = OpenCVB.callTrace(0)
         firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
-        If Me.Text = firstEntry + titleStr = False Then updateTree()
+        If Me.Text = firstEntry + titleStr = False Then
+            updateTree()
+            Dim left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
+            Dim Top = GetSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
+            If Me.Left <> left Or Me.Top <> Me.Top Then
+                SaveSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
+                SaveSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
+            End If
+        End If
     End Sub
 End Class

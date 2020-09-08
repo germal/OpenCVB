@@ -1,16 +1,16 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 Module Algorithm_Module
-    Public appLocation As cv.Rect
+    ' these are all global settings that are updated by individual algorithms.  
     Public radioOffset As cv.Point
     Public slidersOffset As cv.Point
-    ' these are all global settings that are updated by individual algorithms.  
     Public Const offsetIncr = 25
     Public Const offsetMax = 150
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play
+    Public appLocation As cv.Rect
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
@@ -67,6 +67,8 @@ Public Class ActiveTask : Implements IDisposable
         Public Const D455 As Int32 = 6
     End Structure
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
+        radioOffset = New cv.Point(0, 5)
+        slidersOffset = New cv.Point(0, 5)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New VBocvb(resolution, parms, location)
         ocvb.testAllRunning = parms.testAllRunning
@@ -85,8 +87,6 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub UpdateHostLocation(location As cv.Rect)
         appLocation = location
-        radioOffset = New cv.Point
-        slidersOffset = New cv.Point
     End Sub
     Public Sub RunAlgorithm()
         Try
