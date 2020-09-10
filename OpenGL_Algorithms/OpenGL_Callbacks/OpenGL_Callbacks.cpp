@@ -22,8 +22,8 @@ int main(int argc, char* argv[])
 	while (app)
 	{
 		readPipeAndMemMap();
-
-		tex.upload(rgbBuffer, imageWidth, imageHeight);
+		
+		tex.upload(rgbMat.data, imageWidth, imageHeight);
 
 		// OpenGL commands that prep screen for the pointcloud
 		glLoadIdentity();

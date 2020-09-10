@@ -101,11 +101,12 @@ void OpenCVGL_Image_Control(float _ppx, float _ppy, float _fx, float _fy, float 
 }
 
 extern "C" __declspec(dllexport)
-void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int rows, int cols)
+void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int pc_rows, int pc_cols, int rgb_rows, int rgb_cols)
 {
 	Mat rgb, depth;
-	rgb = Mat(rows, cols, CV_8UC3, rgbPtr);
-	Mat vertex = Mat(rows, cols, CV_32FC3, pointCloud);
+	Mat tmp = Mat(rgb_rows, rgb_cols, CV_8UC3, rgbPtr);
+	Mat vertex = Mat(pc_rows, pc_cols, CV_32FC3, pointCloud);
+	resize(tmp, rgb, vertex.size());
 
 	renderData->arr.setVertexArray(vertex);
 	renderData->arr.setTexCoordArray(texCoords); 
@@ -119,7 +120,7 @@ void OpenCVGL_Image_Run(int *rgbPtr, int *pointCloud, int rows, int cols)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(FOV, (double)cols / rows, zNear + 0.01, zFar);
+	gluPerspective(FOV, (double)pc_cols / pc_rows, zNear + 0.01, zFar);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

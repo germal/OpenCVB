@@ -1128,18 +1128,12 @@ Public Class OpenCVB
                 If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
                 camera.newImagesAvailable = False
 
-                If resolutionXY.width <> 1280 Then
-                    task.ocvb.color = camera.color.Resize(resolutionXY)
-                    task.ocvb.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
-                    task.ocvb.leftView = camera.leftView.Resize(resolutionXY)
-                    task.ocvb.rightView = camera.rightView.Resize(resolutionXY)
-                Else
-                    task.ocvb.color = camera.color
-                    task.ocvb.RGBDepth = camera.RGBDepth
-                    task.ocvb.leftView = camera.leftView
-                    task.ocvb.rightView = camera.rightView
-                End If
+                task.ocvb.color = camera.color.Resize(resolutionXY)
+                task.ocvb.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
+                task.ocvb.leftView = camera.leftView.Resize(resolutionXY)
+                task.ocvb.rightView = camera.rightView.Resize(resolutionXY)
                 task.ocvb.pointCloud = camera.PointCloud
+
                 task.ocvb.depth16 = camera.depth16
                 task.ocvb.transformationMatrix = camera.transformationMatrix
                 task.ocvb.IMU_TimeStamp = camera.IMU_TimeStamp

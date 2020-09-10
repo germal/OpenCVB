@@ -11,6 +11,10 @@
 #include <chrono>
 #include <thread>
 #include <tchar.h>
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+using namespace cv;
+
 #ifndef NOGLFW
 #define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
@@ -110,6 +114,7 @@ static int dataBufferSize;
 
 static int rgbBufferSize;
 static uint8_t *rgbBuffer;
+static Mat rgbMat;
 
 static double pcBufferSize;
 static float3 *pointCloudBuffer;
@@ -249,6 +254,15 @@ static void readPipeAndMemMap()
 	if (pcBufferSize > 0)
 	{
 		ReadFile(pipe, pointCloudBuffer, (int)pcBufferSize, &dwRead, NULL);
+	}
+	if (rgbBufferSize != dwRead * 4)
+	{
+		Mat tmp = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
+		imageWidth = 1280;
+		imageHeight = 720;
+		resize(tmp, rgbMat, cv::Size(1280, 720)); // point cloud is always at 1280x720
+	} else {
+		rgbMat = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
 	}
 	ReadFile(pipe, imageLabel, imageLabelBufferSize, &dwRead, NULL);
 	imageLabel[imageLabelBufferSize] = 0;

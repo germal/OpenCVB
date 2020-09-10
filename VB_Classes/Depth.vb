@@ -1322,7 +1322,7 @@ Public Class Depth_PointCloudInRange_IMU
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud.Resize(src.Size)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
         maxMeters = histOpts.sliders.trackbar(1).Value / 1000
         Dim tSplit = cv.Cv2.Split(src)
         split = tSplit
@@ -1357,6 +1357,77 @@ Public Class Depth_PointCloudInRange_IMU
             cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
             Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)
+            If standalone Then dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_PointCloudReduction
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public Mask As New cv.Mat
+    Public maxMeters As Double
+    Public split(3 - 1) As cv.Mat
+    Public imu As IMU_GVector
+    Public xRotation As Boolean = True
+    Public zRotation As Boolean = True
+    Public reduction As Reduction_Depth
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        imu = New IMU_GVector(ocvb)
+        reduction = New Reduction_Depth(ocvb)
+
+        If standalone Then histOpts = New Histogram_ProjectionOptions(ocvb)
+        label1 = "Mask for depth values that are in-range"
+        desc = "Rotate the reduced PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
+        maxMeters = histOpts.sliders.trackbar(1).Value / 1000
+        Dim tSplit = cv.Cv2.Split(src)
+        split = tSplit
+
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            imu.Run(ocvb)
+            If zRotation Then
+                '[cos(a) -sin(a) 0]
+                '[sin(a)  cos(a) 0]
+                '[0      0       1] rotate the point cloud around the z-axis.
+                Dim yZ(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
+
+                split(0) = yZ(0, 0) * tSplit(0) + yZ(0, 1) * tSplit(1)
+                split(1) = yZ(1, 0) * tSplit(0) + yZ(1, 1) * tSplit(1)
+                split(2) = tSplit(2)
+                tSplit = split
+            End If
+
+            If xRotation Then
+                '[1      0       0] rotate the point cloud around the x-axis.
+                '[0 cos(a) -sin(a)]
+                '[0 sin(a)  cos(a)]
+                Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
+
+                split(0) = tSplit(0)
+                split(1) = xZ(1, 1) * tSplit(1) + xZ(1, 2) * tSplit(2)
+                split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
+            End If
+
+            reduction.src = split(2)
+            reduction.Run(ocvb)
+            split(2) = reduction.dst1
+
+            cv.Cv2.InRange(split(2), cv.Scalar.Black, cv.Scalar.All(maxMeters), Mask)
+            Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            Mask = Mask.SetTo(0, zeroDepth)
+
             If standalone Then dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
     End Sub

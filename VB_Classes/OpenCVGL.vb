@@ -12,7 +12,7 @@ Module OpenCVGL_Image_CPP_Module
                                     yaw As Single, roll As Single, pitch As Single, pointSize As Int32, zTrans As Single, textureWidth As Int32, textureHeight As Int32)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub OpenCVGL_Image_Run(rgbPtr As IntPtr, pointCloud As IntPtr, rows As Int32, cols As Int32)
+    Public Sub OpenCVGL_Image_Run(rgbPtr As IntPtr, pointCloud As IntPtr, pc_rows As Int32, pc_cols As Int32, rgb_rows As Int32, rgb_cols As Int32)
     End Sub
 End Module
 
@@ -37,7 +37,7 @@ Public Class OpenCVGL_Image_CPP
             sliders.trackbar(2).Value = 0 ' pitch
             sliders.trackbar(3).Value = 0 ' roll
 
-            OpenCVGL_Image_Open(src.Cols, src.Rows)
+            OpenCVGL_Image_Open(ocvb.pointCloud.Cols, ocvb.pointCloud.Rows)
         End If
         desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
@@ -62,7 +62,7 @@ Public Class OpenCVGL_Image_CPP
         Dim zTrans = sliders.trackbar(7).Value / 100
 
         OpenCVGL_Image_Control(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
-                               FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, src.Width, src.Height)
+                               FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, ocvb.pointCloud.Width, ocvb.pointCloud.Height)
 
         Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
         If rgbData.Length <> src.Total * src.ElemSize Then ReDim rgbData(src.Total * src.ElemSize - 1)
@@ -71,7 +71,7 @@ Public Class OpenCVGL_Image_CPP
         Marshal.Copy(ocvb.pointCloud.Data, pointCloudData, 0, pcSize)
         Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
         Dim handlePointCloud = GCHandle.Alloc(pointCloudData, GCHandleType.Pinned)
-        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), src.Rows, src.Cols)
+        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), ocvb.pointCloud.Rows, ocvb.pointCloud.Cols, src.Rows, src.Cols)
         handleRGB.Free()
         handlePointCloud.Free()
     End Sub

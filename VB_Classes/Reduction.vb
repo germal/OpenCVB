@@ -127,10 +127,12 @@ Public Class Reduction_Depth
         If src.Type <> cv.MatType.CV_32F Then src = getDepth32f(ocvb)
         src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run(ocvb)
-        reduction.dst1.ConvertTo(colorizer.src, cv.MatType.CV_32F)
-        colorizer.Run(ocvb)
-        dst1 = colorizer.dst1
-        dst2 = colorizer.src
+        reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
+        If standalone Then
+            colorizer.src = dst1
+            colorizer.Run(ocvb)
+            dst2 = colorizer.dst1
+        End If
     End Sub
 End Class
 

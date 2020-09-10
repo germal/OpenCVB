@@ -404,8 +404,10 @@ Public Class OpenGL_GravityTransform
             gCloud.zRotation = False
         End If
 
+        gCloud.src = ocvb.pointCloud
         gCloud.Run(ocvb)
         cv.Cv2.Merge(gCloud.split, ogl.pointCloudInput)
+
         ogl.src = src
         ogl.Run(ocvb)
     End Sub
