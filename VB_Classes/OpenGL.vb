@@ -45,14 +45,14 @@ Public Class OpenGL_Basics
         End If
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
-            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy, ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy,
-                                                src.Width, src.Height, src.ElemSize * src.Total,
-                                                dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
-                                                ocvb.IMU_AngularVelocity.X, ocvb.IMU_AngularVelocity.Y, ocvb.IMU_AngularVelocity.Z,
-                                                ocvb.IMU_Acceleration.X, ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z, ocvb.IMU_TimeStamp,
-                                                If(ocvb.parms.IMU_Present, 1, 0), eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
-                                                scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
-                                                imageLabel.Length)
+            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
+                                     ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, src.Width, src.Height, src.ElemSize * src.Total,
+                                     dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
+                                     ocvb.IMU_AngularVelocity.X, ocvb.IMU_AngularVelocity.Y, ocvb.IMU_AngularVelocity.Z,
+                                     ocvb.IMU_Acceleration.X, ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z, ocvb.IMU_TimeStamp,
+                                     If(ocvb.parms.IMU_Present, 1, 0), eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
+                                     scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
+                                     imageLabel.Length)
         Next
     End Sub
     Private Sub startOpenGLWindow(ocvb As VBocvb, pcSize As Integer)
@@ -98,15 +98,22 @@ Public Class OpenGL_Basics
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
 
         If rgb.Width > 0 Then Marshal.Copy(rgb.Data, rgbBuffer, 0, rgbBuffer.Length)
-        If dataInput.Width > 0 Then Marshal.Copy(dataInput.Data, dataBuffer, 0, dataBuffer.Length)
-        If pointCloudBuffer.Length <> pointCloudInput.Total * pointCloudInput.ElemSize Then ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
-        If pointCloudInput.Width > 0 Then Marshal.Copy(pointCloudInput.Data, pointCloudBuffer, 0, pcSize)
+        ' either shipping data or pointcloud to the opengl app - not both.
+        If dataInput.Width > 0 Then
+            Marshal.Copy(dataInput.Data, dataBuffer, 0, dataBuffer.Length)
+        Else
+            If pointCloudBuffer.Length <> pointCloudInput.Total * pointCloudInput.ElemSize Then ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
+            If pointCloudInput.Width > 0 Then Marshal.Copy(pointCloudInput.Data, pointCloudBuffer, 0, pcSize)
+        End If
 
         If pipe.IsConnected Then
             On Error Resume Next
             pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
-            pipe.Write(dataBuffer, 0, dataBuffer.Length)
-            pipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
+            If dataBuffer.Length Then
+                pipe.Write(dataBuffer, 0, dataBuffer.Length)
+            Else
+                pipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
+            End If
             Dim buff = System.Text.Encoding.UTF8.GetBytes(imageLabel)
             pipe.Write(buff, 0, imageLabel.Length)
         End If
@@ -340,7 +347,6 @@ Public Class OpenGL_Voxels
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         voxels = New Voxels_Basics_MT(ocvb)
-        voxels.check.Box(0).Checked = False
 
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Voxels"
@@ -349,9 +355,13 @@ Public Class OpenGL_Voxels
     Public Sub Run(ocvb As VBocvb)
         voxels.src = src
         voxels.Run(ocvb)
+        Static intermediateResults = findCheckBox("Display intermediate results")
+        If intermediateResults.checked Then
+            dst1 = voxels.dst1
+            dst2 = voxels.dst2
+        End If
 
-        ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_64F, voxels.voxels)
-        ogl.dataInput *= 1 / (voxels.maxDepth - voxels.minDepth)
+        ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_32F, voxels.voxels)
         ogl.src = src
         ogl.Run(ocvb)
     End Sub

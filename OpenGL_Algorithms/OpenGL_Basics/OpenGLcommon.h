@@ -207,23 +207,7 @@ static void readPipeAndMemMap()
 	app_state.yaw = sharedMem[10];
 	app_state.pitch = sharedMem[11];
 	app_state.roll = sharedMem[12];
-	if ((int)sharedMem[8] != dataBufferSize)
-	{
-		dataBufferSize = (int)sharedMem[8];
-		free(dataBuffer);
-		dataBuffer = (float3 *)malloc(dataBufferSize);
-	}
-
-	if ((int)sharedMem[7] != rgbBufferSize)
-	{
-		free(rgbBuffer);
-		rgbBufferSize = (int)sharedMem[7];
-		rgbBuffer = (unsigned char *)malloc(rgbBufferSize);
-	}
-
-	dataWidth = (int)sharedMem[16];
-	dataHeight = (int)sharedMem[17];
-
+	
 	gyro_data.x = (float)sharedMem[18];
 	gyro_data.y = (float)sharedMem[19];
 	gyro_data.z = (float)sharedMem[20];
@@ -249,12 +233,36 @@ static void readPipeAndMemMap()
 	imageLabelBufferSize = (int)sharedMem[35];
 
 	DWORD dwRead;
-	ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
-	ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
-	if (pcBufferSize > 0)
+	if ((int)sharedMem[7] != rgbBufferSize)
 	{
-		ReadFile(pipe, pointCloudBuffer, (int)pcBufferSize, &dwRead, NULL);
+		free(rgbBuffer);
+		rgbBufferSize = (int)sharedMem[7];
+		rgbBuffer = (unsigned char*)malloc(rgbBufferSize);
 	}
+	ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
+
+	dataBufferSize = (int)sharedMem[8];
+	if (dataBufferSize > 0)
+	{
+		dataWidth = (int)sharedMem[16];
+		dataHeight = (int)sharedMem[17];
+
+		static int saveDataBufferSize = 0;
+		if (saveDataBufferSize != dataBufferSize)
+		{
+			saveDataBufferSize = dataBufferSize;
+			free(dataBuffer);
+			dataBuffer = (float3*)malloc(dataBufferSize);
+		}
+		ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
+	}
+	else {
+		if (pcBufferSize > 0)
+		{
+			ReadFile(pipe, pointCloudBuffer, (int)pcBufferSize, &dwRead, NULL);
+		}
+	}
+
 	if (rgbBufferSize != dwRead * 4)
 	{
 		Mat tmp = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);

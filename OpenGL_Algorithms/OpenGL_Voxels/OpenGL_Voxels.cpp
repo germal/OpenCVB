@@ -22,7 +22,6 @@ int main(int argc, char* argv[])
 	MyState.pitch = 5.0f;
 	MyState.yaw = 0;
 	register_glfw_callbacks(app, MyState);
-	double pixels = imageWidth * imageHeight;
 
 	while (app)
 	{
@@ -40,7 +39,7 @@ int main(int argc, char* argv[])
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		gluLookAt(0, 0, -2, 0, 0, 10, 0, -1, 0);
-
+		 
 		glTranslatef(0, 0, +0.5f + MyState.offset_y * 0.05f);
 		glRotated(MyState.pitch, 1, 0, 0);
 		glRotated(MyState.yaw, 0, 1, 0);
@@ -49,7 +48,7 @@ int main(int argc, char* argv[])
 		glEnable(GL_DEPTH_TEST);
 		glColor3f(1.0f, 0, 0);
 
-		Mat voxels(dataHeight, dataWidth, CV_64F, dataBuffer);
+		Mat voxels(dataHeight, dataWidth, CV_32F, dataBuffer);
 
 		float x = 0, y = -5, z = 0;
 		float dx = 0.3f, dy = dx, dz = dx;
@@ -58,18 +57,23 @@ int main(int argc, char* argv[])
 		int half = int(dataWidth / 2);
 		int testCount = 0;
 		glLineWidth(3.0f);
+		double min, max;
+		cv::minMaxLoc(voxels, &min, &max);
+		min /= 1000;
+		max /= 1000;
 		for (int i = -half; i < half; i++)
 		{
 			for (int j = 0; j < dataHeight; j++)
 			{
-				double v = voxels.at<double>(dataHeight - j - 1, i + half);
+				float d = voxels.at<float>(dataHeight - j - 1, i + half) / 1000;
+				float v = float((d - min) / (max - min));
 				if (v > 0 && v < 1.0f)
 				{
 					glBegin(GL_POLYGON);
 					glColor3f(float((1.0f - v) * nearColor(0) + v * farColor(0)),
 							  float((1.0f - v) * nearColor(1) + v * farColor(1)),
 							  float((1.0f - v) * nearColor(2) + v * farColor(2)));
-					z = float(v * 20.0f);
+					z = float(d * 5.0f);
 					glVertex3f(x + i * dx, -y - j * dy - dy, z - dz);
 					glVertex3f(x + i * dx, -y - j * dy, z - dz);      
 					glVertex3f(x + i * dx - dx, -y - j * dy, z - dz);      
