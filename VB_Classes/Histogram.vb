@@ -539,6 +539,8 @@ Public Class Histogram_2D_TopView
 
         Static inRangeSlider = findSlider("InRange Max Depth")
         Dim zRange = inRangeSlider?.Value / 1000
+
+        trimPC.src = ocvb.pointCloud
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 
@@ -603,6 +605,7 @@ Public Class Histogram_2D_SideView
 
         Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
         Dim maxZ = inRangeSlider.Value / 1000
+        trimPC.src = ocvb.pointCloud
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 

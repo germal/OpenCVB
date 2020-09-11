@@ -132,11 +132,9 @@ Public Class Reduction_Depth
         End If
         reduction.Run(ocvb)
         reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-        If standalone Then
-            colorizer.src = dst1
-            colorizer.Run(ocvb)
-            dst2 = colorizer.dst1
-        End If
+        colorizer.src = dst1
+        colorizer.Run(ocvb)
+        dst2 = colorizer.dst1
     End Sub
 End Class
 

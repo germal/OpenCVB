@@ -1312,18 +1312,22 @@ Public Class Depth_PointCloudInRange_IMU
     Public imu As IMU_GVector
     Public xRotation As Boolean = True
     Public zRotation As Boolean = True
+    Public useReduction As Boolean = False
+    Public reduction As Reduction_Depth
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
+        histOpts = New Histogram_ProjectionOptions(ocvb)
         imu = New IMU_GVector(ocvb)
+        reduction = New Reduction_Depth(ocvb)
 
-        If standalone Then histOpts = New Histogram_ProjectionOptions(ocvb)
         label1 = "Mask for depth values that are in-range"
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
-        maxMeters = histOpts.sliders.trackbar(1).Value / 1000
+        If standalone Then src = ocvb.pointCloud
+        Static rangeSlider = findSlider("InRange Max Depth (mm)")
+        maxMeters = rangeSlider.Value / 1000
         Dim tSplit = cv.Cv2.Split(src)
         split = tSplit
 
@@ -1354,10 +1358,18 @@ Public Class Depth_PointCloudInRange_IMU
                 split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
             End If
 
+            If useReduction Then
+                split(2) *= 1000
+                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run(ocvb)
+                split(2) = reduction.dst1 / 1000
+            End If
+
             cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
-            Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)
-            If standalone Then dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = split(2).ConvertScaleAbs(255)
         End If
     End Sub
 End Class
@@ -1368,6 +1380,33 @@ End Class
 
 
 Public Class Depth_PointCloudReduction
+    Inherits VBparent
+    Public reduction As Depth_PointCloudInRange_IMU
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        reduction = New Depth_PointCloudInRange_IMU(ocvb)
+        reduction.useReduction = True
+
+        label1 = "Mask for depth values that are in-range"
+        desc = "Rotate the reduced PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If standalone Then src = ocvb.pointCloud
+
+        reduction.src = src
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1
+        dst2 = reduction.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_PointCloudReduction1
     Inherits VBparent
     Public histOpts As Histogram_ProjectionOptions
     Public Mask As New cv.Mat
