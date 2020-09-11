@@ -5,6 +5,10 @@ Public Class Reduction_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction factor", 1, 255, 64)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Use Reduction"
+
         label1 = "Reduced color image."
         desc = "Reduction: a simple way to get KMeans with much less work"
     End Sub
