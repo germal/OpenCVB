@@ -522,8 +522,6 @@ Public Class Histogram_2D_TopView
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
-        trimPCGravity.histOpts = histOpts
-        trimPCStatic.histOpts = histOpts
 
         label1 = "XZ (Top Down View)"
         desc = "Create a 2D histogram for depth in XZ (a top down view.)"
@@ -587,9 +585,6 @@ Public Class Histogram_2D_SideView
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
 
-        trimPCGravity.histOpts = histOpts
-        trimPCStatic.histOpts = histOpts
-
         label1 = "YZ (Side View)"
         desc = "Create a 2D histogram for depth in YZ (Side View.)"
     End Sub
@@ -620,7 +615,8 @@ Public Class Histogram_2D_SideView
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, src.Height), New cv.Rangef(0, src.Width)}
         cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {Zdata, XorYdata}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(histOpts.sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         Dim rect As New cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height)
         cv.Cv2.Rotate(dst1(rect), dst1(rect), cv.RotateFlags.Rotate90Clockwise)

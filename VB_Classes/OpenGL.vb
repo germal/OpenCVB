@@ -426,3 +426,27 @@ End Class
 
 
 
+
+
+Public Class OpenGL_Reduced
+    Inherits VBparent
+    Dim reduction As Reduction_PointCloud
+    Public ogl As OpenGL_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        reduction = New Reduction_PointCloud(ocvb)
+
+        ogl = New OpenGL_Basics(ocvb)
+        ogl.OpenGLTitle = "OpenGL_Callbacks"
+        desc = "Use the reduced depth pointcloud in OpenGL"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        reduction.src = ocvb.pointCloud
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1
+
+        ogl.pointCloudInput = reduction.newPointCloud
+        ogl.src = src
+        ogl.Run(ocvb)
+    End Sub
+End Class

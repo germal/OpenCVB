@@ -149,7 +149,7 @@ End Class
 Public Class Reduction_PointCloud
     Inherits VBparent
     Dim reduction As Reduction_Basics
-    Dim newPointCloud As New cv.Mat
+    Public newPointCloud As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         reduction = New Reduction_Basics(ocvb)
