@@ -589,17 +589,24 @@ Public Class Histogram_2D_SideView
         desc = "Create a 2D histogram for depth in YZ (Side View.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim histSize() = {src.Height, src.Width}
+        Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
 
         Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        Static useReductionBox = findCheckBox("Use Reduction")
+
+        'If useReductionBox.checked Then
+        '    Static reductionSlider = findSlider("Reduction power factor")
+
+        'End If
+
+        Dim histSize() = {src.Height, src.Width}
         If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
         If useIMU <> useIMUcheckbox?.Checked Or ocvb.frameCount = 0 Then
             useIMU = useIMUcheckbox.Checked
             trimPC = If(useIMU, trimPCGravity, trimPCStatic)
         End If
 
-        Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
-        Dim maxZ = inRangeSlider.Value / 1000
         trimPC.src = ocvb.pointCloud
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1

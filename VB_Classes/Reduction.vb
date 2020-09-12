@@ -4,17 +4,50 @@ Public Class Reduction_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Reduction factor", 1, 255, 64)
+        sliders.setupTrackBar(0, "Reduction factor", 0, 12, 6)
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use Reduction"
+        check.Box(0).Checked = True
 
-        label1 = "Reduced color image."
-        desc = "Reduction: a simple way to get KMeans with much less work"
+        desc = "Reduction: a simpler way to KMeans by removing low-order bits"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If check.Box(0).Checked Then
+            Dim power = Choose(sliders.trackbar(0).Value + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096) - 1
+            Dim maskval = 256 - power
+            If src.Type = cv.MatType.CV_32S Then maskval = Integer.MaxValue - power
+            Dim tmp = New cv.Mat(src.Size, src.Type).SetTo(cv.Scalar.All(maskval))
+            cv.Cv2.BitwiseAnd(src, tmp, dst1)
+            label1 = "Reduced color image after zero'ing bit 0x" + Hex(power)
+        Else
+            dst1 = src
+            label1 = "No reduction requested"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Reduction_Simple
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Reduction factor", 1, 4000, 64)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Use Simple Reduction"
+
+        desc = "Reduction: a simple way to get KMeans"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1 = src / sliders.trackbar(0).Value ' can be any mat type...
-        dst1 *= sliders.trackbar(0).Value
+        dst1 *= sliders.trackbar(0).Value
+        label1 = "Reduced image - factor = " + CStr(sliders.trackbar(0).Value)
     End Sub
 End Class
 
@@ -35,7 +68,7 @@ Public Class Reduction_Edges
         kReduce = New Reduction_Basics(ocvb)
         label1 = "Reduced image"
         label2 = "Laplacian edges of reduced image"
-        desc = "The simplest kmeans is to just reduce the resolution."
+        desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         kReduce.src = src
@@ -54,11 +87,11 @@ End Class
 Public Class Reduction_Floodfill
     Inherits VBparent
     Public bflood As Floodfill_Identifiers
-    Public kReduce As Reduction_Basics
+    Public kReduce As Reduction_Simple
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bflood = New Floodfill_Identifiers(ocvb)
-        kReduce = New Reduction_Basics(ocvb)
+        kReduce = New Reduction_Simple(ocvb)
         desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -79,15 +112,17 @@ End Class
 
 Public Class Reduction_KNN
     Inherits VBparent
-    Dim kReduce As Reduction_Basics
+    Dim kReduce As Reduction_Simple
     Dim bflood As FloodFill_Black
     Dim pTrack As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        bflood = New FloodFill_Black(ocvb)
-        kReduce = New Reduction_Basics(ocvb)
 
+        bflood = New FloodFill_Black(ocvb)
+        kReduce = New Reduction_Simple(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
+
+        label2 = "Original floodfill color selections"
         desc = "Use KNN with reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -139,6 +174,7 @@ Public Class Reduction_Depth
         colorizer.src = dst1
         colorizer.Run(ocvb)
         dst2 = colorizer.dst1
+        label1 = reduction.label1
     End Sub
 End Class
 
@@ -164,5 +200,6 @@ Public Class Reduction_PointCloud
         dst1 = dst2.Resize(ocvb.pointCloud.Size)
         split(2) = dst1 / 1000
         cv.Cv2.Merge(split, newPointCloud)
+        dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
     End Sub
 End Class

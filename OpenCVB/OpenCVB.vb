@@ -285,7 +285,7 @@ Public Class OpenCVB
                         cvext.BitmapConverter.ToBitmap(imgResult, camPic(2).Image)
                     End If
                 Catch ex As Exception
-                    Console.WriteLine("Error in form result update: " + ex.Message)
+                    Console.WriteLine("Error in OpenCVB/Paint updating dst output: " + ex.Message)
                 End Try
             End SyncLock
         End If
