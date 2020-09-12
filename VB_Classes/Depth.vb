@@ -1273,16 +1273,27 @@ Public Class Depth_PointCloudInRange
     Public Mask As New cv.Mat
     Public maxMeters As Double
     Public split() As cv.Mat
+    Public reduction As Reduction_Depth
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        If standalone Then histOpts = New Histogram_ProjectionOptions(ocvb)
+        reduction = New Reduction_Depth(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
         label1 = "Mask for depth values that are in-range"
         desc = "Show PointCloud while varying the max depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        maxMeters = histOpts.sliders.trackbar(1).Value / 1000
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxMeters = inRangeSlider.Value / 1000
 
         split = cv.Cv2.Split(ocvb.pointCloud)
+
+        Static reductionCheck = findCheckBox("Use Reduction")
+        If reductionCheck.checked Then
+            split(2) *= 1000
+            split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+            reduction.Run(ocvb)
+            split(2) = reduction.dst1 / 1000
+        End If
 
         Dim tmp As New cv.Mat
         cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)

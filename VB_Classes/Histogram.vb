@@ -592,7 +592,6 @@ Public Class Histogram_2D_SideView
         Dim histSize() = {src.Height, src.Width}
 
         Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        Static useReduction = findSlider("Reduction factor")
         If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
         If useIMU <> useIMUcheckbox?.Checked Or ocvb.frameCount = 0 Then
             useIMU = useIMUcheckbox.Checked
