@@ -309,6 +309,9 @@ Public Class PointCloud_TopView
         hist = New Histogram_2D_TopView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
 
+        Dim reductionCheck = findCheckBox("Use Reduction")
+        reductionCheck.Checked = False
+
         desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -339,6 +342,9 @@ Public Class PointCloud_SideView
 
         hist = New Histogram_2D_SideView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
+
+        Dim reductionCheck = findCheckBox("Use Reduction")
+        reductionCheck.Checked = False
 
         desc = "Display the histogram with and without adjusting for gravity"
     End Sub

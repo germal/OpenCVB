@@ -60,20 +60,20 @@ End Class
 Public Class Reduction_Edges
     Inherits VBparent
     Dim edges As Edges_Laplacian
-    Dim kReduce As Reduction_Basics
+    Dim reduction As Reduction_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         edges = New Edges_Laplacian(ocvb)
-        kReduce = New Reduction_Basics(ocvb)
+        reduction = New Reduction_Basics(ocvb)
         label1 = "Reduced image"
         label2 = "Laplacian edges of reduced image"
         desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        kReduce.src = src
-        kReduce.Run(ocvb)
-        dst1 = kReduce.dst1.Clone
+        reduction.src = src
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1.Clone
 
         edges.src = src
         edges.Run(ocvb)
@@ -87,21 +87,22 @@ End Class
 Public Class Reduction_Floodfill
     Inherits VBparent
     Public bflood As Floodfill_Identifiers
-    Public kReduce As Reduction_Simple
+    Public reduction As Reduction_Simple
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         bflood = New Floodfill_Identifiers(ocvb)
-        kReduce = New Reduction_Simple(ocvb)
+        reduction = New Reduction_Simple(ocvb)
         desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        kReduce.src = src
-        kReduce.Run(ocvb)
+        reduction.src = src
+        reduction.Run(ocvb)
 
-        bflood.src = kReduce.dst1
+        bflood.src = reduction.dst1
         bflood.Run(ocvb)
 
         dst1 = bflood.dst2
+        label1 = reduction.label1
     End Sub
 End Class
 
@@ -112,24 +113,24 @@ End Class
 
 Public Class Reduction_KNN
     Inherits VBparent
-    Dim kReduce As Reduction_Simple
+    Dim reduction As Reduction_Simple
     Dim bflood As FloodFill_Black
     Dim pTrack As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         bflood = New FloodFill_Black(ocvb)
-        kReduce = New Reduction_Simple(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
+        reduction = New Reduction_Simple(ocvb)
 
         label2 = "Original floodfill color selections"
         desc = "Use KNN with reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        kReduce.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        kReduce.Run(ocvb)
+        reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        reduction.Run(ocvb)
 
-        bflood.src = kReduce.dst1
+        bflood.src = reduction.dst1
         bflood.Run(ocvb)
         dst2 = bflood.dst2
 
@@ -144,6 +145,7 @@ Public Class Reduction_KNN
             dst1.Circle(vw.Values(i).centroid, 6, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             dst1.Circle(vw.Values(i).centroid, 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
+        label1 = reduction.label1
     End Sub
 End Class
 
