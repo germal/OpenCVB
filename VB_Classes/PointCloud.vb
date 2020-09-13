@@ -40,7 +40,7 @@ Module PointCloud
             Return -1
         End Function
     End Class
-    Private Function setDetails(detailPoint As cv.Point, viewObjects As SortedList(Of Integer, viewObject)) As Integer
+    Public Function findNearestPoint(detailPoint As cv.Point, viewObjects As SortedList(Of Integer, viewObject)) As Integer
         Dim minIndex As Integer
         Dim minDistance As Single = Single.MaxValue
         For i = 0 To viewObjects.Count - 1
@@ -708,19 +708,6 @@ Public Class PointCloud_BothViews
 
         desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
-    Private Function setDetails(detailPoint As cv.Point, vw As SortedList(Of Integer, viewObject)) As Integer
-        Dim minIndex As Integer = 0
-        Dim minDistance As Single = Single.MaxValue
-        For i = 0 To vw.Count - 1
-            Dim pt = vw.Values(i).centroid
-            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
-            If distance < minDistance Then
-                minIndex = i
-                minDistance = distance
-            End If
-        Next
-        Return minIndex
-    End Function
     Public Sub Run(ocvb As VBocvb)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
         Dim showDetails = showRectanglesCheck.checked
@@ -769,7 +756,7 @@ Public Class PointCloud_BothViews
 
         Dim widthInfo As String = ""
         If vwTop.Count And topActive Then
-            minIndex = setDetails(ocvb.mouseClickPoint, vwTop)
+            minIndex = findNearestPoint(ocvb.mouseClickPoint, vwTop)
             Dim rView = vwTop.Values(minIndex).rectView
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwTop.Values(minIndex).rectFront
@@ -791,7 +778,7 @@ Public Class PointCloud_BothViews
         End If
 
         If vwSide.Count And sideActive Then
-            minIndex = setDetails(ocvb.mouseClickPoint, vwSide)
+            minIndex = findNearestPoint(ocvb.mouseClickPoint, vwSide)
             Dim rView = vwSide.Values(minIndex).rectView
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwSide.Values(minIndex).rectFront

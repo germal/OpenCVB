@@ -126,8 +126,8 @@ Public Class KNN_1_to_1
         setCaller(ocvb)
 
         basics = New KNN_Basics(ocvb)
-        If standalone Then basics.useRandomData = True
-        basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below.
+        If standalone Then basics.useRandomData = True Else basics.knnQT.sliders.Visible = False ' with 1:1, no need to adjust train/query counts.
+        basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
         desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."

@@ -508,8 +508,8 @@ Public Class Histogram_2D_TopView
     Inherits VBparent
     Public histOpts As Histogram_ProjectionOptions
     Public trimPC As Object
-    Dim trimPCStatic As Depth_PointCloudInRange
-    Dim trimPCGravity As Depth_PointCloudInRange_IMU
+    Dim gCloud As Depth_PointCloudInRange
+    Dim gCloudIMU As Depth_PointCloudInRange_IMU
     Public XorYdata As Integer = 0
     Public Zdata As Integer = 2
     Public histOutput As New cv.Mat
@@ -517,8 +517,8 @@ Public Class Histogram_2D_TopView
     Public useIMU As Boolean = False
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        trimPCGravity = New Depth_PointCloudInRange_IMU(ocvb)
-        trimPCStatic = New Depth_PointCloudInRange(ocvb)
+        gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
+        gCloud = New Depth_PointCloudInRange(ocvb)
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
@@ -532,7 +532,7 @@ Public Class Histogram_2D_TopView
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
         If useIMU <> imuCheckBox?.Checked Or ocvb.frameCount = 0 Then
             useIMU = imuCheckBox?.Checked
-            trimPC = If(useIMU, trimPCGravity, trimPCStatic)
+            trimPC = If(useIMU, gCloudIMU, gCloud)
         End If
 
         Static inRangeSlider = findSlider("InRange Max Depth")
@@ -569,8 +569,8 @@ Public Class Histogram_2D_SideView
     Inherits VBparent
     Public trimPC As Object
     Public histOpts As Histogram_ProjectionOptions
-    Dim trimPCStatic As Depth_PointCloudInRange
-    Dim trimPCGravity As Depth_PointCloudInRange_IMU
+    Dim gCloud As Depth_PointCloudInRange
+    Dim gCloudIMU As Depth_PointCloudInRange_IMU
     Public XorYdata As Integer = 1
     Public Zdata As Integer = 2
     Public histOutput As New cv.Mat
@@ -579,8 +579,8 @@ Public Class Histogram_2D_SideView
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        trimPCGravity = New Depth_PointCloudInRange_IMU(ocvb)
-        trimPCStatic = New Depth_PointCloudInRange(ocvb)
+        gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
+        gCloud = New Depth_PointCloudInRange(ocvb)
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
@@ -592,19 +592,12 @@ Public Class Histogram_2D_SideView
         Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        Static useReductionBox = findCheckBox("Use Reduction")
-
-        'If useReductionBox.checked Then
-        '    Static reductionSlider = findSlider("Reduction power factor")
-
-        'End If
-
         Dim histSize() = {src.Height, src.Width}
+        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
         If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
         If useIMU <> useIMUcheckbox?.Checked Or ocvb.frameCount = 0 Then
             useIMU = useIMUcheckbox.Checked
-            trimPC = If(useIMU, trimPCGravity, trimPCStatic)
+            trimPC = If(useIMU, gCloudIMU, gCloud)
         End If
 
         trimPC.src = ocvb.pointCloud

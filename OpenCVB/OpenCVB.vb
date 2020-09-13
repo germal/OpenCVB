@@ -398,15 +398,9 @@ Public Class OpenCVB
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
-    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-        Dim openForm As Boolean
-        If TreeViewDialog Is Nothing Then
-            openForm = True
-        Else
-            If TreeViewDialog.TreeView1.IsDisposed Then openForm = True
-        End If
-
-        If openForm Then
+    Private Sub TreeButton_Click_1(sender As Object, e As EventArgs) Handles TreeButton.Click
+        If TreeButton.CheckState = CheckState.Unchecked Then
+            TreeButton.CheckState = CheckState.Checked
             TreeViewDialog = New TreeviewForm
             TreeViewDialog.updateTree()
             TreeViewDialog.Show()
@@ -609,7 +603,7 @@ Public Class OpenCVB
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
-            If PausePlayButton.Text = "Run" Then ToolStripButton1_Click(sender, e) ' if paused, then restart.
+            If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
             StartAlgorithmTask()
         End If
@@ -776,7 +770,7 @@ Public Class OpenCVB
     Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
         DrawingRectangle = False
     End Sub
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+    Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
         Static saveTestAllState As Boolean
         Static algorithmRunning = True
         If PausePlayButton.Text = "Run" Then
@@ -830,6 +824,7 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
+        If TreeViewDialog IsNot Nothing Then If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         Static lastFrame As Int32
         If lastFrame > frameCount Then lastFrame = 0
         Dim countFrames = frameCount - lastFrame

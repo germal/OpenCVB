@@ -6,7 +6,7 @@ Public Class TreeviewForm
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
-    Private Sub Cancel_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Cancel_Button.Click
+    Private Sub Cancel_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Close()
     End Sub
@@ -93,7 +93,7 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
         tv.ExpandAll()
-        Me.Height = If(entryCount > 10, entryCount * 22, Me.Height)
+        Me.Height = If(entryCount > 5, entryCount * 26, Me.Height)
         If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick

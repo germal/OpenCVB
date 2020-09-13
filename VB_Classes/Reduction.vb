@@ -17,9 +17,12 @@ Public Class Reduction_Basics
             Dim power = Choose(sliders.trackbar(0).Value + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096) - 1
             Dim maskval = 256 - power
             If src.Type = cv.MatType.CV_32S Then maskval = Integer.MaxValue - power
+            If src.Type = cv.MatType.CV_8U Or src.Type = cv.MatType.CV_8UC3 And maskval < 2 Then
+                Console.WriteLine("Reduction_Basics: the limit of the reduction factor for 8-bit images is 7 or fewer and it is set to 8!")
+            End If
             Dim tmp = New cv.Mat(src.Size, src.Type).SetTo(cv.Scalar.All(maskval))
             cv.Cv2.BitwiseAnd(src, tmp, dst1)
-            label1 = "Reduced color image after zero'ing bit 0x" + Hex(power)
+            label1 = "Reduced color image after zero'ing bit(s) 0x" + Hex(power)
         Else
             dst1 = src
             label1 = "No reduction requested"
@@ -37,17 +40,23 @@ Public Class Reduction_Simple
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Reduction factor", 1, 4000, 64)
+        sliders.setupTrackBar(0, "Simple reduction factor", 1, 4000, 64)
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use Simple Reduction"
+        check.Box(0).Checked = True
 
         desc = "Reduction: a simple way to get KMeans"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        dst1 = src / sliders.trackbar(0).Value ' can be any mat type...
-        dst1 *= sliders.trackbar(0).Value
-        label1 = "Reduced image - factor = " + CStr(sliders.trackbar(0).Value)
+        If check.Box(0).Checked Then
+            dst1 = src / sliders.trackbar(0).Value ' can be any mat type...
+            dst1 *= sliders.trackbar(0).Value
+            label1 = "Reduced image - factor = " + CStr(sliders.trackbar(0).Value)
+        Else
+            dst1 = src
+            label1 = "No reduction requested"
+        End If
     End Sub
 End Class
 
@@ -113,9 +122,9 @@ End Class
 
 Public Class Reduction_KNN
     Inherits VBparent
-    Dim reduction As Reduction_Simple
-    Dim bflood As FloodFill_Black
-    Dim pTrack As Kalman_PointTracker
+    Public reduction As Reduction_Simple
+    Public bflood As FloodFill_Black
+    Public pTrack As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
@@ -146,6 +155,43 @@ Public Class Reduction_KNN
             dst1.Circle(vw.Values(i).centroid, 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
         label1 = reduction.label1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Reduction_KNN_Clickable
+    Inherits VBparent
+    Dim reduction As Reduction_KNN
+    Dim highlightPoint As New cv.Point
+    Dim highlightRect As New cv.Rect
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        reduction = New Reduction_KNN(ocvb)
+        desc = "Highlight individual rectangles and centroids in Reduction_KNN - Tracker Algorithm"
+    End Sub
+    Private Sub setPoint(pt As cv.Point, vw As SortedList(Of Integer, viewObject))
+        Dim index = findNearestPoint(pt, vw)
+        highlightPoint = vw.ElementAt(index).Value.centroid
+        highlightRect = vw.ElementAt(index).Value.rectView
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        reduction.src = src
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1
+        Dim vw = reduction.pTrack.viewObjects
+        If ocvb.mouseClickFlag Then
+            setPoint(ocvb.mouseClickPoint, vw)
+            ocvb.mouseClickFlag = False ' absorb the mouse click here only
+        End If
+        If highlightRect.Width > 0 Then
+            setPoint(highlightPoint, vw)
+            dst1.Circle(highlightPoint, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Rectangle(highlightRect, cv.Scalar.Yellow, 2)
+        End If
     End Sub
 End Class
 
