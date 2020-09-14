@@ -13,8 +13,11 @@ Public Class KNN_QueryTrain
         sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
         sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
         sliders.setupTrackBar(2, "KNN k nearest points", 1, 5, 1)
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Reuse the training and query data"
+
+        If standalone Then
+            check.Setup(ocvb, caller, 1)
+            check.Box(0).Text = "Reuse the training and query data"
+        End If
 
         randomTrain = New Random_Points(ocvb)
         randomTrain.sliders.Visible = False
@@ -26,8 +29,11 @@ Public Class KNN_QueryTrain
         desc = "Create a set of random query and training points within the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static reuseCheck = findCheckBox("Reuse the training and query data")
-        Dim reuseData = reuseCheck.Checked
+        Dim reuseData = False
+        If standalone Then
+            Static reuseCheck = findCheckBox("Reuse the training and query data")
+            reuseData = reuseCheck.Checked
+        End If
         If reuseData = False Then
             Static trainSlider = findSlider("KNN Train count")
             randomTrain.sliders.trackbar(0).Value = trainSlider.Value

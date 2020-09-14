@@ -399,15 +399,21 @@ Public Class FloodFill_Black
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
+    Public edges As Depth_Edges
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         pFlood = New Floodfill_Identifiers(ocvb)
+        edges = New Depth_Edges(ocvb)
 
         label1 = ""
         desc = "Use floodfill to identify each of the black regions of the src image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        edges.src = src
+        edges.Run(ocvb)
+
         pFlood.src = src
+        'pFlood.src.SetTo(cv.Scalar.White, edges.dst2)
         pFlood.Run(ocvb)
         dst2 = pFlood.dst2.Clone
 

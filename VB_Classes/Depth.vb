@@ -1433,3 +1433,24 @@ Public Class Depth_Reduction
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Depth_Edges
+    Inherits VBparent
+    Dim edges As Edges_Laplacian
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        edges = New Edges_Laplacian(ocvb)
+        desc = "Find edges in depth data"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        edges.src = src
+        edges.Run(ocvb)
+        dst1 = edges.dst2
+        dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(200, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class

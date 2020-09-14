@@ -579,9 +579,10 @@ End Class
 
 Public Structure viewObject
     Dim centroid As cv.Point2f
-    Dim rectFront As cv.Rect ' this is the rect describing the object in the color and RGB depth views.
-    Dim rectView As cv.Rect ' rectangle in the top/side view (see previous rect.)
+    Dim rectFront As cv.Rect ' this becomes the front view after processing.
+    Dim rectView As cv.Rect ' rectangle in the view presented (could be top/side or front view.
     Dim color As cv.Scalar
+    Dim mask As cv.Mat
     Dim active As Boolean
 End Structure
 
@@ -746,6 +747,7 @@ Public Class Kalman_PointTracker
 
                     vo.rectView = rect
                     vo.color = scalarColors(i Mod 255)
+                    vo.mask = lastMask(i)
                     viewObjects.Add(vo.rectView.Width * vo.rectView.Height, vo)
                 End If
             End If

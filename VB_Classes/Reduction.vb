@@ -168,15 +168,19 @@ Public Class Reduction_KNN_Clickable
     Dim reduction As Reduction_KNN
     Dim highlightPoint As New cv.Point
     Dim highlightRect As New cv.Rect
+    Dim highlightMask As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         reduction = New Reduction_KNN(ocvb)
+
+        label1 = "Click near any centroid to highlight the object"
         desc = "Highlight individual rectangles and centroids in Reduction_KNN - Tracker Algorithm"
     End Sub
     Private Sub setPoint(pt As cv.Point, vw As SortedList(Of Integer, viewObject))
         Dim index = findNearestPoint(pt, vw)
         highlightPoint = vw.ElementAt(index).Value.centroid
         highlightRect = vw.ElementAt(index).Value.rectView
+        highlightmask = vw.ElementAt(index).Value.mask
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
@@ -189,8 +193,11 @@ Public Class Reduction_KNN_Clickable
         End If
         If highlightRect.Width > 0 Then
             setPoint(highlightPoint, vw)
-            dst1.Circle(highlightPoint, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst1.Rectangle(highlightRect, cv.Scalar.Yellow, 2)
+            dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Rectangle(highlightRect, cv.Scalar.Red, 2)
+            Dim rect = New cv.Rect(0, 0, highlightMask.Width, highlightMask.Height)
+            dst2.SetTo(0)
+            dst2(rect).SetTo(cv.Scalar.Yellow, highlightMask)
         End If
     End Sub
 End Class

@@ -93,7 +93,7 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
         tv.ExpandAll()
-        Me.Height = If(entryCount > 5, entryCount * 26, Me.Height)
+        Me.Height = If(entryCount > 5, entryCount * 25, Me.Height)
         If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
