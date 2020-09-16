@@ -1442,12 +1442,15 @@ Public Class Depth_Edges
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         edges = New Edges_Laplacian(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
         desc = "Find edges in depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         edges.src = src
         edges.Run(ocvb)
         dst1 = edges.dst2
-        dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(200, 255, cv.ThresholdTypes.Binary)
+        dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

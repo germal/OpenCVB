@@ -9,11 +9,12 @@ Public Class CComp_Basics
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public drawRectangles As Boolean = True
+    Public edgeMask As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 128)
-        sliders.setupTrackBar(1, "CComp Min Area", 0, src.Width * src.Height, 500)
+        sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 0)
+        sliders.setupTrackBar(1, "CComp Min Area", 0, 10000, 500)
 
         desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
@@ -27,7 +28,7 @@ Public Class CComp_Basics
             If rect.Width = src.Width And rect.Height = src.Height Then Continue For
             If rect.X + rect.Width > src.Width Or rect.Y + rect.Height > src.Height Then Continue For
             rects.Add(rect)
-            Dim mask = dst1(rect)
+            Dim mask = dst2(rect)
             masks.Add(mask)
 
             Dim m = cv.Cv2.Moments(mask, True)
@@ -51,15 +52,50 @@ Public Class CComp_Basics
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim threshold = sliders.trackbar(0).Value
-        dst1 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
-        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst1)
+        dst2 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
+        If edgeMask IsNot Nothing Then dst2.SetTo(0, edgeMask)
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
         Dim tmp = renderBlobs()
 
-        dst1 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
-        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst1)
-        dst2 = renderBlobs() + tmp
+        If edgeMask IsNot Nothing Then dst2.SetTo(0, edgeMask)
+        dst2 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
+        dst1 = renderBlobs() + tmp
     End Sub
 End Class
+
+
+
+
+
+
+Public Class CComp_DepthEdge
+    Inherits VBparent
+    Dim ccomp As CComp_Basics
+    Dim depth As Depth_Edges
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        ccomp = New CComp_Basics(ocvb)
+        depth = New Depth_Edges(ocvb)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Use edge mask in connected components"
+        check.Box(0).Checked = True
+
+        desc = "Use depth edges to isolate connected components in depth"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        depth.Run(ocvb)
+        If standalone Then dst2 = depth.dst2
+
+        If check.Box(0).Checked Then ccomp.edgeMask = depth.dst2 Else ccomp.edgeMask = Nothing
+        ccomp.src = src
+        ccomp.Run(ocvb)
+        dst1 = ccomp.dst1
+    End Sub
+End Class
+
 
 
 
