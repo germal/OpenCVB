@@ -116,10 +116,9 @@ Public Class Video_CarCComp
     Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
+
         bgSub = New BGSubtract_MOG(ocvb)
-
         cc = New CComp_Basics(ocvb)
-
         video = New Video_Basics(ocvb)
 
         desc = "Outline cars with a rectangle"

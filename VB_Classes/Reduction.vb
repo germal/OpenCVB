@@ -75,8 +75,6 @@ Public Class Reduction_Edges
 
         edges = New Edges_Laplacian(ocvb)
         reduction = New Reduction_Basics(ocvb)
-        label1 = "Reduced image"
-        label2 = "Laplacian edges of reduced image"
         desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -84,7 +82,10 @@ Public Class Reduction_Edges
         reduction.Run(ocvb)
         dst1 = reduction.dst1.Clone
 
-        edges.src = src
+        Static reductionCheck = findCheckBox("Use Reduction")
+        label1 = If(reductionCheck.checked, "Reduced image", "Original image")
+        label2 = If(reductionCheck.checked, "Laplacian edges of reduced image", "Laplacian edges of original image")
+        edges.src = dst1
         edges.Run(ocvb)
         dst2 = edges.dst1
     End Sub
@@ -95,11 +96,11 @@ End Class
 
 Public Class Reduction_Floodfill
     Inherits VBparent
-    Public bflood As Floodfill_Identifiers
+    Public flood As FloodFill_Basics
     Public reduction As Reduction_Simple
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        bflood = New Floodfill_Identifiers(ocvb)
+        flood = New FloodFill_Basics(ocvb)
         reduction = New Reduction_Simple(ocvb)
         desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
@@ -107,11 +108,11 @@ Public Class Reduction_Floodfill
         reduction.src = src
         reduction.Run(ocvb)
 
-        bflood.src = reduction.dst1
-        bflood.Run(ocvb)
+        flood.src = reduction.dst1
+        flood.Run(ocvb)
 
-        dst1 = bflood.dst2
-        label1 = reduction.label1
+        dst1 = flood.dst2
+        label1 = flood.label2
     End Sub
 End Class
 
@@ -120,41 +121,55 @@ End Class
 
 
 
-Public Class Reduction_KNN
+Public Class Reduction_KNN_Color
     Inherits VBparent
-    Public reduction As Reduction_Simple
-    Public bflood As FloodFill_Black
+    Public reduction As Reduction_Floodfill
     Public pTrack As Kalman_PointTracker
+    Dim highlightPoint As New cv.Point
+    Dim highlightRect As New cv.Rect
+    Dim preKalmanRect As New cv.Rect
+    Dim highlightMask As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        bflood = New FloodFill_Black(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
-        reduction = New Reduction_Simple(ocvb)
+        reduction = New Reduction_Floodfill(ocvb)
 
         label2 = "Original floodfill color selections"
-        desc = "Use KNN with reduction to consistently identify regions and color them."
+        desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(ocvb)
+        dst2 = reduction.dst1
 
-        bflood.src = reduction.dst1
-        bflood.Run(ocvb)
-        dst2 = bflood.dst2
-
-        pTrack.queryPoints = New List(Of cv.Point2f)(bflood.centroids)
-        pTrack.queryRects = New List(Of cv.Rect)(bflood.rects)
-        pTrack.queryMasks = New List(Of cv.Mat)(bflood.masks)
+        pTrack.queryPoints = New List(Of cv.Point2f)(reduction.flood.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(reduction.flood.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(reduction.flood.masks)
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
 
         Dim vw = pTrack.viewObjects
-        For i = 0 To vw.Count - 1
-            dst1.Circle(vw.Values(i).centroid, 6, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(vw.Values(i).centroid, 4, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        Next
-        label1 = reduction.label1
+        If ocvb.mouseClickFlag Then
+            highlightPoint = ocvb.mouseClickPoint
+            ocvb.mouseClickFlag = False ' absorb the mouse click here only
+        End If
+        If highlightPoint.X > 0 Then
+            Dim index = findNearestPoint(highlightPoint, vw)
+            highlightPoint = vw.ElementAt(index).Value.centroid
+            highlightRect = vw.ElementAt(index).Value.rectView
+            highlightMask = vw.ElementAt(index).Value.mask
+            preKalmanRect = vw.ElementAt(index).Value.preKalmanRect
+
+            dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Rectangle(highlightRect, cv.Scalar.Red, 2)
+            Dim rect = New cv.Rect(0, 0, highlightMask.Width, highlightMask.Height)
+            src.CopyTo(dst2)
+            dst2(preKalmanRect).SetTo(cv.Scalar.Yellow, highlightMask)
+            label2 = "Highlighting the selected region."
+        End If
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        label1 = "There were " + CStr(vw.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
 
@@ -163,42 +178,25 @@ End Class
 
 
 
-Public Class Reduction_KNN_Clickable
+Public Class Reduction_KNN_ColorAndDepth
     Inherits VBparent
-    Dim reduction As Reduction_KNN
-    Dim highlightPoint As New cv.Point
-    Dim highlightRect As New cv.Rect
-    Dim highlightMask As New cv.Mat
+    Dim reduction As Reduction_KNN_Color
+    Dim depth As Depth_Edges
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        reduction = New Reduction_KNN(ocvb)
-
-        label1 = "Click near any centroid to highlight the object"
-        desc = "Highlight individual rectangles and centroids in Reduction_KNN - Tracker Algorithm"
-    End Sub
-    Private Sub setPoint(pt As cv.Point, vw As SortedList(Of Integer, viewObject))
-        Dim index = findNearestPoint(pt, vw)
-        highlightPoint = vw.ElementAt(index).Value.centroid
-        highlightRect = vw.ElementAt(index).Value.rectView
-        highlightmask = vw.ElementAt(index).Value.mask
+        depth = New Depth_Edges(ocvb)
+        reduction = New Reduction_KNN_Color(ocvb)
+        label1 = "Detecting objects using only color coherence"
+        label2 = "Detecting objects with color and depth coherence"
+        desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
         reduction.Run(ocvb)
         dst1 = reduction.dst1
-        Dim vw = reduction.pTrack.viewObjects
-        If ocvb.mouseClickFlag Then
-            setPoint(ocvb.mouseClickPoint, vw)
-            ocvb.mouseClickFlag = False ' absorb the mouse click here only
-        End If
-        If highlightRect.Width > 0 Then
-            setPoint(highlightPoint, vw)
-            dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Rectangle(highlightRect, cv.Scalar.Red, 2)
-            Dim rect = New cv.Rect(0, 0, highlightMask.Width, highlightMask.Height)
-            dst2.SetTo(0)
-            dst2(rect).SetTo(cv.Scalar.Yellow, highlightMask)
-        End If
+
+        depth.Run(ocvb)
+        dst2 = depth.dst1
     End Sub
 End Class
 

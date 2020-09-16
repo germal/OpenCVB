@@ -132,9 +132,9 @@ Public Class Camshift_Object
         If blob.flood.fBasics.masks.Count > 0 Then
             Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
-                ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+                ocvb.drawRect = blob.flood.fBasics.rects(largestMask)
             End If
-            If camshift.trackBox.Size.Width < 50 Then ocvb.drawRect = blob.flood.fBasics.maskRects(largestMask)
+            If camshift.trackBox.Size.Width < 50 Then ocvb.drawRect = blob.flood.fBasics.rects(largestMask)
             camshift.src = src
             camshift.Run(ocvb)
             dst1 = camshift.dst1
@@ -179,7 +179,7 @@ Public Class Camshift_TopObjects
             If blob.flood.fBasics.maskSizes.Count > i Then
                 Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
                 If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
-                    ocvb.drawRect = blob.flood.fBasics.maskRects(camIndex)
+                    ocvb.drawRect = blob.flood.fBasics.rects(camIndex)
                 End If
 
                 cams(i).src = src

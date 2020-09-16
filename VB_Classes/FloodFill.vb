@@ -2,9 +2,10 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class FloodFill_Basics
     Inherits VBparent
-    Public masks As New List(Of cv.Mat)
     Public maskSizes As New SortedList(Of Int32, Int32)(New CompareMaskSize)
-    Public maskRects As New List(Of cv.Rect)
+    Public rects As New List(Of cv.Rect)
+    Public masks As New List(Of cv.Mat)
+    Public centroids As New List(Of cv.Point2f)
 
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
@@ -19,9 +20,9 @@ Public Class FloodFill_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
-        sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 20)
+        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 25)
+        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 25)
+        sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
 
         label1 = "Input image to floodfill"
         desc = "Use floodfill to build image segments in a grayscale image."
@@ -40,7 +41,8 @@ Public Class FloodFill_Basics
 
         masks.Clear()
         maskSizes.Clear()
-        maskRects.Clear()
+        rects.Clear()
+        centroids.Clear()
 
         maskPlus.SetTo(0)
         Dim ignoreMasks = initialMask.Clone()
@@ -55,7 +57,10 @@ Public Class FloodFill_Basics
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
                         masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
                         maskSizes.Add(rect.Width * rect.Height, masks.Count - 1)
-                        maskRects.Add(rect)
+                        rects.Add(rect)
+                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+                        centroids.Add(centroid)
                     End If
                     ' Mask off any object that is too small or previously identified
                     cv.Cv2.BitwiseOr(ignoreMasks, maskPlus(maskRect), ignoreMasks)
@@ -186,33 +191,6 @@ End Class
 
 
 
-Public Class FloodFill_WithDepth
-    Inherits VBparent
-    Dim range As FloodFill_RelativeRange
-    Dim shadow As Depth_Holes
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        shadow = New Depth_Holes(ocvb)
-
-        range = New FloodFill_RelativeRange(ocvb)
-
-        label2 = "Floodfill results after removing unknown depth"
-        desc = "Floodfill only the areas where there is depth"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        shadow.Run(ocvb)
-
-        range.src = src
-        range.fBasics.initialMask = shadow.holeMask
-        range.Run(ocvb)
-        dst1 = range.dst1
-        dst2 = range.dst2
-    End Sub
-End Class
-
-
-
-
 
 Public Class FloodFill_CComp
     Inherits VBparent
@@ -221,27 +199,26 @@ Public Class FloodFill_CComp
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
+
         shadow = New Depth_Holes(ocvb)
-
         ccomp = New CComp_Basics(ocvb)
-
         range = New FloodFill_RelativeRange(ocvb)
 
         label1 = "Input to Floodfill "
         desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        shadow.Run(ocvb)
+        ' shadow.Run(ocvb)
 
         ccomp.src = src
         ccomp.Run(ocvb)
 
         range.src = ccomp.dst1
-        range.fBasics.initialMask = shadow.holeMask
+        ' range.fBasics.initialMask = shadow.holeMask
         range.Run(ocvb)
         dst1 = range.dst1
         dst2 = range.dst2
-        label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.maskRects.Count) + " were more than " +
+        label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.rects.Count) + " were more than " +
                       CStr(range.fBasics.sliders.trackbar(0).Value) + " pixels"
     End Sub
 End Class
@@ -332,6 +309,79 @@ End Class
 
 
 
+
+Public Class Floodfill_Objects
+    Inherits VBparent
+    Dim basics As FloodFill_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
+
+        basics = New FloodFill_Basics(ocvb)
+        basics.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
+
+        desc = "Use floodfill to identify the desired number of objects"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        basics.src = src
+        basics.Run(ocvb)
+        dst1 = basics.dst2
+
+        label1 = CStr(basics.masks.Count) + " objects with more than " + CStr(basics.sliders.trackbar(0).Value) + " bytes"
+        Static lastSetting As Integer = basics.sliders.trackbar(1).Value
+        If dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * basics.src.Total And basics.sliders.trackbar(0).Value > 500 Then
+            basics.sliders.trackbar(0).Value -= 10
+        Else
+            If basics.masks.Count >= sliders.trackbar(0).Value Then
+                If basics.sliders.trackbar(1).Value < basics.sliders.trackbar(1).Maximum Then basics.sliders.trackbar(1).Value += 1
+                If basics.sliders.trackbar(2).Value < basics.sliders.trackbar(2).Maximum Then basics.sliders.trackbar(2).Value += 1
+            Else
+                If basics.sliders.trackbar(1).Value > 1 Then
+                    basics.sliders.trackbar(1).Value -= 1
+                    basics.sliders.trackbar(2).Value -= 1
+                End If
+            End If
+            lastSetting = basics.sliders.trackbar(1).Value
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_WithDepth
+    Inherits VBparent
+    Dim range As FloodFill_RelativeRange
+    Dim shadow As Depth_Holes
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        shadow = New Depth_Holes(ocvb)
+
+        range = New FloodFill_RelativeRange(ocvb)
+
+        label1 = "Floodfill results after removing unknown depth"
+        label2 = "Mask showing where depth data is missing"
+        desc = "Floodfill only the areas where there is depth"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        shadow.Run(ocvb)
+
+        range.src = src
+        range.fBasics.initialMask = shadow.holeMask
+        range.Run(ocvb)
+        dst1 = range.dst2
+        dst2 = shadow.holeMask
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Floodfill_Identifiers
     Inherits VBparent
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
@@ -393,89 +443,32 @@ End Class
 
 
 
-Public Class FloodFill_Black
+
+Public Class Floodfill_ColorObjects
     Inherits VBparent
     Public pFlood As Floodfill_Identifiers
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
-    Public edges As Depth_Edges
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         pFlood = New Floodfill_Identifiers(ocvb)
-        edges = New Depth_Edges(ocvb)
 
-        label1 = ""
-        desc = "Use floodfill to identify each of the black regions of the src image."
+        desc = "Use floodfill to identify each of the region candidates using only color."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        edges.src = src
-        edges.Run(ocvb)
-
         pFlood.src = src
-        'pFlood.src.SetTo(cv.Scalar.White, edges.dst2)
         pFlood.Run(ocvb)
-        dst2 = pFlood.dst2.Clone
+        dst1 = pFlood.dst2.Clone
 
         masks = New List(Of cv.Mat)(pFlood.masks)
         rects = New List(Of cv.Rect)(pFlood.rects)
         centroids = New List(Of cv.Point2f)(pFlood.centroids)
-
-        src = pFlood.dst2
-        dst1 = pFlood.dst2.Clone
-        Dim mask = src.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        pFlood.src = mask.Clone
-        pFlood.Run(ocvb)
 
         For i = 0 To pFlood.masks.Count - 1
             masks.Add(pFlood.masks(i))
             rects.Add(pFlood.rects(i))
             centroids.Add(pFlood.centroids(i))
         Next
-
-        pFlood.dst2.CopyTo(dst1, mask)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Floodfill_Objects
-    Inherits VBparent
-    Dim basics As FloodFill_Basics
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
-
-        basics = New FloodFill_Basics(ocvb)
-        basics.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
-
-        desc = "Use floodfill to identify the desired number of objects"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        basics.src = src
-        basics.Run(ocvb)
-        dst1 = basics.dst2
-
-        label1 = CStr(basics.masks.Count) + " objects with more than " + CStr(basics.sliders.trackbar(0).Value) + " bytes"
-        Static lastSetting As Integer = basics.sliders.trackbar(1).Value
-        If dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * basics.src.Total And basics.sliders.trackbar(0).Value > 500 Then
-            basics.sliders.trackbar(0).Value -= 10
-        Else
-            If basics.masks.Count >= sliders.trackbar(0).Value Then
-                If basics.sliders.trackbar(1).Value < basics.sliders.trackbar(1).Maximum Then basics.sliders.trackbar(1).Value += 1
-                If basics.sliders.trackbar(2).Value < basics.sliders.trackbar(2).Maximum Then basics.sliders.trackbar(2).Value += 1
-            Else
-                If basics.sliders.trackbar(1).Value > 1 Then
-                    basics.sliders.trackbar(1).Value -= 1
-                    basics.sliders.trackbar(2).Value -= 1
-                End If
-            End If
-            lastSetting = basics.sliders.trackbar(1).Value
-        End If
     End Sub
 End Class

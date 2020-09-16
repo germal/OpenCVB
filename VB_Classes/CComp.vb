@@ -12,40 +12,14 @@ Public Class CComp_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 10)
+        sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 128)
         sliders.setupTrackBar(1, "CComp Min Area", 0, src.Width * src.Height, 500)
 
         desc = "Draw bounding boxes around RGB binarized connected Components"
-        label1 = "CComp binary"
-        label2 = "Blob Rectangles and centroids"
     End Sub
-    Private Function findNonZeroPixel(src As cv.Mat, startPt As cv.Point) As cv.Point
-        For y = src.Height / 4 To src.Height - 1
-            For x = src.Width / 4 To src.Width - 1
-                If src.Get(Of cv.Vec3b)(y, x) <> cv.Scalar.All(0) Then Return New cv.Point(x, y)
-            Next
-        Next
-    End Function
-    Public Sub Run(ocvb As VBocvb)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Dim threshold = sliders.trackbar(0).Value
-        Dim binary As New cv.Mat
-        If threshold < 128 Then
-            binary = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
-        Else
-            binary = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
-        End If
-        connectedComponents = cv.Cv2.ConnectedComponentsEx(binary)
-
-        Static lastImage As New cv.Mat
-
-        connectedComponents.RenderBlobs(dst1)
-        dst1.CopyTo(dst2)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        rects.Clear()
-        centroids.Clear()
-        masks.Clear()
+    Private Function renderBlobs() As cv.Mat
+        Dim cc As New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
+        connectedComponents.RenderBlobs(cc)
         For Each blob In connectedComponents.Blobs
             If blob.Area < sliders.trackbar(1).Value Then Continue For ' skip it if too small...
             Dim rect = blob.Rect
@@ -63,11 +37,27 @@ Public Class CComp_Basics
             centroids.Add(centroid)
 
             If drawRectangles Then
-                dst2(rect).Circle(centroid, 5, cv.Scalar.Yellow, -1)
-                dst2.Rectangle(rect, cv.Scalar.White, 2)
+                cc(rect).Circle(centroid, 5, cv.Scalar.Yellow, -1)
+                cc.Rectangle(rect, cv.Scalar.White, 2)
             End If
         Next
-        lastImage = dst1.Clone()
+        Return cc
+    End Function
+    Public Sub Run(ocvb As VBocvb)
+        rects.Clear()
+        centroids.Clear()
+        masks.Clear()
+
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim threshold = sliders.trackbar(0).Value
+        dst1 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst1)
+        Dim tmp = renderBlobs()
+
+        dst1 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst1)
+        dst2 = renderBlobs() + tmp
     End Sub
 End Class
 
@@ -346,11 +336,11 @@ Public Class CComp_OverlappingRectangles
         overlap.Run(ocvb)
 
         dst2.SetTo(0)
-        For i = 0 To overlap.sortedMasks.Count - 1
-            Dim mask = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Value
-            Dim rect = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Key
-            dst2(rect).SetTo(scalarColors(i), mask)
-            dst2.Rectangle(rect, cv.Scalar.White, 2)
-        Next
+        'For i = 0 To overlap.sortedMasks.Count - 1
+        '    Dim mask = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Value
+        '    Dim rect = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Key
+        '    dst2(rect).SetTo(scalarColors(i), mask)
+        '    dst2.Rectangle(rect, cv.Scalar.White, 2)
+        'Next
     End Sub
 End Class

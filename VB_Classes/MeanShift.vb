@@ -140,7 +140,7 @@ Public Class Meanshift_TopObjects
             If blob.flood.fBasics.maskSizes.Count > i Then
                 Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
                 If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or ocvb.frameCount < 3 Then
-                    cams(i).inputRect = blob.flood.fBasics.maskRects(camIndex)
+                    cams(i).inputRect = blob.flood.fBasics.rects(camIndex)
                 End If
 
                 cams(i).src = src

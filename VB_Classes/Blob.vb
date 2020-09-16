@@ -261,7 +261,7 @@ Public Class Blob_Largest
     Public Sub Run(ocvb As VBocvb)
         blobs.Run(ocvb)
         dst2 = blobs.dst2
-        rects = blobs.flood.fBasics.maskRects
+        rects = blobs.flood.fBasics.rects
         masks = blobs.flood.fBasics.masks
 
         If masks.Count > 0 Then

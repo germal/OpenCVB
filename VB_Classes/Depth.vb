@@ -232,36 +232,27 @@ End Class
 
 
 
-Public Class Depth_FlatBackground
+Public Class Depth_Zero
     Inherits VBparent
-    Dim shadow As Depth_Holes
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        shadow = New Depth_Holes(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "FlatBackground Max Depth", 200, 10000, 2000)
+        sliders.setupTrackBar(0, "Depth_Zero Max Depth", 200, 10000, 4000)
 
-        desc = "Simplify the depth image with a flat background"
+        label2 = "Mask for depth zero or out-of-range"
+        desc = "Create a mask for zero depth - depth shadow and depth out-of-range"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        shadow.Run(ocvb) ' get where depth is zero
-        Dim mask As New cv.Mat
-        Dim maxDepth = cv.Scalar.All(sliders.trackbar(0).Value)
-        Dim tmp As New cv.Mat
-        dst1 = getDepth32f(ocvb)
-        cv.Cv2.InRange(dst1, 0, maxDepth, tmp)
-        cv.Cv2.ConvertScaleAbs(tmp, mask)
-
-        Dim zeroMask As New cv.Mat
-        cv.Cv2.BitwiseNot(mask, zeroMask)
-        dst1.SetTo(0, zeroMask)
-
-        ocvb.RGBDepth.CopyTo(dst1, mask)
-        zeroMask.SetTo(255, shadow.holeMask)
-        src.CopyTo(dst1, zeroMask)
-        dst1.SetTo(maxDepth, zeroMask) ' set the depth to the maxdepth for any background
+        cv.Cv2.InRange(getDepth32f(ocvb), 1, sliders.trackbar(0).Value, dst2)
+        dst1.SetTo(0)
+        ocvb.RGBDepth.CopyTo(dst1, dst2)
+        cv.Cv2.BitwiseNot(dst2, dst2)
     End Sub
 End Class
+
+
+
+
 
 
 
@@ -279,7 +270,9 @@ End Module
 
 
 
-' Use the C++ version below of this algorithm - this is way too slow...
+
+
+
 Public Class Depth_WorldXYZ
     Inherits VBparent
     Public xyzFrame As cv.Mat
@@ -440,6 +433,10 @@ Public Class Depth_MeanStdev_MT
         label1 = "Mean for each ROI (normalized): Min " + Format(minVal, "#0.0") + " Max " + Format(maxVal, "#0.0")
     End Sub
 End Class
+
+
+
+
 
 
 Public Class Depth_MeanStdevPlot
@@ -1395,11 +1392,11 @@ Public Class Depth_Reduction
     Inherits VBparent
     Dim gCloudIMU As Depth_PointCloudInRange_IMU
     Dim reductionSlider As System.Windows.Forms.TrackBar
-    Dim reduction As Reduction_KNN
+    Dim reduction As Reduction_KNN_Color
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        reduction = New Reduction_KNN(ocvb)
+        reduction = New Reduction_KNN_Color(ocvb)
         gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
         reductionSlider = findSlider("Reduction factor")
 

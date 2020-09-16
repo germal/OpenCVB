@@ -143,7 +143,7 @@ Public Class Replay_Record
         End If
     End Sub
     Public Sub Close()
-        SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
+        If recordingFilename IsNot Nothing Then SaveSetting("OpenCVB", "ReplayFileName", "ReplayFileName", recordingFilename.FullName)
         If recordingActive Then binWrite.Close()
     End Sub
 End Class

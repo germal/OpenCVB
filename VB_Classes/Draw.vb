@@ -501,20 +501,19 @@ End Class
 
 Public Class Draw_OverlappingRectangles
     Inherits VBparent
-    Dim flood As Floodfill_Identifiers
+    Dim flood As FloodFill_Basics
     Public inputRects As New List(Of cv.Rect)
     Public inputMasks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
-    Public sortedMasks As New SortedList(Of cv.Rect, cv.Mat)(New CompareMasks)
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        If standalone Then flood = New Floodfill_Identifiers(ocvb)
+        If standalone Then flood = New FloodFill_Basics(ocvb)
 
-        label1 = "Redundant rectangles are yellow"
-        label2 = "Unique rectangles with their respective masks"
-        desc = "Use Clipline to find rectangles that are completely overlapping - one contained in the other."
+        label1 = "Overlapping rectangles are red, non-overlapping in yellow"
+        label2 = "Original list of rectangles"
+        desc = "Find rectangles that are overlapping."
     End Sub
     Private Class CompareMasks : Implements IComparer(Of cv.Rect)
         Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
@@ -522,15 +521,27 @@ Public Class Draw_OverlappingRectangles
             Return -1 ' never returns equal because duplicates can happen.
         End Function
     End Class
-    Private Function testRect(r1 As cv.Rect, r2 As cv.Rect)
+    Private Function overlapping(r1 As cv.Rect, r2 As cv.Rect)
         Dim w = r1.Width
         Dim h = r1.Height
         For i = 0 To 4 - 1
-            Dim p1 = Choose(i + 1, New cv.Point(r1.X, r1.Y), New cv.Point(r1.X, r1.Y), New cv.Point(r1.X + w, r1.Y), New cv.Point(r1.X, r1.Y + h))
+            Dim p1 = Choose(i + 1, New cv.Point(r1.X, r1.Y), New cv.Point(r1.X + w, r1.Y), New cv.Point(r1.X, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h))
+            If p1.x >= r2.X And p1.x <= r2.X + r2.Width And p1.y >= r2.Y And p1.y <= r2.Y + r2.Height Then Return True
             Dim p2 = Choose(i + 1, New cv.Point(r1.X + w, r1.Y), New cv.Point(r1.X, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h))
-            If cv.Cv2.ClipLine(r2, p1, p2) = False Then Return False
         Next
-        Return True
+        Return False
+    End Function
+    Private Function addOverlapping(overlapping As List(Of cv.Rect), r As cv.Rect) As List(Of cv.Rect)
+        For Each rect In overlapping
+            If rect.X = r.X And rect.Y = r.Y Then
+                overlapping.Remove(rect)
+                r.Width = Math.Max(rect.Width, r.Width)
+                r.Height = Math.Max(rect.Height, r.Height)
+                Exit For
+            End If
+        Next
+        overlapping.Add(r)
+        Return overlapping
     End Function
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -541,30 +552,39 @@ Public Class Draw_OverlappingRectangles
             inputMasks = flood.masks
         End If
 
-        Dim redundantRects As New List(Of cv.Rect)
+        dst2.SetTo(0)
+        For Each r In inputRects
+            dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+        Next
+
+        Dim removeRects As New List(Of cv.Rect)
+        Dim overlappingRects As New List(Of cv.Rect)
+
         For i = 0 To inputRects.Count - 1
             Dim r1 = inputRects(i)
             For j = i + 1 To inputRects.Count - 1
                 Dim r2 = inputRects(j)
-                If testRect(r1, r2) Then
-                    dst1.Rectangle(r1, cv.Scalar.Yellow, 2)
-                    redundantRects.Add(r1)
-                ElseIf testRect(r2, r1) Then
-                    dst1.Rectangle(r2, cv.Scalar.Yellow, 2)
-                    redundantRects.Add(r2)
+                Dim overlap1 = overlapping(r1, r2)
+                Dim overlap2 = overlapping(r2, r1)
+                If overlap1 Or overlap2 Then
+                    Dim pt1 = New cv.Point(Math.Min(r1.X, r2.X), Math.Min(r1.Y, r2.Y))
+                    Dim pt2 = New cv.Point(Math.Max(r1.X + r1.Width, r2.X + r2.Width), Math.Max(r1.Y + r1.Height, r2.Y + r2.Height))
+                    Dim rect = New cv.Rect(pt1.X, pt1.Y, pt2.X - pt1.X, pt2.Y - pt1.Y)
+                    overlappingRects = addOverlapping(overlappingRects, rect)
+                    If removeRects.Contains(r1) = False Then removeRects.Add(r1)
+                    If removeRects.Contains(r2) = False Then removeRects.Add(r2)
                 End If
             Next
         Next
-        dst2.SetTo(0)
-        sortedMasks.Clear()
+        For Each r In removeRects
+            inputRects.Remove(r)
+        Next
+        For Each r In overlappingRects
+            inputRects.Add(r)
+        Next
 
-        For i = 0 To inputRects.Count - 1
-            If redundantRects.Contains(inputRects(i)) = False Then
-                Dim rect = inputRects(i)
-                dst2(rect).SetTo(cv.Scalar.White, inputMasks(i))
-                dst2.Rectangle(rect, cv.Scalar.Red, 2)
-                sortedMasks.Add(rect, inputMasks(i))
-            End If
+        For Each r In inputRects
+            dst1.Rectangle(r, cv.Scalar.Red, 2)
         Next
     End Sub
 End Class
