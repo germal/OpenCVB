@@ -9,63 +9,152 @@ Public Class CComp_Basics
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public edgeMask As cv.Mat
+    Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
+        mats = New Mat_4to1(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-        sliders.setupTrackBar(1, "CComp threshold", 0, 255, 128)
+        sliders.setupTrackBar(1, "CComp Max Area", 0, src.Width * src.Height / 2, src.Width * src.Height / 4)
+        sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
 
-        check.Setup(ocvb, caller, 3)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Use OTSU to binarize the image"
         check.Box(1).Text = "Input to CComp is above CComp threshold"
-        check.Box(2).Text = "Toss any rect's that are the size of the image"
         check.Box(0).Checked = True
 
         desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
-    Private Function renderBlobs() As cv.Mat
-        Dim cc As New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
-        connectedComponents.RenderBlobs(cc)
+    Private Function renderBlobs(minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
+        Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
-            If blob.Area < sliders.trackbar(0).Value Then Continue For ' skip it if too small...
+            If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
+            If blob.rect.width * blob.rect.height >= src.Width * src.Height Then Continue For
+            If blob.rect.width = src.Width Or blob.rect.height = src.Height Then Continue For
             Dim rect = blob.Rect
-            If check.Box(2).Checked Then If rect.width * rect.height = src.Width * src.Height Then Continue For ' skip if the entire image.
             rects.Add(rect)
-            Dim mask = dst2(rect)
-            masks.Add(mask)
+            Dim nextMask = mask(rect)
+            masks.Add(nextMask)
 
-            Dim m = cv.Cv2.Moments(mask, True)
+            Dim m = cv.Cv2.Moments(nextMask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
-            Dim centroid = New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y))
-
-            centroids.Add(centroid)
+            centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
+            If standalone Then dst1(blob.Rect).SetTo(scalarColors(count), (dst2)(blob.Rect))
+            count += 1
         Next
-        Return cc
+        Return count
     End Function
     Public Sub Run(ocvb As VBocvb)
         rects.Clear()
         centroids.Clear()
         masks.Clear()
+        dst1.SetTo(0)
+        Static minSizeSlider = findSlider("CComp Min Area")
+        Static maxSizeSlider = findSlider("CComp Max Area")
+        Dim minSize = minSizeSlider.value
+        Dim maxSize = maxSizeSlider.value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim threshold = sliders.trackbar(1).Value
+        Static thresholdSlider = findSlider("CComp threshold")
+        Dim threshold = thresholdSlider.value
         Dim tFlag = If(check.Box(1).Checked, OpenCvSharp.ThresholdTypes.Binary, OpenCvSharp.ThresholdTypes.BinaryInv)
         tFlag += If(check.Box(0).Checked, OpenCvSharp.ThresholdTypes.Otsu, 0)
-        dst2 = src.Threshold(threshold, 255, tFlag)
-        If edgeMask IsNot Nothing Then dst2.SetTo(0, edgeMask)
-        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
-        dst1 = renderBlobs()
+        mats.mat(0) = src.Threshold(threshold, 255, tFlag)
+        If edgeMask IsNot Nothing Then mats.mat(0).SetTo(0, edgeMask)
 
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(mats.mat(0))
+        connectedComponents.renderblobs(mats.mat(2))
+
+        Dim count = renderBlobs(minSize, mats.mat(0), maxSize)
+        cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
+
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(mats.mat(1))
+        connectedComponents.renderblobs(mats.mat(3))
+
+        count += renderBlobs(minSize, mats.mat(1), maxSize)
         If standalone Then
             For i = 0 To centroids.Count - 1
                 dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                 dst1.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
             Next
         End If
+        label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
+        connectedComponents.renderblobs(dst2)
+
+        mats.Run(ocvb)
+        If check.Box(0).Checked Then
+            If check.Box(1).Checked Then
+                label2 = "OTSU light, OTSU dark, rendered light, rendered dark"
+            Else
+                label2 = "OTSU dark, OTSU light, rendered dark, rendered light"
+            End If
+        Else
+            If check.Box(1).Checked Then
+                label2 = ">Slider, <Slider, rendered >Slider, rendered <slider"
+            Else
+                label2 = "<Slider, >Slider, rendered <Slider, rendered >slider"
+            End If
+        End If
+        dst2 = mats.dst1
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class CComp_Basics_FullImage
+    Inherits VBparent
+    Dim mats As Mat_4to1
+    Dim basics As CComp_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        mats = New Mat_4to1(ocvb)
+        basics = New CComp_Basics(ocvb)
+
+        desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
+        label2 = "Masks binary+otsu used to compute mean depth"
+    End Sub
+    Private Function colorWithDepth(ocvb As VBocvb, matIndex As Integer) As Integer
+        Dim cc = cv.Cv2.ConnectedComponentsEx(mats.mat(matIndex))
+
+        Dim blobList As New List(Of cv.Rect)
+        For Each blob In cc.Blobs
+            If blob.Rect.Width > 1 And blob.Rect.Height > 1 Then blobList.Add(blob.Rect)
+        Next
+
+        blobList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
+
+        Dim count As Integer = 0
+        Static minSizeSlider = findSlider("CComp Min Area")
+        Static maxSizeSlider = findSlider("CComp Max Area")
+        Dim minSize = minSizeSlider.value
+        Dim maxSize = maxSizeSlider.value
+        For Each blob In cc.Blobs
+            If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
+            count += 1
+            Dim avg = ocvb.RGBDepth(blob.Rect).Mean(mats.mat(matIndex)(blob.Rect))
+            dst1(blob.Rect).SetTo(avg, mats.mat(matIndex)(blob.Rect))
+        Next
+        Return count
+    End Function
+    Public Sub Run(ocvb As VBocvb)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(0)
+
+        mats.mat(0) = src.Threshold(0, 255, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu)
+        Dim count = colorWithDepth(ocvb, 0)
+        cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
+        count += colorWithDepth(ocvb, 1)
+        label1 = CStr(count) + " items found and colored mean depth"
+
+        mats.Run(ocvb)
+        dst2 = mats.dst1
+    End Sub
+End Class
 
 
 
@@ -81,8 +170,6 @@ Public Class CComp_PointTracker
         pTrack = New Kalman_PointTracker(ocvb)
         basics = New CComp_Basics(ocvb)
 
-        label1 = "Color after using point tracker"
-        label2 = "Colors before using point tracker"
         desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -103,11 +190,67 @@ Public Class CComp_PointTracker
         If highlight.highlightPoint <> New cv.Point Then
             dst2 = highlight.dst2
             label2 = "Selected region in yellow"
+        Else
+            dst2 = src
         End If
-        label1 = CStr(pTrack.viewObjects.Count) + " regions identified using point tracker"
+        label1 = basics.label1
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class CComp_MaxBlobs
+    Inherits VBparent
+    Dim tracker As CComp_PointTracker
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        tracker = New CComp_PointTracker(ocvb)
+        Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
+        checkOTSU.Checked = False ' turn off OTSU so the slider works...
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Restart the calculation of the max blobs"
+
+        desc = "Find the most blobs between specified min and max size"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static maxBlobs As Integer = -1
+        Static maxValues(255) As Integer ' march through all 255 values and find the best...
+        Static thresholdSlider = findSlider("CComp threshold")
+        If ocvb.frameCount = 0 Then thresholdSlider.value = 0
+
+        tracker.src = src
+        tracker.Run(ocvb)
+        dst1 = tracker.dst1
+        dst2 = tracker.dst2
+
+        Dim incr = 10
+        If thresholdSlider.value + incr >= 255 Then
+            For i = 0 To maxValues.Count - 1
+                If maxBlobs < maxValues(i) Then
+                    maxBlobs = maxValues(i)
+                    thresholdSlider.value = i
+                End If
+            Next
+        End If
+
+        If check.Box(0).Checked Then
+            check.Box(0).Checked = False
+            maxBlobs = -1
+            thresholdSlider.value = 0
+        End If
+
+        If maxBlobs = -1 Then
+            maxValues(thresholdSlider.value) = tracker.pTrack.queryPoints.Count
+            If thresholdSlider.value + incr < 255 Then thresholdSlider.value += incr
+        End If
+        dst2 = tracker.dst2
+    End Sub
+End Class
 
 
 
@@ -204,48 +347,6 @@ End Class
 
 
 
-Public Class CComp_Image
-    Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Connect components throughout the image"
-        label1 = "Connected Components colored with Mean Depth"
-        label2 = "Mask binary+otsu to help compute mean depth"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
-
-        Dim cc = cv.Cv2.ConnectedComponentsEx(dst2)
-
-        Dim blobList As New List(Of cv.Rect)
-        For Each blob In cc.Blobs.Skip(1) ' skip the blob for the whole image.
-            If blob.Rect.Width > 1 And blob.Rect.Height > 1 Then blobList.Add(blob.Rect)
-        Next
-
-        blobList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
-
-        For i = 0 To blobList.Count - 1
-            Dim avg = ocvb.RGBDepth(blobList(i)).Mean(dst2(blobList(i)))
-            dst1(blobList(i)).SetTo(avg, dst2(blobList(i)))
-        Next
-
-        cv.Cv2.BitwiseNot(dst2, dst2)
-        cc = cv.Cv2.ConnectedComponentsEx(dst2)
-        blobList.Clear()
-        For Each blob In cc.Blobs.Skip(1) ' skip the blob for the whole image.
-            If blob.Rect.Width > 1 And blob.Rect.Height > 1 Then blobList.Add(blob.Rect)
-        Next
-
-        blobList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
-
-        For i = 0 To blobList.Count - 1
-            Dim avg = ocvb.RGBDepth(blobList(i)).Mean(dst2(blobList(i)))
-            dst1(blobList(i)).SetTo(avg, dst2(blobList(i)))
-        Next
-    End Sub
-End Class
 
 
 

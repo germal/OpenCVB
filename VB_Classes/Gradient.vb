@@ -1,5 +1,7 @@
 Imports cv = OpenCvSharp
+#If USE_NUMPY Then
 Imports py = Python.Runtime
+#End If
 Imports System.Runtime.InteropServices
 Public Class Gradient_Basics
     Inherits VBparent

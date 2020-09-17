@@ -141,10 +141,13 @@ Public Class Mat_4to1
             mat4 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
-        If mat(0).Channels <> dst1.Channels Then dst1 = New cv.Mat(src.Size(), mat(0).Type, 0)
         For i = 0 To 4 - 1
-            Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-            If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
+            Dim tmp = mat(i).Clone
+            If mat(i).Empty = False Then
+                If tmp.Channels <> dst1.Channels Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
+                dst1(roi) = tmp.Resize(nSize)
+            End If
         Next
         If noLines = False Then
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, 2)

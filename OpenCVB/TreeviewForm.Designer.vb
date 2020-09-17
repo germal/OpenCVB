@@ -36,13 +36,13 @@ Partial Class TreeviewForm
         Me.TreeView1.Dock = System.Windows.Forms.DockStyle.Top
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
-        Me.TreeView1.Size = New System.Drawing.Size(943, 322)
+        Me.TreeView1.Size = New System.Drawing.Size(943, 75)
         Me.TreeView1.TabIndex = 1
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(21, 353)
+        Me.Label1.Location = New System.Drawing.Point(12, 96)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(199, 20)
         Me.Label1.TabIndex = 2
@@ -69,7 +69,7 @@ Partial Class TreeviewForm
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(731, 338)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(738, 83)
         Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
@@ -82,7 +82,7 @@ Partial Class TreeviewForm
         Me.AcceptButton = Me.OK_Button
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(943, 397)
+        Me.ClientSize = New System.Drawing.Size(943, 125)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.TreeView1)
         Me.Controls.Add(Me.TableLayoutPanel1)
