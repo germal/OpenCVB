@@ -17,7 +17,7 @@ Public Class Encode_Basics
         Dim encodeParams() As Int32 = {options.getEncodeParameter(), options.qualityLevel}
 
         cv.Cv2.ImEncode(".jpg", src, buf, encodeParams)
-        dst2 = cv.Cv2.ImDecode(buf, 1)
+        dst2 = cv.Cv2.ImDecode(buf, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst2, output)
@@ -76,7 +76,7 @@ Public Class Encode_Options
         Dim encodeParams() As Int32 = {getEncodeParameter(), qualityLevel}
 
         cv.Cv2.ImEncode(fileExtension, src, buf, encodeParams)
-        dst2 = cv.Cv2.ImDecode(buf, 1)
+        dst2 = cv.Cv2.ImDecode(buf, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst2, output)
