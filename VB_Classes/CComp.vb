@@ -8,13 +8,18 @@ Public Class CComp_Basics
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
-    Public drawRectangles As Boolean = True
     Public edgeMask As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "CComp Threshold", 0, 255, 0)
-        sliders.setupTrackBar(1, "CComp Min Area", 0, 10000, 500)
+        sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
+        sliders.setupTrackBar(1, "CComp threshold", 0, 255, 128)
+
+        check.Setup(ocvb, caller, 3)
+        check.Box(0).Text = "Use OTSU to binarize the image"
+        check.Box(1).Text = "Input to CComp is above CComp threshold"
+        check.Box(2).Text = "Toss any rect's that are the size of the image"
+        check.Box(0).Checked = True
 
         desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
@@ -22,25 +27,18 @@ Public Class CComp_Basics
         Dim cc As New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
         connectedComponents.RenderBlobs(cc)
         For Each blob In connectedComponents.Blobs
-            If blob.Area < sliders.trackbar(1).Value Then Continue For ' skip it if too small...
+            If blob.Area < sliders.trackbar(0).Value Then Continue For ' skip it if too small...
             Dim rect = blob.Rect
-            ' if it covers everything, then forget it...
-            If rect.Width = src.Width And rect.Height = src.Height Then Continue For
-            If rect.X + rect.Width > src.Width Or rect.Y + rect.Height > src.Height Then Continue For
+            If check.Box(2).Checked Then If rect.width * rect.height = src.Width * src.Height Then Continue For ' skip if the entire image.
             rects.Add(rect)
             Dim mask = dst2(rect)
             masks.Add(mask)
 
             Dim m = cv.Cv2.Moments(mask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
-            Dim centroid = New cv.Point(CInt(m.M10 / m.M00), CInt(m.M01 / m.M00))
+            Dim centroid = New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y))
 
             centroids.Add(centroid)
-
-            If drawRectangles Then
-                cc(rect).Circle(centroid, 5, cv.Scalar.Yellow, -1)
-                cc.Rectangle(rect, cv.Scalar.White, 2)
-            End If
         Next
         Return cc
     End Function
@@ -51,16 +49,62 @@ Public Class CComp_Basics
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim threshold = sliders.trackbar(0).Value
-        dst2 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
+        Dim threshold = sliders.trackbar(1).Value
+        Dim tFlag = If(check.Box(1).Checked, OpenCvSharp.ThresholdTypes.Binary, OpenCvSharp.ThresholdTypes.BinaryInv)
+        tFlag += If(check.Box(0).Checked, OpenCvSharp.ThresholdTypes.Otsu, 0)
+        dst2 = src.Threshold(threshold, 255, tFlag)
         If edgeMask IsNot Nothing Then dst2.SetTo(0, edgeMask)
         connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
-        Dim tmp = renderBlobs()
+        dst1 = renderBlobs()
 
-        If edgeMask IsNot Nothing Then dst2.SetTo(0, edgeMask)
-        dst2 = src.Threshold(threshold, 255, OpenCvSharp.ThresholdTypes.BinaryInv + OpenCvSharp.ThresholdTypes.Otsu)
-        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
-        dst1 = renderBlobs() + tmp
+        If standalone Then
+            For i = 0 To centroids.Count - 1
+                dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst1.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class CComp_PointTracker
+    Inherits VBparent
+    Public basics As CComp_Basics
+    Public pTrack As Kalman_PointTracker
+    Public highlight As Highlight_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        highlight = New Highlight_Basics(ocvb)
+        pTrack = New Kalman_PointTracker(ocvb)
+        basics = New CComp_Basics(ocvb)
+
+        label1 = "Color after using point tracker"
+        label2 = "Colors before using point tracker"
+        desc = "Track connected componenent centroids and use it to match coloring"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        basics.src = src
+        basics.Run(ocvb)
+        dst2 = basics.dst1
+
+        pTrack.queryPoints = basics.centroids
+        pTrack.queryRects = basics.rects
+        pTrack.queryMasks = basics.masks
+        pTrack.Run(ocvb)
+        dst1 = pTrack.dst1
+
+        highlight.viewObjects = pTrack.viewObjects
+        highlight.src = dst1
+        highlight.Run(ocvb)
+        dst1 = highlight.dst1
+        If highlight.highlightPoint <> New cv.Point Then
+            dst2 = highlight.dst2
+            label2 = "Selected region in yellow"
+        End If
+        label1 = CStr(pTrack.viewObjects.Count) + " regions identified using point tracker"
     End Sub
 End Class
 
@@ -68,15 +112,14 @@ End Class
 
 
 
-
-Public Class CComp_DepthEdge
+Public Class CComp_DepthEdges
     Inherits VBparent
-    Dim ccomp As CComp_Basics
+    Dim ccomp As CComp_PointTracker
     Dim depth As Depth_Edges
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        ccomp = New CComp_Basics(ocvb)
+        ccomp = New CComp_PointTracker(ocvb)
         depth = New Depth_Edges(ocvb)
 
         check.Setup(ocvb, caller, 1)
@@ -89,10 +132,12 @@ Public Class CComp_DepthEdge
         depth.Run(ocvb)
         If standalone Then dst2 = depth.dst2
 
-        If check.Box(0).Checked Then ccomp.edgeMask = depth.dst2 Else ccomp.edgeMask = Nothing
+        'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
+        If check.Box(0).Checked Then src.SetTo(0, depth.dst2)
         ccomp.src = src
         ccomp.Run(ocvb)
         dst1 = ccomp.dst1
+        If ccomp.highlight.highlightPoint <> New cv.Point Then dst2 = ccomp.highlight.dst2
     End Sub
 End Class
 
@@ -380,3 +425,4 @@ Public Class CComp_OverlappingRectangles
         'Next
     End Sub
 End Class
+

@@ -42,7 +42,6 @@ Public Class Features_PointTracker
         setCaller(ocvb)
         features = New Features_GoodFeatures(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
-        pTrack.maskAvailable = False
         Dim drawRectCheck = findCheckBox("Draw rectangle for each mask")
         drawRectCheck.Checked = False
 

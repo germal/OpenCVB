@@ -125,15 +125,13 @@ Public Class Reduction_KNN_Color
     Inherits VBparent
     Public reduction As Reduction_Floodfill
     Public pTrack As Kalman_PointTracker
-    Dim highlightPoint As New cv.Point
-    Dim highlightRect As New cv.Rect
-    Dim preKalmanRect As New cv.Rect
-    Dim highlightMask As New cv.Mat
+    Dim highlight As Highlight_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         pTrack = New Kalman_PointTracker(ocvb)
         reduction = New Reduction_Floodfill(ocvb)
+        If standalone Then highlight = New Highlight_Basics(ocvb)
 
         label2 = "Original floodfill color selections"
         desc = "Use KNN with color reduction to consistently identify regions and color them."
@@ -149,29 +147,18 @@ Public Class Reduction_KNN_Color
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
 
-        Dim vw = pTrack.viewObjects
-        If ocvb.mouseClickFlag Then
-            highlightPoint = ocvb.mouseClickPoint
-            ocvb.mouseClickFlag = False ' absorb the mouse click here only
+        If standalone Then
+            highlight.viewObjects = pTrack.viewObjects
+            highlight.src = dst1
+            highlight.Run(ocvb)
+            dst1 = highlight.dst1
         End If
-        If highlightPoint.X > 0 Then
-            Dim index = findNearestPoint(highlightPoint, vw)
-            highlightPoint = vw.ElementAt(index).Value.centroid
-            highlightRect = vw.ElementAt(index).Value.rectView
-            highlightMask = vw.ElementAt(index).Value.mask
-            preKalmanRect = vw.ElementAt(index).Value.preKalmanRect
 
-            dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Rectangle(highlightRect, cv.Scalar.Red, 2)
-            Dim rect = New cv.Rect(0, 0, highlightMask.Width, highlightMask.Height)
-            src.CopyTo(dst2)
-            dst2(preKalmanRect).SetTo(cv.Scalar.Yellow, highlightMask)
-            label2 = "Highlighting the selected region."
-        End If
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        label1 = "There were " + CStr(vw.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        label1 = "There were " + CStr(pTrack.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
+
 
 
 

@@ -1,4 +1,6 @@
-﻿Imports Numpy
+﻿#if USE_NUMPY Then
+Imports Numpy
+#End If
 Imports System.Windows.Forms
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
@@ -161,6 +163,7 @@ Public Class VBparent : Implements IDisposable
         If p.Y > dst1.Height Then p.Y = dst1.Height - 1
         Return p
     End Function
+#If USE_NUMPY Then
     Public Function MatToNumPyFloat(mat As cv.Mat) As NDarray
         Dim array(mat.Total - 1) As Single
         Marshal.Copy(mat.Data, array, 0, array.Length)
@@ -170,6 +173,7 @@ Public Class VBparent : Implements IDisposable
     Public Sub NumPyFloatToMat(array As NDarray, ByRef mat As cv.Mat)
         Marshal.Copy(array.GetData(Of Single), 0, mat.Data, mat.Total)
     End Sub
+#End If
     Public Sub New()
         algorithm = Me
         For i = 0 To rColors.Length - 1

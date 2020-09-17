@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
+#If USE_NUMPY Then
 Imports Numpy
+#End If
 Imports py = Python.Runtime
 Public Class OptionsDialog
     Dim numPyEnabled As Boolean = False
@@ -63,7 +65,8 @@ Public Class OptionsDialog
         End Select
     End Sub
     Public Sub TestEnableNumPy()
-        If EnableNumPy.Checked Then
+#If USE_NUMPY Then
+               If EnableNumPy.Checked Then
             If numPyEnabled = False Then
                 numPyEnabled = True
                 ' This allows the VB_Classes to use NumPy and then reuse it.  OpenCVB.exe does not use NumPy but must do this to allow the child threads to use NumPy
@@ -72,6 +75,9 @@ Public Class OptionsDialog
                 py.PythonEngine.BeginAllowThreads()
             End If
         End If
+#Else
+        numPyEnabled = False
+#End If
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i = 0 To cameraRadioButton.Count - 1

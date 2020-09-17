@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports Numpy
 Imports py = Python.Runtime
 Imports System.Runtime.InteropServices
 Public Class Gradient_Basics
@@ -123,40 +122,42 @@ End Class
 
 
 
+#If USE_NUMPY Then
 ' https://github.com/SciSharp/Numpy.NET
-Public Class Gradient_NumPy
-    Inherits VBparent
-    Public gradient As Gradient_Basics
-    Public magnitude As New cv.Mat
-    Public angle As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        gradient = New Gradient_Basics(ocvb)
-        gradient.sobel.sliders.trackbar(0).Value = 1
+'Public Class Gradient_NumPy
+'    Inherits VBparent
+'    Public gradient As Gradient_Basics
+'    Public magnitude As New cv.Mat
+'    Public angle As New cv.Mat
+'    Public Sub New(ocvb As VBocvb)
+'        setCaller(ocvb)
+'        gradient = New Gradient_Basics(ocvb)
+'        gradient.sobel.sliders.trackbar(0).Value = 1
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
+'        sliders.Setup(ocvb, caller)
+'        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
 
-        label1 = "CartToPolar Magnitude Output Normalized"
-        label2 = "CartToPolar Angle Output"
-        desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
-        gradient.Run(ocvb)
+'        label1 = "CartToPolar Magnitude Output Normalized"
+'        label2 = "CartToPolar Angle Output"
+'        desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+'    End Sub
+'    Public Sub Run(ocvb As VBocvb)
+'        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
+'        gradient.Run(ocvb)
 
-        If ocvb.parms.NumPyEnabled Then
-            gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
-            gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
+'        If ocvb.parms.NumPyEnabled Then
+'            gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
+'            gradient.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
 
-            cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
-            magnitude = magnitude.Normalize()
-            Dim npMag = MatToNumPyFloat(magnitude)
-            Dim exponent = sliders.trackbar(0).Value / 100
-            Numpy.np.power(npMag, exponent, npMag)
-            NumPyFloatToMat(npMag, dst1)
-        Else
-            ocvb.trueText("Enable Embedded NumPy in the OptionsDialog")
-        End If
-    End Sub
-End Class
+'            cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
+'            magnitude = magnitude.Normalize()
+'            Dim npMag = MatToNumPyFloat(magnitude)
+'            Dim exponent = sliders.trackbar(0).Value / 100
+'            Numpy.np.power(npMag, exponent, npMag)
+'            NumPyFloatToMat(npMag, dst1)
+'        Else
+'            ocvb.trueText("Enable Embedded NumPy in the OptionsDialog")
+'        End If
+'    End Sub
+'End Class
+#End If

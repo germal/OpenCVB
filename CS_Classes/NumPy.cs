@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define USE_NUMPY
+#if (USE_NUMPY)
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -100,3 +102,4 @@ namespace CS_Classes
         }
     }
 }
+#endif
