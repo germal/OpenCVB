@@ -2,8 +2,8 @@
 Imports System.IO
 #If USE_NUMPY Then
 Imports Numpy
-#End If
 Imports py = Python.Runtime
+#End If
 Public Class OptionsDialog
     Dim numPyEnabled As Boolean = False
 

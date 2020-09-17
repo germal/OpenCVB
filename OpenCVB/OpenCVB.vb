@@ -6,7 +6,6 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports py = Python.Runtime
 Module opencv_module
     Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
     Public delegateLock As New PictureBox
@@ -1081,6 +1080,7 @@ Public Class OpenCVB
 
             BothFirstAndLastReady = False
             frameCount = 0 ' restart the count...
+#If USE_NUMPY Then
             If task.ocvb.parms.NumPyEnabled Then
                 Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ and https://github.com/SciSharp/Numpy.NET (see multi-threading (Must read!))
                     Run(task, algName)
@@ -1088,6 +1088,9 @@ Public Class OpenCVB
             Else
                 Run(task, algName)
             End If
+#Else
+            Run(task, algName)
+#End If
 
             ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
             ' This deletes the options forms for the current thread so they can be created (if needed) with the next algorithm thread.
