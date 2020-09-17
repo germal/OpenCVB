@@ -57,6 +57,7 @@ Public Class OpenCVB
     Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
     Dim openCVKeywords As New List(Of String)
     Dim OptionsBringToFront As Boolean
+    Dim treeViewBringToFront As Boolean
     Dim optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
     Dim openForm As OpenFilename
@@ -804,17 +805,10 @@ Public Class OpenCVB
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         OptionsBringToFront = True
+        treeViewBringToFront = True
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
-    End Sub
-    Private Sub ActivateTimer_Tick(sender As Object, e As EventArgs) Handles ActivateTimer.Tick
-        ActivateTimer.Enabled = False
-        If TestAllButton.Text <> "Stop Test" Then
-            If AvailableAlgorithms.SelectedIndex < 0 Then AvailableAlgorithms.SelectedIndex = 0
-            Me.Activate()
-            AvailableAlgorithms.Select(AvailableAlgorithms.SelectedIndex, 1)
-        End If
     End Sub
     Public Sub raiseEventCamera()
         SyncLock delegateLock
@@ -824,7 +818,12 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        If TreeViewDialog IsNot Nothing Then If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
+        If TreeViewDialog IsNot Nothing Then
+            If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
+            If treeViewBringToFront And TreeButton.Checked Then TreeViewDialog.BringToFront()
+            treeViewBringToFront = False
+        End If
+
         Static lastFrame As Int32
         If lastFrame > frameCount Then lastFrame = 0
         Dim countFrames = frameCount - lastFrame
@@ -1043,7 +1042,6 @@ Public Class OpenCVB
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
 
-        ActivateTimer.Enabled = True
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)

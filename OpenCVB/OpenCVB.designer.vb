@@ -31,7 +31,6 @@ Partial Class OpenCVB
         Me.SnapShotButton = New System.Windows.Forms.ToolStripButton()
         Me.TreeButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.ActivateTimer = New System.Windows.Forms.Timer(Me.components)
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
         Me.OpenCVkeyword = New System.Windows.Forms.ComboBox()
@@ -108,10 +107,6 @@ Partial Class OpenCVB
         '
         Me.TestAllTimer.Interval = 5000
         '
-        'ActivateTimer
-        '
-        Me.ActivateTimer.Interval = 500
-        '
         'fpsTimer
         '
         Me.fpsTimer.Interval = 1000
@@ -166,7 +161,6 @@ Partial Class OpenCVB
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents TestAllButton As ToolStripButton
     Friend WithEvents TestAllTimer As Timer
-    Friend WithEvents ActivateTimer As Timer
     Friend WithEvents fpsTimer As Timer
     Friend WithEvents AlgorithmDesc As Label
     Friend WithEvents OptionsButton As ToolStripButton
