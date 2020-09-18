@@ -398,7 +398,7 @@ Public Class OpenCVB
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
-    Private Sub TreeButton_Click_1(sender As Object, e As EventArgs) Handles TreeButton.Click
+    Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         If TreeButton.CheckState = CheckState.Unchecked Then
             TreeButton.CheckState = CheckState.Checked
             TreeViewDialog = New TreeviewForm
@@ -821,9 +821,17 @@ Public Class OpenCVB
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
             If treeViewBringToFront And TreeButton.Checked Then TreeViewDialog.BringToFront()
             treeViewBringToFront = False
+        Else
+            Static loadTree As Boolean = True
+            If loadTree Then
+                If GetSetting("OpenCVB", "TreeButton", "TreeButton", False) Then
+                    TreeButton_Click(sender, e)
+                End If
+                loadTree = False
+            End If
         End If
 
-        Static lastFrame As Int32
+            Static lastFrame As Int32
         If lastFrame > frameCount Then lastFrame = 0
         Dim countFrames = frameCount - lastFrame
         lastFrame = frameCount
@@ -858,6 +866,7 @@ Public Class OpenCVB
         camera.closePipe()
         textDesc = ""
         saveLayout()
+        SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
     End Sub
     Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
         Dim img As New Bitmap(Me.Width, Me.Height)
@@ -1042,6 +1051,7 @@ Public Class OpenCVB
         algorithmTaskHandle.Start(parms)
 
         fpsTimer.Enabled = True
+        Dim sender As New Object, e As New EventArgs
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
