@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using OpenCvSharp;
 using OpenCvSharp.XFeatures2D;
+using OpenCvSharp.Features2D;
 
 /// http://www.prism.gatech.edu/~ahuaman3/docs/OpenCV_Docs/tutorials/nonfree_1/nonfree_1.html
 namespace CS_Classes
@@ -46,32 +47,31 @@ namespace CS_Classes
         }
     }
 
-    // this was removed with OpenCV 4.4 - unless you can find a way to enable it!
-    //public class CS_SiftBasics
-    //{
-    //    public void New(){}
-    //    public void Run(Mat gray1, Mat gray2, Mat dst1, bool useBFMatcher, int pointsToMatch)
-    //    {
-    //        var sift = SIFT.Create(pointsToMatch);
+    public class CS_SiftBasics
+    {
+        public void New() { }
+        public void Run(Mat gray1, Mat gray2, Mat dst1, bool useBFMatcher, int pointsToMatch)
+        {
+            var sift = SIFT.Create(pointsToMatch);
 
-    //        KeyPoint[] keypoints1, keypoints2;
-    //        var descriptors1 = new Mat();
-    //        var descriptors2 = new Mat();
-    //        sift.DetectAndCompute(gray1, null, out keypoints1, descriptors1);
-    //        sift.DetectAndCompute(gray2, null, out keypoints2, descriptors2);
+            KeyPoint[] keypoints1, keypoints2;
+            var descriptors1 = new Mat();
+            var descriptors2 = new Mat();
+            sift.DetectAndCompute(gray1, null, out keypoints1, descriptors1);
+            sift.DetectAndCompute(gray2, null, out keypoints2, descriptors2);
 
-    //        if (useBFMatcher)
-    //        {
-    //            var bfMatcher = new BFMatcher(NormTypes.L2, false);
-    //            DMatch[] bfMatches = bfMatcher.Match(descriptors1, descriptors2);
-    //            Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, bfMatches, dst1);
-    //        }
-    //        else
-    //        {
-    //            var flannMatcher = new FlannBasedMatcher();
-    //            DMatch[] flannMatches = flannMatcher.Match(descriptors1, descriptors2);
-    //            Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst1);
-    //        }
-    //    }
-    //}
+            if (useBFMatcher)
+            {
+                var bfMatcher = new BFMatcher(NormTypes.L2, false);
+                DMatch[] bfMatches = bfMatcher.Match(descriptors1, descriptors2);
+                Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, bfMatches, dst1);
+            }
+            else
+            {
+                var flannMatcher = new FlannBasedMatcher();
+                DMatch[] flannMatches = flannMatcher.Match(descriptors1, descriptors2);
+                Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst1);
+            }
+        }
+    }
 }
