@@ -163,6 +163,7 @@ Public Class CComp_PointTracker
     Public basics As CComp_Basics
     Public pTrack As Kalman_PointTracker
     Public highlight As Highlight_Basics
+    Public trackPoints As Boolean = True
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
@@ -177,11 +178,13 @@ Public Class CComp_PointTracker
         basics.Run(ocvb)
         dst2 = basics.dst1
 
-        pTrack.queryPoints = basics.centroids
-        pTrack.queryRects = basics.rects
-        pTrack.queryMasks = basics.masks
-        pTrack.Run(ocvb)
-        dst1 = pTrack.dst1
+        If trackPoints Then
+            pTrack.queryPoints = basics.centroids
+            pTrack.queryRects = basics.rects
+            pTrack.queryMasks = basics.masks
+            pTrack.Run(ocvb)
+            dst1 = pTrack.dst1
+        End If
 
         highlight.viewObjects = pTrack.viewObjects
         highlight.src = dst1
@@ -207,7 +210,7 @@ Public Class CComp_MaxBlobs
     Inherits VBparent
     Public tracker As CComp_PointTracker
     Public maxBlobs As Integer = -1
-    Public incr = 10
+    Public incr = 2
     Public maxValues(255) As Integer ' march through all 255 values and find the best...
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -221,6 +224,7 @@ Public Class CComp_MaxBlobs
         desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If ocvb.frameCount < 10 Then Exit Sub
         Static thresholdSlider = findSlider("CComp threshold")
         If ocvb.frameCount = 0 Then thresholdSlider.value = 0
 
@@ -229,18 +233,21 @@ Public Class CComp_MaxBlobs
         dst1 = tracker.dst1
         dst2 = tracker.dst2
 
-        If thresholdSlider.value + incr >= 255 Then
+        If maxBlobs = -1 Then
+            tracker.trackPoints = False ' not tracking yet...
+            For i = 10 To 160 Step incr
+                maxValues(thresholdSlider.value) = tracker.basics.centroids.Count
+                If thresholdSlider.value + incr < 255 Then thresholdSlider.value = i
+                tracker.Run(ocvb)
+            Next
+            tracker.trackPoints = True
+
             For i = 0 To maxValues.Count - 1
-                If maxBlobs < maxValues(i) Then
+                If maxBlobs <= maxValues(i) Then
                     maxBlobs = maxValues(i)
                     thresholdSlider.value = i
                 End If
             Next
-        End If
-
-        If maxBlobs = -1 Then
-            maxValues(thresholdSlider.value) = tracker.pTrack.queryPoints.Count
-            If thresholdSlider.value + incr < 255 Then thresholdSlider.value += incr
         End If
         dst2 = tracker.dst2
 
@@ -250,6 +257,7 @@ Public Class CComp_MaxBlobs
             thresholdSlider.value = 0
             ReDim maxValues(255)
         End If
+        label1 = "There were " + CStr(tracker.pTrack.queryPoints.Count) + " regions identified"
     End Sub
 End Class
 
@@ -260,7 +268,7 @@ End Class
 Public Class CComp_MaxPixels
     Inherits VBparent
     Dim maxBlob As CComp_MaxBlobs
-    Public maxPixels As Integer = -2
+    Public maxPixels As Integer = -1
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         maxBlob = New CComp_MaxBlobs(ocvb)
@@ -268,6 +276,7 @@ Public Class CComp_MaxPixels
         desc = "Find the best CComp threshold to maximize pixels"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If ocvb.frameCount < 10 Then Exit Sub
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
 
@@ -276,22 +285,25 @@ Public Class CComp_MaxPixels
         dst1 = maxBlob.dst1
         dst2 = maxBlob.dst2
 
-        Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-        If maxBlob.maxBlobs = -1 Then
-            pixelValues(thresholdSlider.value) = pixelCount
+        If maxPixels = -1 Then
+            For i = Math.Max(thresholdSlider.value - 10, 0) To Math.Min(thresholdSlider.value + 10, 255)
+                thresholdSlider.value = i
+                maxBlob.Run(ocvb)
+                Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+                pixelValues(thresholdSlider.value) = pixelCount
+            Next
+            For i = 0 To pixelValues.Count - 1
+                If maxPixels < pixelValues(i) Then
+                    maxPixels = pixelValues(i)
+                    thresholdSlider.value = i
+                End If
+            Next
+            maxBlob.Run(ocvb)
+            dst1 = maxBlob.dst1
         Else
-            If maxPixels < 0 Then
-                For i = 0 To pixelValues.Count - 1
-                    If maxBlob.maxValues(i) >= 5 Then
-                        If maxPixels < pixelValues(i) Then
-                            maxPixels = pixelValues(i)
-                            thresholdSlider.value = i
-                        End If
-                    End If
-                Next
-            End If
+            Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+            label1 = CStr(CInt(pixelCount / 1024)) + "k pixels with " + CStr(maxBlob.tracker.pTrack.queryPoints.Count) + " regions width threshold=" + CStr(thresholdSlider.value)
         End If
-        label1 = CStr(CInt(pixelCount / 1024)) + "k pixels with " + CStr(maxBlob.tracker.pTrack.queryPoints.Count) + " regions width threshold=" + CStr(thresholdSlider.value)
     End Sub
 End Class
 
