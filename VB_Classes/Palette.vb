@@ -282,6 +282,7 @@ End Class
 Public Class Palette_ColorMap
     Inherits VBparent
     Public gradMap As Palette_BuildGradientColorMap
+    Public colormap As cv.ColormapTypes
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         gradMap = New Palette_BuildGradientColorMap(ocvb)
@@ -293,46 +294,48 @@ Public Class Palette_ColorMap
         radio.check(4).Checked = True
         desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim colormap = cv.ColormapTypes.Autumn
-        Static buildNewRandomMap = False
+    Public Function checkRadios() As cv.ColormapTypes
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
-                colormap = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
-                                             cv.ColormapTypes.Hsv, cv.ColormapTypes.Jet, cv.ColormapTypes.Ocean, cv.ColormapTypes.Pink,
-                                             cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter,
-                                             12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
-                label1 = "ColorMap = " + mapNames(i)
-
-                Static cMapDir As New DirectoryInfo(ocvb.HomeDir + "OpenCV/modules/imgproc/doc/pics/colormaps")
-                Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(i) + ".jpg")
-                If mapFile.Exists Then
-                    Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
-                    dst2 = cmap.Resize(src.Size())
-                End If
-
-                ' special case the random color map!
-                If colormap = 19 Then
-                    Static saveTransitionCount = gradMap.sliders.trackbar(0).Value
-                    If buildNewRandomMap = False Or saveTransitionCount <> gradMap.sliders.trackbar(0).Value Then
-                        saveTransitionCount = gradMap.sliders.trackbar(0).Value
-                        buildNewRandomMap = True
-                        gradMap.Run(ocvb)
-                    End If
-                    dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
-                    dst2 = gradMap.dst2
-                    Exit For
-                End If
-                buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
-                If colormap = 20 Then
-                    dst1 = src.Clone()
-                    dst2 = dst2.SetTo(0)
-                    Exit For
-                End If
-                cv.Cv2.ApplyColorMap(src, dst1, colormap)
-                Exit For
+                Dim scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
+                                         cv.ColormapTypes.Hsv, cv.ColormapTypes.Jet, cv.ColormapTypes.Ocean, cv.ColormapTypes.Pink,
+                                         cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter,
+                                         12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
+                Return scheme
             End If
         Next
+        Return 0
+    End Function
+    Public Sub Run(ocvb As VBocvb)
+        Static buildNewRandomMap = False
+
+        colormap = checkRadios()
+        label1 = "ColorMap = " + mapNames(colormap)
+
+        Static cMapDir As New DirectoryInfo(ocvb.HomeDir + "OpenCV/modules/imgproc/doc/pics/colormaps")
+        Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg")
+        If mapFile.Exists Then
+            Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
+            dst2 = cmap.Resize(src.Size())
+        End If
+
+        ' special case the random color map!
+        If colormap = 19 Then
+            Static saveTransitionCount = gradMap.sliders.trackbar(0).Value
+            If buildNewRandomMap = False Or saveTransitionCount <> gradMap.sliders.trackbar(0).Value Then
+                saveTransitionCount = gradMap.sliders.trackbar(0).Value
+                buildNewRandomMap = True
+                gradMap.Run(ocvb)
+            End If
+            dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
+            dst2 = gradMap.dst2
+        End If
+        buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
+        If colormap = 20 Then
+            dst1 = src.Clone()
+            dst2 = dst2.SetTo(0)
+        End If
+        cv.Cv2.ApplyColorMap(src, dst1, colormap)
     End Sub
 End Class
 
@@ -342,12 +345,14 @@ End Class
 
 Public Class Palette_DepthColorMap
     Inherits VBparent
-    Public gradientColorMap As New cv.Mat
+    Dim gradientColorMap As New cv.Mat
     Dim holes As Depth_Holes
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         holes = New Depth_Holes(ocvb)
         holes.sliders.Visible = False ' don't need it here...
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
 
         label2 = "Palette used to color left image"
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
@@ -363,38 +368,21 @@ Public Class Palette_DepthColorMap
             gradMat = colorTransition(color3, color1, src.Width)
             cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
+
+            Dim r As New cv.Rect(0, 0, 255, 1)
+            For i = 0 To dst2.Height - 1
+                r.Y = i
+                dst2(r) = gradientColorMap
+            Next
         End If
-        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(0.1)
-        If depth8u.Width <> src.Width Then depth8u = depth8u.Resize(src.Size())
+        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(sliders.trackbar(0).Value / 100)
         dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
         holes.Run(ocvb)
         dst1.SetTo(0, holes.holeMask)
-
-        Dim r As New cv.Rect(0, 0, 255, 1)
-        For i = 0 To dst2.Height - 1
-            r.Y = i
-            dst2(r) = gradientColorMap
-        Next
     End Sub
 End Class
 
-
-
-
-
-Public Class Palette_DepthColorMapJet
-    Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use the Jet colormap to display depth. "
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(0.03)
-        If depth8u.Width <> src.Width Then depth8u = depth8u.Resize(src.Size())
-        cv.Cv2.ApplyColorMap(255 - depth8u, dst1, cv.ColormapTypes.Jet)
-    End Sub
-End Class
 
 
 
@@ -468,14 +456,66 @@ End Class
 Public Class Palette_ObjectColors
     Inherits VBparent
     Dim reduction As Reduction_KNN_Color
+    Dim inrange As Depth_InRange
+    Dim palette As Palette_ColorMap
+    Public gray As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
+
         reduction = New Reduction_KNN_Color(ocvb)
+        inrange = New Depth_InRange(ocvb)
+        palette = New Palette_ColorMap(ocvb)
+        palette.gradMap.sliders.Visible = False
+
+        label1 = "Consistent colors"
+        label2 = "Original colors"
         desc = "New class description"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
         reduction.Run(ocvb)
-        dst1 = reduction.dst1
+        dst2 = reduction.dst2
+
+        inrange.Run(ocvb)
+        Static minDepthSlider = findSlider("InRange Min Depth")
+        Static maxDepthSlider = findSlider("InRange Max Depth")
+        If ocvb.frameCount = 0 Then maxDepthSlider.value = maxDepthSlider.maximum
+        Dim minDepth = minDepthSlider.value
+        Dim maxDepth = maxDepthSlider.value
+        If maxDepth - minDepth < 2 Then Exit Sub
+
+        Dim depth32f = getDepth32f(ocvb)
+        Dim blobList As New SortedList(Of Single, Integer)
+        For i = 0 To reduction.pTrack.viewObjects.Count - 1
+            Dim vo = reduction.pTrack.viewObjects.Values(i)
+            Dim mask = vo.mask.Clone
+            Dim r = vo.preKalmanRect
+            mask.SetTo(0, inrange.zeroMask(r)) ' count only points with depth
+            Dim countDepthPixels = mask.CountNonZero()
+            If countDepthPixels > 30 Then
+                Dim depth = depth32f(r).Mean(mask)
+                If depth.Item(0) > minDepth And depth.Item(0) < maxDepth Then blobList.Add(depth.Item(0), i)
+            End If
+        Next
+
+        gray = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To blobList.Count - 1
+            Dim index = blobList.ElementAt(i).Value
+            Dim blob = reduction.pTrack.viewObjects.Values(index)
+            gray(blob.preKalmanRect).SetTo(i + 1, blob.mask)
+        Next
+        dst1 = gray * Math.Floor(255 / blobList.Count) ' map to 0-255
+        Dim colormap = palette.checkRadios()
+        cv.Cv2.ApplyColorMap(src, dst1, colormap)
+
+        dst1.SetTo(0, gray.ConvertScaleAbs(255))
+        For i = 0 To blobList.Count - 1
+            Dim index = blobList.ElementAt(i).Value
+            Dim blob = reduction.pTrack.viewObjects.Values(index)
+            dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * fontsize, 30 * fontsize), cv.Scalar.Black, -1)
+            ocvb.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
+        Next
+        label1 = CStr(blobList.Count) + " regions between " + Format(minDepth / 1000, "0.0") + " and " + Format(maxDepth / 1000, "0.0") + "meters"
     End Sub
 End Class
+

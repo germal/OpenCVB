@@ -819,7 +819,6 @@ Public Class Depth_Colorizer_MT
         grid.Run(ocvb)
 
         If standalone Then src = getDepth32f(ocvb)
-        If src.Width <> src.Width Then src = src.Resize(src.Size())
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
