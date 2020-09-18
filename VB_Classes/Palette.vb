@@ -347,7 +347,9 @@ Public Class Palette_DepthColorMap
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         holes = New Depth_Holes(ocvb)
+        holes.sliders.Visible = False ' don't need it here...
 
+        label2 = "Palette used to color left image"
         desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -463,96 +465,17 @@ End Class
 
 
 
-
-'Public Class Palette_ConsistentCentroid_3PointOnly
-'    Inherits ocvbClass
-'    Dim emax As EMax_CPP
-'    Dim lut As LUT_Basics
-'    Dim flood As Floodfill_Identifiers
-'    Dim knn As knn_Basics
-'    Dim scaleFactor = 1
-'    Dim moment() As Moments_Basics
-'    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        emax = New EMax_CPP(ocvb)
-'        emax.basics.sliders.trackbar(1).Value = 15
-'        emax.showInput = False
-
-'        lut = New LUT_Basics(ocvb)
-
-'        flood = New Floodfill_Identifiers(ocvb)
-'        flood.sliders.trackbar(0).Value /= scaleFactor
-'        knn = New knn_Basics(ocvb)
-'        ReDim knn.input(1)
-'        knn.sliders.trackbar(1).Value = 1
-
-'        ReDim moment(10 - 1)
-'        ocvb.parms.ShowOptions = False
-
-'        desc = "Try to keep track of the centroids from frame to frame - needs more work"
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        dst1.SetTo(0)
-'        If standalone Then
-'            emax.Run(ocvb)
-'            src = emax.dst2
-'        End If
-'        Dim size = New cv.Size(CInt(src.Width / scaleFactor), CInt(src.Height / scaleFactor))
-'        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
-'        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-'        flood.src = img
-'        flood.Run(ocvb)
-
-'        If flood.rects.Count > 0 Then
-'            dst2 = src
-'            Dim reallocated As Boolean
-'            Dim cCount = flood.rects.Count
-'            If knn.input.Count <> cCount Then
-'                Console.WriteLine("Reallocation with " + CStr(cCount))
-'                ReDim moment(cCount - 1)
-'                For i = 0 To moment.Count - 1
-'                    moment(i) = New Moments_Basics(ocvb)
-'                    moment(i).scaleFactor = scaleFactor
-'                Next
-'                ReDim knn.input(cCount - 1)
-'                ReDim knn.queryPoints(cCount - 1)
-'                reallocated = True
-'            End If
-
-'            For i = 0 To cCount - 1
-'                moment(i).inputMask = flood.masks(i)
-'                moment(i).offsetPt = New cv.Point(flood.rects(i).X, flood.rects(i).Y)
-'                moment(i).useKalman = False
-'                moment(i).Run(ocvb)
-'                knn.queryPoints(i) = moment(i).centroid
-'                If reallocated Then
-'                    knn.input(i) = moment(i).centroid
-'                End If
-'            Next
-
-'            knn.Run(ocvb)
-
-'            If reallocated Then
-'                For i = 0 To cCount - 1
-'                    knn.input(i) = moment(knn.matchedIndex(i)).centroid
-'                    moment(i).useKalman = True
-'                    moment(i).Run(ocvb)
-'                Next
-'            End If
-
-'            knn.Run(ocvb)
-
-'            For i = 0 To knn.matchedPoints.Count - 1
-'                dst1.Circle(knn.queryPoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-'                dst1.Circle(knn.matchedPoints(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-'                dst1.Line(knn.matchedPoints(i), knn.queryPoints(i), cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-'                dst2.Circle(moment(i).centroid, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-'            Next
-
-'            For i = 0 To cCount - 1
-'                knn.input(i) = moment(knn.matchedIndex(i)).centroid
-'            Next
-'        End If
-'    End Sub
-'End Class
+Public Class Palette_ObjectColors
+    Inherits VBparent
+    Dim reduction As Reduction_KNN_Color
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        reduction = New Reduction_KNN_Color(ocvb)
+        desc = "New class description"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        reduction.src = src
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1
+    End Sub
+End Class

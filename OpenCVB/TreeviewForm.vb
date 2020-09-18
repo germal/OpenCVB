@@ -52,8 +52,14 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
+    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
     Dim titleStr = " - Click on any node to review the algorithm's input and output."
     Public Sub updateTree()
+        If OpenCVB.callTrace.Count = 0 Then Exit Sub
         Dim tv = TreeView1
         tv.Nodes.Clear()
         Dim rootcall = Trim(OpenCVB.callTrace(0))
@@ -96,17 +102,13 @@ Public Class TreeviewForm
         Me.Height = 100 + entryCount * 26
         If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
     End Sub
+
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        Dim firstEntry = OpenCVB.callTrace(0)
-        firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
-        If Me.Text = firstEntry + titleStr = False Then
-            updateTree()
-            Dim left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
-            Dim Top = GetSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
-            If Me.Left <> left Or Me.Top <> Me.Top Then
-                SaveSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
-                SaveSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
-            End If
+        If OpenCVB.callTrace Is Nothing Then Exit Sub
+        If OpenCVB.callTrace.Count > 0 Then
+            Dim firstEntry = OpenCVB.callTrace(0)
+            firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
+            If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
         End If
     End Sub
 End Class

@@ -85,6 +85,7 @@ Public Class OpenCVB
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
+    Dim startAlgorithmTime As DateTime
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -265,6 +266,7 @@ Public Class OpenCVB
 
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
+        If GetSetting("OpenCVB", "TreeButton", "TreeButton", False) Then TreeButton_Click(sender, e)
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -737,6 +739,11 @@ Public Class OpenCVB
             Console.WriteLine("Error in camPic_MouseDown: " + ex.Message)
         End Try
     End Sub
+    Private Sub AvailableAlgorithms_MouseClick(sender As Object, e As MouseEventArgs) Handles AvailableAlgorithms.MouseClick
+        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disable.  
+        ' Clicking on availablealgorithms indicates they are done with using the treeview.
+        If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
+    End Sub
     Private Sub camPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
             Dim pic = DirectCast(sender, PictureBox)
@@ -803,8 +810,8 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        OptionsBringToFront = True
-        treeViewBringToFront = True
+        Dim diff = Now().Subtract(startAlgorithmTime)
+        If diff.TotalSeconds > 5 Then OptionsBringToFront = True
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
@@ -819,19 +826,9 @@ Public Class OpenCVB
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
-            If treeViewBringToFront And TreeButton.Checked Then TreeViewDialog.BringToFront()
-            treeViewBringToFront = False
-        Else
-            Static loadTree As Boolean = True
-            If loadTree Then
-                If GetSetting("OpenCVB", "TreeButton", "TreeButton", False) Then
-                    TreeButton_Click(sender, e)
-                End If
-                loadTree = False
-            End If
         End If
 
-            Static lastFrame As Int32
+        Static lastFrame As Int32
         If lastFrame > frameCount Then lastFrame = 0
         Dim countFrames = frameCount - lastFrame
         lastFrame = frameCount
@@ -1049,9 +1046,8 @@ Public Class OpenCVB
         saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
-
+        startAlgorithmTime = Now() ' black out optionsbringtofront
         fpsTimer.Enabled = True
-        Dim sender As New Object, e As New EventArgs
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.

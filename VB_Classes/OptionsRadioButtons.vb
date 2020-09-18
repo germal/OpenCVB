@@ -11,7 +11,11 @@ Public Class OptionsRadioButtons
         Next
         Me.Show()
     End Sub
-
+    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
     Private Sub OptionsRadioButtons_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(appLocation.X + appLocation.Width / 2 + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr

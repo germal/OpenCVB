@@ -9,7 +9,11 @@ Public Class OptionsCombo
         Next
         Box.SelectedIndex = 0
     End Sub
-
+    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
     Private Sub OptionsCombo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(radioOffset.X, radioOffset.Y)
         radioOffset.X += offsetIncr

@@ -20,6 +20,11 @@ Public Class OptionsCheckbox
         Next
         Return 0
     End Function
+    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
     Private Sub OptionsCheckbox_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(appLocation.X + appLocation.Width / 2 + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr

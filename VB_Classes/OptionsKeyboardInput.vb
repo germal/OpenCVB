@@ -27,7 +27,11 @@ Public Class OptionsKeyboardInput
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles HoldKeyTimer.Tick
         inputText.Add(keyboardLastInput) ' press and hold means send this key again...
     End Sub
-
+    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
     Private Sub OptionsKeyboardInput_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SetDesktopLocation(appLocation.X + appLocation.Width / 2 + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
         radioOffset.X += offsetIncr
