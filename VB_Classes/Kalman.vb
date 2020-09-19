@@ -638,6 +638,7 @@ Public Class Kalman_PointTracker
                     kalman(i).input = New Single() {queryPoints(i).X, queryPoints(i).Y, 0, 0, 0, 0}
                 Else
                     kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
+                    kalman(i).output = New Single() {-1, -1, 0, 0, 0, 0}
                 End If
             Next
             kalmanAging = New ArrayList(kalman.Count - 1)
@@ -720,15 +721,15 @@ Public Class Kalman_PointTracker
             Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
             ' if the trainingpoint was not found, then reflect the same centroid/rect/mask as last time until it ages out...
             If maskIndex < 0 Then
-                'If i < lastViewObjects.Count Then
-                '    If kalmanAging(i) > 0 Then
-                '        ' use the same viewobject from the previous generation.
-                '        viewObjects.Add(lastViewObjects.ElementAt(i).Key, lastViewObjects.ElementAt(i).Value)
-                '        kalmanAging(i) -= 1
-                '    Else
-                '        newCentroids.Add(pt1)
-                '    End If
-                'End If
+                If i < lastViewObjects.Count Then
+                    If kalmanAging(i) > 0 Then
+                        ' use the same viewobject from the previous generation.
+                        viewObjects.Add(lastViewObjects.ElementAt(i).Key, lastViewObjects.ElementAt(i).Value)
+                        kalmanAging(i) -= 1
+                    Else
+                        newCentroids.Add(pt1)
+                    End If
+                End If
             End If
 
             If maskIndex >= 0 And kalman(i).output IsNot Nothing Then
