@@ -663,6 +663,7 @@ Public Class Kalman_PointTracker
                 If qIndex >= kalman.Count Then Exit Sub ' we don't have enough kalman filters to handle this level of queries so restart
             Next
         End If
+        newCentroids.Clear()
 
         knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
         knn.Run(ocvb)
@@ -714,15 +715,23 @@ Public Class Kalman_PointTracker
                     Exit For
                 End If
             Next
+            If kalman(i).input(0) = -1 Then Exit For ' hit the unused kalman entries...
 
+            Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
             ' if the trainingpoint was not found, then reflect the same centroid/rect/mask as last time until it ages out...
-            'If maskIndex < 0 Then
-            '    If kalmanAging(i) > 0 And kalmanActive Then maskIndex = i
-            '    kalmanAging(i) -= 1
-            'End If
+            If maskIndex < 0 Then
+                'If i < lastViewObjects.Count Then
+                '    If kalmanAging(i) > 0 Then
+                '        ' use the same viewobject from the previous generation.
+                '        viewObjects.Add(lastViewObjects.ElementAt(i).Key, lastViewObjects.ElementAt(i).Value)
+                '        kalmanAging(i) -= 1
+                '    Else
+                '        newCentroids.Add(pt1)
+                '    End If
+                'End If
+            End If
 
             If maskIndex >= 0 And kalman(i).output IsNot Nothing Then
-                Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
                 Dim vo = New viewObject
                 vo.centroid = New cv.Point(kalman(i).output(0), kalman(i).output(1))
 
@@ -734,12 +743,6 @@ Public Class Kalman_PointTracker
                     outRect.X = src.Width - 1
                     outRect.Width = 1
                 End If
-
-                If outRect.Height <= 0 Then
-                    outRect.Y = src.Height - 1
-                    outRect.Height = 1
-                End If
-
                 vo.rectView = outRect
 
                 Dim pt = vo.centroid
@@ -766,12 +769,6 @@ Public Class Kalman_PointTracker
                 val = queryPoints(maskIndex).X * queryPoints(maskIndex).Y * inputRect.Width * inputRect.Height
                 viewObjects.Add(val, vo)
             End If
-        Next
-
-        newCentroids.Clear()
-        For i = 0 To knn.matchedPoints.Count - 1
-            Dim pt1 = knn.matchedPoints(i)
-            If pt1.X = -1 And pt1.X = -1 Then newCentroids.Add(pt1)
         Next
 
         Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")

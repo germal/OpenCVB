@@ -96,6 +96,8 @@ Public Class Dither_Basics
         Next
         radio.check(4).Checked = True ' this one was interesting...
 
+        label1 = "Dither applied to the RGB image"
+        label2 = "Dither applied to the Depth image"
         desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run(ocvb As VBocvb)

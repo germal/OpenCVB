@@ -32,8 +32,7 @@ Public Class KNN_QueryTrain
     Public Sub Run(ocvb As VBocvb)
         ' algorithm does nothing but provide a location for query/train points when not running standalone.
         If standalone Or useRandomData Then
-            Static reuseCheck = findCheckBox("Reuse the training and query data")
-            If reuseCheck.Checked = False Then
+            If check.Box(0).Checked = False Then
                 Static trainSlider = findSlider("KNN Train count")
                 randomTrain.sliders.trackbar(0).Value = trainSlider.Value
                 randomTrain.Run(ocvb)
