@@ -15,10 +15,8 @@ Public Class KNN_QueryTrain
         sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
         sliders.setupTrackBar(2, "KNN k nearest points", 1, 5, 1)
 
-        If standalone Then
-            check.Setup(ocvb, caller, 1)
-            check.Box(0).Text = "Reuse the training and query data"
-        End If
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Reuse the training and query data"
 
         randomTrain = New Random_Points(ocvb)
         randomTrain.sliders.Visible = False
@@ -30,34 +28,32 @@ Public Class KNN_QueryTrain
         desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If check.Box(0).Checked = False Or useRandomData Then
+            Static trainSlider = findSlider("KNN Train count")
+            randomTrain.sliders.trackbar(0).Value = trainSlider.Value
+            randomTrain.Run(ocvb)
+
+            Static querySlider = findSlider("KNN Query count")
+            randomQuery.sliders.trackbar(0).Value = querySlider.Value
+            randomQuery.Run(ocvb)
+        End If
+
         ' algorithm does nothing but provide a location for query/train points when not running standalone.
-        If standalone Or useRandomData Then
-            If check.Box(0).Checked = False Then
-                Static trainSlider = findSlider("KNN Train count")
-                randomTrain.sliders.trackbar(0).Value = trainSlider.Value
-                randomTrain.Run(ocvb)
+        If standalone Then
+            ' query/train points need to be manufactured when standalone
+            trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
+            queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
 
-                Static querySlider = findSlider("KNN Query count")
-                randomQuery.sliders.trackbar(0).Value = querySlider.Value
-                randomQuery.Run(ocvb)
-            End If
-
-            If standalone Then
-                ' query/train points need to be manufactured when standalone
-                trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
-                queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
-
-                dst1.SetTo(cv.Scalar.White)
-                dst2.SetTo(cv.Scalar.White)
-                For i = 0 To randomTrain.Points2f.Count - 1
-                    Dim pt = randomTrain.Points2f(i)
-                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                Next
-                For i = 0 To randomQuery.Points2f.Count - 1
-                    Dim pt = randomQuery.Points2f(i)
-                    cv.Cv2.Circle(dst2, pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-                Next
-            End If
+            dst1.SetTo(cv.Scalar.White)
+            dst2.SetTo(cv.Scalar.White)
+            For i = 0 To randomTrain.Points2f.Count - 1
+                Dim pt = randomTrain.Points2f(i)
+                cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+            Next
+            For i = 0 To randomQuery.Points2f.Count - 1
+                Dim pt = randomQuery.Points2f(i)
+                cv.Cv2.Circle(dst2, pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            Next
         End If
     End Sub
 End Class
