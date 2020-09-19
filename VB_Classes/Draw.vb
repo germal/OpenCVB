@@ -511,9 +511,9 @@ Public Class Draw_OverlappingRectangles
 
         If standalone Then flood = New FloodFill_Basics(ocvb)
 
-        label1 = "Overlapping rectangles are red, non-overlapping in yellow"
+        label1 = "(First 5) Overlapping rectangles are red, original in yellow"
         label2 = "Original list of rectangles"
-        desc = "Find rectangles that are overlapping."
+        desc = "Find first 5 rectangles that are overlapping."
     End Sub
     Private Class CompareMasks : Implements IComparer(Of cv.Rect)
         Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
@@ -548,13 +548,19 @@ Public Class Draw_OverlappingRectangles
             flood.src = src
             flood.Run(ocvb)
             dst1 = flood.dst2
-            inputRects = flood.rects
-            inputMasks = flood.masks
+            inputRects.Clear()
+            inputMasks.Clear()
+
+            For i = 0 To Math.Min(5, flood.rects.Count) - 1
+                inputRects.Add(flood.rects(i))
+                inputMasks.Add(flood.masks(i))
+            Next
         End If
 
         dst2.SetTo(0)
         For Each r In inputRects
-            dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+            dst1.Rectangle(r, cv.Scalar.Yellow, 4)
+            dst2.Rectangle(r, cv.Scalar.Yellow, 1)
         Next
 
         Dim removeRects As New List(Of cv.Rect)
@@ -584,7 +590,7 @@ Public Class Draw_OverlappingRectangles
         Next
 
         For Each r In inputRects
-            dst1.Rectangle(r, cv.Scalar.Red, 2)
+            dst1.Rectangle(r, cv.Scalar.Red, 1)
         Next
     End Sub
 End Class
