@@ -519,3 +519,31 @@ Public Class Palette_ObjectColors
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Palette_Layout2D
+    Inherits VBparent
+    Dim grid As Thread_Grid
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        grid = New Thread_Grid(ocvb)
+        Dim widthSlider = findSlider("ThreadGrid Width")
+        Dim heightslider = findSlider("ThreadGrid Height")
+        widthSlider.Value = 80
+        heightslider.Value = 60
+        grid.Run(ocvb)
+        desc = "Layout the available colors in a 2D grid"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        grid.Run(ocvb)
+        Dim index As Integer
+        For Each r In grid.roiList
+            dst1(r).SetTo(scalarColors(index Mod 255))
+            index += 1
+        Next
+        label1 = "Palette_Layout2D - " + CStr(grid.roiList.Count) + " regions"
+    End Sub
+End Class

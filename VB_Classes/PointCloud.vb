@@ -33,14 +33,14 @@ Module PointCloud
     Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
     End Function
 
-    Public Class compareAllowIdenticalIntInverted : Implements IComparer(Of Integer)
-        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+    Public Class compareAllowIdenticalIntInverted : Implements IComparer(Of Single)
+        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
             ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
             If a <= b Then Return 1
             Return -1
         End Function
     End Class
-    Public Function findNearestPoint(detailPoint As cv.Point, viewObjects As SortedList(Of Integer, viewObject)) As Integer
+    Public Function findNearestPoint(detailPoint As cv.Point, viewObjects As SortedList(Of Single, viewObject)) As Integer
         Dim minIndex As Integer
         Dim minDistance As Single = Single.MaxValue
         For i = 0 To viewObjects.Count - 1
@@ -368,7 +368,7 @@ End Class
 Public Class PointCloud_Objects_TopView
     Inherits VBparent
     Public measure As PointCloud_Kalman_TopView
-    Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -451,7 +451,7 @@ End Class
 Public Class PointCloud_Objects_SideView
     Inherits VBparent
     Public measure As PointCloud_Kalman_SideView
-    Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -692,8 +692,8 @@ Public Class PointCloud_BothViews
     Public detailText As String
     Public backMat As New cv.Mat
     Public backMatMask As New cv.Mat
-    Public vwTop As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
-    Public vwSide As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
+    Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -750,7 +750,7 @@ Public Class PointCloud_BothViews
         Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
         Dim minIndex As Integer
         Dim detailPoint As cv.Point
-        Dim vw As New SortedList(Of Integer, viewObject)
+        Dim vw As New SortedList(Of Single, viewObject)
         Dim topActive = If(standalone, True, (activeView = QUAD0 Or activeView = QUAD2))
         Dim sideActive = If(standalone, True, (activeView = QUAD1 Or activeView = QUAD3))
 
@@ -807,7 +807,7 @@ Public Class PointCloud_BothViews
                 cv.Cv2.InRange(depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
 
                 backMat.SetTo(0)
-                backMat(roi).SetTo(vw.Values(minIndex).color, backMatMask(roi))
+                backMat(roi).SetTo(vw.Values(minIndex).LayoutColor, backMatMask(roi))
             End If
         End If
 

@@ -6,6 +6,7 @@ Public Class KNN_QueryTrain
     Public queryPoints As New List(Of cv.Point2f)
     Public randomTrain As Random_Points
     Public randomQuery As Random_Points
+    Public useRandomData As Boolean
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
@@ -26,37 +27,38 @@ Public Class KNN_QueryTrain
 
         label1 = "Random training points"
         label2 = "Random query points"
-        desc = "Create a set of random query and training points within the image."
+        desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim reuseData = False
-        If standalone Then
+        ' algorithm does nothing but provide a location for query/train points when not running standalone.
+        If standalone Or useRandomData Then
             Static reuseCheck = findCheckBox("Reuse the training and query data")
-            reuseData = reuseCheck.Checked
-        End If
-        If reuseData = False Then
-            Static trainSlider = findSlider("KNN Train count")
-            randomTrain.sliders.trackbar(0).Value = trainSlider.Value
-            randomTrain.Run(ocvb)
+            If reuseCheck.Checked = False Then
+                Static trainSlider = findSlider("KNN Train count")
+                randomTrain.sliders.trackbar(0).Value = trainSlider.Value
+                randomTrain.Run(ocvb)
 
-            Static querySlider = findSlider("KNN Query count")
-            randomQuery.sliders.trackbar(0).Value = querySlider.Value
-            randomQuery.Run(ocvb)
-        End If
-        trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
-        queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
+                Static querySlider = findSlider("KNN Query count")
+                randomQuery.sliders.trackbar(0).Value = querySlider.Value
+                randomQuery.Run(ocvb)
+            End If
 
-        If standalone Then
-            dst1.SetTo(cv.Scalar.White)
-            dst2.SetTo(cv.Scalar.White)
-            For i = 0 To randomTrain.Points2f.Count - 1
-                Dim pt = randomTrain.Points2f(i)
-                cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-            Next
-            For i = 0 To randomQuery.Points2f.Count - 1
-                Dim pt = randomQuery.Points2f(i)
-                cv.Cv2.Circle(dst2, pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-            Next
+            If standalone Then
+                ' query/train points need to be manufactured when standalone
+                trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
+                queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
+
+                dst1.SetTo(cv.Scalar.White)
+                dst2.SetTo(cv.Scalar.White)
+                For i = 0 To randomTrain.Points2f.Count - 1
+                    Dim pt = randomTrain.Points2f(i)
+                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                Next
+                For i = 0 To randomQuery.Points2f.Count - 1
+                    Dim pt = randomQuery.Points2f(i)
+                    cv.Cv2.Circle(dst2, pt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+                Next
+            End If
         End If
     End Sub
 End Class
@@ -70,7 +72,6 @@ End Class
 Public Class KNN_Basics
     Inherits VBparent
     Public neighbors As New cv.Mat
-    Public useRandomData As Boolean
     Public testMode As Boolean
     Public desiredMatches = 1
     Public knn As cv.ML.KNearest
@@ -87,7 +88,7 @@ Public Class KNN_Basics
     Public Sub Run(ocvb As VBocvb)
         dst1.SetTo(cv.Scalar.Black)
 
-        If standalone Or useRandomData Then
+        If standalone Or knnQT.useRandomData Then
             knnQT.Run(ocvb)
             knnQT.trainingPoints = New List(Of cv.Point2f)(knnQT.randomTrain.Points2f)
             knnQT.queryPoints = New List(Of cv.Point2f)(knnQT.randomQuery.Points2f)
@@ -132,7 +133,7 @@ Public Class KNN_1_to_1
         setCaller(ocvb)
 
         basics = New KNN_Basics(ocvb)
-        If standalone Then basics.useRandomData = True Else basics.knnQT.sliders.Visible = False ' with 1:1, no need to adjust train/query counts.
+        If standalone Then basics.knnQT.useRandomData = True Else basics.knnQT.sliders.Visible = False ' with 1:1, no need to adjust train/query counts.
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
@@ -225,7 +226,7 @@ Public Class KNN_Emax
         check.Box(2).Checked = True
 
         knn = New KNN_1_to_1(ocvb)
-        knn.basics.useRandomData = False
+        knn.basics.knnQT.useRandomData = False
 
         label1 = "Output from Emax"
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
@@ -503,7 +504,7 @@ Public Class KNN_Point2d
         setCaller(ocvb)
 
         knn = New KNN_Basics(ocvb)
-        If standalone Then knn.useRandomData = True
+        If standalone Then knn.knnQT.useRandomData = True
 
         desc = "Use KNN to find n matching points for each query."
         label1 = "Yellow=Queries, Blue=Best Responses"

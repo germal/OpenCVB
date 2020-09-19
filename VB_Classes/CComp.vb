@@ -176,27 +176,27 @@ Public Class CComp_PointTracker
     Public Sub Run(ocvb As VBocvb)
         basics.src = src
         basics.Run(ocvb)
-        dst2 = basics.dst1
 
         If trackPoints Then
+            dst2 = basics.dst1
             pTrack.queryPoints = basics.centroids
             pTrack.queryRects = basics.rects
             pTrack.queryMasks = basics.masks
             pTrack.Run(ocvb)
             dst1 = pTrack.dst1
-        End If
 
-        highlight.viewObjects = pTrack.viewObjects
-        highlight.src = dst1
-        highlight.Run(ocvb)
-        dst1 = highlight.dst1
-        If highlight.highlightPoint <> New cv.Point Then
-            dst2 = highlight.dst2
-            label2 = "Selected region in yellow"
-        Else
-            dst2 = src
+            highlight.viewObjects = pTrack.viewObjects
+            highlight.src = dst1
+            highlight.Run(ocvb)
+            dst1 = highlight.dst1
+            If highlight.highlightPoint <> New cv.Point Then
+                dst2 = highlight.dst2
+                label2 = "Selected region in yellow"
+            Else
+                dst2 = src
+            End If
+            label1 = basics.label1
         End If
-        label1 = basics.label1
     End Sub
 End Class
 

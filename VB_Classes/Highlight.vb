@@ -6,7 +6,7 @@ Public Class Highlight_Basics
     Dim highlightRect As New cv.Rect
     Dim preKalmanRect As New cv.Rect
     Dim highlightMask As New cv.Mat
-    Public viewObjects As New SortedList(Of Integer, viewObject)(New compareAllowIdenticalIntInverted)
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If standalone Then reduction = New Reduction_KNN_Color(ocvb)
