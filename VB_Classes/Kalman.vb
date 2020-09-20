@@ -659,9 +659,11 @@ Public Class Kalman_PointTracker
         knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
         knn.Run(ocvb)
 
-        If knn.matchedPoints Is Nothing Then Exit Sub ' first pass condition.
-        For i = 0 To knn.matchedPoints.Count - 1
-            If knn.matchedPoints(i).X < 0 Then
+        Dim matches As New List(Of cv.Point2f)(knn.matchedPoints)
+        If matches Is Nothing Then Exit Sub ' first pass condition.
+
+        For i = 0 To matches.Count - 1
+            If matches(i).X < 0 Then
                 For j = 0 To kalman.Count - 1
                     If kalman(j).input(0) < 0 Then
                         kalman(j).input = {knn.basics.knnQT.queryPoints(i).X, knn.basics.knnQT.queryPoints(i).Y, 0, 0, 0, 0}
@@ -679,29 +681,25 @@ Public Class Kalman_PointTracker
             maskIndex = -1
             inputRect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
             Dim pt1 = knn.basics.knnQT.trainingPoints(i)
-            For j = 0 To knn.matchedPoints.Count - 1
-                Dim pt2 = knn.matchedPoints(j)
-                If pt1 = pt2 Then
-                    Dim qpt = queryPoints(j)
-                    For k = 0 To queryRects.Count - 1
-                        If queryPoints(k) = qpt Then
-                            inputRect = queryRects(k)
-                            maskIndex = k
-                            Exit For
-                        End If
-                    Next
-                    If maskIndex >= 0 Then
-                        kalman(i).input = {queryPoints(j).X, queryPoints(j).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
-                        If kalmanActive Then
-                            kalman(i).Run(ocvb)
-                        Else
-                            kalman(i).output = {queryPoints(j).X, queryPoints(j).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
-                        End If
+            If matches.Contains(pt1) Then
+                Dim matchIndex = matches.IndexOf(pt1)
+                Dim qpt = queryPoints(matchIndex)
+                For k = 0 To queryRects.Count - 1
+                    If queryPoints(k) = qpt Then
+                        inputRect = queryRects(k)
+                        maskIndex = k
+                        Exit For
                     End If
-                    Exit For
+                Next
+                If maskIndex >= 0 Then
+                    kalman(i).input = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+                    If kalmanActive Then
+                        kalman(i).Run(ocvb)
+                    Else
+                        kalman(i).output = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+                    End If
                 End If
-            Next
-            If kalman(i).input(0) = -1 Then Exit For ' hit the unused kalman entries...
+            End If
 
             If maskIndex >= 0 And kalman(i).output IsNot Nothing Then
                 Dim vo = New viewObject
@@ -741,16 +739,16 @@ Public Class Kalman_PointTracker
         Next
 
         Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
-        If drawRectangleCheck?.checked Then
-            ' render masks first so they don't cover circles or rectangles below
-            For i = 0 To viewObjects.Count - 1
-                Dim vo = viewObjects.ElementAt(i).Value
-                If vo.mask IsNot Nothing Then
-                    Dim r = vo.preKalmanRect
-                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
-                End If
-            Next
+        ' render masks first so they don't cover circles or rectangles below
+        For i = 0 To viewObjects.Count - 1
+            Dim vo = viewObjects.ElementAt(i).Value
+            If vo.mask IsNot Nothing Then
+                Dim r = vo.preKalmanRect
+                If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
+            End If
+        Next
 
+        If drawRectangleCheck?.checked Then
             For i = 0 To viewObjects.Count - 1
                 Dim vw = viewObjects.ElementAt(i).Value
                 Dim pt = vw.centroid
