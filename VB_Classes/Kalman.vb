@@ -5,6 +5,8 @@ Public Class Kalman_Basics
     Dim kalman() As Kalman_Simple
     Public input(4 - 1) As Single
     Public output(4 - 1) As Single
+    Public layoutColor As cv.Scalar
+    Public layoutColorSet As Boolean
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
@@ -625,6 +627,7 @@ Public Class Kalman_PointTracker
             topView.Run(ocvb)
             dst1 = topView.dst1
             dst2 = topView.pTrack.dst2
+            topView.pTrack.palette.Run(ocvb)
             Exit Sub
         End If
         Static useKalmanCheck As Windows.Forms.CheckBox
@@ -751,24 +754,20 @@ Public Class Kalman_PointTracker
                 If pt.X >= src.Width Then pt.X = src.Width - 1
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y >= src.Height Then pt.Y = src.Height - 1
-                vo.LayoutColor = palette.dst1.Get(Of cv.Vec3b)(pt.Y, pt.X)
 
-                ' for some reason, lastViewOjbects.containskey(x) did not match.  Tried integer as well and it still failed.  Curious but this works.
-                Dim val As Single = pt1.X * pt1.Y * inputRect.Width * inputRect.Height ' guaranteed to be unique...
-                For j = 0 To lastViewObjects.Count - 1
-                    Dim vox = lastViewObjects.ElementAt(j)
-                    If val = vox.Key Then
-                        vo.LayoutColor = vox.Value.LayoutColor
-                        Exit For
-                    End If
-                Next
+                If kalman(i).layoutColorSet = False Then
+                    kalman(i).layoutColorSet = True
+                    vo.LayoutColor = palette.dst1.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                    kalman(i).layoutColor = vo.LayoutColor
+                Else
+                    vo.LayoutColor = kalman(i).layoutColor
+                End If
                 vo.preKalmanRect = inputRect
 
                 If maskIndex < queryMasks.Count Then
                     If queryMasks(maskIndex).Size <> src.Size Then vo.mask = queryMasks(maskIndex) Else vo.mask = queryMasks(maskIndex)(vo.preKalmanRect)
                 End If
-                val = queryPoints(maskIndex).X * queryPoints(maskIndex).Y * inputRect.Width * inputRect.Height
-                viewObjects.Add(val, vo)
+                viewObjects.Add(inputRect.Width * inputRect.Height, vo)
             End If
         Next
 
