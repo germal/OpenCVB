@@ -596,13 +596,11 @@ Public Class Kalman_PointTracker
     Dim knn As KNN_1_to_1
     Dim newCentroids As New List(Of cv.Point2f)
     Dim topView As PointCloud_Kalman_TopView
-    Dim kalmanAging As ArrayList
     Dim kalman As New List(Of Kalman_Basics)
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
-    Public palette As Palette_Layout2D
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
@@ -611,21 +609,15 @@ Public Class Kalman_PointTracker
         check.Box(0).Text = "Draw rectangle for each mask"
         check.Box(0).Checked = True
 
-        palette = New Palette_Layout2D(ocvb)
-        palette.Run(ocvb) ' only run once...
-
         knn = New KNN_1_to_1(ocvb)
 
         label2 = "Initial color values for each centroid"
         desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Const maxAge = 10
         If standalone Then
             topView.Run(ocvb)
             dst1 = topView.dst1
-            dst2 = topView.pTrack.dst2
-            topView.pTrack.palette.Run(ocvb)
             Exit Sub
         End If
         Static useKalmanCheck As Windows.Forms.CheckBox
@@ -642,8 +634,6 @@ Public Class Kalman_PointTracker
                     kalman(i).output = New Single() {-1, -1, 0, 0, 0, 0}
                 End If
             Next
-            kalmanAging = New ArrayList(kalman.Count - 1)
-            kalmanAging = ArrayList.Repeat(maxAge, kalman.Count)
             useKalmanCheck = findCheckBox("Turn Kalman filtering on") ' we left one of these visible...
         End If
         Dim kalmanActive = useKalmanCheck?.Checked
@@ -660,7 +650,6 @@ Public Class Kalman_PointTracker
                 If qIndex >= newCentroids.Count Then Exit For
                 knn.basics.knnQT.trainingPoints.Add(newCentroids(qIndex))
                 kalman(i).input = {newCentroids(qIndex).X, newCentroids(qIndex).Y, 0, 0, 0, 0}
-                kalmanAging(i) = maxAge
                 qIndex += 1
                 If qIndex >= kalman.Count Then Exit Sub ' we don't have enough kalman filters to handle this level of queries so restart
             Next
@@ -693,7 +682,6 @@ Public Class Kalman_PointTracker
             For j = 0 To knn.matchedPoints.Count - 1
                 Dim pt2 = knn.matchedPoints(j)
                 If pt1 = pt2 Then
-                    kalmanAging(i) = maxAge ' if not found for x generations, then stop reporting this kalman filter.
                     Dim qpt = queryPoints(j)
                     For k = 0 To queryRects.Count - 1
                         If queryPoints(k) = qpt Then
@@ -715,23 +703,11 @@ Public Class Kalman_PointTracker
             Next
             If kalman(i).input(0) = -1 Then Exit For ' hit the unused kalman entries...
 
-            Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
-            ' if the trainingpoint was not found, then reflect the same centroid/rect/mask as last time until it ages out...
-            If maskIndex < 0 Then
-                If kalmanAging(i) > 0 Then
-                    Dim vo = kalman(i).vo
-                    ' use the same viewobject from the previous generation.
-                    viewObjects.Add(vo.preKalmanRect.Width * vo.preKalmanRect.Height, vo)
-                    kalmanAging(i) -= 1
-                Else
-                    newCentroids.Add(pt1)
-                End If
-            End If
-
             If maskIndex >= 0 And kalman(i).output IsNot Nothing Then
                 Dim vo = New viewObject
                 vo.centroid = New cv.Point(kalman(i).output(0), kalman(i).output(1))
 
+                Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
                 If outRect.X < 0 Then outRect.X = 0
                 If outRect.Y < 0 Then outRect.Y = 0
                 If outRect.X + outRect.Width > src.Width Then outRect.Width = src.Width - outRect.X
@@ -754,7 +730,7 @@ Public Class Kalman_PointTracker
                 End If
 
                 If kalman(i).vo.mask Is Nothing Then
-                    vo.LayoutColor = palette.dst1.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                    vo.LayoutColor = scalarColors(i)
                     kalman(i).vo = vo
                 Else
                     vo.LayoutColor = kalman(i).vo.LayoutColor
@@ -766,14 +742,12 @@ Public Class Kalman_PointTracker
 
         Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
         If drawRectangleCheck?.checked Then
-            dst2 = palette.dst1.Clone
             ' render masks first so they don't cover circles or rectangles below
             For i = 0 To viewObjects.Count - 1
                 Dim vo = viewObjects.ElementAt(i).Value
                 If vo.mask IsNot Nothing Then
                     Dim r = vo.preKalmanRect
                     If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
-                    dst2.Circle(vo.centroid, 4, cv.Scalar.Black, -1, cv.LineTypes.AntiAlias)
                 End If
             Next
 
