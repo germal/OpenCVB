@@ -488,13 +488,17 @@ Public Class Palette_ObjectColors
         Dim blobList As New SortedList(Of Single, Integer)
         For i = 0 To reduction.pTrack.viewObjects.Count - 1
             Dim vo = reduction.pTrack.viewObjects.Values(i)
-            Dim mask = vo.mask.Clone
-            Dim r = vo.preKalmanRect
-            mask.SetTo(0, inrange.zeroMask(r)) ' count only points with depth
-            Dim countDepthPixels = mask.CountNonZero()
-            If countDepthPixels > 30 Then
-                Dim depth = depth32f(r).Mean(mask)
-                If depth.Item(0) > minDepth And depth.Item(0) < maxDepth Then blobList.Add(depth.Item(0), i)
+            If vo.mask IsNot Nothing Then
+                Dim mask = vo.mask.Clone
+                Dim r = vo.preKalmanRect
+                mask.SetTo(0, inrange.zeroMask(r)) ' count only points with depth
+                Dim countDepthPixels = mask.CountNonZero()
+                If countDepthPixels > 30 Then
+                    Dim depth = depth32f(r).Mean(mask)
+                    If blobList.ContainsKey(depth.Item(0)) = False Then
+                        If depth.Item(0) > minDepth And depth.Item(0) < maxDepth Then blobList.Add(depth.Item(0), i)
+                    End If
+                End If
             End If
         Next
 
