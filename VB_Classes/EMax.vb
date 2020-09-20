@@ -184,47 +184,85 @@ End Class
 Public Class EMax_Centroids
     Inherits VBparent
     Public emaxCPP As EMax_CPP
-    Public stepsize = 50
-    Public centroids As New List(Of cv.Point2f)
-    Public rects As New List(Of cv.Rect)
+    Public flood As FloodFill_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
+        flood = New FloodFill_Basics(ocvb)
+        Dim lowDiffslider = findSlider("FloodFill LoDiff")
+        Dim highDiffslider = findSlider("FloodFill HiDiff")
+        lowDiffslider.Value = 1
+        highDiffslider.Value = 1
         emaxCPP = New EMax_CPP(ocvb)
-        emaxCPP.Run(ocvb)
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        gridWidthSlider.Value = 170
 
         desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim lastImage = emaxCPP.dst2.Clone()
         emaxCPP.Run(ocvb)
-        dst1 = emaxCPP.dst2.Clone
 
-        Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
-        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
+        flood.src = emaxCPP.dst2.Clone
+        flood.Run(ocvb)
+        dst1 = flood.dst2
 
-        Dim rect As New cv.Rect
-
-        centroids.Clear()
-        rects.Clear()
-        For y = 0 To dst1.Height - 1 Step stepsize
-            For x = 0 To dst1.Width - 1 Step stepsize
-                If maskPlus(maskRect).Get(Of Byte)(y, x) = 0 Then
-                    Dim color = lastImage.Get(Of cv.Vec3b)(y, x)
-                    cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point2f(x, y), color, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
-                    If rect.Width > 0 Then
-                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
-                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-                        centroids.Add(centroid)
-                        rects.Add(rect)
-                    End If
-                End If
-            Next
+        For i = 0 To flood.centroids.Count - 1
+            dst1.Circle(flood.centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
-        If standalone Then
-            For i = 0 To centroids.Count - 1
-                dst1.Circle(centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class EMax_PointTracker
+    Inherits VBparent
+    Dim pTrack As Kalman_PointTracker
+    Dim emax As EMax_Centroids
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        emax = New EMax_Centroids(ocvb)
+
+        pTrack = New Kalman_PointTracker(ocvb)
+        Dim rectCheckbox = findCheckBox("Draw rectangle for each mask")
+        rectCheckbox.Checked = False
+        Dim floodMinSlider = findSlider("FloodFill Minimum Size")
+        floodMinSlider.Value = 100
+
+        label1 = "Original before KNN and Kalman tracking"
+        desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        emax.Run(ocvb)
+        dst1 = emax.dst1
+
+        pTrack.queryPoints = emax.flood.centroids
+        pTrack.queryMasks = emax.flood.masks
+        pTrack.queryRects = emax.flood.rects
+        pTrack.Run(ocvb)
+        dst2 = pTrack.dst1
+
+        ' this is to verify that the colors are remaining largely consistent (they may change if more centroids appear.)
+        Static lastImage = dst2
+        Dim tallyErrors = 0
+        For Each pt In emax.flood.centroids
+            Dim v1 = dst2.Get(Of cv.Vec3b)(pt.Y, pt.X)
+            Dim v2 = lastImage.Get(Of cv.Vec3b)(pt.Y, pt.X)
+            If v1 <> v2 Then tallyErrors += 1
+        Next
+        lastImage = dst2.Clone
+        Static totalErrors = 0
+        Static generationCount = 0
+        Static saveCount = 0
+        If emax.emaxCPP.basics.grid.roiList.Count <> saveCount Then
+            saveCount = emax.emaxCPP.basics.grid.roiList.Count
+            totalErrors = 0
+            generationCount = 0
         End If
+        totalErrors += tallyErrors
+        generationCount += 1
+        label2 = "After: there were " + Format(totalErrors / generationCount, "0.0") + " average errors matching centroids"
     End Sub
 End Class

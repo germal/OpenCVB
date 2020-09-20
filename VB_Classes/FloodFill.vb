@@ -71,8 +71,7 @@ Public Class FloodFill_Basics
         dst2.SetTo(0)
         For i = 0 To masks.Count - 1
             Dim maskIndex = maskSizes.ElementAt(i).Value
-            Dim nextColor = scalarColors(i Mod 255)
-            dst2.SetTo(nextColor, masks(maskIndex))
+            dst2.SetTo(scalarColors(i Mod 255), masks(maskIndex))
         Next
         label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
@@ -411,7 +410,6 @@ Public Class Floodfill_Identifiers
         masks.Clear()
         dst2.SetTo(0)
         cv.Cv2.BitwiseNot(src, src)
-        Dim nextColor As cv.Vec3b
         For y = 0 To src.Height - 1 Step stepSize
             For x = 0 To src.Width - 1 Step stepSize
                 If src.Get(Of Byte)(y, x) < 255 Then
@@ -433,8 +431,7 @@ Public Class Floodfill_Identifiers
 
         For i = 0 To masks.Count - 1
             Dim rect = rects(i)
-            nextColor = rColors(i Mod 255)
-            dst2(rect).SetTo(nextColor, masks(i))
+            dst2(rect).SetTo(scalarColors(i Mod 255), masks(i))
         Next
     End Sub
 End Class
