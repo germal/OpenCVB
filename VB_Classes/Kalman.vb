@@ -5,8 +5,7 @@ Public Class Kalman_Basics
     Dim kalman() As Kalman_Simple
     Public input(4 - 1) As Single
     Public output(4 - 1) As Single
-    Public layoutColor As cv.Scalar
-    Public layoutColorSet As Boolean
+    Public vo As viewObject
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
@@ -603,7 +602,6 @@ Public Class Kalman_PointTracker
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
-    Public lastViewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Public palette As Palette_Layout2D
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -686,10 +684,6 @@ Public Class Kalman_PointTracker
 
         dst1.SetTo(0)
         Dim inputRect = New cv.Rect
-        lastViewObjects.Clear()
-        For Each vo In viewObjects
-            lastViewObjects.Add(vo.Key, vo.Value)
-        Next
         viewObjects.Clear()
         Dim maskIndex As Integer
         For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
@@ -724,14 +718,13 @@ Public Class Kalman_PointTracker
             Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
             ' if the trainingpoint was not found, then reflect the same centroid/rect/mask as last time until it ages out...
             If maskIndex < 0 Then
-                If i < lastViewObjects.Count Then
-                    If kalmanAging(i) > 0 Then
-                        ' use the same viewobject from the previous generation.
-                        viewObjects.Add(lastViewObjects.ElementAt(i).Key, lastViewObjects.ElementAt(i).Value)
-                        kalmanAging(i) -= 1
-                    Else
-                        newCentroids.Add(pt1)
-                    End If
+                If kalmanAging(i) > 0 Then
+                    Dim vo = kalman(i).vo
+                    ' use the same viewobject from the previous generation.
+                    viewObjects.Add(vo.preKalmanRect.Width * vo.preKalmanRect.Height, vo)
+                    kalmanAging(i) -= 1
+                Else
+                    newCentroids.Add(pt1)
                 End If
             End If
 
@@ -755,18 +748,18 @@ Public Class Kalman_PointTracker
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y >= src.Height Then pt.Y = src.Height - 1
 
-                If kalman(i).layoutColorSet = False Then
-                    kalman(i).layoutColorSet = True
-                    vo.LayoutColor = palette.dst1.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                    kalman(i).layoutColor = vo.LayoutColor
-                Else
-                    vo.LayoutColor = kalman(i).layoutColor
-                End If
                 vo.preKalmanRect = inputRect
-
                 If maskIndex < queryMasks.Count Then
                     If queryMasks(maskIndex).Size <> src.Size Then vo.mask = queryMasks(maskIndex) Else vo.mask = queryMasks(maskIndex)(vo.preKalmanRect)
                 End If
+
+                If kalman(i).vo.mask Is Nothing Then
+                    vo.LayoutColor = palette.dst1.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                    kalman(i).vo = vo
+                Else
+                    vo.LayoutColor = kalman(i).vo.LayoutColor
+                End If
+
                 viewObjects.Add(inputRect.Width * inputRect.Height, vo)
             End If
         Next
