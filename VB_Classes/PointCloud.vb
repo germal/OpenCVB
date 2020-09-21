@@ -756,49 +756,6 @@ End Class
 
 
 
-Public Class PointCloud_WallsFloorsCeilings
-    Inherits VBparent
-    Dim both As PointCloud_HistBothViews
-    Dim lDetect As lineDetector_FLD_CPP
-    Public walls As cv.Vec4f()
-    Public floorsCeilings As cv.Vec4f()
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        lDetect = New lineDetector_FLD_CPP(ocvb)
-        both = New PointCloud_HistBothViews(ocvb)
-
-        Dim histThresholdSlider = findSlider("Histogram threshold")
-        histThresholdSlider.Value = 100
-
-        Dim reductionCheck = findCheckBox("Use Reduction")
-        reductionCheck.Checked = True
-
-        label1 = "Top View: wall candidates in red"
-        label2 = "Side View: floors/ceiling candidates in red"
-        desc = "Use the top down view to detect walls with a line detector algorithm"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If ocvb.frameCount = 0 Then checkIMU.checked = True
-        both.src = src
-        both.Run(ocvb)
-        dst1 = both.dst1
-        dst2 = both.dst2
-
-        lDetect.src = dst1
-        lDetect.Run(ocvb)
-        dst1 = lDetect.dst1.Clone
-        lDetect.src = dst2
-        lDetect.Run(ocvb)
-        dst2 = lDetect.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class PointCloud_HistTopView
     Inherits VBparent
@@ -869,5 +826,102 @@ Public Class PointCloud_HistBothViews
         sideView.src = src
         sideView.Run(ocvb)
         dst2 = sideView.dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class PointCloud_WallsFloors_Kalman
+    Inherits VBparent
+    Dim walls As PointCloud_WallsFloors
+    Dim pTrackWall As Kalman_PointTracker
+    Dim pTrackFloor As Kalman_PointTracker
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        walls = New PointCloud_WallsFloors(ocvb)
+        Dim drawCheckbox = findCheckBox("FLD - Draw lines on input image")
+        drawCheckbox.Checked = False ' we will draw them below.
+        pTrackWall = New Kalman_PointTracker(ocvb)
+        pTrackFloor = New Kalman_PointTracker(ocvb)
+        Dim drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
+        drawRectangleCheck.Checked = False
+
+        desc = "Use Kalman to smooth results of wall/floor detection"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        walls.Run(ocvb)
+        dst1 = walls.dst1
+        dst2 = walls.dst2
+
+        For i = 0 To 1
+            Dim ptrack As Kalman_PointTracker = Choose(i + 1, pTrackWall, pTrackFloor)
+            Dim mat = Choose(i + 1, walls.wallLines, walls.floorsLines)
+            Dim dst = Choose(i + 1, dst1, dst2)
+
+            ptrack.queryPoints.Clear()
+            ptrack.queryRects.Clear()
+            For j = 0 To mat.Rows - 1
+                Dim nextVec = mat.Get(Of cv.Vec6f)(j, 0)
+                ptrack.queryPoints.Add(New cv.Point2f(nextVec.Item0, nextVec.Item1))
+                ptrack.queryRects.Add(New cv.Rect(nextVec.Item2, nextVec.Item3, 0, 0))
+            Next
+
+            ptrack.Run(ocvb)
+
+            Dim viewObjects = New SortedList(Of Single, viewObject)(ptrack.viewObjects)
+            For j = 0 To viewObjects.Count - 1
+                Dim vw = viewObjects.ElementAt(j).Value
+                Dim pt1 = vw.centroid
+                Dim pt2 = New cv.Point2f(vw.rectView.X, vw.rectView.Y)
+                dst.Line(pt1, pt2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class PointCloud_WallsFloors
+    Inherits VBparent
+    Dim both As PointCloud_HistBothViews
+    Public lDetect As lineDetector_FLD_CPP
+    Public wallLines As cv.Mat
+    Public floorsLines As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        lDetect = New lineDetector_FLD_CPP(ocvb)
+        both = New PointCloud_HistBothViews(ocvb)
+
+        Dim histThresholdSlider = findSlider("Histogram threshold")
+        histThresholdSlider.Value = 100
+
+        Dim reductionCheck = findCheckBox("Use Reduction")
+        reductionCheck.Checked = True
+
+        label1 = "Top View: wall candidates in red"
+        label2 = "Side View: floors/ceiling candidates in red"
+        desc = "Use the top down view to detect walls with a line detector algorithm"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static checkIMU = findCheckBox("Use IMU gravity vector")
+        If ocvb.frameCount = 0 Then checkIMU.checked = True
+        both.src = src
+        both.Run(ocvb)
+        dst1 = both.dst1
+        dst2 = both.dst2
+
+        lDetect.src = dst1
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1.Clone
+        wallLines = lDetect.lineMat.Clone
+
+        lDetect.src = dst2
+        lDetect.Run(ocvb)
+        dst2 = lDetect.dst1.Clone
+        floorsLines = lDetect.lineMat.Clone
     End Sub
 End Class

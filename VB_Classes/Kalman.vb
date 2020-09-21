@@ -612,9 +612,13 @@ Public Class Kalman_PointTracker
                     If outRect.Y < 0 Then outRect.Y = 0
                     If outRect.X + outRect.Width > src.Width Then outRect.Width = src.Width - outRect.X
                     If outRect.Y + outRect.Height > src.Height Then outRect.Height = src.Height - outRect.Y
-                    If outRect.Width <= 0 Then
-                        outRect.X = src.Width - 1
+                    If outRect.Width < 0 Then
+                        outRect.X = 0
                         outRect.Width = 1
+                    End If
+                    If outRect.Height < 0 Then
+                        outRect.Y = 0
+                        outRect.Height = 1
                     End If
                     vo.rectView = outRect
 
@@ -630,7 +634,7 @@ Public Class Kalman_PointTracker
                     End If
 
                     If kalman(i).vo.mask Is Nothing Then
-                        vo.LayoutColor = scalarColors(i)
+                        vo.LayoutColor = scalarColors(i Mod 255)
                         kalman(i).vo = vo
                     Else
                         vo.LayoutColor = kalman(i).vo.LayoutColor

@@ -852,9 +852,18 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
         SaveSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
 
-        Dim details = CStr(camWidth) + "x" + CStr(camHeight) + " display " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + " Resolution=" + optionsForm.resolutionName
-        picLabels(0) = "Input " + details
-        picLabels(1) = "Depth " + details
+        Dim resolutionDesc As String = ""
+        Select Case optionsForm.resolutionName
+            Case "Low"
+                resolutionDesc = "320x180"
+            Case "Medium"
+                resolutionDesc = "640x360"
+            Case "High"
+                resolutionDesc = "1280x720"
+        End Select
+        Dim details = " Display at " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + ", Working Res. = " + resolutionDesc
+        picLabels(0) = "RGB:" + details
+        picLabels(1) = "Depth:" + details
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         stopCameraThread = True

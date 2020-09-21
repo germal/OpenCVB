@@ -158,7 +158,7 @@ Module fastLineDetector_Exports
 
     ' there is a drawsegments in the contrib library but this code will operate on the full size of the image - not the small copy passed to the C++ code
     ' But, more importantly, this code uses anti-alias for the lines.  It adds the lines to a mask that may be useful with depth data.
-    Public Function drawSegments(dst1 As cv.Mat, lineCount As integer, thickness As Integer) As SortedList(Of cv.Vec6f, Integer)
+    Public Function drawSegments(dst1 As cv.Mat, lineCount As Integer, thickness As Integer, drawLines As Boolean, ByRef lineMat As cv.Mat) As SortedList(Of cv.Vec6f, Integer)
         Dim sortedLines As New SortedList(Of cv.Vec6f, Integer)(New CompareVec6f)
 
         Dim lines(lineCount * 4 - 1) As Single
@@ -166,7 +166,7 @@ Module fastLineDetector_Exports
         If linePtr = 0 Then Return Nothing ' it happened!
         Marshal.Copy(linePtr, lines, 0, lines.Length)
 
-        Dim lineMat = New cv.Mat(lineCount, 1, cv.MatType.CV_32FC4, lines)
+        lineMat = New cv.Mat(lineCount, 1, cv.MatType.CV_32FC4, lines)
         Dim v6 As New cv.Vec6f
         For i = 0 To lineCount - 1
             Dim v = lineMat.Get(Of cv.Vec4f)(i)
@@ -190,14 +190,16 @@ Module fastLineDetector_Exports
             End If
         Next
 
-        For i = sortedLines.Count - 1 To 0 Step -1
-            Dim v = sortedLines.ElementAt(i).Key
-            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
-                Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
-            End If
-        Next
+        If drawLines Then
+            For i = sortedLines.Count - 1 To 0 Step -1
+                Dim v = sortedLines.ElementAt(i).Key
+                If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
+                    Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                    Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                    dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                End If
+            Next
+        End If
         Return sortedLines
     End Function
 End Module
@@ -209,6 +211,7 @@ End Module
 Public Class lineDetector_FLD_CPP
     Inherits VBparent
     Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
+    Public lineMat As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
@@ -220,9 +223,12 @@ Public Class lineDetector_FLD_CPP
         sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
         sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
+        check.Box(1).Text = "FLD - Draw lines on input image"
+        check.Box(1).Checked = True
+
         desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -245,7 +251,7 @@ Public Class lineDetector_FLD_CPP
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, src.Height, src.Width, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.trackbar(3).Value)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sliders.trackbar(3).Value, check.Box(1).Checked, lineMat)
     End Sub
 End Class
 

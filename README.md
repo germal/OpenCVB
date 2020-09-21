@@ -568,9 +568,9 @@ Python, or HighGUI windows.
 *The bottom left is a top-down view of the point cloud data for an Intel D455
 camera while the bottom right is a side view of the same point cloud. The red
 lines indicate where walls were detected. A slider controls the expected minimum
-length of a detected wall. The images are produced after correcting the point
-cloud data to align with the gravity vector from the integrated IMU on the D455
-camera.*
+length of a detected wall. The images are actually histograms of projections
+after correcting the point cloud data to align with the gravity vector from the
+integrated IMU on the D455 camera.*
 
 ![](media/e377133fbea5d03a0c3d83299aa994bd.png)
 
