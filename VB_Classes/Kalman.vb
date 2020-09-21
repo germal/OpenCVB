@@ -612,14 +612,8 @@ Public Class Kalman_PointTracker
                     If outRect.Y < 0 Then outRect.Y = 0
                     If outRect.X + outRect.Width > src.Width Then outRect.Width = src.Width - outRect.X
                     If outRect.Y + outRect.Height > src.Height Then outRect.Height = src.Height - outRect.Y
-                    If outRect.Width < 0 Then
-                        outRect.X = 0
-                        outRect.Width = 1
-                    End If
-                    If outRect.Height < 0 Then
-                        outRect.Y = 0
-                        outRect.Height = 1
-                    End If
+                    If outRect.Width < 0 Then outRect.Width = 1
+                    If outRect.Height < 0 Then outRect.Height = 1
                     vo.rectView = outRect
 
                     Dim pt = vo.centroid
