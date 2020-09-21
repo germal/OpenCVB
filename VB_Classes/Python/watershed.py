@@ -35,10 +35,10 @@ class App:
             raise Exception('Failed to load image file: %s' % fn)
 
         h, w = self.img.shape[:2]
-        self.markers = np.zeros((h, w), np.integer)
+        self.markers = np.zeros((h, w), np.int32)
         self.markers_vis = self.img.copy()
         self.cur_marker = 1
-        self.colors = np.integer( list(np.ndindex(2, 2, 2)) ) * 255
+        self.colors = np.int32( list(np.ndindex(2, 2, 2)) ) * 255
 
         self.auto_update = True
         self.sketch = Sketcher('img', [self.markers_vis, self.markers], self.get_colors)

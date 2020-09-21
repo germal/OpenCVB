@@ -49,8 +49,8 @@ class LetterStatModel(object):
 
     def unroll_responses(self, responses):
         sample_n = len(responses)
-        new_responses = np.zeros(sample_n*self.class_n, np.integer)
-        resp_idx = np.integer( responses + np.arange(sample_n)*self.class_n )
+        new_responses = np.zeros(sample_n*self.class_n, np.int32)
+        resp_idx = np.int32( responses + np.arange(sample_n)*self.class_n )
         new_responses[resp_idx] = 1
         return new_responses
 
@@ -123,7 +123,7 @@ class MLP(LetterStatModel):
     def train(self, samples, responses):
         _sample_n, var_n = samples.shape
         new_responses = self.unroll_responses(responses).reshape(-1, self.class_n)
-        layer_sizes = np.integer([var_n, 100, 100, self.class_n])
+        layer_sizes = np.int32([var_n, 100, 100, self.class_n])
 
         self.model.setLayerSizes(layer_sizes)
         self.model.setTrainMethod(cv.ml.ANN_MLP_BACKPROP)

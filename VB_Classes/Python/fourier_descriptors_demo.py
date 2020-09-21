@@ -114,7 +114,7 @@ while (code!=27):
         ctrNoisy= NoisyPolygon(ctrRef,p.levelNoise)
         ctrNoisy1 = np.reshape(ctrNoisy,(ctrNoisy.shape[0],1,2))
         ctrNoisyRotate = cv.transform(ctrNoisy1,r)
-        ctrNoisyRotateShift = np.empty([ctrNoisyRotate.shape[0],1,2],dtype=np.integer)
+        ctrNoisyRotateShift = np.empty([ctrNoisyRotate.shape[0],1,2],dtype=np.int32)
         for  i in range(0,ctrNoisy.shape[0]):
             k=(i+(p.origin*ctrNoisy.shape[0])//100)% ctrNoisyRotate.shape[0]
             ctrNoisyRotateShift[i] = ctrNoisyRotate[k]

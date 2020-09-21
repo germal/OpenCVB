@@ -25,8 +25,8 @@ def make_image():
             for j in range(11):
                 angle = (j+5)*np.pi/21
                 c, s = np.cos(angle), np.sin(angle)
-                x1, y1 = np.integer([dx+100+j*10-80*c, dy+100-90*s])
-                x2, y2 = np.integer([dx+100+j*10-30*c, dy+100-30*s])
+                x1, y1 = np.int32([dx+100+j*10-80*c, dy+100-90*s])
+                x2, y2 = np.int32([dx+100+j*10-30*c, dy+100-30*s])
                 cv.line(img, (x1, y1), (x2, y2), white)
  
         cv.ellipse( img, (dx+150, dy+100), (100,70), 0, 0, 360, white, -1 )

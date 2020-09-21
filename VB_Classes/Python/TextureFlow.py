@@ -35,8 +35,8 @@ def main():
     vis[:] = (192 + np.uinteger(vis)) / 2
     d = 12
     points =  np.dstack( np.mgrid[d/2:width:d, d/2:height:d] ).reshape(-1, 2)
-    for x, y in np.integer(points):
-        vx, vy = np.integer(flow[y, x]*d)
+    for x, y in np.int32(points):
+        vx, vy = np.int32(flow[y, x]*d)
         cv.line(vis, (x-vx, y-vy), (x+vx, y+vy), (0, 0, 0), 1, cv.LINE_AA)
 
     size = img.shape[0], img.shape[1], 3

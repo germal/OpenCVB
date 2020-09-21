@@ -44,7 +44,7 @@ def affine_skew(tilt, phi, img, mask=None):
         s, c = np.sin(phi), np.cos(phi)
         A = np.float32([[c,-s], [ s, c]])
         corners = [[0, 0], [w, 0], [w, h], [0, h]]
-        tcorners = np.integer( np.dot(corners, A.T) )
+        tcorners = np.int32( np.dot(corners, A.T) )
         x, y, w, h = cv.boundingRect(tcorners.reshape(1,-1,2))
         A = np.hstack([A, [[-x], [-y]]])
         img = cv.warpAffine(img, A, (w, h), flags=cv.INTER_LINEAR, borderMode=cv.BORDER_REPLICATE)

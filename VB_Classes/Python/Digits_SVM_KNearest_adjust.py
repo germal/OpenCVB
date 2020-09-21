@@ -101,7 +101,7 @@ def evaluate_model(model, digits, samples, labels):
     err = (labels != resp).mean()
     print('error: %.2f %%' % (err*100))
 
-    confusion = np.zeros((10, 10), np.integer)
+    confusion = np.zeros((10, 10), np.int32)
     for i, j in zip(labels, resp):
         confusion[i, int(j)] += 1
     print('confusion matrix:')
@@ -126,7 +126,7 @@ def preprocess_hog(digits):
         gy = cv.Sobel(img, cv.CV_32F, 0, 1)
         mag, ang = cv.cartToPolar(gx, gy)
         bin_n = 16
-        bin = np.integer(bin_n*ang/(2*np.pi))
+        bin = np.int32(bin_n*ang/(2*np.pi))
         bin_cells = bin[:10,:10], bin[10:,:10], bin[:10,10:], bin[10:,10:]
         mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
         hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]

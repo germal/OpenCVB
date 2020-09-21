@@ -13,7 +13,7 @@ I = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
 
 # --------------------- 1. Set up training data randomly ---------------------------------------
 trainData = np.empty((2*NTRAINING_SAMPLES, 2), dtype=np.float32)
-labels = np.empty((2*NTRAINING_SAMPLES, 1), dtype=np.integer)
+labels = np.empty((2*NTRAINING_SAMPLES, 1), dtype=np.int32)
 
 rng.seed(100) # Random value generation class
 
