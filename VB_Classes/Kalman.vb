@@ -480,6 +480,7 @@ End Class
 
 
 
+
 Public Structure viewObject
     Dim centroid As cv.Point2f
     Dim preKalmanRect As cv.Rect

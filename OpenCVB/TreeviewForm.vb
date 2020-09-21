@@ -107,8 +107,10 @@ Public Class TreeviewForm
         If OpenCVB.callTrace Is Nothing Then Exit Sub
         If OpenCVB.callTrace.Count > 0 Then
             Dim firstEntry = OpenCVB.callTrace(0)
-            firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
-            If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
+            If Len(firstEntry) Then
+                firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
+                If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
+            End If
         End If
     End Sub
 End Class
