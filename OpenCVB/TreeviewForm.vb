@@ -104,13 +104,15 @@ Public Class TreeviewForm
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If OpenCVB.callTrace Is Nothing Then Exit Sub
-        If OpenCVB.callTrace.Count > 0 Then
-            Dim firstEntry = OpenCVB.callTrace(0)
-            If Len(firstEntry) Then
-                firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
-                If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
+        SyncLock OpenCVB.callTraceLock
+            If OpenCVB.callTrace Is Nothing Then Exit Sub
+            If OpenCVB.callTrace.Count > 0 Then
+                Dim firstEntry = OpenCVB.callTrace(0)
+                If Len(firstEntry) Then
+                    firstEntry = Mid(firstEntry, 1, Len(firstEntry) - 1)
+                    If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
+                End If
             End If
-        End If
+        End SyncLock
     End Sub
 End Class

@@ -85,6 +85,7 @@ Public Class OpenCVB
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
+    Public callTraceLock As New cv.Mat
     Dim startAlgorithmTime As DateTime
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -1241,11 +1242,13 @@ Public Class OpenCVB
             End Try
 
             If frameCount Mod 100 = 0 Then
-                ' this allows for dynamic allocation of new algorithms.
-                callTrace.Clear()
-                For i = 0 To task.ocvb.callTrace.Count - 1
-                    callTrace.Add(task.ocvb.callTrace(i))
-                Next
+                SyncLock callTraceLock
+                    ' this allows for dynamic allocation of new algorithms.
+                    callTrace.Clear()
+                    For i = 0 To task.ocvb.callTrace.Count - 1
+                        callTrace.Add(task.ocvb.callTrace(i))
+                    Next
+                End SyncLock
             End If
             frameCount += 1
         End While
