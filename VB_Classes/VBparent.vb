@@ -177,7 +177,7 @@ Public Class VBparent : Implements IDisposable
     Public Sub New()
         algorithm = Me
         For i = 0 To rColors.Length - 1
-            rColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255))
+            rColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255)) ' note: cannot generate black!
             scalarColors(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
         Next
     End Sub

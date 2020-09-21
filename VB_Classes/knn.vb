@@ -344,17 +344,10 @@ Public Class KNN_Cluster2D
     Inherits VBparent
     Dim knn As KNN_Point2d
     Public cityPositions() As cv.Point
-    Public cityOrder() As Int32
-    Public distances() As Int32
-    Dim numberOfCities As Int32
-    Dim closedRegions As Int32
-    Dim totalClusters As Int32
-    Public Sub drawMap(result As cv.Mat)
-        For i = 0 To cityOrder.Length - 1
-            result.Circle(cityPositions(i), 5, cv.Scalar.White, -1)
-            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 2)
-        Next
-    End Sub
+    Public cityOrder() As Integer
+    Public distances() As Integer
+    Dim numberOfCities As Integer
+    Dim closedRegions As Integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         knn = New KNN_Point2d(ocvb)
@@ -364,9 +357,10 @@ Public Class KNN_Cluster2D
         sliders.setupTrackBar(0, "KNN - number of cities", 10, 1000, 100)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Demo Mode (continuous update)"
-        If ocvb.testAllRunning Then check.Box(0).Checked = True
+        check.Box(0).Checked = True
 
-        desc = "Use knn to cluster cities as preparation for a solution to the traveling salesman problem."
+        label1 = ""
+        desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
     End Sub
     Private Sub cluster(result As cv.Mat)
         Dim alreadyTaken As New List(Of Int32)
@@ -385,28 +379,22 @@ Public Class KNN_Cluster2D
                 End If
             Next
         Next
-        drawMap(result)
-        Dim tmp As cv.Mat
-        tmp = result.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim hitBlack As Int32
+        For i = 0 To cityOrder.Length - 1
+            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * fontsize)
+        Next
+
+        closedRegions = 0
         For y = 0 To result.Rows - 1
             For x = 0 To result.Cols - 1
-                Dim blackTest = result.Get(Of cv.Vec3b)(y, x)
-                If blackTest = cv.Scalar.Black Then
-                    If rColors(closedRegions Mod rColors.Length) = cv.Scalar.Black Then
-                        hitBlack += 1
-                        closedRegions += 1 ' skip the randomly generated black color as that is our key.
-                    End If
+                If result.Get(Of cv.Vec3b)(y, x) = cv.Scalar.Black Then
                     Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), rColors(closedRegions Mod rColors.Length))
                     If byteCount > 10 Then closedRegions += 1 ' there are fake regions due to anti-alias like features that appear when drawing.
                 End If
-                If tmp.Get(Of Byte)(y, x) = 255 Then
-                    cv.Cv2.FloodFill(tmp, New cv.Point(x, y), cv.Scalar.Black)
-                    totalClusters += 1
-                End If
             Next
         Next
-        If hitBlack Then closedRegions -= hitBlack
+        For i = 0 To cityOrder.Length - 1
+            result.Circle(cityPositions(i), 4 * fontsize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ' If they changed Then number of elements in the set
@@ -438,10 +426,8 @@ Public Class KNN_Cluster2D
             Next
             knn.Run(ocvb)
             dst1.SetTo(0)
-            totalClusters = 0
-            closedRegions = 0
             cluster(dst1)
-            label1 = "knn clusters total=" + CStr(totalClusters) + " closedRegions=" + CStr(closedRegions)
+            ocvb.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
         End If
     End Sub
 End Class
