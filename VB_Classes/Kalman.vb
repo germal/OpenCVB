@@ -496,7 +496,7 @@ End Structure
 
 Public Class Kalman_PointTracker
     Inherits VBparent
-    Dim knn As KNN_1_to_1
+    Public knn As KNN_1_to_1
     Dim newCentroids As New List(Of cv.Point2f)
     Dim topView As PointCloud_Kalman_TopView
     Dim kalman As New List(Of Kalman_Basics)

@@ -848,6 +848,12 @@ Public Class PointCloud_WallsFloors_Kalman
         Dim drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
         drawRectangleCheck.Checked = False
 
+        pTrackWall.check.Visible = False
+        pTrackFloor.check.Visible = False
+
+        pTrackWall.knn.basics.knnQT.check.Visible = False
+        pTrackFloor.knn.basics.knnQT.check.Visible = False
+
         desc = "Use Kalman to smooth results of wall/floor detection"
     End Sub
     Public Sub Run(ocvb As VBocvb)
