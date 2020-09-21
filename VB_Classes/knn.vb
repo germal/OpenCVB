@@ -247,47 +247,6 @@ End Class
 
 
 
-'Public Class KNN_CentroidsEMax
-'    Inherits VBparent
-'    Public emax As EMax_Centroids
-'    Public knnEmax As KNN_Emax
-'    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        emax = New EMax_Centroids(ocvb)
-'        knnEmax = New KNN_Emax(ocvb)
-
-'        label1 = "Colors are much more consistent across generations"
-'        label2 = "Raw EMax output with random coloring."
-'        desc = "Map the current centroids to the previous generation to match the color used."
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        If standalone Then knnEmax.knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.centroids)
-
-'        emax.Run(ocvb)
-
-'        knnEmax.knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.centroids)
-'        knnEmax.Run(ocvb)
-
-'        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
-'        Dim rect As New cv.Rect
-'        Static lastImage = emax.emaxCPP.dst2.Clone
-'        dst1 = emax.emaxCPP.dst2.Clone()
-'        If knnEmax.knn.matchedPoints IsNot Nothing Then ' no centroids are matched on the first pass.
-'            For Each pt In knnEmax.knn.matchedPoints
-'                If pt.X >= 0 Then
-'                    Dim nextVec = lastImage.Get(Of cv.Vec3b)(pt.Y, pt.X)
-'                    Dim nextColor = New cv.Scalar(nextVec.item0, nextVec.item1, nextVec.item2)
-'                    cv.Cv2.FloodFill(dst1, maskPlus, pt, nextColor, rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
-'                End If
-'            Next
-'        End If
-'        lastImage = dst1.Clone
-'        dst2 = emax.emaxCPP.dst2
-'    End Sub
-'End Class
-
-
-
 
 
 Public Class KNN_Test

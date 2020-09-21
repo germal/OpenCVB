@@ -195,7 +195,7 @@ Public Class EMax_Centroids
         highDiffslider.Value = 1
         emaxCPP = New EMax_CPP(ocvb)
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        gridWidthSlider.Value = 170
+        gridWidthSlider.Value = src.Width * 170 / 640
 
         desc = "Get the Emax cluster centroids using floodfill "
     End Sub
@@ -206,9 +206,14 @@ Public Class EMax_Centroids
         flood.Run(ocvb)
         dst1 = flood.dst2
 
+        Static lastCentroids As New List(Of cv.Point2f)
         For i = 0 To flood.centroids.Count - 1
             dst1.Circle(flood.centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            If i < lastCentroids.count Then
+                dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            End If
         Next
+        lastCentroids = New List(Of cv.Point2f)(flood.centroids)
     End Sub
 End Class
 
@@ -231,7 +236,7 @@ Public Class EMax_PointTracker
         Dim floodMinSlider = findSlider("FloodFill Minimum Size")
         floodMinSlider.Value = 100
 
-        label1 = "Original before KNN and Kalman tracking"
+        label1 = "Original before KNN/Kalman tracking (red=previous)"
         desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
     Public Sub Run(ocvb As VBocvb)
