@@ -769,6 +769,10 @@ Public Class PointCloud_WallsFloorsCeilings
 
         Dim histThresholdSlider = findSlider("Histogram threshold")
         histThresholdSlider.Value = 100
+
+        Dim reductionCheck = findCheckBox("Use Reduction")
+        reductionCheck.Checked = True
+
         label1 = "Top View: wall candidates in red"
         label2 = "Side View: floors/ceiling candidates in red"
         desc = "Use the top down view to detect walls with a line detector algorithm"

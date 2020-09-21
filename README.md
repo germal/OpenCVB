@@ -563,6 +563,15 @@ In the OpenCVB user interface, the top left image is the RGB and top right is
 depth. Algorithm results are in the bottom left and right or additional OpenGL,
 Python, or HighGUI windows.
 
+![](media/d484f0049c87c9cd2ea7f99a61d12215.png)
+
+*The bottom left is a top-down view of the point cloud data for an Intel D455
+camera while the bottom right is a side view of the same point cloud. The red
+lines indicate where walls were detected. A slider controls the expected minimum
+length of a detected wall. The images are produced after correcting the point
+cloud data to align with the gravity vector from the integrated IMU on the D455
+camera.*
+
 ![](media/e377133fbea5d03a0c3d83299aa994bd.png)
 
 *OpenGL has an infinite number of ways to view a point cloud but visualizing top
