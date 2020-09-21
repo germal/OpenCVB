@@ -7,23 +7,23 @@ Module recordPlaybackCommon
     Public bytesPerRGBDepth As Int64
     Public bytesPerCloud As Int64
     Public Structure fileHeader
-        Public pcBufferSize As Int32 ' indicates that a point cloud is in the data stream.
+        Public pcBufferSize As integer ' indicates that a point cloud is in the data stream.
 
-        Public colorWidth As Int32
-        Public colorHeight As Int32
-        Public colorElemsize As Int32
+        Public colorWidth As integer
+        Public colorHeight As integer
+        Public colorElemsize As integer
 
-        Public depthWidth As Int32
-        Public depthHeight As Int32
-        Public depth16Elemsize As Int32
+        Public depthWidth As integer
+        Public depthHeight As integer
+        Public depth16Elemsize As integer
 
-        Public RGBDepthWidth As Int32
-        Public RGBDepthHeight As Int32
-        Public RGBDepthElemsize As Int32
+        Public RGBDepthWidth As integer
+        Public RGBDepthHeight As integer
+        Public RGBDepthElemsize As integer
 
-        Public cloudWidth As Int32
-        Public cloudHeight As Int32
-        Public cloudElemsize As Int32
+        Public cloudWidth As integer
+        Public cloudHeight As integer
+        Public cloudElemsize As integer
     End Structure
     Public Sub writeHeader(ocvb As VBocvb, binWrite As BinaryWriter)
         binWrite.Write(ocvb.color.Width)

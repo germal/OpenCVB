@@ -72,7 +72,7 @@ Public Class Brightness_Gamma
         sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static lastGamma As Int32 = -1
+        Static lastGamma As integer = -1
         If lastGamma <> sliders.trackbar(0).Value Then
             lastGamma = sliders.trackbar(0).Value
             For i = 0 To lookupTable.Length - 1
@@ -94,7 +94,7 @@ Module Brightness_Module
     Public Sub WhiteBalance_Close(wPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WhiteBalance_Run(wPtr As IntPtr, rgb As IntPtr, rows As Int32, cols As Int32, thresholdVal As Single) As IntPtr
+    Public Function WhiteBalance_Run(wPtr As IntPtr, rgb As IntPtr, rows As integer, cols As integer, thresholdVal As Single) As IntPtr
     End Function
 End Module
 
@@ -171,7 +171,7 @@ Public Class Brightness_WhiteBalance
 
         Dim thresholdVal = sliders.trackbar(0).Value / 100
         Dim sum As Single
-        Dim threshold As Int32
+        Dim threshold As integer
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1
             sum += hist.histRaw(0).Get(Of Single)(i, 0)
             If sum > hist.src.Rows * hist.src.Cols * thresholdVal Then

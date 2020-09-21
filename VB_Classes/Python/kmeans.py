@@ -31,7 +31,7 @@ def main():
         _ret, labels, _centers = cv.kmeans(points, cluster_n, None, term_crit, 10, 0)
 
         img = np.zeros((img_size, img_size, 3), np.uint8)
-        for (x, y), label in zip(np.int32(points), labels.ravel()):
+        for (x, y), label in zip(np.integer(points), labels.ravel()):
             c = list(map(int, colors[label]))
 
             cv.circle(img, (x, y), 1, c, -1)

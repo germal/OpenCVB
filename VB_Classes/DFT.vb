@@ -22,8 +22,8 @@ Public Class DFT_Basics
     Public spectrum As New cv.Mat
     Public complexImage As New cv.Mat
     Public gray As cv.Mat
-    Public rows As Int32
-    Public cols As Int32
+    Public rows As integer
+    Public cols As integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mats = New Mat_4to1(ocvb)
@@ -149,8 +149,8 @@ Public Class DFT_ButterworthFilter_MT
         dft.src = src
         dft.Run(ocvb)
 
-        Static radius As Int32
-        Static order As Int32
+        Static radius As integer
+        Static order As integer
         Static butterworthFilter(1) As cv.Mat
         ' only create the filter if radius or order has changed.
         If radius <> sliders.trackbar(0).Value Or order <> sliders.trackbar(1).Value Then

@@ -30,7 +30,7 @@ Module PointCloud
     Public Function Project_GravityHist_Side(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Int32, cols As Int32) As IntPtr
+    Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Integer, cols As Integer) As IntPtr
     End Function
 
     Public Class compareAllowIdenticalIntInverted : Implements IComparer(Of Single)

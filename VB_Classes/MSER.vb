@@ -4,7 +4,7 @@ Public Class MSER_Basics
     Inherits VBparent
     Public zone() As cv.Rect = Nothing
     Public region()() As cv.Point = Nothing
-    Dim saveParms() As Int32
+    Dim saveParms() As integer
     Dim mser As cv.MSER
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -62,7 +62,7 @@ Public Class MSER_Basics
         mser.DetectRegions(src, region, zone)
 
         If standalone Then
-            Dim pixels As Int32
+            Dim pixels As integer
             dst1.SetTo(0)
             For i = 0 To region.Length - 1
                 Dim nextRegion = region(i)
@@ -83,14 +83,14 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Synthetic
     Inherits VBparent
-    Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Int32, color() As Int32, n As Int32)
+    Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As integer, color() As integer, n As integer)
         For i = 0 To n - 1
             img.Rectangle(New cv.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
             p0 += New cv.Point((width(i) - width(i + 1)) / 2, (width(i) - width(i + 1)) / 2)
             img.FloodFill(p0, color(i))
         Next
     End Sub
-    Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As Int32, color() As Int32, n As Int32)
+    Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As integer, color() As integer, n As integer)
         For i = 0 To n - 1
             img.Circle(p0, width(i) / 2, color(i), 1)
             img.FloodFill(p0, color(i))
@@ -127,14 +127,14 @@ Public Class MSER_TestSynthetic
     Inherits VBparent
     Dim mser As MSER_Basics
     Dim synth As MSER_Synthetic
-    Private Function testSynthetic(ocvb As VBocvb, img As cv.Mat, pass2Only As Boolean, delta As Int32) As String
+    Private Function testSynthetic(ocvb As VBocvb, img As cv.Mat, pass2Only As Boolean, delta As integer) As String
         mser.check.Box(0).Checked = pass2Only
         mser.sliders.trackbar(0).Value = delta
         mser.src = img
         mser.Run(ocvb)
 
-        Dim pixels As Int32
-        Dim regionCount As Int32
+        Dim pixels As integer
+        Dim regionCount As integer
         For i = 0 To mser.region.Length - 1
             regionCount += 1
             Dim nextRegion = mser.region(i)
@@ -226,7 +226,7 @@ Public Class MSER_Contours
         mser.src = src
         mser.Run(ocvb)
 
-        Dim pixels As Int32
+        Dim pixels As integer
         dst1 = src
         Dim hull() As cv.Point
         For i = 0 To mser.region.Length - 1

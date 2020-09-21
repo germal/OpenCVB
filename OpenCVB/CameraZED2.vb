@@ -3,10 +3,10 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Open(width As Int32, height As Int32, fps As Int32) As IntPtr
+    Public Function Zed2Open(width As integer, height As integer, fps As integer) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2SerialNumber(cPtr As IntPtr) As Int32
+    Public Function Zed2SerialNumber(cPtr As IntPtr) As integer
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsLeft(cPtr As IntPtr) As IntPtr
@@ -104,7 +104,7 @@ Public Class CameraZED2
         Dim height As Int64
     End Structure
 
-    Public Sub initialize(fps As Int32)
+    Public Sub initialize(fps As integer)
         cPtr = Zed2Open(width, height, 60)
         deviceName = "StereoLabs ZED 2"
         cameraName = deviceName

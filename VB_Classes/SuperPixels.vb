@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 
 Module SuperPixel_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_Open(width As Int32, height As Int32, num_superpixels As Int32, num_levels As Int32, prior As Int32) As IntPtr
+    Public Function SuperPixel_Open(width As integer, height As integer, num_superpixels As integer, num_levels As integer, prior As integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub SuperPixel_Close(spPtr As IntPtr)
@@ -36,9 +36,9 @@ Public Class SuperPixel_Basics_CPP
         desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static numSuperPixels As Int32
-        Static numIterations As Int32
-        Static prior As Int32
+        Static numSuperPixels As integer
+        Static numIterations As integer
+        Static prior As integer
         If numSuperPixels <> sliders.trackbar(0).Value Or numIterations <> sliders.trackbar(1).Value Or prior <> sliders.trackbar(2).Value Then
             numSuperPixels = sliders.trackbar(0).Value
             numIterations = sliders.trackbar(1).Value

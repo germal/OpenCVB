@@ -58,13 +58,13 @@ Public Class ActiveTask : Implements IDisposable
         Public intrinsicsRight As intrinsics_VB
         Public extrinsics As Extrinsics_VB
 
-        Public Const Kinect4AzureCam As Int32 = 0
-        Public Const T265Camera As Int32 = 1
-        Public Const StereoLabsZED2 As Int32 = 2
-        Public Const MyntD1000 As Int32 = 3
-        Public Const D435i As Int32 = 4
-        Public Const L515 As Int32 = 5
-        Public Const D455 As Int32 = 6
+        Public Const Kinect4AzureCam As integer = 0
+        Public Const T265Camera As integer = 1
+        Public Const StereoLabsZED2 As integer = 2
+        Public Const MyntD1000 As integer = 3
+        Public Const D435i As integer = 4
+        Public Const L515 As integer = 5
+        Public Const D455 As integer = 6
     End Structure
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
         radioOffset = New cv.Point(0, 5)

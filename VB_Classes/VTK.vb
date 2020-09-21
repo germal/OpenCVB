@@ -22,13 +22,13 @@ Public Class VTK_Basics
     Dim rgbBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
     Dim dataBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
     Dim memMapWriter As MemoryMappedViewAccessor
-    Dim memMapbufferSize As Int32
+    Dim memMapbufferSize As integer
     Dim memMapFile As MemoryMappedFile
     Public memMapSysData(6) As Double ' allow space for 10 user data values
     Public memMapUserData(10) As Double ' allow space for 10 user data values
     Public memMapValues(49) As Double ' more than needed - room for growth
     Public usingDepthAndRGB As Boolean = True ' if false, we are using plotData, not depth32f.
-    Public pointSize As Int32 = 1
+    Public pointSize As integer = 1
     Public rgbInput As New cv.Mat
     Public dataInput As New cv.Mat
     Public FOV As Single = 60
@@ -150,7 +150,7 @@ Public Class VTK_Histogram3D
             Exit Sub
         End If
 
-        Static lastStdev As Int32 = -1
+        Static lastStdev As integer = -1
         If vtk.memMapUserData(0) <> sliders.trackbar(1).Value Or vtk.memMapUserData(1) <> sliders.trackbar(2).Value / 1000000 Or
                 lastStdev <> sliders.trackbar(0).Value Then
             vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.

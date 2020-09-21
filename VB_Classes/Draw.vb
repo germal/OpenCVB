@@ -74,7 +74,7 @@ End Class
 
 Public Class Draw_Noise
     Inherits VBparent
-    Public maxNoiseWidth As Int32 = 3
+    Public maxNoiseWidth As integer = 3
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
     Public Sub New(ocvb As VBocvb)

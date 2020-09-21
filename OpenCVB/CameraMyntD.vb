@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Module MyntD_Interface
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MyntDOpen(width As Int32, height As Int32, fps As Int32) As IntPtr
+    Public Function MyntDOpen(width As integer, height As integer, fps As integer) As IntPtr
     End Function
     <DllImport(("Cam_MyntD.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MyntDWaitFrame(cPtr As IntPtr) As IntPtr
@@ -94,7 +94,7 @@ Public Class CameraMyntD
     Private Sub IMUdataCollection()
         MyntDtaskIMU(cPtr)
     End Sub
-    Public Sub initialize(fps As Int32)
+    Public Sub initialize(fps As integer)
         cPtr = MyntDOpen(width, height, 30)
         deviceName = "MyntEyeD 1000"
         cameraName = deviceName

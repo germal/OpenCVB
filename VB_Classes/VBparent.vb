@@ -7,8 +7,8 @@ Imports cv = OpenCvSharp
 Public Class TTtext
     Public text As String
     Public picTag = 2
-    Public x As Int32
-    Public y As Int32
+    Public x As Integer
+    Public y As Integer
     Private Sub setup(_text As String, _x As Integer, _y As Integer, camPicIndex As Integer)
         text = _text
         x = _x

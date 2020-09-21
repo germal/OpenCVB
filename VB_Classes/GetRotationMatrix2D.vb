@@ -34,7 +34,7 @@ Public Class GetRotationMatrix2D_Basics
     Inherits VBparent
     Public M As cv.Mat
     Public Mflip As cv.Mat
-    Public warpFlag As Int32
+    Public warpFlag As integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)

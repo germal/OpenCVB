@@ -70,7 +70,7 @@ Public Class DNN_Basics
     Dim net As Net
     Dim dnnPrepared As Boolean
     Dim crop As cv.Rect
-    Dim dnnWidth As Int32, dnnHeight As Int32
+    Dim dnnWidth As integer, dnnHeight As integer
     Dim testImage As cv.Mat
     Dim kalman(10) As Kalman_Basics
     Public rect As cv.Rect

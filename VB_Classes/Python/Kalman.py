@@ -68,9 +68,9 @@ def main():
                          color, 1, cv.LINE_AA, 0)
 
             img = np.zeros((img_height, img_width, 3), np.uint8)
-            draw_cross(np.int32(state_pt), (255, 255, 255), 3)
-            draw_cross(np.int32(measurement_pt), (0, 0, 255), 3)
-            draw_cross(np.int32(predict_pt), (0, 255, 0), 3)
+            draw_cross(np.integer(state_pt), (255, 255, 255), 3)
+            draw_cross(np.integer(measurement_pt), (0, 0, 255), 3)
+            draw_cross(np.integer(predict_pt), (0, 255, 0), 3)
 
             cv.line(img, state_pt, measurement_pt, (0, 0, 255), 3, cv.LINE_AA, 0)
             cv.line(img, state_pt, predict_pt, (0, 255, 255), 3, cv.LINE_AA, 0)

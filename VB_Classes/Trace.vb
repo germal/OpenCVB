@@ -8,7 +8,7 @@ Module Trace_OpenCV_CPP_Module
     Public Sub Trace_OpenCV_Close(Trace_OpenCVPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Trace_OpenCV_Run(Trace_OpenCVPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
+    Public Function Trace_OpenCV_Run(Trace_OpenCVPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, channels As integer) As IntPtr
     End Function
 End Module
 

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 
 Module Hough_Exports
-    Public Sub houghShowLines(ByRef dst1 As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As Int32)
+    Public Sub houghShowLines(ByRef dst1 As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As integer)
         For i = 0 To Math.Min(segments.Length, desiredCount) - 1
             Dim rho As Single = segments(i).Rho
             Dim theta As Single = segments(i).Theta
@@ -53,7 +53,7 @@ Public Class Hough_Circles
         circles.src = src
         circles.Run(ocvb)
         dst1 = circles.dst1
-        Static Dim method As Int32 = 3
+        Static Dim method As integer = 3
         cv.Cv2.CvtColor(dst1, dst2, cv.ColorConversionCodes.BGR2GRAY)
         Dim cFound = cv.Cv2.HoughCircles(dst2, method, 1, dst1.Rows / 4, 100, 10, 1, 200)
         Dim foundColor = New cv.Scalar(0, 0, 255)

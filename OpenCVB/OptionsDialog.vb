@@ -7,9 +7,9 @@ Imports py = Python.Runtime
 Public Class OptionsDialog
     Dim numPyEnabled As Boolean = False
 
-    Public cameraIndex As Int32 ' an index into the cameraRadioButton array.
+    Public cameraIndex As integer ' an index into the cameraRadioButton array.
 
-    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) As Int32
+    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) As integer
     Public cameraRadioButton(VB_Classes.ActiveTask.algParms.D455) As RadioButton
     Public cameraTotalCount As Integer = 0
 

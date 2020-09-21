@@ -143,8 +143,8 @@ Public Class DCT_FeatureLess_MT
         ' Result2 contain the RGB image with highest frequency removed.
         Parallel.For(0, dst2.Rows,
         Sub(i)
-            Dim runLen As Int32 = 0
-            Dim runStart As Int32 = 0
+            Dim runLen As integer = 0
+            Dim runStart As integer = 0
             For j = 1 To dst2.Cols - 1
                 If dst2.Get(Of Byte)(i, j) = dst2.Get(Of Byte)(i, j - 1) Then
                     runLen += 1
@@ -214,7 +214,7 @@ Public Class DCT_Surfaces_debug
         depth32f.SetTo(0, notMask) ' remove non-featureless surface depth data.
 
         ' find the most featureless roi
-        Dim maxIndex As Int32
+        Dim maxIndex As integer
         Dim roiCounts(grid.roiList.Count - 1)
         For i = 0 To grid.roiList.Count - 1
             roiCounts(i) = mask(grid.roiList(i)).CountNonZero()

@@ -178,7 +178,7 @@ Module Stabilizer_Basics_Module
     Public Sub Stabilizer_Basics_Close(sPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Stabilizer_Basics_Run(sPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Stabilizer_Basics_Run(sPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer) As IntPtr
     End Function
 End Module
 Public Class Stabilizer_Basics_CPP

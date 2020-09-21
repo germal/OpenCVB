@@ -137,7 +137,7 @@
 # include <stdint.h>
   typedef  uint8_t BYTE;
   typedef uint16_t U16;
-  typedef uint32_t U32;
+  typedef uint32 U32;
   typedef  int32_t S32;
   typedef uint64_t U64;
   typedef uintptr_t uptrval;

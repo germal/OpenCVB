@@ -12,7 +12,7 @@ Public Class VBocvb
 
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
-    Public frameCount As Int32 = 0
+    Public frameCount As Integer = 0
     Public label1 As String
     Public label2 As String
     Public quadrantIndex As Integer = 0

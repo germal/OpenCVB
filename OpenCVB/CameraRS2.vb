@@ -5,7 +5,7 @@ Imports cv = OpenCvSharp
 
 Module RS2_Module_CPP
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RS2Open(width As Int32, height As Int32, IMUPresent As Boolean, lidarCam As Boolean) As IntPtr
+    Public Function RS2Open(width As integer, height As integer, IMUPresent As Boolean, lidarCam As Boolean) As IntPtr
     End Function
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub RS2WaitForFrame(tp As IntPtr)
@@ -58,8 +58,8 @@ Structure RS2IMUdata
     Public rotation As cv.Point3f
     Public angularVelocity As cv.Point3f
     Public angularAcceleration As cv.Point3f
-    Public trackerConfidence As Int32
-    Public mapperConfidence As Int32
+    Public trackerConfidence As integer
+    Public mapperConfidence As integer
 End Structure
 Public Class CameraRS2
     Inherits Camera
@@ -89,7 +89,7 @@ Public Class CameraRS2
         Dim Devices = ctx.QueryDevices()
         Return Devices(index).Info(0)
     End Function
-    Public Sub initialize(fps As Int32)
+    Public Sub initialize(fps As integer)
         deviceName = cameraName ' devicename is used to determine that the camera has been initialized.
         lidarCam = If(deviceName = "Intel RealSense L515", True, False)
         cPtr = RS2Open(width, height, IMU_Present, lidarCam)

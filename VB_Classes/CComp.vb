@@ -421,7 +421,7 @@ Public Class CComp_InRange_MT
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim rangeCount As Int32 = sliders.trackbar(0).Value
+        Dim rangeCount As integer = sliders.trackbar(0).Value
         Dim maxDepth = sliders.trackbar(1).Value
         Dim minBlobSize = sliders.trackbar(2).Value * 1000
 
@@ -429,7 +429,7 @@ Public Class CComp_InRange_MT
         Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
         dst1.SetTo(0)
-        Dim totalBlobs As Int32
+        Dim totalBlobs As integer
         Parallel.For(0, rangeCount,
         Sub(i)
             Dim lowerBound = i * (255 / rangeCount)
@@ -473,7 +473,7 @@ Public Class CComp_InRange
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim rangeCount As Int32 = sliders.trackbar(0).Value
+        Dim rangeCount As integer = sliders.trackbar(0).Value
         Dim minBlobSize = sliders.trackbar(1).Value * 1000
 
         Dim mask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()

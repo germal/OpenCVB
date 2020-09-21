@@ -61,7 +61,7 @@ Public Class Font_FlowText
             msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.")
             msgs.Add("Then at the end of your Run method, invoke flow.Run(ocvb)")
         End If
-        Static lastCount As Int32
+        Static lastCount As integer
 
         Dim maxlines = 22
         Dim firstLine = If(msgs.Count - maxlines < 0, 0, msgs.Count - maxlines)
@@ -72,7 +72,7 @@ Public Class Font_FlowText
         ocvb.trueText(fullText, 10, 20)
 
         If msgs.Count >= maxLines Then
-            Dim index As Int32
+            Dim index As integer
             For i = 0 To lastCount - maxLines - 1
                 msgs.RemoveAt(index)
                 index += 1

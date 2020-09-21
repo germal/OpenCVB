@@ -9,7 +9,7 @@ Module Harris_Exports
     Public Sub Harris_Features_Close(Harris_FeaturesPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Features_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Int32, cols As Int32, threshold As Single,
+    Public Function Harris_Features_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As integer, cols As integer, threshold As Single,
                                         neighborhood As Int16, aperture As Int16, HarrisParm As Single) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -19,7 +19,7 @@ Module Harris_Exports
     Public Sub Harris_Detector_Close(Harris_FeaturesPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Detector_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Int32, cols As Int32, qualityLevel As Double,
+    Public Function Harris_Detector_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As integer, cols As integer, qualityLevel As Double,
                                         count As IntPtr) As IntPtr
     End Function
 End Module
@@ -80,7 +80,7 @@ End Class
 Public Class Harris_Detector_CPP
     Inherits VBparent
     Dim srcData() As Byte
-    Dim ptCount(1) As Int32
+    Dim ptCount(1) As integer
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New(ocvb As VBocvb)
@@ -104,13 +104,13 @@ Public Class Harris_Detector_CPP
         handleSrc.Free()
         handleCount.Free()
         If ptCount(0) > 1 And ptPtr <> 0 Then
-            Dim pts((ptCount(0) - 1) * 2 - 1) As Int32
+            Dim pts((ptCount(0) - 1) * 2 - 1) As integer
             Marshal.Copy(ptPtr, pts, 0, ptCount(0))
             Dim ptMat = New cv.Mat(ptCount(0), 2, cv.MatType.CV_32S, pts)
             If standalone Then src.CopyTo(dst1)
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
-                FeaturePoints.Add(New cv.Point2f(ptMat.Get(of Int32)(i, 0), ptMat.Get(of Int32)(i, 1)))
+                FeaturePoints.Add(New cv.Point2f(ptMat.Get(of integer)(i, 0), ptMat.Get(of integer)(i, 1)))
                 if standalone Then dst1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Next
         End If

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module undistort_Mats
     Public Sub undistortSetup(ocvb As VBocvb, ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
-                       maxDisp As Int32, stereo_height_px As Int32, intrinsics As ActiveTask.intrinsics_VB)
+                       maxDisp As integer, stereo_height_px As integer, intrinsics As ActiveTask.intrinsics_VB)
         Dim kLeft(8) As Double
         Dim rLeft(8) As Double
         Dim dLeft(4) As Double
@@ -60,10 +60,10 @@ Public Class Undistort_Basics
     Inherits VBparent
     Dim leftViewMap1 As New cv.Mat
     Dim leftViewMap2 As New cv.Mat
-    Dim saveK As Int32, saveD As Int32, saveR As Int32, saveP As Int32
-    Dim maxDisp As Int32
-    Dim stereo_cx As Int32
-    Dim stereo_cy As Int32
+    Dim saveK As integer, saveD As integer, saveR As integer, saveP As integer
+    Dim maxDisp As integer
+    Dim stereo_cx As integer
+    Dim stereo_cy As integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)

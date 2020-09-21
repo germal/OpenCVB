@@ -3,10 +3,10 @@ Public Class Featureless_Basics_MT
     Inherits VBparent
     Public edges As Edges_Canny
     Public grid As Thread_Grid
-    Public regionCount As Int32
+    Public regionCount As integer
     Public mask As New cv.Mat
     Public objects As New List(Of cv.Mat)
-    Public objectSize As New List(Of Int32)
+    Public objectSize As New List(Of integer)
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
@@ -181,7 +181,7 @@ Public Class Featureless_DCT_MT
         dst2 = dct.dst2
 
         Dim mask = dst1.Clone()
-        Dim objectSize As New List(Of Int32)
+        Dim objectSize As New List(Of integer)
         Dim regionCount = 1
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
@@ -194,7 +194,7 @@ Public Class Featureless_DCT_MT
             Next
         Next
 
-        Dim maxSize As Int32, maxIndex As Int32
+        Dim maxSize As integer, maxIndex As integer
         For i = 0 To objectSize.Count - 1
             If maxSize < objectSize.ElementAt(i) Then
                 maxSize = objectSize.ElementAt(i)

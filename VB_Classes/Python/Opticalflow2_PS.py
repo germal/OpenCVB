@@ -7,7 +7,7 @@ def draw_flow(img, flow, step=16):
     y, x = np.mgrid[step/2:height:step, step/2:width:step].reshape(2,-1).astype(int)
     fx, fy = flow[y,x].T
     lines = np.vstack([x, y, x+fx, y+fy]).T.reshape(-1, 2, 2)
-    lines = np.int32(lines + 0.5)
+    lines = np.integer(lines + 0.5)
     vis = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
     cv.polylines(vis, lines, 0, (0, 255, 0))
     for (x1, y1), (_x2, _y2) in lines:

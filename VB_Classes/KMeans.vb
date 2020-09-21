@@ -150,7 +150,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         Dim img() = New cv.Mat() {rgb32f, xyDepth32f}
         Dim all32f = New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC(6)) ' output will have 6 channels!
         Dim mixed() = New cv.Mat() {all32f}
-        Dim from_to() = New Int32() {0, 0, 0, 1, 0, 2, 3, 3, 4, 4, 5, 5}
+        Dim from_to() = New integer() {0, 0, 0, 1, 0, 2, 3, 3, 4, 4, 5, 5}
         cv.Cv2.MixChannels(img, mixed, from_to)
 
         Dim columnVector As New cv.Mat
@@ -211,7 +211,7 @@ Public Class kMeans_XYDepth
         Dim colors As New cv.Mat
         cv.Cv2.Kmeans(columnVector, sliders.trackbar(0).Value, labels, term, 3, cv.KMeansFlags.PpCenters, colors)
         For i = 0 To columnVector.Rows - 1
-            columnVector.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
+            columnVector.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of integer)(i)))
         Next
         ocvb.RGBDepth.CopyTo(dst1)
         columnVector.Reshape(3, dst1(roi).Height).ConvertTo(dst1(roi), cv.MatType.CV_8U)
@@ -281,7 +281,7 @@ Public Class kMeans_LAB
         cv.Cv2.Kmeans(lab32f, clusterCount, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
 
         For i = 0 To columnVector.Rows - 1
-            lab32f.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Int32)(i)))
+            lab32f.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of integer)(i)))
         Next
         src.CopyTo(dst1)
         lab32f.Reshape(3, roi.Height).ConvertTo(dst1(roi), cv.MatType.CV_8UC3)

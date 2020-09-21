@@ -33,7 +33,7 @@ Public Class MultiDimensionScaling_Cities
         Next
         Return Math.Max(Math.Max(c1, max), 0)
     End Function
-    Private Function CenteringMatrix(n As Int32) As cv.Mat
+    Private Function CenteringMatrix(n As integer) As cv.Mat
         Return cv.Mat.Eye(n, n, cv.MatType.CV_64F) - 1.0 / n
     End Function
     Public Sub Run(ocvb As VBocvb)

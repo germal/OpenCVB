@@ -38,7 +38,7 @@ End Class
 Public Class MotionBlur_Deblur
     Inherits VBparent
     Dim mblur As MotionBlur_Basics
-    Private Function calcPSF(filterSize As cv.Size, len As Int32, theta As Double) As cv.Mat
+    Private Function calcPSF(filterSize As cv.Size, len As integer, theta As Double) As cv.Mat
         Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)
         Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)
         h.Ellipse(pt, New cv.Size(0, CInt(len / 2)), 90 - theta, 0, 360, New cv.Scalar(255), -1)

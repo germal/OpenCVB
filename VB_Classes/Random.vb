@@ -238,7 +238,7 @@ Module Random_PatternGenerator_CPP_Module
     Public Sub Random_PatternGenerator_Close(Random_PatternGeneratorPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_PatternGenerator_Run(Random_PatternGeneratorPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
+    Public Function Random_PatternGenerator_Run(Random_PatternGeneratorPtr As IntPtr, rows As integer, cols As integer, channels As integer) As IntPtr
     End Function
 End Module
 

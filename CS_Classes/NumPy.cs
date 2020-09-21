@@ -94,7 +94,7 @@ namespace CS_Classes
                 dynamic a = np.array(new List<float> { 1, 2, 3});
                 Console.WriteLine(a.dtype);
 
-                dynamic b = np.array(new List<float> { 6, 5, 4}, dtype: np.int32);
+                dynamic b = np.array(new List<float> { 6, 5, 4}, dtype: np.integer);
                 Console.WriteLine(b.dtype);
 
                 Console.WriteLine(a * b);

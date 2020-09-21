@@ -16,8 +16,8 @@ Public Class Edges_Canny
         label2 = "Canny using L2 Norm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim threshold1 As Int32 = sliders.trackbar(0).Value
-        Dim threshold2 As Int32 = sliders.trackbar(1).Value
+        Dim threshold1 As integer = sliders.trackbar(0).Value
+        Dim threshold2 As integer = sliders.trackbar(1).Value
         Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Canny(threshold1, threshold2, aperture, False)
@@ -157,7 +157,7 @@ Module Edges_Exports
     Public Sub Edges_RandomForest_Close(Edges_RandomForestPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edges_RandomForest_Run(Edges_RandomForestPtr As IntPtr, inputPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Edges_RandomForest_Run(Edges_RandomForestPtr As IntPtr, inputPtr As IntPtr, rows As integer, cols As integer) As IntPtr
     End Function
 End Module
 
@@ -301,7 +301,7 @@ Module Edges_Deriche_CPP_Module
     Public Sub Edges_Deriche_Close(Edges_DerichePtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edges_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, alpha As Single, omega As Single) As IntPtr
+    Public Function Edges_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, alpha As Single, omega As Single) As IntPtr
     End Function
 End Module
 

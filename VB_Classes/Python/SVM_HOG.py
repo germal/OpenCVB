@@ -29,7 +29,7 @@ def hog(img):
     gx = cv.Sobel(img, cv.CV_32F, 1, 0)
     gy = cv.Sobel(img, cv.CV_32F, 0, 1)
     mag, ang = cv.cartToPolar(gx, gy)
-    bins = np.int32(bin_n*ang/(2*np.pi))    # quantizing binvalues in (0...16)
+    bins = np.integer(bin_n*ang/(2*np.pi))    # quantizing binvalues in (0...16)
     bin_cells = bins[:10,:10], bins[10:,:10], bins[:10,10:], bins[10:,10:]
     mag_cells = mag[:10,:10], mag[10:,:10], mag[:10,10:], mag[10:,10:]
     hists = [np.bincount(b.ravel(), m.ravel(), bin_n) for b, m in zip(bin_cells, mag_cells)]

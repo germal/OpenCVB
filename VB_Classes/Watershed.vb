@@ -36,7 +36,7 @@ Public Class Watershed_Basics
                 cv.Cv2.Watershed(src, markers)
                 For y = 0 To dst1.Rows - 1
                     For x = 0 To dst1.Cols - 1
-                        Dim idx = markers.Get(Of Int32)(y, x)
+                        Dim idx = markers.Get(Of integer)(y, x)
                         If idx = -1 Then
                             dst1.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(255, 255, 255))
                         ElseIf idx <= 0 Or idx > componentCount Then

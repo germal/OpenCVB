@@ -19,7 +19,7 @@ End Class
 
 
 Module Math_Functions
-    Public Function computeMedian(src As cv.Mat, mask As cv.Mat, totalPixels As Integer, bins As Int32, rangeMin As Single, rangeMax As Single) As Double
+    Public Function computeMedian(src As cv.Mat, mask As cv.Mat, totalPixels As Integer, bins As integer, rangeMin As Single, rangeMax As Single) As Double
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(rangeMin, rangeMax)}
 
@@ -47,7 +47,7 @@ Public Class Math_Median_CDF
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
-    Public bins As Int32 = 10
+    Public bins As integer = 10
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)

@@ -41,7 +41,7 @@ def thresh_callback(val):
             cv.ellipse(drawing, minEllipse[i], color, 2)
         # rotated rectangle
         box = cv.boxPoints(minRect[i])
-        box = np.intp(box) #np.intp: Integer used for indexing (same as C ssize_t; normally either int32 or int64)
+        box = np.intp(box) #np.intp: Integer used for indexing (same as C ssize_t; normally either integer or int64)
         cv.drawContours(drawing, [box], 0, color)
     ## [forContour]
 

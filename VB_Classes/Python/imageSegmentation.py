@@ -94,7 +94,7 @@ dist_8u = dist.astype('uint8')
 contours, _ = cv.findContours(dist_8u, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
 # Create the marker image for the watershed algorithm
-markers = np.zeros(dist.shape, dtype=np.int32)
+markers = np.zeros(dist.shape, dtype=np.integer)
 
 # Draw the foreground markers
 for i in range(len(contours)):

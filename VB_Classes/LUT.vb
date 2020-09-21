@@ -21,7 +21,7 @@ Public Class LUT_Gray
         Dim vals = {0, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, 255}
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
-        Dim splitIndex As Int32
+        Dim splitIndex As integer
         For i = 0 To 255
             myLut.Set(Of Byte)(0, i, vals(splitIndex))
             If i >= splits(splitIndex) Then splitIndex += 1

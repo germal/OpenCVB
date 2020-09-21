@@ -7,9 +7,9 @@ Public Class Thread_Grid
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
     Public gridMask As cv.Mat
-    Public tilesPerRow As Int32
-    Public tilesPerCol As Int32
-    Dim incompleteRegions As Int32
+    Public tilesPerRow As integer
+    Public tilesPerCol As integer
+    Dim incompleteRegions As integer
     Private Sub drawGrid(rList As List(Of cv.Rect))
         For Each roi In rList
             Dim p1 = New cv.Point(roi.X + roi.Width, roi.Y)
@@ -36,9 +36,9 @@ Public Class Thread_Grid
         desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static lastWidth As Int32
-        Static lastHeight As Int32
-        Static lastBorder As Int32
+        Static lastWidth As integer
+        Static lastHeight As integer
+        Static lastBorder As integer
 
         Dim borderSize = sliders.trackbar(2).Value
         If lastWidth <> sliders.trackbar(0).Value Or lastHeight <> sliders.trackbar(1).Value Or lastBorder <> borderSize Then

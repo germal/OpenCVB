@@ -67,7 +67,7 @@ End Module
 
 Public Class Python_Run
     Inherits VBparent
-    Dim tryCount As Int32
+    Dim tryCount As integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.HomeDir + "VB_Classes/Python/PythonPackages.py"
@@ -106,7 +106,7 @@ Public Class Python_MemMap
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
     Public memMapValues(49) As Double ' more than we need - buffer for growth
-    Public memMapbufferSize As Int32
+    Public memMapbufferSize As integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If ocvb.PythonFileName Is Nothing Then

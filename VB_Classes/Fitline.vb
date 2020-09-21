@@ -206,9 +206,9 @@ Public Class Fitline_EigenFit
         Static m2 As Single
         If ocvb.frameCount Mod 30 = 0 Then
 
-            Static noisePointCount As Int32
-            Static linePointCount As Int32
-            Static lineNoise As Int32
+            Static noisePointCount As integer
+            Static linePointCount As integer
+            Static lineNoise As integer
             Static highlight As Boolean
             'If noisyLine.sliders.trackbar(0).Value <> noisePointCount Or noisyLine.sliders.trackbar(1).Value <> linePointCount Or
             '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then

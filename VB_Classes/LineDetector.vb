@@ -41,18 +41,18 @@ End Class
 
 Module fastLineDetector_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function lineDetectorFast_Run(image As IntPtr, rows As Int32, cols As Int32, length_threshold As Int32, distance_threshold As Single, canny_th1 As Int32, canny_th2 As Int32,
-                                             canny_aperture_size As Int32, do_merge As Boolean) As Int32
+    Public Function lineDetectorFast_Run(image As IntPtr, rows As integer, cols As integer, length_threshold As integer, distance_threshold As Single, canny_th1 As integer, canny_th2 As integer,
+                                             canny_aperture_size As integer, do_merge As Boolean) As integer
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function lineDetector_Run(image As IntPtr, rows As Int32, cols As Int32) As Int32
+    Public Function lineDetector_Run(image As IntPtr, rows As integer, cols As integer) As integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function lineDetector_Lines() As IntPtr
     End Function
 
-    Public Sub find3DLineSegment(ocvb As VBocvb, dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Int32)
+    Public Sub find3DLineSegment(ocvb As VBocvb, dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As integer)
         Dim pt1 = New cv.Point(aa(0), aa(1))
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
@@ -68,8 +68,8 @@ Module fastLineDetector_Exports
         If roi.Y + roi.Height >= _mask.Height Then roi.Height = _mask.Height - roi.Y - 1
         Dim mask = _mask(roi).Clone()
         Dim depth32f = _depth32f(roi).Clone()
-        Dim totalPoints As Int32
-        Dim skipPoints As Int32
+        Dim totalPoints As integer
+        Dim skipPoints As integer
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
                 If mask.Get(Of Byte)(y, x) = 1 Then
@@ -113,7 +113,7 @@ Module fastLineDetector_Exports
             End If
         End If
     End Sub
-    Public Function segment3D(worldDepth As List(Of cv.Vec6f), ByRef skipPoints As Int32) As cv.Vec6f()
+    Public Function segment3D(worldDepth As List(Of cv.Vec6f), ByRef skipPoints As integer) As cv.Vec6f()
         ' by construction, x and y are already on a line.  Compute the average z delta.  Eliminate outliers with that average.
         Dim sum As Double = 0
         Dim midPoint As Double
@@ -123,7 +123,7 @@ Module fastLineDetector_Exports
         Next
         Dim avgDelta = sum / worldDepth.Count * 3
         midPoint /= worldDepth.Count
-        Dim midIndex As Int32 = -1
+        Dim midIndex As integer = -1
         ' find a point which is certain to be on the line - something close the centroid
         For i = worldDepth.Count / 4 To worldDepth.Count - 1
             If Math.Abs(worldDepth(i).Item2 - midPoint) < avgDelta Then
@@ -158,7 +158,7 @@ Module fastLineDetector_Exports
 
     ' there is a drawsegments in the contrib library but this code will operate on the full size of the image - not the small copy passed to the C++ code
     ' But, more importantly, this code uses anti-alias for the lines.  It adds the lines to a mask that may be useful with depth data.
-    Public Function drawSegments(dst1 As cv.Mat, lineCount As Int32, thickness As Integer) As SortedList(Of cv.Vec6f, Integer)
+    Public Function drawSegments(dst1 As cv.Mat, lineCount As integer, thickness As Integer) As SortedList(Of cv.Vec6f, Integer)
         Dim sortedLines As New SortedList(Of cv.Vec6f, Integer)(New CompareVec6f)
 
         Dim lines(lineCount * 4 - 1) As Single
@@ -278,7 +278,7 @@ Public Class LineDetector_3D_LongestLine
 
         If lines.sortedLines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-            Dim maskLineWidth As Int32 = sliders.trackbar(0).Value
+            Dim maskLineWidth As integer = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
             find3DLineSegment(ocvb, dst1, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
@@ -311,7 +311,7 @@ Public Class LineDetector_3D_FLD_MT
         Dim depth32f = getDepth32f(ocvb)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-        Dim maskLineWidth As Int32 = sliders.trackbar(0).Value
+        Dim maskLineWidth As integer = sliders.trackbar(0).Value
         Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(lines.sortedLines.Count - 20, lines.sortedLines.Count,
             Sub(i)
@@ -358,7 +358,7 @@ Public Class LineDetector_3D_FitLineZ
 
         If sortedlines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will likely get full length.
-            Dim maskLineWidth As Int32 = sliders.trackbar(0).Value
+            Dim maskLineWidth As integer = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
 
             Dim longestLineOnly As Boolean = check.Box(1).Checked

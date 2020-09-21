@@ -28,7 +28,7 @@ def main():
         print('generating %dx%d procedural image ...' % (sz, sz))
         img = np.zeros((sz, sz), np.uint8)
         track = np.cumsum(np.random.rand(500000, 2)-0.5, axis=0)
-        track = np.int32(track*10 + (sz/2, sz/2))
+        track = np.integer(track*10 + (sz/2, sz/2))
         cv.polylines(img, [track], 0, 255, 1, cv.LINE_AA)
 
 

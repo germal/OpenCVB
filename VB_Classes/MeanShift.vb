@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
 Public Class MeanShift_Basics
     Inherits VBparent
-    Public rectangleEdgeWidth As Int32 = 2
+    Public rectangleEdgeWidth As integer = 2
     Public inputRect As cv.Rect
     Public trackbox As New cv.Rect
     Public usingDrawRect As Boolean
@@ -17,8 +17,8 @@ Public Class MeanShift_Basics
         If inputRect.X + inputRect.Width > src.Width Then inputRect.Width = src.Width - inputRect.X
         If inputRect.Y + inputRect.Height > src.Height Then inputRect.Height = src.Height - inputRect.Y
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim ch() As Int32 = {0, 1, 2}
-        Dim hsize() As Int32 = {16, 16, 16}
+        Dim ch() As integer = {0, 1, 2}
+        Dim hsize() As integer = {16, 16, 16}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
         Static roi_hist As New cv.Mat
         If inputRect.Width > 0 And inputRect.Height > 0 Then

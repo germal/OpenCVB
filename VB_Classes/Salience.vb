@@ -6,7 +6,7 @@ Module Salience_Exports
     Public Function Salience_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Salience_Run(classPtr As IntPtr, numScales As Int32, grayInput As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Salience_Run(classPtr As IntPtr, numScales As integer, grayInput As IntPtr, rows As integer, cols As integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Salience_Close(classPtr As IntPtr)
@@ -19,7 +19,7 @@ End Module
 Public Class Salience_Basics_CPP
     Inherits VBparent
     Dim grayData(0) As Byte
-    Dim numScales As Int32
+    Dim numScales As integer
     Dim salience As IntPtr
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)

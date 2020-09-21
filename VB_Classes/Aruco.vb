@@ -15,7 +15,7 @@ Public Class Aruco_Basics
         detectorParameters.CornerRefinementWinSize = 9
         Dim dictionary = cv.Aruco.CvAruco.GetPredefinedDictionary(cv.Aruco.PredefinedDictionaryName.Dict4X4_1000)
         Dim corners()() As cv.Point2f = Nothing
-        Dim ids() As Int32 = Nothing
+        Dim ids() As integer = Nothing
         Dim rejectedPoints()() As cv.Point2f = Nothing
         ' this fails!  Cannot cast a Mat to an InputArray!  Bug?
         ' cv.Aruco.CvAruco.DetectMarkers(tmp, dictionary, corners, ids, detectorParameters, rejectedPoints)

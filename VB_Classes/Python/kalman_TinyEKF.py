@@ -60,7 +60,7 @@ def drawCross(img, center, r, g, b):
 
 
 def drawLines(img, points, r, g, b):
-    cv.polylines(img, [np.int32(points)], isClosed=False, color=(r, g, b))
+    cv.polylines(img, [np.integer(points)], isClosed=False, color=(r, g, b))
 
 
 def newImage():

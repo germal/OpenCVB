@@ -7,7 +7,7 @@ Public Class EMax_Basics
     Public samples As cv.Mat
     Public labels As cv.Mat
     Public grid As Thread_Grid
-    Public regionCount As Int32
+    Public regionCount As Integer
     Public gridWidthSlider As System.Windows.Forms.TrackBar
     Public gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
@@ -93,7 +93,7 @@ Public Class EMax_Basics
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
             Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
-            dst1.Circle(pt, 4, rColors(labels.Get(Of Int32)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+            dst1.Circle(pt, 4, rColors(labels.Get(Of Integer)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
 End Class
@@ -110,8 +110,8 @@ Module EMax_Exports
     Public Sub EMax_Basics_Close(EMax_BasicsPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function EMax_Basics_Run(EMax_BasicsPtr As IntPtr, samplesPtr As IntPtr, labelsPtr As IntPtr, rows As Int32, cols As Int32, imgRows As Int32,
-                                    imgCols As Int32, clusters As Int32, stepSize As Int32, covarianceMatrixType As Int32) As IntPtr
+    Public Function EMax_Basics_Run(EMax_BasicsPtr As IntPtr, samplesPtr As IntPtr, labelsPtr As IntPtr, rows As Integer, cols As Integer, imgRows As Integer,
+                                    imgCols As Integer, clusters As Integer, stepSize As Integer, covarianceMatrixType As Integer) As IntPtr
     End Function
 End Module
 
@@ -140,7 +140,7 @@ Public Class EMax_CPP
         label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
         If basics.regionCount <= 0 Then Exit Sub
 
-        Dim covarianceMatrixType As Int32 = 0
+        Dim covarianceMatrixType As Integer = 0
         For i = 0 To 3 - 1
             If basics.radio.check(i).Checked = True Then
                 covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
@@ -152,7 +152,7 @@ Public Class EMax_CPP
         handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Marshal.Copy(basics.samples.Data, srcData, 0, srcData.Length)
 
-        Dim labelData(srcCount - 1) As Int32
+        Dim labelData(srcCount - 1) As Integer
         Dim handleLabels As GCHandle
         handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
         Marshal.Copy(basics.labels.Data, labelData, 0, labelData.Length)

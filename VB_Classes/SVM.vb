@@ -181,13 +181,13 @@ Public Class SVM_Random
 
         For i = 0 To dataSize
             Dim pt = New cv.Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1))
-            Dim resp As Int32
+            Dim resp As integer
             If setLinear Then
                 If pt.X >= pt.Y Then resp = 1 Else resp = -1
             Else
                 If pt.X > rect.X And pt.X < rect.X + rect.Width And pt.Y > rect.Y And pt.Y < rect.Y + rect.Height Then resp = 1 Else resp = -1
             End If
-            response.Set(Of Int32)(i, 0, resp)
+            response.Set(Of integer)(i, 0, resp)
             dst1.Circle(pt, 5, If(resp = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, cv.LineTypes.AntiAlias)
             trainData.Set(Of Single)(i, 0, pt.X)
             trainData.Set(Of Single)(i, 1, pt.Y)
@@ -231,7 +231,7 @@ End Class
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_TestCase
     Inherits VBparent
-    Dim labels() As Int32 = {1, -1, -1, -1}
+    Dim labels() As integer = {1, -1, -1, -1}
     Dim trainData(,) As Single = {{501, 50}, {255, 50}, {501, 255}, {50, 200}}
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
@@ -269,7 +269,7 @@ Public Class SVM_TestCase
         Next
 
         For i = 0 To trainMat.Rows - 1
-            Dim color = If(labelsMat.Get(Of Int32)(i) = 1, cv.Scalar.Yellow, cv.Scalar.Red)
+            Dim color = If(labelsMat.Get(Of integer)(i) = 1, cv.Scalar.Yellow, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
             dst1.Circle(pt, 5, color, -1, cv.LineTypes.AntiAlias)
             dst2.Circle(pt, 5, color, -1, cv.LineTypes.AntiAlias)

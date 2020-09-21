@@ -54,7 +54,7 @@ Public Class KLT_Basics
             outputMat = inputMat.Clone()
             cv.Cv2.CalcOpticalFlowPyrLK(prevGray, src, inputMat, outputMat, status, err, winSize, 3, term, cv.OpticalFlowFlags.None)
 
-            Dim k As Int32
+            Dim k As integer
             For i = 0 To inputPoints.Length - 1
                 If status.Get(Of Byte)(i) Then
                     inputPoints(k) = outputMat.Get(Of cv.Point2f)(i)

@@ -12,7 +12,7 @@ Public Class Mouse_Basics
         If lastPoint = ocvb.mousePoint Or ocvb.mousePicTag <> 2 Then Exit Sub
         lastPoint = ocvb.mousePoint
         Dim radius = 10
-        Static colorIndex As Int32
+        Static colorIndex As integer
         Dim nextColor = scalarColors(colorIndex)
         Dim nextPt = ocvb.mousePoint
         dst1.Circle(nextPt, radius, nextColor, -1, cv.LineTypes.AntiAlias)

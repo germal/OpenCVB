@@ -134,8 +134,8 @@ Public Class Contours_Depth
         dst1 = trim.dst1
         dst2.SetTo(0)
         Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim maxIndex As Int32
-        Dim maxNodes As Int32
+        Dim maxIndex As integer
+        Dim maxNodes As integer
         For i = 0 To contours0.Length - 1
             Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
             If maxNodes < contours.Length Then
@@ -165,8 +165,8 @@ Public Class Contours_RGB
         img.SetTo(0, trim.zeroMask)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim maxIndex As Int32
-        Dim maxNodes As Int32
+        Dim maxIndex As integer
+        Dim maxNodes As integer
         For i = 0 To contours0.Length - 1
             Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
             If maxNodes < contours.Length Then

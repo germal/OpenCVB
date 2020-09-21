@@ -13,7 +13,7 @@ Module Delaunay_Exports
         End If
     End Sub
 
-    Public Sub draw_subdiv(img As cv.Mat, subdiv As cv.Subdiv2D, delaunay_color As cv.Scalar, testval As Int32)
+    Public Sub draw_subdiv(img As cv.Mat, subdiv As cv.Subdiv2D, delaunay_color As cv.Scalar, testval As integer)
         If testval Then
             Dim trianglelist() = subdiv.GetTriangleList()
             Dim pt(3) As cv.Point
@@ -38,7 +38,7 @@ Module Delaunay_Exports
         End If
     End Sub
     Public Sub locate_point(img As cv.Mat, subdiv As cv.Subdiv2D, fp As cv.Point2f, active_color As cv.Scalar)
-        Dim e0 As Int32, vector As Int32
+        Dim e0 As integer, vector As integer
 
         subdiv.Locate(fp, e0, vector)
         If e0 > 0 Then
@@ -59,7 +59,7 @@ Module Delaunay_Exports
     Public Sub paint_voronoi(scalarColors() As cv.Scalar, img As cv.Mat, subdiv As cv.Subdiv2D)
         Dim facets = New cv.Point2f()() {Nothing}
         Dim centers() As cv.Point2f = Nothing
-        subdiv.GetVoronoiFacetList(New List(Of Int32)(), facets, centers)
+        subdiv.GetVoronoiFacetList(New List(Of integer)(), facets, centers)
 
         Dim ifacet() As cv.Point = Nothing
         Dim ifacets = New cv.Point()() {Nothing}

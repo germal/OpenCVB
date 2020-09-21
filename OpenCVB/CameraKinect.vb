@@ -6,7 +6,7 @@ Module Kinect_Interface
     Public Function KinectOpen() As IntPtr
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KinectDeviceCount(cPtr As IntPtr) As Int32
+    Public Function KinectDeviceCount(cPtr As IntPtr) As integer
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDeviceName(cPtr As IntPtr) As IntPtr
@@ -67,7 +67,7 @@ Public Class CameraKinect
         Dim metric_radius As Single ' Metric radius */
     End Structure
 
-    Public Sub initialize(fps As Int32)
+    Public Sub initialize(fps As integer)
         cPtr = KinectOpen()
         deviceName = "Kinect for Azure"
         cameraName = deviceName

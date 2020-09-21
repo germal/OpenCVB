@@ -5,7 +5,7 @@ Public Class Clone_Basics
     Public colorChangeValues As cv.Vec3f
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
-    Public cloneSpec As Int32 ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
+    Public cloneSpec As integer ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 

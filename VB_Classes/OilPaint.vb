@@ -139,12 +139,12 @@ Public Class OilPaint_Manual
         Dim result1 = color.Clone()
         For y = filtersize To roi.Height - filtersize - 1
             For x = filtersize To roi.Width - filtersize - 1
-                Dim intensitybins(levels) As Int32
-                Dim bluebin(levels) As Int32
-                Dim greenbin(levels) As Int32
-                Dim redbin(levels) As Int32
-                Dim maxIntensity As Int32 = 0
-                Dim maxIndex As Int32 = 0
+                Dim intensitybins(levels) As integer
+                Dim bluebin(levels) As integer
+                Dim greenbin(levels) As integer
+                Dim redbin(levels) As integer
+                Dim maxIntensity As integer = 0
+                Dim maxIndex As integer = 0
                 Dim vec As cv.Vec3b = Nothing
                 For yy = y - filtersize To y + filtersize - 1
                     For xx = x - filtersize To x + filtersize - 1
@@ -196,7 +196,7 @@ Public Class OilPaint_Manual_CS
         src.CopyTo(dst1)
         oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.trackbar(1).Value)
         dst2 = src.EmptyClone.SetTo(0)
-        Dim factor As Int32 = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
+        Dim factor As integer = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
         cv.Cv2.Resize(dst1(roi), dst2(New cv.Rect(0, 0, s.Width, s.Height)), s)
     End Sub

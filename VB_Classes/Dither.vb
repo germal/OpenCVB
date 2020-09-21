@@ -2,77 +2,77 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module Dither_module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer16(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayer16(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer8(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayer8(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer4(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayer4(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer3(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayer3(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer2(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayer2(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgbNbpp(pixels As IntPtr, width As Int32, height As Int32, nColors As Int32)
+    Public Sub ditherBayerRgbNbpp(pixels As IntPtr, width As integer, height As integer, nColors As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb3bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayerRgb3bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb6bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayerRgb6bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb9bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayerRgb9bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb12bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayerRgb12bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb15bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayerRgb15bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb18bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherBayerRgb18bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgbNbpp(pixels As IntPtr, width As Int32, height As Int32, nColors As Int32)
+    Public Sub ditherFSRgbNbpp(pixels As IntPtr, width As integer, height As integer, nColors As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFS(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherFS(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb3bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherFSRgb3bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb6bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherFSRgb6bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb9bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherFSRgb9bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb12bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherFSRgb12bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb15bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherFSRgb15bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb18bpp(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherFSRgb18bpp(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierraLiteRgbNbpp(pixels As IntPtr, width As Int32, height As Int32, nColors As Int32)
+    Public Sub ditherSierraLiteRgbNbpp(pixels As IntPtr, width As integer, height As integer, nColors As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierraLite(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherSierraLite(pixels As IntPtr, width As integer, height As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierraRgbNbpp(pixels As IntPtr, width As Int32, height As Int32, nColors As Int32)
+    Public Sub ditherSierraRgbNbpp(pixels As IntPtr, width As integer, height As integer, nColors As integer)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierra(pixels As IntPtr, width As Int32, height As Int32)
+    Public Sub ditherSierra(pixels As IntPtr, width As integer, height As integer)
     End Sub
 End Module
 

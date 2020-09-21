@@ -75,7 +75,7 @@ Public Class Entropy_Highest_MT
 
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
-        Dim maxIndex As Int32
+        Dim maxIndex As integer
         For i = 0 To entropies.Count - 1
             If entropies(i).entropy > maxEntropy Then
                 maxEntropy = entropies(i).entropy

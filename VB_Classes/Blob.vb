@@ -216,7 +216,7 @@ Public Class Blob_Rectangles
         For i = 0 To blobs.rects.Count - 1
             sortedBlobs.Add(blobs.rects(i), i)
         Next
-        Static blobCount As Int32
+        Static blobCount As integer
         Dim blobsToShow = Math.Min(3, blobs.rects.Count - 1)
         If blobCount <> blobsToShow And blobsToShow > 0 Then
             blobCount = blobsToShow
@@ -249,7 +249,7 @@ Public Class Blob_Largest
     Public rects As List(Of cv.Rect)
     Public masks As List(Of cv.Mat)
     Public kalman As Kalman_Basics
-    Public blobIndex As Int32
+    Public blobIndex As integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         kalman = New Kalman_Basics(ocvb)

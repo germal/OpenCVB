@@ -27,14 +27,14 @@ Public Class CamShift_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static roi As New cv.Rect
-        Static vMinLast As Int32
-        Static vMaxLast As Int32
+        Static vMinLast As integer
+        Static vMaxLast As integer
         Static sBinsLast As cv.Scalar
         Static roi_hist As New cv.Mat
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
         Dim bins = sliders.trackbar(3).Value
-        Dim hsize() As Int32 = {bins, bins, bins}
+        Dim hsize() As integer = {bins, bins, bins}
         Dim ranges() = {New cv.Rangef(0, 180)}
         Dim min = Math.Min(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
         Dim max = Math.Max(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
@@ -86,8 +86,8 @@ Public Class CamShift_Foreground
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim restartRequested As Boolean
-        Static depthMin As Int32
-        Static depthMax As Int32
+        Static depthMin As integer
+        Static depthMax As integer
         If camshift.trackBox.Size.Width < 50 Then restartRequested = True
         If fore.trim.sliders.trackbar(0).Value <> depthMin Then
             depthMin = fore.trim.sliders.trackbar(0).Value

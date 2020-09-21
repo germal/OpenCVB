@@ -108,7 +108,7 @@ Public Class DilateErode_OpenClose
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim n = sliders.trackbar(0).Value
-        Dim an As Int32 = If(n > 0, n, -n)
+        Dim an As integer = If(n > 0, n, -n)
         Dim morphShape = cv.MorphShapes.Rect
         If radio.check(0).Checked Then morphShape = cv.MorphShapes.Cross
         If radio.check(1).Checked Then morphShape = cv.MorphShapes.Ellipse

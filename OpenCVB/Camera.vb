@@ -30,7 +30,7 @@ Public Class Camera
     Public width As Integer
     Public height As Integer
 
-    Public deviceCount As Int32
+    Public deviceCount As integer
     Public deviceName As String = ""
     Public Extrinsics_VB As VB_Classes.ActiveTask.Extrinsics_VB
     Public IMU_Present As Boolean
@@ -45,7 +45,7 @@ Public Class Camera
     Public pointCloudBytes() As Byte
 
     Public serialNumber As String
-    Public failedImageCount As Int32
+    Public failedImageCount As integer
     Public modelInverse As Boolean
     Public newImagesAvailable As Boolean
     Public cPtr As IntPtr
@@ -74,8 +74,8 @@ Public Class Camera
         Public rotation As Quaternion
         Public angularVelocity As cv.Point3f
         Public angularAcceleration As cv.Point3f
-        Public trackerConfidence As Int32
-        Public mapperConfidence As Int32
+        Public trackerConfidence As integer
+        Public mapperConfidence As integer
     End Structure
     Public Function setintrinsics(intrinsicsHW As rs.Intrinsics) As VB_Classes.ActiveTask.intrinsics_VB
         Dim intrinsics As New VB_Classes.ActiveTask.intrinsics_VB

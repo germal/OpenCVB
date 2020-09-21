@@ -14,7 +14,7 @@ Public Class Encode_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim buf(src.Width * src.Height * src.ElemSize) As Byte
-        Dim encodeParams() As Int32 = {options.getEncodeParameter(), options.qualityLevel}
+        Dim encodeParams() As integer = {options.getEncodeParameter(), options.qualityLevel}
 
         cv.Cv2.ImEncode(".jpg", src, buf, encodeParams)
         dst2 = cv.Cv2.ImDecode(buf, cv.ImreadModes.AnyColor)
@@ -73,7 +73,7 @@ Public Class Encode_Options
         Dim buf(src.Width * src.Height * src.ElemSize) As Byte
 
         Dim fileExtension = ".jpg"
-        Dim encodeParams() As Int32 = {getEncodeParameter(), qualityLevel}
+        Dim encodeParams() As integer = {getEncodeParameter(), qualityLevel}
 
         cv.Cv2.ImEncode(fileExtension, src, buf, encodeParams)
         dst2 = cv.Cv2.ImDecode(buf, cv.ImreadModes.AnyColor)

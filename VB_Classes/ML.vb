@@ -7,7 +7,7 @@ Module ML__Exports
             Return If(a(0) < b(0), -1, 1)
         End Function
     End Class
-    Public Function detectAndFillShadow(holeMask As cv.Mat, borderMask As cv.Mat, depth32f As cv.Mat, color As cv.Mat, minLearnCount As Int32) As cv.Mat
+    Public Function detectAndFillShadow(holeMask As cv.Mat, borderMask As cv.Mat, depth32f As cv.Mat, color As cv.Mat, minLearnCount As integer) As cv.Mat
         Dim learnData As New SortedList(Of cv.Vec3f, Single)(New CompareVec3f)
         Dim rng As New System.Random
         Dim holeCount = cv.Cv2.CountNonZero(holeMask)
@@ -166,7 +166,7 @@ Public Class ML_DepthFromColor_MT
 
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
-        Dim predictedRegions As Int32
+        Dim predictedRegions As integer
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
                 Dim maskCount = roi.Width * roi.Height - mask(roi).CountNonZero()
@@ -410,7 +410,7 @@ Public Class ML_EdgeDepth_MT
 
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
-        Dim predictedRegions As Int32
+        Dim predictedRegions As integer
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
                 Dim maskCount = mask(roi).CountNonZero()

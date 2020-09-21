@@ -45,7 +45,7 @@ def my_polygon(img):
                     [18 * W / 40, W / 4], [14 * W / 40, W / 4],
                     [14 * W / 40, W / 8], [W / 4, W / 8],
                     [W / 4, 3 * W / 8], [13 * W / 32, 3 * W / 8],
-                    [5 * W / 16, 13 * W / 16], [W / 4, 13 * W / 16]], np.int32)
+                    [5 * W / 16, 13 * W / 16], [W / 4, 13 * W / 16]], np.integer)
     ppt = ppt.reshape((-1, 1, 2))
     cv.fillPoly(img, [ppt], (255, 255, 255), line_type)
     # Only drawing the lines would be:

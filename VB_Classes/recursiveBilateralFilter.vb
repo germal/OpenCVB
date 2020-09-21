@@ -9,7 +9,7 @@ Module RecursiveBilateralFilter_Exports
     Public Sub RecursiveBilateralFilter_Close(rbf As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RecursiveBilateralFilter_Run(rbf As IntPtr, inputPtr As IntPtr, rows As Int32, cols As Int32, recursions As Int32) As IntPtr
+    Public Function RecursiveBilateralFilter_Run(rbf As IntPtr, inputPtr As IntPtr, rows As integer, cols As integer, recursions As integer) As IntPtr
     End Function
 End Module
 

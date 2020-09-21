@@ -15,7 +15,7 @@ Public Class Kalman_Basics
         desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static saveDimension As Int32 = -1
+        Static saveDimension As Integer = -1
         If saveDimension <> input.Length Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -136,7 +136,7 @@ Public Class Kalman_RotatingPoint
         Return center + New cv.Point2f(Math.Cos(angle), -Math.Sin(angle)) * R
     End Function
     Private Sub drawCross(dst1 As cv.Mat, center As cv.Point, color As cv.Scalar)
-        Dim d As Int32 = 3
+        Dim d As Integer = 3
         cv.Cv2.Line(dst1, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(dst1, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
@@ -240,7 +240,7 @@ Public Class Kalman_CVMat
         desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static saveDimension As Int32 = -1
+        Static saveDimension As Integer = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then

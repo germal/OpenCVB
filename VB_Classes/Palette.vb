@@ -57,7 +57,7 @@ End Class
 
 Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Int32, cols As Int32, channels As Int32)
+    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
     End Sub
     Public mapNames() As String = {"Autumn", "Bone", "Cool", "Hot", "Hsv", "Jet", "Ocean", "Pink", "Rainbow", "Spring", "Summer", "Winter", "Parula", "Magma", "Inferno", "Viridis", "Cividis", "Twilight", "Twilight_Shifted", "Random", "None"}
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
@@ -83,7 +83,7 @@ Module Palette_Custom_Module
         handledst1.Free()
         Return output
     End Function
-    Public Function colorTransition(color1 As cv.Scalar, color2 As cv.Scalar, width As Int32) As cv.Mat
+    Public Function colorTransition(color1 As cv.Scalar, color2 As cv.Scalar, width As Integer) As cv.Mat
         Dim f As Double = 1.0
         Dim gradientColors As New cv.Mat(1, width, cv.MatType.CV_64FC3)
         For i = 0 To width - 1
@@ -206,7 +206,7 @@ End Class
 
 Public Class Palette_Gradient
     Inherits VBparent
-    Public frameModulo As Int32 = 30 ' every 30 frames try a different pair of random colors.
+    Public frameModulo As Integer = 30 ' every 30 frames try a different pair of random colors.
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public Sub New(ocvb As VBocvb)

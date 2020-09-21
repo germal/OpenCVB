@@ -4,13 +4,13 @@ Imports System.IO
 
 Module Retina_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Retina_Basics_Open(rows As Int32, cols As Int32, useLogSampling As Boolean, samplingFactor As Single) As IntPtr
+    Public Function Retina_Basics_Open(rows As integer, cols As integer, useLogSampling As Boolean, samplingFactor As Single) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Retina_Basics_Close(RetinaPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Retina_Basics_Run(RetinaPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, magno As IntPtr, useLogSampling As Int32) As IntPtr
+    Public Function Retina_Basics_Run(RetinaPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, magno As IntPtr, useLogSampling As integer) As IntPtr
     End Function
 End Module
 
@@ -47,7 +47,7 @@ Public Class Retina_Basics_CPP
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
             End If
         End If
-        Static useLogSampling As Int32 = check.Box(0).Checked
+        Static useLogSampling As integer = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.trackbar(0).Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)

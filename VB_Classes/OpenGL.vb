@@ -9,14 +9,14 @@ Public Class OpenGL_Basics
     Dim pipeName As String ' this is name of pipe to the OpenGL task.  It is dynamic and increments.
     Dim pipe As NamedPipeServerStream
     Dim startInfo As New ProcessStartInfo
-    Dim memMapbufferSize As Int32
+    Dim memMapbufferSize As integer
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
     Dim rgbBuffer(0) As Byte
     Dim dataBuffer(0) As Byte
     Dim pointCloudBuffer(0) As Byte
     Public memMapValues(49) As Double ' more than needed - buffer for growth.
-    Public pointSize As Int32 = 2
+    Public pointSize As integer = 2
     Public dataInput As New cv.Mat
     Public FOV As Single = 150
     Public yaw As Single = 0
@@ -249,7 +249,7 @@ End Class
 
 Module histogram_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Histogram_3D_RGB(rgbPtr As IntPtr, rows As Int32, cols As Int32, bins As Int32) As IntPtr
+    Public Function Histogram_3D_RGB(rgbPtr As IntPtr, rows As integer, cols As integer, bins As integer) As IntPtr
     End Function
 End Module
 

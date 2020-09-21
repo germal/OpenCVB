@@ -120,7 +120,7 @@ End Class
 
 Module corners_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Corners_ShiTomasi(grayPtr As IntPtr, rows As Int32, cols As Int32, blocksize As Int32, aperture As Int32) As IntPtr
+    Public Function Corners_ShiTomasi(grayPtr As IntPtr, rows As integer, cols As integer, blocksize As integer, aperture As integer) As IntPtr
     End Function
 End Module
 

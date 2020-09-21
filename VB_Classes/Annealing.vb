@@ -4,13 +4,13 @@ Imports System.Text.RegularExpressions
 
 Module Annealing_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Open(cityPositions As IntPtr, numberOfCities As Int32) As IntPtr
+    Public Function Annealing_Basics_Open(cityPositions As IntPtr, numberOfCities As integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Annealing_Basics_Close(saPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Run(saPtr As IntPtr, cityOrder As IntPtr, numberOfCities As Int32) As IntPtr
+    Public Function Annealing_Basics_Run(saPtr As IntPtr, cityOrder As IntPtr, numberOfCities As integer) As IntPtr
     End Function
 End Module
 
@@ -19,12 +19,12 @@ End Module
 
 Public Class Annealing_Basics_CPP
     Inherits VBparent
-    Public numberOfCities As Int32 = 25
+    Public numberOfCities As integer = 25
     Public restartComputation As Boolean
     Public msg As String
 
     Public cityPositions() As cv.Point2f
-    Public cityOrder() As Int32
+    Public cityOrder() As integer
 
     Public energy As Single
     Public closed As Boolean
@@ -185,8 +185,8 @@ Public Class Annealing_CPP_MT
 
         ' find the best result and start all the others with it.
         Dim minEnergy As Single = Single.MaxValue
-        Dim minIndex As Int32 = 0
-        Dim bestList As New SortedList(Of Single, Int32)(New CompareEnergy)
+        Dim minIndex As integer = 0
+        Dim bestList As New SortedList(Of Single, integer)(New CompareEnergy)
         flow.msgs.Clear()
         For i = 0 To anneal.Length - 1
             bestList.Add(anneal(i).energy, i)
@@ -196,7 +196,7 @@ Public Class Annealing_CPP_MT
 
         ' if the top 4 are all the same energy, then we are done.
         If bestList.Count > 1 Then
-            Dim sameEnergy As Int32 = 1
+            Dim sameEnergy As integer = 1
             Dim successCounter = sliders.trackbar(1).Value
             For i = 1 To successCounter - 1
                 If anneal(CInt(bestList.ElementAt(i).Value)).energy = anneal(CInt(bestList.ElementAt(0).Value)).energy Then sameEnergy += 1

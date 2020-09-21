@@ -16,7 +16,7 @@ Module Puzzle_Solvers
         none
     End Enum
     Public Structure bestFit
-        Public index As Int32
+        Public index As integer
         Public bestMetricUp As Single
         Public bestMetricDn As Single
         Public bestMetricLt As Single
@@ -33,13 +33,13 @@ Module Puzzle_Solvers
         Public corner As cornerType
     End Structure
     Public Class fit
-        Public index As Int32
+        Public index As integer
         Public neighbor As Integer
         Public metricUp As Single
         Public metricDn As Single
         Public metricLt As Single
         Public metricRt As Single
-        Sub New(abs() As Single, _index As Int32, n As Int32)
+        Sub New(abs() As Single, _index As integer, n As integer)
             metricUp = abs(0)
             metricDn = abs(1)
             metricLt = abs(2)
@@ -241,8 +241,8 @@ Public Class Puzzle_Basics
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
     Public Sub Run(ocvb As VBocvb)
-        Static width As Int32
-        Static height As Int32
+        Static width As integer
+        Static height As integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or ocvb.frameCount = 0 Or restartRequested Then
             restartRequested = False
             grid.Run(ocvb)

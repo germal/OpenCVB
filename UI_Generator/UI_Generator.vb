@@ -36,8 +36,8 @@ Module UI_GeneratorMain
         readProj.Close()
 
         Dim className As String = ""
-        Dim CodeLineCount As Int32
-        Dim sortedNames As New SortedList(Of String, Int32)
+        Dim CodeLineCount As integer
+        Dim sortedNames As New SortedList(Of String, integer)
         Dim sIndex As Integer
         For Each fileName In fileNames
             If fileName.EndsWith(".py") Then

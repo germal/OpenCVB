@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class FloodFill_Basics
     Inherits VBparent
-    Public maskSizes As New SortedList(Of Int32, Int32)(New CompareMaskSize)
+    Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
@@ -10,8 +10,8 @@ Public Class FloodFill_Basics
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public minFloodSize As Integer
-    Public Class CompareMaskSize : Implements IComparer(Of Int32)
-        Public Function Compare(ByVal a As Int32, ByVal b As Int32) As Integer Implements IComparer(Of Int32).Compare
+    Public Class CompareMaskSize : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
             If a <= b Then Return 1
             Return -1
         End Function
@@ -282,7 +282,7 @@ Public Class FloodFill_Top16
         flood.Run(ocvb)
 
         dst1.SetTo(0)
-        Dim thumbCount As Int32
+        Dim thumbCount As Integer
         Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
         For i = 0 To flood.masks.Count - 1
             Dim maskIndex = flood.maskSizes.ElementAt(i).Value

@@ -4,7 +4,7 @@ Imports System.Runtime.InteropServices
 Public Class BGSubtract_Basics_CPP
     Inherits VBparent
     Dim bgfs As IntPtr
-    Public currMethod As Int32 = -1
+    Public currMethod As integer = -1
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 7)
@@ -327,13 +327,13 @@ End Class
 
 Module BGSubtract_BGFG_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Open(currMethod As Int32) As IntPtr
+    Public Function BGSubtract_BGFG_Open(currMethod As integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub BGSubtract_BGFG_Close(bgfs As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
+    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, channels As integer) As IntPtr
     End Function
 End Module
 
@@ -369,7 +369,7 @@ End Class
 
 Module BGSubtract_Synthetic_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Open(rgbPtr As IntPtr, rows As Int32, cols As Int32, fgFilename As String, amplitude As Double,
+    Public Function BGSubtract_Synthetic_Open(rgbPtr As IntPtr, rows As integer, cols As integer, fgFilename As String, amplitude As Double,
                                               magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>

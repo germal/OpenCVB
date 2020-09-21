@@ -143,7 +143,7 @@ Public Class Depth_Foreground
         dst1 = trim.dst1.ConvertScaleAbs(255)
         Dim tmp = trim.dst1.ConvertScaleAbs(255)
         ' find the largest blob and use that as the body.  Head is highest in the image.
-        Dim blobSize As New List(Of Int32)
+        Dim blobSize As New List(Of integer)
         Dim blobLocation As New List(Of cv.Point)
         For y = 0 To tmp.Height - 1
             For x = 0 To tmp.Width - 1
@@ -157,8 +157,8 @@ Public Class Depth_Foreground
                 End If
             Next
         Next
-        Dim maxBlob As Int32
-        Dim maxIndex As Int32 = -1
+        Dim maxBlob As integer
+        Dim maxIndex As integer = -1
         For i = 0 To blobSize.Count - 1
             If maxBlob < blobSize.Item(i) Then
                 maxBlob = blobSize.Item(i)
@@ -264,7 +264,7 @@ Module DepthXYZ_CPP_Module
     Public Sub Depth_XYZ_OpenMP_Close(DepthXYZPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_XYZ_OpenMP_Run(DepthXYZPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Depth_XYZ_OpenMP_Run(DepthXYZPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer) As IntPtr
     End Function
 End Module
 
@@ -377,7 +377,7 @@ Public Class Depth_MeanStdev_MT
         Dim maxDepth = sliders.trackbar(0).Value
         Dim meanCount = sliders.trackbar(1).Value
 
-        Static lastMeanCount As Int32
+        Static lastMeanCount As integer
         If grid.roiList.Count <> meanSeries.Rows Or meanCount <> lastMeanCount Then
             meanSeries = New cv.Mat(grid.roiList.Count, meanCount, cv.MatType.CV_32F, 0)
             lastMeanCount = meanCount
@@ -548,7 +548,7 @@ Module Depth_Colorizer_CPP_Module
     Public Sub Depth_Colorizer_Close(Depth_ColorizerPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Depth_Colorizer_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer) As IntPtr
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -558,7 +558,7 @@ Module Depth_Colorizer_CPP_Module
     Public Sub Depth_Colorizer2_Close(Depth_ColorizerPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, histSize As Int32) As IntPtr
+    Public Function Depth_Colorizer2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, histSize As integer) As IntPtr
     End Function
 
 
@@ -569,7 +569,7 @@ Module Depth_Colorizer_CPP_Module
     Public Sub Depth_Colorizer32f_Close(Depth_ColorizerPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer32f_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Depth_Colorizer32f_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer) As IntPtr
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -579,7 +579,7 @@ Module Depth_Colorizer_CPP_Module
     Public Sub Depth_Colorizer32f2_Close(Depth_ColorizerPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer32f2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, histSize As Int32) As IntPtr
+    Public Function Depth_Colorizer32f2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, histSize As integer) As IntPtr
     End Function
     Public Function getDepth32f(ocvb As VBocvb) As cv.Mat
         Dim depth32f As New cv.Mat
@@ -700,7 +700,7 @@ Public Class Depth_ColorizerVB
         Dim nearColor = New Byte() {0, 255, 255}
         Dim farColor = New Byte() {255, 0, 0}
 
-        Dim histogram(256 * 256 - 1) As Int32
+        Dim histogram(256 * 256 - 1) As integer
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
                 Dim pixel = Math.Truncate(src.Get(Of Single)(y, x))
@@ -777,7 +777,7 @@ Public Class Depth_ColorizerVB_MT
            Sub(roi)
                Dim depth = src(roi)
                Dim rgbdata(src.Total) As cv.Vec3b
-               Dim rgbIndex As Int32
+               Dim rgbIndex As integer
                For y = 0 To depth.Rows - 1
                    For x = 0 To depth.Cols - 1
                        Dim pixel = Math.Truncate(depth.Get(Of Single)(y, x))

@@ -5,7 +5,7 @@ Public Class Plot_Basics
     Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Basics
-    Public plotCount As Int32 = 3
+    Public plotCount As integer = 3
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         hist = New Histogram_Basics(ocvb)
@@ -91,13 +91,13 @@ End Class
 Public Class Plot_OverTime
     Inherits VBparent
     Public plotData As cv.Scalar
-    Public plotCount As Int32 = 3
+    Public plotCount As integer = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
     Public backColor = cv.Scalar.Aquamarine
-    Public minScale As Int32 = 50
-    Public maxScale As Int32 = 200
+    Public minScale As integer = 50
+    Public maxScale As integer = 200
     Public plotTriggerRescale = 50
-    Public columnIndex As Int32
+    Public columnIndex As integer
     Public offChartCount As Integer
     Public lastXdelta As New List(Of cv.Scalar)
     Public topBottomPad As Integer
@@ -138,8 +138,8 @@ Public Class Plot_OverTime
         If (offChartCount > plotTriggerRescale Or check.Box(0).Checked) And lastXdelta.Count >= plotSeriesCount Then
             check.Box(0).Checked = False
             dst1.SetTo(0)
-            maxScale = Int32.MinValue
-            minScale = Int32.MaxValue
+            maxScale = integer.MinValue
+            minScale = integer.MaxValue
             For i = 0 To lastXdelta.Count - 1
                 Dim nextVal = lastXdelta.Item(i)
                 For j = 0 To plotCount - 1
@@ -197,9 +197,9 @@ End Class
 Public Class Plot_Histogram
     Inherits VBparent
     Public hist As New cv.Mat
-    Public bins As Int32 = 50
-    Public minRange As Int32 = 0
-    Public maxRange As Int32 = 255
+    Public bins As integer = 50
+    Public minRange As integer = 0
+    Public maxRange As integer = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public fixedMaxVal As Integer
     Public Sub New(ocvb As VBocvb)
@@ -248,7 +248,7 @@ End Class
 
 Module Plot_OpenCV_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As Int32, dstptr As IntPtr, rows As Int32, cols As Int32)
+    Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As integer, dstptr As IntPtr, rows As integer, cols As integer)
     End Sub
 
     Public Sub AddPlotScale(dst1 As cv.Mat, minVal As Double, maxVal As Double, fontsize As Double)

@@ -57,8 +57,8 @@ Module xPhoto_OilPaint_CPP_Module
     Public Sub xPhoto_OilPaint_Close(xPhoto_OilPaint_Ptr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Run(xPhoto_OilPaint_Ptr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32,
-                                       size As Int32, dynRatio As Int32, colorCode As Int32) As IntPtr
+    Public Function xPhoto_OilPaint_Run(xPhoto_OilPaint_Ptr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer,
+                                       size As integer, dynRatio As integer, colorCode As integer) As IntPtr
     End Function
 End Module
 
@@ -87,7 +87,7 @@ Public Class xPhoto_OilPaint_CPP
         desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim colorCode As Int32 = cv.ColorConversionCodes.BGR2GRAY
+        Dim colorCode As integer = cv.ColorConversionCodes.BGR2GRAY
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 colorCode = Choose(i + 1, cv.ColorConversionCodes.BGR2GRAY, cv.ColorConversionCodes.BGR2HSV, cv.ColorConversionCodes.BGR2YUV,

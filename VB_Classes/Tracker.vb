@@ -4,7 +4,7 @@ Public Class Tracker_Basics
     Public tracker As cv.Tracking.MultiTracker
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
-    Public trackerIndex As Int32 = 5 ' trackerMIL by default...
+    Public trackerIndex As integer = 5 ' trackerMIL by default...
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         check.Setup(ocvb, caller, 1)
@@ -116,7 +116,7 @@ Public Class Tracker_Methods
         desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static saveMethod As Int32
+        Static saveMethod As integer
 
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked = True Then

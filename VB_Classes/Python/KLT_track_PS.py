@@ -60,13 +60,13 @@ class App:
                 new_tracks.append(tr)
                 cv.circle(vis, (x, y), 2, (0, 255, 0), -1)
             self.tracks = new_tracks
-            cv.polylines(vis, [np.int32(tr) for tr in self.tracks], False, (0, 255, 0))
+            cv.polylines(vis, [np.integer(tr) for tr in self.tracks], False, (0, 255, 0))
             draw_str(vis, (20, 20), 'track count: %d' % len(self.tracks))
 
         if self.frame_idx % self.detect_interval == 0:
             mask = np.zeros_like(frame_gray)
             mask[:] = 255
-            for x, y in [np.int32(tr[-1]) for tr in self.tracks]:
+            for x, y in [np.integer(tr[-1]) for tr in self.tracks]:
                 cv.circle(mask, (x, y), 5, 0, -1)
             p = cv.goodFeaturesToTrack(frame_gray, mask = mask, **feature_params)
             if p is not None:

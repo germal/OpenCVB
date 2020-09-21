@@ -59,8 +59,8 @@ class App:
         if playing:
             tracked = self.tracker.track(self.frame)
             for tr in tracked:
-                cv.polylines(vis, [np.int32(tr.quad)], True, (255, 255, 255), 2)
-                for (x, y) in np.int32(tr.p1):
+                cv.polylines(vis, [np.integer(tr.quad)], True, (255, 255, 255), 2)
+                for (x, y) in np.integer(tr.p1):
                     cv.circle(vis, (x, y), 2, (255, 255, 255))
                 self.draw_overlay(vis, tr)
 

@@ -6,13 +6,13 @@ Imports System.IO
 
 Module T265_Module_CPP
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265Open(width As Int32, height As Int32) As IntPtr
+    Public Function T265Open(width As integer, height As integer) As IntPtr
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265RawWidth(tp As IntPtr) As Int32
+    Public Function T265RawWidth(tp As IntPtr) As integer
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function T265RawHeight(tp As IntPtr) As Int32
+    Public Function T265RawHeight(tp As IntPtr) As integer
     End Function
     <DllImport(("Cam_T265.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub T265WaitFrame(tp As IntPtr)
@@ -62,14 +62,14 @@ Structure T265IMUdata
     Public rotation As cv.Point3f
     Public angularVelocity As cv.Point3f
     Public angularAcceleration As cv.Point3f
-    Public trackerConfidence As Int32
-    Public mapperConfidence As Int32
+    Public trackerConfidence As integer
+    Public mapperConfidence As integer
 End Structure
 Public Class CameraT265
     Inherits Camera
     Public cameraName As String
-    Dim rawHeight As Int32
-    Dim rawWidth As Int32
+    Dim rawHeight As integer
+    Dim rawWidth As integer
 
     Public extrinsics As rs.Extrinsics
     Dim rawSrcRect As cv.Rect
@@ -77,7 +77,7 @@ Public Class CameraT265
 
     Public Sub New()
     End Sub
-    Public Sub initialize(fps As Int32)
+    Public Sub initialize(fps As integer)
         deviceName = "Intel T265"
         cameraName = deviceName
         deviceCount = 1

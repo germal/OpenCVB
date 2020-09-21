@@ -60,7 +60,7 @@ End Class
 
 
 Module histogram_Functions
-    Public Sub histogram2DPlot(histogram As cv.Mat, dst1 As cv.Mat, xBins As Int32, yBins As Int32)
+    Public Sub histogram2DPlot(histogram As cv.Mat, dst1 As cv.Mat, xBins As integer, yBins As integer)
         Dim maxVal As Double
         histogram.MinMaxLoc(0, maxVal)
         Dim xScale = dst1.Cols / xBins
@@ -214,7 +214,7 @@ Public Class Histogram_KalmanSmoothed
         desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static splitIndex As Int32 = -1
+        Static splitIndex As integer = -1
         Static colorName As String
         If standalone Then
             Dim split() = cv.Cv2.Split(src)
@@ -298,10 +298,10 @@ Public Class Histogram_DepthValleys
     Dim kalman As Kalman_Basics
     Dim hist As Histogram_Depth
     Public rangeBoundaries As New List(Of cv.Point)
-    Public sortedSizes As New List(Of Int32)
+    Public sortedSizes As New List(Of integer)
     Private Class CompareCounts : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
-            ' why have compare for just int32?  So we can get duplicates.  Nothing below returns a zero (equal)
+            ' why have compare for just integer?  So we can get duplicates.  Nothing below returns a zero (equal)
             If a <= b Then Return -1
             Return 1
         End Function

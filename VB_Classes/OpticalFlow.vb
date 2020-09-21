@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module OpticalFlowModule_Exports
     ' https://docs.opencv.org/3.4/db/d7f/tutorial_js_lucas_kanade.html
-    Public Function opticalFlow_Dense(oldGray As cv.Mat, gray As cv.Mat, pyrScale As Single, levels As Int32, winSize As Int32, iterations As Int32,
+    Public Function opticalFlow_Dense(oldGray As cv.Mat, gray As cv.Mat, pyrScale As Single, levels As integer, winSize As integer, iterations As integer,
                                 polyN As Single, polySigma As Single, OpticalFlowFlags As cv.OpticalFlowFlags) As cv.Mat
         Dim flow As New cv.Mat
         If pyrScale >= 1 Then pyrScale = 0.99
@@ -38,7 +38,7 @@ Module OpticalFlowModule_Exports
     Public Sub OpticalFlow_CPP_Close(sPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OpticalFlow_CPP_Run(sPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function OpticalFlow_CPP_Run(sPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer) As IntPtr
     End Function
     Public Sub calcOpticalFlowPyrLK_Native(gray1 As cv.Mat, gray2 As cv.Mat, features1 As cv.Mat, features2 As cv.Mat)
         Dim hGray1 As GCHandle
@@ -65,13 +65,13 @@ Public Class OpticalFlow_DenseOptions
     Inherits VBparent
 
     Public pyrScale As Single
-    Public levels As Int32
-    Public winSize As Int32
-    Public iterations As Int32
+    Public levels As integer
+    Public winSize As integer
+    Public iterations As integer
     Public polyN As Single
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
-    Public outputScaling As Int32
+    Public outputScaling As integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         radio.Setup(ocvb, caller, 5)

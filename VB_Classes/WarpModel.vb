@@ -81,7 +81,7 @@ Module WarpModel_CPP_Module
     Public Sub WarpModel_Close(WarpModelPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WarpModel_Run(WarpModelPtr As IntPtr, src1Ptr As IntPtr, src2Ptr As IntPtr, rows As Int32, cols As Int32, channels As Int32, warpMode As Integer) As IntPtr
+    Public Function WarpModel_Run(WarpModelPtr As IntPtr, src1Ptr As IntPtr, src2Ptr As IntPtr, rows As integer, cols As integer, channels As integer, warpMode As Integer) As IntPtr
     End Function
 End Module
 

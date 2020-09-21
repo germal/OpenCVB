@@ -54,7 +54,7 @@ Public Class Mat_MatToPoint
     Public Sub Run(ocvb As VBocvb)
         Dim points(src.Total - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
-        Dim index As Int32 = 0
+        Dim index As integer = 0
         Dim m3b = src.Clone()
         Dim indexer = m3b.GetGenericIndexer(Of cv.Vec3b)()
         For y = 0 To src.Rows - 1

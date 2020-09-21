@@ -81,7 +81,7 @@ Public Class Video_CarCounting
             Dim activeHeight = 30
             Dim finishLine = bgSub.dst1.Height - activeHeight * 8
             Static activeState(5) As Boolean
-            Static carCount As Int32
+            Static carCount As integer
             For i = 1 To activeState.Length - 1
                 Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
                 Dim cellCount = videoImage(lane).CountNonZero()
