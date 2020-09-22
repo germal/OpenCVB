@@ -72,11 +72,15 @@ Public Class Font_FlowText
         ocvb.trueText(fullText, 10, 20)
 
         If msgs.Count >= maxLines Then
-            Dim index As integer
-            For i = 0 To lastCount - maxLines - 1
-                msgs.RemoveAt(index)
-                index += 1
-            Next
+            Try
+                Dim index As Integer
+                For i = 0 To lastCount - maxlines - 1
+                    msgs.RemoveAt(index)
+                    index += 1
+                Next
+            Catch ex As Exception
+                msgs.Clear()
+            End Try
         End If
         lastCount = msgs.Count
     End Sub

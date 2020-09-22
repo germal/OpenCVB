@@ -110,6 +110,7 @@
     <Compile Include="AddWeighted.vb" />
     <Compile Include="Fibonacci.vb" />
     <Compile Include="Highlight.vb" />
+    <Compile Include="ProCon.vb" />
     <Compile Include="VBocvb.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="AlphaChannel.vb" />

@@ -7,8 +7,9 @@ Imports System.Threading
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Module opencv_module
-    Public bufferLock As New PictureBox ' this is a global lock on the camera buffers.
-    Public delegateLock As New PictureBox
+    Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
+    Public delegateLock As New Mutex(True, "delegateLock")
+    Public callTraceLock As New Mutex(True, "callTraceLock")
     Public algorithmThreadLock As New List(Of Integer)
     Public cameraThreadLock As New List(Of Integer)
 End Module
@@ -85,7 +86,6 @@ Public Class OpenCVB
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
-    Public callTraceLock As New cv.Mat
     Dim startAlgorithmTime As DateTime
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
