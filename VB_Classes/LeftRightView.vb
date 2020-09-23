@@ -178,11 +178,11 @@ End Class
 Public Class LeftRightView_Palettized
     Inherits VBparent
     Dim lrView As LeftRightView_Basics
-    Dim palette As Palette_ColorMap
+    Dim palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         lrView = New LeftRightView_Basics(ocvb)
-        palette = New Palette_ColorMap(ocvb)
+        palette = New Palette_Basics(ocvb)
 
         desc = "Add color to the 8-bit infrared images."
         label1 = "Left Image"

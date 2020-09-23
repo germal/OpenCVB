@@ -80,6 +80,94 @@ End Class
 
 
 
+Public Class FloodFill_Basics8bit
+    Inherits VBparent
+    Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+    Public rects As New List(Of cv.Rect)
+    Public masks As New List(Of cv.Mat)
+    Public centroids As New List(Of cv.Point2f)
+
+    Public initialMask As New cv.Mat
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public minFloodSize As Integer
+    Public palette As Palette_Basics
+    Public Class CompareMaskSize : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
+        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 25)
+        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 25)
+        sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
+
+        palette = New Palette_Basics(ocvb)
+
+        label1 = "Input image to floodfill"
+        desc = "Use floodfill to build image segments in a grayscale image."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        minFloodSize = sliders.trackbar(0).Value
+        Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
+        Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
+        Dim stepSize = sliders.trackbar(3).Value
+
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src
+        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
+        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+        initialMask = src.EmptyClone().SetTo(0)
+
+        masks.Clear()
+        maskSizes.Clear()
+        rects.Clear()
+        centroids.Clear()
+
+        maskPlus.SetTo(0)
+        Dim ignoreMasks = initialMask.Clone()
+
+        Dim gray = src.Clone()
+        For y = 0 To gray.Height - 1 Step stepSize
+            For x = 0 To gray.Width - 1 Step stepSize
+                If gray.Get(Of Byte)(y, x) > 0 Then
+                    Dim rect As New cv.Rect
+                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
+                    If count > minFloodSize Then
+                        masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
+                        masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
+                        maskSizes.Add(rect.Width * rect.Height, masks.Count - 1)
+                        rects.Add(rect)
+                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+                        centroids.Add(centroid)
+                    End If
+                    ' Mask off any object that is too small or previously identified
+                    cv.Cv2.BitwiseOr(ignoreMasks, maskPlus(maskRect), ignoreMasks)
+                End If
+            Next
+        Next
+
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+        Dim incr = 255 / masks.Count
+        For i = 0 To masks.Count - 1
+            Dim maskIndex = maskSizes.ElementAt(i).Value
+            dst2.SetTo(i * incr, masks(maskIndex))
+        Next
+        label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+
+        palette.src = dst2
+        palette.Run(ocvb)
+        dst2 = palette.dst1
+    End Sub
+End Class
+
+
+
+
 
 Public Class FloodFill_Top16_MT
     Inherits VBparent

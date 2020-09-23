@@ -627,3 +627,81 @@ Public Class KNN_PointPresent
         flow.Run(ocvb)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class KNN_SmoothAverage
+    Inherits VBparent
+    Dim knn As KNN_DepthClusters
+    Dim lastinput As New cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        knn = New KNN_DepthClusters(ocvb)
+        Dim drawCheckbox = findCheckBox("Draw rectangle for each mask")
+        drawCheckbox.Checked = False
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Weight X100", 0, 100, 50)
+
+        label1 = "AddWeight result of current and previous frame"
+        label2 = "Mask for difference between current and last frame"
+        desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        knn.src = src
+        knn.Run(ocvb)
+
+        Static accum As New cv.Mat
+        If ocvb.frameCount = 0 Then accum = knn.dst2.Clone
+
+        Dim alpha = sliders.trackbar(0).Value / 100
+        cv.Cv2.AddWeighted(knn.dst2, alpha, accum, 1.0 - alpha, 0, accum)
+        dst1 = accum
+
+        Dim tmp = knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+        If ocvb.frameCount = 0 Then lastinput = tmp.Clone
+        cv.Cv2.BitwiseXor(tmp, lastinput, dst2)
+        lastinput = tmp
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_StabilizeRegions
+    Inherits VBparent
+    Public knn As KNN_DepthClusters
+    Public flood As FloodFill_Basics8bit
+    Dim lastinput As New cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        knn = New KNN_DepthClusters(ocvb)
+        Dim drawCheckbox = findCheckBox("Draw rectangle for each mask")
+        drawCheckbox.Checked = False
+
+        flood = New FloodFill_Basics8bit(ocvb)
+
+        label1 = "Output of KNN_DepthClusters"
+        label2 = "KNN_DepthClusters output plus unstable regions"
+        desc = "Identify major regions that are unstable - appearing and disappearing"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        knn.src = src
+        knn.Run(ocvb)
+        dst1 = knn.dst2
+
+        Dim tmp = knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+        If ocvb.frameCount = 0 Then lastinput = tmp.Clone
+        cv.Cv2.BitwiseXor(tmp, lastinput, dst2)
+        lastinput = tmp
+
+        flood.src = dst2
+        flood.Run(ocvb)
+        dst2 = flood.dst2
+    End Sub
+End Class

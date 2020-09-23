@@ -969,13 +969,13 @@ End Class
 
 Public Class Depth_ColorMap
     Inherits VBparent
-    Dim Palette As Palette_ColorMap
+    Dim Palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 3)
 
-        Palette = New Palette_ColorMap(ocvb)
+        Palette = New Palette_Basics(ocvb)
         desc = "Display the depth as a color map"
     End Sub
     Public Sub Run(ocvb As VBocvb)

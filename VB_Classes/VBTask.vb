@@ -5,7 +5,7 @@ Module Algorithm_Module
     Public radioOffset As cv.Point
     Public slidersOffset As cv.Point
     Public Const offsetIncr = 25
-    Public Const offsetMax = 150
+    Public Const offsetMax = 250
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)

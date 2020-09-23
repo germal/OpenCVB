@@ -124,11 +124,11 @@ End Class
 Public Class Fractal_MandelbrotZoomColor
     Inherits VBparent
     Public mandel As Fractal_MandelbrotZoom
-    Public palette As Palette_ColorMap
+    Public palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         mandel = New Fractal_MandelbrotZoom(ocvb)
-        palette = New Palette_ColorMap(ocvb)
+        palette = New Palette_Basics(ocvb)
         palette.radio.check(5).Checked = True
         desc = "Classic Mandelbrot in color"
     End Sub

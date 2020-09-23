@@ -2,6 +2,85 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 
+Public Class Palette_Basics
+    Inherits VBparent
+    Public gradMap As Palette_BuildGradientColorMap
+    Public colormap As cv.ColormapTypes
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        gradMap = New Palette_BuildGradientColorMap(ocvb)
+
+        radio.Setup(ocvb, caller, 21)
+        For i = 0 To radio.check.Count - 1
+            radio.check(i).Text = mapNames(i)
+        Next
+        radio.check(5).Checked = True
+        desc = "Apply the different color maps in OpenCV - Painterly Effect"
+    End Sub
+    Public Function checkRadios() As cv.ColormapTypes
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                Dim scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
+                                           cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
+                                           cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
+                                           cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer,
+                                           cv.ColormapTypes.Twilight, cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis,
+                                           cv.ColormapTypes.Winter, 20) ' The last is a placeholder for "Random"
+                Return scheme
+            End If
+        Next
+        Return 0
+    End Function
+    Public Sub Run(ocvb As VBocvb)
+        Static randomColorMapReady = False
+
+        colormap = checkRadios()
+        label1 = "ColorMap = " + mapNames(colormap)
+
+        Static cMapDir As New DirectoryInfo(ocvb.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+        Static saveColorMap As Integer = -1
+        If saveColorMap <> colormap Then
+            saveColorMap = colormap
+            Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
+            ' The color scale file appear to be flipped - Ocean is actual HSV and vice versa.
+            If str.Contains("Ocean") Then
+                str = str.Replace("Ocean", "Hsv")
+            ElseIf str.Contains("Hsv") Then
+                str = str.replace("Hsv", "Ocean")
+            End If
+            Dim mapFile = New FileInfo(str)
+            If mapFile.Exists Then
+                Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
+                If standalone Then dst2 = cmap.Resize(src.Size())
+            End If
+        End If
+
+        ' special case the random color map!
+        If colormap = 20 Then
+            Static saveTransitionCount = gradMap.sliders.trackbar(0).Value
+            If randomColorMapReady = False Or saveTransitionCount <> gradMap.sliders.trackbar(0).Value Then
+                saveTransitionCount = gradMap.sliders.trackbar(0).Value
+                randomColorMapReady = True
+                gradMap.Run(ocvb)
+            End If
+
+            ' Uncomment this to test if the .NET interface for ApplyColorMap for custom color maps is working
+            ' cv.Cv2.ApplyColorMap(src, dst2, gradMap.gradientColorMap) 
+
+            ' In the meantime, this will work!
+            dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
+            dst2 = gradMap.gradientColorMap.Resize(dst2.Size)
+        Else
+            randomColorMapReady = False ' if they select something other than random, then next random request will rebuild the map.
+            cv.Cv2.ApplyColorMap(src, dst1, colormap)
+        End If
+    End Sub
+End Class
+
+
+
+
+
 Public Class Palette_Color
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
@@ -59,7 +138,8 @@ Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
     End Sub
-    Public mapNames() As String = {"Autumn", "Bone", "Cool", "Hot", "Hsv", "Jet", "Ocean", "Pink", "Rainbow", "Spring", "Summer", "Winter", "Parula", "Magma", "Inferno", "Viridis", "Cividis", "Twilight", "Twilight_Shifted", "Random", "None"}
+    Public mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
+                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter", "Random"}
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
         ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
@@ -181,11 +261,11 @@ End Class
 
 Public Class Palette_DrawTest
     Inherits VBparent
-    Dim palette As Palette_ColorMap
+    Dim palette As Palette_Basics
     Dim draw As Draw_RngImage
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        palette = New Palette_ColorMap(ocvb)
+        palette = New Palette_Basics(ocvb)
 
         draw = New Draw_RngImage(ocvb)
         palette.src = dst1
@@ -265,77 +345,8 @@ Public Class Palette_BuildGradientColorMap
             color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
         Next
-        gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
-        Dim r As New cv.Rect(0, 0, 255, 1)
-        For i = 0 To dst2.Height - 1
-            r.Y = i
-            dst2(r) = gradientColorMap
-        Next
-        If standalone Then dst1 = Palette_Custom_Apply(src, gradientColorMap)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Palette_ColorMap
-    Inherits VBparent
-    Public gradMap As Palette_BuildGradientColorMap
-    Public colormap As cv.ColormapTypes
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        gradMap = New Palette_BuildGradientColorMap(ocvb)
-
-        radio.Setup(ocvb, caller, 21)
-        For i = 0 To radio.check.Count - 1
-            radio.check(i).Text = mapNames(i)
-        Next
-        radio.check(4).Checked = True
-        desc = "Apply the different color maps in OpenCV - Painterly Effect"
-    End Sub
-    Public Function checkRadios() As cv.ColormapTypes
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
-                Dim scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cool, cv.ColormapTypes.Hot,
-                                         cv.ColormapTypes.Hsv, cv.ColormapTypes.Jet, cv.ColormapTypes.Ocean, cv.ColormapTypes.Pink,
-                                         cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer, cv.ColormapTypes.Winter,
-                                         12, 13, 14, 15, 16, 17, 18, 19, 20) ' missing some colorMapType definitions but they are there...
-                Return scheme
-            End If
-        Next
-        Return 0
-    End Function
-    Public Sub Run(ocvb As VBocvb)
-        Static buildNewRandomMap = False
-
-        colormap = checkRadios()
-        label1 = "ColorMap = " + mapNames(colormap)
-
-        Static cMapDir As New DirectoryInfo(ocvb.HomeDir + "OpenCV/modules/imgproc/doc/pics/colormaps")
-        Dim mapFile = New FileInfo(cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg")
-        If mapFile.Exists Then
-            Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
-            dst2 = cmap.Resize(src.Size())
-        End If
-
-        ' special case the random color map!
-        If colormap = 19 Then
-            Static saveTransitionCount = gradMap.sliders.trackbar(0).Value
-            If buildNewRandomMap = False Or saveTransitionCount <> gradMap.sliders.trackbar(0).Value Then
-                saveTransitionCount = gradMap.sliders.trackbar(0).Value
-                buildNewRandomMap = True
-                gradMap.Run(ocvb)
-            End If
-            dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
-            dst2 = gradMap.dst2
-        End If
-        buildNewRandomMap = False ' if they select something other than random, then next random request will rebuild the map.
-        If colormap = 20 Then
-            dst1 = src.Clone()
-            dst2 = dst2.SetTo(0)
-        End If
-        cv.Cv2.ApplyColorMap(src, dst1, colormap)
+        gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
+        dst1 = Palette_Custom_Apply(src, gradientColorMap)
     End Sub
 End Class
 
@@ -457,14 +468,14 @@ Public Class Palette_ObjectColors
     Inherits VBparent
     Dim reduction As Reduction_KNN_Color
     Dim inrange As Depth_InRange
-    Dim palette As Palette_ColorMap
+    Dim palette As Palette_Basics
     Public gray As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
         reduction = New Reduction_KNN_Color(ocvb)
         inrange = New Depth_InRange(ocvb)
-        palette = New Palette_ColorMap(ocvb)
+        palette = New Palette_Basics(ocvb)
         palette.gradMap.sliders.Visible = False
 
         label1 = "Consistent colors"
