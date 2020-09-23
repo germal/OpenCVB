@@ -34,24 +34,20 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Color
+Public Class LUT_Basics
     Inherits VBparent
-    Public paletteMap(256) As cv.Vec3b
+    Public reduction As Reduction_Simple
+    Public colorMat As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        paletteMap = rColors
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
+        reduction = New Reduction_Simple(ocvb)
+        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, rColors)
         desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim reduction = sliders.trackbar(0).Value
-        If standalone Then
-            src /= reduction
-            src *= reduction
-        End If
-        Dim colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, paletteMap)
-        dst1 = src.LUT(colorMat)
+        reduction.src = src
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1.LUT(colorMat)
         If standalone Then dst2 = colorMat.Resize(src.Size())
     End Sub
 End Class
@@ -62,8 +58,34 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+Public Class LUT_Color
+    Inherits VBparent
+    Public paletteMap(256) As cv.Vec3b
+    Dim colorMat As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
+        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, rColors) ' Create a new color palette here.
+        desc = "Build and use a custom color palette - Painterly Effect"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim reduction = sliders.trackbar(0).Value
+        If standalone Then
+            src /= reduction
+            src *= reduction
+        End If
+        dst1 = src.LUT(colorMat)
+        If standalone Then dst2 = colorMat.Resize(src.Size())
+    End Sub
+End Class
+
+
+
+
+' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 ' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
-Public Class LUT_Basics
+Public Class LUT_Rebuild
     Inherits VBparent
     Public paletteMap(256 - 1) As Byte
     Public Sub New(ocvb As VBocvb)

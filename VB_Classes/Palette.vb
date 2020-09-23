@@ -404,7 +404,7 @@ Public Class Palette_Consistency
     Inherits VBparent
     Dim emax As EMax_CPP
     Public hist As Histogram_Simple
-    Dim lut As LUT_Basics
+    Dim lut As LUT_Rebuild
     Private Class CompareHistCounts : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
             If a > b Then Return 1
@@ -420,7 +420,7 @@ Public Class Palette_Consistency
         hist.sliders.trackbar(0).Value = 255
         hist.sliders.Visible = False ' it must remain at 255...
 
-        lut = New LUT_Basics(ocvb)
+        lut = New LUT_Rebuild(ocvb)
 
         desc = "Using a histogram, assign the same colors to the same areas across frames"
     End Sub

@@ -567,12 +567,12 @@ End Class
 Public Class KNN_DepthClusters
     Inherits VBparent
     Public blobs As Blob_DepthClusters
-    Public flood As FloodFill_Basics
+    Public flood As FloodFill_8bit
     Public pTrack As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
-        flood = New FloodFill_Basics(ocvb)
+        flood = New FloodFill_8bit(ocvb)
         blobs = New Blob_DepthClusters(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
 
@@ -587,9 +587,9 @@ Public Class KNN_DepthClusters
         flood.src = dst1
         flood.Run(ocvb)
 
-        pTrack.queryPoints = flood.centroids
-        pTrack.queryMasks = flood.masks
-        pTrack.queryRects = flood.rects
+        pTrack.queryPoints = flood.basics.centroids
+        pTrack.queryMasks = flood.basics.masks
+        pTrack.queryRects = flood.basics.rects
         pTrack.Run(ocvb)
         dst2 = pTrack.dst1
     End Sub
@@ -676,7 +676,7 @@ End Class
 Public Class KNN_StabilizeRegions
     Inherits VBparent
     Public knn As KNN_DepthClusters
-    Public flood As FloodFill_Basics8bit
+    Public flood As FloodFill_8bit
     Dim lastinput As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -684,7 +684,7 @@ Public Class KNN_StabilizeRegions
         Dim drawCheckbox = findCheckBox("Draw rectangle for each mask")
         drawCheckbox.Checked = False
 
-        flood = New FloodFill_Basics8bit(ocvb)
+        flood = New FloodFill_8bit(ocvb)
 
         label1 = "Output of KNN_DepthClusters"
         label2 = "KNN_DepthClusters output plus unstable regions"
@@ -703,5 +703,6 @@ Public Class KNN_StabilizeRegions
         flood.src = dst2
         flood.Run(ocvb)
         dst2 = flood.dst2
+
     End Sub
 End Class
