@@ -3,16 +3,18 @@ Imports System.Threading
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class ProCon_Basics
     Inherits VBparent
-    Dim buffer(10 - 1) As Integer
-    Dim mutex = New Mutex(True, "BufferMutex")
-    Dim p As Thread
-    Dim c As Thread
-    Dim head = -1, tail = -1
-    Dim frameCount = 1
-    Dim flow As Font_FlowText
-    Dim terminateNotice As Boolean
-    Dim pduration As Integer
-    Dim cduration As Integer
+    Public buffer(10 - 1) As Integer
+    Public mutex = New Mutex(True, "BufferMutex")
+    Public p As Thread
+    Public c As Thread
+    Public head = -1
+    Public tail = -1
+    Public frameCount = 1
+    Public flow As Font_FlowText
+    Public terminateConsumer As Boolean
+    Public terminateProducer As Boolean
+    Public pduration As Integer
+    Public cduration As Integer
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
@@ -36,10 +38,10 @@ Public Class ProCon_Basics
 
         desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced."
     End Sub
-    Private Function success(index As Integer) As Integer
+    Public Function success(index As Integer) As Integer
         Return (index + 1) Mod buffer.Length
     End Function
-    Private Sub Consumer()
+    Public Sub Consumer()
         While 1
             SyncLock mutex
                 head = success(head)
@@ -49,7 +51,7 @@ Public Class ProCon_Basics
                     buffer(head) = -1
                 End If
             End SyncLock
-            If terminateNotice Then Exit While Else Thread.Sleep(cduration)
+            If terminateConsumer Then Exit While Else Thread.Sleep(cduration)
         End While
     End Sub
     Private Sub Producer()
@@ -62,7 +64,7 @@ Public Class ProCon_Basics
                     frameCount += 1
                 End If
             End SyncLock
-            If terminateNotice Then Exit While Else Thread.Sleep(pduration)
+            If terminateProducer Then Exit While Else Thread.Sleep(pduration)
         End While
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -83,6 +85,41 @@ Public Class ProCon_Basics
         End SyncLock
     End Sub
     Public Sub Close()
-        terminateNotice = True
+        terminateProducer = True
+        terminateConsumer = True
     End Sub
 End Class
+
+
+
+
+
+' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
+Public Class ProCon_Variation
+    Inherits VBparent
+    Dim procon As ProCon_Basics
+    Dim frameCount As Integer
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        procon = New ProCon_Basics(ocvb)
+        procon.sliders.trackbar(1).Enabled = False ' no duration for the producer because algorithm task is the producer.
+        procon.terminateProducer = True ' we don't want 2 producer tasks...
+        desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        SyncLock procon.mutex
+            procon.tail = procon.success(procon.tail)
+            If procon.buffer(procon.tail) = -1 Then
+                procon.buffer(procon.tail) = frameCount
+                frameCount += 1
+            End If
+        End SyncLock
+        procon.Run(ocvb)
+    End Sub
+    Public Sub Close()
+        procon.terminateConsumer = True
+        procon.terminateProducer = True
+    End Sub
+End Class
+
+

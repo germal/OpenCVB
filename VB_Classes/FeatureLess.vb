@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Featureless_Basics_MT
     Inherits VBparent
-    Public edges As Edges_Canny
+    Public edges As Edges_Basics
     Public grid As Thread_Grid
     Public regionCount As integer
     Public mask As New cv.Mat
@@ -15,7 +15,7 @@ Public Class Featureless_Basics_MT
         sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
         sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 100, 10000, If(src.Width > 1000, 1000, 500))
 
-        edges = New Edges_Canny(ocvb)
+        edges = New Edges_Basics(ocvb)
 
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")

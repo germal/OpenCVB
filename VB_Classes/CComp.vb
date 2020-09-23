@@ -80,7 +80,7 @@ Public Class CComp_Basics
             Next
         End If
         label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
-        connectedComponents.renderblobs(dst2)
+        connectedComponents.renderblobs(dst1)
 
         mats.Run(ocvb)
         If check.Box(0).Checked Then

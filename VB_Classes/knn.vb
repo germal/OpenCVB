@@ -559,3 +559,71 @@ Public Class KNN_Cluster2D
     End Sub
 End Class
 
+
+
+
+
+
+Public Class KNN_DepthClusters
+    Inherits VBparent
+    Public blobs As Blob_DepthClusters
+    Public flood As FloodFill_Basics
+    Public pTrack As Kalman_PointTracker
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        flood = New FloodFill_Basics(ocvb)
+        blobs = New Blob_DepthClusters(ocvb)
+        pTrack = New Kalman_PointTracker(ocvb)
+
+        label1 = "Output of Blob_DepthClusters"
+        label2 = "Same output after Kalman_PointTracker"
+        desc = "Use KNN to track and color the Blob results from clustering the depth data"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        blobs.Run(ocvb)
+        dst1 = blobs.dst2
+
+        flood.src = dst1
+        flood.Run(ocvb)
+
+        pTrack.queryPoints = flood.centroids
+        pTrack.queryMasks = flood.masks
+        pTrack.queryRects = flood.rects
+        pTrack.Run(ocvb)
+        dst2 = pTrack.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_PointPresent
+    Inherits VBparent
+    Dim knn As KNN_DepthClusters
+    Dim flow As Font_FlowText
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        flow = New Font_FlowText(ocvb)
+        flow.dst = RESULT2
+        knn = New KNN_DepthClusters(ocvb)
+
+        desc = "Determine if a point is present or not on the basis of the previous x frames"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        knn.src = src
+        knn.Run(ocvb)
+        dst1 = knn.dst2
+
+        Dim presentStr As String = ""
+        For i = 0 To knn.pTrack.kalman.Count - 1
+            presentStr += CStr(i) + ", "
+        Next
+        If Len(presentStr) Then presentStr = Mid(presentStr, 1, Len(presentStr) - 1) ' Trim comma...
+        flow.msgs.Add(presentStr)
+        flow.Run(ocvb)
+    End Sub
+End Class

@@ -71,11 +71,11 @@ End Class
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Lines
     Inherits VBparent
-    Dim edges As Edges_Canny
+    Dim edges As Edges_Basics
     Public segments() As cv.LineSegmentPolar
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        edges = New Edges_Canny(ocvb)
+        edges = New Edges_Basics(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "rho", 1, 100, 1)
@@ -117,7 +117,7 @@ End Class
 
 Public Class Hough_Lines_MT
     Inherits VBparent
-    Dim edges As Edges_Canny
+    Dim edges As Edges_Basics
     Public grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -126,7 +126,7 @@ Public Class Hough_Lines_MT
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 3)
 
-        edges = New Edges_Canny(ocvb)
+        edges = New Edges_Basics(ocvb)
 
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")

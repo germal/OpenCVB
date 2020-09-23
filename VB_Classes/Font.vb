@@ -49,6 +49,7 @@ End Class
 Public Class Font_FlowText
     Inherits VBparent
     Public msgs As New List(Of String)
+    Public dst As Integer = RESULT1 ' set to result2 to appear in dst2
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         desc = "Show TrueType text flowing through an image."
@@ -69,7 +70,7 @@ Public Class Font_FlowText
         For i = firstLine To msgs.Count - 1
             fullText += msgs(i) + vbCrLf
         Next
-        ocvb.trueText(fullText, 10, 20)
+        ocvb.trueText(fullText, 10, 20, dst)
 
         If msgs.Count >= maxLines Then
             Try

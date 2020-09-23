@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
-Public Class Edges_Canny
+Public Class Edges_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -16,8 +16,8 @@ Public Class Edges_Canny
         label2 = "Canny using L2 Norm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim threshold1 As integer = sliders.trackbar(0).Value
-        Dim threshold2 As integer = sliders.trackbar(1).Value
+        Dim threshold1 As Integer = sliders.trackbar(0).Value
+        Dim threshold2 As Integer = sliders.trackbar(1).Value
         Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Canny(threshold1, threshold2, aperture, False)
@@ -30,14 +30,14 @@ End Class
 Public Class Edges_DepthAndColor
     Inherits VBparent
     Dim shadow As Depth_Holes
-    Dim canny As Edges_Canny
+    Dim canny As Edges_Basics
     Dim dilate As DilateErode_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         dilate = New DilateErode_Basics(ocvb)
         dilate.radio.check(2).Checked = True
 
-        canny = New Edges_Canny(ocvb)
+        canny = New Edges_Basics(ocvb)
         canny.sliders.trackbar(0).Value = 100
         canny.sliders.trackbar(1).Value = 100
 

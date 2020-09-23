@@ -134,10 +134,10 @@ End Class
 Public Class SuperPixel_WithCanny
     Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
-    Dim edges As Edges_Canny
+    Dim edges As Edges_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        edges = New Edges_Canny(ocvb)
+        edges = New Edges_Basics(ocvb)
 
         pixels = New SuperPixel_Basics_CPP(ocvb)
 
