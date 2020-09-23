@@ -471,7 +471,7 @@ End Class
 Public Class PointCloud_Kalman_TopView
     Inherits VBparent
     Public pTrack As Kalman_PointTracker
-    Public flood As Floodfill_Identifiers
+    Public flood As FloodFill_8bit
     Public view As PointCloud_HistTopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
@@ -479,7 +479,7 @@ Public Class PointCloud_Kalman_TopView
         setCaller(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
-        flood = New Floodfill_Identifiers(ocvb)
+        flood = New FloodFill_8bit(ocvb)
         flood.basics.sliders.trackbar(0).Value = 100
         pTrack = New Kalman_PointTracker(ocvb)
         view = New PointCloud_HistTopView(ocvb)
@@ -497,10 +497,10 @@ Public Class PointCloud_Kalman_TopView
         flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
-        pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        pTrack.queryPoints = New List(Of cv.Point2f)(flood.centroids)
-        pTrack.queryRects = New List(Of cv.Rect)(flood.rects)
-        pTrack.queryMasks = New List(Of cv.Mat)(flood.masks)
+        If flood.dst1.Channels = 3 Then pTrack.src = flood.dst1 Else pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
 
