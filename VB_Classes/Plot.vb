@@ -222,7 +222,7 @@ Public Class Plot_Histogram
             Static savedMaxVal = maxVal
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000
             If maxVal < 0 Then maxVal = savedMaxVal
-            If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.2 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
+            If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.5 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
         Else
             maxVal = fixedMaxVal
         End If
@@ -261,8 +261,14 @@ Module Plot_OpenCV_Module
             Dim pt2 = New cv.Point(dst1.Width, spacer * i)
             dst1.Line(pt1, pt2, cv.Scalar.White, 1)
             If i = 0 Then pt2.Y += 10
-            cv.Cv2.PutText(dst1, Format(maxVal - spaceVal * i, "###,###,##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
+            Dim nextVal = (maxVal - spaceVal * i)
+            If maxVal > 1000 Then
+                cv.Cv2.PutText(dst1, Format(nextVal / 1000, "###,###,##0.0") + "k", New cv.Point(pt1.X + 5, pt1.Y - 4),
                            cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Beige, 2)
+            Else
+                cv.Cv2.PutText(dst1, Format(nextVal, "##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
+                           cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Beige, 2)
+            End If
         Next
     End Sub
 End Module
