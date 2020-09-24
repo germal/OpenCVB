@@ -914,7 +914,9 @@ Public Class OpenCVB
         SyncLock cameraThreadLock
             stopCameraThread = False
             While stopCameraThread = False
-                camera.GetNextFrame()
+                SyncLock bufferLock
+                    camera.GetNextFrame()
+                End SyncLock
                 cameraRefresh = True
 
                 Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
