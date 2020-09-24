@@ -10,8 +10,8 @@ Module opencv_module
     Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public delegateLock As New Mutex(True, "delegateLock")
     Public callTraceLock As New Mutex(True, "callTraceLock")
-    Public algorithmThreadLock As New List(Of Integer)
-    Public cameraThreadLock As New List(Of Integer)
+    Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
+    Public cameraThreadLock As New Mutex(True, "CameraThreadLock")
 End Module
 Public Class OpenCVB
 #Region "Globals"
