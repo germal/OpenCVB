@@ -472,7 +472,7 @@ Public Class PointCloud_Kalman_TopView
     Inherits VBparent
     Public pTrack As Kalman_PointTracker
     Public flood As FloodFill_8bit
-    Public view As PointCloud_HistTopView
+    Public histogram As PointCloud_HistTopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
@@ -482,7 +482,7 @@ Public Class PointCloud_Kalman_TopView
         flood = New FloodFill_8bit(ocvb)
         flood.basics.sliders.trackbar(0).Value = 100
         pTrack = New Kalman_PointTracker(ocvb)
-        view = New PointCloud_HistTopView(ocvb)
+        histogram = New PointCloud_HistTopView(ocvb)
 
         desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
@@ -490,11 +490,11 @@ Public Class PointCloud_Kalman_TopView
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        view.src = src
-        view.Run(ocvb)
+        histogram.src = src
+        histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
         If flood.dst1.Channels = 3 Then pTrack.src = flood.dst1 Else pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -521,7 +521,7 @@ End Class
 Public Class PointCloud_Kalman_SideView
     Inherits VBparent
     Public flood As Floodfill_Identifiers
-    Public view As PointCloud_HistSideView
+    Public histogram As PointCloud_HistSideView
     Public pTrack As Kalman_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
@@ -531,7 +531,7 @@ Public Class PointCloud_Kalman_SideView
         cmats = New PointCloud_Colorize(ocvb)
         flood = New Floodfill_Identifiers(ocvb)
         flood.basics.sliders.trackbar(0).Value = 100
-        view = New PointCloud_HistSideView(ocvb)
+        histogram = New PointCloud_HistSideView(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
 
         desc = "Measure each object found in a Centroids view and provide pixel width as well"
@@ -540,11 +540,11 @@ Public Class PointCloud_Kalman_SideView
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        view.src = src
-        view.Run(ocvb)
+        histogram.src = src
+        histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = view.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
         pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

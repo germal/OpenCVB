@@ -527,7 +527,7 @@ Public Class FloodFill_PointTracker
         flood = New FloodFill_8bit(ocvb)
 
         label1 = "Point tracker output"
-        desc = "Use the FloodFill output as input into the point tracker"
+        desc = "Test the FloodFill output as input into the point tracker"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         flood.src = src

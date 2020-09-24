@@ -482,8 +482,9 @@ Public Class Histogram_ProjectionOptions
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 10, 10000, MAXZ_DEFAULT * 1000)
         If standalone Then sliders.trackbar(0).Value = 1
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Use IMU gravity vector"
+        check.Box(1).Text = "Only use pointcloud data for featureless regions"
         check.Box(0).Checked = True
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.L515 Or
             ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
@@ -515,6 +516,7 @@ Public Class Histogram_2D_TopView
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
     Public useIMU As Boolean = False
+    Public featureless As Featureless_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
@@ -522,6 +524,7 @@ Public Class Histogram_2D_TopView
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
+        featureless = New Featureless_Basics(ocvb)
 
         label1 = "XZ (Top Down View)"
         desc = "Create a 2D histogram for depth in XZ (a top down view.)"
@@ -538,6 +541,15 @@ Public Class Histogram_2D_TopView
         Static inRangeSlider = findSlider("InRange Max Depth")
         Dim zRange = inRangeSlider?.Value / 1000
 
+        Static featurelessCheck = findCheckBox("Only use pointcloud data for featureless regions")
+        If featurelessCheck.checked Then
+            featureless.src = ocvb.color
+            featureless.Run(ocvb)
+            Dim tmp As New cv.Mat
+            cv.Cv2.BitwiseNot(featureless.flood.allRegionMask, tmp)
+            tmp = tmp.Resize(ocvb.pointCloud.Size)
+            ocvb.pointCloud.SetTo(0, tmp) ' clear out all pointcloud data not in the featureless regions.
+        End If
         trimPC.src = ocvb.pointCloud
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1

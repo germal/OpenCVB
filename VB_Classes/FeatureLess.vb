@@ -1,31 +1,30 @@
 Imports cv = OpenCvSharp
-Public Class Featureless_Basics1
+Public Class Featureless_Basics
     Inherits VBparent
     Public edges As Edges_Basics
     Public grid As Thread_Grid
-    Public regionCount As Integer
-    Public mask As New cv.Mat
-    Public objects As New List(Of cv.Mat)
-    Public objectSize As New List(Of Integer)
+    Public flood As FloodFill_8bit
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
-        sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 100, 10000, If(src.Width > 1000, 1000, 500))
 
         edges = New Edges_Basics(ocvb)
 
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = If(src.Width > 1000, 16, 8)
-        gridHeightSlider.Value = If(src.Width > 1000, 16, 8)
+        gridWidthSlider.Value = 10
+        gridHeightSlider.Value = gridWidthSlider.Value
 
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
+        sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
+        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, resFactor * 500)
 
-        desc = "Multithread Houghlines to find featureless regions in an image."
+        flood = New FloodFill_8bit(ocvb)
+
         label1 = "Featureless regions with mask in depth color"
+        desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -39,41 +38,21 @@ Public Class Featureless_Basics1
         Dim floodCountThreshold = sliders.trackbar(3).Value
 
         src.CopyTo(dst1)
-        mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then mask(roi).SetTo(255)
         End Sub)
-        regionCount = 1
-        For y = 0 To mask.Rows - 1
-            For x = 0 To mask.Cols - 1
-                If mask.Get(Of Byte)(y, x) = 255 Then
-                    Dim pt As New cv.Point(x, y)
-                    Dim floodCount = mask.FloodFill(pt, regionCount)
-                    If floodCount < floodCountThreshold Then
-                        mask.FloodFill(pt, 0)
-                    Else
-                        objectSize.Add(floodCount)
-                        regionCount += 1
-                    End If
-                End If
-            Next
-        Next
 
-        objects.Clear()
-        objectSize.Clear()
-        dst2.SetTo(0)
-        For i = 1 To regionCount - 1
-            Dim label = mask.InRange(i, i)
-            objects.Add(label.Clone())
-            Dim mean = ocvb.RGBDepth.Mean(label)
-            dst2.SetTo(mean, label)
-        Next
-        cv.Cv2.AddWeighted(src, 0.5, dst2, 0.5, 0, dst1)
-        label2 = "FeatureLess Regions = " + CStr(regionCount)
+        flood.src = mask
+        flood.Run(ocvb)
+        dst1 = flood.dst1
+
+        label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count)
     End Sub
 End Class
+
 
 
 
@@ -96,7 +75,7 @@ Public Class Featureless_DCT_MT
         dst2 = dct.dst2
 
         Dim mask = dst1.Clone()
-        Dim objectSize As New List(Of integer)
+        Dim objectSize As New List(Of Integer)
         Dim regionCount = 1
         For y = 0 To mask.Rows - 1
             For x = 0 To mask.Cols - 1
@@ -109,7 +88,7 @@ Public Class Featureless_DCT_MT
             Next
         Next
 
-        Dim maxSize As integer, maxIndex As integer
+        Dim maxSize As Integer, maxIndex As Integer
         For i = 0 To objectSize.Count - 1
             If maxSize < objectSize.ElementAt(i) Then
                 maxSize = objectSize.ElementAt(i)
@@ -209,59 +188,3 @@ Public Class FeatureLess_Prediction
     End Sub
 End Class
 
-
-
-
-Public Class Featureless_Basics
-    Inherits VBparent
-    Public edges As Edges_Basics
-    Public grid As Thread_Grid
-    Public flood As FloodFill_8bit
-    Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-
-        edges = New Edges_Basics(ocvb)
-
-        grid = New Thread_Grid(ocvb)
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 10
-        gridHeightSlider.Value = gridWidthSlider.Value
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
-        sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, resFactor * 500)
-
-        flood = New FloodFill_8bit(ocvb)
-
-        label1 = "Featureless regions with mask in depth color"
-        desc = "Multithread Houghlines to find featureless regions in an image."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        grid.Run(ocvb)
-
-        edges.src = src
-        edges.Run(ocvb)
-
-        Dim rhoIn = sliders.trackbar(0).Value
-        Dim thetaIn = sliders.trackbar(1).Value / 1000
-        Dim threshold = sliders.trackbar(2).Value
-        Dim floodCountThreshold = sliders.trackbar(3).Value
-
-        src.CopyTo(dst1)
-        Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        Sub(roi)
-            Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
-            If segments.Count = 0 Then mask(roi).SetTo(255)
-        End Sub)
-
-        flood.src = mask
-        flood.Run(ocvb)
-        dst1 = flood.dst1
-
-        label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count)
-    End Sub
-End Class
