@@ -628,7 +628,7 @@ Public Class Kalman_PointTracker
                     End If
 
                     If kalman(i).vo.mask Is Nothing Then
-                        vo.LayoutColor = scalarColors(i Mod 255)
+                        vo.LayoutColor = ocvb.scalarColors(i Mod 255)
                         kalman(i).vo = vo
                     Else
                         vo.LayoutColor = kalman(i).vo.LayoutColor
@@ -639,6 +639,7 @@ Public Class Kalman_PointTracker
             Next
 
             Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
+            Dim incr = 255 / viewObjects.Count
             ' render masks first so they don't cover circles or rectangles below
             For i = 0 To viewObjects.Count - 1
                 Dim vo = viewObjects.ElementAt(i).Value

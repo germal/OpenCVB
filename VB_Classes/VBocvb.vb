@@ -37,6 +37,7 @@ Public Class VBocvb
     Public HomeDir As String
     Public testAllRunning As Boolean
     Public transformationMatrix() As Single
+    Public scalarColors(255) As cv.Scalar
 
     Public openFileDialogRequested As Boolean
     Public openFileInitialDirectory As String

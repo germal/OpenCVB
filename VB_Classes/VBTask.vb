@@ -77,6 +77,28 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.PythonExe = parms.PythonExe
         ocvb.HomeDir = homeDir
         ocvb.parms = parms
+
+        Dim vec As cv.Scalar, r As Integer = 120, b As Integer = 255, g As Integer = 0
+        Dim scalarList As New List(Of cv.Scalar)
+        For i = 0 To ocvb.scalarColors.Length - 1
+            Select Case i Mod 3
+                Case 0
+                    vec = New cv.Scalar(b, g, r)
+                    r = (r + 50) Mod 255
+                Case 1
+                    vec = New cv.Scalar(b, g, r)
+                    g = (g + 75) Mod 255
+                Case 2
+                    vec = New cv.Scalar(b, g, r)
+                    b = (b + 150) Mod 255
+            End Select
+            If scalarList.Contains(New cv.Scalar(b, g, r)) Then b = (b + 100) Mod 255 ' try not to have duplicates.
+            If r + g + b < 180 Then r = 120 ' need bright colors.
+
+            ocvb.scalarColors(i) = New cv.Scalar(b, g, r)
+            scalarList.Add(ocvb.scalarColors(i))
+        Next
+
         algorithmObject = algoList.createAlgorithm(ocvb, algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +

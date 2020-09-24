@@ -2,8 +2,8 @@
 Imports Numpy
 #End If
 Imports System.Windows.Forms
-Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Imports System.IO
 Public Class TTtext
     Public text As String
     Public picTag = 2
@@ -42,6 +42,7 @@ Public Class VBparent : Implements IDisposable
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public fontsize As Single
+    Public resFactor As Single ' resolution is often a factor in sizing tasks.
     Public caller As String
     Public topCameraPoint As cv.Point
     Public sideCameraPoint As cv.Point
@@ -79,7 +80,17 @@ Public Class VBparent : Implements IDisposable
         src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        fontsize = src.Width / 1280
+        Select Case src.Width
+            Case 320
+                fontsize = src.Width / 1280
+                resFactor = 0.1
+            Case 640
+                fontsize = src.Width / 1280
+                resFactor = 0.3
+            Case 1280
+                fontsize = 1
+                resFactor = 1
+        End Select
 
         topCameraPoint = New cv.Point(src.Height, src.Height)
         sideCameraPoint = New cv.Point((src.Width - src.Height) / 2, src.Height - (src.Width - src.Height) / 2)

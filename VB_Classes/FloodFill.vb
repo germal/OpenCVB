@@ -85,26 +85,36 @@ End Class
 Public Class FloodFill_8bit
     Inherits VBparent
     Public basics As FloodFill_Basics
-    Dim colorMat As cv.Mat
+    Public palette As Palette_Basics
+    Public allRegionMask As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
+        palette = New Palette_Basics(ocvb)
+        palette.Run(ocvb)
+
         basics = New FloodFill_Basics(ocvb)
-        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, rColors) ' Create a new color palette here.
-        desc = "Create a floodfill image that is only 8-bit for use with a LUT - better than moving 24-bits around"
+        desc = "Create a floodfill image that is only 8-bit for use with a palette"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         basics.src = src
         basics.Run(ocvb)
 
         dst2.SetTo(0)
-        Dim incr = 255 / basics.masks.Count
         For i = 0 To basics.masks.Count - 1
             Dim maskIndex = basics.maskSizes.ElementAt(i).Value
-            dst2.SetTo(cv.Scalar.All(i * incr), basics.masks(maskIndex))
+            dst2.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
         Next
-        dst1 = dst2.LUT(colorMat)
-        If standalone Then dst2 = colorMat.Resize(src.Size())
+
+        allRegionMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+
+        Dim incr = 255 / basics.masks.Count
+        palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
+        palette.Run(ocvb)
+        dst1.SetTo(0)
+        palette.dst1.CopyTo(dst1, allRegionMask)
+
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(basics.minFloodSize) + " pixels"
+        If standalone Then dst2 = palette.colorMat.Resize(src.Size())
     End Sub
 End Class
 
@@ -200,12 +210,12 @@ End Class
 Public Class FloodFill_DCT
     Inherits VBparent
     Dim flood As FloodFill_Color_MT
-    Dim dct As DCT_FeatureLess_MT
+    Dim dct As DCT_FeatureLess
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         flood = New FloodFill_Color_MT(ocvb)
 
-        dct = New DCT_FeatureLess_MT(ocvb)
+        dct = New DCT_FeatureLess(ocvb)
         desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -499,5 +509,37 @@ Public Class Floodfill_ColorObjects
             rects.Add(pFlood.rects(i))
             centroids.Add(pFlood.centroids(i))
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_PointTracker
+    Inherits VBparent
+    Dim pTrack As Kalman_PointTracker
+    Dim flood As FloodFill_8bit
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+
+        pTrack = New Kalman_PointTracker(ocvb)
+        flood = New FloodFill_8bit(ocvb)
+
+        label1 = "Point tracker output"
+        desc = "Use the FloodFill output as input into the point tracker"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        flood.src = src
+        flood.Run(ocvb)
+        dst2 = flood.dst1
+
+        pTrack.queryPoints = flood.basics.centroids
+        pTrack.queryRects = flood.basics.rects
+        pTrack.queryMasks = flood.basics.masks
+        pTrack.Run(ocvb)
+
+        label2 = CStr(pTrack.viewObjects.Count) + " regions were found"
+        dst1 = pTrack.dst1
     End Sub
 End Class

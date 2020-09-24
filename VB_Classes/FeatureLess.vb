@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
-Public Class Featureless_Basics_MT
+Public Class Featureless_Basics1
     Inherits VBparent
     Public edges As Edges_Basics
     Public grid As Thread_Grid
-    Public regionCount As integer
+    Public regionCount As Integer
     Public mask As New cv.Mat
     Public objects As New List(Of cv.Mat)
-    Public objectSize As New List(Of integer)
+    Public objectSize As New List(Of Integer)
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
@@ -27,7 +27,6 @@ Public Class Featureless_Basics_MT
         desc = "Multithread Houghlines to find featureless regions in an image."
         label1 = "Featureless regions with mask in depth color"
     End Sub
-
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
 
@@ -79,15 +78,66 @@ End Class
 
 
 
+Public Class Featureless_DCT_MT
+    Inherits VBparent
+    Dim dct As DCT_FeatureLess
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        dct = New DCT_FeatureLess(ocvb)
+
+        label2 = "Largest FeatureLess Region"
+        desc = "Use DCT to find featureless regions."
+    End Sub
+
+    Public Sub Run(ocvb As VBocvb)
+        dct.src = src
+        dct.Run(ocvb)
+        dst1 = dct.dst1
+        dst2 = dct.dst2
+
+        Dim mask = dst1.Clone()
+        Dim objectSize As New List(Of integer)
+        Dim regionCount = 1
+        For y = 0 To mask.Rows - 1
+            For x = 0 To mask.Cols - 1
+                If mask.Get(Of Byte)(y, x) = 255 Then
+                    Dim pt As New cv.Point(x, y)
+                    Dim floodCount = mask.FloodFill(pt, regionCount)
+                    objectSize.Add(floodCount)
+                    regionCount += 1
+                End If
+            Next
+        Next
+
+        Dim maxSize As integer, maxIndex As integer
+        For i = 0 To objectSize.Count - 1
+            If maxSize < objectSize.ElementAt(i) Then
+                maxSize = objectSize.ElementAt(i)
+                maxIndex = i
+            End If
+        Next
+
+        Dim label = mask.InRange(maxIndex + 1, maxIndex + 1)
+        Dim nonZ = label.CountNonZero()
+        label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
+        dst2.SetTo(cv.Scalar.White, label)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class FeatureLess_Prediction
     Inherits VBparent
-    Dim fLess As Featureless_Basics_MT
+    Dim fLess As Featureless_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
 
-        fLess = New Featureless_Basics_MT(ocvb)
+        fLess = New Featureless_Basics(ocvb)
 
         desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
@@ -96,24 +146,23 @@ Public Class FeatureLess_Prediction
         fLess.Run(ocvb)
         dst1 = fLess.dst1
         dst2 = fLess.dst2
-        Dim labels = fLess.mask.Clone()
-        fLess.mask = fLess.mask.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim labels = fLess.dst2.Clone()
 
         Dim percent = Math.Sqrt(sliders.trackbar(0).Value / 100)
         Dim newSize = New cv.Size(src.Width * percent, src.Height * percent)
 
-        Dim rgb = src.Clone(), depth32f = getDepth32f(ocvb).Resize(newSize), mask = fLess.mask
+        Dim rgb = src.Clone(), depth32f = getDepth32f(ocvb).Resize(newSize), mask = fLess.dst2
 
         rgb = rgb.Resize(newSize)
 
         ' manually resize the mask to make sure there is no dithering...
         mask = New cv.Mat(depth32f.Size(), cv.MatType.CV_8U, 0)
         Dim labelSmall As New cv.Mat(mask.Size(), cv.MatType.CV_32S, 0)
-        Dim xFactor = CInt(fLess.mask.Width / newSize.Width)
-        Dim yFactor = CInt(fLess.mask.Height / newSize.Height)
+        Dim xFactor = CInt(fLess.dst2.Width / newSize.Width)
+        Dim yFactor = CInt(fLess.dst2.Height / newSize.Height)
         For y = 0 To mask.Height - 2
             For x = 0 To mask.Width - 2
-                If fLess.mask.Get(Of Byte)(y * yFactor, x * xFactor) = 255 Then
+                If fLess.dst2.Get(Of Byte)(y * yFactor, x * xFactor) = 255 Then
                     mask.Set(Of Byte)(y, x, 255)
                     labelSmall.Set(Of Byte)(y, x, labels.Get(Of Byte)(y, x))
                 End If
@@ -163,49 +212,56 @@ End Class
 
 
 
-Public Class Featureless_DCT_MT
+Public Class Featureless_Basics
     Inherits VBparent
-    Dim dct As DCT_FeatureLess_MT
+    Public edges As Edges_Basics
+    Public grid As Thread_Grid
+    Public flood As FloodFill_8bit
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        dct = New DCT_FeatureLess_MT(ocvb)
 
-        desc = "Use DCT to find largest featureless region."
-        label2 = "Largest FeatureLess Region"
+        edges = New Edges_Basics(ocvb)
+
+        grid = New Thread_Grid(ocvb)
+        Static gridWidthSlider = findSlider("ThreadGrid Width")
+        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        gridWidthSlider.Value = 10
+        gridHeightSlider.Value = gridWidthSlider.Value
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
+        sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
+        sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
+        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, resFactor * 500)
+
+        flood = New FloodFill_8bit(ocvb)
+
+        label1 = "Featureless regions with mask in depth color"
+        desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-
     Public Sub Run(ocvb As VBocvb)
-        dct.src = src
-        dct.Run(ocvb)
-        dst1 = dct.dst1
-        dst2 = dct.dst2
+        grid.Run(ocvb)
 
-        Dim mask = dst1.Clone()
-        Dim objectSize As New List(Of integer)
-        Dim regionCount = 1
-        For y = 0 To mask.Rows - 1
-            For x = 0 To mask.Cols - 1
-                If mask.Get(Of Byte)(y, x) = 255 Then
-                    Dim pt As New cv.Point(x, y)
-                    Dim floodCount = mask.FloodFill(pt, regionCount)
-                    objectSize.Add(floodCount)
-                    regionCount += 1
-                End If
-            Next
-        Next
+        edges.src = src
+        edges.Run(ocvb)
 
-        Dim maxSize As integer, maxIndex As integer
-        For i = 0 To objectSize.Count - 1
-            If maxSize < objectSize.ElementAt(i) Then
-                maxSize = objectSize.ElementAt(i)
-                maxIndex = i
-            End If
-        Next
+        Dim rhoIn = sliders.trackbar(0).Value
+        Dim thetaIn = sliders.trackbar(1).Value / 1000
+        Dim threshold = sliders.trackbar(2).Value
+        Dim floodCountThreshold = sliders.trackbar(3).Value
 
-        Dim label = mask.InRange(maxIndex + 1, maxIndex + 1)
-        Dim nonZ = label.CountNonZero()
-        label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
-        dst2.SetTo(cv.Scalar.White, label)
+        src.CopyTo(dst1)
+        Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Sub(roi)
+            Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
+            If segments.Count = 0 Then mask(roi).SetTo(255)
+        End Sub)
+
+        flood.src = mask
+        flood.Run(ocvb)
+        dst1 = flood.dst1
+
+        label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count)
     End Sub
 End Class
-

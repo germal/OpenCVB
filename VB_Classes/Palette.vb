@@ -6,6 +6,7 @@ Public Class Palette_Basics
     Inherits VBparent
     Public gradMap As Palette_BuildGradientColorMap
     Public colormap As cv.ColormapTypes
+    Public colorMat As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         gradMap = New Palette_BuildGradientColorMap(ocvb)
@@ -42,7 +43,7 @@ Public Class Palette_Basics
         If saveColorMap <> colormap Then
             saveColorMap = colormap
             Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
-            ' The color scale file appear to be flipped - Ocean is actual HSV and vice versa.
+            ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
             If str.Contains("Ocean") Then
                 str = str.Replace("Ocean", "Hsv")
             ElseIf str.Contains("Hsv") Then
@@ -50,8 +51,8 @@ Public Class Palette_Basics
             End If
             Dim mapFile = New FileInfo(str)
             If mapFile.Exists Then
-                Dim cmap = cv.Cv2.ImRead(mapFile.FullName)
-                If standalone Then dst2 = cmap.Resize(src.Size())
+                colorMat = cv.Cv2.ImRead(mapFile.FullName)
+                If standalone Then dst2 = colorMat.Resize(src.Size())
             End If
         End If
 
@@ -183,12 +184,17 @@ End Module
 
 
 
-Public Class Palette_Map
+
+
+Public Class Palette_Reduction
     Inherits VBparent
+    Dim reduction As Reduction_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
+        reduction = New Reduction_Basics(ocvb)
+
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "inRange offset", 1, 100, 10)
+        sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
         desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
@@ -203,16 +209,23 @@ Public Class Palette_Map
             Return If(a(2) < b(2), -1, 1)
         End Function
     End Class
-
     Public Sub Run(ocvb As VBocvb)
-        dst1 = src / 64
-        dst1 *= 64
+        Static reductionCheck = findCheckBox("Use Reduction")
+        reductionCheck.checked = True
+        Static reductionSlider = findSlider("Reduction factor")
+        If reductionSlider.value < 5 Then
+            reductionSlider.value = 5
+            Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 5")
+        End If
+        reduction.src = src
+        reduction.Run(ocvb)
+        dst1 = reduction.dst1
+
         Dim palette As New SortedList(Of cv.Vec3b, Integer)(New CompareVec3b)
-        Dim black As New cv.Vec3b(0, 0, 0)
         For y = 0 To dst1.Height - 1
             For x = 0 To dst1.Width - 1
                 Dim nextVec = dst1.Get(Of cv.Vec3b)(y, x)
-                If nextVec <> black Then
+                If nextVec <> cv.Scalar.Black Then
                     If palette.ContainsKey(nextVec) Then
                         palette(nextVec) = palette(nextVec) + 1
                     Else
@@ -547,8 +560,8 @@ Public Class Palette_Layout2D
         grid = New Thread_Grid(ocvb)
         Dim widthSlider = findSlider("ThreadGrid Width")
         Dim heightslider = findSlider("ThreadGrid Height")
-        widthSlider.Value = 80
-        heightslider.Value = 60
+        widthSlider.Value = 40
+        heightslider.Value = 24
         grid.Run(ocvb)
         desc = "Layout the available colors in a 2D grid"
     End Sub
@@ -556,7 +569,7 @@ Public Class Palette_Layout2D
         grid.Run(ocvb)
         Dim index As Integer
         For Each r In grid.roiList
-            dst1(r).SetTo(scalarColors(index Mod 255))
+            dst1(r).SetTo(ocvb.scalarColors(index Mod 255))
             index += 1
         Next
         label1 = "Palette_Layout2D - " + CStr(grid.roiList.Count) + " regions"

@@ -27,8 +27,8 @@ Public Class Thread_Grid
         setCaller(ocvb)
         src = ocvb.color
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "ThreadGrid Width", 5, src.Width, 32)
-        sliders.setupTrackBar(1, "ThreadGrid Height", 5, src.Height, 32)
+        sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
+        sliders.setupTrackBar(1, "ThreadGrid Height", 2, src.Height, 32)
         sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)

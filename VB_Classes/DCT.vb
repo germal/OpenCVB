@@ -122,7 +122,7 @@ End Class
 
 
 
-Public Class DCT_FeatureLess_MT
+Public Class DCT_FeatureLess
     Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New(ocvb As VBocvb)
@@ -143,8 +143,8 @@ Public Class DCT_FeatureLess_MT
         ' Result2 contain the RGB image with highest frequency removed.
         Parallel.For(0, dst2.Rows,
         Sub(i)
-            Dim runLen As integer = 0
-            Dim runStart As integer = 0
+            Dim runLen As Integer = 0
+            Dim runStart As Integer = 0
             For j = 1 To dst2.Cols - 1
                 If dst2.Get(Of Byte)(i, j) = dst2.Get(Of Byte)(i, j - 1) Then
                     runLen += 1
@@ -177,7 +177,7 @@ Public Class DCT_Surfaces_debug
     Inherits VBparent
     Dim Mats As Mat_4to1
     Dim grid As Thread_Grid
-    Dim dct As DCT_FeatureLess_MT
+    Dim dct As DCT_FeatureLess
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
@@ -188,7 +188,7 @@ Public Class DCT_Surfaces_debug
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 100
         gridHeightSlider.Value = 150
-        dct = New DCT_FeatureLess_MT(ocvb)
+        dct = New DCT_FeatureLess(ocvb)
         dct.dct.sliders.trackbar(0).Value = 1
         Mats = New Mat_4to1(ocvb)
 
@@ -260,11 +260,11 @@ End Class
 
 Public Class DCT_CComponents
     Inherits VBparent
-    Dim dct As DCT_FeatureLess_MT
+    Dim dct As DCT_FeatureLess
     Dim cc As CComp_ColorDepth
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        dct = New DCT_FeatureLess_MT(ocvb)
+        dct = New DCT_FeatureLess(ocvb)
         cc = New CComp_ColorDepth(ocvb)
 
         label1 = "DCT masks colorized with average depth."
