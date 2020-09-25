@@ -194,8 +194,8 @@ End Class
 
 Public Class FeatureLess_PointTracker
     Inherits VBparent
-    Dim fLess As Featureless_Basics
-    Dim pTrack As Kalman_PointTracker
+    Public fLess As Featureless_Basics
+    Public pTrack As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
@@ -214,5 +214,35 @@ Public Class FeatureLess_PointTracker
         pTrack.queryMasks = fLess.flood.basics.masks
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FeatureLess_Highlights
+    Inherits VBparent
+    Public fLessP As FeatureLess_PointTracker
+    Public addW As AddWeighted_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        fLessP = New FeatureLess_PointTracker(ocvb)
+        fLessP.fLess.flood.palette.gradMap.sliders.Visible = False
+        fLessP.fLess.flood.palette.check.Visible = False
+        fLessP.fLess.flood.palette.radio.Visible = False
+        addW = New AddWeighted_Basics(ocvb)
+        desc = "Highlight the featureless region in an RGB image"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        fLessP.src = src
+        fLessP.Run(ocvb)
+
+        addW.src1 = src
+        addW.src2 = fLessP.dst1
+        addW.Run(ocvb)
+        dst1 = addW.dst1
     End Sub
 End Class

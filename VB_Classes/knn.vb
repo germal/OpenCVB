@@ -121,6 +121,7 @@ Public Class KNN_QueryTrain
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reuse the training and query data"
+        If standalone = False Then check.Visible = False
 
         randomTrain = New Random_Points(ocvb)
         randomTrain.sliders.Visible = False
