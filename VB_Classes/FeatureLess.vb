@@ -188,3 +188,31 @@ Public Class FeatureLess_Prediction
     End Sub
 End Class
 
+
+
+
+
+Public Class FeatureLess_PointTracker
+    Inherits VBparent
+    Dim fLess As Featureless_Basics
+    Dim pTrack As Kalman_PointTracker
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        pTrack = New Kalman_PointTracker(ocvb)
+        fLess = New Featureless_Basics(ocvb)
+        label1 = "After point tracker"
+        label2 = "Before point tracker"
+        desc = "Track the featureless regions with point tracker"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        fLess.src = src
+        fLess.Run(ocvb)
+        dst2 = fLess.dst1
+
+        pTrack.queryPoints = fLess.flood.basics.centroids
+        pTrack.queryRects = fLess.flood.basics.rects
+        pTrack.queryMasks = fLess.flood.basics.masks
+        pTrack.Run(ocvb)
+        dst1 = pTrack.dst1
+    End Sub
+End Class
