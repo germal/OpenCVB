@@ -910,6 +910,10 @@ Public Class Depth_LocalMinMax_Kalman_MT
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 128
         gridHeightSlider.Value = 90
+        grid.Run(ocvb)
+
+        kalman = New Kalman_Basics(ocvb)
+        ReDim kalman.input(grid.roiList.Count * 4 - 1)
 
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(4 - 1)
