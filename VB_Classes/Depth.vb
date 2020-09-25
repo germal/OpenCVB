@@ -132,7 +132,7 @@ Public Class Depth_Foreground
 
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(4 - 1) ' cv.rect...
-        kalman.check.Visible = False ' we don't allow turning off kalman with this algorithm.
+        hideForm("Kalman_Basics CheckBox Options")
 
         label1 = "Blue is current, red is kalman, green is trusted"
         desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."

@@ -13,7 +13,6 @@ Public Class CamShift_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         plotHist = New Plot_Histogram(ocvb)
-        plotHist.sliders.Visible = False
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "CamShift vMin", 0, 255, 32)
@@ -160,7 +159,6 @@ Public Class Camshift_TopObjects
         mats = New Mat_4to1(ocvb)
 
         blob = New Blob_DepthClusters(ocvb)
-        blob.sliders.Visible = False
         For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics(ocvb)
         Next
@@ -173,7 +171,8 @@ Public Class Camshift_TopObjects
         blob.Run(ocvb)
         dst1 = blob.dst2
 
-        Dim updateFrequency = sliders.trackbar(0).Value
+        Static updateSlider = findSlider("Reinitialize camshift after x frames")
+        Dim updateFrequency = updateSlider.Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
         For i = 0 To cams.Length - 1
             If blob.flood.fBasics.maskSizes.Count > i Then

@@ -32,7 +32,6 @@ Public Class VBocvb
     Public parentAlgorithm As String
     Public callTrace As New List(Of String)
 
-    Public appLocation As cv.Rect
     Public description As String
     Public HomeDir As String
     Public testAllRunning As Boolean

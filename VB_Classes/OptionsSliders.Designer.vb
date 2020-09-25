@@ -30,7 +30,7 @@ Partial Class OptionsSliders
         Me.FlowLayoutPanel1.AutoSize = True
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(12, 12)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(895, 316)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(895, 326)
         Me.FlowLayoutPanel1.TabIndex = 0
         '
         'OptionsSliders

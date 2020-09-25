@@ -374,7 +374,8 @@ Public Class Palette_DepthColorMap
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         holes = New Depth_Holes(ocvb)
-        holes.sliders.Visible = False ' don't need it here...
+        hideForm("Depth_Holes Slider Options")
+
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
 
@@ -431,7 +432,7 @@ Public Class Palette_Consistency
 
         hist = New Histogram_Simple(ocvb)
         hist.sliders.trackbar(0).Value = 255
-        hist.sliders.Visible = False ' it must remain at 255...
+        hideForm("Histogram_Simple Slider Options")
 
         lut = New LUT_Rebuild(ocvb)
 
@@ -486,10 +487,10 @@ Public Class Palette_ObjectColors
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
 
+        palette = New Palette_Basics(ocvb)
+        hideForm("Palette_BuildGradientColorMap Slider Options")
         reduction = New Reduction_KNN_Color(ocvb)
         inrange = New Depth_InRange(ocvb)
-        palette = New Palette_Basics(ocvb)
-        palette.gradMap.sliders.Visible = False
 
         label1 = "Consistent colors"
         label2 = "Original colors"

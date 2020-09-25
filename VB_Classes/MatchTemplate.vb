@@ -19,6 +19,7 @@ Public Class MatchTemplate_Basics
         radio.check(4).Text = "SqDiff"
         radio.check(5).Text = "SqDiffNormed"
         radio.check(1).Checked = True
+
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
         desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
@@ -29,8 +30,6 @@ Public Class MatchTemplate_Basics
             sample2 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(sample1, 100, 25)
             cv.Cv2.Randn(sample2, 0, 25)
-        Else
-            sliders.Visible = False
         End If
 
         matchOption = cv.TemplateMatchModes.CCoeffNormed
@@ -66,7 +65,7 @@ Public Class MatchTemplate_RowCorrelation
         flow = New Font_FlowText(ocvb)
 
         corr = New MatchTemplate_Basics(ocvb)
-        corr.sliders.Visible = False
+        hideForm("MatchTemplate_Basics Slider Options")
 
         desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub

@@ -87,6 +87,7 @@ Module UI_GeneratorMain
         sw.WriteLine("Module AlgorithmNameList")
         sw.WriteLine("Public callerSliderCounts() as integer")
         sw.WriteLine("Public callerCheckBoxCounts() as integer")
+        sw.WriteLine("Public callerRadioCounts() as integer")
         sw.WriteLine("Public callerNames() as string = {")
         For i = 0 To cleanNames.Count - 1
             If i < cleanNames.Count - 1 Then
@@ -102,6 +103,7 @@ Module UI_GeneratorMain
         sw.WriteLine("Public Function createAlgorithm(ocvb As VBocvb, algorithmName as string) As Object")
         sw.WriteLine(vbTab + "redim callerSliderCounts(" + CStr(cleanNames.Count - 1) + ")")
         sw.WriteLine(vbTab + "redim callerCheckboxCounts(" + CStr(cleanNames.Count - 1) + ")")
+        sw.WriteLine(vbTab + "redim callerRadioCounts(" + CStr(cleanNames.Count - 1) + ")")
         sw.WriteLine("Select Case ucase(algorithmName)")
         For i = 0 To cleanNames.Count - 1
             Dim nextName = cleanNames.Item(i)

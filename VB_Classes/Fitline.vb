@@ -8,6 +8,7 @@ Public Class Fitline_Basics
         setCaller(ocvb)
         draw = New Draw_Line(ocvb)
         draw.sliders.trackbar(0).Value = 2
+        hideForm("Draw_Line Slider Options")
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
@@ -22,7 +23,6 @@ Public Class Fitline_Basics
             dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst1 = dst2
         Else
-            If draw.sliders.Visible Then draw.sliders.Visible = False
             lines.Clear()
         End If
 

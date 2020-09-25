@@ -58,7 +58,6 @@ Public Class Gabor_Basics_MT
         gridHeightSlider.Value = src.Height / 4
 
         grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
-        grid.sliders.Visible = False
 
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics(ocvb)

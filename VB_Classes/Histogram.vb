@@ -14,7 +14,7 @@ Public Class Histogram_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 51)
+        sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 50)
         sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
 
         desc = "Plot histograms for up to 3 channels."
@@ -487,7 +487,7 @@ Public Class Histogram_ProjectionOptions
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Use IMU gravity vector"
-        check.Box(1).Text = "Only use pointcloud data for featureless regions"
+        check.Box(1).Text = "Use featureless regions only"
         check.Box(0).Checked = True
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.L515 Or
             ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
@@ -544,7 +544,7 @@ Public Class Histogram_2D_TopView
         Static inRangeSlider = findSlider("InRange Max Depth")
         Dim zRange = inRangeSlider?.Value / 1000
 
-        Static featurelessCheck = findCheckBox("Only use pointcloud data for featureless regions")
+        Static featurelessCheck = findCheckBox("Use featureless regions only")
         If featurelessCheck.checked Then
             featureless.src = ocvb.color
             featureless.Run(ocvb)

@@ -517,6 +517,8 @@ Public Class Kalman_PointTracker
 
         allocateKalman(ocvb, 16) ' allocate some kalman objects
 
+        hideForm("Thread_Grid Slider Options")
+        hideForm("Palette_BuildGradientColorMap Slider Options")
         label2 = "Initial color values for each centroid"
         desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub

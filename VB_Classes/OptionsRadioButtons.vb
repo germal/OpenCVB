@@ -9,11 +9,23 @@ Public Class OptionsRadioButtons
             check(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
-        Me.Show()
+        If lookupAlgorithm(caller) = 1 Then Me.Show() ' only the first one gets to be visible...
     End Sub
+    Private Function lookupAlgorithm(caller As String) As Integer
+        For i = 0 To callerNames.Length - 1
+            If callerNames(i) = caller Then
+                callerRadioCounts(i) += 1
+                Return callerRadioCounts(i)
+            End If
+        Next
+        Return 0
+    End Function
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get
             Return True
         End Get
     End Property
+    Private Sub OptionsRadioButtons_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.SetDesktopLocation(optionLocation.X, optionLocation.Y)
+    End Sub
 End Class

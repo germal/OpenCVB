@@ -71,5 +71,6 @@ Public Class OptionsSliders
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth
         Me.Height = defaultHeight
+        Me.SetDesktopLocation(optionLocation.X, optionLocation.Y)
     End Sub
 End Class

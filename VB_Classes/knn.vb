@@ -124,9 +124,8 @@ Public Class KNN_QueryTrain
         If standalone = False Then check.Visible = False
 
         randomTrain = New Random_Points(ocvb)
-        randomTrain.sliders.Visible = False
+        hideForm("Random_Points Slider Options")
         randomQuery = New Random_Points(ocvb)
-        randomQuery.sliders.Visible = False
 
         label1 = "Random training points"
         label2 = "Random query points"
@@ -177,7 +176,7 @@ Public Class KNN_1_to_1
         setCaller(ocvb)
 
         basics = New KNN_Basics(ocvb)
-        If standalone Then basics.knnQT.useRandomData = True Else basics.knnQT.sliders.Visible = False ' with 1:1, no need to adjust train/query counts.
+        If standalone Then basics.knnQT.useRandomData = True Else hideForm("KNN_QueryTrain Slider Options") ' with 1:1, no need to adjust train/query counts.
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
@@ -313,7 +312,6 @@ Public Class KNN_Test
         gridHeightSlider.Value = 100
 
         knn = New KNN_Basics(ocvb)
-        knn.sliders.Visible = False
         knn.testMode = True
 
         check.Setup(ocvb, caller, 1)
@@ -358,7 +356,6 @@ Public Class KNN_Test_1_to_1
         gridHeightSlider.Value = 100
 
         knn = New KNN_1_to_1(ocvb)
-        knn.basics.sliders.Visible = False
 
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show grid mask"
@@ -479,7 +476,6 @@ Public Class KNN_Cluster2D
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         knn = New KNN_Point2d(ocvb)
-        knn.sliders.Visible = False
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "KNN - number of cities", 10, 1000, 100)

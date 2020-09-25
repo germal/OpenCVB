@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Windows.Forms
 Module Algorithm_Module
+    Public optionLocation As cv.Point
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
@@ -83,15 +84,14 @@ Public Class ActiveTask : Implements IDisposable
             scalarList.Add(ocvb.scalarColors(i))
         Next
     End Sub
-    Private Sub layoutOptions(applocation As cv.Rect)
-        Dim sliderOffset As New cv.Point(applocation.Left, applocation.Top + applocation.Height)
-        Dim otherOffset As New cv.Point(applocation.Left + applocation.Width / 2, applocation.Top + applocation.Height)
+    Private Sub layoutOptions(mainLocation As cv.Rect)
+        Dim sliderOffset As New cv.Point(mainLocation.Left, mainLocation.Top + mainLocation.Height)
+        Dim otherOffset As New cv.Point(mainLocation.Left + mainLocation.Width / 2, mainLocation.Top + mainLocation.Height)
         Dim offset = 30
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
             For Each frm In Application.OpenForms
-                Console.WriteLine(frm.name + " title = " + frm.text)
                 If frm.name.startswith("OptionsSliders") Or frm.name.startswith("OptionsKeyboardInput") Or frm.name.startswith("OptionsAlphaBlend") Then
                     If frm.visible Then
                         frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
@@ -110,6 +110,7 @@ Public Class ActiveTask : Implements IDisposable
         End Try
     End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
+        optionLocation = New cv.Point(location.X, location.Y + location.Height)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New VBocvb(resolution, parms, location)
         ocvb.testAllRunning = parms.testAllRunning
