@@ -1,7 +1,7 @@
 ﻿Imports System.Windows.Forms
 Public Class OptionsCheckbox
     Public Box() As CheckBox
-    Public Sub Setup(ocvb As VBocvb, caller As String, count As integer)
+    Public Sub Setup(ocvb As VBocvb, caller As String, count As Integer)
         ReDim Box(count - 1)
         Me.Text = caller + " CheckBox Options"
         For i = 0 To Box.Count - 1
@@ -25,11 +25,4 @@ Public Class OptionsCheckbox
             Return True
         End Get
     End Property
-    Private Sub OptionsCheckbox_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(appLocation.X + appLocation.Width / 2 + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
-        radioOffset.X += offsetIncr
-        radioOffset.Y += offsetIncr
-        If radioOffset.X > offsetMax Then radioOffset.X = 0
-        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
-    End Sub
 End Class

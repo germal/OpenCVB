@@ -2,16 +2,10 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Windows.Forms
 Module Algorithm_Module
-    ' these are all global settings that are updated by individual algorithms.  
-    Public radioOffset As cv.Point
-    Public slidersOffset As cv.Point
-    Public Const offsetIncr = 25
-    Public Const offsetMax = 250
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public recordedData As Replay_Play
-    Public appLocation As cv.Rect
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
@@ -89,9 +83,9 @@ Public Class ActiveTask : Implements IDisposable
             scalarList.Add(ocvb.scalarColors(i))
         Next
     End Sub
-    Private Sub layoutOptions()
-        Dim sliderOffset As New cv.Point(appLocation.Left, appLocation.Top + appLocation.Height)
-        Dim otherOffset As New cv.Point(appLocation.Left + appLocation.Width / 2, appLocation.Top + appLocation.Height)
+    Private Sub layoutOptions(applocation As cv.Rect)
+        Dim sliderOffset As New cv.Point(applocation.Left, applocation.Top + applocation.Height)
+        Dim otherOffset As New cv.Point(applocation.Left + applocation.Width / 2, applocation.Top + applocation.Height)
         Dim offset = 30
         Try
             Dim indexS As Integer = 0
@@ -116,12 +110,9 @@ Public Class ActiveTask : Implements IDisposable
         End Try
     End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
-        radioOffset = New cv.Point(0, 5)
-        slidersOffset = New cv.Point(0, 5)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New VBocvb(resolution, parms, location)
         ocvb.testAllRunning = parms.testAllRunning
-        UpdateHostLocation(location)
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
         ocvb.PythonExe = parms.PythonExe
         ocvb.HomeDir = homeDir
@@ -134,10 +125,7 @@ Public Class ActiveTask : Implements IDisposable
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
         ocvb.description = algorithmObject.desc
-        layoutOptions()
-    End Sub
-    Public Sub UpdateHostLocation(location As cv.Rect)
-        appLocation = location
+        layoutOptions(location)
     End Sub
     Public Sub RunAlgorithm()
         Try

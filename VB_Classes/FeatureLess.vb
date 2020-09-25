@@ -230,9 +230,8 @@ Public Class FeatureLess_Highlights
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         fLessP = New FeatureLess_PointTracker(ocvb)
-        fLessP.fLess.flood.palette.gradMap.sliders.Visible = False
-        fLessP.fLess.flood.palette.check.Visible = False
-        fLessP.fLess.flood.palette.radio.Visible = False
+        hideForm("Palette_BuildGradientColorMap Slider Options")
+        hideForm("Palette_Basics Radio Options")
         addW = New AddWeighted_Basics(ocvb)
         desc = "Highlight the featureless region in an RGB image"
     End Sub

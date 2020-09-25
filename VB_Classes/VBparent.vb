@@ -132,6 +132,15 @@ Public Class VBparent : Implements IDisposable
         End While
         Return Nothing
     End Function
+    Public Sub hideForm(title As String)
+        For Each frm In Application.OpenForms
+            Console.WriteLine(frm.name + " " + frm.text)
+            If frm.text = title Then
+                frm.hide
+                Exit Sub
+            End If
+        Next
+    End Sub
     Public Function findSlider(opt As String) As TrackBar
         While 1
             Try

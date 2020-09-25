@@ -32,7 +32,8 @@ Public Class Kalman_Basics
             ReDim output(input.Count - 1)
         End If
 
-        If check.Box(0).Checked Then
+        Static filteringOnCheck = findCheckBox("Turn Kalman filtering on")
+        If filteringOnCheck.Checked Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input(i)
                 kalman(i).Run(ocvb)
@@ -504,6 +505,7 @@ Public Class Kalman_PointTracker
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
+    Dim useKalmanCheck As Windows.Forms.CheckBox
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
@@ -513,32 +515,33 @@ Public Class Kalman_PointTracker
         check.Box(0).Text = "Draw rectangle for each mask"
         check.Box(0).Checked = True
 
+        allocateKalman(ocvb, 16) ' allocate some kalman objects
+
         label2 = "Initial color values for each centroid"
         desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
+    Private Sub allocateKalman(ocvb As VBocvb, count As Integer)
+        For i = kalman.Count To count - 1
+            kalman.Add(New Kalman_Basics(ocvb))
+            ReDim kalman(i).input(6 - 1)
+            If i < queryPoints.Count Then
+                kalman(i).input = New Single() {queryPoints(i).X, queryPoints(i).Y, 0, 0, 0, 0}
+            Else
+                kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
+                kalman(i).output = New Single() {-1, -1, 0, 0, 0, 0}
+            End If
+        Next
+    End Sub
     Public Sub Run(ocvb As VBocvb)
+        Dim kalmanActive = useKalmanCheck?.Checked
         If standalone Then
             topView.Run(ocvb)
             dst1 = topView.dst1
             Exit Sub
         End If
-        Static useKalmanCheck As Windows.Forms.CheckBox
 
         ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
-        If kalman.Count < queryPoints.Count + newCentroids.Count Then
-            For i = kalman.Count To queryPoints.Count + newCentroids.Count - 1
-                kalman.Add(New Kalman_Basics(ocvb))
-                ReDim kalman(i).input(6 - 1)
-                If i < queryPoints.Count Then
-                    kalman(i).input = New Single() {queryPoints(i).X, queryPoints(i).Y, 0, 0, 0, 0}
-                Else
-                    kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
-                    kalman(i).output = New Single() {-1, -1, 0, 0, 0, 0}
-                End If
-            Next
-            useKalmanCheck = findCheckBox("Turn Kalman filtering on") ' we left one of these visible...
-        End If
-        Dim kalmanActive = useKalmanCheck?.Checked
+        If kalman.Count < queryPoints.Count + newCentroids.Count Then allocateKalman(ocvb, queryPoints.Count + newCentroids.Count)
 
         knn.basics.knnQT.trainingPoints.Clear()
         ' The previous generation's query points becomes the trainingpoints for the current generation here.

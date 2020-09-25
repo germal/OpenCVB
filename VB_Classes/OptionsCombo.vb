@@ -8,17 +8,11 @@ Public Class OptionsCombo
             Box.Items.Add(comboList.ElementAt(i))
         Next
         Box.SelectedIndex = 0
+        Me.Show()
     End Sub
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get
             Return True
         End Get
     End Property
-    Private Sub OptionsCombo_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(radioOffset.X, radioOffset.Y)
-        radioOffset.X += offsetIncr
-        radioOffset.Y += offsetIncr
-        If radioOffset.X > offsetMax Then radioOffset.X = 0
-        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
-    End Sub
 End Class

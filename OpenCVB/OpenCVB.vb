@@ -1165,8 +1165,6 @@ Public Class OpenCVB
                 task.ocvb.CPU_FrameTime = camera.CPU_FrameTime
             End SyncLock
 
-            task.UpdateHostLocation(New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height))
-
             Try
                 Dim ratio = task.ocvb.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
                 If GrabRectangleData Then

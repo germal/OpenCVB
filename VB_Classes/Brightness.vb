@@ -143,19 +143,19 @@ End Class
 Public Class Brightness_WhiteBalance
     Inherits VBparent
     Dim hist As Histogram_Basics
+    Dim whiteCPP As Brightness_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         hist = New Histogram_Basics(ocvb)
+        hist.plotRequested = True
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
-        If standalone = False Then hist.sliders.Visible = False
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
+        whiteCPP = New Brightness_WhiteBalance_CPP(ocvb)
 
         label1 = "Image with auto white balance"
-        desc = "Automate getting the right white balance - faster than the C++ version (in debug mode)"
+        desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim rgb32f As New cv.Mat
@@ -168,8 +168,10 @@ Public Class Brightness_WhiteBalance
         sum32f = planes(0) + planes(1) + planes(2)
         hist.src = sum32f
         hist.Run(ocvb)
+        dst2 = hist.dst1
 
-        Dim thresholdVal = sliders.trackbar(0).Value / 100
+        Static thresholdSlider = findSlider("White balance threshold X100")
+        Dim thresholdVal = thresholdSlider.Value / 100
         Dim sum As Single
         Dim threshold As integer
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1
@@ -209,9 +211,7 @@ Public Class Brightness_ChangeMask
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         white = New Brightness_WhiteBalance(ocvb)
-        If standalone = False Then white.sliders.Visible = False
         whiteCPP = New Brightness_WhiteBalance_CPP(ocvb)
-        If standalone = False Then whiteCPP.sliders.Visible = False
 
         desc = "Create a mask for the changed pixels after white balance"
     End Sub
@@ -258,13 +258,8 @@ Public Class Brightness_PlotHist
         white = New Brightness_ChangeMask(ocvb)
 
         hist1 = New Histogram_KalmanSmoothed(ocvb)
-        hist1.sliders.Visible = False
-        hist1.plotHist.sliders.Visible = False
-
         hist2 = New Histogram_KalmanSmoothed(ocvb)
-        hist2.sliders.Visible = False
-        hist2.plotHist.sliders.Visible = False
-
+        hideForm("Histogram_KalmanSmoothed Slider Options")
         mat2to1 = New Mat_2to1(ocvb)
 
         desc = "Plot the histogram of the before and after white balancing"

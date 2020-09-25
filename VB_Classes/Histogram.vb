@@ -14,15 +14,17 @@ Public Class Histogram_Basics
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 256)
+        sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 51)
         sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
 
         desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        bins = sliders.trackbar(0).Value
+        Static histBinSlider = findSlider("Histogram Bins")
+        bins = histBinSlider.Value
 
-        Dim thickness = sliders.trackbar(1).Value
+        Static thicknessSlider = findSlider("Histogram line thickness")
+        Dim thickness = thicknessSlider.Value
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
@@ -227,7 +229,8 @@ Public Class Histogram_KalmanSmoothed
         Else
             If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        plotHist.bins = sliders.trackbar(0).Value
+        Static histBinSlider = findSlider("Histogram Bins")
+        plotHist.bins = histBinSlider.Value
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 

@@ -146,7 +146,8 @@ Public Class Annealing_CPP_MT
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
         random = New Random_Points(ocvb)
-        random.sliders.Visible = False
+        'random.sliders.Visible = False
+        hideForm("Random_Points Slider Options")
 
         mats = New Mat_4to1(ocvb)
 

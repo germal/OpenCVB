@@ -32,11 +32,4 @@ Public Class OptionsKeyboardInput
             Return True
         End Get
     End Property
-    Private Sub OptionsKeyboardInput_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(appLocation.X + appLocation.Width / 2 + radioOffset.X, appLocation.Top + appLocation.Height + radioOffset.Y)
-        radioOffset.X += offsetIncr
-        radioOffset.Y += offsetIncr
-        If radioOffset.X > offsetMax Then radioOffset.X = 0
-        If radioOffset.Y > offsetMax Then radioOffset.Y = 0
-    End Sub
 End Class

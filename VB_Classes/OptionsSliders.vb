@@ -3,6 +3,7 @@ Imports System.Windows.Forms
 Imports System.Drawing
 
 Public Class OptionsSliders
+    Public DontShow As Boolean = False
     Public trackbar() As TrackBar
     Public sLabels() As Label
     Public countLabel() As Label
@@ -70,10 +71,5 @@ Public Class OptionsSliders
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth
         Me.Height = defaultHeight
-        Me.SetDesktopLocation(appLocation.Left + slidersOffset.X, appLocation.Top + appLocation.Height + slidersOffset.Y)
-        slidersOffset.X += offsetIncr
-        slidersOffset.Y += offsetIncr
-        If slidersOffset.X > offsetMax Then slidersOffset.X = 0
-        If slidersOffset.Y > offsetMax Then slidersOffset.Y = 0
     End Sub
 End Class
