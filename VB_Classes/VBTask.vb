@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.IO
+Imports System.Windows.Forms
 Module Algorithm_Module
     ' these are all global settings that are updated by individual algorithms.  
     Public radioOffset As cv.Point
@@ -58,26 +59,15 @@ Public Class ActiveTask : Implements IDisposable
         Public intrinsicsRight As intrinsics_VB
         Public extrinsics As Extrinsics_VB
 
-        Public Const Kinect4AzureCam As integer = 0
-        Public Const T265Camera As integer = 1
-        Public Const StereoLabsZED2 As integer = 2
-        Public Const MyntD1000 As integer = 3
-        Public Const D435i As integer = 4
-        Public Const L515 As integer = 5
-        Public Const D455 As integer = 6
+        Public Const Kinect4AzureCam As Integer = 0
+        Public Const T265Camera As Integer = 1
+        Public Const StereoLabsZED2 As Integer = 2
+        Public Const MyntD1000 As Integer = 3
+        Public Const D435i As Integer = 4
+        Public Const L515 As Integer = 5
+        Public Const D455 As Integer = 6
     End Structure
-    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
-        radioOffset = New cv.Point(0, 5)
-        slidersOffset = New cv.Point(0, 5)
-        Randomize() ' just in case anyone uses VB.Net's Rnd
-        ocvb = New VBocvb(resolution, parms, location)
-        ocvb.testAllRunning = parms.testAllRunning
-        UpdateHostLocation(location)
-        If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
-        ocvb.PythonExe = parms.PythonExe
-        ocvb.HomeDir = homeDir
-        ocvb.parms = parms
-
+    Private Sub buildColors(ocvb As VBocvb)
         Dim vec As cv.Scalar, r As Integer = 120, b As Integer = 255, g As Integer = 0
         Dim scalarList As New List(Of cv.Scalar)
         For i = 0 To ocvb.scalarColors.Length - 1
@@ -98,7 +88,45 @@ Public Class ActiveTask : Implements IDisposable
             ocvb.scalarColors(i) = New cv.Scalar(b, g, r)
             scalarList.Add(ocvb.scalarColors(i))
         Next
-
+    End Sub
+    Private Sub layoutOptions()
+        Dim sliderOffset As New cv.Point(appLocation.Left, appLocation.Top + appLocation.Height)
+        Dim otherOffset As New cv.Point(appLocation.Left + appLocation.Width / 2, appLocation.Top + appLocation.Height)
+        Dim offset = 30
+        Try
+            Dim indexS As Integer = 0
+            Dim indexO As Integer = 0
+            For Each frm In Application.OpenForms
+                Console.WriteLine(frm.name + " title = " + frm.text)
+                If frm.name.startswith("OptionsSliders") Or frm.name.startswith("OptionsKeyboardInput") Or frm.name.startswith("OptionsAlphaBlend") Then
+                    If frm.visible Then
+                        frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                        indexS += 1
+                    End If
+                End If
+                If frm.name.startswith("OptionsRadioButtons") Or frm.name.startswith("OptionsCheckbox") Or frm.name.startswith("OptionsCombo") Then
+                    If frm.visible Then
+                        frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
+                        indexO += 1
+                    End If
+                End If
+            Next
+        Catch ex As Exception
+            Console.WriteLine("Error in layoutOptions: " + ex.Message)
+        End Try
+    End Sub
+    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
+        radioOffset = New cv.Point(0, 5)
+        slidersOffset = New cv.Point(0, 5)
+        Randomize() ' just in case anyone uses VB.Net's Rnd
+        ocvb = New VBocvb(resolution, parms, location)
+        ocvb.testAllRunning = parms.testAllRunning
+        UpdateHostLocation(location)
+        If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
+        ocvb.PythonExe = parms.PythonExe
+        ocvb.HomeDir = homeDir
+        ocvb.parms = parms
+        buildColors(ocvb)
         algorithmObject = algoList.createAlgorithm(ocvb, algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
@@ -106,6 +134,7 @@ Public Class ActiveTask : Implements IDisposable
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
         ocvb.description = algorithmObject.desc
+        layoutOptions()
     End Sub
     Public Sub UpdateHostLocation(location As cv.Rect)
         appLocation = location

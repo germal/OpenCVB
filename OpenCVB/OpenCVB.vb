@@ -1232,7 +1232,7 @@ Public Class OpenCVB
                         task.ocvb.TTtextData.Clear()
                     End If
                 End SyncLock
-                If OptionsBringToFront And TestAllTimer.Enabled = False Then
+                If OptionsBringToFront Then
                     OptionsBringToFront = False
                     Try
                         For Each frm In Application.OpenForms
