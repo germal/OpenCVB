@@ -10,12 +10,12 @@
         "projectUniqueName": "C:\\_src\\OpenCVB\\CS_Classes\\CS_Classes.csproj",
         "projectName": "CS_Classes",
         "projectPath": "C:\\_src\\OpenCVB\\CS_Classes\\CS_Classes.csproj",
-        "packagesPath": "C:\\Users\\bobdavies\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\bobda\\.nuget\\packages\\",
         "outputPath": "C:\\_src\\OpenCVB\\CS_Classes\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "configFilePaths": [
-          "C:\\Users\\bobdavies\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\bobda\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -95,12 +95,12 @@
         "projectUniqueName": "C:\\_src\\OpenCVB\\OpenCVB\\OpenCVB.vbproj",
         "projectName": "OpenCVB",
         "projectPath": "C:\\_src\\OpenCVB\\OpenCVB\\OpenCVB.vbproj",
-        "packagesPath": "C:\\Users\\bobdavies\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\bobda\\.nuget\\packages\\",
         "outputPath": "C:\\_src\\OpenCVB\\OpenCVB\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "configFilePaths": [
-          "C:\\Users\\bobdavies\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\bobda\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -184,12 +184,12 @@
         "projectUniqueName": "C:\\_src\\OpenCVB\\VB_Classes\\VB_Classes.vbproj",
         "projectName": "VB_Classes",
         "projectPath": "C:\\_src\\OpenCVB\\VB_Classes\\VB_Classes.vbproj",
-        "packagesPath": "C:\\Users\\bobdavies\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\bobda\\.nuget\\packages\\",
         "outputPath": "C:\\_src\\OpenCVB\\VB_Classes\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "configFilePaths": [
-          "C:\\Users\\bobdavies\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\bobda\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

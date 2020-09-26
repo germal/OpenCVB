@@ -152,8 +152,8 @@ Installation – Quick Reference
     -   After “PrepareTree.bat” completes, Visual Studio projects will open. Run
         “Batch Build” in each Visual Studio project.
 
--   Set Environmental variable OpenCV_Version to 440. – This depends on the
-    version of OpenCV, currently 4.40.
+-   Set Environmental variable OpenCV_Version to 450. – This depends on the
+    version of OpenCV, currently 4.50.
 
 -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download> –
     Select “Windows Installer” to get proprietary Kinect4Azure support.
@@ -194,9 +194,9 @@ After all the packages have been built, then there is one environmental variable
 that needs to be set and it will depend on which version of OpenCV was just
 downloaded and built.
 
--   Environmental variable “OpenCV_Version” should be set to 440
+-   Environmental variable “OpenCV_Version” should be set to 450
 
-The currently available OpenCV download is 4.40 so setting OpenCV_Version to 440
+The currently available OpenCV download is 4.50 so setting OpenCV_Version to 450
 reflects that but note that OpenCV is updated several times a year and the
 environmental variable may need to be updated.
 
