@@ -7,7 +7,6 @@ VB_Classes/Python/.vs/PythonDebug/v16/.suo
 *.lock
 *.ide
 *.pdb
-*.ocvb
 *.ide-shm
 *.ide-wal
 *.ipch
@@ -15,6 +14,7 @@ VB_Classes/Python/.vs/PythonDebug/v16/.suo
 *.idb
 *.ilk
 .vs/*
+*/obj/*
 *.exe
 *.enc
 *.iobj
@@ -45,4 +45,3 @@ Data/svm_data.dat
 packages/EMGU*
 MYNT-EYE-D-SDK
 ~$README.md
-*.recipe
