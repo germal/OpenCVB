@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports MathNet.Spatial.Euclidean
 Public Class LineDetector_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
@@ -8,6 +9,9 @@ Public Class LineDetector_Basics
         setCaller(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
+        sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
+        sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 100) ' not used in Run below but externally...
+        sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 5) ' not used in Run below but externally...
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
@@ -495,5 +499,100 @@ Public Class lineDetector_FLD
                 dst1.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
             Next
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineDetector_LongLines
+    Inherits VBparent
+    Dim lDetect As LineDetector_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        lDetect = New LineDetector_Basics(ocvb)
+
+        label1 = "Longest lines using depth data"
+        label2 = "Longest lines in pixels (yellow)"
+        desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        lDetect.src = src
+        lDetect.Run(ocvb)
+        dst1 = src.Clone
+        dst2 = src.Clone
+
+        Static thicknessSlider = findSlider("Line thickness")
+        Dim thickness = thicknessSlider.value
+        Static lenSlider = findSlider("Line length threshold (mm)")
+        Dim mmThreshold = lenSlider.value
+        Static pixelSlider = findSlider("Line length threshold in pixels")
+        Dim pixelThreshold = pixelSlider.value
+        Static radiusSlider = findSlider("Depth search radius in pixels")
+        Dim pixelRadius = radiusSlider.value
+
+        Dim sortPixels As New SortedList(Of Single, cv.Vec4f)(New compareAllowIdenticalIntInverted)
+        Dim sortWithDepth As New SortedList(Of Single, cv.Vec4f)(New compareAllowIdenticalIntInverted)
+        For Each v In lDetect.lines
+            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
+                   v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
+                Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                Dim pixelLen = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
+                If pixelLen > pixelThreshold Then
+                    sortPixels.Add(pixelLen, v)
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                Else
+                    dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+                End If
+
+                Dim r1 = New cv.Rect(Math.Max(0, pt1.X - pixelRadius), Math.Max(0, pt1.Y - pixelRadius), pixelRadius * 2, pixelRadius * 2)
+                Dim mean1 = ocvb.pointCloud(r1).Mean()
+
+                Dim r2 = New cv.Rect(Math.Max(pt2.X - pixelRadius, 0), Math.Max(0, pt2.Y - pixelRadius), pixelRadius * 2, pixelRadius * 2)
+                Dim mean2 = ocvb.pointCloud(r2).Mean()
+
+                Dim m1 = New Point3D(mean1.Item(0) * 1000, mean1.Item(1) * 1000, mean1.Item(2) * 1000)
+                Dim m2 = New Point3D(mean2.Item(0) * 1000, mean2.Item(1) * 1000, mean2.Item(2) * 1000)
+
+                If m1 <> New Point3D And m2 <> New Point3D Then
+                    Dim distance = m1.DistanceTo(m2)
+                    If distance > mmThreshold Then
+                        sortWithDepth.Add(distance, v)
+                        dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                    End If
+                End If
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineDetector_Reduction
+    Inherits VBparent
+    Dim lDetect As LineDetector_Basics
+    Dim reduction As Reduction_Basics
+    Public Sub New(ocvb As VBocvb)
+        setCaller(ocvb)
+        lDetect = New LineDetector_Basics(ocvb)
+        reduction = New Reduction_Basics(ocvb)
+
+        label1 = "Output of line detection using reduced input"
+        label2 = "Output of reduction_basics"
+        desc = "Use the reduced rgb image as input to the line detector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        reduction.src = src
+        reduction.Run(ocvb)
+        dst2 = lDetect.dst1
+
+        lDetect.src = reduction.dst1
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
     End Sub
 End Class
