@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "/AxL5TrQDtyjw9g4aUBRaAVhNyJg+4O9FPn8mBYX/RUrKicb1Q+pI0m5zFYoMeHwS39HyNfsLzQPj+5W0iP34A==",
+  "dgSpecHash": "DI504m8LwZpxX0zkNXj9eMhOy6eYRyRl8jphD0hEaedq3PdR45pJQyeusbFMnFVGZ9YTDmJLrBT+TI4VSvVY8Q==",
   "success": true,
   "projectFilePath": "C:\\_src\\OpenCVB\\CS_Classes\\CS_Classes.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\bobda\\.nuget\\packages\\mathnet.numerics\\4.12.0\\mathnet.numerics.4.12.0.nupkg.sha512",
     "C:\\Users\\bobda\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\bobda\\.nuget\\packages\\opencvsharp4\\4.4.0.20200915\\opencvsharp4.4.4.0.20200915.nupkg.sha512",
     "C:\\Users\\bobda\\.nuget\\packages\\opencvsharp4.runtime.win\\4.4.0.20200915\\opencvsharp4.runtime.win.4.4.0.20200915.nupkg.sha512",
