@@ -7,7 +7,7 @@ Public Class Plot_Basics
     Dim hist As Histogram_Basics
     Public plotCount As integer = 3
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         hist = New Histogram_Basics(ocvb)
         hist.plotRequested = True
 
@@ -15,7 +15,7 @@ Public Class Plot_Basics
 
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
-        desc = "Plot data provided in src Mat"
+        ocvb.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         hist.src = src
@@ -44,8 +44,8 @@ Public Class Plot_Basics_CPP
     Public srcX() As Double
     Public srcY() As Double
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
+        initParent(ocvb)
+        ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim maxX As Double = Double.MinValue
@@ -103,7 +103,7 @@ Public Class Plot_OverTime
     Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
@@ -111,7 +111,7 @@ Public Class Plot_OverTime
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
-        desc = "Plot an input variable over time"
+        ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -203,8 +203,8 @@ Public Class Plot_Histogram
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public fixedMaxVal As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Plot histogram data with a stable scale at the left of the image."
+        initParent(ocvb)
+        ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -283,7 +283,7 @@ Public Class Plot_Depth
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         hist = New Histogram_Depth(ocvb)
         hist.sliders.trackbar(0).Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.trackbar(0).Value = 200 ' a lot more bins in a plot than a bar chart.
@@ -291,7 +291,7 @@ Public Class Plot_Depth
 
         plot = New Plot_Basics_CPP(ocvb)
 
-        desc = "Show depth using OpenCV's plot format with variable bins."
+        ocvb.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)

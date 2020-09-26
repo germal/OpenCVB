@@ -138,7 +138,7 @@ Public Class PointCloud_Colorize
         Return dst
     End Function
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         centroidRadius = src.Width / 100
 
@@ -162,7 +162,7 @@ Public Class PointCloud_Colorize
 
         label1 = "Colorize mask for top down view"
         label2 = "Colorize mask for side view"
-        desc = "Create the colorizeMat's used for projections"
+        ocvb.desc = "Create the colorizeMat's used for projections"
     End Sub
     Public Sub Run(ocvb As VBocvb)
     End Sub
@@ -178,7 +178,7 @@ Public Class PointCloud_Raw_CPP
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -190,7 +190,7 @@ Public Class PointCloud_Raw_CPP
         foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
-        desc = "Project the depth data onto a top view and side view."
+        ocvb.desc = "Project the depth data onto a top view and side view."
 
         cPtr = SimpleProjectionOpen()
     End Sub
@@ -236,7 +236,7 @@ Public Class PointCloud_Raw
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -248,7 +248,7 @@ Public Class PointCloud_Raw
         foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
-        desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
+        ocvb.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
 
         cPtr = SimpleProjectionOpen()
     End Sub
@@ -304,7 +304,7 @@ Public Class PointCloud_Objects
     Dim cmats As PointCloud_Colorize
     Public SideViewFlag As Boolean = True
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
         measureSide = New PointCloud_Kalman_SideView(ocvb)
@@ -316,7 +316,7 @@ Public Class PointCloud_Objects
             sliders.Setup(ocvb, caller, 1)
             sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
         End If
-        desc = "Validate the formula for pixel height as a function of distance"
+        ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim saveSideViewFlag As Boolean
@@ -429,11 +429,11 @@ Public Class PointCloud_Objects_TopView
     Inherits VBparent
     Dim view As PointCloud_Objects
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         view = New PointCloud_Objects(ocvb)
         view.SideViewFlag = False
 
-        desc = "Display only the top view of the depth data - with and without the IMU active"
+        ocvb.desc = "Display only the top view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         view.src = src
@@ -450,11 +450,11 @@ Public Class PointCloud_Objects_SideView
     Inherits VBparent
     Dim view As PointCloud_Objects
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         view = New PointCloud_Objects(ocvb)
         view.SideViewFlag = True
 
-        desc = "Display only the side view of the depth data - with and without the IMU active"
+        ocvb.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         view.src = src
@@ -476,7 +476,7 @@ Public Class PointCloud_Kalman_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_8bit(ocvb)
@@ -484,7 +484,7 @@ Public Class PointCloud_Kalman_TopView
         pTrack = New Kalman_PointTracker(ocvb)
         histogram = New PointCloud_HistTopView(ocvb)
 
-        desc = "Measure each object found in a Centroids view and provide pixel width as well"
+        ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
@@ -526,7 +526,7 @@ Public Class PointCloud_Kalman_SideView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
         flood = New Floodfill_Identifiers(ocvb)
@@ -534,7 +534,7 @@ Public Class PointCloud_Kalman_SideView
         histogram = New PointCloud_HistSideView(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
 
-        desc = "Measure each object found in a Centroids view and provide pixel width as well"
+        ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
@@ -577,13 +577,13 @@ Public Class PointCloud_BackProject
     Dim both As PointCloud_BothViews
     Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         both = New PointCloud_BothViews(ocvb)
         mats = New Mat_4to1(ocvb)
         label1 = "Click any quadrant below to enlarge it"
         label2 = "Click any centroid to display details"
-        desc = "Backproject the selected object"
+        ocvb.desc = "Backproject the selected object"
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
@@ -626,7 +626,7 @@ Public Class PointCloud_BothViews
     Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         levelCheck = New IMU_IsCameraLevel(ocvb)
         topPixel = New PointCloud_Objects(ocvb)
@@ -638,7 +638,7 @@ Public Class PointCloud_BothViews
         backMat = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         backMatMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
 
-        desc = "Find the actual width in pixels for the objects detected in the top view"
+        ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
@@ -761,7 +761,7 @@ Public Class PointCloud_HistTopView
     Inherits VBparent
     Public hist As Histogram_2D_TopView
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         hist = New Histogram_2D_TopView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
@@ -769,7 +769,7 @@ Public Class PointCloud_HistTopView
         Dim reductionCheck = findCheckBox("Use Reduction")
         reductionCheck.Checked = False
 
-        desc = "Display the histogram with and without adjusting for gravity"
+        ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
@@ -785,7 +785,7 @@ Public Class PointCloud_HistSideView
     Inherits VBparent
     Public hist As Histogram_2D_SideView
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         hist = New Histogram_2D_SideView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
@@ -793,7 +793,7 @@ Public Class PointCloud_HistSideView
         Dim reductionCheck = findCheckBox("Use Reduction")
         reductionCheck.Checked = False
 
-        desc = "Display the histogram with and without adjusting for gravity"
+        ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
@@ -810,13 +810,13 @@ Public Class PointCloud_HistBothViews
     Dim topView As PointCloud_HistTopView
     Dim sideView As PointCloud_HistSideView
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         topView = New PointCloud_HistTopView(ocvb)
         sideView = New PointCloud_HistSideView(ocvb)
 
         label1 = "Histogram Top View"
         label2 = "Histogram Side View"
-        desc = "Show the histogram for both the side and top views"
+        ocvb.desc = "Show the histogram for both the side and top views"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         topView.src = src
@@ -839,7 +839,7 @@ Public Class PointCloud_WallsFloors_Kalman
     Dim pTrackWall As Kalman_PointTracker
     Dim pTrackFloor As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         walls = New PointCloud_WallsFloors(ocvb)
         Dim drawCheckbox = findCheckBox("FLD - Draw lines on input image")
         drawCheckbox.Checked = False ' we will draw them below.
@@ -851,7 +851,7 @@ Public Class PointCloud_WallsFloors_Kalman
         hideForm("Kalman_PointTracker CheckBox Options")
         hideForm("Palette_Basics Radio Options")
 
-        desc = "Use Kalman to smooth results of wall/floor detection"
+        ocvb.desc = "Use Kalman to smooth results of wall/floor detection"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         walls.Run(ocvb)
@@ -895,7 +895,7 @@ Public Class PointCloud_WallsFloors
     Public wallLines As cv.Mat
     Public floorsLines As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         lDetect = New lineDetector_FLD_CPP(ocvb)
         both = New PointCloud_HistBothViews(ocvb)
 
@@ -907,7 +907,7 @@ Public Class PointCloud_WallsFloors
 
         label1 = "Top View: wall candidates in red"
         label2 = "Side View: floors/ceiling candidates in red"
-        desc = "Use the top down view to detect walls with a line detector algorithm"
+        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static checkIMU = findCheckBox("Use IMU gravity vector")

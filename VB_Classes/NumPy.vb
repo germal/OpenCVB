@@ -10,8 +10,8 @@
 'Public Class NumPy_FFT
 '    Inherits VBparent
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        desc = "Test Numpy interface for FFT"
+'        initParent(ocvb)
+'        ocvb.desc = "Test Numpy interface for FFT"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.parms.NumPyEnabled Then
@@ -37,8 +37,8 @@
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_EmbeddedTest
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        desc = "Run an embedded Python script"
+'        initParent(ocvb)
+'        ocvb.desc = "Run an embedded Python script"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.parms.NumPyEnabled Then
@@ -60,8 +60,8 @@
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_EmbeddedMat
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        desc = "Run an embedded Python script to display an image"
+'        initParent(ocvb)
+'        ocvb.desc = "Run an embedded Python script to display an image"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.parms.NumPyEnabled Then
@@ -86,8 +86,8 @@
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_Cmds
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        desc = "Run an embedded Python string of commands"
+'        initParent(ocvb)
+'        ocvb.desc = "Run an embedded Python string of commands"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.parms.NumPyEnabled Then
@@ -109,8 +109,8 @@
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_EmbeddedCmd
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        desc = "Install a package on the embedded Python with Pip"
+'        initParent(ocvb)
+'        ocvb.desc = "Install a package on the embedded Python with Pip"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.parms.NumPyEnabled Then

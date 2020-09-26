@@ -7,13 +7,13 @@ Public Class KNN_Basics
     Public knn As cv.ML.KNearest
     Public knnQT As KNN_QueryTrain
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         knnQT = New KNN_QueryTrain(ocvb)
 
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
-        desc = "Test knn with random points in the image.  Find the nearest n points."
+        ocvb.desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1.SetTo(cv.Scalar.Black)
@@ -62,12 +62,12 @@ Public Class KNN_Point2d
     Public findXnearest As Integer = 1
     Public responseSet() As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         knn = New KNN_Basics(ocvb)
         If standalone Then knn.knnQT.useRandomData = True
 
-        desc = "Use KNN to find n matching points for each query."
+        ocvb.desc = "Use KNN to find n matching points for each query."
         label1 = "Yellow=Queries, Blue=Best Responses"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -112,7 +112,7 @@ Public Class KNN_QueryTrain
     Public randomQuery As Random_Points
     Public useRandomData As Boolean
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
@@ -129,7 +129,7 @@ Public Class KNN_QueryTrain
 
         label1 = "Random training points"
         label2 = "Random query points"
-        desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
+        ocvb.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If check.Box(0).Checked = False Or useRandomData Then
@@ -173,14 +173,14 @@ Public Class KNN_1_to_1
     Public unmatchedPoints As New List(Of cv.Point2f)
     Public basics As KNN_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         basics = New KNN_Basics(ocvb)
         If standalone Then basics.knnQT.useRandomData = True Else hideForm("KNN_QueryTrain Slider Options") ' with 1:1, no need to adjust train/query counts.
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
-        desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
+        ocvb.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         basics.Run(ocvb)
@@ -254,7 +254,7 @@ Public Class KNN_Emax
     Public knn As KNN_1_to_1
     Dim emax As EMax_Centroids
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         If standalone Then
             emax = New EMax_Centroids(ocvb)
             emax.Run(ocvb) ' set the first generation of points.
@@ -273,7 +273,7 @@ Public Class KNN_Emax
 
         label1 = "Output from Emax"
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
-        desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
+        ocvb.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -302,7 +302,7 @@ Public Class KNN_Test
     Public grid As Thread_Grid
     Dim knn As KNN_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -317,7 +317,7 @@ Public Class KNN_Test
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show grid mask"
 
-        desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
+        ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -346,7 +346,7 @@ Public Class KNN_Test_1_to_1
     Public grid As Thread_Grid
     Dim knn As KNN_1_to_1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -360,7 +360,7 @@ Public Class KNN_Test_1_to_1
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show grid mask"
 
-        desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
+        ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -392,12 +392,12 @@ Public Class KNN_Point3d
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public findXnearest As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar(1, "knn k nearest points", 0, 500, 1)
 
-        desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
+        ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
@@ -474,7 +474,7 @@ Public Class KNN_Cluster2D
     Dim numberOfCities As Integer
     Dim closedRegions As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         knn = New KNN_Point2d(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -484,7 +484,7 @@ Public Class KNN_Cluster2D
         check.Box(0).Checked = True
 
         label1 = ""
-        desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
+        ocvb.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
     End Sub
     Private Sub cluster(ocvb As VBocvb, result As cv.Mat)
         Dim alreadyTaken As New List(Of Integer)
@@ -567,7 +567,7 @@ Public Class KNN_DepthClusters
     Public flood As FloodFill_8bit
     Public pTrack As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         flood = New FloodFill_8bit(ocvb)
         blobs = New Blob_DepthClusters(ocvb)
@@ -575,7 +575,7 @@ Public Class KNN_DepthClusters
 
         label1 = "Output of Blob_DepthClusters"
         label2 = "Same output after Kalman_PointTracker"
-        desc = "Use KNN to track and color the Blob results from clustering the depth data"
+        ocvb.desc = "Use KNN to track and color the Blob results from clustering the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         blobs.Run(ocvb)
@@ -602,13 +602,13 @@ Public Class KNN_PointPresent
     Dim knn As KNN_DepthClusters
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         flow = New Font_FlowText(ocvb)
         flow.dst = RESULT2
         knn = New KNN_DepthClusters(ocvb)
 
-        desc = "Determine if a point is present or not on the basis of the previous x frames"
+        ocvb.desc = "Determine if a point is present or not on the basis of the previous x frames"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         knn.src = src
@@ -635,7 +635,7 @@ Public Class KNN_SmoothAverage
     Dim knn As KNN_DepthClusters
     Dim lastinput As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         knn = New KNN_DepthClusters(ocvb)
         Dim drawCheckbox = findCheckBox("Draw rectangle for each mask")
         drawCheckbox.Checked = False
@@ -645,7 +645,7 @@ Public Class KNN_SmoothAverage
 
         label1 = "AddWeight result of current and previous frame"
         label2 = "Mask for difference between current and last frame"
-        desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
+        ocvb.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         knn.src = src
@@ -676,7 +676,7 @@ Public Class KNN_StabilizeRegions
     Public flood As FloodFill_8bit
     Dim lastinput As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         knn = New KNN_DepthClusters(ocvb)
         Dim drawCheckbox = findCheckBox("Draw rectangle for each mask")
         drawCheckbox.Checked = False
@@ -685,7 +685,7 @@ Public Class KNN_StabilizeRegions
 
         label1 = "Output of KNN_DepthClusters"
         label2 = "KNN_DepthClusters output plus unstable regions"
-        desc = "Identify major regions that are unstable - appearing and disappearing"
+        ocvb.desc = "Identify major regions that are unstable - appearing and disappearing"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         knn.src = src

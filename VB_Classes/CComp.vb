@@ -11,7 +11,7 @@ Public Class CComp_Basics
     Public edgeMask As cv.Mat
     Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mats = New Mat_4to1(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
@@ -23,7 +23,7 @@ Public Class CComp_Basics
         check.Box(1).Text = "Input to CComp is above CComp threshold"
         check.Box(0).Checked = True
 
-        desc = "Draw bounding boxes around RGB binarized connected Components"
+        ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
     Private Function renderBlobs(ocvb As VBocvb, minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
         Dim count As Integer = 0
@@ -111,11 +111,11 @@ Public Class CComp_Basics_FullImage
     Dim mats As Mat_4to1
     Dim basics As CComp_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mats = New Mat_4to1(ocvb)
         basics = New CComp_Basics(ocvb)
 
-        desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
+        ocvb.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
         label2 = "Masks binary+otsu used to compute mean depth"
     End Sub
     Private Function colorWithDepth(ocvb As VBocvb, matIndex As Integer) As Integer
@@ -165,13 +165,13 @@ Public Class CComp_PointTracker
     Public highlight As Highlight_Basics
     Public trackPoints As Boolean = True
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         highlight = New Highlight_Basics(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
         basics = New CComp_Basics(ocvb)
 
-        desc = "Track connected componenent centroids and use it to match coloring"
+        ocvb.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         basics.src = src
@@ -213,7 +213,7 @@ Public Class CComp_MaxBlobs
     Public incr = 2
     Public maxValues(255) As Integer ' march through all 255 values and find the best...
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         tracker = New CComp_PointTracker(ocvb)
         Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
         checkOTSU.Checked = False ' turn off OTSU so the slider works...
@@ -221,7 +221,7 @@ Public Class CComp_MaxBlobs
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reassess the best CComp threshold"
 
-        desc = "Find the best CComp threshold to maximize the number of blobs"
+        ocvb.desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount < 10 Then Exit Sub
@@ -270,10 +270,10 @@ Public Class CComp_MaxPixels
     Dim maxBlob As CComp_MaxBlobs
     Public maxPixels As Integer = -1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         maxBlob = New CComp_MaxBlobs(ocvb)
         maxBlob.incr = 5
-        desc = "Find the best CComp threshold to maximize pixels"
+        ocvb.desc = "Find the best CComp threshold to maximize pixels"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount < 10 Then Exit Sub
@@ -315,7 +315,7 @@ Public Class CComp_DepthEdges
     Dim ccomp As CComp_PointTracker
     Dim depth As Depth_Edges
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         ccomp = New CComp_PointTracker(ocvb)
         depth = New Depth_Edges(ocvb)
@@ -324,7 +324,7 @@ Public Class CComp_DepthEdges
         check.Box(0).Text = "Use edge mask in connected components"
         check.Box(0).Checked = True
 
-        desc = "Use depth edges to isolate connected components in depth"
+        ocvb.desc = "Use depth edges to isolate connected components in depth"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         depth.Run(ocvb)
@@ -348,12 +348,12 @@ Public Class CComp_EdgeMask
     Dim ccomp As CComp_ColorDepth
     Dim edges As Edges_DepthAndColor
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         edges = New Edges_DepthAndColor(ocvb)
 
         ccomp = New CComp_ColorDepth(ocvb)
 
-        desc = "Isolate Color connected components after applying the Edge Mask"
+        ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
@@ -373,13 +373,13 @@ End Class
 Public Class CComp_ColorDepth
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
 
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
-        desc = "Color connected components based on their depth"
+        ocvb.desc = "Color connected components based on their depth"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -409,13 +409,13 @@ End Class
 Public Class CComp_InRange_MT
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
         sliders.setupTrackBar(1, "InRange Max Depth", 150, 10000, 3000)
         sliders.setupTrackBar(2, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
-        desc = "Connected components in specific ranges"
+        ocvb.desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -463,12 +463,12 @@ End Class
 Public Class CComp_InRange
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
-        desc = "Connect components in specific ranges"
+        ocvb.desc = "Connect components in specific ranges"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -509,11 +509,11 @@ Public Class CComp_Shapes
     Inherits VBparent
     Dim shapes As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        shapes = New cv.Mat(ocvb.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
+        initParent(ocvb)
+        shapes = New cv.Mat(ocvb.parms.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
-        desc = "Use connected components to isolate objects in image."
+        ocvb.desc = "Use connected components to isolate objects in image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -552,7 +552,7 @@ Public Class CComp_OverlappingRectangles
     Dim ccomp As CComp_Basics
     Dim overlap As Draw_OverlappingRectangles
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         ccomp = New CComp_Basics(ocvb)
         ccomp.sliders.trackbar(1).Value = 10 ' allow very small regions.
@@ -561,7 +561,7 @@ Public Class CComp_OverlappingRectangles
 
         label1 = "Input Image with all ccomp rectangles"
         label2 = "Unique rectangles (largest to smallest) colored by size"
-        desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
+        ocvb.desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ccomp.src = src

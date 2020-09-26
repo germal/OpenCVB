@@ -226,7 +226,7 @@ Public Class Puzzle_Basics
     Dim gridWidthSlider As System.Windows.Forms.TrackBar
     Dim gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
@@ -234,7 +234,7 @@ Public Class Puzzle_Basics
         gridHeightSlider.Value = src.Rows / 8
 
         grid.Run(ocvb)
-        desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
+        ocvb.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
         Dim r As Random = New Random()
@@ -282,7 +282,7 @@ Public Class Puzzle_Solver
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         puzzle = New Puzzle_Basics(ocvb)
 
         radio.Setup(ocvb, caller, 3)
@@ -298,7 +298,7 @@ Public Class Puzzle_Solver
         check.Box(0).Checked = True
         check.Box(1).Checked = False
 
-        desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
+        ocvb.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
     Private Function checkUsedList(best As List(Of Integer)) As bestFit
         Dim bfit As New bestFit
@@ -332,7 +332,7 @@ Public Class Puzzle_Solver
         Static xyOffset As Integer
         Static yxOffset As Integer
         Static yyOffset As Integer
-        If check.Box(0).Checked Or ocvb.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> src.Width Then
+        If check.Box(0).Checked Or ocvb.parms.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> src.Width Then
             Dim factor = 1
             saveRadioIndex = radioIndex
             saveResolutionWidth = src.Width

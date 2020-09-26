@@ -2,6 +2,8 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Windows.Forms
 Module Algorithm_Module
+    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
+    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public optionLocation As cv.Point
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
@@ -41,6 +43,7 @@ Public Class ActiveTask : Implements IDisposable
         ' one-time only constants needed by the algorithms.
         Public cameraIndex As Integer
         Public PythonExe As String
+        Public homeDir As String
         Public useRecordedData As Boolean
         Public externalPythonInvocation As Boolean ' OpenCVB was initialized remotely...
         Public ShowConsoleLog As Boolean
@@ -114,14 +117,11 @@ Public Class ActiveTask : Implements IDisposable
             Console.WriteLine("Error in layoutOptions: " + ex.Message)
         End Try
     End Sub
-    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, homeDir As String, location As cv.Rect)
+    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, location As cv.Rect)
         optionLocation = New cv.Point(location.X, location.Y + location.Height)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New VBocvb(resolution, parms, location)
-        ocvb.testAllRunning = parms.testAllRunning
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
-        ocvb.PythonExe = parms.PythonExe
-        ocvb.HomeDir = homeDir
         ocvb.parms = parms
         buildColors(ocvb)
         algorithmObject = algoList.createAlgorithm(ocvb, algName)
@@ -130,7 +130,6 @@ Public Class ActiveTask : Implements IDisposable
                    "Problem likely originated with the UIindexer.")
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
-        ocvb.description = algorithmObject.desc
         layoutOptions(location)
     End Sub
     Public Sub RunAlgorithm()

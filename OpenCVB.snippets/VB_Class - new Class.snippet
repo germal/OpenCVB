@@ -11,8 +11,8 @@ Imports cv = OpenCvSharp
 Public Class newClass_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "New class description"
+        initParent(ocvb)
+        ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As VBocvb)
     End Sub

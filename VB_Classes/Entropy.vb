@@ -7,12 +7,12 @@ Public Class Entropy_Basics
     Dim simple = New Entropy_Simple
     Public entropy As Single
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New Font_FlowText(ocvb)
 
         hist = New Histogram_Basics(ocvb)
 
-        desc = "Compute the entropy in an image - a measure of contrast(iness)"
+        ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         simple.bins = hist.sliders.trackbar(0).Value
@@ -43,7 +43,7 @@ Public Class Entropy_Highest_MT
     Public grid As Thread_Grid
     Public bestContrast As cv.Rect
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -54,7 +54,7 @@ Public Class Entropy_Highest_MT
         hist = New Histogram_Basics(ocvb)
 
         label1 = "Highest entropy marked with red rectangle"
-        desc = "Find the highest entropy section of the color image."
+        ocvb.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -109,13 +109,13 @@ Public Class Entropy_FAST
     Dim fast As FAST_Basics
     Dim entropy As Entropy_Highest_MT
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         fast = New FAST_Basics(ocvb)
         entropy = New Entropy_Highest_MT(ocvb)
 
         label1 = "Output of Fast_Basics, input to entropy calculation"
         label2 = "Lighter color is higher entropy, Red marks highest"
-        desc = "Use FAST markings to add to entropy"
+        ocvb.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fast.src = src

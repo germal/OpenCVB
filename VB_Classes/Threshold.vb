@@ -4,13 +4,13 @@ Public Class Threshold_LaplacianFilter
     Dim edges As Filter_Laplacian
     Dim trim As Depth_InRange
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         trim = New Depth_InRange(ocvb)
         edges = New Filter_Laplacian(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "dist Threshold", 1, 100, 40)
         label1 = "Foreground Input"
-        desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
+        ocvb.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         edges.src = src

@@ -9,7 +9,7 @@ Public Class WarpModel_Input
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
@@ -29,14 +29,14 @@ Public Class WarpModel_Input
         check.Box(0).Text = "Use Gradient in WarpInput"
 
         sobel = New Edges_Sobel(ocvb)
-        desc = "Import the misaligned input."
+        ocvb.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim img As New cv.Mat
         For i = 0 To radio.check.Count - 1
             Dim nextRadio = radio.check(i)
             If nextRadio.Checked Then
-                Dim photo As New FileInfo(ocvb.homeDir + "Data\Prokudin\" + nextRadio.Text)
+                Dim photo As New FileInfo(ocvb.parms.homeDir + "Data\Prokudin\" + nextRadio.Text)
                 img = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                 label1 = photo.Name + " - red image"
                 label2 = photo.Name + " - Naively aligned merge"
@@ -102,7 +102,7 @@ Public Class WarpModel_FindTransformECC_CPP
     Public warpMode As Integer
     Public aligned As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         cPtr = WarpModel_Open()
 
         radio.Setup(ocvb, caller,4)
@@ -114,7 +114,7 @@ Public Class WarpModel_FindTransformECC_CPP
 
         input = New WarpModel_Input(ocvb)
 
-        desc = "Use FindTransformECC to align 2 images"
+        ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         input.src = src
@@ -193,10 +193,10 @@ Public Class WarpModel_AlignImages
     Inherits VBparent
     Dim ecc As WarpModel_FindTransformECC_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         ecc = New WarpModel_FindTransformECC_CPP(ocvb)
 
-        desc = "Align the RGB inputs raw images from the Prokudin examples."
+        ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim aligned() = {New cv.Mat, New cv.Mat}

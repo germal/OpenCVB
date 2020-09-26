@@ -43,10 +43,10 @@ Public Class Draw_rectangles
     Public updateFrequency = 30
     Public drawRotatedRectangles As Boolean
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
-        desc = "Draw the requested number of rotated rectangles."
+        ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency = 0 Then
@@ -78,11 +78,11 @@ Public Class Draw_Noise
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
-        desc = "Add Noise to the color image"
+        ocvb.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         maxNoiseWidth = sliders.trackbar(1).Value
@@ -107,10 +107,10 @@ Public Class Draw_rotatedRectangles
     Inherits VBparent
     Public rect As Draw_rectangles
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         rect = New Draw_rectangles(ocvb)
         rect.drawRotatedRectangles = True
-        desc = "Draw the requested number of rectangles."
+        ocvb.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         rect.src = src
@@ -125,10 +125,10 @@ Public Class Draw_Ellipses
     Inherits VBparent
     Public updateFrequency = 30
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
-        desc = "Draw the requested number of ellipses."
+        ocvb.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency = 0 Then
@@ -150,10 +150,10 @@ Public Class Draw_Circles
     Inherits VBparent
     Public updateFrequency = 30
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
-        desc = "Draw the requested number of circles."
+        ocvb.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency = 0 Then
@@ -174,10 +174,10 @@ Public Class Draw_Line
     Inherits VBparent
     Public updateFrequency = 30
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
-        desc = "Draw the requested number of Lines."
+        ocvb.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
@@ -197,10 +197,10 @@ End Class
 Public Class Draw_Polygon
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
-        desc = "Draw Polygon figures"
+        ocvb.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
 
         radio.Setup(ocvb, caller, 2) ' ask for 2 radio buttons
@@ -253,8 +253,8 @@ End Class
 Public Class Draw_RngImage
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use RNG to draw the same set of shapes every time"
+        initParent(ocvb)
+        ocvb.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
@@ -294,7 +294,7 @@ End Class
 Public Class Draw_SymmetricalShapes
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
         sliders.setupTrackBar(1, "Radius 1", 1, src.Rows / 2, src.Rows / 4)
@@ -308,7 +308,7 @@ Public Class Draw_SymmetricalShapes
         check.Box(3).Text = "Reverse In/Out"
         check.Box(4).Text = "Use demo mode"
         check.Box(4).Checked = True
-        desc = "Generate shapes programmatically"
+        ocvb.desc = "Generate shapes programmatically"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static rotateAngle As Single = 0
@@ -381,14 +381,14 @@ Public Class Draw_ClipLine
         If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         flow = New Font_FlowText(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
         setup()
 
-        desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
+        ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst2 = src
@@ -449,7 +449,7 @@ Public Class Draw_Arc
         kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(7 - 1)
@@ -464,7 +464,7 @@ Public Class Draw_Arc
 
         setup(ocvb)
 
-        desc = "Use OpenCV's ellipse function to draw an arc"
+        ocvb.desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If kalman.check.Box(0).Checked Then
@@ -507,13 +507,13 @@ Public Class Draw_OverlappingRectangles
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         If standalone Then flood = New FloodFill_Basics(ocvb)
 
         label1 = "(First 5) Overlapping rectangles are red, original in yellow"
         label2 = "Original list of rectangles"
-        desc = "Find first 5 rectangles that are overlapping."
+        ocvb.desc = "Find first 5 rectangles that are overlapping."
     End Sub
     Private Class CompareMasks : Implements IComparer(Of cv.Rect)
         Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare

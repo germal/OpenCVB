@@ -38,17 +38,17 @@ Public Class Sound_ToPCM
         pcmDuration = reader.TotalTime.TotalSeconds
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         ocvb.openFileDialogRequested = True
-        ocvb.openFileInitialDirectory = ocvb.HomeDir + "Data\"
+        ocvb.openFileInitialDirectory = ocvb.parms.homeDir + "Data\"
         ocvb.openFileDialogName = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", "")
         ocvb.openFileFilter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
         ocvb.openFileFilterIndex = 1
         ocvb.openFileDialogTitle = "Select an audio file to analyze"
         ocvb.initialStartSetting = True
 
-        desc = "Load an audio file, play it, and convert to PCM"
+        ocvb.desc = "Load an audio file, play it, and convert to PCM"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If inputFileName <> ocvb.openFileDialogName Then
@@ -114,7 +114,7 @@ Public Class Sound_SignalGenerator
     Dim generatedSamplesPerSecond As Integer = 44100
     Dim startTime As Date
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller, 5)
         sliders.setupTrackBar(0, "Sine Wave Frequency", 10, 4000, 1000)
@@ -136,7 +136,7 @@ Public Class Sound_SignalGenerator
         player = New WaveOut
         player.Init(wGen)
 
-        desc = "Generate sound with a sine waveform."
+        ocvb.desc = "Generate sound with a sine waveform."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static radioIndex As Integer
@@ -193,7 +193,7 @@ Public Class Sound_Display
     Public pcm32f As cv.Mat
     Public starttime As Date
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Max Absolute Value"
@@ -207,7 +207,7 @@ Public Class Sound_Display
         check.Box(0).Checked = True
 
         label2 = "Black shows approximately what is currently playing"
-        desc = "Display a sound buffer in several styles"
+        ocvb.desc = "Display a sound buffer in several styles"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static useGenerated As Boolean

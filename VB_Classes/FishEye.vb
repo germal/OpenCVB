@@ -9,7 +9,7 @@ Public Class FishEye_Rectified
     Dim t265Rect As cv.Rect
     Dim t265Original As cv.Rect
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         Dim minDisp = 0
         Dim dispOffset = 112
         Dim numDisp = dispOffset - minDisp
@@ -45,7 +45,7 @@ Public Class FishEye_Rectified
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMatRight, dMatRight, rMatRight, pMatRight, New cv.Size(t265Original.Width, t265Original.Height),
                                                cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
 
-        desc = "Use OpenCV's FishEye API to undistort a fisheye lens input - needs more work"
+        ocvb.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input - needs more work"
         label1 = "Left View"
         label2 = "Right View"
     End Sub
@@ -75,8 +75,8 @@ End Class
 Public Class FishEye_Raw
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Display the Raw FishEye images for the T265 (only)"
+        initParent(ocvb)
+        ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.T265Camera Then

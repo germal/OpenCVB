@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class intrinsicsLeft_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Show the depth camera intrinsicsLeft."
+        initParent(ocvb)
+        ocvb.desc = "Show the depth camera intrinsicsLeft."
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run(ocvb As VBocvb)

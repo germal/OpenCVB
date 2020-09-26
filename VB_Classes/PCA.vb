@@ -3,10 +3,10 @@ Imports cv = OpenCvSharp
 Public Class PCA_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
-        desc = "Reconstruct a video stream as a composite of X images."
+        ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static images(7) As cv.Mat
@@ -40,9 +40,9 @@ Public Class PCA_Depth
     Inherits VBparent
     Dim pca As PCA_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         pca = New PCA_Basics(ocvb)
-        desc = "Reconstruct a depth stream as a composite of X images."
+        ocvb.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         pca.src = ocvb.RGBDepth
@@ -60,10 +60,10 @@ Public Class PCA_DrawImage
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         pca = New PCA_Basics(ocvb)
-        image = cv.Cv2.ImRead(ocvb.homeDir + "Data/pca_test1.jpg")
-        desc = "Use PCA to find the principle direction of an object."
+        image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/pca_test1.jpg")
+        ocvb.desc = "Use PCA to find the principle direction of an object."
         label1 = "Original image"
         label2 = "PCA Output"
     End Sub

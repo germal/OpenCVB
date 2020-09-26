@@ -3,12 +3,12 @@ Imports cv = OpenCvSharp
 Public Class Pencil_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "Pencil Sigma_r", 1, 100, 7)
         sliders.setupTrackBar(2, "Pencil Shade Factor", 1, 200, 40)
-        desc = "Convert image to a pencil sketch - Painterly Effect"
+        ocvb.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim sigma_s = sliders.trackbar(0).Value
@@ -25,10 +25,10 @@ End Class
 Public Class Pencil_Manual
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
-        desc = "Break down the process of converting an image to a sketch - Painterly Effect"
+        ocvb.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

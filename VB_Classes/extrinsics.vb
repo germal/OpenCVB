@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Extrinsics_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Show the depth camera extrinsics."
+        initParent(ocvb)
+        ocvb.desc = "Show the depth camera extrinsics."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim nextline = "Rotation MatrixTranslation" + vbCrLf

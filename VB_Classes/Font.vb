@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Font_OpenCV
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Display different font options available in OpenCV"
+        initParent(ocvb)
+        ocvb.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 30 Then Exit Sub
@@ -31,8 +31,8 @@ End Class
 Public Class Font_TrueType
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Display different TrueType fonts"
+        initParent(ocvb)
+        ocvb.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
@@ -51,8 +51,8 @@ Public Class Font_FlowText
     Public msgs As New List(Of String)
     Public dst As Integer = RESULT1 ' set to result2 to appear in dst2
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Show TrueType text flowing through an image."
+        initParent(ocvb)
+        ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then

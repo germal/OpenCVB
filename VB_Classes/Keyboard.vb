@@ -6,11 +6,11 @@ Public Class Keyboard_Basics
     Dim flow As Font_FlowText
     Public checkKeys As New OptionsKeyboardInput
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         checkKeys.Setup(ocvb, caller)
         flow = New Font_FlowText(ocvb)
         label1 = "Keyboard data will flow to algorithm"
-        desc = "Test the keyboard interface available to all algorithms"
+        ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Input = New List(Of String)(checkKeys.inputText)

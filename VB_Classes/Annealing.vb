@@ -67,9 +67,9 @@ Public Class Annealing_Basics_CPP
         closed = False
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         setup(ocvb)
-        desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
+        ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If closed = True Then Exit Sub
@@ -144,7 +144,7 @@ Public Class Annealing_CPP_MT
     End Sub
 
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         random = New Random_Points(ocvb)
         hideForm("Random_Points Slider Options")
 
@@ -167,7 +167,7 @@ Public Class Annealing_CPP_MT
         label1 = "Log of Annealing progress"
         label2 = "Top 2 are best solutions, bottom 2 are worst."
 
-        desc = "Setup and control finding the optimal route for a traveling salesman"
+        ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
@@ -240,7 +240,7 @@ Public Class Annealing_Options
     Public anneal As Annealing_Basics_CPP
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         random = New Random_Points(ocvb)
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = 25 ' change the default number of cities here.
@@ -262,7 +262,7 @@ Public Class Annealing_Options
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
         anneal.setup(ocvb)
         anneal.Open()
-        desc = "Setup and control finding the optimal route for a traveling salesman"
+        ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static randomSlider = findSlider("Random Pixel Count")

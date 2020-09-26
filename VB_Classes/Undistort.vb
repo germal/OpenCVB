@@ -65,7 +65,7 @@ Public Class Undistort_Basics
     Dim stereo_cx As integer
     Dim stereo_cy As integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
 
@@ -82,7 +82,7 @@ Public Class Undistort_Basics
         check.Box(0).Checked = True
 
         label1 = "Left Image with sliders applied"
-        desc = "Use sliders to control the undistort OpenCV API - Painterly"
+        ocvb.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat

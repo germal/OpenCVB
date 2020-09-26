@@ -20,12 +20,12 @@ Public Class Area_MinTriangle_CPP
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup(ocvb)
-        desc = "Find minimum containing triangle for a set of points."
+        ocvb.desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static pointCountSlider = findSlider("Area Number of Points")
@@ -70,7 +70,7 @@ Public Class Area_MinRect
         ReDim srcPoints(numberOfPoints)
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
@@ -78,7 +78,7 @@ Public Class Area_MinRect
 
         setup(ocvb, sliders.trackbar(0).Value)
 
-        desc = "Find minimum containing rectangle for a set of points."
+        ocvb.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static pointCountSlider = findSlider("Area Number of Points")
@@ -106,11 +106,11 @@ Public Class Area_MinMotionRect
     Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         bgSub = New BGSubtract_MOG(ocvb)
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
         bgSubLearnRate.Value = 100 ' low threshold to maximize motion
-        desc = "Use minRectArea to encompass detected motion"
+        ocvb.desc = "Use minRectArea to encompass detected motion"
         label1 = "MinRectArea of MOG motion"
     End Sub
 
@@ -144,10 +144,10 @@ End Class
 Public Class Area_FindNonZero
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Coordinates of non-zero points"
         label2 = "Non-zero original points"
-        desc = "Use FindNonZero API to get coordinates of non-zero points."
+        ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)

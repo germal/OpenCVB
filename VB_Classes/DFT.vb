@@ -25,11 +25,11 @@ Public Class DFT_Basics
     Public rows As integer
     Public cols As integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mats = New Mat_4to1(ocvb)
         mats.noLines = True
 
-        desc = "Explore the Discrete Fourier Transform."
+        ocvb.desc = "Explore the Discrete Fourier Transform."
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
@@ -85,9 +85,9 @@ Public Class DFT_Inverse
     Inherits VBparent
     Dim mats As Mat_2to1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mats = New Mat_2to1(ocvb)
-        desc = "Take the inverse of the Discrete Fourier Transform."
+        ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -126,7 +126,7 @@ Public Class DFT_ButterworthFilter_MT
     Inherits VBparent
     Public dft As DFT_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, src.Rows, src.Rows)
         sliders.setupTrackBar(1, "DFT B Filter - Order", 1, src.Rows, 2)
@@ -141,7 +141,7 @@ Public Class DFT_ButterworthFilter_MT
         radio.check(0).Checked = True
 
         dft = New DFT_Basics(ocvb)
-        desc = "Use the Butterworth filter on a DFT image - color image input."
+        ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
@@ -202,10 +202,10 @@ Public Class DFT_ButterworthDepth
     Inherits VBparent
     Dim bfilter As DFT_ButterworthFilter_MT
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         bfilter = New DFT_ButterworthFilter_MT(ocvb)
 
-        desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
+        ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub

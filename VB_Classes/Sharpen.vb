@@ -2,12 +2,12 @@ Imports cv = OpenCvSharp
 Public Class Sharpen_UnsharpMask
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
         sliders.setupTrackBar(1, "threshold", 0, 255, 5)
         sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
-        desc = "Sharpen an image - Painterly Effect"
+        ocvb.desc = "Sharpen an image - Painterly Effect"
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -31,11 +31,11 @@ End Class
 Public Class Sharpen_DetailEnhance
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "DetailEnhance Sigma_r", 1, 100, 7)
-        desc = "Enhance detail on an image - Painterly Effect"
+        ocvb.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim sigma_s = sliders.trackbar(0).Value
@@ -51,11 +51,11 @@ End Class
 Public Class Sharpen_Stylize
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "Stylize Sigma_r", 1, 100, 7)
-        desc = "Stylize an image - Painterly Effect"
+        ocvb.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim sigma_s = sliders.trackbar(0).Value

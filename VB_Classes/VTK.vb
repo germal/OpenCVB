@@ -40,10 +40,10 @@ Public Class VTK_Basics
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         Dispose() ' make sure there wasn't an old VTKWindow sitting around...
-        desc = "Create VTK window and update it with images"
+        ocvb.desc = "Create VTK window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As VBocvb)
         ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
@@ -128,7 +128,7 @@ Public Class VTK_Histogram3D
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar(1, "Hist 3D bins", 1, 100, 32)
@@ -142,7 +142,7 @@ Public Class VTK_Histogram3D
         vtk.usingDepthAndRGB = False
 
         random = New Random_NormalDist(ocvb)
-        desc = "Create the test pattern and send it to VTK for 3D display."
+        ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If vtk.vtkPresent = False Then

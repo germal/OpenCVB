@@ -39,7 +39,7 @@ Public Class Smoothing_Exterior
 		Return spline
 	End Function
 	Public Sub New(ocvb As VBocvb)
-		setCaller(ocvb)
+		initParent(ocvb)
 		hull = New Hull_Basics(ocvb)
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 
@@ -48,7 +48,7 @@ Public Class Smoothing_Exterior
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
-		desc = "Smoothing the line connecting a series of points."
+		ocvb.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
 		If ocvb.frameCount Mod 30 Then Exit Sub
@@ -112,7 +112,7 @@ Public Class Smoothing_Interior
 	End Function
 
 	Public Sub New(ocvb As VBocvb)
-		setCaller(ocvb)
+		initParent(ocvb)
 		hull = New Hull_Basics(ocvb)
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.sliders.trackbar(0).Value = 16
@@ -123,7 +123,7 @@ Public Class Smoothing_Interior
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
-		desc = "Smoothing the line connecting a series of points staying inside the outline."
+		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
 		If ocvb.frameCount Mod 30 Then Exit Sub

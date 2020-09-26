@@ -11,10 +11,10 @@ Public Class Fractal_Mandelbrot
     Public incrX As Single
     Public incrY As Single
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
-        desc = "Run the classic Mandalbrot algorithm"
+        ocvb.desc = "Run the classic Mandalbrot algorithm"
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         saveIterations = 0
     End Sub
@@ -52,9 +52,9 @@ Public Class Fractal_Mandelbrot_MT
     Inherits VBparent
     Dim mandel As Fractal_Mandelbrot
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mandel = New Fractal_Mandelbrot(ocvb)
-        desc = "Run a multi-threaded version of the Mandalbrot algorithm"
+        ocvb.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim iterations = mandel.sliders.trackbar(0).Value
@@ -76,11 +76,11 @@ Public Class Fractal_MandelbrotZoom
     Inherits VBparent
     Public mandel As Fractal_Mandelbrot
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mandel = New Fractal_Mandelbrot(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Reset to original Mandelbrot"
-        desc = "Run the classic Mandalbrot algorithm and allow zooming in"
+        ocvb.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim iterations = mandel.sliders.trackbar(0).Value
@@ -126,11 +126,11 @@ Public Class Fractal_MandelbrotZoomColor
     Public mandel As Fractal_MandelbrotZoom
     Public palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mandel = New Fractal_MandelbrotZoom(ocvb)
         palette = New Palette_Basics(ocvb)
         palette.radio.check(5).Checked = True
-        desc = "Classic Mandelbrot in color"
+        ocvb.desc = "Classic Mandelbrot in color"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         mandel.Run(ocvb)
@@ -156,10 +156,10 @@ Public Class Fractal_Julia
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mandel = New Fractal_MandelbrotZoomColor(ocvb)
         label2 = "Mouse selects different Julia Sets - zoom for detail"
-        desc = "Build Julia set from any point in the Mandelbrot fractal"
+        ocvb.desc = "Build Julia set from any point in the Mandelbrot fractal"
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
         If Complex.Abs(z) > r Then

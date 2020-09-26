@@ -4,9 +4,9 @@ Public Class Fibonacci_Basics
     Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New Font_FlowText(ocvb)
-        desc = "Generate the fibonacci sequence using conventional code"
+        ocvb.desc = "Generate the fibonacci sequence using conventional code"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static a As Double = 0, b As Double = 1
@@ -32,9 +32,9 @@ Public Class Fibonacci_Yield
     Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New Font_FlowText(ocvb)
-        desc = "Generate the fibonacci sequence using ienumerable's"
+        ocvb.desc = "Generate the fibonacci sequence using ienumerable's"
     End Sub
     Private Iterator Function nextFib() As System.Collections.Generic.IEnumerable(Of Double)
         Dim a As Double = 0

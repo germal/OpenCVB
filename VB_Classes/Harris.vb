@@ -32,7 +32,7 @@ Public Class Harris_Features_CPP
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller, 5)
         sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
@@ -41,7 +41,7 @@ Public Class Harris_Features_CPP
         sliders.setupTrackBar(3, "Harris Parameter", 1, 100, 1)
         sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
 
-        desc = "Use Harris feature detectors to identify interesting points."
+        ocvb.desc = "Use Harris feature detectors to identify interesting points."
 
         ReDim srcData(src.Total - 1)
         Harris_Features = Harris_Features_Open()
@@ -84,11 +84,11 @@ Public Class Harris_Detector_CPP
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
 
-        desc = "Use Harris detector to identify interesting points."
+        ocvb.desc = "Use Harris detector to identify interesting points."
 
         ReDim srcData(src.Total - 1)
         Harris_Detector = Harris_Detector_Open()

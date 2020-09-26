@@ -2,14 +2,14 @@ Imports cv = OpenCvSharp
 Public Class Polylines_IEnumerableExample
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
         sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
-        desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
+        ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
@@ -35,9 +35,9 @@ Public Class Polylines_Random
     Inherits VBparent
     Dim zoomFactor = 4
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
-        desc = "Create a random procedural image - Painterly Effect"
+        ocvb.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 150 = 0 Then ' every x frames.

@@ -8,7 +8,7 @@ Public Class Palette_Basics
     Public colormap As cv.ColormapTypes
     Public colorMat As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         gradMap = New Palette_BuildGradientColorMap(ocvb)
 
         radio.Setup(ocvb, caller, 21)
@@ -16,7 +16,7 @@ Public Class Palette_Basics
             radio.check(i).Text = mapNames(i)
         Next
         radio.check(5).Checked = True
-        desc = "Apply the different color maps in OpenCV - Painterly Effect"
+        ocvb.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
         For i = 0 To radio.check.Count - 1
@@ -38,7 +38,7 @@ Public Class Palette_Basics
         colormap = checkRadios()
         label1 = "ColorMap = " + mapNames(colormap)
 
-        Static cMapDir As New DirectoryInfo(ocvb.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+        Static cMapDir As New DirectoryInfo(ocvb.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Static saveColorMap As Integer = -1
         If saveColorMap <> colormap Then
             saveColorMap = colormap
@@ -47,7 +47,7 @@ Public Class Palette_Basics
             If str.Contains("Ocean") Then
                 str = str.Replace("Ocean", "Hsv")
             ElseIf str.Contains("Hsv") Then
-                str = str.replace("Hsv", "Ocean")
+                str = str.Replace("Hsv", "Ocean")
             End If
             Dim mapFile = New FileInfo(str)
             If mapFile.Exists Then
@@ -85,12 +85,12 @@ End Class
 Public Class Palette_Color
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
-        desc = "Define a color using sliders."
+        ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim b = sliders.trackbar(0).Value
@@ -109,8 +109,8 @@ End Class
 Public Class Palette_LinearPolar
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use LinearPolar to create gradient image"
+        initParent(ocvb)
+        ocvb.desc = "Use LinearPolar to create gradient image"
         SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
 
         sliders.Setup(ocvb, caller)
@@ -190,12 +190,12 @@ Public Class Palette_Reduction
     Inherits VBparent
     Dim reduction As Reduction_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
-        desc = "Map colors to different palette - Painterly Effect."
+        ocvb.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
     Private Class CompareVec3b : Implements IComparer(Of cv.Vec3b)
@@ -277,13 +277,13 @@ Public Class Palette_DrawTest
     Dim palette As Palette_Basics
     Dim draw As Draw_RngImage
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         palette = New Palette_Basics(ocvb)
 
         draw = New Draw_RngImage(ocvb)
         palette.src = dst1
 
-        desc = "Experiment with palette using a drawn image"
+        ocvb.desc = "Experiment with palette using a drawn image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         draw.Run(ocvb)
@@ -303,9 +303,9 @@ Public Class Palette_Gradient
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label2 = "From and To colors"
-        desc = "Create gradient image"
+        ocvb.desc = "Create gradient image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod frameModulo = 0 Then
@@ -339,12 +339,12 @@ Public Class Palette_BuildGradientColorMap
     Inherits VBparent
     Public gradientColorMap As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
         label2 = "Generated colormap"
-        desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
+        ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then If ocvb.frameCount Mod 100 Then Exit Sub
@@ -372,7 +372,7 @@ Public Class Palette_DepthColorMap
     Dim gradientColorMap As New cv.Mat
     Dim holes As Depth_Holes
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         holes = New Depth_Holes(ocvb)
         hideForm("Depth_Holes Slider Options")
 
@@ -380,7 +380,7 @@ Public Class Palette_DepthColorMap
         sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
 
         label2 = "Palette used to color left image"
-        desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
+        ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount = 0 Then
@@ -426,7 +426,7 @@ Public Class Palette_Consistency
         End Function
     End Class
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         emax = New EMax_CPP(ocvb)
         emax.basics.sliders.trackbar(1).Value = 15
 
@@ -436,7 +436,7 @@ Public Class Palette_Consistency
 
         lut = New LUT_Rebuild(ocvb)
 
-        desc = "Using a histogram, assign the same colors to the same areas across frames"
+        ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -485,7 +485,7 @@ Public Class Palette_ObjectColors
     Dim palette As Palette_Basics
     Public gray As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         palette = New Palette_Basics(ocvb)
         hideForm("Palette_BuildGradientColorMap Slider Options")
@@ -494,7 +494,7 @@ Public Class Palette_ObjectColors
 
         label1 = "Consistent colors"
         label2 = "Original colors"
-        desc = "New class description"
+        ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
@@ -557,14 +557,14 @@ Public Class Palette_Layout2D
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Dim widthSlider = findSlider("ThreadGrid Width")
         Dim heightslider = findSlider("ThreadGrid Height")
         widthSlider.Value = 40
         heightslider.Value = 24
         grid.Run(ocvb)
-        desc = "Layout the available colors in a 2D grid"
+        ocvb.desc = "Layout the available colors in a 2D grid"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)

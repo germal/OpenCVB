@@ -42,10 +42,10 @@ Public Class Hough_Circles
     Inherits VBparent
     Dim circles As Draw_Circles
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         circles = New Draw_Circles(ocvb)
         circles.sliders.trackbar(0).Value = 3
-        desc = "Find circles using HoughCircles."
+        ocvb.desc = "Find circles using HoughCircles."
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
     End Sub
@@ -74,7 +74,7 @@ Public Class Hough_Lines
     Dim edges As Edges_Basics
     Public segments() As cv.LineSegmentPolar
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         edges = New Edges_Basics(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -82,7 +82,7 @@ Public Class Hough_Lines
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 50)
         sliders.setupTrackBar(3, "Lines to Plot", 1, 1000, 25)
-        desc = "Use Houghlines to find lines in the image."
+        ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
@@ -120,7 +120,7 @@ Public Class Hough_Lines_MT
     Dim edges As Edges_Basics
     Public grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "rho", 1, 100, 1)
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
@@ -134,7 +134,7 @@ Public Class Hough_Lines_MT
         gridWidthSlider.Value = 16
         gridHeightSlider.Value = 16
 
-        desc = "Multithread Houghlines to find lines in image fragments."
+        ocvb.desc = "Multithread Houghlines to find lines in image fragments."
         label1 = "Hough_Lines_MT"
         label2 = "Hough_Lines_MT"
     End Sub

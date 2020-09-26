@@ -4,14 +4,14 @@ Public Class BlockMatching_Basics
     Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)
         sliders.setupTrackBar(1, "Blockmatch block size", 5, 255, 15)
         sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
-        desc = "Use OpenCV's block matching on left and right views"
+        ocvb.desc = "Use OpenCV's block matching on left and right views"
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
     End Sub

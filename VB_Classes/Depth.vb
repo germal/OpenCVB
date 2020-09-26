@@ -4,12 +4,12 @@ Public Class Depth_Median
     Inherits VBparent
     Dim median As Math_Median_CDF
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         median = New Math_Median_CDF(ocvb)
         median.src = New cv.Mat
         median.rangeMax = 10000
         median.rangeMin = 1 ' ignore depth of zero as it is not known.
-        desc = "Divide the depth image ahead and behind the median."
+        ocvb.desc = "Divide the depth image ahead and behind the median."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         median.src = getDepth32f(ocvb)
@@ -39,12 +39,12 @@ End Class
 Public Class Depth_Flatland
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Region Count", 1, 250, 10)
 
         label2 = "Grayscale version"
-        desc = "Attempt to stabilize the depth image."
+        ocvb.desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
@@ -60,8 +60,8 @@ End Class
 Public Class Depth_FirstLastDistance
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Monitor the first and last depth distances"
+        initParent(ocvb)
+        ocvb.desc = "Monitor the first and last depth distances"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim depth32f = getDepth32f(ocvb)
@@ -86,13 +86,13 @@ Public Class Depth_HolesRect
     Inherits VBparent
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "shadowRect Min Size", 1, 20000, 2000)
 
         shadow = New Depth_Holes(ocvb)
 
-        desc = "Identify the minimum rectangles of contours of the depth shadow"
+        ocvb.desc = "Identify the minimum rectangles of contours of the depth shadow"
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
@@ -127,7 +127,7 @@ Public Class Depth_Foreground
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         trim = New Depth_InRange(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
@@ -135,7 +135,7 @@ Public Class Depth_Foreground
         hideForm("Kalman_Basics CheckBox Options")
 
         label1 = "Blue is current, red is kalman, green is trusted"
-        desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
+        ocvb.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)
@@ -200,14 +200,14 @@ Public Class Depth_FlatData
     Inherits VBparent
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         shadow = New Depth_Holes(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FlatData Region Count", 1, 250, 200)
 
         label1 = "Reduced resolution RGBDepth"
-        desc = "Attempt to stabilize the depth image."
+        ocvb.desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb) ' get where depth is zero
@@ -235,12 +235,12 @@ End Class
 Public Class Depth_Zero
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Depth_Zero Max Depth", 200, 10000, 4000)
 
         label2 = "Mask for depth zero or out-of-range"
-        desc = "Create a mask for zero depth - depth shadow and depth out-of-range"
+        ocvb.desc = "Create a mask for zero depth - depth shadow and depth out-of-range"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         cv.Cv2.InRange(getDepth32f(ocvb), 1, sliders.trackbar(0).Value, dst2)
@@ -277,9 +277,9 @@ Public Class Depth_WorldXYZ
     Inherits VBparent
     Public xyzFrame As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
-        desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
+        ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim depth32f = (getDepth32f(ocvb) * 0.001).ToMat ' convert to meters.
@@ -311,7 +311,7 @@ Public Class Depth_WorldXYZ_MT
     Dim trim As Depth_InRange
     Public xyzFrame As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -321,7 +321,7 @@ Public Class Depth_WorldXYZ_MT
         trim = New Depth_InRange(ocvb)
 
         xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
-        desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
+        ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)
@@ -357,7 +357,7 @@ Public Class Depth_MeanStdev_MT
     Dim grid As Thread_Grid
     Dim meanSeries As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -367,7 +367,7 @@ Public Class Depth_MeanStdev_MT
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "MeanStdev Max Depth Range", 1, 20000, 3500)
         sliders.setupTrackBar(1, "MeanStdev Frame Series", 1, 100, 5)
-        desc = "Collect a time series of depth and measure where the stdev is unstable.  Plan is to avoid depth where unstable."
+        ocvb.desc = "Collect a time series of depth and measure where the stdev is unstable.  Plan is to avoid depth where unstable."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -445,7 +445,7 @@ Public Class Depth_MeanStdevPlot
     Dim plot1 As Plot_OverTime
     Dim plot2 As Plot_OverTime
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         shadow = New Depth_Holes(ocvb)
 
         plot1 = New Plot_OverTime(ocvb)
@@ -458,7 +458,7 @@ Public Class Depth_MeanStdevPlot
         plot2.maxScale = 1000
         plot2.plotCount = 1
 
-        desc = "Plot the mean and stdev of the depth image"
+        ocvb.desc = "Plot the mean and stdev of the depth image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
@@ -491,14 +491,14 @@ Public Class Depth_Uncertainty
     Inherits VBparent
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         retina = New Retina_Basics_CPP(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
 
         label2 = "Mask of areas with unstable depth"
-        desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
+        ocvb.desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         retina.src = ocvb.RGBDepth
@@ -518,12 +518,12 @@ Public Class Depth_Palette
     Public trim As Depth_InRange
     Dim customColorMap As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         trim = New Depth_InRange(ocvb)
         trim.sliders.trackbar(1).Value = 5000
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
-        desc = "Use a palette to display depth from the raw depth data."
+        ocvb.desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)
@@ -594,9 +594,9 @@ Public Class Depth_Colorizer_CPP
     Inherits VBparent
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         dcPtr = Depth_Colorizer_Open()
-        desc = "Display Depth image using C++ instead of VB.Net"
+        ocvb.desc = "Display Depth image using C++ instead of VB.Net"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then src = getDepth32f(ocvb) Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
@@ -622,11 +622,11 @@ Public Class Depth_ManualTrim
     Inherits VBparent
     Public Mask As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Depth", 200, 1000, 200)
         sliders.setupTrackBar(1, "Max Depth", 200, 10000, 1400)
-        desc = "Manually show depth with varying min and max depths."
+        ocvb.desc = "Manually show depth with varying min and max depths."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
@@ -658,13 +658,13 @@ Public Class Depth_ColorizerFastFade_CPP
     Public trim As Depth_InRange
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         dcPtr = Depth_Colorizer2_Open()
 
         trim = New Depth_InRange(ocvb)
 
         label2 = "Mask from Depth_InRange"
-        desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
+        ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)
@@ -692,8 +692,8 @@ End Class
 Public Class Depth_ColorizerVB
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Colorize depth manually."
+        initParent(ocvb)
+        ocvb.desc = "Colorize depth manually."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim src = getDepth32f(ocvb)
@@ -739,14 +739,14 @@ Public Class Depth_ColorizerVB_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
         sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
 
         grid = New Thread_Grid(ocvb)
 
-        desc = "Colorize depth manually with multi-threading."
+        ocvb.desc = "Colorize depth manually with multi-threading."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -806,14 +806,14 @@ Public Class Depth_Colorizer_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Min Depth", 100, 1000, 100)
         sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
 
         grid = New Thread_Grid(ocvb)
 
-        desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
+        ocvb.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -857,11 +857,11 @@ Public Class Depth_LocalMinMax_MT
     Public minPoint(0) As cv.Point2f
     Public maxPoint(0) As cv.Point2f
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
 
         label1 = "Red is min distance, blue is max distance"
-        desc = "Find min and max depth in each segment."
+        ocvb.desc = "Find min and max depth in each segment."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -904,7 +904,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
     Dim kalman As Kalman_Basics
     Public grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -919,7 +919,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
         ReDim kalman.input(4 - 1)
 
         label1 = "Red is min distance, blue is max distance"
-        desc = "Find minimum depth in each segment."
+        ocvb.desc = "Find minimum depth in each segment."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -975,12 +975,12 @@ Public Class Depth_ColorMap
     Inherits VBparent
     Dim Palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 3)
 
         Palette = New Palette_Basics(ocvb)
-        desc = "Display the depth as a color map"
+        ocvb.desc = "Display the depth as a color map"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim alpha = sliders.trackbar(0).Value / 100
@@ -1000,13 +1000,13 @@ Public Class Depth_Holes
     Public borderMask As New cv.Mat
     Dim element As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Amount of dilation around depth holes", 1, 10, 1)
 
         label2 = "Shadow Edges (use sliders to expand)"
         element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
-        desc = "Identify holes in the depth image."
+        ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
@@ -1029,12 +1029,12 @@ Public Class Depth_Stable
     Inherits VBparent
     Public mog As BGSubtract_Basics_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         mog = New BGSubtract_Basics_CPP(ocvb)
 
         label2 = "Stable (non-zero) Depth"
-        desc = "Collect X frames, compute stable depth using the RGB and Depth image."
+        ocvb.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then src = ocvb.RGBDepth
@@ -1058,13 +1058,13 @@ Public Class Depth_Stabilizer
     Public mean As Mean_Basics
     Public colorize As Depth_Colorizer_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         mean = New Mean_Basics(ocvb)
         colorize = New Depth_Colorizer_CPP(ocvb)
         stable = New Depth_Stable(ocvb)
 
-        desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
+        ocvb.desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         stable.src = src
@@ -1091,11 +1091,11 @@ Public Class Depth_Decreasing
     Inherits VBparent
     Public Increasing As Boolean
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
 
-        desc = "Identify where depth is decreasing - coming toward the camera."
+        ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim depth32f = If(standalone, getDepth32f(ocvb), src)
@@ -1121,10 +1121,10 @@ Public Class Depth_Increasing
     Inherits VBparent
     Public depth As Depth_Decreasing
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         depth = New Depth_Decreasing(ocvb)
         depth.Increasing = True
-        desc = "Identify where depth is increasing - retreating from the camera."
+        ocvb.desc = "Identify where depth is increasing - retreating from the camera."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         depth.src = src
@@ -1142,9 +1142,9 @@ Public Class Depth_Punch
     Inherits VBparent
     Dim depth As Depth_Decreasing
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         depth = New Depth_Decreasing(ocvb)
-        desc = "Identify the largest blob in the depth decreasing output"
+        ocvb.desc = "Identify the largest blob in the depth decreasing output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         depth.src = getDepth32f(ocvb)
@@ -1163,13 +1163,13 @@ Public Class Depth_SmoothingMat
     Inherits VBparent
     Public trim As Depth_InRange
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         trim = New Depth_InRange(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 10)
         label2 = "Depth pixels after smoothing"
-        desc = "Use depth rate of change to smooth the depth values beyond close range"
+        ocvb.desc = "Use depth rate of change to smooth the depth values beyond close range"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then src = getDepth32f(ocvb)
@@ -1202,14 +1202,14 @@ Public Class Depth_Smoothing
     Inherits VBparent
     Dim smooth As Depth_SmoothingMat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         smooth = New Depth_SmoothingMat(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Smooth the dst2 output "
         check.Box(0).Checked = True
 
-        desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
+        ocvb.desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         smooth.src = getDepth32f(ocvb)
@@ -1238,13 +1238,13 @@ Public Class Depth_InRange
     Public minDepth As Double
     Public maxDepth As Double
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange Min Depth", 0, 1000, 200)
         sliders.setupTrackBar(1, "InRange Max Depth", 200, 10000, 1400)
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
-        desc = "Show depth with OpenCV using varying min and max depths."
+        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
@@ -1275,11 +1275,11 @@ Public Class Depth_PointCloudInRange
     Public split() As cv.Mat
     Public reduction As Reduction_Depth
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         reduction = New Reduction_Depth(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
         label1 = "Mask for depth values that are in-range"
-        desc = "Show PointCloud while varying the max depth."
+        ocvb.desc = "Show PointCloud while varying the max depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
@@ -1324,14 +1324,14 @@ Public Class Depth_PointCloudInRange_IMU
     Public zRotation As Boolean = True
     Public reduction As Reduction_Depth
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         reduction = New Reduction_Depth(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
         imu = New IMU_GVector(ocvb)
 
         label1 = "Mask for depth values that are in-range"
-        desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then src = ocvb.pointCloud
@@ -1397,13 +1397,13 @@ Public Class Depth_Reduction
     Dim reductionSlider As System.Windows.Forms.TrackBar
     Dim reduction As Reduction_KNN_Color
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         reduction = New Reduction_KNN_Color(ocvb)
         gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
         reductionSlider = findSlider("Reduction factor")
 
-        desc = "Find discrete depth levels and their centroids"
+        ocvb.desc = "Find discrete depth levels and their centroids"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
@@ -1443,12 +1443,12 @@ Public Class Depth_Edges
     Inherits VBparent
     Dim edges As Edges_Laplacian
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         edges = New Edges_Laplacian(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
-        desc = "Find edges in depth data"
+        ocvb.desc = "Find edges in depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         edges.src = src

@@ -4,11 +4,11 @@ Public Class MotionBlur_Basics
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
-        desc = "Use Filter2D to create a motion blur"
+        ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         if standalone Then
@@ -115,7 +115,7 @@ Public Class MotionBlur_Deblur
         Return planes(0)
     End Function
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Redo motion blurred image"
         check.Box(0).Checked = True
@@ -128,7 +128,7 @@ Public Class MotionBlur_Deblur
         sliders.setupTrackBar(2, "Deblur Signal to Noise Ratio", 1, 1000, 700)
         sliders.setupTrackBar(3, "Deblur Gamma", 1, 100, 5)
 
-        desc = "Deblur a motion blurred image"
+        ocvb.desc = "Deblur a motion blurred image"
         label1 = "Blurred Image Input"
         label2 = "Deblurred Image Output"
     End Sub

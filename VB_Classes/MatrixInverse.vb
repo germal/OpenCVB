@@ -32,9 +32,9 @@ End Module
 '    Dim defaultBVector() As Double = {12, 7, 7, 13}
 '    Dim input As cv.Mat
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
+'        initParent(ocvb)
 '        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-'        desc = "Manually invert a matrix"
+'        ocvb.desc = "Manually invert a matrix"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        If input.Width <> input.Height Then
@@ -61,9 +61,9 @@ Public Class MatrixInverse_OpenCV
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Dim input As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-        desc = "Use OpenCV to invert a matrix"
+        ocvb.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If input.Width <> input.Height Then

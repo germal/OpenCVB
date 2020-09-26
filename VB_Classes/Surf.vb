@@ -10,7 +10,7 @@ Public Class Surf_Basics_CS
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
         radio.Setup(ocvb, caller, 2)
@@ -21,7 +21,7 @@ Public Class Surf_Basics_CS
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
 
-        desc = "Compare 2 images to get a homography.  We will use left and right images."
+        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
@@ -53,12 +53,12 @@ Public Class Surf_Basics
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
         surf = New Surf_Basics_CS(ocvb)
 
-        desc = "Use left and right views to match points in horizontal slices."
+        ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then fisheye.Run(ocvb)
@@ -79,14 +79,14 @@ Public Class Surf_DrawMatchManual_CS
     Inherits VBparent
     Dim surf As Surf_Basics_CS
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         surf = New Surf_Basics_CS(ocvb)
         surf.CS_SurfBasics.drawPoints = False
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
 
-        desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
+        ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         surf.src = src

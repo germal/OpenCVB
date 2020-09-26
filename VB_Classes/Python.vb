@@ -6,12 +6,12 @@ Imports System.IO.Pipes
 Module Python_Module
     Public Function checkPythonPackage(ocvb As VBocvb, packageName As String) As Boolean
         ' make sure that opencv-python and numpy are installed on this system.
-        If ocvb.PythonExe = "" Then
+        If ocvb.parms.pythonExe = "" Then
             ocvb.trueText("Python is not present and needs to be installed." + vbCrLf +
                                                   "Get Python 3.7+ with Visual Studio's Install app.")
             Return False
         End If
-        Dim pythonFileInfo = New FileInfo(ocvb.PythonExe)
+        Dim pythonFileInfo = New FileInfo(ocvb.parms.pythonExe)
         Dim packageDir = New FileInfo(pythonFileInfo.DirectoryName + "\Lib\site-packages\")
         Dim packageFolder As New IO.DirectoryInfo(packageDir.DirectoryName + "\")
         Dim packageFiles = packageFolder.GetDirectories(packageName, IO.SearchOption.TopDirectoryOnly)
@@ -30,7 +30,7 @@ Module Python_Module
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it
-        If ocvb.testAllRunning Then
+        If ocvb.parms.testAllRunning Then
             For Each p In Process.GetProcesses
                 If p.ProcessName.ToUpper.Contains("PYTHON") Then
                     Try
@@ -44,7 +44,7 @@ Module Python_Module
         End If
         If pythonApp.Exists Then
             Dim p As New Process
-            p.StartInfo.FileName = ocvb.PythonExe
+            p.StartInfo.FileName = ocvb.parms.pythonExe
             p.StartInfo.WorkingDirectory = pythonApp.DirectoryName
             If arguments = "" Then
                 p.StartInfo.Arguments = """" + pythonApp.Name + """"
@@ -69,8 +69,8 @@ Public Class Python_Run
     Inherits VBparent
     Dim tryCount As integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.HomeDir + "VB_Classes/Python/PythonPackages.py"
+        initParent(ocvb)
+        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.PythonFileName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
@@ -78,7 +78,7 @@ Public Class Python_Run
         Else
             StartPython(ocvb, "")
         End If
-        desc = "Run Python app: " + pythonApp.Name
+        ocvb.desc = "Run Python app: " + pythonApp.Name
         label1 = ""
         label2 = ""
     End Sub
@@ -108,9 +108,9 @@ Public Class Python_MemMap
     Public memMapValues(49) As Double ' more than we need - buffer for growth
     Public memMapbufferSize As integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.HomeDir + "VB_Classes/Python/Python_MemMap.py"
+            ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/Python_MemMap.py"
         End If
 
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length
@@ -126,7 +126,7 @@ Public Class Python_MemMap
             End If
             Dim pythonApp = New FileInfo(ocvb.PythonFileName)
             label1 = "No output for Python_MemMap - see Python console"
-            desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
+            ocvb.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -148,7 +148,7 @@ Public Class Python_SurfaceBlit
     Dim rgbBuffer(1) As Byte
     Dim PythonReady As Boolean
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         ' this Python script requires pygame to be present...
         If checkPythonPackage(ocvb, "pygame") = False Then
             PythonReady = False
@@ -159,7 +159,7 @@ Public Class Python_SurfaceBlit
         PipeTaskIndex += 1
 
         ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
-        ocvb.PythonFileName = ocvb.HomeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
+        ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap(ocvb)
 
         If ocvb.parms.externalPythonInvocation Then
@@ -168,7 +168,7 @@ Public Class Python_SurfaceBlit
             PythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
         End If
         If PythonReady Then pipe.WaitForConnection()
-        desc = "Stream data to Python_SurfaceBlit Python script."
+        ocvb.desc = "Stream data to Python_SurfaceBlit Python script."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If PythonReady Then

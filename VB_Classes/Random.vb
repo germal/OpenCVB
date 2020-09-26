@@ -8,7 +8,7 @@ Public Class Random_Points
     Public rangeRect As cv.Rect
     Public plotPoints As Boolean = False
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random Pixel Count", 1, src.Cols * src.Rows, 20)
 
@@ -16,7 +16,7 @@ Public Class Random_Points
         ReDim Points2f(sliders.trackbar(0).Value - 1)
 
         rangeRect = New cv.Rect(0, 0, src.Cols, src.Rows)
-        desc = "Create a uniform random mask with a specificied number of pixels."
+        ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If Points.Length <> sliders.trackbar(0).Value Then
@@ -41,8 +41,8 @@ Public Class Random_Shuffle
     Inherits VBparent
     Dim myRNG As New cv.RNG
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use randomShuffle to reorder an image."
+        initParent(ocvb)
+        ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ocvb.RGBDepth.CopyTo(dst1)
@@ -58,10 +58,10 @@ Public Class Random_LUTMask
     Dim random As Random_Points
     Dim km As kMeans_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         km = New kMeans_Basics(ocvb)
         random = New Random_Points(ocvb)
-        desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
+        ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -91,8 +91,8 @@ End Class
 Public Class Random_UniformDist
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Create a uniform distribution."
+        initParent(ocvb)
+        ocvb.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
@@ -105,13 +105,13 @@ End Class
 Public Class Random_NormalDist
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
         sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
-        desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
+        ocvb.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
@@ -125,13 +125,13 @@ Public Class Random_CheckUniformSmoothed
     Dim histogram As Histogram_KalmanSmoothed
     Dim rUniform As Random_UniformDist
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         histogram = New Histogram_KalmanSmoothed(ocvb)
         histogram.sliders.trackbar(0).Value = 255
 
         rUniform = New Random_UniformDist(ocvb)
 
-        desc = "Display the smoothed histogram for a uniform distribution."
+        ocvb.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         rUniform.src = src
@@ -154,13 +154,13 @@ Public Class Random_CheckUniformDist
     Dim histogram As Histogram_Basics
     Dim rUniform As Random_UniformDist
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         histogram = New Histogram_Basics(ocvb)
         histogram.sliders.trackbar(0).Value = 255
 
         rUniform = New Random_UniformDist(ocvb)
 
-        desc = "Display the histogram for a uniform distribution."
+        ocvb.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         rUniform.src = src
@@ -183,11 +183,11 @@ Public Class Random_CheckNormalDist
     Dim histogram As Histogram_Basics
     Dim normalDist As Random_NormalDist
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         histogram = New Histogram_Basics(ocvb)
         histogram.sliders.trackbar(0).Value = 255
         normalDist = New Random_NormalDist(ocvb)
-        desc = "Display the histogram for a Normal distribution."
+        ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         normalDist.src = src
@@ -209,12 +209,12 @@ Public Class Random_CheckNormalDistSmoothed
     Dim histogram As Histogram_KalmanSmoothed
     Dim normalDist As Random_NormalDist
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         histogram = New Histogram_KalmanSmoothed(ocvb)
         histogram.sliders.trackbar(0).Value = 255
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist(ocvb)
-        desc = "Display the histogram for a Normal distribution."
+        ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         normalDist.src = src
@@ -249,9 +249,9 @@ Public Class Random_PatternGenerator_CPP
     Inherits VBparent
     Dim Random_PatternGenerator As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         Random_PatternGenerator = Random_PatternGenerator_Open()
-        desc = "Generate random patterns for use with 'Random Pattern Calibration'"
+        ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
@@ -283,13 +283,13 @@ Public Class Random_CustomDistribution
     Public outputHistogram As cv.Mat
     Public plotHist As Plot_Histogram
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
         inputCDF = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
 
         If standalone Then plotHist = New Plot_Histogram(ocvb)
 
-        desc = "Create a custom random number distribution from any histogram"
+        ocvb.desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
@@ -331,13 +331,13 @@ Public Class Random_MonteCarlo
     Public plotHist As Plot_Histogram
     Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         plotHist = New Plot_Histogram(ocvb)
         plotHist.fixedMaxVal = 100
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
-        desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
+        ocvb.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim dimension = sliders.trackbar(0).Value
@@ -374,7 +374,7 @@ Public Class Random_CustomHistogram
     Public hist As Histogram_Simple
     Public saveHist As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         random = New Random_CustomDistribution(ocvb)
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
@@ -385,7 +385,7 @@ Public Class Random_CustomHistogram
         label1 = "Histogram of the grayscale image"
         label2 = "Histogram of the resulting random numbers"
 
-        desc = "Create a random number distribution that reflects histogram of a grayscale image"
+        ocvb.desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

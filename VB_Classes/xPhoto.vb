@@ -6,8 +6,8 @@ Imports System.Windows.Forms
 Public Class xPhoto_Bm3dDenoise
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Denoise image with block matching and filtering."
+        initParent(ocvb)
+        ocvb.desc = "Denoise image with block matching and filtering."
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
@@ -30,8 +30,8 @@ End Class
 Public Class xPhoto_Bm3dDenoiseDepthImage
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Denoise the depth image with block matching and filtering."
+        initParent(ocvb)
+        ocvb.desc = "Denoise the depth image with block matching and filtering."
         label2 = "Difference from Input"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -69,7 +69,7 @@ Public Class xPhoto_OilPaint_CPP
     Inherits VBparent
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar(1, "xPhoto Block Size", 1, 100, 3)
@@ -84,7 +84,7 @@ Public Class xPhoto_OilPaint_CPP
 
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
-        desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
+        ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim colorCode As integer = cv.ColorConversionCodes.BGR2GRAY

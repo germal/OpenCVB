@@ -11,19 +11,19 @@ Public Class Etch_ASketch
         Return New cv.Point(ms_rng.Next(0, src.Width), ms_rng.Next(0, src.Height))
     End Function
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Etch_ASketch clean slate"
         check.Box(1).Text = "Demo mode"
         check.Box(1).Checked = True
-        If ocvb.testAllRunning Then check.Box(1).Checked = True
+        If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
 
         keys = New Keyboard_Basics(ocvb)
 
         cursor = randomCursor(ocvb)
         dst1.SetTo(slateColor)
-        desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
+        ocvb.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         keys.Run(ocvb)

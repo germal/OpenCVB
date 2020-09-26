@@ -3,11 +3,11 @@ Imports System.Runtime.InteropServices
 Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
-        desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
+        ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -28,8 +28,8 @@ Public Class Brightness_Hue
     Inherits VBparent
     Public hsv_planes(2) As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Show hue (Result1) and Saturation (Result2)."
+        initParent(ocvb)
+        ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
@@ -48,8 +48,8 @@ End Class
 Public Class Brightness_AlphaBeta
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use alpha and beta with ConvertScaleAbs."
+        initParent(ocvb)
+        ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
@@ -66,8 +66,8 @@ Public Class Brightness_Gamma
     Inherits VBparent
     Dim lookupTable(255) As Byte
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use gamma with ConvertScaleAbs."
+        initParent(ocvb)
+        ocvb.desc = "Use gamma with ConvertScaleAbs."
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
     End Sub
@@ -107,14 +107,14 @@ Public Class Brightness_WhiteBalance_CPP
     Inherits VBparent
     Dim wPtr As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
 
         wPtr = WhiteBalance_Open()
         label1 = "Image with auto white balance"
         label2 = "White pixels were altered from the original"
-        desc = "Automate getting the right white balance"
+        ocvb.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
@@ -146,7 +146,7 @@ Public Class Brightness_WhiteBalance
     Dim whiteCPP As Brightness_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         hist = New Histogram_Basics(ocvb)
         hist.plotRequested = True
         hist.bins = 256 * 3
@@ -155,7 +155,7 @@ Public Class Brightness_WhiteBalance
         whiteCPP = New Brightness_WhiteBalance_CPP(ocvb)
 
         label1 = "Image with auto white balance"
-        desc = "Automate getting the right white balance"
+        ocvb.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim rgb32f As New cv.Mat
@@ -209,11 +209,11 @@ Public Class Brightness_ChangeMask
     Dim white As Brightness_WhiteBalance
     Dim whiteCPP As Brightness_WhiteBalance_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         white = New Brightness_WhiteBalance(ocvb)
         whiteCPP = New Brightness_WhiteBalance_CPP(ocvb)
 
-        desc = "Create a mask for the changed pixels after white balance"
+        ocvb.desc = "Create a mask for the changed pixels after white balance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static countdown = 60
@@ -254,7 +254,7 @@ Public Class Brightness_PlotHist
     Public hist2 As Histogram_KalmanSmoothed
     Dim mat2to1 As Mat_2to1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         white = New Brightness_ChangeMask(ocvb)
 
         hist1 = New Histogram_KalmanSmoothed(ocvb)
@@ -262,7 +262,7 @@ Public Class Brightness_PlotHist
         hideForm("Histogram_KalmanSmoothed Slider Options")
         mat2to1 = New Mat_2to1(ocvb)
 
-        desc = "Plot the histogram of the before and after white balancing"
+        ocvb.desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         hist1.src = src

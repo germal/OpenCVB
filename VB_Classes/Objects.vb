@@ -4,14 +4,14 @@ Public Class Object_Basics
     Dim trim As Depth_InRange
     Dim ccomp As CComp_ColorDepth
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         trim = New Depth_InRange(ocvb)
 
         ccomp = New CComp_ColorDepth(ocvb)
 
         label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"
-        desc = "Identify objects in the foreground."
+        ocvb.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         trim.src = getDepth32f(ocvb)

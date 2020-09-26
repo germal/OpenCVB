@@ -7,7 +7,7 @@ Public Class SVM_Options
     Public points() As cv.Point2f
     Public responses() As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller, 8)
         sliders.setupTrackBar(0, "SampleCount", 5, 1000, 500)
@@ -36,7 +36,7 @@ Public Class SVM_Options
 
 
         label1 = "SVM_Options - only options, no output"
-        desc = "SVM has many options - enough to make a class for it."
+        ocvb.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
         For i = 0 To radio.check.Length - 1
@@ -97,9 +97,9 @@ Public Class SVM_Basics
     Inherits VBparent
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         svmOptions = New SVM_Options(ocvb)
-        desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
+        ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         label1 = "SVM_Basics input data"
         label2 = "Results - line is ground truth"
     End Sub
@@ -148,7 +148,7 @@ Public Class SVM_Random
     Inherits VBparent
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         svmOptions = New SVM_Options(ocvb)
         svmOptions.sliders.trackbar(1).Value = 15
 
@@ -158,7 +158,7 @@ Public Class SVM_Random
         check.Box(0).Text = "Restrict random test to square area"
 
         label1 = "SVM Training data"
-        desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
+        ocvb.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         svmOptions.Run(ocvb)
@@ -237,7 +237,7 @@ Public Class SVM_TestCase
     Dim labelsMat As cv.Mat
     Dim svmOptions As SVM_Options
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
         labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
@@ -246,7 +246,7 @@ Public Class SVM_TestCase
         svmOptions.sliders.trackbar(1).Value = 15
         svmOptions.radio.check(3).Enabled = False
 
-        desc = "Text book example on SVM"
+        ocvb.desc = "Text book example on SVM"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1.SetTo(cv.Scalar.White)

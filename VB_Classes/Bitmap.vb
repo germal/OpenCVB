@@ -4,13 +4,13 @@ Imports cv = OpenCvSharp
 Public Class Bitmap_ToMat
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Convert color bitmap to Mat"
         label2 = "Convert Mat to bitmap and then back to Mat"
-        desc = "Convert a color and grayscale bitmap to a cv.Mat"
+        ocvb.desc = "Convert a color and grayscale bitmap to a cv.Mat"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim bitmap = New Bitmap(ocvb.homeDir + "Data/lena.jpg")
+        Dim bitmap = New Bitmap(ocvb.parms.homeDir + "Data/lena.jpg")
         dst1 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)

@@ -1432,7 +1432,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\bobdavies\\.nuget\\packages\\": {}
+    "C:\\Users\\bobda\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -1440,12 +1440,12 @@
       "projectUniqueName": "C:\\_src\\OpenCVB\\OpenCVB\\OpenCVB.vbproj",
       "projectName": "OpenCVB",
       "projectPath": "C:\\_src\\OpenCVB\\OpenCVB\\OpenCVB.vbproj",
-      "packagesPath": "C:\\Users\\bobdavies\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\bobda\\.nuget\\packages\\",
       "outputPath": "C:\\_src\\OpenCVB\\OpenCVB\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
-        "C:\\Users\\bobdavies\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\bobda\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

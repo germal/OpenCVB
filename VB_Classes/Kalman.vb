@@ -7,12 +7,12 @@ Public Class Kalman_Basics
     Public output(4 - 1) As Single
     Public vo As viewObject
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Turn Kalman filtering on"
         check.Box(0).Checked = True
 
-        desc = "Use Kalman to stabilize values (such as a cv.rect.)"
+        ocvb.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static saveDimension As Integer = -1
@@ -71,7 +71,7 @@ Public Class Kalman_Compare
     Public plot As Plot_OverTime
     Public kPlot As Plot_OverTime
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         plot = New Plot_OverTime(ocvb)
         plot.plotCount = 3
         plot.topBottomPad = 20
@@ -82,7 +82,7 @@ Public Class Kalman_Compare
 
         label1 = "Kalman input: mean values for RGB"
         label2 = "Kalman output: smoothed mean values for RGB"
-        desc = "Use this kalman filter to predict the next value."
+        ocvb.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount = 0 Then
@@ -142,7 +142,7 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Line(dst1, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
@@ -155,7 +155,7 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Randn(kf.StatePost, New cv.Scalar(0), cv.Scalar.All(1))
         radius = src.Rows / 2.4 ' so we see the entire circle...
         center = New cv.Point2f(src.Cols / 2, src.Rows / 2)
-        desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
+        ocvb.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim stateAngle = kState.Get(Of Single)(0)
@@ -197,14 +197,14 @@ Public Class Kalman_MousePredict
     Dim kalman As Kalman_Basics
     Dim lineWidth As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(2 - 1)
         ReDim kalman.output(2 - 1)
 
         lineWidth = src.Width / 300
         label1 = "Red is real mouse, white is prediction"
-        desc = "Use kalman filter to predict the next mouse location."
+        ocvb.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
@@ -233,12 +233,12 @@ Public Class Kalman_CVMat
     Public output As cv.Mat
     Dim basics As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         basics = New Kalman_Basics(ocvb)
         ReDim basics.input(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
-        desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
+        ocvb.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static saveDimension As Integer = -1
@@ -302,14 +302,14 @@ Public Class Kalman_ImageSmall
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_CVMat(ocvb)
 
         resize = New Resize_Percentage(ocvb)
 
         label1 = "The small image is processed by the Kalman filter"
         label2 = "Mask of the smoothed image minus original"
-        desc = "Resize the image to allow the Kalman filter to process the whole image."
+        ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -339,12 +339,12 @@ Public Class Kalman_DepthSmall
     Inherits VBparent
     Dim kalman As Kalman_ImageSmall
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_ImageSmall(ocvb)
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Mask of the smoothed image minus original"
-        desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
+        ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         kalman.src = ocvb.RGBDepth
@@ -365,7 +365,7 @@ Public Class Kalman_Depth32f
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_CVMat(ocvb)
 
         resize = New Resize_Percentage(ocvb)
@@ -373,7 +373,7 @@ Public Class Kalman_Depth32f
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Difference from original depth"
-        desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
+        ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim depth32f = getDepth32f(ocvb)
@@ -409,7 +409,7 @@ Public Class Kalman_Single
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTransmissionMatrix As Boolean = True
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         Dim tMatrix() As Single = {1, 1, 0, 1}
         kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
@@ -417,7 +417,7 @@ Public Class Kalman_Single
         kf.MeasurementNoiseCov.SetIdentity(0.1)
         kf.ErrorCovPost.SetIdentity(1)
 
-        desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
+        ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -507,7 +507,7 @@ Public Class Kalman_PointTracker
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Dim useKalmanCheck As Windows.Forms.CheckBox
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
 
         knn = New KNN_1_to_1(ocvb)
@@ -520,7 +520,7 @@ Public Class Kalman_PointTracker
         hideForm("Thread_Grid Slider Options")
         hideForm("Palette_BuildGradientColorMap Slider Options")
         label2 = "Initial color values for each centroid"
-        desc = "Use KNN to track points and Kalman to smooth the results"
+        ocvb.desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
     Private Sub allocateKalman(ocvb As VBocvb, count As Integer)
         For i = kalman.Count To count - 1

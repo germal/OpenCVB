@@ -11,7 +11,7 @@ Public Class CamShift_Basics
     Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         plotHist = New Plot_Histogram(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -22,7 +22,7 @@ Public Class CamShift_Basics
 
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
-        desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
+        ocvb.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static roi As New cv.Rect
@@ -77,11 +77,11 @@ Public Class CamShift_Foreground
     Dim camshift As CamShift_Basics
     Dim fore As Depth_Foreground
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         camshift = New CamShift_Basics(ocvb)
         fore = New Depth_Foreground(ocvb)
         label1 = "Automatically finding the head - top of nearest object"
-        desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
+        ocvb.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim restartRequested As Boolean
@@ -114,14 +114,14 @@ Public Class Camshift_Object
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blob = New Blob_DepthClusters(ocvb)
 
         camshift = New CamShift_Basics(ocvb)
 
         label1 = "Largest blob with hue tracked.  Draw enabled."
         label2 = "Backprojection of depth clusters masked with hue"
-        desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
+        ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         blob.Run(ocvb)
@@ -155,7 +155,7 @@ Public Class Camshift_TopObjects
     Dim cams(4 - 1) As CamShift_Basics
     Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mats = New Mat_4to1(ocvb)
 
         blob = New Blob_DepthClusters(ocvb)
@@ -165,7 +165,7 @@ Public Class Camshift_TopObjects
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
-        desc = "Track - Tracker Algorithm"
+        ocvb.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         blob.Run(ocvb)

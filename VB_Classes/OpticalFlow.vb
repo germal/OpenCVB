@@ -73,7 +73,7 @@ Public Class OpticalFlow_DenseOptions
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
@@ -91,7 +91,7 @@ Public Class OpticalFlow_DenseOptions
         sliders.setupTrackBar(5, "Optical Flow Scaling Output", 1, 100, 50)
 
         label1 = "No output - just option settings..."
-        desc = "Use dense optical flow algorithm options"
+        ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
@@ -122,9 +122,9 @@ Public Class OpticalFlow_DenseBasics
     Inherits VBparent
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New OpticalFlow_DenseOptions(ocvb)
-        desc = "Use dense optical flow algorithm  "
+        ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static oldGray As New cv.Mat
@@ -153,7 +153,7 @@ Public Class OpticalFlow_DenseBasics_MT
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -168,7 +168,7 @@ Public Class OpticalFlow_DenseBasics_MT
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
 
-        desc = "MultiThread dense optical flow algorithm  "
+        ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static oldGray As New cv.Mat
@@ -220,7 +220,7 @@ Public Class OpticalFlow_Sparse
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         good = New Features_GoodFeatures(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -237,7 +237,7 @@ Public Class OpticalFlow_Sparse
         radio.check(5).Enabled = False
         radio.check(0).Checked = True
 
-        desc = "Show the optical flow of a sparse matrix."
+        ocvb.desc = "Show the optical flow of a sparse matrix."
         label1 = ""
         label2 = ""
     End Sub

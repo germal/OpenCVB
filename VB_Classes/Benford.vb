@@ -20,7 +20,7 @@ Public Class Benford_Basics
     Dim weight As AddWeighted_Basics
     Dim use99 As Boolean
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         plot = New Plot_Histogram(ocvb)
         If standalone Then benford = New Benford_NormalizedImage(ocvb)
 
@@ -30,7 +30,7 @@ Public Class Benford_Basics
 
         weight = New AddWeighted_Basics(ocvb)
 
-        desc = "Build the capability to perform a Benford analysis."
+        ocvb.desc = "Build the capability to perform a Benford analysis."
     End Sub
     Public Sub setup99()
         ReDim expectedDistribution(100 - 1)
@@ -111,11 +111,11 @@ Public Class Benford_NormalizedImage
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         benford = New Benford_Basics(ocvb)
 
-        desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
+        ocvb.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -139,12 +139,12 @@ Public Class Benford_NormalizedImage99
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         benford = New Benford_Basics(ocvb)
         benford.setup99()
 
-        desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
+        ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -168,14 +168,14 @@ Public Class Benford_JPEG
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         benford = New Benford_Basics(ocvb)
 
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
-        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
+        ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
@@ -197,7 +197,7 @@ Public Class Benford_JPEG99
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         benford = New Benford_Basics(ocvb)
         benford.setup99()
@@ -205,7 +205,7 @@ Public Class Benford_JPEG99
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
-        desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
+        ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static qualitySlider = findSlider("JPEG Quality")
@@ -229,14 +229,14 @@ Public Class Benford_PNG
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         benford = New Benford_Basics(ocvb)
 
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
 
-        desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
+        ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static compressionSlider = findSlider("PNG Compression")
@@ -258,9 +258,9 @@ Public Class Benford_Depth
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         benford = New Benford_Basics(ocvb)
-        desc = "Apply Benford to the depth data"
+        ocvb.desc = "Apply Benford to the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         benford.src = getDepth32f(ocvb)
@@ -279,9 +279,9 @@ Public Class Benford_DepthRGB
     Inherits VBparent
     Public benford As Benford_JPEG
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         benford = New Benford_JPEG(ocvb)
-        desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
+        ocvb.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim jpeg = ocvb.RGBDepth.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, benford.sliders.trackbar(0).Value})

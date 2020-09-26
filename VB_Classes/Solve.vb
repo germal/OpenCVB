@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class Solve_ByMat
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Solve a set of equations with OpenCV's Solve API."
+        initParent(ocvb)
+        ocvb.desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ' x + y = 10
@@ -28,8 +28,8 @@ End Class
 Public Class Solve_ByArray
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
+        initParent(ocvb)
+        ocvb.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ' x + y = 10

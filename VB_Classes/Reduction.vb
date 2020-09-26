@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Reduction_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction factor", 0, 12, 6)
 
@@ -10,7 +10,7 @@ Public Class Reduction_Basics
         check.Box(0).Text = "Use Reduction"
         check.Box(0).Checked = True
 
-        desc = "Reduction: a simpler way to KMeans by removing low-order bits"
+        ocvb.desc = "Reduction: a simpler way to KMeans by removing low-order bits"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If check.Box(0).Checked Then
@@ -38,7 +38,7 @@ End Class
 Public Class Reduction_Simple
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Simple reduction factor", 1, 4000, 64)
 
@@ -46,7 +46,7 @@ Public Class Reduction_Simple
         check.Box(0).Text = "Use Simple Reduction"
         check.Box(0).Checked = True
 
-        desc = "Reduction: a simple way to get KMeans"
+        ocvb.desc = "Reduction: a simple way to get KMeans"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If check.Box(0).Checked Then
@@ -71,11 +71,11 @@ Public Class Reduction_Edges
     Dim edges As Edges_Laplacian
     Dim reduction As Reduction_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         edges = New Edges_Laplacian(ocvb)
         reduction = New Reduction_Basics(ocvb)
-        desc = "Get the edges after reducing the image."
+        ocvb.desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
@@ -99,10 +99,10 @@ Public Class Reduction_Floodfill
     Public flood As FloodFill_Basics
     Public reduction As Reduction_Simple
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flood = New FloodFill_Basics(ocvb)
         reduction = New Reduction_Simple(ocvb)
-        desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
+        ocvb.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
@@ -127,14 +127,14 @@ Public Class Reduction_KNN_Color
     Public pTrack As Kalman_PointTracker
     Dim highlight As Highlight_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         pTrack = New Kalman_PointTracker(ocvb)
         reduction = New Reduction_Floodfill(ocvb)
         If standalone Then highlight = New Highlight_Basics(ocvb)
 
         label2 = "Original floodfill color selections"
-        desc = "Use KNN with color reduction to consistently identify regions and color them."
+        ocvb.desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -170,12 +170,12 @@ Public Class Reduction_KNN_ColorAndDepth
     Dim reduction As Reduction_KNN_Color
     Dim depth As Depth_Edges
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         depth = New Depth_Edges(ocvb)
         reduction = New Reduction_KNN_Color(ocvb)
         label1 = "Detecting objects using only color coherence"
         label2 = "Detecting objects with color and depth coherence"
-        desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
+        ocvb.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
@@ -197,10 +197,10 @@ Public Class Reduction_Depth
     Dim reduction As Reduction_Basics
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
         colorizer = New Depth_Colorizer_CPP(ocvb)
-        desc = "Use reduction to smooth depth data"
+        ocvb.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Type = cv.MatType.CV_32S Then
@@ -227,9 +227,9 @@ Public Class Reduction_PointCloud
     Dim reduction As Reduction_Basics
     Public newPointCloud As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
-        desc = "Use reduction to smooth depth data"
+        ocvb.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim split() = ocvb.pointCloud.Split()

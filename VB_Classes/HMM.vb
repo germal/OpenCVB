@@ -21,13 +21,13 @@ Public Class HMM_Example_CPP
     Inherits VBparent
     Dim HMM As IntPtr = 0
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        If ocvb.testAllRunning = False Then HMM = HMM_Open()
+        initParent(ocvb)
+        If ocvb.parms.testAllRunning = False Then HMM = HMM_Open()
         label1 = "Text output with explanation will appear in the Visual Studio output."
-        desc = "Simple test of Hidden Markov Model - text output"
+        ocvb.desc = "Simple test of Hidden Markov Model - text output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.testAllRunning Then
+        If ocvb.parms.testAllRunning Then
             ocvb.trueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
         End If

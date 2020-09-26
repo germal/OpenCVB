@@ -9,7 +9,7 @@ Public Class Moments_Basics
     Public kalman As Kalman_Basics
     Public useKalman As Boolean = True
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         If standalone Then foreground = New kMeans_Depth_FG_BG(ocvb)
 
@@ -17,7 +17,7 @@ Public Class Moments_Basics
         ReDim kalman.input(2 - 1) ' 2 elements - cv.point
 
         label1 = "Red dot = Kalman smoothed centroid"
-        desc = "Compute the centroid of the provided mask file."
+        ocvb.desc = "Compute the centroid of the provided mask file."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -50,14 +50,14 @@ Public Class Moments_CentroidKalman
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(2 - 1) ' 2 elements - cv.point
 
         foreground = New kMeans_Depth_FG_BG(ocvb)
 
         label1 = "Red dot = Kalman smoothed centroid"
-        desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
+        ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         foreground.Run(ocvb)

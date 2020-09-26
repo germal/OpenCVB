@@ -4,13 +4,13 @@ Imports cv = OpenCvSharp
 Public Class LUT_Gray
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
         sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
         sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
         sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
-        desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
+        ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
@@ -39,10 +39,10 @@ Public Class LUT_Basics
     Public reduction As Reduction_Simple
     Public colorMat As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         reduction = New Reduction_Simple(ocvb)
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors)
-        desc = "Build and use a custom color palette - Painterly Effect"
+        ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
@@ -63,11 +63,11 @@ Public Class LUT_Color
     Public paletteMap(256) As cv.Vec3b
     Dim colorMat As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors) ' Create a new color palette here.
-        desc = "Build and use a custom color palette - Painterly Effect"
+        ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim reduction = sliders.trackbar(0).Value
@@ -89,11 +89,11 @@ Public Class LUT_Rebuild
     Inherits VBparent
     Public paletteMap(256 - 1) As Byte
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         For i = 0 To paletteMap.Count - 1
             paletteMap(i) = i
         Next
-        desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
+        ocvb.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)

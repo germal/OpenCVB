@@ -1039,6 +1039,7 @@ Public Class OpenCVB
         parms.intrinsicsLeft = camera.intrinsicsLeft_VB
         parms.intrinsicsRight = camera.intrinsicsRight_VB
         parms.extrinsics = camera.Extrinsics_VB
+        parms.homeDir = HomeDir.FullName
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
@@ -1070,8 +1071,8 @@ Public Class OpenCVB
             If algName = "" Then Exit Sub
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, HomeDir.FullName, myLocation)
-            textDesc = task.ocvb.description
+            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, myLocation)
+            textDesc = task.ocvb.desc
             openFileInitialDirectory = task.ocvb.openFileInitialDirectory
             openFileDialogRequested = task.ocvb.openFileDialogRequested
             openFileinitialStartSetting = task.ocvb.initialStartSetting

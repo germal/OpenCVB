@@ -2,9 +2,9 @@ Imports cv = OpenCvSharp
 Public Class Mouse_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Move the mouse below to show mouse tracking."
-        desc = "Test the mousePoint interface"
+        ocvb.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static lastPoint = New cv.Point
@@ -26,9 +26,9 @@ End Class
 Public Class Mouse_LeftClick
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Left click and drag to draw a rectangle"
-        desc = "Demonstrate what the left-click enables"
+        ocvb.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ocvb.trueText("Left-click and drag to select a region in any of the images." + vbCrLf +
@@ -46,9 +46,9 @@ End Class
 Public Class Mouse_RightClick
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Right click and drag to draw a rectangle"
-        desc = "Demonstrate what the right-click enables"
+        ocvb.desc = "Demonstrate what the right-click enables"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ocvb.trueText("Right-click and drag to select a region in one of the images." + vbCrLf +

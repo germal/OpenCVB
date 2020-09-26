@@ -24,7 +24,7 @@ Public Class Thread_Grid
         Next
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         src = ocvb.color
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
@@ -33,7 +33,7 @@ Public Class Thread_Grid
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
-        desc = "Create a grid for use with parallel.ForEach."
+        ocvb.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static lastWidth As integer
@@ -106,14 +106,14 @@ Public Class Thread_GridTest
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 40
         label1 = ""
-        desc = "Validation test for thread_grid algorithm"
+        ocvb.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)

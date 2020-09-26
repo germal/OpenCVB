@@ -4,12 +4,12 @@ Imports System.Runtime.InteropServices
 Public Class Corners_Harris
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
-        desc = "Find corners using Eigen values and vectors"
+        ocvb.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -60,12 +60,12 @@ Public Class Corners_SubPix
     Inherits VBparent
     Public good As Features_GoodFeatures
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         good = New Features_GoodFeatures(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)
         label1 = "Output of GoodFeatures"
-        desc = "Use PreCornerDetect to find features in the image."
+        ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         good.src = src
@@ -92,12 +92,12 @@ Public Class Corners_PreCornerDetect
     Inherits VBparent
     Dim median As Math_Median_CDF
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         median = New Math_Median_CDF(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
 
-        desc = "Use PreCornerDetect to find features in the image."
+        ocvb.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -130,13 +130,13 @@ End Module
 Public Class Corners_ShiTomasi_CPP
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
         sliders.setupTrackBar(3, "Corner normalize alpha", 1, 255, 127)
-        desc = "Find corners using Eigen values and vectors"
+        ocvb.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(ocvb As VBocvb)

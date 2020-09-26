@@ -6,10 +6,10 @@ Public Class Tracker_Basics
     Public boxObject() As cv.Rect2d
     Public trackerIndex As integer = 5 ' trackerMIL by default...
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
-        desc = "Track an object using cv.Tracking API - tracker algorithm"
+        ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ocvb.trueText("Draw a rectangle around object to be tracked.", 10, 140)
@@ -62,8 +62,8 @@ Public Class Tracker_MultiObject
     Inherits VBparent
     Dim trackers As New List(Of Tracker_Basics)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Track any number of objects simultaneously - tracker algorithm"
+        initParent(ocvb)
+        ocvb.desc = "Track any number of objects simultaneously - tracker algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.drawRect.Width <> 0 Then
@@ -98,7 +98,7 @@ Public Class Tracker_Methods
     Inherits VBparent
     Dim tracker As Tracker_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         tracker = New Tracker_Basics(ocvb)
 
         radio.Setup(ocvb, caller, 8)
@@ -113,7 +113,7 @@ Public Class Tracker_Methods
         radio.check(7).Text = "TrackerTLD"
         radio.check(5).Checked = True ' TrackerMIL is the default
 
-        desc = "Experiment with the different types of tracking methods - apparently not much difference..."
+        ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static saveMethod As integer

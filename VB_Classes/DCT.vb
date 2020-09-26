@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class DCT_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
         sliders.setupTrackBar(1, "Run Length Minimum", 1, 100, 15)
@@ -12,7 +12,7 @@ Public Class DCT_Basics
         radio.check(2).Text = "DCT Flags Inverse"
         radio.check(0).Checked = True
 
-        desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
+        ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         label2 = "Difference from original"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -47,13 +47,13 @@ Public Class DCT_RGB
     Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         dct = New DCT_Basics(ocvb)
         dct.sliders.trackbar(0).Value = 1
 
         label1 = "Reconstituted RGB image"
         label2 = "Difference from original"
-        desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
+        ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim srcPlanes() As cv.Mat = Nothing
@@ -94,11 +94,11 @@ Public Class DCT_Depth
     Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         dct = New DCT_Basics(ocvb)
         dct.sliders.trackbar(0).Value = 1
         label2 = "Subtract DCT inverse from Grayscale depth"
-        desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
+        ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -126,11 +126,11 @@ Public Class DCT_FeatureLess
     Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         dct = New DCT_Basics(ocvb)
         dct.sliders.trackbar(0).Value = 1
-        desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
+        ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -180,7 +180,7 @@ Public Class DCT_Surfaces_debug
     Dim dct As DCT_FeatureLess
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New Font_FlowText(ocvb)
 
         grid = New Thread_Grid(ocvb)
@@ -194,7 +194,7 @@ Public Class DCT_Surfaces_debug
 
         label1 = "Largest flat surface segment stats"
         label2 = "Lower right image identifies potential flat surface"
-        desc = "Find plane equation for a featureless surface - debugging one region for now."
+        ocvb.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -263,13 +263,13 @@ Public Class DCT_CComponents
     Dim dct As DCT_FeatureLess
     Dim cc As CComp_ColorDepth
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         dct = New DCT_FeatureLess(ocvb)
         cc = New CComp_ColorDepth(ocvb)
 
         label1 = "DCT masks colorized with average depth."
         label2 = "DCT mask"
-        desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
+        ocvb.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dct.src = src

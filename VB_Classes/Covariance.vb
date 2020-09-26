@@ -4,9 +4,9 @@ Public Class Covariance_Basics
     Dim random As Random_Points
     Public samples As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         random = New Random_Points(ocvb)
-        desc = "Calculate the covariance of random depth data points."
+        ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim covariance As New cv.Mat, mean = New cv.Mat
@@ -47,10 +47,10 @@ Public Class Covariance_Test
     Inherits VBparent
     Dim covar As Covariance_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         covar = New Covariance_Basics(ocvb)
-        desc = "Test the covariance basics algorithm."
+        ocvb.desc = "Test the covariance basics algorithm."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}

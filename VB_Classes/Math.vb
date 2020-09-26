@@ -2,12 +2,12 @@ Imports cv = OpenCvSharp
 Public Class Math_Subtract
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Red", 0, 255, 255)
         sliders.setupTrackBar(1, "Green", 0, 255, 255)
         sliders.setupTrackBar(2, "Blue", 0, 255, 255)
-        desc = "Invert the image colors using subtract"
+        ocvb.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
@@ -49,10 +49,10 @@ Public Class Math_Median_CDF
     Public rangeMax As Integer = 255
     Public bins As integer = 10
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
-        desc = "Compute the src image median"
+        ocvb.desc = "Compute the src image median"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -84,9 +84,9 @@ Public Class Math_DepthMeanStdev
     Inherits VBparent
     Dim minMax As Depth_Stable
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         minMax = New Depth_Stable(ocvb)
-        desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
+        ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         minMax.src = src
@@ -114,11 +114,11 @@ Public Class Math_RGBCorrelation
     Dim flow As Font_FlowText
     Dim corr As MatchTemplate_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New Font_FlowText(ocvb)
 
         corr = New MatchTemplate_Basics(ocvb)
-        desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
+        ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim split = src.Split()

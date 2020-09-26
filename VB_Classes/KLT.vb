@@ -8,7 +8,7 @@ Public Class KLT_Basics
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
         sliders.setupTrackBar(1, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
@@ -19,7 +19,7 @@ Public Class KLT_Basics
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
-        desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
+        ocvb.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static prevGray As New cv.Mat
@@ -88,9 +88,9 @@ Public Class KLT_OpticalFlow
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         klt = New KLT_Basics(ocvb)
-        desc = "KLT optical flow - needs more work"
+        ocvb.desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         klt.src = src

@@ -11,7 +11,7 @@ Public Class EMax_Basics
     Public gridWidthSlider As System.Windows.Forms.TrackBar
     Public gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show EMax input in output"
 
@@ -32,7 +32,7 @@ Public Class EMax_Basics
         radio.check(2).Text = "EMax matrix type Generic"
         radio.check(0).Checked = True
 
-        desc = "OpenCV expectation maximization example."
+        ocvb.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -125,13 +125,13 @@ Public Class EMax_CPP
     Dim inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         basics = New EMax_Basics(ocvb)
 
         EMax_Basics = EMax_Basics_Open()
 
         label2 = "Emax regions around clusters"
-        desc = "Use EMax - Expectation Maximization - to classify a series of points"
+        ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         basics.Run(ocvb)
@@ -186,7 +186,7 @@ Public Class EMax_Centroids
     Public emaxCPP As EMax_CPP
     Public flood As FloodFill_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         flood = New FloodFill_Basics(ocvb)
         Dim lowDiffslider = findSlider("FloodFill LoDiff")
@@ -197,7 +197,7 @@ Public Class EMax_Centroids
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         gridWidthSlider.Value = src.Width * 170 / 640
 
-        desc = "Get the Emax cluster centroids using floodfill "
+        ocvb.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run(ocvb As VBocvb)
         emaxCPP.Run(ocvb)
@@ -226,7 +226,7 @@ Public Class EMax_PointTracker
     Dim pTrack As Kalman_PointTracker
     Dim emax As EMax_Centroids
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         emax = New EMax_Centroids(ocvb)
 
@@ -237,7 +237,7 @@ Public Class EMax_PointTracker
         floodMinSlider.Value = 100
 
         label1 = "Original before KNN/Kalman tracking (red=previous)"
-        desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
+        ocvb.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         emax.Run(ocvb)

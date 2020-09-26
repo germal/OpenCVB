@@ -37,8 +37,6 @@ Public Class VBparent : Implements IDisposable
     Public label2 As String
     Public msRNG As New System.Random
     Dim algorithm As Object
-    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
-    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public fontsize As Single
     Public resFactor As Single ' resolution is often a factor in sizing tasks.
     Public caller As String
@@ -47,25 +45,8 @@ Public Class VBparent : Implements IDisposable
     Public Const MAXZ_DEFAULT = 4
     Public maxZ As Single = MAXZ_DEFAULT
     Public desc As String
-    Public Sub setCaller(ocvb As VBocvb)
-        caller = Me.GetType.Name
-        label1 = caller
-        Dim stackTrace = Environment.StackTrace
-        Dim lines() = stackTrace.Split(vbCrLf)
-        Dim callStack = ""
-        For i = 0 To lines.Count - 1
-            lines(i) = Trim(lines(i))
-            Dim offset = InStr(lines(i), "VB_Classes.")
-            If offset > 0 Then
-                Dim partLine = Mid(lines(i), offset + 11)
-                If partLine.StartsWith("algorithmList.createAlgorithm") Then Exit For
-                Dim split() = partLine.Split("\")
-                partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
-                If Not (partLine.StartsWith("VBparent") Or partLine.StartsWith("ActiveTask")) Then
-                    callStack = partLine + "\" + callStack
-                End If
-            End If
-        Next
+    Dim callStack = ""
+    Public Sub initParent(ocvb As VBocvb)
         If ocvb.callTrace.Count = 0 Then
             standalone = True
             ocvb.callTrace.Clear()
@@ -76,22 +57,22 @@ Public Class VBparent : Implements IDisposable
         End If
 
         src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        Select Case src.Width
+        dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        Select Case ocvb.color.Width
             Case 320
-                fontsize = src.Width / 1280
+                fontsize = ocvb.color.Width / 1280
                 resFactor = 0.1
             Case 640
-                fontsize = src.Width / 1280
+                fontsize = ocvb.color.Width / 1280
                 resFactor = 0.3
             Case 1280
                 fontsize = 1
                 resFactor = 1
         End Select
 
-        topCameraPoint = New cv.Point(src.Height, src.Height)
-        sideCameraPoint = New cv.Point((src.Width - src.Height) / 2, src.Height - (src.Width - src.Height) / 2)
+        topCameraPoint = New cv.Point(CInt(src.Height), CInt(src.Height))
+        sideCameraPoint = New cv.Point(CInt((src.Width - src.Height) / 2), CInt(src.Height - (src.Width - src.Height) / 2))
     End Sub
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
     Public Const QUAD1 = 1
@@ -193,7 +174,23 @@ Public Class VBparent : Implements IDisposable
 #End If
     Public Sub New()
         algorithm = Me
-
+        caller = Me.GetType.Name
+        label1 = caller
+        Dim stackTrace = Environment.StackTrace
+        Dim lines() = stackTrace.Split(vbCrLf)
+        For i = 0 To lines.Count - 1
+            lines(i) = Trim(lines(i))
+            Dim offset = InStr(lines(i), "VB_Classes.")
+            If offset > 0 Then
+                Dim partLine = Mid(lines(i), offset + 11)
+                If partLine.StartsWith("algorithmList.createAlgorithm") Then Exit For
+                Dim split() = partLine.Split("\")
+                partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
+                If Not (partLine.StartsWith("VBparent") Or partLine.StartsWith("ActiveTask")) Then
+                    callStack = partLine + "\" + callStack
+                End If
+            End If
+        Next
     End Sub
     Private Function MakeSureImage8uC3(ByVal src As cv.Mat) As cv.Mat
         If src.Type = cv.MatType.CV_32F Then

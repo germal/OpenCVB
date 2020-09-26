@@ -7,14 +7,14 @@ Public Class AlphaChannel_Basics
     Dim fg As Depth_InRange
     Dim alpha As New OptionsAlphaBlend
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         fg = New Depth_InRange(ocvb)
 
         alpha.Show()
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
 
-        desc = "Use the the Windows 10 alpha channel to separate foreground and background"
+        ocvb.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fg.Run(ocvb)
@@ -37,14 +37,14 @@ Public Class AlphaChannel_Blend
     Inherits VBparent
     Dim fg As Depth_InRange
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         fg = New Depth_InRange(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)
 
-        desc = "Use alpha blending to smoothly separate background from foreground"
+        ocvb.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fg.Run(ocvb)

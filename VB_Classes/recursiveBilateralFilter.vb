@@ -20,11 +20,11 @@ Public Class RecursiveBilateralFilter_CPP
     Dim srcData(0) As Byte
     Dim rbf As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)
         rbf = RecursiveBilateralFilter_Open()
-        desc = "Apply the recursive bilateral filter"
+        ocvb.desc = "Apply the recursive bilateral filter"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If srcData.Length <> src.Total * src.ElemSize Then ReDim srcData(src.Total * src.ElemSize - 1)

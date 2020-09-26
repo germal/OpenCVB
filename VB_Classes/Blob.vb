@@ -8,7 +8,7 @@ Public Class Blob_Input
     Dim Mats As Mat_4to1
     Public updateFrequency = 30
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         rectangles = New Draw_rotatedRectangles(ocvb)
         circles = New Draw_Circles(ocvb)
         ellipses = New Draw_Ellipses(ocvb)
@@ -29,7 +29,7 @@ Public Class Blob_Input
 
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
-        desc = "Test simple Blob Detector."
+        ocvb.desc = "Test simple Blob Detector."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         rectangles.src = src
@@ -61,7 +61,7 @@ Public Class Blob_Detector_CS
     Dim input As Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         input = New Blob_Input(ocvb)
         input.updateFrequency = 1 ' it is pretty fast but sloppy...
         check.Setup(ocvb, caller, 5)
@@ -113,11 +113,11 @@ Public Class Blob_RenderBlobs
     Inherits VBparent
     Dim input As Blob_Input
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         input = New Blob_Input(ocvb)
         input.updateFrequency = 1
 
-        desc = "Use connected components to find blobs."
+        ocvb.desc = "Use connected components to find blobs."
         label1 = "Input blobs"
         label2 = "Showing only the largest blob in test data"
     End Sub
@@ -158,7 +158,7 @@ Public Class Blob_DepthClusters
     Public flood As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         shadow = New Depth_Holes(ocvb)
 
@@ -169,7 +169,7 @@ Public Class Blob_DepthClusters
         flood.fBasics.sliders.trackbar(2).Value = 1 ' pixels are exact.
 
         label2 = "Backprojection of identified histogram depth clusters."
-        desc = "Highlight the distinct histogram blobs found with depth clustering."
+        ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
@@ -202,9 +202,9 @@ Public Class Blob_Rectangles
         End Function
     End Class
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blobs = New Blob_Largest(ocvb)
-        desc = "Get the blobs and their masks and outline them with a rectangle."
+        ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         blobs.Run(ocvb)
@@ -251,12 +251,12 @@ Public Class Blob_Largest
     Public kalman As Kalman_Basics
     Public blobIndex As integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(4 - 1)
 
         blobs = New Blob_DepthClusters(ocvb)
-        desc = "Gather all the blob data and display the largest."
+        ocvb.desc = "Gather all the blob data and display the largest."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         blobs.Run(ocvb)
@@ -286,10 +286,10 @@ Public Class Blob_LargestDepthCluster
     Inherits VBparent
     Dim blobs As Blob_DepthClusters
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blobs = New Blob_DepthClusters(ocvb)
 
-        desc = "Display only the largest depth cluster (might not be contiguous.)"
+        ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         blobs.src = src

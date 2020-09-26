@@ -6,7 +6,7 @@ Public Class LineDetector_Basics
     Dim ld As cv.XImgProc.FastLineDetector
     Public lines As cv.Vec4f()
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
         sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
@@ -15,7 +15,7 @@ Public Class LineDetector_Basics
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
+        ocvb.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         lines = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -45,18 +45,18 @@ End Class
 
 Module fastLineDetector_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function lineDetectorFast_Run(image As IntPtr, rows As integer, cols As integer, length_threshold As integer, distance_threshold As Single, canny_th1 As integer, canny_th2 As integer,
-                                             canny_aperture_size As integer, do_merge As Boolean) As integer
+    Public Function lineDetectorFast_Run(image As IntPtr, rows As Integer, cols As Integer, length_threshold As Integer, distance_threshold As Single, canny_th1 As Integer, canny_th2 As Integer,
+                                             canny_aperture_size As Integer, do_merge As Boolean) As Integer
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function lineDetector_Run(image As IntPtr, rows As integer, cols As integer) As integer
+    Public Function lineDetector_Run(image As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function lineDetector_Lines() As IntPtr
     End Function
 
-    Public Sub find3DLineSegment(ocvb As VBocvb, dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As integer)
+    Public Sub find3DLineSegment(ocvb As VBocvb, dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Integer)
         Dim pt1 = New cv.Point(aa(0), aa(1))
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
@@ -72,8 +72,8 @@ Module fastLineDetector_Exports
         If roi.Y + roi.Height >= _mask.Height Then roi.Height = _mask.Height - roi.Y - 1
         Dim mask = _mask(roi).Clone()
         Dim depth32f = _depth32f(roi).Clone()
-        Dim totalPoints As integer
-        Dim skipPoints As integer
+        Dim totalPoints As Integer
+        Dim skipPoints As Integer
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
                 If mask.Get(Of Byte)(y, x) = 1 Then
@@ -117,7 +117,7 @@ Module fastLineDetector_Exports
             End If
         End If
     End Sub
-    Public Function segment3D(worldDepth As List(Of cv.Vec6f), ByRef skipPoints As integer) As cv.Vec6f()
+    Public Function segment3D(worldDepth As List(Of cv.Vec6f), ByRef skipPoints As Integer) As cv.Vec6f()
         ' by construction, x and y are already on a line.  Compute the average z delta.  Eliminate outliers with that average.
         Dim sum As Double = 0
         Dim midPoint As Double
@@ -127,7 +127,7 @@ Module fastLineDetector_Exports
         Next
         Dim avgDelta = sum / worldDepth.Count * 3
         midPoint /= worldDepth.Count
-        Dim midIndex As integer = -1
+        Dim midIndex As Integer = -1
         ' find a point which is certain to be on the line - something close the centroid
         For i = worldDepth.Count / 4 To worldDepth.Count - 1
             If Math.Abs(worldDepth(i).Item2 - midPoint) < avgDelta Then
@@ -217,7 +217,7 @@ Public Class lineDetector_FLD_CPP
     Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
     Public lineMat As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller, 6)
         sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
@@ -233,7 +233,7 @@ Public Class lineDetector_FLD_CPP
         check.Box(1).Text = "FLD - Draw lines on input image"
         check.Box(1).Checked = True
 
-        desc = "Basics for a Fast Line Detector"
+        ocvb.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         sortedLines.Clear()
@@ -268,14 +268,14 @@ Public Class LineDetector_3D_LongestLine
     Inherits VBparent
     Dim lines As lineDetector_FLD_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
-        desc = "Identify planes using the lines present in the rgb image."
+        ocvb.desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -288,7 +288,7 @@ Public Class LineDetector_3D_LongestLine
 
         If lines.sortedLines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-            Dim maskLineWidth As integer = sliders.trackbar(0).Value
+            Dim maskLineWidth As Integer = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
             find3DLineSegment(ocvb, dst1, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
@@ -302,14 +302,14 @@ Public Class LineDetector_3D_FLD_MT
     Inherits VBparent
     Dim lines As lineDetector_FLD_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         lines = New lineDetector_FLD_CPP(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
-        desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
+        ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -321,7 +321,7 @@ Public Class LineDetector_3D_FLD_MT
         Dim depth32f = getDepth32f(ocvb)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
-        Dim maskLineWidth As integer = sliders.trackbar(0).Value
+        Dim maskLineWidth As Integer = sliders.trackbar(0).Value
         Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(lines.sortedLines.Count - 20, lines.sortedLines.Count,
             Sub(i)
@@ -338,7 +338,7 @@ Public Class LineDetector_3D_FitLineZ
     Inherits VBparent
     Dim linesFLD As lineDetector_FLD_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         linesFLD = New lineDetector_FLD_CPP(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -351,7 +351,7 @@ Public Class LineDetector_3D_FitLineZ
         check.Box(1).Text = "Display only the longest line"
         check.Box(1).Checked = True
 
-        desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
+        ocvb.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -368,7 +368,7 @@ Public Class LineDetector_3D_FitLineZ
 
         If sortedlines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will likely get full length.
-            Dim maskLineWidth As integer = sliders.trackbar(0).Value
+            Dim maskLineWidth As Integer = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
 
             Dim longestLineOnly As Boolean = check.Box(1).Checked
@@ -445,7 +445,7 @@ Public Class lineDetector_FLD
     Inherits VBparent
     Public lines As New List(Of cv.Vec4f)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller, 6)
         sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
@@ -458,7 +458,7 @@ Public Class lineDetector_FLD
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
-        desc = "A Fast Line Detector"
+        ocvb.desc = "A Fast Line Detector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         lines.Clear()
@@ -510,12 +510,12 @@ Public Class LineDetector_LongLines
     Inherits VBparent
     Dim lDetect As LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         lDetect = New LineDetector_Basics(ocvb)
 
         label1 = "Longest lines using depth data"
         label2 = "Longest lines in pixels (yellow)"
-        desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
+        ocvb.desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         lDetect.src = src
@@ -578,13 +578,13 @@ Public Class LineDetector_Reduction
     Dim lDetect As LineDetector_Basics
     Dim reduction As Reduction_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         lDetect = New LineDetector_Basics(ocvb)
         reduction = New Reduction_Basics(ocvb)
 
         label1 = "Output of line detection using reduced input"
         label2 = "Output of reduction_basics"
-        desc = "Use the reduced rgb image as input to the line detector"
+        ocvb.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src

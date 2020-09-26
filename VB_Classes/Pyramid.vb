@@ -3,10 +3,10 @@ Imports cv = OpenCvSharp
 Public Class Pyramid_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
-        desc = "Use pyrup and pyrdown to zoom in and out of an image."
+        ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim zoom = sliders.trackbar(0).Value
@@ -35,10 +35,10 @@ Public Class Pyramid_Filter
     Inherits VBparent
     Dim laplace As Laplacian_PyramidFilter
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         laplace = New Laplacian_PyramidFilter(ocvb)
 
-        desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
+        ocvb.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         laplace.src = src

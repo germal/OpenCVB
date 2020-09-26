@@ -3,13 +3,13 @@ Public Class Resize_Basics
     Inherits VBparent
     Public newSize As cv.Size
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         SetInterpolationRadioButtons(ocvb, caller, radio, "Resize")
         ' warp is not allowed in resize
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
 
-        desc = "Resize with different options and compare them"
+        ocvb.desc = "Resize with different options and compare them"
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
@@ -38,13 +38,13 @@ Public Class Resize_Percentage
     Inherits VBparent
     Public resizeOptions As Resize_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         resizeOptions = New Resize_Basics(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
 
-        desc = "Resize by a percentage of the image."
+        ocvb.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)

@@ -5,16 +5,16 @@ Public Class FREAK_Basics
     Inherits VBparent
     Dim orb As ORB_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         orb = New ORB_Basics(ocvb)
-        desc = "Find keypoints using ORB and FREAK algorithm"
+        ocvb.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         orb.src = src
         orb.Run(ocvb)
 
         Dim freak = cv.XFeatures2D.FREAK.Create()
-        Dim fDesc = New cv.Mat
+        Dim fdesc = New cv.Mat
         freak.Compute(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), orb.keypoints, fDesc)
 
         dst1 = src.Clone()

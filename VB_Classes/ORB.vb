@@ -5,11 +5,11 @@ Public Class ORB_Basics
     Public keypoints() As cv.KeyPoint
     Dim orb As cv.ORB
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
 
-        desc = "Find keypoints using ORB"
+        ocvb.desc = "Find keypoints using ORB"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

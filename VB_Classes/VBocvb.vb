@@ -23,7 +23,6 @@ Public Class VBocvb
     Public mousePicTag As Integer ' which image was the mouse in?
     Public mousePoint As cv.Point ' trace any mouse movements using this.
 
-    Public PythonExe As String
     Public PythonFileName As String
     Public TTtextData As List(Of TTtext)
 
@@ -32,9 +31,6 @@ Public Class VBocvb
     Public parentAlgorithm As String
     Public callTrace As New List(Of String)
 
-    Public description As String
-    Public HomeDir As String
-    Public testAllRunning As Boolean
     Public transformationMatrix() As Single
     Public fixedColors(255) As cv.Scalar
 
@@ -63,6 +59,7 @@ Public Class VBocvb
     Public CPU_FrameTime As Double
     Public scalarColors(255) As cv.Scalar
     Public vecColors(255) As cv.Vec3b
+    Public desc As String
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

@@ -5,7 +5,7 @@ Imports cv = OpenCvSharp
 Public Class InPaint_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
 
@@ -14,7 +14,7 @@ Public Class InPaint_Basics
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
 
-        desc = "Create a flaw in an image and then use inPaint to mask it."
+        ocvb.desc = "Create a flaw in an image and then use inPaint to mask it."
         label2 = "Repaired Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -39,7 +39,7 @@ Public Class InPaint_Noise
     Inherits VBparent
     Dim noise As Draw_Noise
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         noise = New Draw_Noise(ocvb)
 
         radio.Setup(ocvb, caller, 2)
@@ -47,7 +47,7 @@ Public Class InPaint_Noise
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
 
-        desc = "Create noise in an image and then use inPaint to remove it."
+        ocvb.desc = "Create noise in an image and then use inPaint to remove it."
         label2 = "Repaired Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)

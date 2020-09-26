@@ -9,7 +9,7 @@ Usage:
 '''
 import numpy as np
 import cv2 as cv
-desc = "Painterly Effect"
+ocvb.desc = "Painterly Effect"
 title_window = 'TextureFlow.py'
 
 def main():

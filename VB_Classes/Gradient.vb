@@ -7,9 +7,9 @@ Public Class Gradient_Basics
     Inherits VBparent
     Public sobel As Edges_Sobel
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sobel = New Edges_Sobel(ocvb)
-        desc = "Use phase to compute gradient"
+        ocvb.desc = "Use phase to compute gradient"
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -34,9 +34,9 @@ Public Class Gradient_Depth
     Inherits VBparent
     Dim sobel As Edges_Sobel
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sobel = New Edges_Sobel(ocvb)
-        desc = "Use phase to compute gradient on depth image"
+        ocvb.desc = "Use phase to compute gradient on depth image"
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -63,11 +63,11 @@ Public Class Gradient_Flatland
     Inherits VBparent
     Dim grade As Gradient_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grade = New Gradient_Basics(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
-        desc = "Reduced grayscale shows isobars in depth."
+        ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
@@ -93,7 +93,7 @@ Public Class Gradient_CartToPolar
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         basics = New Gradient_Basics(ocvb)
         basics.sobel.sliders.trackbar(0).Value = 1
 
@@ -101,7 +101,7 @@ Public Class Gradient_CartToPolar
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
-        desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
@@ -132,7 +132,7 @@ End Class
 '    Public magnitude As New cv.Mat
 '    Public angle As New cv.Mat
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
+'        initParent(ocvb)
 '        gradient = New Gradient_Basics(ocvb)
 '        gradient.sobel.sliders.trackbar(0).Value = 1
 
@@ -141,7 +141,7 @@ End Class
 
 '        label1 = "CartToPolar Magnitude Output Normalized"
 '        label2 = "CartToPolar Angle Output"
-'        desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+'        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)

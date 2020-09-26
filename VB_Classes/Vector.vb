@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class Vector_Magnitude
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Compute Euclidian and Manhattan Distance on a single vector."
+        initParent(ocvb)
+        ocvb.desc = "Compute Euclidian and Manhattan Distance on a single vector."
         label1 = "Vector Magnitude"
     End Sub
     Public Sub Run(ocvb As VBocvb)

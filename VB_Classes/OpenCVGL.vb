@@ -26,10 +26,10 @@ Public Class OpenCVGL_Image_CPP
     Dim rgbData(0) As Byte
     Dim pointCloudData(0) As Byte
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         imu = New IMU_Basics(ocvb)
 
-        If ocvb.testAllRunning = False Then
+        If ocvb.parms.testAllRunning = False Then
             setOpenGLsliders(ocvb, caller, sliders)
             sliders.trackbar(10).Value = -10 ' eye.z
             sliders.trackbar(0).Value = 30 ' FOV
@@ -39,10 +39,10 @@ Public Class OpenCVGL_Image_CPP
 
             OpenCVGL_Image_Open(1280, 720)
         End If
-        desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
+        ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.testAllRunning Then
+        If ocvb.parms.testAllRunning Then
             ' It runs fine but after several cycles, it will fail with an external exception.
             ' Only happens on 'Test All' runs.  Runs fine otherwise.
             ocvb.trueText("OpenCVGL only fails when running 'Test All'.  Can't get it to fail otherwise." + vbCrLf +

@@ -24,8 +24,8 @@ End Module
 '    Dim rightData(1 - 1) As Byte
 '    Dim cPtr As IntPtr
 '    Public Sub New(ocvb As VBocvb)
-'        setCaller(ocvb)
-'        desc = "Find depth using the semi-global matching algorithm."
+'        initParent(ocvb)
+'        ocvb.desc = "Find depth using the semi-global matching algorithm."
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
 '        If ocvb.frameCount < 10 Then Exit Sub

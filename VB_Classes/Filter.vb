@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class Filter_Laplacian
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use a filter to approximate the Laplacian derivative."
+        initParent(ocvb)
+        ocvb.desc = "Use a filter to approximate the Laplacian derivative."
         label1 = "Sharpened image using Filter2D output"
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
@@ -24,7 +24,7 @@ End Class
 Public Class Filter_NormalizedKernel
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "INF"
         radio.check(1).Text = "L1"
@@ -33,7 +33,7 @@ Public Class Filter_NormalizedKernel
         radio.check(3).Text = "MinMax"
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
-        desc = "Create a normalized kernel and use it."
+        ocvb.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
@@ -63,10 +63,10 @@ End Class
 Public Class Filter_Normalized2D
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Filter_Normalized2D kernel size", 1, 21, 3)
-        desc = "Create and apply a normalized kernel."
+        ocvb.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = If(standalone, (ocvb.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
@@ -83,7 +83,7 @@ End Class
 Public Class Filter_SepFilter2D
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
         check.Box(0).Checked = True
@@ -93,7 +93,7 @@ Public Class Filter_SepFilter2D
         sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
         sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)
         label1 = "Gaussian Blur result"
-        desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
+        ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim xDim = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

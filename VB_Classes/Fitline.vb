@@ -5,7 +5,7 @@ Public Class Fitline_Basics
     Public draw As Draw_Line
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         draw = New Draw_Line(ocvb)
         draw.sliders.trackbar(0).Value = 2
         hideForm("Draw_Line Slider Options")
@@ -14,7 +14,7 @@ Public Class Fitline_Basics
         sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
         sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
 
-        desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
+        ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -53,9 +53,9 @@ Public Class Fitline_3DBasics_MT
     Inherits VBparent
     Dim hlines As Hough_Lines_MT
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         hlines = New Hough_Lines_MT(ocvb)
-        desc = "Use visual lines to find 3D lines."
+        ocvb.desc = "Use visual lines to find 3D lines."
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -115,7 +115,7 @@ Public Class Fitline_RawInput
     Public m As Single
     Public bb As Single
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random point count", 0, 500, 100)
         sliders.setupTrackBar(1, "Line Point Count", 0, 500, 20)
@@ -127,11 +127,11 @@ Public Class Fitline_RawInput
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
-        desc = "Generate a noisy line in a field of random data."
+        ocvb.desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
-            If ocvb.testAllRunning = False Then check.Box(1).Checked = False
+            If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
             Dim dotSize = 2
             Dim width = src.Width
@@ -191,13 +191,13 @@ Public Class Fitline_EigenFit
     Inherits VBparent
     Dim noisyLine As Fitline_RawInput
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         noisyLine = New Fitline_RawInput(ocvb)
         noisyLine.sliders.trackbar(0).Value = 30
         noisyLine.sliders.trackbar(1).Value = 400
         label1 = "blue=GT, red=fitline, yellow=EigenFit"
         label2 = "Raw input (use sliders below to explore)"
-        desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
+        ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)

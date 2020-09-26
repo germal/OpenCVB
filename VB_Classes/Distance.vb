@@ -4,7 +4,7 @@ Public Class Distance_Basics
     Inherits VBparent
     Dim foreground As kMeans_Depth_FG_BG
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
@@ -14,7 +14,7 @@ Public Class Distance_Basics
         foreground = New kMeans_Depth_FG_BG(ocvb)
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
-        desc = "Distance algorithm basics."
+        ocvb.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         foreground.Run(ocvb)

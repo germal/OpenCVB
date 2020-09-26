@@ -6,12 +6,12 @@ Public Class Pixel_GetSet
     Inherits VBparent
     Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mats = New Mat_4to1(ocvb)
 
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
         label2 = "Click any quadrant at left to view it below"
-        desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
+        ocvb.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim rows = src.Height

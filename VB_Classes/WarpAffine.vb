@@ -7,8 +7,8 @@ Public Class WarpAffine_Captcha
     Const captchaLength = 8
     Dim rng As New System.Random
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use OpenCV to build a captcha Turing test."
+        initParent(ocvb)
+        ocvb.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
         For n = 0 To 100
@@ -90,13 +90,13 @@ End Class
 Public Class WarpAffine_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle", 0, 360, 10)
 
         SetInterpolationRadioButtons(ocvb, caller, radio, "WarpAffine")
 
-        desc = "Use WarpAffine to transform input images."
+        ocvb.desc = "Use WarpAffine to transform input images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim warpFlag = getInterpolationRadioButtons(radio)
@@ -122,12 +122,12 @@ Public Class WarpAffine_3Points
     Inherits VBparent
     Dim triangle As Area_MinTriangle_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         triangle = New Area_MinTriangle_CPP(ocvb)
         triangle.sliders.trackbar(0).Value = 20
         triangle.sliders.trackbar(1).Value = 150
 
-        desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
+        ocvb.desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
         label1 = "Triangles define the affine transform"
         label2 = "Image with affine transform applied"
     End Sub
@@ -197,10 +197,10 @@ Public Class WarpAffine_4Points
     Inherits VBparent
     Dim rect As Area_MinRect
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         rect = New Area_MinRect(ocvb)
 
-        desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
+        ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         label1 = "Color image with perspective transform applied"
     End Sub
     Public Sub Run(ocvb As VBocvb)

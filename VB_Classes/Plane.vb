@@ -98,14 +98,14 @@ Public Class Plane_Detect
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 64
 
-        desc = "Identify planes in each segment."
+        ocvb.desc = "Identify planes in each segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -173,14 +173,14 @@ Public Class Plane_DetectDebug
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 32
         gridHeightSlider.Value = 32
 
-        desc = "Debug code to identify planes in just one segment."
+        ocvb.desc = "Debug code to identify planes in just one segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As VBocvb)

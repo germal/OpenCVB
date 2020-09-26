@@ -16,7 +16,7 @@ Public Class ProCon_Basics
     Public pduration As Integer
     Public cduration As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Buffer Size", 1, 100, buffer.Length)
@@ -36,7 +36,7 @@ Public Class ProCon_Basics
         c.Name = "Consumer"
         c.Start()
 
-        desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced."
+        ocvb.desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced."
     End Sub
     Public Function success(index As Integer) As Integer
         Return (index + 1) Mod buffer.Length
@@ -100,11 +100,11 @@ Public Class ProCon_Variation
     Dim procon As ProCon_Basics
     Dim frameCount As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         procon = New ProCon_Basics(ocvb)
         procon.sliders.trackbar(1).Enabled = False ' no duration for the producer because algorithm task is the producer.
         procon.terminateProducer = True ' we don't want 2 producer tasks...
-        desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
+        ocvb.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         SyncLock procon.mutex

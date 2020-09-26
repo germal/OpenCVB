@@ -7,11 +7,11 @@ Public Class Video_Basics
     Public image As New cv.Mat
     Public captureVideo As New cv.VideoCapture
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         ocvb.openFileDialogRequested = True
-        ocvb.openFileInitialDirectory = ocvb.HomeDir + "/Data/"
-        ocvb.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
+        ocvb.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
         ocvb.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
         ocvb.openFileFilterIndex = 1
         ocvb.openFileDialogTitle = "Select a video file for input"
@@ -22,7 +22,7 @@ Public Class Video_Basics
 
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
         label1 = fileInfo.Name
-        desc = "Show a video file"
+        ocvb.desc = "Show a video file"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim fileInfo = New FileInfo(ocvb.openFileDialogName)
@@ -58,14 +58,14 @@ Public Class Video_CarCounting
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         bgSub = New BGSubtract_MOG(ocvb)
 
         video = New Video_Basics(ocvb)
 
         flow = New Font_FlowText(ocvb)
 
-        desc = "Count cars in a video file"
+        ocvb.desc = "Count cars in a video file"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         video.Run(ocvb)
@@ -115,13 +115,13 @@ Public Class Video_CarCComp
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         bgSub = New BGSubtract_MOG(ocvb)
         cc = New CComp_Basics(ocvb)
         video = New Video_Basics(ocvb)
 
-        desc = "Outline cars with a rectangle"
+        ocvb.desc = "Outline cars with a rectangle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         video.Run(ocvb)
@@ -146,13 +146,13 @@ Public Class Video_MinRect
     Public bgSub As BGSubtract_MOG
     Public contours As cv.Point()()
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         video = New Video_Basics(ocvb)
-        video.srcVideo = ocvb.homeDir + "Data/CarsDrivingUnderBridge.mp4"
+        video.srcVideo = ocvb.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(ocvb)
 
         bgSub = New BGSubtract_MOG(ocvb)
-        desc = "Find area of car outline - example of using minAreaRect"
+        ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         video.Run(ocvb)
@@ -181,9 +181,9 @@ Public Class Video_MinCircle
     Inherits VBparent
     Dim input As Video_MinRect
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         input = New Video_MinRect(ocvb)
-        desc = "Find area of car outline - example of using MinEnclosingCircle"
+        ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         input.Run(ocvb)

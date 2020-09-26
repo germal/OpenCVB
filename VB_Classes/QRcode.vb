@@ -6,16 +6,16 @@ Public Class QRcode_Basics
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        Dim fileInfo = New FileInfo(ocvb.homeDir + "data/QRcode1.png")
+        initParent(ocvb)
+        Dim fileInfo = New FileInfo(ocvb.parms.homeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
-        fileInfo = New FileInfo(ocvb.homeDir + "Data/QRCode2.png")
+        fileInfo = New FileInfo(ocvb.parms.homeDir + "Data/QRCode2.png")
         If fileInfo.Exists Then qrInput2 = cv.Cv2.ImRead(fileInfo.FullName)
         If src.Width < 480 Then ' for the smallest configurations the default size can be too big!
             qrInput1 = qrInput1.Resize(New cv.Size(120, 160))
             qrInput2 = qrInput2.Resize(New cv.Size(120, 160))
         End If
-        desc = "Read a QR code"
+        ocvb.desc = "Read a QR code"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))

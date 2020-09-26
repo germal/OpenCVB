@@ -10,8 +10,8 @@ End Module
 Public Class Rodrigues_ValidateKinect
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Validate the Rodrigues calibration for Kinect camera (only)"
+        initParent(ocvb)
+        ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.Kinect4AzureCam Then
@@ -38,8 +38,8 @@ End Class
 Public Class Rodrigues_ValidateVector
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
+        initParent(ocvb)
+        ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.StereoLabsZED2 And
@@ -83,8 +83,8 @@ End Class
 Public Class Rodrigues_RotationMatrix
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Display the contents of the IMU Rotation Matrix"
+        initParent(ocvb)
+        ocvb.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim rot = ocvb.parms.IMU_RotationMatrix
@@ -114,8 +114,8 @@ End Class
 Public Class Rodrigues_Extrinsics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
+        initParent(ocvb)
+        ocvb.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim rot = ocvb.parms.extrinsics.rotation

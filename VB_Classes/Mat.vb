@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Mat_Repeat
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use the repeat method to replicate data."
+        initParent(ocvb)
+        ocvb.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -19,12 +19,12 @@ Public Class Mat_PointToMat
     Inherits VBparent
     Dim mask As Random_Points
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mask = New Random_Points(ocvb)
         mask.plotPoints = True
         label1 = "Random_Points points (original)"
         label2 = "Random_Points points after format change"
-        desc = "Convert pointf3 into a mat of points"
+        ocvb.desc = "Convert pointf3 into a mat of points"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         mask.Run(ocvb) ' generates a set of points
@@ -46,9 +46,9 @@ Public Class Mat_MatToPoint
     Inherits VBparent
     Dim mask As Random_Points
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mask = New Random_Points(ocvb)
-        desc = "Convert a mat into a vector of points."
+        ocvb.desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -73,8 +73,8 @@ End Class
 Public Class Mat_Transpose
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Transpose a Mat and show results."
+        initParent(ocvb)
+        ocvb.desc = "Transpose a Mat and show results."
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
@@ -92,10 +92,10 @@ End Class
 Public Class Mat_Tricks
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
-        desc = "Show some Mat tricks."
+        ocvb.desc = "Show some Mat tricks."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
@@ -117,7 +117,7 @@ Public Class Mat_4to1
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mat1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
@@ -126,7 +126,7 @@ Public Class Mat_4to1
 
         label1 = "Combining 4 images into one"
         label2 = "Click any quadrant at left to view it below"
-        desc = "Use one Mat for up to 4 images"
+        ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
@@ -167,14 +167,14 @@ Public Class Mat_2to1
     Public mat() = {mat1, mat2}
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mat1 = New cv.Mat(New cv.Size(src.Rows, src.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
         dst1 = dst2
 
         label1 = ""
-        desc = "Fill a Mat with 2 images"
+        ocvb.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static nSize = New cv.Size(src.Width, src.Height / 2)
@@ -206,7 +206,7 @@ Public Class Mat_ImageXYZ_MT
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -222,7 +222,7 @@ Public Class Mat_ImageXYZ_MT
         Next
         cv.Cv2.Split(xyDepth, xyzPlanes)
 
-        desc = "Create a cv.Point3f vector with x, y, and z."
+        ocvb.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -246,9 +246,9 @@ End Class
 Public Class Mat_RowColRange
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "BitwiseNot of RowRange and ColRange"
-        desc = "Perform operation on a range of cols and/or Rows."
+        ocvb.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim midX = src.Width / 2
@@ -266,9 +266,9 @@ End Class
 Public Class Mat_Managed
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Color change is in the managed cv.vec3b array"
-        desc = "There is a limited ability to use Mat data in Managed code directly."
+        ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static autoRand As New Random()

@@ -3,10 +3,10 @@ Public Class Mean_Basics
     Inherits VBparent
     Dim images As New List(Of cv.Mat)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Mean - number of input images", 1, 100, 10)
-        desc = "Create an image that is the mean of x number of previous images."
+        ocvb.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static saveImageCount = sliders.trackbar(0).Value

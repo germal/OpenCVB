@@ -3,10 +3,10 @@ Imports System.Runtime.InteropServices
 Public Class Transform_Resize
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
-        desc = "Resize an image based on the slider value."
+        ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim resizeFactor = sliders.trackbar(0).Value / 100
@@ -30,13 +30,13 @@ End Class
 Public Class Transform_Rotate
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle", 0, 360, 30)
         sliders.setupTrackBar(1, "Scale Factor", 1, 100, 100)
         sliders.setupTrackBar(2, "Rotation center X", 1, src.Width, src.Width / 2)
         sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
-        desc = "Rotate and scale and image based on the slider values."
+        ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
@@ -52,14 +52,14 @@ End Class
 Public Class Transform_Sort
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
         radio.check(2).Text = "EveryColumn"
         radio.check(3).Text = "EveryRow"
-        desc = "Sort the pixels of a grayscale image."
+        ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -79,12 +79,12 @@ End Class
 Public Class Transform_SortReshape
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
-        desc = "Sort the pixels of a grayscale image."
+        ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -103,11 +103,11 @@ End Class
 Public Class Transform_Affine3D
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Check to snap the first point cloud"
         check.Box(1).Text = "Check to snap the second point cloud"
-        desc = "Using 2 point clouds compute the 3D affine transform between them"
+        ocvb.desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
@@ -115,7 +115,7 @@ Public Class Transform_Affine3D
         Static pc2 As cv.Mat
         Static affineTransform As cv.Mat
 
-        If ocvb.testAllRunning Then
+        If ocvb.parms.testAllRunning Then
             If ocvb.frameCount = 30 Then check.Box(0).Checked = True
             If ocvb.frameCount = 60 Then check.Box(1).Checked = True
         End If

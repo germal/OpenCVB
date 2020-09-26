@@ -3,10 +3,10 @@ Imports CS_Classes
 Public Class Blur_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
-        desc = "Smooth each pixel with a Gaussian kernel of different sizes."
+        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim kernelSize As integer = sliders.trackbar(0).Value
@@ -30,9 +30,9 @@ Public Class Blur_Gaussian_CS
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Dim blur As Blur_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blur = New Blur_Basics(ocvb)
-        desc = "Smooth each pixel with a Gaussian kernel of different sizes."
+        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -57,9 +57,9 @@ Public Class Blur_Median_CS
     Dim CS_BlurMedian As New CS_BlurMedian
     Dim blur As Blur_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blur = New Blur_Basics(ocvb)
-        desc = "Replace each pixel with the median of neighborhood of varying sizes."
+        ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -83,9 +83,9 @@ Public Class Blur_Homogeneous
     Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blur = New Blur_Basics(ocvb)
-        desc = "Smooth each pixel with a kernel of 1's of different sizes."
+        ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -111,9 +111,9 @@ Public Class Blur_Median
     Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blur = New Blur_Basics(ocvb)
-        desc = "Replace each pixel with the median of neighborhood of varying sizes."
+        ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -139,9 +139,9 @@ Public Class Blur_Bilateral
     Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blur = New Blur_Basics(ocvb)
-        desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
+        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -166,7 +166,7 @@ Public Class Blur_PlusHistogram
     Dim blur As Blur_Bilateral
     Dim myhist As Histogram_EqualizeGray
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mat2to1 = New Mat_2to1(ocvb)
 
         blur = New Blur_Bilateral(ocvb)
@@ -174,7 +174,7 @@ Public Class Blur_PlusHistogram
 
         label1 = "Use Blur slider to see impact on histograms"
         label2 = "Top is before equalize, Bottom is after Equalize"
-        desc = "Compound algorithms Blur and Histogram"
+        ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         myhist.src = src
@@ -204,7 +204,7 @@ Public Class Blur_TopoMap
     Inherits VBparent
     Dim gradient As Gradient_CartToPolar
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         gradient = New Gradient_CartToPolar(ocvb)
 
@@ -214,7 +214,7 @@ Public Class Blur_TopoMap
         sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)
 
         label1 = "Image Gradient"
-        desc = "Create a topo map from the blurred image"
+        ocvb.desc = "Create a topo map from the blurred image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static savePercent As Single

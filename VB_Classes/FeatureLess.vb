@@ -5,7 +5,7 @@ Public Class Featureless_Basics
     Public grid As Thread_Grid
     Public flood As FloodFill_8bit
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         edges = New Edges_Basics(ocvb)
 
@@ -24,7 +24,7 @@ Public Class Featureless_Basics
         flood = New FloodFill_8bit(ocvb)
 
         label1 = "Featureless regions with mask in depth color"
-        desc = "Multithread Houghlines to find featureless regions in an image."
+        ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         grid.Run(ocvb)
@@ -61,11 +61,11 @@ Public Class Featureless_DCT_MT
     Inherits VBparent
     Dim dct As DCT_FeatureLess
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         dct = New DCT_FeatureLess(ocvb)
 
         label2 = "Largest FeatureLess Region"
-        desc = "Use DCT to find featureless regions."
+        ocvb.desc = "Use DCT to find featureless regions."
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
@@ -112,13 +112,13 @@ Public Class FeatureLess_Prediction
     Inherits VBparent
     Dim fLess As Featureless_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
 
         fLess = New Featureless_Basics(ocvb)
 
-        desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
+        ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fLess.src = src
@@ -197,12 +197,12 @@ Public Class FeatureLess_PointTracker
     Public fLess As Featureless_Basics
     Public pTrack As Kalman_PointTracker
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
         fLess = New Featureless_Basics(ocvb)
         label1 = "After point tracker"
         label2 = "Before point tracker"
-        desc = "Track the featureless regions with point tracker"
+        ocvb.desc = "Track the featureless regions with point tracker"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fLess.src = src
@@ -228,12 +228,12 @@ Public Class FeatureLess_Highlights
     Public fLessP As FeatureLess_PointTracker
     Public addW As AddWeighted_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         fLessP = New FeatureLess_PointTracker(ocvb)
         hideForm("Palette_BuildGradientColorMap Slider Options")
         hideForm("Palette_Basics Radio Options")
         addW = New AddWeighted_Basics(ocvb)
-        desc = "Highlight the featureless region in an RGB image"
+        ocvb.desc = "Highlight the featureless region in an RGB image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fLessP.src = src

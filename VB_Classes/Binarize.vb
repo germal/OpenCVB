@@ -13,10 +13,10 @@ Public Class Binarize_Basics
     Public meanScalar As cv.Scalar
     Dim blur As Blur_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         blur = New Blur_Basics(ocvb)
 
-        desc = "Binarize an image using Threshold with OTSU."
+        ocvb.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -48,7 +48,7 @@ Public Class Binarize_OTSU
     Dim plotHist As Plot_Histogram
     Dim binarize As Binarize_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         binarize = New Binarize_Basics(ocvb)
 
         plotHist = New Plot_Histogram(ocvb)
@@ -58,7 +58,7 @@ Public Class Binarize_OTSU
 
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         label2 = "Histograms correspond to images on the left"
-        desc = "Binarize an image using Threshold with OTSU."
+        ocvb.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst2.SetTo(0)
@@ -93,14 +93,14 @@ End Class
 Public Class Binarize_Niblack_Sauvola
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
         sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
         sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
 
-        desc = "Binarize an image using Niblack and Sauvola"
+        ocvb.desc = "Binarize an image using Niblack and Sauvola"
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
@@ -123,13 +123,13 @@ End Class
 Public Class Binarize_Niblack_Nick
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
         sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
 
-        desc = "Binarize an image using Niblack and Nick"
+        ocvb.desc = "Binarize an image using Niblack and Nick"
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
@@ -152,7 +152,7 @@ End Class
 Public Class Binarize_Bernson
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
         sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
@@ -161,7 +161,7 @@ Public Class Binarize_Bernson
         label1 = "Binarize Bernson (Draw Enabled)"
 
         ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
-        desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+        ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value
@@ -185,7 +185,7 @@ Public Class Binarize_Bernson_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -197,7 +197,7 @@ Public Class Binarize_Bernson_MT
         sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
         sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
 
-        desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+        ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run(ocvb As VBocvb)

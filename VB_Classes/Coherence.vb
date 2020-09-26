@@ -3,14 +3,14 @@ Imports cv = OpenCvSharp
 Public Class Coherence_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
         sliders.setupTrackBar(1, "Coherence Blend", 1, 10, 10)
         sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)
         sliders.setupTrackBar(3, "Coherence eigen kernel", 1, 31, 1)
         label1 = "Coherence - draw rectangle to apply"
-        desc = "Find lines that are artistically coherent in the image - Painterly"
+        ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
@@ -82,9 +82,9 @@ Public Class Coherence_Depth
     Inherits VBparent
     Dim coherent As Coherence_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         coherent = New Coherence_Basics(ocvb)
-        desc = "Find coherent lines in the depth image - Painterly"
+        ocvb.desc = "Find coherent lines in the depth image - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         coherent.src = ocvb.RGBDepth

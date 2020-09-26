@@ -83,8 +83,8 @@ End Module
 Public Class Delaunay_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Use Delaunay to subdivide an image into triangles."
+        initParent(ocvb)
+        ocvb.desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
@@ -110,10 +110,10 @@ Public Class Delaunay_GoodFeatures
     Inherits VBparent
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         features = New Features_GoodFeatures(ocvb)
         label2 = "Voronoi facets of delauney good features"
-        desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
+        ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         features.src = src
@@ -141,9 +141,9 @@ Public Class Delauney_Subdiv2D
     Inherits VBparent
     Public updateFrequency As Integer = 30
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label2 = "Voronoi facets for the same subdiv2D"
-        desc = "Generate random points and divide the image around those points."
+        ocvb.desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
@@ -194,13 +194,13 @@ Public Class Delauney_Coverage
     Inherits VBparent
     Dim delauney As Delauney_Subdiv2D
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         delauney = New Delauney_Subdiv2D(ocvb)
         delauney.updateFrequency = 1
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
         label1 = "Coverage of space"
-        desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
+        ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)

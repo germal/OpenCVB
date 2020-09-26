@@ -2,12 +2,12 @@ Imports cv = OpenCvSharp
 Public Class Grayscale_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use OpenCV to create grayscale image"
         check.Box(0).Checked = True
 
-        desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
+        ocvb.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
         label1 = "Grayscale_Basics"
         label2 = ""
     End Sub

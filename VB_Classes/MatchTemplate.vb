@@ -8,7 +8,7 @@ Public Class MatchTemplate_Basics
     Public correlationMat As New cv.Mat
     Public matchOption As cv.TemplateMatchModes
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New Font_FlowText(ocvb)
 
         radio.Setup(ocvb, caller, 6)
@@ -22,7 +22,7 @@ Public Class MatchTemplate_Basics
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
-        desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
+        ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -61,13 +61,13 @@ Public Class MatchTemplate_RowCorrelation
     Dim corr As MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flow = New Font_FlowText(ocvb)
 
         corr = New MatchTemplate_Basics(ocvb)
         hideForm("MatchTemplate_Basics Slider Options")
 
-        desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
+        ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim line1 = msRNG.Next(0, src.Height - 1)
@@ -105,7 +105,7 @@ Public Class MatchTemplate_DrawRect
     Public saveTemplate As cv.Mat
     Public saveRect As cv.Rect
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 6)
         For i = 0 To radio.check.Count - 1
             radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
@@ -115,7 +115,7 @@ Public Class MatchTemplate_DrawRect
 
         label1 = "Probabilities (draw rectangle to test again)"
         label2 = "White is input, Red circle centers highest probability"
-        desc = "Find the requested template in an image.  Tracker Algorithm"
+        ocvb.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
@@ -151,7 +151,7 @@ Public Class MatchTemplate_BestEntropy_MT
     Dim entropy As Entropy_Highest_MT
     Dim match As MatchTemplate_DrawRect
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         match = New MatchTemplate_DrawRect(ocvb)
 
@@ -159,7 +159,7 @@ Public Class MatchTemplate_BestEntropy_MT
 
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
-        desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
+        ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 30 = 0 Then

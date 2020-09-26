@@ -7,7 +7,7 @@ Public Class MSER_Basics
     Dim saveParms() As integer
     Dim mser As cv.MSER
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller, 9)
 
         sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
@@ -27,7 +27,7 @@ Public Class MSER_Basics
         check.Box(1).Checked = True
 
         ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
-        desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
+        ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim delta = sliders.trackbar(0).Value
@@ -97,8 +97,8 @@ Public Class MSER_Synthetic
         Next
     End Sub
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
+        initParent(ocvb)
+        ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
@@ -146,7 +146,7 @@ Public Class MSER_TestSynthetic
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mser = New MSER_Basics(ocvb)
         mser.sliders.trackbar(0).Value = 10
         mser.sliders.trackbar(1).Value = 100
@@ -158,7 +158,7 @@ Public Class MSER_TestSynthetic
         synth = New MSER_Synthetic(ocvb)
         label1 = "Input image to MSER"
         label1 = "Output image from MSER"
-        desc = "Test MSER with the synthetic image."
+        ocvb.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         synth.Run(ocvb)
@@ -178,11 +178,11 @@ Public Class MSER_CPPStyle
     Dim gray As cv.Mat
     Dim image As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
-        desc = "Maximally Stable Extremal Regions example - still image"
-        image = cv.Cv2.ImRead(ocvb.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
+        ocvb.desc = "Maximally Stable Extremal Regions example - still image"
+        image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -217,10 +217,10 @@ Public Class MSER_Contours
     Inherits VBparent
     Dim mser As MSER_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         mser = New MSER_Basics(ocvb)
         mser.sliders.trackbar(1).Value = 4000
-        desc = "Use MSER but show the contours of each region."
+        ocvb.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         mser.src = src

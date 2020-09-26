@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class EigenVecVals_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Solve system of equations using OpenCV's EigenVV"
+        initParent(ocvb)
+        ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
         label1 = "EigenVec (solution)"
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub

@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 Public Class TextureFlow_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
 
-        desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
+        ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim TFdelta = sliders.trackbar(0).Value
@@ -37,9 +37,9 @@ Public Class TextureFlow_Depth
     Inherits VBparent
     Dim texture As TextureFlow_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         texture = New TextureFlow_Basics(ocvb)
-        desc = "Display texture flow in the depth data"
+        ocvb.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         texture.src = ocvb.RGBDepth

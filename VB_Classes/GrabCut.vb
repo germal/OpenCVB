@@ -4,14 +4,14 @@ Public Class GrabCut_Basics
     Inherits VBparent
     Dim contours As Contours_Depth
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         contours = New Contours_Depth(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
         sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
 
-        desc = "Use grabcut to isolate what is in the foreground and background.  "
+        ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
         contours.src = src

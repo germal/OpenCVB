@@ -6,7 +6,7 @@ Public Class CellAuto_Basics
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim input(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         i18.Add("00011110 Rule 30 (chaotic)")
         i18.Add("00110110 Rule 54")
         i18.Add("00111100 Rule 60")
@@ -34,7 +34,7 @@ Public Class CellAuto_Basics
         check.Box(0).Text = "Rotate through the different rules"
         check.Box(0).Checked = True
 
-        desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
+        ocvb.desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
     End Sub
     Public Function createCells(outStr As String) As cv.Mat
         Dim outcomes(8 - 1) As Byte
@@ -110,7 +110,7 @@ Public Class CellAuto_Life
         Return CountNeighbors
     End Function
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New cv.Mat(src.Height / factor, src.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
@@ -118,7 +118,7 @@ Public Class CellAuto_Life
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
-        desc = "Use OpenCV to implement the Game of Life"
+        ocvb.desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static savePointCount As Integer
@@ -185,13 +185,13 @@ Public Class CellAuto_LifeColor
     Inherits VBparent
     Dim game As CellAuto_Life
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         game = New CellAuto_Life(ocvb)
         game.backColor = cv.Scalar.White
         game.nodeColor = cv.Scalar.Black
 
         label1 = "Births are blue, deaths are red"
-        desc = "Game of Life but with color added"
+        ocvb.desc = "Game of Life but with color added"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         game.Run(ocvb)
@@ -221,7 +221,7 @@ Public Class CellAuto_LifePopulation
     Dim plot As Plot_OverTime
     Dim game As CellAuto_Life
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         game = New CellAuto_Life(ocvb)
 
         plot = New Plot_OverTime(ocvb)
@@ -229,7 +229,7 @@ Public Class CellAuto_LifePopulation
         plot.maxScale = 2000
         plot.plotCount = 1
 
-        desc = "Show Game of Life display with plot of population"
+        ocvb.desc = "Show Game of Life display with plot of population"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         game.Run(ocvb)
@@ -253,12 +253,12 @@ Public Class CellAuto_Basics_MP
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         cell = New CellAuto_Basics(ocvb)
         i18 = cell.i18
 
-        desc = "Multi-threaded version of CellAuto_Basics"
+        ocvb.desc = "Multi-threaded version of CellAuto_Basics"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
@@ -295,13 +295,13 @@ Public Class CellAuto_All256
     Inherits VBparent
     Dim cell As CellAuto_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         cell = New CellAuto_Basics(ocvb)
         cell.combo.Visible = False ' won't need this...
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
-        desc = "Run through all 256 combinations of outcomes"
+        ocvb.desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String
         Dim outstr As String = ""
@@ -343,12 +343,12 @@ Public Class CellAuto_MultiPoint
     Inherits VBparent
     Dim cell As CellAuto_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         cell = New CellAuto_Basics(ocvb)
         cell.combo.Box.SelectedIndex = 4 ' this one is nice...
         cell.check.Box(0).Checked = False ' just the one pattern.
-        desc = "All256 above starts with just one point.  Here we start with multiple points."
+        ocvb.desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)

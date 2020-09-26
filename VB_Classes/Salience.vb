@@ -22,13 +22,13 @@ Public Class Salience_Basics_CPP
     Dim numScales As integer
     Dim salience As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders = New OptionsSliders
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
 
         salience = Salience_Open()
-        desc = "Show results of Salience algorithm when using C++"
+        ocvb.desc = "Show results of Salience algorithm when using C++"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -51,11 +51,11 @@ Public Class Salience_Basics_MT
     Inherits VBparent
     Dim salience As Salience_Basics_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         salience = New Salience_Basics_CPP(ocvb)
         salience.sliders.trackbar(1).Value = 2
 
-        desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
+        ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

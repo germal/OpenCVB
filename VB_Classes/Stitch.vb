@@ -3,12 +3,12 @@ Imports cv = OpenCvSharp
 Public Class Stitch_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)
         sliders.setupTrackBar(1, "Rectangle width", ocvb.color.Width / 4, ocvb.color.Width - 1, ocvb.color.Width / 2)
         sliders.setupTrackBar(2, "Rectangle height", ocvb.color.Height / 4, ocvb.color.Height - 1, ocvb.color.Height / 2)
-        desc = "Stitch together random parts of a color image."
+        ocvb.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim mats As New List(Of cv.Mat)
@@ -24,7 +24,7 @@ Public Class Stitch_Basics
             mats.Add(src(rect).Clone())
         Next
 
-        'If ocvb.testAllRunning  Then
+        'If ocvb.parms.testAllRunning  Then
         ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.
         ocvb.trueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
                                      "Skipping it during a 'Test All' just so all the other tests can be exercised.")

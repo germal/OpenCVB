@@ -8,12 +8,12 @@ Public Class DNN_Test
     Inherits VBparent
     Dim net As Net
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label2 = "Input Image"
-        desc = "Download and use a Caffe database"
+        ocvb.desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim modelFile As New FileInfo(ocvb.homeDir + "Data/bvlc_googlenet.caffemodel")
+        Dim modelFile As New FileInfo(ocvb.parms.homeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
             ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
             Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
@@ -23,9 +23,9 @@ Public Class DNN_Test
             responseStream.CopyTo(memory)
             File.WriteAllBytes(modelFile.FullName, memory.ToArray)
         End If
-        net = Net.ReadNetFromCaffe(ocvb.homeDir + "Data/bvlc_googlenet.prototxt")
+        net = Net.ReadNetFromCaffe(ocvb.parms.homeDir + "Data/bvlc_googlenet.prototxt")
 
-        Dim image = cv.Cv2.ImRead(ocvb.homeDir + "Data/space_shuttle.jpg")
+        Dim image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/space_shuttle.jpg")
         dst2 = image.Resize(dst2.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
@@ -43,17 +43,17 @@ Public Class DNN_Caffe_CS
     Inherits VBparent
     Dim caffeCS As CS_Classes.DNN
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label2 = "Input Image"
-        desc = "Download and use a Caffe database"
+        ocvb.desc = "Download and use a Caffe database"
 
-        Dim protoTxt = ocvb.HomeDir + "Data/bvlc_googlenet.prototxt"
-        Dim modelFile = ocvb.HomeDir + "Data/bvlc_googlenet.caffemodel"
-        Dim synsetWords = ocvb.HomeDir + "Data/synset_words.txt"
+        Dim protoTxt = ocvb.parms.homeDir + "Data/bvlc_googlenet.prototxt"
+        Dim modelFile = ocvb.parms.homeDir + "Data/bvlc_googlenet.caffemodel"
+        Dim synsetWords = ocvb.parms.homeDir + "Data/synset_words.txt"
         caffeCS = New CS_Classes.DNN(protoTxt, modelFile, synsetWords)
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim image = cv.Cv2.ImRead(ocvb.HomeDir + "Data/space_shuttle.jpg")
+        Dim image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
         dst2 = image.Resize(dst2.Size())
         ocvb.trueText(str, 10, 100)
@@ -77,7 +77,7 @@ Public Class DNN_Basics
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "DNN Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar(1, "DNN MeanVal", 1, 255, 127)
@@ -93,9 +93,9 @@ Public Class DNN_Basics
         dnnHeight = src.Height
         crop = New cv.Rect(src.Width / 2 - dnnWidth / 2, src.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-        Dim infoText As New FileInfo(ocvb.HomeDir + "Data/MobileNetSSD_deploy.prototxt")
+        Dim infoText As New FileInfo(ocvb.parms.homeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
-            Dim infoModel As New FileInfo(ocvb.HomeDir + "Data/MobileNetSSD_deploy.caffemodel")
+            Dim infoModel As New FileInfo(ocvb.parms.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
             If infoModel.Exists Then
                 net = CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
                 dnnPrepared = True
@@ -104,7 +104,7 @@ Public Class DNN_Basics
         If dnnPrepared = False Then
             ocvb.trueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
         End If
-        desc = "Use OpenCV's dnn from Caffe file."
+        ocvb.desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run(ocvb As VBocvb)

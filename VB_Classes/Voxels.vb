@@ -8,7 +8,7 @@ Public Class Voxels_Basics_MT
     Public minDepth As Single
     Public maxDepth As Single
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
@@ -25,7 +25,7 @@ Public Class Voxels_Basics_MT
         gridHeightSlider.Value = 16
 
         label2 = "Voxels labeled with their median distance"
-        desc = "Use multi-threading to get median depth values as voxels."
+        ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim split() = ocvb.pointCloud.Split()

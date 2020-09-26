@@ -4,8 +4,8 @@ Imports cv = OpenCvSharp
 Public Class FLANN_Test
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
+        initParent(ocvb)
+        ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         label1 = "FLANN Basics"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -48,7 +48,7 @@ Public Class FLANN_Basics
     Dim random As Random_Points
     Dim qArray() As cv.Point2f
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         random = New Random_Points(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -62,7 +62,7 @@ Public Class FLANN_Basics
         check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
         check.Box(1).Checked = True
 
-        desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
+        ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         label1 = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run(ocvb As VBocvb)

@@ -17,11 +17,11 @@ Public Class FitEllipse_Basics_CPP
     Dim area As Area_MinTriangle_CPP
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         area = New Area_MinTriangle_CPP(ocvb)
 
         label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"
-        desc = "Use FitEllipse to draw around a set of points"
+        ocvb.desc = "Use FitEllipse to draw around a set of points"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         area.Run(ocvb)  ' get some random clusters of points

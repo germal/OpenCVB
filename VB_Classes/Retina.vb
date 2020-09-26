@@ -22,7 +22,7 @@ Public Class Retina_Basics_CPP
     Dim magnoData(0) As Byte
     Dim srcData(0) As Byte
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
 
@@ -32,16 +32,16 @@ Public Class Retina_Basics_CPP
 
         label1 = "Retina Parvo"
         label2 = "Retina Magno"
-        desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
+        ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
             If fileinfo.Exists Then
-                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", ocvb.homeDir + "data/RetinaDefaultParameters.xml")
+                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", ocvb.parms.homeDir + "data/RetinaDefaultParameters.xml")
                 startInfo.FileName = "wordpad.exe"
-                startInfo.Arguments = ocvb.homeDir + "Data/RetinaDefaultParameters.xml"
+                startInfo.Arguments = ocvb.parms.homeDir + "Data/RetinaDefaultParameters.xml"
                 Process.Start(startInfo)
             Else
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
@@ -55,12 +55,12 @@ Public Class Retina_Basics_CPP
             ReDim srcData(src.Total * src.ElemSize - 1)
             useLogSampling = check.Box(0).Checked
             samplingFactor = sliders.trackbar(0).Value
-            If ocvb.testAllRunning = False Then Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
+            If ocvb.parms.testAllRunning = False Then Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim magnoPtr As IntPtr = 0
-        If ocvb.testAllRunning = False Then
+        If ocvb.parms.testAllRunning = False Then
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else
@@ -91,10 +91,10 @@ Public Class Retina_Depth
     Inherits VBparent
     Dim retina As Retina_Basics_CPP
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         retina = New Retina_Basics_CPP(ocvb)
 
-        desc = "Use the bio-inspired retina algorithm with the depth data."
+        ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub

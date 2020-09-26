@@ -3,12 +3,12 @@ Imports cv = OpenCvSharp
 Public Class Laplacian_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
         sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
-        desc = "Laplacian filter - the second derivative."
+        ocvb.desc = "Laplacian filter - the second derivative."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value()
@@ -32,7 +32,7 @@ End Class
 Public Class Laplacian_Blur
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
         sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
@@ -43,7 +43,7 @@ Public Class Laplacian_Blur
         radio.check(1).Text = "Add boxfilter Blur"
         radio.check(2).Text = "Add median Blur"
         radio.check(0).Checked = True
-        desc = "Laplacian filter - the second derivative - with different bluring techniques"
+        ocvb.desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim kernelSize = sliders.trackbar(0).Value()
@@ -78,7 +78,7 @@ End Class
 Public Class Laplacian_PyramidFilter
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller, 6)
         sliders.setupTrackBar(0, "Sharpest", 0, 10, 1)
         sliders.setupTrackBar(1, "blurryMin", 0, 10, 1)
@@ -86,7 +86,7 @@ Public Class Laplacian_PyramidFilter
         sliders.setupTrackBar(3, "blurryMed2", 0, 10, 1)
         sliders.setupTrackBar(4, "blurryMax", 0, 10, 1)
         sliders.setupTrackBar(5, "Saturate", 0, 10, 1)
-        desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
+        ocvb.desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim levelMat(sliders.trackbar.Length - 1) As cv.Mat

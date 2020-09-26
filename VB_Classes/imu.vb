@@ -7,13 +7,13 @@ Public Class IMU_Basics
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
 
         flow = New Font_FlowText(ocvb)
 
-        desc = "Read and display the IMU coordinates"
+        ocvb.desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present = False Then
@@ -64,10 +64,10 @@ Public Class IMU_Stabilizer
     Inherits VBparent
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(3 - 1)
-        desc = "Stabilize the image with the IMU data."
+        ocvb.desc = "Stabilize the image with the IMU data."
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
     End Sub
@@ -118,13 +118,13 @@ Public Class IMU_Magnetometer
     Inherits VBparent
     Public plot As Plot_OverTime
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 10
         plot.minScale = -10
 
-        desc = "Get the IMU_Magnetometer values from the IMU (if available)"
+        ocvb.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.IMU_Magnetometer = New cv.Point3f Then
@@ -147,8 +147,8 @@ End Class
 Public Class IMU_Barometer
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Get the barometric pressure from the IMU (if available)"
+        initParent(ocvb)
+        ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.IMU_Barometer = 0 Then
@@ -166,8 +166,8 @@ End Class
 Public Class IMU_Temperature
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Get the temperature of the IMU (if available)"
+        initParent(ocvb)
+        ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present = False Then
@@ -188,7 +188,7 @@ Public Class IMU_FrameTime
     Public CPUInterval As Double
     Public IMUtoCaptureEstimate As Double
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 150
@@ -201,7 +201,7 @@ Public Class IMU_FrameTime
         sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
-        desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
+        ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present = False Then
@@ -287,7 +287,7 @@ Public Class IMU_HostFrameTimes
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         plot = New Plot_OverTime(ocvb)
         plot.dst1 = dst2
         plot.maxScale = 150
@@ -300,7 +300,7 @@ Public Class IMU_HostFrameTimes
         sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
 
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
-        desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
+        ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present = False Then
@@ -375,7 +375,7 @@ Public Class IMU_TotalDelay
     Dim plot As Plot_OverTime
     Dim kalman As Kalman_Single
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         host = New IMU_HostFrameTimes(ocvb)
         imu = New IMU_FrameTime(ocvb)
@@ -389,7 +389,7 @@ Public Class IMU_TotalDelay
 
         label1 = "Timing data - total (white) right image"
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
-        desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
+        ocvb.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present = False Then
@@ -456,11 +456,11 @@ Public Class IMU_IsCameraLevel
     Public cameraLevel As Boolean
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         If standalone Then flow = New Font_FlowText(ocvb)
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is a 20/10 or 2 degrees from 0...
-        desc = "Answer the question: Is the camera level?"
+        ocvb.desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present = False Then
@@ -500,10 +500,10 @@ Public Class IMU_GVector
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.input(6 - 1)
-        desc = "Find the angle of tilt for the camera with respect to gravity."
+        ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.parms.IMU_Present = False Then

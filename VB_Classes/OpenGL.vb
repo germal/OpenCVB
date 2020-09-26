@@ -33,8 +33,8 @@ Public Class OpenGL_Basics
     Dim openGLHeight = 1200
     Dim openGLWidth = 1500
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Create an OpenGL window and update it with images"
+        initParent(ocvb)
+        ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate(ocvb As VBocvb)
         Dim timeConversionUnits As Double = 1000
@@ -161,10 +161,10 @@ Public Class OpenGL_Options
     Inherits VBparent
     Public OpenGL As OpenGL_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         OpenGL = New OpenGL_Basics(ocvb)
         setOpenGLsliders(ocvb, caller, sliders)
-        desc = "Adjust point size and FOV in OpenGL"
+        ocvb.desc = "Adjust point size and FOV in OpenGL"
         label1 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -199,10 +199,10 @@ Public Class OpenGL_Callbacks
     Inherits VBparent
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-        desc = "Show the point cloud of 3D data and use callbacks to modify view."
+        ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ogl.src = src
@@ -221,7 +221,7 @@ Public Class OpenGL_IMU
     Public imu As IMU_GVector
 
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         imu = New IMU_GVector(ocvb)
 
         ogl = New OpenGL_Options(ocvb)
@@ -230,7 +230,7 @@ Public Class OpenGL_IMU
         ogl.sliders.trackbar(2).Value = 0 ' yaw
         ogl.sliders.trackbar(3).Value = 0 ' roll
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud in this example.
-        desc = "Show how to use IMU coordinates in OpenGL"
+        ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         imu.Run(ocvb)
@@ -263,7 +263,7 @@ Public Class OpenGL_3Ddata
     Public ogl As OpenGL_Options
     Dim histInput() As Byte
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
@@ -281,7 +281,7 @@ Public Class OpenGL_3Ddata
         ogl.OpenGL.src = dst1.Clone() ' only need to set this once.
 
         label1 = "Input to Histogram 3D"
-        desc = "Plot the results of a 3D histogram in OpenGL."
+        ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim bins = sliders.trackbar(0).Value
@@ -311,7 +311,7 @@ Public Class OpenGL_Draw3D
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         circle = New Draw_Circles(ocvb)
         circle.sliders.trackbar(0).Value = 5
 
@@ -324,7 +324,7 @@ Public Class OpenGL_Draw3D
         ogl.sliders.trackbar(10).Value = -30
         ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
-        desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
+        ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         circle.Run(ocvb)
@@ -345,12 +345,12 @@ Public Class OpenGL_Voxels
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         voxels = New Voxels_Basics_MT(ocvb)
 
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Voxels"
-        desc = "Show the voxel representation in OpenGL"
+        ocvb.desc = "Show the voxel representation in OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         voxels.src = src
@@ -379,7 +379,7 @@ Public Class OpenGL_GravityTransform
     Public ogl As OpenGL_Basics
     Public gCloud As Depth_PointCloudInRange_IMU
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         gCloud = New Depth_PointCloudInRange_IMU(ocvb)
         gCloud.histOpts = New Histogram_ProjectionOptions(ocvb)
@@ -394,7 +394,7 @@ Public Class OpenGL_GravityTransform
         radio.check(3).Text = "No rotation"
         radio.check(2).Checked = True
 
-        desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
+        ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If radio.check(0).Checked Then
@@ -433,12 +433,12 @@ Public Class OpenGL_Reduced
     Dim reduction As Reduction_PointCloud
     Public ogl As OpenGL_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         reduction = New Reduction_PointCloud(ocvb)
 
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-        desc = "Use the reduced depth pointcloud in OpenGL"
+        ocvb.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = ocvb.pointCloud

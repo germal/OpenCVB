@@ -2,10 +2,10 @@ Imports cv = OpenCvSharp
 Public Class LeftRightView_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
-        desc = "Show the left and right views from the 3D Camera"
+        ocvb.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraIndex
             Case VB_Classes.ActiveTask.algParms.D435i, VB_Classes.ActiveTask.algParms.StereoLabsZED2
                 label1 = "Left Image"
@@ -38,7 +38,7 @@ Public Class LeftRightView_CompareUndistorted
     Inherits VBparent
     Public fisheye As FishEye_Rectified
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         fisheye = New FishEye_Rectified(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -59,7 +59,7 @@ Public Class LeftRightView_CompareUndistorted
                 label2 = "Undistorted Right Image"
                 sliders.trackbar(0).Value = 50
         End Select
-        desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
+        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim sliceY = sliders.trackbar(1).Value
@@ -96,7 +96,7 @@ Public Class LeftRightView_CompareRaw
     Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
         sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
@@ -116,7 +116,7 @@ Public Class LeftRightView_CompareRaw
         End Select
         lrView = New LeftRightView_Basics(ocvb)
         lrView.sliders.Hide()
-        desc = "Show slices of the left and right view next to each other for visual comparison"
+        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         lrView.Run(ocvb)
@@ -144,12 +144,12 @@ Public Class LeftRightView_Features
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         features = New Features_GoodFeatures(ocvb)
 
         lrView = New LeftRightView_Basics(ocvb)
 
-        desc = "Find GoodFeatures in the left and right depalettized infrared images"
+        ocvb.desc = "Find GoodFeatures in the left and right depalettized infrared images"
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -180,11 +180,11 @@ Public Class LeftRightView_Palettized
     Dim lrView As LeftRightView_Basics
     Dim palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         lrView = New LeftRightView_Basics(ocvb)
         palette = New Palette_Basics(ocvb)
 
-        desc = "Add color to the 8-bit infrared images."
+        ocvb.desc = "Add color to the 8-bit infrared images."
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -209,8 +209,8 @@ Public Class LeftRightView_BRISK
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Add color to the 8-bit infrared images."
+        initParent(ocvb)
+        ocvb.desc = "Add color to the 8-bit infrared images."
         label1 = "Infrared Left Image"
         label2 = "Infrared Right Image"
 

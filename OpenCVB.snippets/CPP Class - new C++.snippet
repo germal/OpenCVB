@@ -68,9 +68,9 @@ Public Class AnyName_CPP
     Inherits VBparent
     Dim anyname As IntPtr
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 		    anyname = Anyname_Open()
-        desc = "New class description"
+        ocvb.desc = "New class description"
 	  End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim src = ocvb.color

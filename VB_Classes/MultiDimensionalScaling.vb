@@ -14,9 +14,9 @@ Public Class MultiDimensionScaling_Cities
         2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle
         543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C.
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         label1 = "Resulting solution using cv.Eigen"
-        desc = "Use OpenCV's Eigen function to solve a system of equations"
+        ocvb.desc = "Use OpenCV's Eigen function to solve a system of equations"
     End Sub
     Private Function Torgerson(src As cv.Mat) As Double
         Dim rows = src.Rows

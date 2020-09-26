@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class XFeatures2D_StarDetector
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
-        desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
+        initParent(ocvb)
+        ocvb.desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst1 = src.Clone()

@@ -83,7 +83,7 @@ End Module
 Public Class Dither_Basics
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
 
@@ -98,7 +98,7 @@ Public Class Dither_Basics
 
         label1 = "Dither applied to the RGB image"
         label2 = "Dither applied to the Depth image"
-        desc = "Explore all the varieties of dithering"
+        ocvb.desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim radioIndex As Integer

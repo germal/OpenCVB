@@ -8,9 +8,9 @@ Public Class Highlight_Basics
     Dim highlightMask As New cv.Mat
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         If standalone Then reduction = New Reduction_KNN_Color(ocvb)
-        desc = "Highlight the rectangle and centroid nearest the mouse click"
+        ocvb.desc = "Highlight the rectangle and centroid nearest the mouse click"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then

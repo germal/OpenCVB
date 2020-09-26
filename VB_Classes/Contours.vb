@@ -4,7 +4,7 @@ Public Class Contours_Basics
     Inherits VBparent
     Public rotatedRect As Draw_rotatedRectangles
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         radio.Setup(ocvb, caller, 5)
         radio.Text = "Retrieval Mode Options"
         radio.check(0).Text = "CComp"
@@ -24,7 +24,7 @@ Public Class Contours_Basics
 
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.trackbar(0).Value = 5
-        desc = "Demo options on FindContours."
+        ocvb.desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -90,12 +90,12 @@ Public Class Contours_FindandDraw
     Inherits VBparent
     Dim rotatedRect As Draw_rotatedRectangles
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
-        desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
+        ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
@@ -122,9 +122,9 @@ Public Class Contours_Depth
     Inherits VBparent
     Public trim As Depth_InRange
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         trim = New Depth_InRange(ocvb)
-        desc = "Find and draw the contour of the depth foreground."
+        ocvb.desc = "Find and draw the contour of the depth foreground."
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
@@ -153,9 +153,9 @@ Public Class Contours_RGB
     Inherits VBparent
     Dim trim As Depth_InRange
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         trim = New Depth_InRange(ocvb)
-        desc = "Find and draw the contour of the largest foreground RGB contour."
+        ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -199,17 +199,17 @@ End Class
 Public Class Contours_RemoveLines
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller, 3)
         sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
         sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
         sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
         label1 = "Original image"
         label2 = "Original with horizontal/vertical lines removed"
-        desc = "Remove the lines from an invoice image"
+        ocvb.desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim tmp = cv.Cv2.ImRead(ocvb.homeDir + "Data/invoice.jpg")
+        Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
         dst1(dstRect) = tmp.Resize(dstSize)

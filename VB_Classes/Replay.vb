@@ -75,17 +75,17 @@ Public Class Replay_Record
     Dim maxBytes As Single = 20000000000
     Dim recordingFilename As FileInfo
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         ocvb.openFileDialogRequested = True
-        ocvb.openFileInitialDirectory = ocvb.HomeDir + "/Data/"
-        ocvb.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.HomeDir + "Recording.ocvb")
+        ocvb.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.homeDir + "Recording.ocvb")
         ocvb.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         ocvb.openFileFilterIndex = 1
         ocvb.openFileDialogTitle = "Select an OpenCVB bag file to create"
         ocvb.initialStartSetting = False
 
-        desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
+        ocvb.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static bytesTotal As Int64
@@ -164,16 +164,16 @@ Public Class Replay_Play
     Dim fs As FileStream
     Dim recordingFilename As FileInfo
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         ocvb.openFileDialogRequested = True
-        ocvb.openFileInitialDirectory = ocvb.HomeDir + "/Data/"
-        ocvb.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.HomeDir + "Recording.ocvb")
+        ocvb.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
+        ocvb.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.homeDir + "Recording.ocvb")
         ocvb.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         ocvb.openFileFilterIndex = 1
         ocvb.openFileDialogTitle = "Select an OpenCVB bag file to create"
         ocvb.initialStartSetting = True
 
-        desc = "Playback a file recorded by OpenCVB"
+        ocvb.desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static bytesTotal As Int64
@@ -248,10 +248,10 @@ Public Class Replay_OpenGL
     Dim ogl As OpenGL_Callbacks
     Dim replay As Replay_Play
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         ogl = New OpenGL_Callbacks(ocvb)
         replay = New Replay_Play(ocvb)
-        desc = "Replay a recorded session with OpenGL"
+        ocvb.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         replay.Run(ocvb)

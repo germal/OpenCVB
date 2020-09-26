@@ -3,14 +3,14 @@ Public Class TransformationMatrix_Basics
     Inherits VBparent
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.StereoLabsZED2 Then sliders.trackbar(0).Value = 1 ' need a smaller multiplier...
 
         label1 = "View from above the camera"
         label2 = "View from side of the camera"
-        desc = "Show the contents of the transformation matrix"
+        ocvb.desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.transformationMatrix IsNot Nothing Then

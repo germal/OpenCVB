@@ -17,7 +17,7 @@ Public Class FloodFill_Basics
         End Function
     End Class
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
         sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 25)
@@ -25,7 +25,7 @@ Public Class FloodFill_Basics
         sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
 
         label1 = "Input image to floodfill"
-        desc = "Use floodfill to build image segments in a grayscale image."
+        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         minFloodSize = sliders.trackbar(0).Value
@@ -88,12 +88,12 @@ Public Class FloodFill_8bit
     Public palette As Palette_Basics
     Public allRegionMask As cv.Mat
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         palette = New Palette_Basics(ocvb)
         palette.Run(ocvb)
 
         basics = New FloodFill_Basics(ocvb)
-        desc = "Create a floodfill image that is only 8-bit for use with a palette"
+        ocvb.desc = "Create a floodfill image that is only 8-bit for use with a palette"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         basics.src = src
@@ -127,14 +127,14 @@ Public Class FloodFill_Top16_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2000)
         sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
 
-        desc = "Use floodfill to build image segments with a grayscale image."
+        ocvb.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim minFloodSize = sliders.trackbar(0).Value
@@ -169,11 +169,11 @@ Public Class FloodFill_Color_MT
     Dim flood As FloodFill_Top16_MT
     Dim grid As Thread_Grid
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         grid = New Thread_Grid(ocvb)
         flood = New FloodFill_Top16_MT(ocvb)
 
-        desc = "Use floodfill to build image segments in an RGB image."
+        ocvb.desc = "Use floodfill to build image segments in an RGB image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim minFloodSize = flood.sliders.trackbar(0).Value
@@ -212,11 +212,11 @@ Public Class FloodFill_DCT
     Dim flood As FloodFill_Color_MT
     Dim dct As DCT_FeatureLess
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         flood = New FloodFill_Color_MT(ocvb)
 
         dct = New DCT_FeatureLess(ocvb)
-        desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
+        ocvb.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dct.src = src
@@ -239,14 +239,14 @@ Public Class FloodFill_CComp
     Dim range As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         shadow = New Depth_Holes(ocvb)
         ccomp = New CComp_Basics(ocvb)
         range = New FloodFill_RelativeRange(ocvb)
 
         label1 = "Input to Floodfill "
-        desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
+        ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         ' shadow.Run(ocvb)
@@ -272,7 +272,7 @@ Public Class FloodFill_RelativeRange
     Inherits VBparent
     Public fBasics As FloodFill_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         fBasics = New FloodFill_Basics(ocvb)
         check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
@@ -281,7 +281,7 @@ Public Class FloodFill_RelativeRange
         check.Box(2).Text = "Use 'Mask Only'"
         label1 = "Input to floodfill basics"
         label2 = "Output of floodfill basics"
-        desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
+        ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fBasics.floodFlag = 0
@@ -305,14 +305,14 @@ Public Class FloodFill_Top16
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
 
         flood = New FloodFill_Basics(ocvb)
 
         label1 = "Input image to floodfill"
-        desc = "Use floodfill to build image segments in a grayscale image."
+        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -355,7 +355,7 @@ Public Class Floodfill_Objects
     Inherits VBparent
     Dim basics As FloodFill_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         sliders.Setup(ocvb, caller, 1)
         sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
@@ -363,7 +363,7 @@ Public Class Floodfill_Objects
         basics = New FloodFill_Basics(ocvb)
         basics.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
 
-        desc = "Use floodfill to identify the desired number of objects"
+        ocvb.desc = "Use floodfill to identify the desired number of objects"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         basics.src = src
@@ -398,14 +398,14 @@ Public Class FloodFill_WithDepth
     Dim range As FloodFill_RelativeRange
     Dim shadow As Depth_Holes
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         shadow = New Depth_Holes(ocvb)
 
         range = New FloodFill_RelativeRange(ocvb)
 
         label1 = "Floodfill results after removing unknown depth"
         label2 = "Mask showing where depth data is missing"
-        desc = "Floodfill only the areas where there is depth"
+        ocvb.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         shadow.Run(ocvb)
@@ -432,10 +432,10 @@ Public Class Floodfill_Identifiers
     Public minFloodSize As Integer
     Public basics As FloodFill_Basics
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         basics = New FloodFill_Basics(ocvb)
         label1 = "Input image to floodfill"
-        desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
+        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         minFloodSize = basics.sliders.trackbar(0).Value
@@ -490,10 +490,10 @@ Public Class Floodfill_ColorObjects
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
         pFlood = New Floodfill_Identifiers(ocvb)
 
-        desc = "Use floodfill to identify each of the region candidates using only color."
+        ocvb.desc = "Use floodfill to identify each of the region candidates using only color."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         pFlood.src = src
@@ -521,13 +521,13 @@ Public Class FloodFill_PointTracker
     Dim pTrack As Kalman_PointTracker
     Dim flood As FloodFill_8bit
     Public Sub New(ocvb As VBocvb)
-        setCaller(ocvb)
+        initParent(ocvb)
 
         pTrack = New Kalman_PointTracker(ocvb)
         flood = New FloodFill_8bit(ocvb)
 
         label1 = "Point tracker output"
-        desc = "Test the FloodFill output as input into the point tracker"
+        ocvb.desc = "Test the FloodFill output as input into the point tracker"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         flood.src = src
