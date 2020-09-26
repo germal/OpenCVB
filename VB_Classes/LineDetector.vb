@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports MathNet.Spatial.Euclidean
+' Imports MathNet.Spatial.Euclidean
 Public Class LineDetector_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
@@ -553,16 +553,16 @@ Public Class LineDetector_LongLines
                 Dim r2 = New cv.Rect(Math.Max(pt2.X - pixelRadius, 0), Math.Max(0, pt2.Y - pixelRadius), pixelRadius * 2, pixelRadius * 2)
                 Dim mean2 = ocvb.pointCloud(r2).Mean()
 
-                Dim m1 = New Point3D(mean1.Item(0) * 1000, mean1.Item(1) * 1000, mean1.Item(2) * 1000)
-                Dim m2 = New Point3D(mean2.Item(0) * 1000, mean2.Item(1) * 1000, mean2.Item(2) * 1000)
+                'Dim m1 = New Point3D(mean1.Item(0) * 1000, mean1.Item(1) * 1000, mean1.Item(2) * 1000)
+                'Dim m2 = New Point3D(mean2.Item(0) * 1000, mean2.Item(1) * 1000, mean2.Item(2) * 1000)
 
-                If m1 <> New Point3D And m2 <> New Point3D Then
-                    Dim distance = m1.DistanceTo(m2)
-                    If distance > mmThreshold Then
-                        sortWithDepth.Add(distance, v)
-                        dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
-                    End If
-                End If
+                'If m1 <> New Point3D And m2 <> New Point3D Then
+                '    Dim distance = m1.DistanceTo(m2)
+                '    If distance > mmThreshold Then
+                '        sortWithDepth.Add(distance, v)
+                '        dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                '    End If
+                'End If
             End If
         Next
     End Sub
