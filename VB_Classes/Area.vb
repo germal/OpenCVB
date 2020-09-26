@@ -114,13 +114,13 @@ Public Class Area_MinMotionRect
         label1 = "MinRectArea of MOG motion"
     End Sub
 
-    Private Function motionRectangles(gray As cv.Mat, rColors() As cv.Vec3b) As cv.Mat
+    Private Function motionRectangles(gray As cv.Mat, colors() As cv.Vec3b) As cv.Mat
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(gray, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
         For i = 0 To contours.Length - 1
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-            Dim nextColor = New cv.Scalar(rColors(i Mod 255).Item0, rColors(i Mod 255).Item1, rColors(i Mod 255).Item2)
+            Dim nextColor = New cv.Scalar(colors(i Mod 255).Item0, colors(i Mod 255).Item1, colors(i Mod 255).Item2)
             drawRotatedRectangle(minRect, gray, nextColor)
         Next
         Return gray
@@ -130,7 +130,7 @@ Public Class Area_MinMotionRect
         bgSub.Run(ocvb)
         Dim gray As cv.Mat
         If bgSub.dst1.Channels = 1 Then gray = bgSub.dst1 Else gray = bgSub.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = motionRectangles(gray, rColors)
+        dst1 = motionRectangles(gray, ocvb.vecColors)
         dst1.SetTo(cv.Scalar.All(255), gray)
     End Sub
 End Class

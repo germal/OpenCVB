@@ -65,7 +65,7 @@ Public Class ActiveTask : Implements IDisposable
     Private Sub buildColors(ocvb As VBocvb)
         Dim vec As cv.Scalar, r As Integer = 120, b As Integer = 255, g As Integer = 0
         Dim scalarList As New List(Of cv.Scalar)
-        For i = 0 To ocvb.scalarColors.Length - 1
+        For i = 0 To ocvb.fixedColors.Length - 1
             Select Case i Mod 3
                 Case 0
                     vec = New cv.Scalar(b, g, r)
@@ -82,6 +82,11 @@ Public Class ActiveTask : Implements IDisposable
 
             ocvb.scalarColors(i) = New cv.Scalar(b, g, r)
             scalarList.Add(ocvb.scalarColors(i))
+        Next
+        Dim msrng As New System.Random
+        For i = 0 To ocvb.vecColors.Length - 1
+            ocvb.vecColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255)) ' note: cannot generate black!
+            ocvb.scalarColors(i) = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
         Next
     End Sub
     Private Sub layoutOptions(mainLocation As cv.Rect)

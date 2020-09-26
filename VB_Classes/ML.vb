@@ -498,8 +498,8 @@ End Class
 '            For i = 0 To nextInput.Rows - 1
 '                Dim pt = nextInput.Get(Of cv.Point2f)(i, 0)
 '                Dim cIndex = CInt(predictions.Get(Of Single)(i, 0))
-'                cv.Cv2.FloodFill(dst1, New cv.Mat, pt, scalarColors(cIndex), New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
-'                Dim vec = convertScalarToVec3b(scalarColors(cIndex))
+'                cv.Cv2.FloodFill(dst1, New cv.Mat, pt, ocvb.scalarColors(cIndex), New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+'                Dim vec = convertScalarToVec3b(ocvb.scalarColors(cIndex))
 '                If vec = lastColors.Get(Of cv.Vec3b)(pt.Y, pt.X) Then truthCount += 1
 '                dst1.Circle(pt, 10, cv.Scalar.Black, -1, cv.LineTypes.AntiAlias)
 '            Next

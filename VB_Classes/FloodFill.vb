@@ -71,7 +71,7 @@ Public Class FloodFill_Basics
         dst2.SetTo(0)
         For i = 0 To masks.Count - 1
             Dim maskIndex = maskSizes.ElementAt(i).Value
-            dst2.SetTo(scalarColors(i Mod 255), masks(maskIndex))
+            dst2.SetTo(ocvb.scalarColors(i Mod 255), masks(maskIndex))
         Next
         label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
@@ -328,7 +328,7 @@ Public Class FloodFill_Top16
         Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
         For i = 0 To flood.masks.Count - 1
             Dim maskIndex = flood.maskSizes.ElementAt(i).Value
-            Dim nextColor = scalarColors(i Mod 255)
+            Dim nextColor = ocvb.scalarColors(i Mod 255)
             dst1.SetTo(nextColor, flood.masks(maskIndex))
             If thumbCount < 16 Then
                 thumbNails(allRect) = flood.masks(maskIndex).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -473,7 +473,7 @@ Public Class Floodfill_Identifiers
 
         For i = 0 To masks.Count - 1
             Dim rect = rects(i)
-            dst2(rect).SetTo(scalarColors(i Mod 255), masks(i))
+            dst2(rect).SetTo(ocvb.scalarColors(i Mod 255), masks(i))
         Next
     End Sub
 End Class

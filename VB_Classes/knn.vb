@@ -486,7 +486,7 @@ Public Class KNN_Cluster2D
         label1 = ""
         desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
     End Sub
-    Private Sub cluster(result As cv.Mat)
+    Private Sub cluster(ocvb As VBocvb, result As cv.Mat)
         Dim alreadyTaken As New List(Of Integer)
         For i = 0 To numberOfCities - 1
             For j = 1 To numberOfCities - 1
@@ -511,7 +511,7 @@ Public Class KNN_Cluster2D
         For y = 0 To result.Rows - 1
             For x = 0 To result.Cols - 1
                 If result.Get(Of cv.Vec3b)(y, x) = cv.Scalar.Black Then
-                    Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), rColors(closedRegions Mod rColors.Length))
+                    Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), ocvb.vecColors(closedRegions Mod ocvb.vecColors.Length))
                     If byteCount > 10 Then closedRegions += 1 ' there are fake regions due to anti-alias like features that appear when drawing.
                 End If
             Next
@@ -550,7 +550,7 @@ Public Class KNN_Cluster2D
             Next
             knn.Run(ocvb)
             dst1.SetTo(0)
-            cluster(dst1)
+            cluster(ocvb, dst1)
             ocvb.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
         End If
     End Sub

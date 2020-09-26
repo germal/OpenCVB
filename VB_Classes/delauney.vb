@@ -56,10 +56,10 @@ Module Delaunay_Exports
 
         cv.Cv2.Circle(img, fp, 10, active_color, -1, cv.LineTypes.AntiAlias, 0)
     End Sub
-    Public Sub paint_voronoi(scalarColors() As cv.Scalar, img As cv.Mat, subdiv As cv.Subdiv2D)
+    Public Sub paint_voronoi(colors() As cv.Scalar, img As cv.Mat, subdiv As cv.Subdiv2D)
         Dim facets = New cv.Point2f()() {Nothing}
         Dim centers() As cv.Point2f = Nothing
-        subdiv.GetVoronoiFacetList(New List(Of integer)(), facets, centers)
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
 
         Dim ifacet() As cv.Point = Nothing
         Dim ifacets = New cv.Point()() {Nothing}
@@ -69,7 +69,7 @@ Module Delaunay_Exports
             For j = 0 To facets(i).Length - 1
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
-            Dim nextColor = scalarColors(i Mod scalarColors.Length)
+            Dim nextColor = colors(i Mod colors.Length)
             ifacets(0) = ifacet
             cv.Cv2.FillConvexPoly(img, ifacet, nextColor, cv.LineTypes.AntiAlias)
             cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), 1, cv.LineTypes.AntiAlias, 0)
@@ -99,7 +99,7 @@ Public Class Delaunay_Basics
             draw_subdiv(dst1, subdiv, cv.Scalar.White, ocvb.frameCount Mod 2)
         Next
 
-        paint_voronoi(scalarColors, dst1, subdiv)
+        paint_voronoi(ocvb.scalarColors, dst1, subdiv)
     End Sub
 End Class
 
@@ -128,7 +128,7 @@ Public Class Delaunay_GoodFeatures
         Next
 
         Dim mixPercent = features.sliders.trackbar(3).Value / 100
-        paint_voronoi(scalarColors, dst2, subdiv)
+        paint_voronoi(ocvb.scalarColors, dst2, subdiv)
         cv.Cv2.AddWeighted(dst2, 1 - mixPercent, src, mixPercent, 0, dst2)
     End Sub
 End Class

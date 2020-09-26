@@ -384,7 +384,7 @@ Public Class Histogram_DepthValleys
             For j = 0 To rangeBoundaries.Count - 1
                 Dim startEnd = rangeBoundaries.ElementAt(j)
                 If depth >= startEnd.X And depth < startEnd.Y Then
-                    plotColors(i) = scalarColors(j Mod 255)
+                    plotColors(i) = ocvb.scalarColors(j Mod 255)
                     Exit For
                 End If
             Next
@@ -417,7 +417,7 @@ Public Class Histogram_DepthClusters
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            dst2.SetTo(scalarColors(i), mask)
+            dst2.SetTo(ocvb.scalarColors(i), mask)
         Next
         If standalone Then
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"

@@ -330,7 +330,7 @@ Public Class OpenGL_Draw3D
         circle.Run(ocvb)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
-        ogl.OpenGL.src = New cv.Mat(1, rColors.Length - 1, cv.MatType.CV_8UC3, rColors.ToArray)
+        ogl.OpenGL.src = New cv.Mat(1, ocvb.vecColors.Length - 1, cv.MatType.CV_8UC3, ocvb.vecColors.ToArray)
         ogl.src = src
         ogl.Run(ocvb)
     End Sub

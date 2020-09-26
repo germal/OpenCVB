@@ -36,7 +36,7 @@ Public Class VBocvb
     Public HomeDir As String
     Public testAllRunning As Boolean
     Public transformationMatrix() As Single
-    Public scalarColors(255) As cv.Scalar
+    Public fixedColors(255) As cv.Scalar
 
     Public openFileDialogRequested As Boolean
     Public openFileInitialDirectory As String
@@ -61,6 +61,8 @@ Public Class VBocvb
     Public IMU_FrameTime As Double
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
+    Public scalarColors(255) As cv.Scalar
+    Public vecColors(255) As cv.Vec3b
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

@@ -37,8 +37,6 @@ Public Class VBparent : Implements IDisposable
     Public label2 As String
     Public msRNG As New System.Random
     Dim algorithm As Object
-    Public scalarColors(255) As cv.Scalar
-    Public rColors(255) As cv.Vec3b
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public fontsize As Single
@@ -134,7 +132,6 @@ Public Class VBparent : Implements IDisposable
     End Function
     Public Sub hideForm(title As String)
         For Each frm In Application.OpenForms
-            Console.WriteLine(frm.name + " " + frm.text)
             If frm.text = title Then
                 frm.hide
                 Exit Sub
@@ -196,10 +193,7 @@ Public Class VBparent : Implements IDisposable
 #End If
     Public Sub New()
         algorithm = Me
-        For i = 0 To rColors.Length - 1
-            rColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255)) ' note: cannot generate black!
-            scalarColors(i) = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
-        Next
+
     End Sub
     Private Function MakeSureImage8uC3(ByVal src As cv.Mat) As cv.Mat
         If src.Type = cv.MatType.CV_32F Then

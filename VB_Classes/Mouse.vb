@@ -13,11 +13,11 @@ Public Class Mouse_Basics
         lastPoint = ocvb.mousePoint
         Dim radius = 10
         Static colorIndex As integer
-        Dim nextColor = scalarColors(colorIndex)
+        Dim nextColor = ocvb.scalarColors(colorIndex)
         Dim nextPt = ocvb.mousePoint
         dst1.Circle(nextPt, radius, nextColor, -1, cv.LineTypes.AntiAlias)
         colorIndex += 1
-        If colorIndex >= scalarColors.Count Then colorIndex = 0
+        If colorIndex >= ocvb.scalarColors.Count Then colorIndex = 0
     End Sub
 End Class
 

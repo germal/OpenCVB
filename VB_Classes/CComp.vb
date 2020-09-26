@@ -25,7 +25,7 @@ Public Class CComp_Basics
 
         desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
-    Private Function renderBlobs(minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
+    Private Function renderBlobs(ocvb As VBocvb, minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
             If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
@@ -39,7 +39,7 @@ Public Class CComp_Basics
             Dim m = cv.Cv2.Moments(nextMask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
-            If standalone Then dst1(blob.Rect).SetTo(scalarColors(count), (dst2)(blob.Rect))
+            If standalone Then dst1(blob.Rect).SetTo(ocvb.scalarColors(count), (dst2)(blob.Rect))
             count += 1
         Next
         Return count
@@ -64,15 +64,15 @@ Public Class CComp_Basics
         If edgeMask IsNot Nothing Then mats.mat(0).SetTo(0, edgeMask)
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(mats.mat(0))
-        connectedComponents.renderblobs(mats.mat(2))
+        connectedComponents.renderblobs(ocvb, mats.mat(2))
 
-        Dim count = renderBlobs(minSize, mats.mat(0), maxSize)
+        Dim count = renderBlobs(ocvb, minSize, mats.mat(0), maxSize)
         cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(mats.mat(1))
         connectedComponents.renderblobs(mats.mat(3))
 
-        count += renderBlobs(minSize, mats.mat(1), maxSize)
+        count += renderBlobs(ocvb, minSize, mats.mat(1), maxSize)
         If standalone Then
             For i = 0 To centroids.Count - 1
                 dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
@@ -421,7 +421,7 @@ Public Class CComp_InRange_MT
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim rangeCount As integer = sliders.trackbar(0).Value
+        Dim rangeCount As Integer = sliders.trackbar(0).Value
         Dim maxDepth = sliders.trackbar(1).Value
         Dim minBlobSize = sliders.trackbar(2).Value * 1000
 
@@ -429,7 +429,7 @@ Public Class CComp_InRange_MT
         Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
         dst1.SetTo(0)
-        Dim totalBlobs As integer
+        Dim totalBlobs As Integer
         Parallel.For(0, rangeCount,
         Sub(i)
             Dim lowerBound = i * (255 / rangeCount)
@@ -473,7 +473,7 @@ Public Class CComp_InRange
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim rangeCount As integer = sliders.trackbar(0).Value
+        Dim rangeCount As Integer = sliders.trackbar(0).Value
         Dim minBlobSize = sliders.trackbar(1).Value * 1000
 
         Dim mask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -510,7 +510,7 @@ Public Class CComp_Shapes
     Dim shapes As cv.Mat
     Public Sub New(ocvb As VBocvb)
         setCaller(ocvb)
-        shapes = New cv.Mat(ocvb.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
+        shapes = New cv.Mat(ocvb.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."
@@ -576,7 +576,7 @@ Public Class CComp_OverlappingRectangles
         'For i = 0 To overlap.sortedMasks.Count - 1
         '    Dim mask = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Value
         '    Dim rect = overlap.sortedMasks.ElementAt(overlap.sortedMasks.Count - i - 1).Key
-        '    dst2(rect).SetTo(scalarColors(i), mask)
+        '    dst2(rect).SetTo(ocvb.scalarColors(i), mask)
         '    dst2.Rectangle(rect, cv.Scalar.White, 2)
         'Next
     End Sub

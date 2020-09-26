@@ -59,7 +59,7 @@ Public Class Draw_rectangles
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
 
-                Dim nextColor = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
+                Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
                 If drawRotatedRectangles Then
                     drawRotatedRectangle(rotatedRect, dst1, nextColor)
                 Else
@@ -137,7 +137,7 @@ Public Class Draw_Ellipses
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
-                Dim nextColor = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
+                Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
                 dst1.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, -1,)
             Next
         End If
@@ -161,7 +161,7 @@ Public Class Draw_Circles
             For i = 0 To sliders.trackbar(0).Value - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
-                Dim nextColor = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
+                Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
                 dst1.Circle(nPoint, radius, nextColor, -1,)
             Next
         End If
@@ -186,7 +186,7 @@ Public Class Draw_Line
             Dim nPoint1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim nPoint2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim thickness = msRNG.Next(1, 10)
-            Dim nextColor = New cv.Scalar(rColors(i).Item0, rColors(i).Item1, rColors(i).Item2)
+            Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
             dst1.Line(nPoint1, nPoint2, nextColor, thickness, cv.LineTypes.AntiAlias)
         Next
     End Sub
@@ -319,7 +319,7 @@ Public Class Draw_SymmetricalShapes
                 If sliders.trackbar(1).Value < sliders.trackbar(1).Maximum - 10 Then sliders.trackbar(1).Value += 10 Else sliders.trackbar(1).Value = 1
                 If sliders.trackbar(2).Value > 13 Then sliders.trackbar(2).Value -= 13 Else sliders.trackbar(2).Value = sliders.trackbar(2).Maximum
                 If sliders.trackbar(3).Value > 27 Then sliders.trackbar(3).Value -= 27 Else sliders.trackbar(3).Value = sliders.trackbar(3).Maximum
-                fillColor = scalarColors(ocvb.frameCount Mod 255)
+                fillColor = ocvb.scalarColors(ocvb.frameCount Mod 255)
             End If
             If ocvb.frameCount Mod 37 = 0 Then check.Box(0).Checked = Not check.Box(0).Checked
             If ocvb.frameCount Mod 222 = 0 Then check.Box(1).Checked = Not check.Box(1).Checked
@@ -353,7 +353,7 @@ Public Class Draw_SymmetricalShapes
         Next
 
         For i = 0 To numPoints - 1
-            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), scalarColors(i Mod scalarColors.Count), 2, cv.LineTypes.AntiAlias)
+            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), ocvb.scalarColors(i Mod ocvb.scalarColors.Count), 2, cv.LineTypes.AntiAlias)
         Next
 
         If check.Box(2).Checked Then dst1.FloodFill(center, fillColor)
@@ -477,12 +477,12 @@ Public Class Draw_Arc
         If r.Width <= 5 Then r.Width = 5
         If r.Height <= 5 Then r.Height = 5
         Dim rr = New cv.RotatedRect(New cv.Point2f(r.X, r.Y), New cv.Size2f(r.Width, r.Height), angle)
-        Dim color = scalarColors(colorIndex)
+        Dim color = ocvb.scalarColors(colorIndex)
 
         dst1.SetTo(cv.Scalar.White)
         If radio.check(0).Checked Then
             dst1.Ellipse(rr, color, thickness, cv.LineTypes.AntiAlias)
-            drawRotatedOutline(rr, dst1, scalarColors(colorIndex))
+            drawRotatedOutline(rr, dst1, ocvb.scalarColors(colorIndex))
         Else
             Dim angle = kalman.output(4)
             Dim startAngle = kalman.output(5)
