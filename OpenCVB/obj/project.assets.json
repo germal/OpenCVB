@@ -202,7 +202,6 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.6.1",
         "dependencies": {
-          "MathNet.Numerics": "4.12.0",
           "Microsoft.CSharp": "4.7.0",
           "OpenCvSharp4": "4.4.0.20200915",
           "OpenCvSharp4.Windows": "4.4.0.20200915",
@@ -423,7 +422,6 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.6.1",
         "dependencies": {
-          "MathNet.Numerics": "4.12.0",
           "Microsoft.CSharp": "4.7.0",
           "OpenCvSharp4": "4.4.0.20200915",
           "OpenCvSharp4.Windows": "4.4.0.20200915",
@@ -649,7 +647,6 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.6.1",
         "dependencies": {
-          "MathNet.Numerics": "4.12.0",
           "Microsoft.CSharp": "4.7.0",
           "OpenCvSharp4": "4.4.0.20200915",
           "OpenCvSharp4.Windows": "4.4.0.20200915",
@@ -875,7 +872,6 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.6.1",
         "dependencies": {
-          "MathNet.Numerics": "4.12.0",
           "Microsoft.CSharp": "4.7.0",
           "OpenCvSharp4": "4.4.0.20200915",
           "OpenCvSharp4.Windows": "4.4.0.20200915",
@@ -1422,7 +1418,6 @@
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.6.1": [
-      "MathNet.Numerics >= 4.12.0",
       "Microsoft.CSharp >= 4.7.0",
       "OpenCvSharp4 >= 4.4.0.20200915",
       "OpenCvSharp4.Windows >= 4.4.0.20200915",
@@ -1437,7 +1432,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\bobda\\.nuget\\packages\\": {}
+    "C:\\Users\\bobdavies\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -1445,12 +1440,12 @@
       "projectUniqueName": "C:\\_src\\OpenCVB\\OpenCVB\\OpenCVB.vbproj",
       "projectName": "OpenCVB",
       "projectPath": "C:\\_src\\OpenCVB\\OpenCVB\\OpenCVB.vbproj",
-      "packagesPath": "C:\\Users\\bobda\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\bobdavies\\.nuget\\packages\\",
       "outputPath": "C:\\_src\\OpenCVB\\OpenCVB\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
-        "C:\\Users\\bobda\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\bobdavies\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1473,10 +1468,6 @@
     "frameworks": {
       "net461": {
         "dependencies": {
-          "MathNet.Numerics": {
-            "target": "Package",
-            "version": "[4.12.0, )"
-          },
           "Microsoft.CSharp": {
             "target": "Package",
             "version": "[4.7.0, )"
