@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "/AxL5TrQDtyjw9g4aUBRaAVhNyJg+4O9FPn8mBYX/RUrKicb1Q+pI0m5zFYoMeHwS39HyNfsLzQPj+5W0iP34A==",
+  "success": true,
+  "projectFilePath": "C:\\_src\\OpenCVB\\CS_Classes\\CS_Classes.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bobda\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\opencvsharp4\\4.4.0.20200915\\opencvsharp4.4.4.0.20200915.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\opencvsharp4.runtime.win\\4.4.0.20200915\\opencvsharp4.runtime.win.4.4.0.20200915.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\opencvsharp4.windows\\4.4.0.20200915\\opencvsharp4.windows.4.4.0.20200915.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\system.drawing.common\\5.0.0-rc.1.20451.14\\system.drawing.common.5.0.0-rc.1.20451.14.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\system.reflection.emit\\4.7.0\\system.reflection.emit.4.7.0.nupkg.sha512",
+    "C:\\Users\\bobda\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\5.0.0-rc.1.20451.14\\system.runtime.compilerservices.unsafe.5.0.0-rc.1.20451.14.nupkg.sha512"
+  ],
+  "logs": []
+}

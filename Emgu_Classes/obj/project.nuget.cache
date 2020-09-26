@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "rGIZ02Gg9RE6Vfn9V7XUHW7IEkfGk3xgkAbwV++2CqmEc1yhL7OicV8uAPQno8RXxt7wel5ZPKFEUDquEvwmMg==",
+  "success": true,
+  "projectFilePath": "C:\\_src\\OpenCVB\\Emgu_Classes\\Emgu_Classes.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bobda\\.nuget\\packages\\emgu.cv\\4.3.0.3890\\emgu.cv.4.3.0.3890.nupkg.sha512"
+  ],
+  "logs": []
+}
