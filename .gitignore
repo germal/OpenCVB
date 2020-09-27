@@ -25,6 +25,7 @@ algorithmlist.txt
 algorithmlist.vb
 *.bob
 *.pyc
+*.recipe
 Data/Filenames.txt
 Data/AlgorithmMapToOpenCV.txt
 unused_api.txt
