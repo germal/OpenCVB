@@ -1285,7 +1285,8 @@ Public Class Depth_PointCloudInRange
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxMeters = inRangeSlider.Value / 1000
 
-        split = cv.Cv2.Split(ocvb.pointCloud)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
+        split = cv.Cv2.Split(src)
 
         Static reductionCheck = findCheckBox("Use Reduction")
         If reductionCheck.checked Then

@@ -28,7 +28,9 @@ algorithmlist.vb
 Data/Filenames.txt
 Data/AlgorithmMapToOpenCV.txt
 unused_api.txt
-obj/x64/*
+*.cache
+*.dll
+OpenCVB/obj/*
 bin/Debug/*
 bin/Release/*
 Azure-Kinect-Sensor-SDK

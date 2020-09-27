@@ -504,7 +504,7 @@ Public Class Kalman_PointTracker
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
-    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim useKalmanCheck As Windows.Forms.CheckBox
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)

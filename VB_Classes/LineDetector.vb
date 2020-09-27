@@ -11,7 +11,7 @@ Public Class LineDetector_Basics
         sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
         sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
         sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 100) ' not used in Run below but externally...
-        sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 5) ' not used in Run below but externally...
+        sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
@@ -508,32 +508,26 @@ End Class
 
 Public Class LineDetector_LongLines
     Inherits VBparent
-    Dim lDetect As LineDetector_Basics
+    Public lDetect As LineDetector_Basics
+    Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         lDetect = New LineDetector_Basics(ocvb)
 
-        label1 = "Longest lines using depth data"
-        label2 = "Longest lines in pixels (yellow)"
+        label1 = "Longest lines in pixels (yellow)"
         ocvb.desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         lDetect.src = src
         lDetect.Run(ocvb)
         dst1 = src.Clone
-        dst2 = src.Clone
 
         Static thicknessSlider = findSlider("Line thickness")
         Dim thickness = thicknessSlider.value
-        Static lenSlider = findSlider("Line length threshold (mm)")
-        Dim mmThreshold = lenSlider.value
         Static pixelSlider = findSlider("Line length threshold in pixels")
         Dim pixelThreshold = pixelSlider.value
-        Static radiusSlider = findSlider("Depth search radius in pixels")
-        Dim pixelRadius = radiusSlider.value
 
-        Dim sortPixels As New SortedList(Of Single, cv.Vec4f)(New compareAllowIdenticalIntInverted)
-        Dim sortWithDepth As New SortedList(Of Single, cv.Vec4f)(New compareAllowIdenticalIntInverted)
+        sortlines.Clear()
         For Each v In lDetect.lines
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
                    v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
@@ -541,27 +535,8 @@ Public Class LineDetector_LongLines
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 Dim pixelLen = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                 If pixelLen > pixelThreshold Then
-                    sortPixels.Add(pixelLen, v)
-                    dst2.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
-                Else
-                    dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-                End If
-
-                Dim r1 = New cv.Rect(Math.Max(0, pt1.X - pixelRadius), Math.Max(0, pt1.Y - pixelRadius), pixelRadius * 2, pixelRadius * 2)
-                Dim mean1 = ocvb.pointCloud(r1).Mean()
-
-                Dim r2 = New cv.Rect(Math.Max(pt2.X - pixelRadius, 0), Math.Max(0, pt2.Y - pixelRadius), pixelRadius * 2, pixelRadius * 2)
-                Dim mean2 = ocvb.pointCloud(r2).Mean()
-
-                Dim m1 = New Point3D(mean1.Item(0) * 1000, mean1.Item(1) * 1000, mean1.Item(2) * 1000)
-                Dim m2 = New Point3D(mean2.Item(0) * 1000, mean2.Item(1) * 1000, mean2.Item(2) * 1000)
-
-                If m1 <> New Point3D And m2 <> New Point3D Then
-                    Dim distance = m1.DistanceTo(m2)
-                    If distance > mmThreshold Then
-                        sortWithDepth.Add(distance, v)
-                        dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
-                    End If
+                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+                    sortlines.Add(pixelLen, v)
                 End If
             End If
         Next
@@ -594,5 +569,63 @@ Public Class LineDetector_Reduction
         lDetect.src = reduction.dst1
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineDetector_Depth
+    Inherits VBparent
+    Dim longline As LineDetector_LongLines
+    Dim sideView As PointCloud_HistSideView
+    Dim topView As PointCloud_HistTopView
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        mats = New Mat_4to1(ocvb)
+        sideView = New PointCloud_HistSideView(ocvb)
+        topView = New PointCloud_HistTopView(ocvb)
+        longline = New LineDetector_LongLines(ocvb)
+
+        ocvb.desc = "Detect the lines in the depth data before trying to model the line in 3D space"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        longline.src = ocvb.RGBDepth
+        longline.Run(ocvb)
+        dst1 = longline.dst1
+
+        Static thicknessSlider = findSlider("Line thickness")
+        Dim thickness = thicknessSlider.value
+        Static lenSlider = findSlider("Line length threshold (mm)")
+        Dim mmThreshold = lenSlider.value
+        Static radiusSlider = findSlider("Depth search radius in pixels")
+        Dim pixelRadius = radiusSlider.value
+
+        sideView.src = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
+        topView.src = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
+        For i = 0 To longline.sortlines.Count - 1
+            Dim line = longline.sortlines.ElementAt(i).Value
+            Dim p1 = New cv.Point(CInt(line(0)), CInt(line(1)))
+            Dim p2 = New cv.Point(CInt(line(2)), CInt(line(3)))
+
+            Dim topleft = New cv.Point(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y))
+            Dim width = Math.Max(p1.X, p2.X) - topleft.X
+            Dim height = Math.Max(p1.Y, p2.Y) - topleft.Y
+
+            If width < pixelRadius * 2 Then
+                width = Math.Min(src.Width - topleft.X, pixelRadius * 2)
+                height = Math.Min(src.Height - topleft.Y, pixelRadius * 2)
+            End If
+            Dim rect = New cv.Rect(topleft.X, topleft.Y, width, height)
+            If rect.Width > 0 And rect.Height > 0 Then ocvb.pointCloud(rect).CopyTo(sideView.src(rect))
+        Next
+        sideView.Run(ocvb)
+        topView.Run(ocvb)
+        mats.mat(0) = sideView.dst1
+        mats.mat(1) = topView.dst1
+        mats.Run(ocvb)
+        dst2 = mats.dst1
     End Sub
 End Class

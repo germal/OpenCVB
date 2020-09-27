@@ -518,8 +518,6 @@ Public Class Histogram_2D_TopView
     Public Zdata As Integer = 2
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
-    Public useIMU As Boolean = False
-    Public featureless As Featureless_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
@@ -527,7 +525,6 @@ Public Class Histogram_2D_TopView
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
-        featureless = New Featureless_Basics(ocvb)
 
         label1 = "XZ (Top Down View)"
         ocvb.desc = "Create a 2D histogram for depth in XZ (a top down view.)"
@@ -536,24 +533,14 @@ Public Class Histogram_2D_TopView
         Dim histSize() = {src.Height, src.Width}
 
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        If useIMU <> imuCheckBox?.Checked Or ocvb.frameCount = 0 Then
-            useIMU = imuCheckBox?.Checked
-            trimPC = If(useIMU, gCloudIMU, gCloud)
-        End If
+        trimPC = If(imuCheckBox?.Checked, gCloudIMU, gCloud)
 
         Static inRangeSlider = findSlider("InRange Max Depth")
         Dim zRange = inRangeSlider?.Value / 1000
 
-        Static featurelessCheck = findCheckBox("Use featureless regions only")
-        If featurelessCheck.checked Then
-            featureless.src = ocvb.color
-            featureless.Run(ocvb)
-            Dim tmp As New cv.Mat
-            cv.Cv2.BitwiseNot(featureless.flood.allRegionMask, tmp)
-            tmp = tmp.Resize(ocvb.pointCloud.Size)
-            ocvb.pointCloud.SetTo(0, tmp) ' clear out all pointcloud data not in the featureless regions.
-        End If
-        trimPC.src = ocvb.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
+        If dst1.Size <> src.Size Then src = src.Resize(dst1.Size)
+        trimPC.src = src
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 
@@ -590,7 +577,6 @@ Public Class Histogram_2D_SideView
     Public Zdata As Integer = 2
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
-    Public useIMU As Boolean = False
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -607,15 +593,12 @@ Public Class Histogram_2D_SideView
         Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        Dim histSize() = {src.Height, src.Width}
         Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-        If useIMU <> useIMUcheckbox?.Checked Or ocvb.frameCount = 0 Then
-            useIMU = useIMUcheckbox.Checked
-            trimPC = If(useIMU, gCloudIMU, gCloud)
-        End If
+        trimPC = If(useIMUcheckbox.Checked, gCloudIMU, gCloud)
 
-        trimPC.src = ocvb.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
+        If dst1.Size <> src.Size Then src = src.Resize(dst1.Size)
+        trimPC.src = src
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 
@@ -627,6 +610,7 @@ Public Class Histogram_2D_SideView
         cv.Cv2.Merge(trimPC.split, histinput)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, src.Height), New cv.Rangef(0, src.Width)}
+        Dim histSize() = {src.Height, src.Width}
         cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {Zdata, XorYdata}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
         Static histThresholdSlider = findSlider("Histogram threshold")

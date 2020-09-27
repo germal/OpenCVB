@@ -33,8 +33,15 @@ Module PointCloud
     Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Integer, cols As Integer) As IntPtr
     End Function
 
-    Public Class compareAllowIdenticalIntInverted : Implements IComparer(Of Single)
+    Public Class compareAllowIdenticalSingleInverted : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Class compareAllowIdenticalIntegerInverted : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
             ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
             If a <= b Then Return 1
             Return -1
@@ -300,7 +307,7 @@ Public Class PointCloud_Objects
     Dim measureSide As PointCloud_Kalman_SideView
     Dim measureTop As PointCloud_Kalman_TopView
     Public measure As Object
-    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim cmats As PointCloud_Colorize
     Public SideViewFlag As Boolean = True
     Public Sub New(ocvb As VBocvb)
@@ -622,8 +629,8 @@ Public Class PointCloud_BothViews
     Public detailText As String
     Public backMat As New cv.Mat
     Public backMatMask As New cv.Mat
-    Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
-    Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalIntInverted)
+    Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -772,6 +779,7 @@ Public Class PointCloud_HistTopView
         ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If src.Type = cv.MatType.CV_32FC3 Then hist.src = src
         hist.Run(ocvb)
         dst1 = hist.dst1
     End Sub
@@ -796,6 +804,7 @@ Public Class PointCloud_HistSideView
         ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        If src.Type = cv.MatType.CV_32FC3 Then hist.src = src
         hist.Run(ocvb)
         dst1 = hist.dst1
     End Sub
