@@ -68,7 +68,7 @@ Public Class ProCon_Basics
         End While
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If sliders.trackbar(0).Value <> buffer?.Length Then
+        If sliders.trackbar(0).Value <> buffer.Length Then
             SyncLock mutex
                 ReDim buffer(sliders.trackbar(0).Value - 1)
                 buffer = Enumerable.Repeat(-1, buffer.Length).ToArray

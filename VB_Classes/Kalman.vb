@@ -653,7 +653,7 @@ Public Class Kalman_PointTracker
                 End If
             Next
 
-            If drawRectangleCheck?.checked Then
+            If drawRectangleCheck.checked Then
                 For i = 0 To viewObjects.Count - 1
                     Dim vw = viewObjects.ElementAt(i).Value
                     Dim pt = vw.centroid

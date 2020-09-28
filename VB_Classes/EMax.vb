@@ -165,7 +165,7 @@ Public Class EMax_CPP
         If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
 
         Static showInputCheck = findCheckBox("Show EMax input in output")
-        If showInputCheck?.Checked Then
+        If showInputCheck.Checked Then
             inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst1.CopyTo(dst2, inputDataMask)
         End If

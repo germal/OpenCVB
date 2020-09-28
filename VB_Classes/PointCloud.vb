@@ -501,7 +501,7 @@ Public Class PointCloud_Kalman_TopView
         histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
         If flood.dst1.Channels = 3 Then pTrack.src = flood.dst1 Else pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -512,7 +512,7 @@ Public Class PointCloud_Kalman_TopView
         dst1 = pTrack.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU?.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1)
+        If checkIMU.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1)
         Dim FOV = hFOVangles(ocvb.parms.cameraIndex)
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
@@ -551,7 +551,7 @@ Public Class PointCloud_Kalman_SideView
         histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold?.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
         pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -562,7 +562,7 @@ Public Class PointCloud_Kalman_SideView
         dst1 = pTrack.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU?.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1)
+        If checkIMU.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1)
         Dim FOV = vFOVangles(ocvb.parms.cameraIndex)
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
@@ -751,7 +751,7 @@ Public Class PointCloud_BothViews
         End If
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU?.Checked = False Then
+        If checkIMU.Checked = False Then
             dst1 = cmats.CameraLocationBot(ocvb, dst1)
             dst2 = cmats.CameraLocationSide(ocvb, dst2)
         End If

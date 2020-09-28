@@ -532,10 +532,10 @@ Public Class Histogram_2D_TopView
         Dim histSize() = {src.Height, src.Width}
 
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        trimPC = If(imuCheckBox?.Checked, gCloudIMU, gCloud)
+        trimPC = If(imuCheckBox.Checked, gCloudIMU, gCloud)
 
         Static inRangeSlider = findSlider("InRange Max Depth")
-        Dim zRange = inRangeSlider?.Value / 1000
+        Dim zRange = inRangeSlider.Value / 1000
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
         If dst1.Size <> src.Size Then src = src.Resize(dst1.Size)
@@ -554,7 +554,7 @@ Public Class Histogram_2D_TopView
         cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {Zdata, XorYdata}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
         Static histThresholdSlider = findSlider("Histogram threshold")
-        dst1 = histOutput.Threshold(histThresholdSlider?.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
