@@ -882,61 +882,6 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjectionGrayscale
-    Inherits VBparent
-    Dim hist As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        hist = New Histogram_KalmanSmoothed(ocvb)
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Histogram index to backproject", 0, 255, 0)
-
-        label2 = "Histogram - yellow is selected for backprojection"
-        ocvb.desc = "Explore Backprojection of each element of a grayscale histogram."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        hist.src = src
-        hist.Run(ocvb)
-        dst2 = hist.dst1
-
-        Dim minVal As Single, maxVal As Single
-        Dim minIdx As cv.Point, maxIdx As cv.Point
-        hist.histogram.MinMaxLoc(minVal, maxVal, minIdx, maxIdx)
-        Static prevBins = -1
-        If hist.sliders.trackbar(0).Value <> prevBins Then
-            sliders.trackbar(0).Value = maxIdx.Y
-            prevBins = hist.sliders.trackbar(0).Value
-        End If
-        If sliders.trackbar(0).Value >= hist.sliders.trackbar(0).Value Then
-            sliders.trackbar(0).Value = hist.sliders.trackbar(0).Value - 1
-        End If
-        Dim histIndex = sliders.trackbar(0).Value
-        Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
-        Dim barRange = 255 / hist.sliders.trackbar(0).Value
-
-        Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
-        Dim bins() = {0}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim mat() As cv.Mat = {gray}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
-        Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
-
-        dst1.SetTo(0)
-        mask = mask.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
-        src.CopyTo(dst1, mask)
-        label1 = "Backprojection index " + CStr(histIndex) + " with " + CStr(maxVal) + " samples"
-        dst2.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
@@ -1030,5 +975,57 @@ Public Class Histogram_HueSaturation2DPlot
         dst1 = mats.dst1
         If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
         dst2 = mats.mat(ocvb.quadrantIndex)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+Public Class Histogram_BackProjectionGrayscale
+    Inherits VBparent
+    Dim hist As Histogram_KalmanSmoothed
+    Public mats As Mat_4to1
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        hist = New Histogram_KalmanSmoothed(ocvb)
+        Dim binSlider = findSlider("Histogram Bins")
+        binSlider.Value = 10
+        mats = New Mat_4to1(ocvb)
+
+        label1 = "Move mouse to backproject each histogram column"
+        ocvb.desc = "Explore Backprojection of each element of a grayscale histogram."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        hist.src = src
+        hist.Run(ocvb)
+        mats.mat(0) = hist.dst1
+
+        Dim histIndex = Math.Floor(hist.histogram.Rows * ocvb.mousePoint.X / src.Width)
+        Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
+        Dim barRange = 255 / hist.sliders.trackbar(0).Value
+
+        Dim mask As New cv.Mat
+        For i = 0 To 4 - 1
+            Dim index = (histIndex + i)
+            If index >= hist.histogram.Rows Then index = i - 1
+            Dim ranges() = New cv.Rangef() {New cv.Rangef(index * barRange, (index + 1) * barRange)}
+            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) '  = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            Dim mat() As cv.Mat = {gray}
+            Dim bins() = {0}
+            cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
+            gray.SetTo(255)
+            gray.SetTo(0, mask)
+            If i = 0 Then dst2 = gray.Clone Else mats.mat(i) = gray.Clone
+        Next
+
+        label2 = "Backprojection index " + CStr(histIndex) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
+        mats.mat(0).Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
+        mats.Run(ocvb)
+        dst1 = mats.dst1
     End Sub
 End Class

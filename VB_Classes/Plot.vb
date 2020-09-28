@@ -222,7 +222,7 @@ Public Class Plot_Histogram
             Static savedMaxVal = maxVal
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000
             If maxVal < 0 Then maxVal = savedMaxVal
-            If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.5 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
+            If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.5 Then maxVal = savedMaxVal Else savedMaxVal = maxVal
         Else
             maxVal = fixedMaxVal
         End If
