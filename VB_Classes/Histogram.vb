@@ -485,9 +485,8 @@ Public Class Histogram_ProjectionOptions
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 10, 10000, MAXZ_DEFAULT * 1000)
         If standalone Then sliders.trackbar(0).Value = 1
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Use IMU gravity vector"
-        check.Box(1).Text = "Use featureless regions only"
         check.Box(0).Checked = True
         If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.L515 Or
             ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
@@ -990,6 +989,7 @@ Public Class Histogram_BackProjectionGrayscale
     Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
     Public mats As Mat_4to1
+    Public histIndex As Integer
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         hist = New Histogram_KalmanSmoothed(ocvb)
@@ -1005,7 +1005,7 @@ Public Class Histogram_BackProjectionGrayscale
         hist.Run(ocvb)
         mats.mat(0) = hist.dst1
 
-        Dim histIndex = Math.Floor(hist.histogram.Rows * ocvb.mousePoint.X / src.Width)
+        histIndex = If(standalone, Math.Floor(hist.histogram.Rows * ocvb.mousePoint.X / src.Width), histIndex) ' provided externally when not standalone.
         Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
         Dim barRange = 255 / hist.sliders.trackbar(0).Value
 
@@ -1020,12 +1020,22 @@ Public Class Histogram_BackProjectionGrayscale
             cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
             gray.SetTo(255)
             gray.SetTo(0, mask)
-            If i = 0 Then dst2 = gray.Clone Else mats.mat(i) = gray.Clone
+            If i = 0 Then
+                dst2 = gray.Clone
+                If standalone = False Then Exit For ' minimize work when not running standalone.
+            Else
+                mats.mat(i) = gray.Clone
+            End If
         Next
 
         label2 = "Backprojection index " + CStr(histIndex) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
-        mats.mat(0).Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
-        mats.Run(ocvb)
-        dst1 = mats.dst1
+        If standalone Then
+            mats.mat(0).Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
+            Dim tmp = mats.mat(0).Clone
+            mats.mat(0) = mats.mat(1).Clone ' avoids clipping the tops of the bar chart.  
+            mats.mat(1) = tmp
+            mats.Run(ocvb)
+            dst1 = mats.dst1
+        End If
     End Sub
 End Class

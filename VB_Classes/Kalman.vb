@@ -32,8 +32,8 @@ Public Class Kalman_Basics
             ReDim output(input.Count - 1)
         End If
 
-        Static filteringOnCheck = findCheckBox("Turn Kalman filtering on")
-        If filteringOnCheck.Checked Then
+        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
+        If useKalmanCheck.Checked Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input(i)
                 kalman(i).Run(ocvb)
@@ -505,7 +505,6 @@ Public Class Kalman_PointTracker
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim useKalmanCheck As Windows.Forms.CheckBox
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
@@ -535,7 +534,6 @@ Public Class Kalman_PointTracker
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim kalmanActive = useKalmanCheck?.Checked
         If standalone Then
             topView.Run(ocvb)
             dst1 = topView.dst1
@@ -600,7 +598,8 @@ Public Class Kalman_PointTracker
                     Next
                     If maskIndex >= 0 Then
                         kalman(i).input = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
-                        If kalmanActive Then
+                        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
+                        If useKalmanCheck.Checked Then
                             kalman(i).Run(ocvb)
                         Else
                             kalman(i).output = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}

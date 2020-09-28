@@ -15,12 +15,12 @@ Module opencv_module
 End Module
 Public Class OpenCVB
 #Region "Globals"
-    Const displayFrames As integer = 3
-    Dim AlgorithmCount As integer
-    Dim AlgorithmTestCount As integer
+    Const displayFrames As Integer = 3
+    Dim AlgorithmCount As Integer
+    Dim AlgorithmTestCount As Integer
     Dim algorithmTaskHandle As Thread
     Dim saveAlgorithmName As String
-    Dim border As integer = 6
+    Dim border As Integer = 6
     Dim BothFirstAndLastReady As Boolean
     Dim camera As Object
     Dim cameraRS2Generic As Object ' used only to initialize D435i and L515
@@ -35,18 +35,18 @@ Public Class OpenCVB
     Dim camPic(displayFrames - 1) As PictureBox
     Dim cameraRefresh As Boolean
     Dim algorithmRefresh As Boolean
-    Dim CodeLineCount As integer
+    Dim CodeLineCount As Integer
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect(0, 0, 0, 0)
     Dim externalPythonInvocation As Boolean
-    Dim fps As integer = 30
+    Dim fps As Integer = 30
     Dim imgResult As New cv.Mat
-    Dim frameCount As integer
+    Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
 
-    Dim LastX As integer
-    Dim LastY As integer
+    Dim LastX As Integer
+    Dim LastY As Integer
     Dim mouseClickFlag As Boolean
     Dim mouseClickPoint As New cv.Point
     Dim mousePicTag As Integer
@@ -62,7 +62,7 @@ Public Class OpenCVB
     Dim TreeViewDialog As TreeviewForm
     Dim openForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
-    Dim camWidth As integer = 1280, camHeight As integer = 720
+    Dim camWidth As Integer = 1280, camHeight As Integer = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public resolutionXY = New cv.Size(1280, 720)
     Public resolutionSetting As Integer = 1
@@ -437,9 +437,9 @@ Public Class OpenCVB
         camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height)
         saveLayout()
     End Sub
-    Public Function USBenumeration(searchName As String) As integer
+    Public Function USBenumeration(searchName As String) As Integer
         Static firstCall = 0
-        Dim deviceCount As integer
+        Dim deviceCount As Integer
         ' See if the desired device shows up in the device manager.'
         Dim info As Management.ManagementObject
         Dim search As System.Management.ManagementObjectSearcher
@@ -829,13 +829,13 @@ Public Class OpenCVB
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
 
-        Static lastFrame As integer
+        Static lastFrame As Integer
         If lastFrame > frameCount Then lastFrame = 0
         Dim countFrames = frameCount - lastFrame
         lastFrame = frameCount
         Dim fps As Single = countFrames / (fpsTimer.Interval / 1000)
 
-        Static lastCameraFrame As integer
+        Static lastCameraFrame As Integer
         If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
         Dim camFrames = camera.frameCount - lastCameraFrame
         lastCameraFrame = camera.frameCount
