@@ -50,7 +50,7 @@ Public Class Reduction_Simple
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If check.Box(0).Checked Then
-            dst1 = src / sliders.trackbar(0).Value ' can be any mat type...
+            dst1 = src / sliders.trackbar(0).Value
             dst1 *= sliders.trackbar(0).Value
             label1 = "Reduced image - factor = " + CStr(sliders.trackbar(0).Value)
         Else
