@@ -10,14 +10,16 @@ Public Class Fuzzy_Basics
         reduction = New Reduction_Simple(ocvb)
         Fuzzy = Fuzzy_Open()
         palette = New Palette_Basics(ocvb)
+        label1 = "Solid regions"
+        label2 = "Fuzzy pixels - not solid"
         ocvb.desc = "That which is not solid is fuzzy"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         reduction.src = src
         reduction.Run(ocvb)
         dst1 = reduction.dst1
-
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
         Dim srcData(dst1.Total) As Byte
         Marshal.Copy(dst1.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -29,9 +31,11 @@ Public Class Fuzzy_Basics
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC1, dstData)
         End If
+        dst2 = dst1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         palette.src = dst1
         palette.Run(ocvb)
         dst1 = palette.dst1
+        dst1.SetTo(0, dst2)
     End Sub
     Public Sub Close()
         Fuzzy_Close(Fuzzy)
@@ -115,5 +119,27 @@ Public Class Fuzzy_FloodFill
         flood.src = fuzzy.dst1
         flood.Run(ocvb)
         dst1 = flood.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Fuzzy_Depth
+    Inherits VBparent
+    Dim fuzzy As Fuzzy_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        fuzzy = New Fuzzy_Basics(ocvb)
+
+        ocvb.desc = "Find solids in the depth data"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        fuzzy.src = ocvb.RGBDepth
+        fuzzy.Run(ocvb)
+        dst1 = fuzzy.dst1
+        dst2 = fuzzy.dst2
     End Sub
 End Class
