@@ -60,7 +60,7 @@ Public Class OpenCVB
     Dim treeViewBringToFront As Boolean
     Dim optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
-    Dim openForm As OpenFilename
+    Dim openFileForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
     Dim camWidth As Integer = 1280, camHeight As Integer = 720
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
@@ -80,7 +80,7 @@ Public Class OpenCVB
     Dim openFileStarted As Boolean
     Dim openfileDialogTitle As String
     Dim openfileSliderPercent As Single
-    Dim openformLocated As Boolean
+    Dim openFileFormLocated As Boolean
     Dim pauseAlgorithmThread As Boolean
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
@@ -148,7 +148,7 @@ Public Class OpenCVB
         End While
         sr.Close()
 
-        openForm = New OpenFilename
+        openFileForm = New OpenFilename
 
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
@@ -353,35 +353,35 @@ Public Class OpenCVB
         If openFileInitialDirectory <> "" Then
             If openFileDialogRequested Then
                 openFileDialogRequested = False
-                openForm.OpenFileDialog1.InitialDirectory = openFileInitialDirectory
-                openForm.OpenFileDialog1.FileName = "*.*"
-                openForm.OpenFileDialog1.CheckFileExists = False
-                openForm.OpenFileDialog1.Filter = openFileFilter
-                openForm.OpenFileDialog1.FilterIndex = openFileFilterIndex
-                openForm.filename.Text = openFileDialogName
-                openForm.Text = openfileDialogTitle
-                openForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
-                openForm.Show()
+                openFileForm.OpenFileDialog1.InitialDirectory = openFileInitialDirectory
+                openFileForm.OpenFileDialog1.FileName = "*.*"
+                openFileForm.OpenFileDialog1.CheckFileExists = False
+                openFileForm.OpenFileDialog1.Filter = openFileFilter
+                openFileForm.OpenFileDialog1.FilterIndex = openFileFilterIndex
+                openFileForm.filename.Text = openFileDialogName
+                openFileForm.Text = openfileDialogTitle
+                openFileForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
+                openFileForm.Show()
                 openFileStarted = openFileinitialStartSetting
-                If openFileinitialStartSetting And openForm.PlayButton.Text = "Start" Then
-                    openForm.PlayButton.PerformClick()
+                If openFileinitialStartSetting And openFileForm.PlayButton.Text = "Start" Then
+                    openFileForm.PlayButton.PerformClick()
                 Else
                     If openFileinitialStartSetting = False Then
-                        openForm.fileStarted = False
-                        openForm.PlayButton.Text = "Start"
+                        openFileForm.fileStarted = False
+                        openFileForm.PlayButton.Text = "Start"
                     End If
                 End If
             Else
-                If (openForm.Location.X <> Me.Left Or openForm.Location.Y <> Me.Top + Me.Height) And openformLocated = False Then
-                    openformLocated = True
-                    openForm.Location = New Point(Me.Left, Me.Top + Me.Height)
+                If (openFileForm.Location.X <> Me.Left Or openFileForm.Location.Y <> Me.Top + Me.Height) And openFileFormLocated = False Then
+                    openFileFormLocated = True
+                    openFileForm.Location = New Point(Me.Left, Me.Top + Me.Height)
                 End If
-                If openFileDialogName <> openForm.filename.Text Then openFileDialogName = openForm.filename.Text
-                If openfileSliderPercent >= 0 And openfileSliderPercent <= 1 Then openForm.TrackBar1.Value = openfileSliderPercent * 10000
-                openForm.PlayButton.Visible = openfileSliderPercent >= 0 ' negative indicates it should not be shown.
-                openForm.TrackBar1.Visible = openForm.PlayButton.Visible
+                If openFileDialogName <> openFileForm.filename.Text Then openFileDialogName = openFileForm.filename.Text
+                If openfileSliderPercent >= 0 And openfileSliderPercent <= 1 Then openFileForm.TrackBar1.Value = openfileSliderPercent * 10000
+                openFileForm.PlayButton.Visible = openfileSliderPercent >= 0 ' negative indicates it should not be shown.
+                openFileForm.TrackBar1.Visible = openFileForm.PlayButton.Visible
             End If
-            openFileStarted = openForm.fileStarted
+            openFileStarted = openFileForm.fileStarted
         End If
         AlgorithmDesc.Text = textDesc
     End Sub
@@ -1010,12 +1010,12 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
-        openForm.Hide()
-        openForm.PlayButton.Text = "Start"
+        openFileForm.Hide()
+        openFileForm.PlayButton.Text = "Start"
         openFileDialogName = ""
         openFileInitialDirectory = ""
-        openForm.fileStarted = False
-        openformLocated = False
+        openFileForm.fileStarted = False
+        openFileFormLocated = False
 
         Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.IMU_RotationMatrix(9 - 1)
@@ -1204,7 +1204,7 @@ Public Class OpenCVB
                     openfileSliderPercent = task.ocvb.openFileSliderPercent
                 End If
 
-                Static inputFile As String = task.ocvb.openFileDialogName
+                Static inputFile As String = "" ' task.ocvb.openFileDialogName
                 If inputFile <> task.ocvb.openFileDialogName Then
                     inputFile = task.ocvb.openFileDialogName
                     openFileInitialDirectory = task.ocvb.openFileInitialDirectory
@@ -1243,7 +1243,7 @@ Public Class OpenCVB
                     Catch ex As Exception
                         Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
                     End Try
-                    openformLocated = False
+                    openFileFormLocated = False
                 End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception

@@ -198,7 +198,7 @@ Public Class IMU_FrameTime
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Minimum IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
 
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"

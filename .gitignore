@@ -23,7 +23,7 @@ VB_Classes/Python/.vs/PythonDebug/v16/.suo
 *.exe.config
 algorithmlist.txt
 algorithmlist.vb
-*.bob
+*.ocvb
 *.pyc
 *.recipe
 Data/Filenames.txt

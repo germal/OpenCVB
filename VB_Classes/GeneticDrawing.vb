@@ -290,10 +290,12 @@ Public Class GeneticDrawing_Photo
         ocvb.openFileDialogTitle = "Select an image file to create a paint version"
         ocvb.initialStartSetting = True
         ocvb.openFileSliderPercent = -1
+        gDraw = New GeneticDrawing_Color(ocvb)
 
         ocvb.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+
         If inputFileName <> ocvb.openFileDialogName Or ocvb.frameCount = 0 Then
             Dim fileinfo = New FileInfo(ocvb.openFileDialogName)
             If fileinfo.Exists = False Then

@@ -890,7 +890,7 @@ MIT License
 
 Fremont, California
 
-Summer 2020
+Fall 2020
 
 Addendum 1: Comparing Cameras
 =============================
@@ -939,7 +939,8 @@ Addendum 2: Some Thoughts
 =========================
 
 1.  The user interface is the documentation. The user interface should make it
-    clear how the algorithm works and what parameters will tweak it.
+    clear how the algorithm works and what parameters will tweak it. Not all
+    algorithms live up to this standard but many do.
 
 2.  There are few comments in the code. Documenting code is a second, parallel
     explanation of the algorithm. There is no need for a second explanation when
@@ -979,9 +980,9 @@ Addendum 2: Some Thoughts
     presented in the user interface whether the data is consumed or not.
 
 9.  Cameras are always run at 1280x720. Requesting a lower resolution simply
-    resizes the camera input before sharing with the algorithm task. The goal is
-    to keep the camera interface simple. Room for improvement: support a full
-    camera interface with different resolutions and settings.
+    resizes the camera input before images are shared with the algorithm task.
+    The goal is to keep the camera interface simple. Room for improvement:
+    support a full camera interface with different resolutions and settings.
 
 10. The user interface is the main task. The camera task is independent of the
     user interface.

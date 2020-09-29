@@ -14,4 +14,9 @@ Public Class OpenFilename
             fileStarted = False
         End If
     End Sub
+    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
 End Class
