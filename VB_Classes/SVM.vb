@@ -34,7 +34,9 @@ Public Class SVM_Options
         radio1.check(3).Text = "SVM Type = NuSvr"
         radio1.check(4).Text = "SVM Type = OneClass"
 
-
+        radio.Text = caller + " Kernel Options"
+        radio1.Text = caller + " SVM Type Options"
+        radio1.Show()
         label1 = "SVM_Options - only options, no output"
         ocvb.desc = "SVM has many options - enough to make a class for it."
     End Sub

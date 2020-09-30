@@ -100,6 +100,58 @@ End Module
 
 
 
+Public Class Fuzzy_Depth
+    Inherits VBparent
+    Dim fuzzy As Fuzzy_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        fuzzy = New Fuzzy_Basics(ocvb)
+
+        label1 = "Solid regions in depth"
+        label2 = "Fuzzy pixels - not solid"
+        ocvb.desc = "Find solids in the depth data"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        fuzzy.src = ocvb.RGBDepth
+        fuzzy.Run(ocvb)
+        dst1 = fuzzy.dst1
+        dst2 = fuzzy.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Fuzzy_Depth2
+    Inherits VBparent
+    Dim fuzzy As Fuzzy_Basics
+    Dim depth As Depth_Colorizer_CPP
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        fuzzy = New Fuzzy_Basics(ocvb)
+        depth = New Depth_Colorizer_CPP(ocvb)
+
+        label1 = "Solid regions in depth"
+        label2 = "Fuzzy pixels - not solid"
+        ocvb.desc = "Find solids in the depth data and show that colorizing manually does not alter the outcome."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        depth.src = getDepth32f(ocvb)
+        depth.Run(ocvb)
+
+        fuzzy.src = depth.dst1
+        fuzzy.Run(ocvb)
+        dst1 = fuzzy.dst1
+        dst2 = fuzzy.dst2
+    End Sub
+End Class
+
+
+
+
+
 Public Class Fuzzy_FloodFill
     Inherits VBparent
     Dim fuzzy As Fuzzy_Basics
@@ -127,19 +179,86 @@ End Class
 
 
 
-Public Class Fuzzy_Depth
+
+
+Public Class Fuzzy_PointTracker
     Inherits VBparent
     Dim fuzzy As Fuzzy_Basics
+    Dim pTrack As Kalman_PointTracker
+    Dim flood As FloodFill_8bit
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         fuzzy = New Fuzzy_Basics(ocvb)
+        flood = New FloodFill_8bit(ocvb)
+        pTrack = New Kalman_PointTracker(ocvb)
 
-        ocvb.desc = "Find solids in the depth data"
+        ocvb.desc = "FloodFill the regions defined as solid"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        fuzzy.src = ocvb.RGBDepth
+        fuzzy.src = src
         fuzzy.Run(ocvb)
-        dst1 = fuzzy.dst1
-        dst2 = fuzzy.dst2
+        dst2 = fuzzy.dst1
+
+        flood.src = fuzzy.dst1
+        flood.Run(ocvb)
+
+        pTrack.queryPoints = flood.basics.centroids
+        pTrack.queryRects = flood.basics.rects
+        pTrack.queryMasks = flood.basics.masks
+        pTrack.Run(ocvb)
+
+        label2 = CStr(pTrack.viewObjects.Count) + " regions were found"
+        dst1 = pTrack.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Fuzzy_Contours
+    Inherits VBparent
+    Dim options As Contours_Basics
+    Dim fuzzy As Fuzzy_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        options = New Contours_Basics(ocvb) ' we need all the options
+        fuzzy = New Fuzzy_Basics(ocvb)
+        ocvb.desc = "Use contours to outline solids"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        options.setOptions()
+        fuzzy.src = src
+        fuzzy.Run(ocvb)
+
+        'Dim contours0 As cv.Point()()
+        'If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+        '    '    Dim img32sc1 As New cv.Mat
+        '    '    src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
+        '    '    contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
+        '    '    img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        '    contours0 = cv.Cv2.FindContoursAsArray(fuzzy.dst2, cv.RetrievalModes.Tree, options.ApproximationMode)
+        'Else
+        '    contours0 = cv.Cv2.FindContoursAsArray(fuzzy.dst2, options.retrievalMode, options.ApproximationMode)
+        'End If
+
+        'Dim contours()() As cv.Point = Nothing
+        'ReDim contours(contours0.Length - 1)
+        'Dim filterCount As Integer
+        'For j = 0 To contours0.Length - 1
+        '    If contours0(j).Length > 10 Then
+        '        contours(filterCount) = cv.Cv2.ApproxPolyDP(contours0(j), contours0(j).Length, True)
+        '        filterCount += 1
+        '    End If
+        'Next
+        'ReDim Preserve contours(filterCount)
+        'dst1 = fuzzy.dst1
+        'dst2.SetTo(0)
+        'If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+        '    cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        'Else
+        '    cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        'End If
     End Sub
 End Class

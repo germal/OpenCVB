@@ -12,9 +12,10 @@ class Fuzzy
 {
 private:
 public:
-    Mat src;
+    Mat src, dst;
     Fuzzy(){}
-    void Run(Mat dst) {
+    void Run() {
+        dst = Mat(src.rows, src.cols, CV_8U);
         dst.setTo(0);
         for (int y = 1; y < src.rows - 3; ++y)
         {
@@ -46,7 +47,6 @@ extern "C" __declspec(dllexport)
 int *Fuzzy_Run(Fuzzy *cPtr, int *grayPtr, int rows, int cols)
 {
 		cPtr->src = Mat(rows, cols, CV_8UC1, grayPtr);
-        static Mat dst = Mat(rows, cols, CV_8U);
-		cPtr->Run(dst);
-		return (int *) dst.data; // return this C++ allocated data to managed code
+		cPtr->Run();
+		return (int *) cPtr->dst.data; // return this C++ allocated data to managed code
 }

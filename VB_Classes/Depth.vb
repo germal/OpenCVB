@@ -599,8 +599,9 @@ Public Class Depth_Colorizer_CPP
         ocvb.desc = "Display Depth image using C++ instead of VB.Net"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If standalone Then src = getDepth32f(ocvb) Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-
+        If src.Type <> cv.MatType.CV_32F Then
+            If standalone Then src = getDepth32f(ocvb) Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        End If
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)

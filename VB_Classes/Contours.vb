@@ -3,10 +3,11 @@ Imports cv = OpenCvSharp
 Public Class Contours_Basics
     Inherits VBparent
     Public rotatedRect As Draw_rotatedRectangles
+    Public retrievalMode As cv.RetrievalModes
+    Public ApproximationMode As cv.ContourApproximationModes
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         radio.Setup(ocvb, caller, 5)
-        radio.Text = "Retrieval Mode Options"
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
         radio.check(2).Text = "FloodFill"
@@ -15,21 +16,21 @@ Public Class Contours_Basics
         radio.check(4).Checked = True
 
         radio1.Setup(ocvb, caller, 4)
-        radio1.Text = "ContourApproximation Mode"
         radio1.check(0).Text = "ApproxNone"
         radio1.check(1).Text = "ApproxSimple"
         radio1.check(2).Text = "ApproxTC89KCOS"
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
 
+        radio.Text = caller + " Retrieval Mode Options"
+        radio1.Text = caller + " ContourApproximation Mode"
+        radio1.Show()
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         ocvb.desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim retrievalMode As cv.RetrievalModes
-        Dim ApproximationMode As cv.ContourApproximationModes
+    Public Sub setOptions()
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then
                 retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
@@ -43,7 +44,9 @@ Public Class Contours_Basics
                 Exit For
             End If
         Next
-
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        setOptions()
         Dim imageInput As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then
