@@ -488,6 +488,7 @@ Public Structure viewObject
     Dim rectFront As cv.Rect ' this becomes the front view after processing.
     Dim rectView As cv.Rect ' rectangle in the view presented (could be top/side or front view.
     Dim LayoutColor As cv.Scalar
+    Dim contourMat As cv.Mat
     Dim mask As cv.Mat
 End Structure
 
@@ -504,6 +505,8 @@ Public Class Kalman_PointTracker
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
+    Public queryColors As New List(Of Integer)
+    Public queryContourMats As New List(Of cv.Mat) ' the points for the contours in a cv.mat
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -578,7 +581,7 @@ Public Class Kalman_PointTracker
                 End If
             Next
 
-            dst1.SetTo(0)
+            If queryMasks.Count > 0 Then dst1.SetTo(0)
             Dim inputRect = New cv.Rect
             viewObjects.Clear()
             Dim maskIndex As Integer
@@ -586,8 +589,9 @@ Public Class Kalman_PointTracker
                 maskIndex = -1
                 inputRect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
                 Dim pt1 = knn.basics.knnQT.trainingPoints(i)
+                Dim matchIndex As Integer
                 If matches.Contains(pt1) Then
-                    Dim matchIndex = matches.IndexOf(pt1)
+                    matchIndex = matches.IndexOf(pt1)
                     Dim qpt = queryPoints(matchIndex)
                     For k = 0 To queryRects.Count - 1
                         If queryPoints(k) = qpt Then
@@ -632,12 +636,12 @@ Public Class Kalman_PointTracker
                     End If
 
                     If kalman(i).vo.mask Is Nothing Then
-                        vo.LayoutColor = ocvb.scalarColors(i Mod 255)
+                        If queryColors.Count = 0 Then vo.LayoutColor = ocvb.scalarColors(i Mod 255) Else vo.LayoutColor = queryColors(maskIndex)
                         kalman(i).vo = vo
                     Else
                         vo.LayoutColor = kalman(i).vo.LayoutColor
                     End If
-
+                    If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(maskIndex)
                     viewObjects.Add(inputRect.Width * inputRect.Height, vo)
                 End If
             Next
