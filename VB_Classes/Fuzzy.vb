@@ -5,6 +5,7 @@ Public Class Fuzzy_Basics
     Dim Fuzzy As IntPtr
     Dim reduction As Reduction_Simple
     Public palette As Palette_Basics
+    Public gray As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         reduction = New Reduction_Simple(ocvb)
@@ -29,10 +30,10 @@ Public Class Fuzzy_Basics
         If imagePtr <> 0 Then
             Dim dstData(dst1.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC1, dstData)
+            gray = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC1, dstData)
         End If
-        dst2 = dst1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        palette.src = dst1
+        dst2 = gray.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        palette.src = gray
         palette.Run(ocvb)
         dst1 = palette.dst1
         dst1.SetTo(0, dst2)
@@ -225,6 +226,10 @@ Public Class Fuzzy_Contours
         initParent(ocvb)
         options = New Contours_Basics(ocvb) ' we need all the options
         fuzzy = New Fuzzy_Basics(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Threshold of contour points", 1, 500, 20)
+
         ocvb.desc = "Use contours to outline solids"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -232,33 +237,73 @@ Public Class Fuzzy_Contours
         fuzzy.src = src
         fuzzy.Run(ocvb)
 
-        'Dim contours0 As cv.Point()()
-        'If options.retrievalMode = cv.RetrievalModes.FloodFill Then
-        '    '    Dim img32sc1 As New cv.Mat
-        '    '    src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
-        '    '    contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
-        '    '    img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        '    contours0 = cv.Cv2.FindContoursAsArray(fuzzy.dst2, cv.RetrievalModes.Tree, options.ApproximationMode)
-        'Else
-        '    contours0 = cv.Cv2.FindContoursAsArray(fuzzy.dst2, options.retrievalMode, options.ApproximationMode)
-        'End If
+        Dim contours As cv.Point()()
+        If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+            contours = cv.Cv2.FindContoursAsArray(fuzzy.dst2, cv.RetrievalModes.Tree, options.ApproximationMode)
+        Else
+            contours = cv.Cv2.FindContoursAsArray(fuzzy.dst2, options.retrievalMode, options.ApproximationMode)
+        End If
 
-        'Dim contours()() As cv.Point = Nothing
-        'ReDim contours(contours0.Length - 1)
-        'Dim filterCount As Integer
-        'For j = 0 To contours0.Length - 1
-        '    If contours0(j).Length > 10 Then
-        '        contours(filterCount) = cv.Cv2.ApproxPolyDP(contours0(j), contours0(j).Length, True)
-        '        filterCount += 1
-        '    End If
-        'Next
-        'ReDim Preserve contours(filterCount)
-        'dst1 = fuzzy.dst1
-        'dst2.SetTo(0)
-        'If options.retrievalMode = cv.RetrievalModes.FloodFill Then
-        '    cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        'Else
-        '    cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-        'End If
+        dst1 = fuzzy.dst1
+        dst2 = fuzzy.dst1.Clone
+        Static pointThreshold = findSlider("Threshold of contour points")
+        Dim maxPoint = pointThreshold.value
+        For i = 0 To contours.Length - 1
+            If contours(i).Length > maxPoint Then
+                Dim len = contours(i).Length
+                For j = 0 To len
+                    dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+                Next
+            End If
+        Next
+        dst2.SetTo(0, fuzzy.dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Fuzzy_ContoursDepth
+    Inherits VBparent
+    Dim options As Contours_Basics
+    Dim fuzzy As Fuzzy_Depth
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        options = New Contours_Basics(ocvb) ' we need all the options
+        fuzzy = New Fuzzy_Depth(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Threshold of contour points", 1, 500, 20)
+
+        ocvb.desc = "Use contours to outline solids in the depth data"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        options.setOptions()
+        fuzzy.Run(ocvb)
+
+        Dim contours As cv.Point()()
+        If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+            contours = cv.Cv2.FindContoursAsArray(fuzzy.dst2, cv.RetrievalModes.Tree, options.ApproximationMode)
+        Else
+            contours = cv.Cv2.FindContoursAsArray(fuzzy.dst2, options.retrievalMode, options.ApproximationMode)
+        End If
+
+        dst1 = fuzzy.dst1
+        dst2 = fuzzy.dst1.Clone
+        Static pointThreshold = findSlider("Threshold of contour points")
+        Dim maxPoint = pointThreshold.value
+        Dim sortContours As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To contours.Length - 1
+            If contours(i).Length > maxPoint Then
+                Dim len = contours(i).Length
+                sortContours.Add(len, i)
+                For j = 0 To len
+                    dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+                Next
+            End If
+        Next
+        ' dst2.SetTo(0, fuzzy.dst2)
     End Sub
 End Class
