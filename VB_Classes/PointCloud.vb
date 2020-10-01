@@ -60,6 +60,19 @@ Module PointCloud
         Next
         Return minIndex
     End Function
+    Public Function findNearestCentroid(detailPoint As cv.Point, centroids As List(Of cv.Point)) As Integer
+        Dim minIndex As Integer
+        Dim minDistance As Single = Single.MaxValue
+        For i = 0 To centroids.Count - 1
+            Dim pt = centroids.ElementAt(i)
+            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
+            If distance < minDistance Then
+                minIndex = i
+                minDistance = distance
+            End If
+        Next
+        Return minIndex
+    End Function
     Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
     Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
 End Module

@@ -405,3 +405,86 @@ Public Class Fuzzy_NeighborProof
         ocvb.trueText("Mask ID's for all contour point in each region identified only one region.", 10, 50, 3)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Fuzzy_TrackerDepth
+    Inherits VBparent
+    Public fuzzy As Fuzzy_ContoursDepth
+    Dim centroids As New List(Of cv.Point)
+    Dim rects As New List(Of cv.Rect)
+    Dim layoutColor As New List(Of Integer)
+    Dim matchColor As Integer = -1
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        fuzzy = New Fuzzy_ContoursDepth(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Desired number of objects", 1, 50, 10)
+
+        ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        fuzzy.src = src
+        fuzzy.Run(ocvb)
+        dst1 = fuzzy.dst1
+
+        centroids.Clear()
+        rects.Clear()
+        layoutColor.Clear()
+        Dim minX As Double, maxX As Double
+        Dim minY As Double, maxY As Double
+        For Each c In fuzzy.sortContours
+            Dim contours = fuzzy.contours(c.Value.Item0)
+            Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
+            Dim center = points.Sum()
+            points = New cv.Mat(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
+            points.Col(0).MinMaxIdx(minX, maxX)
+            points.Col(1).MinMaxIdx(minY, maxY)
+
+            Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
+            Dim centroid = New cv.Point2f(center.Item(0) / contours.Length, center.Item(1) / contours.Length)
+            centroids.Add(centroid)
+            rects.Add(rect)
+            layoutColor.Add(c.Value.Item1)
+
+            dst1.Circle(centroid, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(centroid, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Rectangle(rect, cv.Scalar.Yellow, 2)
+        Next
+
+        If ocvb.mouseClickFlag Then
+            Dim highlightPoint = ocvb.mouseClickPoint
+            ocvb.mouseClickFlag = False
+            Dim Index = findNearestCentroid(highlightPoint, centroids)
+            matchColor = layoutColor.ElementAt(Index)
+        End If
+
+        If layoutColor.Contains(matchColor) = False Then matchColor = -1 ' the tracking object has been lost.
+        If matchColor >= 0 Then
+            dst2 = fuzzy.fuzzyD.basics.gray
+            Dim rect = rects.ElementAt(layoutColor.IndexOf(matchColor))
+            Dim mask = dst2(rect).InRange(matchColor, matchColor + 1)
+            dst2(rect).SetTo(255, mask)
+
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Dim pt = centroids.ElementAt(layoutColor.IndexOf(matchColor))
+            dst2.Circle(pt, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
+        End If
+        label1 = CStr(fuzzy.sortContours.Count) + " regions were found in the image."
+
+        Static contourSlider = findSlider("Threshold of contour points")
+        Dim desired = sliders.trackbar(0).Value
+        If fuzzy.sortContours.Count > desired Then
+            contourSlider.value += 1
+        Else
+            If desired - fuzzy.sortContours.Count > 3 Then contourSlider.value -= 1
+        End If
+    End Sub
+End Class

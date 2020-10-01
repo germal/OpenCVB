@@ -55,6 +55,7 @@ Public Class Highlight_Contour
     Dim tracker As Fuzzy_Tracker
     Public highlightPoint As New cv.Point
     Dim highlightRect As New cv.Rect
+    Dim lower As Integer, upper As Integer
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         tracker = New Fuzzy_Tracker(ocvb)
@@ -66,39 +67,43 @@ Public Class Highlight_Contour
         dst1 = tracker.dst1
         label1 = tracker.label1
 
+        If (lower <> 0 Or upper <> 0) And ocvb.mouseClickFlag = False Then
+            dst2 = tracker.fuzzy.fuzzyD.basics.gray
+            Dim mask = dst2(highlightRect).InRange(lower, upper)
+            dst2(highlightRect).SetTo(255, mask)
+        Else
+            If ocvb.mouseClickFlag Then
+                highlightPoint = ocvb.mouseClickPoint
+                ocvb.mouseClickFlag = False ' absorb the mouse click here only
+                'End If
+                'If highlightPoint <> New cv.Point And tracker.pTrack.viewObjects.Count > 0 Then
+                Dim vo = tracker.pTrack.viewObjects
+                Dim index = findNearestPoint(highlightPoint, vo)
+                highlightPoint = vo.ElementAt(index).Value.centroid
+                highlightRect = vo.ElementAt(index).Value.rectView
+                dst2 = tracker.fuzzy.fuzzyD.basics.gray
 
-        If ocvb.mouseClickFlag Then
-            highlightPoint = ocvb.mouseClickPoint
-            ocvb.mouseClickFlag = False ' absorb the mouse click here only
+                lower = vo.ElementAt(index).Value.LayoutColor
+                upper = cv.Scalar.All(vo.ElementAt(index).Value.LayoutColor.Item(0) + 1)
+                Dim mask = dst2(highlightRect).InRange(lower, upper)
+
+                Dim preKalmanRect = vo.ElementAt(index).Value.preKalmanRect
+
+                dst2(highlightRect).SetTo(255, mask)
+                dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                dst2.Circle(highlightPoint, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(highlightPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                dst2.Rectangle(highlightRect, cv.Scalar.Yellow, 2)
+
+                Dim contourMat = vo.ElementAt(index).Value.contourMat
+                For i = 0 To contourMat.Rows - 1
+                    Dim pt1 = contourMat.Get(Of cv.Point)(i, 0)
+                    dst2.Circle(pt1, 1, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                Next
+
+                label2 = "Highlighting the selected region."
+            End If
         End If
         If highlightPoint = New cv.Point Then ocvb.trueText("Click on any centroid to see details", 10, 50, 3)
-        If highlightPoint <> New cv.Point And tracker.pTrack.viewObjects.Count > 0 Then
-            Dim vo = tracker.pTrack.viewObjects
-            Dim index = findNearestPoint(highlightPoint, vo)
-            highlightPoint = vo.ElementAt(index).Value.centroid
-            highlightRect = vo.ElementAt(index).Value.rectView
-            dst2 = tracker.fuzzy.fuzzyD.basics.gray
-
-            Dim lower = vo.ElementAt(index).Value.LayoutColor
-            Dim upper = cv.Scalar.All(vo.ElementAt(index).Value.LayoutColor.Item(0) + 1)
-            Dim mask = dst2(highlightRect).InRange(lower, upper)
-
-            Dim preKalmanRect = vo.ElementAt(index).Value.preKalmanRect
-
-            dst2(highlightRect).SetTo(255, mask)
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2.Circle(highlightPoint, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(highlightPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst2.Rectangle(highlightRect, cv.Scalar.Yellow, 2)
-
-
-            Dim contourMat = vo.ElementAt(index).Value.contourMat
-            For i = 0 To contourMat.Rows - 1
-                Dim pt1 = contourmat.get(Of cv.Point)(i, 0)
-                dst2.Circle(pt1, 1, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            Next
-
-            label2 = "Highlighting the selected region."
-        End If
     End Sub
 End Class
