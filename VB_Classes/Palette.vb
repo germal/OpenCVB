@@ -26,15 +26,13 @@ Public Class Palette_Basics
                                            cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
                                            cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer,
                                            cv.ColormapTypes.Twilight, cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis,
-                                           cv.ColormapTypes.Winter, 20) ' The last is a placeholder for "Random"
+                                           cv.ColormapTypes.Winter, 20) ' The last = placeholder for Random...
                 Return scheme
             End If
         Next
         Return 0
     End Function
     Public Sub Run(ocvb As VBocvb)
-        Static randomColorMapReady = False
-
         colormap = checkRadios()
         label1 = "ColorMap = " + mapNames(colormap)
 
@@ -58,12 +56,7 @@ Public Class Palette_Basics
 
         ' special case the random color map!
         If colormap = 20 Then
-            Static saveTransitionCount = gradMap.sliders.trackbar(0).Value
-            If randomColorMapReady = False Or saveTransitionCount <> gradMap.sliders.trackbar(0).Value Then
-                saveTransitionCount = gradMap.sliders.trackbar(0).Value
-                randomColorMapReady = True
-                gradMap.Run(ocvb)
-            End If
+            gradMap.Run(ocvb)
 
             ' Uncomment this to test if the .NET interface for ApplyColorMap for custom color maps is working
             ' cv.Cv2.ApplyColorMap(src, dst2, gradMap.gradientColorMap) 
@@ -72,7 +65,6 @@ Public Class Palette_Basics
             dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
             dst2 = gradMap.gradientColorMap.Resize(dst2.Size)
         Else
-            randomColorMapReady = False ' if they select something other than random, then next random request will rebuild the map.
             cv.Cv2.ApplyColorMap(src, dst1, colormap)
         End If
     End Sub
@@ -140,7 +132,7 @@ Module Palette_Custom_Module
     Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
     End Sub
     Public mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
-                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter", "Random"}
+                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter", "Random - use slider to adjust"}
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
         ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
@@ -347,19 +339,23 @@ Public Class Palette_BuildGradientColorMap
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If standalone Then If ocvb.frameCount Mod 100 Then Exit Sub
         Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+        Static saveGradCount = -1
         Dim gradCount = sliders.trackbar(0).Value
-        Dim gradMat As New cv.Mat
-        For i = 0 To gradCount - 1
-            gradMat = colorTransition(color1, color2, src.Width)
-            color2 = color1
-            color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-        Next
+        If saveGradCount <> gradCount Then
+            saveGradCount = gradCount
+            Dim gradMat As New cv.Mat
+            For i = 0 To gradCount - 1
+                gradMat = colorTransition(color1, color2, src.Width)
+                color2 = color1
+                color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+            Next
+        End If
         gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
         dst1 = Palette_Custom_Apply(src, gradientColorMap)
+        dst2 = gradientColorMap
     End Sub
 End Class
 

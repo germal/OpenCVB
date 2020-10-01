@@ -416,18 +416,12 @@ Public Class Kalman_Single
         kf.ProcessNoiseCov.SetIdentity(0.00001)
         kf.MeasurementNoiseCov.SetIdentity(0.1)
         kf.ErrorCovPost.SetIdentity(1)
-
+        plot = New Plot_OverTime(ocvb)
+        plot.plotCount = 2 ' 2 items to plot
         ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
-            If ocvb.frameCount = 0 Then
-                plot = New Plot_OverTime(ocvb)
-                plot.maxScale = 150
-                plot.minScale = 80
-                plot.plotCount = 2
-            End If
-
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
         End If
