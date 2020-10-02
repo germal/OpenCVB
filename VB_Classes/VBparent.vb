@@ -111,6 +111,29 @@ Public Class VBparent : Implements IDisposable
         End While
         Return Nothing
     End Function
+    Public Function findRadio(opt As String) As RadioButton
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" Radio Options") Then
+                        For i = 0 To frm.check.length - 1
+                            If frm.check(i).text.contains(opt) Then Return frm.check(i)
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findRadio failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                MsgBox("A findRadio was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
+                Exit While
+            End If
+        End While
+        Return Nothing
+    End Function
     Public Sub hideForm(title As String)
         For Each frm In Application.OpenForms
             If frm.text = title Then

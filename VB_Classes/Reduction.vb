@@ -4,25 +4,33 @@ Public Class Reduction_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Reduction factor", 0, 12, 6)
+        sliders.setupTrackBar(0, "Reduction factor", 0, 4000, 64)
 
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Use Reduction"
-        check.Box(0).Checked = True
+        radio.Setup(ocvb, caller, 3)
+        radio.check(0).Text = "Use bitwise reduction"
+        radio.check(1).Text = "Use simple reduction"
+        radio.check(2).Text = "No reduction"
+        radio.check(1).Checked = True
 
-        ocvb.desc = "Reduction: a simpler way to KMeans by removing low-order bits"
+        ocvb.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If check.Box(0).Checked Then
-            Dim power = Choose(sliders.trackbar(0).Value + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096) - 1
+        Dim reductionSlider = findSlider("Reduction factor")
+        Dim reductionVal = reductionSlider.Value
+        If radio.check(0).Checked Then
+            Dim nearestPowerOf2 = Math.Round(Math.Log(reductionVal, 2)) ' Math.Pow(2, Math.Round(Math.Log(reductionVal) / Math.Log(2)))
+            If nearestPowerOf2 = Double.NegativeInfinity Then nearestPowerOf2 = 0
+            Dim power = Choose(nearestPowerOf2 + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096) - 1
             Dim maskval = 256 - power
             If src.Type = cv.MatType.CV_32S Then maskval = Integer.MaxValue - power
-            If src.Type = cv.MatType.CV_8U Or src.Type = cv.MatType.CV_8UC3 And maskval < 2 Then
-                Console.WriteLine("Reduction_Basics: the limit of the reduction factor for 8-bit images is 7 or fewer and it is set to 8!")
-            End If
             Dim tmp = New cv.Mat(src.Size, src.Type).SetTo(cv.Scalar.All(maskval))
             cv.Cv2.BitwiseAnd(src, tmp, dst1)
             label1 = "Reduced color image after zero'ing bit(s) 0x" + Hex(power)
+        ElseIf radio.check(1).Checked Then
+            If reductionVal = 0 Then reductionVal = 1
+            dst1 = src / reductionVal
+            dst1 *= reductionVal
+            label1 = "Reduced image - factor = " + CStr(reductionVal)
         Else
             dst1 = src
             label1 = "No reduction requested"
@@ -30,35 +38,6 @@ Public Class Reduction_Basics
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Reduction_Simple
-    Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Simple reduction factor", 1, 4000, 64)
-
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Use Simple Reduction"
-        check.Box(0).Checked = True
-
-        ocvb.desc = "Reduction: a simple way to get KMeans"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If check.Box(0).Checked Then
-            dst1 = src / sliders.trackbar(0).Value
-            dst1 *= sliders.trackbar(0).Value
-            label1 = "Reduced image - factor = " + CStr(sliders.trackbar(0).Value)
-        Else
-            dst1 = src
-            label1 = "No reduction requested"
-        End If
-    End Sub
-End Class
 
 
 
@@ -75,6 +54,8 @@ Public Class Reduction_Edges
 
         edges = New Edges_Laplacian(ocvb)
         reduction = New Reduction_Basics(ocvb)
+        reduction.radio.check(0).Checked = True
+
         ocvb.desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -82,9 +63,10 @@ Public Class Reduction_Edges
         reduction.Run(ocvb)
         dst1 = reduction.dst1.Clone
 
-        Static reductionCheck = findCheckBox("Use Reduction")
-        label1 = If(reductionCheck.checked, "Reduced image", "Original image")
-        label2 = If(reductionCheck.checked, "Laplacian edges of reduced image", "Laplacian edges of original image")
+        Dim reductionRequested = False
+        If reduction.radio.check(0).Checked Or reduction.radio.check(1).Checked Then reductionRequested = True
+        label1 = If(reductionRequested, "Reduced image", "Original image")
+        label2 = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
         edges.src = dst1
         edges.Run(ocvb)
         dst2 = edges.dst1
@@ -97,11 +79,11 @@ End Class
 Public Class Reduction_Floodfill
     Inherits VBparent
     Public flood As FloodFill_Basics
-    Public reduction As Reduction_Simple
+    Public reduction As Reduction_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         flood = New FloodFill_Basics(ocvb)
-        reduction = New Reduction_Simple(ocvb)
+        reduction = New Reduction_Basics(ocvb)
         ocvb.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -199,6 +181,7 @@ Public Class Reduction_Depth
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
+        reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP(ocvb)
         ocvb.desc = "Use reduction to smooth depth data"
     End Sub
@@ -229,6 +212,7 @@ Public Class Reduction_PointCloud
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
+        reduction.radio.check(0).Checked = True
         ocvb.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)

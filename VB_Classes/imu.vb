@@ -495,7 +495,7 @@ End Class
 
 Public Class IMU_GVector
     Inherits VBparent
-    Dim kalman As Kalman_Basics
+    Public kalman As Kalman_Basics
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.

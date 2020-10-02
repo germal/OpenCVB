@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class Fuzzy_Basics
     Inherits VBparent
     Dim Fuzzy As IntPtr
-    Dim reduction As Reduction_Simple
+    Dim reduction As Reduction_Basics
     Dim options As Contours_Basics
     Public palette As Palette_Basics
     Public gray As cv.Mat
@@ -16,7 +16,7 @@ Public Class Fuzzy_Basics
         options.rotatedRect.rect.sliders.Visible = False
 
         palette = New Palette_Basics(ocvb)
-        reduction = New Reduction_Simple(ocvb)
+        reduction = New Reduction_Basics(ocvb)
         Fuzzy = Fuzzy_Open()
 
         sliders.Setup(ocvb, caller)

@@ -1279,18 +1279,21 @@ Public Class Depth_PointCloudInRange
         initParent(ocvb)
         reduction = New Reduction_Depth(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+
         label1 = "Mask for depth values that are in-range"
         ocvb.desc = "Show PointCloud while varying the max depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxMeters = inRangeSlider.Value / 1000
+        dst2.SetTo(0)
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
         split = cv.Cv2.Split(src)
 
-        Static reductionCheck = findCheckBox("Use Reduction")
-        If reductionCheck.checked Then
+        Static reductionRadio = findRadio("No reduction")
+        If reductionRadio.checked = False Then
             split(2) *= 1000
             split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
             reduction.Run(ocvb)
@@ -1330,7 +1333,9 @@ Public Class Depth_PointCloudInRange_IMU
 
         reduction = New Reduction_Depth(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
         imu = New IMU_GVector(ocvb)
+        If standalone Then imu.kalman.check.Visible = False
 
         label1 = "Mask for depth values that are in-range"
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
@@ -1370,14 +1375,15 @@ Public Class Depth_PointCloudInRange_IMU
                 split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
             End If
 
-            Static reductionCheck = findCheckBox("Use Reduction")
-            If reductionCheck.checked Then
-                split(2) *= 1000
-                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-                reduction.Run(ocvb)
-                split(2) = reduction.dst1 / 1000
+            If standalone = False Then
+                Static reductionRadio = findRadio("No reduction")
+                If reductionRadio.checked = False Then
+                    split(2) *= 1000
+                    split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                    reduction.Run(ocvb)
+                    split(2) = reduction.dst1 / 1000
+                End If
             End If
-
             cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
             Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)
@@ -1393,48 +1399,47 @@ End Class
 
 
 
-Public Class Depth_Reduction
-    Inherits VBparent
-    Dim gCloudIMU As Depth_PointCloudInRange_IMU
-    Dim reductionSlider As System.Windows.Forms.TrackBar
-    Dim reduction As Reduction_KNN_Color
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+'Public Class Depth_Reduction
+'    Inherits VBparent
+'    Dim gCloudIMU As Depth_PointCloudInRange_IMU
+'    Dim reduction As Reduction_KNN_Color
+'    Public Sub New(ocvb As VBocvb)
+'        initParent(ocvb)
 
-        reduction = New Reduction_KNN_Color(ocvb)
-        gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
-        reductionSlider = findSlider("Reduction factor")
+'        reduction = New Reduction_KNN_Color(ocvb)
+'        gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
 
-        ocvb.desc = "Find discrete depth levels and their centroids"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        reduction.src = src
-        reduction.Run(ocvb)
-        dst2 = reduction.dst1.Clone()
-        label2 = reduction.label1
+'        ocvb.desc = "Find discrete depth levels and their centroids"
+'    End Sub
+'    Public Sub Run(ocvb As VBocvb)
+'        reduction.src = src
+'        reduction.Run(ocvb)
+'        dst2 = reduction.dst1.Clone()
+'        label2 = reduction.label1
 
-        Static maxZslider = findSlider("InRange Max Depth (mm)")
-        maxZ = maxZslider.value
+'        Static maxZslider = findSlider("InRange Max Depth (mm)")
+'        maxZ = maxZslider.value
 
-        gCloudIMU.src = ocvb.pointCloud
-        gCloudIMU.Run(ocvb)
+'        gCloudIMU.src = ocvb.pointCloud
+'        gCloudIMU.Run(ocvb)
 
-        Dim levels As Integer = CInt(maxZ >> reductionSlider.Value) + 1
-        Dim levelSize = maxZ / levels
-        label1 = "There are " + CStr(levels) + " discrete depth levels to " + CStr(maxZ) + " mm's"
+'        Static reductionSlider = findSlider("Reduction factor")
+'        Dim levels As Integer = CInt(maxZ >> reductionSlider.Value) + 1
+'        Dim levelSize = maxZ / levels
+'        label1 = "There are " + CStr(levels) + " discrete depth levels to " + CStr(maxZ) + " mm's"
 
-        Dim depth32f = gCloudIMU.split(2)
-        depth32f *= 1024 ' convert to mm's
-        depth32f = depth32f.Resize(src.Size)
-        dst1.SetTo(0)
-        For i = 2 To levels - 1
-            Dim tmp = depth32f.Threshold(levelSize * i, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-            Dim mask = depth32f.Threshold(levelSize * (i - 1), 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-            mask = mask.SetTo(0, tmp)
-            dst1.SetTo(ocvb.scalarColors(i Mod 255), mask)
-        Next
-    End Sub
-End Class
+'        Dim depth32f = gCloudIMU.split(2)
+'        depth32f *= 1024 ' convert to mm's
+'        depth32f = depth32f.Resize(src.Size)
+'        dst1.SetTo(0)
+'        For i = 2 To levels - 1
+'            Dim tmp = depth32f.Threshold(levelSize * i, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+'            Dim mask = depth32f.Threshold(levelSize * (i - 1), 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+'            mask = mask.SetTo(0, tmp)
+'            dst1.SetTo(ocvb.scalarColors(i Mod 255), mask)
+'        Next
+'    End Sub
+'End Class
 
 
 

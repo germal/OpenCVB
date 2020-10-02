@@ -36,11 +36,11 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class LUT_Basics
     Inherits VBparent
-    Public reduction As Reduction_Simple
+    Public reduction As Reduction_Basics
     Public colorMat As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        reduction = New Reduction_Simple(ocvb)
+        reduction = New Reduction_Basics(ocvb)
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors)
         ocvb.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub

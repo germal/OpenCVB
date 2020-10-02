@@ -556,6 +556,7 @@ Public Class LineDetector_Reduction
         initParent(ocvb)
         lDetect = New LineDetector_Basics(ocvb)
         reduction = New Reduction_Basics(ocvb)
+        reduction.radio.check(0).Checked = True
 
         label1 = "Output of line detection using reduced input"
         label2 = "Output of reduction_basics"

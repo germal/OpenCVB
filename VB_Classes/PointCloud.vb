@@ -786,8 +786,8 @@ Public Class PointCloud_HistTopView
         hist = New Histogram_2D_TopView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
 
-        Dim reductionCheck = findCheckBox("Use Reduction")
-        reductionCheck.Checked = False
+        Static reductionRadio = findRadio("No reduction")
+        reductionRadio.checked = True
 
         ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
@@ -811,8 +811,8 @@ Public Class PointCloud_HistSideView
         hist = New Histogram_2D_SideView(ocvb)
         hist.histOpts.check.Box(0).Checked = False
 
-        Dim reductionCheck = findCheckBox("Use Reduction")
-        reductionCheck.Checked = False
+        Static reductionRadio = findRadio("No reduction")
+        reductionRadio.checked = True
 
         ocvb.desc = "Display the histogram with and without adjusting for gravity"
     End Sub
@@ -875,34 +875,31 @@ Public Class PointCloud_WallsFloors_Kalman
 
         ocvb.desc = "Use Kalman to smooth results of wall/floor detection"
     End Sub
+    Private Sub runTrack(ocvb As VBocvb, ByRef dst As cv.Mat, pTrack As Object, mat As cv.Mat, vo As SortedList(Of Single, viewObject))
+        pTrack.queryPoints.Clear()
+        pTrack.queryRects.Clear()
+        For j = 0 To mat.Rows - 1
+            Dim nextVec = mat.Get(Of cv.Vec6f)(j, 0)
+            pTrack.queryPoints.Add(New cv.Point2f(nextVec.Item0, nextVec.Item1))
+            pTrack.queryRects.Add(New cv.Rect(nextVec.Item2, nextVec.Item3, 0, 0))
+        Next
+
+        pTrack.Run(ocvb)
+
+        For j = 0 To vo.Count - 1
+            Dim vw = vo.ElementAt(j).Value
+            Dim pt1 = vw.centroid
+            Dim pt2 = New cv.Point2f(vw.rectView.X, vw.rectView.Y)
+            dst.Line(pt1, pt2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
     Public Sub Run(ocvb As VBocvb)
         walls.Run(ocvb)
         dst1 = walls.dst1
         dst2 = walls.dst2
 
-        For i = 0 To 1
-            Dim ptrack As Kalman_PointTracker = Choose(i + 1, pTrackWall, pTrackFloor)
-            Dim mat = Choose(i + 1, walls.wallLines, walls.floorsLines)
-            Dim dst = Choose(i + 1, dst1, dst2)
-
-            ptrack.queryPoints.Clear()
-            ptrack.queryRects.Clear()
-            For j = 0 To mat.Rows - 1
-                Dim nextVec = mat.Get(Of cv.Vec6f)(j, 0)
-                ptrack.queryPoints.Add(New cv.Point2f(nextVec.Item0, nextVec.Item1))
-                ptrack.queryRects.Add(New cv.Rect(nextVec.Item2, nextVec.Item3, 0, 0))
-            Next
-
-            ptrack.Run(ocvb)
-
-            Dim viewObjects = New SortedList(Of Single, viewObject)(ptrack.viewObjects)
-            For j = 0 To viewObjects.Count - 1
-                Dim vw = viewObjects.ElementAt(j).Value
-                Dim pt1 = vw.centroid
-                Dim pt2 = New cv.Point2f(vw.rectView.X, vw.rectView.Y)
-                dst.Line(pt1, pt2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-            Next
-        Next
+        runTrack(ocvb, dst1, pTrackWall, walls.wallLines, pTrackWall.viewObjects)
+        runTrack(ocvb, dst2, pTrackFloor, walls.floorsLines, pTrackFloor.viewObjects)
     End Sub
 End Class
 
@@ -913,19 +910,18 @@ End Class
 Public Class PointCloud_WallsFloors
     Inherits VBparent
     Dim both As PointCloud_HistBothViews
-    Public lDetect As lineDetector_FLD_CPP
+    Public wallDetect As lineDetector_FLD_CPP
+    Public floorDetect As lineDetector_FLD_CPP
     Public wallLines As cv.Mat
     Public floorsLines As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        lDetect = New lineDetector_FLD_CPP(ocvb)
+        wallDetect = New lineDetector_FLD_CPP(ocvb)
+        floorDetect = New lineDetector_FLD_CPP(ocvb)
         both = New PointCloud_HistBothViews(ocvb)
 
         Dim histThresholdSlider = findSlider("Histogram threshold")
         histThresholdSlider.Value = 100
-
-        Dim reductionCheck = findCheckBox("Use Reduction")
-        reductionCheck.Checked = True
 
         label1 = "Top View: wall candidates in red"
         label2 = "Side View: floors/ceiling candidates in red"
@@ -939,14 +935,14 @@ Public Class PointCloud_WallsFloors
         dst1 = both.dst1
         dst2 = both.dst2
 
-        lDetect.src = dst1
-        lDetect.Run(ocvb)
-        dst1 = lDetect.dst1.Clone
-        wallLines = lDetect.lineMat.Clone
+        wallDetect.src = dst1
+        wallDetect.Run(ocvb)
+        dst1 = wallDetect.dst1
+        wallLines = wallDetect.lineMat
 
-        lDetect.src = dst2
-        lDetect.Run(ocvb)
-        dst2 = lDetect.dst1.Clone
-        floorsLines = lDetect.lineMat.Clone
+        floorDetect.src = dst2
+        floorDetect.Run(ocvb)
+        dst2 = floorDetect.dst1
+        floorsLines = floorDetect.lineMat
     End Sub
 End Class

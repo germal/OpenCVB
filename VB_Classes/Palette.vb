@@ -184,6 +184,8 @@ Public Class Palette_Reduction
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
+        reduction.radio.check(0).Checked = True
+        reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
@@ -202,12 +204,10 @@ Public Class Palette_Reduction
         End Function
     End Class
     Public Sub Run(ocvb As VBocvb)
-        Static reductionCheck = findCheckBox("Use Reduction")
-        reductionCheck.checked = True
         Static reductionSlider = findSlider("Reduction factor")
-        If reductionSlider.value < 5 Then
-            reductionSlider.value = 5
-            Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 5")
+        If reductionSlider.value < 32 Then
+            reductionSlider.value = 32
+            Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 2^^5")
         End If
         reduction.src = src
         reduction.Run(ocvb)
