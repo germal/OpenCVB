@@ -64,7 +64,7 @@ Public Class CComp_Basics
         If edgeMask IsNot Nothing Then mats.mat(0).SetTo(0, edgeMask)
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(mats.mat(0))
-        connectedComponents.renderblobs(ocvb, mats.mat(2))
+        connectedComponents.renderblobs(mats.mat(2))
 
         Dim count = renderBlobs(ocvb, minSize, mats.mat(0), maxSize)
         cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
