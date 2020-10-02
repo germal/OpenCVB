@@ -4,18 +4,31 @@ Public Class Fuzzy_Basics
     Inherits VBparent
     Dim Fuzzy As IntPtr
     Dim reduction As Reduction_Simple
+    Dim options As Contours_Basics
     Public palette As Palette_Basics
     Public gray As cv.Mat
+    Public contours As cv.Point()()
+    Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+
+        options = New Contours_Basics(ocvb)
+        options.rotatedRect.rect.sliders.Visible = False
+
+        palette = New Palette_Basics(ocvb)
         reduction = New Reduction_Simple(ocvb)
         Fuzzy = Fuzzy_Open()
-        palette = New Palette_Basics(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Threshold for rectangle size", 50, 50000, 10000)
+        If standalone Then sliders.Visible = False
+
         label1 = "Solid regions"
         label2 = "Fuzzy pixels - not solid"
         ocvb.desc = "That which is not solid is fuzzy"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        options.setOptions()
         reduction.src = src
         reduction.Run(ocvb)
         dst1 = reduction.dst1
@@ -32,7 +45,31 @@ Public Class Fuzzy_Basics
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
             gray = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC1, dstData)
         End If
+
         dst2 = gray.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        contours = cv.Cv2.FindContoursAsArray(dst2, options.retrievalMode, options.ApproximationMode)
+
+        sortContours.Clear()
+        For i = 0 To contours.Length - 1
+            ' get this region's ID
+            Dim maskID As Integer = 0
+            Dim pt = contours(i)(0)
+            For y = pt.Y - 1 To pt.Y + 1
+                For x = pt.X - 1 To pt.X + 1
+                    If x < src.Width And y < src.Height Then
+                        Dim val = gray.Get(Of Byte)(y, x)
+                        If val <> 0 Then maskID = val
+                    End If
+                Next
+            Next
+
+            Dim len = contours(i).Length
+            For j = 0 To len
+                dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            Next
+            sortContours.Add(len, New cv.Point(i, maskID))
+        Next
+
         palette.src = gray
         palette.Run(ocvb)
         dst1 = palette.dst1
@@ -43,39 +80,6 @@ Public Class Fuzzy_Basics
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Fuzzy_Basics_VB
-    Inherits VBparent
-    Dim reduction As Reduction_Simple
-    Dim hist As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        reduction = New Reduction_Simple(ocvb)
-        hist = New Histogram_KalmanSmoothed(ocvb)
-        ocvb.desc = "That which is not solid is fuzzy."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        reduction.src = src
-        reduction.Run(ocvb)
-        dst1 = reduction.dst1
-
-        Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = New cv.Mat(gray.Size, cv.MatType.CV_8U, 0)
-        For y = 1 To gray.Rows - 3
-            For x = 1 To gray.Cols - 3
-                Dim pixel = gray.Get(Of Byte)(y, x)
-                Dim r = New cv.Rect(x, y, 3, 3)
-                Dim pSum = cv.Cv2.Sum(gray(r))
-                If pSum = 9 * pixel Then dst2.Set(Of Byte)(y + 1, x + 1, 255)
-            Next
-        Next
-    End Sub
-End Class
 
 
 
@@ -101,175 +105,20 @@ End Module
 
 
 
-Public Class Fuzzy_Depth
-    Inherits VBparent
-    Public basics As Fuzzy_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        basics = New Fuzzy_Basics(ocvb)
-
-        label1 = "Solid regions in depth"
-        label2 = "Fuzzy pixels - not solid"
-        ocvb.desc = "Find solids in the depth data"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        basics.src = ocvb.RGBDepth
-        basics.Run(ocvb)
-        dst1 = basics.dst1
-        dst2 = basics.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Fuzzy_Depth2
-    Inherits VBparent
-    Dim fuzzy As Fuzzy_Basics
-    Dim depth As Depth_Colorizer_CPP
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fuzzy = New Fuzzy_Basics(ocvb)
-        depth = New Depth_Colorizer_CPP(ocvb)
-
-        label1 = "Solid regions in depth"
-        label2 = "Fuzzy pixels - not solid"
-        ocvb.desc = "Find solids in the depth data and show that colorizing manually does not alter the outcome."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        depth.src = getDepth32f(ocvb)
-        depth.Run(ocvb)
-
-        fuzzy.src = depth.dst1
-        fuzzy.Run(ocvb)
-        dst1 = fuzzy.dst1
-        dst2 = fuzzy.dst2
-    End Sub
-End Class
-
-
-
-
-
-Public Class Fuzzy_FloodFill
-    Inherits VBparent
-    Dim fuzzy As Fuzzy_Basics
-    Dim flood As FloodFill_8bit
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fuzzy = New Fuzzy_Basics(ocvb)
-        flood = New FloodFill_8bit(ocvb)
-
-        ocvb.desc = "FloodFill the regions defined as solid"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        fuzzy.src = src
-        fuzzy.Run(ocvb)
-        dst2 = fuzzy.dst1
-
-        flood.src = fuzzy.dst1
-        flood.Run(ocvb)
-        dst1 = flood.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Fuzzy_Contours
-    Inherits VBparent
-    Dim options As Contours_Basics
-    Public fuzzy As Fuzzy_Basics
-    Public contours As cv.Point()()
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        options = New Contours_Basics(ocvb) ' we need all the options
-        fuzzy = New Fuzzy_Basics(ocvb)
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Threshold of contour points", 1, 500, 20)
-
-        ocvb.desc = "Use contours to outline solids"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        options.setOptions()
-        fuzzy.src = src
-        fuzzy.Run(ocvb)
-
-        contours = cv.Cv2.FindContoursAsArray(fuzzy.dst2, options.retrievalMode, options.ApproximationMode)
-
-        dst1 = fuzzy.dst1
-        dst2 = fuzzy.dst1.Clone
-        Static pointThreshold = findSlider("Threshold of contour points")
-        Dim maxPoint = pointThreshold.value
-        For i = 0 To contours.Length - 1
-            If contours(i).Length > maxPoint Then
-                Dim len = contours(i).Length
-                For j = 0 To len
-                    dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-                Next
-            End If
-        Next
-        dst2.SetTo(0, fuzzy.dst2)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Fuzzy_ContoursDepth
     Inherits VBparent
-    Dim options As Contours_Basics
-    Public fuzzyD As Fuzzy_Depth
-    Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
-    Public contours As cv.Point()()
+    Public fuzzyD As Fuzzy_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        options = New Contours_Basics(ocvb) ' we need all the options
-        fuzzyD = New Fuzzy_Depth(ocvb)
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Threshold of contour points", 1, 500, 20)
+        fuzzyD = New Fuzzy_Basics(ocvb)
 
         ocvb.desc = "Use contours to outline solids in the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        options.setOptions()
+        fuzzyD.src = ocvb.RGBDepth
         fuzzyD.Run(ocvb)
-
-        contours = cv.Cv2.FindContoursAsArray(fuzzyD.dst2, options.retrievalMode, options.ApproximationMode)
-
-        sortContours.Clear()
         dst1 = fuzzyD.dst1
-        dst2 = fuzzyD.dst1.Clone
-        Static pointThreshold = findSlider("Threshold of contour points")
-        Dim maxPoint = pointThreshold.value
-        For i = 0 To contours.Length - 1
-            If contours(i).Length > maxPoint Then
-                Dim len = contours(i).Length
-                For j = 0 To len
-                    dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-                Next
-                Dim maskID As Integer = 0
-                Dim pt = contours(i)(0)
-                For y = pt.Y - 1 To pt.Y + 1
-                    For x = pt.X - 1 To pt.X + 1
-                        If x < src.Width And y < src.Height Then
-                            Dim val = fuzzyD.basics.gray.Get(Of Byte)(y, x)
-                            If val <> 0 Then maskID = val
-                        End If
-                    Next
-                Next
-                sortContours.Add(len, New cv.Point(i, maskID))
-            End If
-        Next
     End Sub
 End Class
 
@@ -277,90 +126,54 @@ End Class
 
 
 
+'Public Class Fuzzy_Tracker
+'    Inherits VBparent
+'    Public fuzzy As Fuzzy_ContoursDepth
+'    Public pTrack As Kalman_PointTracker
+'    Public Sub New(ocvb As VBocvb)
+'        initParent(ocvb)
+'        pTrack = New Kalman_PointTracker(ocvb)
+'        fuzzy = New Fuzzy_ContoursDepth(ocvb)
 
-Public Class Fuzzy_PointTracker
-    Inherits VBparent
-    Dim fuzzy As Fuzzy_Basics
-    Dim pTrack As Kalman_PointTracker
-    Dim flood As FloodFill_8bit
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fuzzy = New Fuzzy_Basics(ocvb)
-        flood = New FloodFill_8bit(ocvb)
-        pTrack = New Kalman_PointTracker(ocvb)
+'        sliders.Setup(ocvb, caller)
+'        sliders.setupTrackBar(0, "Desired number of objects", 1, 50, 10)
 
-        ocvb.desc = "FloodFill the regions defined as solid"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        fuzzy.src = src
-        fuzzy.Run(ocvb)
-        dst2 = fuzzy.dst1
+'        ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
+'    End Sub
+'    Public Sub Run(ocvb As VBocvb)
+'        fuzzy.src = src
+'        fuzzy.Run(ocvb)
+'        dst1 = fuzzy.dst1
 
-        flood.src = fuzzy.dst1
-        flood.Run(ocvb)
+'        pTrack.queryRects.Clear()
+'        pTrack.queryPoints.Clear()
+'        Dim minX As Double, maxX As Double
+'        Dim minY As Double, maxY As Double
+'        For Each c In fuzzy.sortContours
+'            Dim contours = fuzzy.contours(c.Value.Item0)
+'            Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
+'            Dim center = points.Sum()
+'            points = New cv.Mat(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
+'            points.Col(0).MinMaxIdx(minX, maxX)
+'            points.Col(1).MinMaxIdx(minY, maxY)
+'            pTrack.queryPoints.Add(New cv.Point2f(center.Item(0) / contours.Length, center.Item(1) / contours.Length))
+'            pTrack.queryRects.Add(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
+'            pTrack.queryColors.Add(c.Value.Item1) ' this is the gray scale color of the mask...
+'            pTrack.queryContourMats.Add(points.Clone) ' this is the index into the contours that will be used to outline the region...
+'        Next
+'        pTrack.dst1 = fuzzy.dst1
+'        pTrack.Run(ocvb)
+'        label1 = CStr(pTrack.viewObjects.Count) + " regions were found in the image."
 
-        pTrack.queryPoints = flood.basics.centroids
-        pTrack.queryRects = flood.basics.rects
-        pTrack.queryMasks = flood.basics.masks
-        pTrack.Run(ocvb)
-
-        label2 = CStr(pTrack.viewObjects.Count) + " regions were found"
-        dst1 = pTrack.dst1
-    End Sub
-End Class
-
-
-
-
-
-Public Class Fuzzy_Tracker
-    Inherits VBparent
-    Public fuzzy As Fuzzy_ContoursDepth
-    Public pTrack As Kalman_PointTracker
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        pTrack = New Kalman_PointTracker(ocvb)
-        fuzzy = New Fuzzy_ContoursDepth(ocvb)
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Desired number of objects", 1, 50, 10)
-
-        ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        fuzzy.src = src
-        fuzzy.Run(ocvb)
-        dst1 = fuzzy.dst1
-
-        pTrack.queryRects.Clear()
-        pTrack.queryPoints.Clear()
-        Dim minX As Double, maxX As Double
-        Dim minY As Double, maxY As Double
-        For Each c In fuzzy.sortContours
-            Dim contours = fuzzy.contours(c.Value.Item0)
-            Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
-            Dim center = points.Sum()
-            points = New cv.Mat(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
-            points.Col(0).MinMaxIdx(minX, maxX)
-            points.Col(1).MinMaxIdx(minY, maxY)
-            pTrack.queryPoints.Add(New cv.Point2f(center.Item(0) / contours.Length, center.Item(1) / contours.Length))
-            pTrack.queryRects.Add(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-            pTrack.queryColors.Add(c.Value.Item1) ' this is the gray scale color of the mask...
-            pTrack.queryContourMats.Add(points.Clone) ' this is the index into the contours that will be used to outline the region...
-        Next
-        pTrack.dst1 = fuzzy.dst1
-        pTrack.Run(ocvb)
-        label1 = CStr(pTrack.viewObjects.Count) + " regions were found in the image."
-
-        Static contourSlider = findSlider("Threshold of contour points")
-        Dim desired = sliders.trackbar(0).Value
-        If pTrack.viewObjects.Count > desired Then
-            contourSlider.value += 1
-        Else
-            If desired - pTrack.viewObjects.Count > 3 Then contourSlider.value -= 1
-        End If
-    End Sub
-End Class
+'        Static contourSlider = findSlider("Threshold of contour points")
+'        Dim desired = sliders.trackbar(0).Value
+'        If pTrack.viewObjects.Count > desired Then
+'            contourSlider.value += 1
+'        Else
+'            If desired - pTrack.viewObjects.Count > 3 Then contourSlider.value -= 1
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -370,10 +183,10 @@ End Class
 
 Public Class Fuzzy_NeighborProof
     Inherits VBparent
-    Dim fuzzy As Fuzzy_Contours
+    Dim fuzzy As Fuzzy_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        fuzzy = New Fuzzy_Contours(ocvb)
+        fuzzy = New Fuzzy_Basics(ocvb)
         ocvb.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -381,7 +194,7 @@ Public Class Fuzzy_NeighborProof
         If proofFailed Then Exit Sub
         fuzzy.src = src
         fuzzy.Run(ocvb)
-        dst1 = fuzzy.fuzzy.gray
+        dst1 = fuzzy.gray
         For i = 0 To fuzzy.contours.Length - 1
             Dim len = fuzzy.contours(i).Length
             For j = 0 To len - 1
@@ -412,24 +225,28 @@ End Class
 
 
 
+
 Public Class Fuzzy_TrackerDepth
     Inherits VBparent
-    Public fuzzy As Fuzzy_ContoursDepth
-    Dim centroids As New List(Of cv.Point)
-    Dim rects As New List(Of cv.Rect)
-    Dim layoutColor As New List(Of Integer)
-    Dim matchColor As Integer = -1
+    Public fuzzy As Fuzzy_Basics
+    Public centroids As New List(Of cv.Point)
+    Public rects As New List(Of cv.Rect)
+    Public layoutColor As New List(Of Integer)
+    Public highlightPoint As cv.Point
+    Public highlightRect As cv.Rect
+    Public highlightRegion = -1
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        fuzzy = New Fuzzy_ContoursDepth(ocvb)
+        fuzzy = New Fuzzy_Basics(ocvb)
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Desired number of objects", 1, 50, 10)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Display centroid and rectangle for each region"
+        check.Box(0).Checked = True
 
         ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        fuzzy.src = src
+        fuzzy.src = ocvb.RGBDepth
         fuzzy.Run(ocvb)
         dst1 = fuzzy.dst1
 
@@ -438,6 +255,10 @@ Public Class Fuzzy_TrackerDepth
         layoutColor.Clear()
         Dim minX As Double, maxX As Double
         Dim minY As Double, maxY As Double
+        Static displayCheck = findCheckBox("Display centroid and rectangle for each region")
+        Static minRectSizeSlider = findSlider("Threshold for rectangle size")
+        Dim minRectSize = minRectSizeSlider.value
+        Dim displayRect = displayCheck.checked
         For Each c In fuzzy.sortContours
             Dim contours = fuzzy.contours(c.Value.Item0)
             Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
@@ -447,44 +268,135 @@ Public Class Fuzzy_TrackerDepth
             points.Col(1).MinMaxIdx(minY, maxY)
 
             Dim rect = New cv.Rect(minX, minY, maxX - minX, maxY - minY)
-            Dim centroid = New cv.Point2f(center.Item(0) / contours.Length, center.Item(1) / contours.Length)
-            centroids.Add(centroid)
-            rects.Add(rect)
-            layoutColor.Add(c.Value.Item1)
-
-            dst1.Circle(centroid, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(centroid, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Rectangle(rect, cv.Scalar.Yellow, 2)
+            If rect.Width * rect.Height > minRectSize Then
+                Dim centroid = New cv.Point2f(center.Item(0) / contours.Length, center.Item(1) / contours.Length)
+                centroids.Add(centroid)
+                rects.Add(rect)
+                layoutColor.Add(c.Value.Item1)
+                If displayRect Then
+                    dst1.Circle(centroid, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(centroid, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                    dst1.Rectangle(rect, cv.Scalar.Yellow, 2)
+                End If
+            End If
         Next
 
-        If ocvb.mouseClickFlag Then
-            Dim highlightPoint = ocvb.mouseClickPoint
-            ocvb.mouseClickFlag = False
-            Dim Index = findNearestCentroid(highlightPoint, centroids)
-            matchColor = layoutColor.ElementAt(Index)
-        End If
-
-        If layoutColor.Contains(matchColor) = False Then matchColor = -1 ' the tracking object has been lost.
-        If matchColor >= 0 Then
-            dst2 = fuzzy.fuzzyD.basics.gray
-            Dim rect = rects.ElementAt(layoutColor.IndexOf(matchColor))
-            Dim mask = dst2(rect).InRange(matchColor, matchColor + 1)
-            dst2(rect).SetTo(255, mask)
-
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            Dim pt = centroids.ElementAt(layoutColor.IndexOf(matchColor))
-            dst2.Circle(pt, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
-        End If
         label1 = CStr(fuzzy.sortContours.Count) + " regions were found in the image."
+    End Sub
+End Class
 
-        Static contourSlider = findSlider("Threshold of contour points")
-        Dim desired = sliders.trackbar(0).Value
-        If fuzzy.sortContours.Count > desired Then
-            contourSlider.value += 1
-        Else
-            If desired - fuzzy.sortContours.Count > 3 Then contourSlider.value -= 1
+
+
+
+
+
+
+Public Class Fuzzy_TrackerDepthClick
+    Inherits VBparent
+    Public tracker As Fuzzy_TrackerDepth
+    Public highlightPoint As cv.Point
+    Public highlightRect As cv.Rect
+    Public highlightRegion = -1
+    Public regionMask As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        tracker = New Fuzzy_TrackerDepth(ocvb)
+        ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        tracker.src = src
+        tracker.Run(ocvb)
+        dst1 = tracker.dst1
+
+        If standalone And highlightRegion < 0 Then ocvb.trueText("Click any color region to get more details and track it", 10, 50, 3)
+
+        Dim gray = tracker.fuzzy.gray
+        If ocvb.mouseClickFlag Then
+            highlightPoint = ocvb.mouseClickPoint
+            highlightRegion = gray.Get(Of Byte)(highlightPoint.Y, highlightPoint.X)
+            ocvb.mouseClickFlag = False
         End If
+        If highlightRegion >= 0 Then
+            dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            regionMask = gray.InRange(highlightRegion, highlightRegion + 1)
+            dst2.SetTo(cv.Scalar.Yellow, regionMask)
+        End If
+        label1 = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."
+    End Sub
+End Class
+
+
+
+
+
+
+
+'Public Class Fuzzy_Contours
+'    Inherits VBparent
+'    Dim options As Contours_Basics
+'    Public fuzzy As Fuzzy_Basics
+'    Public contours As cv.Point()()
+'    Public Sub New(ocvb As VBocvb)
+'        initParent(ocvb)
+'        options = New Contours_Basics(ocvb) ' we need all the options
+'        fuzzy = New Fuzzy_Basics(ocvb)
+
+'        ocvb.desc = "Use contours to outline solids"
+'    End Sub
+'    Public Sub Run(ocvb As VBocvb)
+'        options.setOptions()
+'        fuzzy.src = src
+'        fuzzy.Run(ocvb)
+
+'        contours = cv.Cv2.FindContoursAsArray(fuzzy.dst2, options.retrievalMode, options.ApproximationMode)
+
+'        dst1 = fuzzy.dst1
+'        dst2 = fuzzy.dst1.Clone
+'        For i = 0 To contours.Length - 1
+'            Dim len = contours(i).Length
+'            For j = 0 To len
+'                dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+'            Next
+'        Next
+'        dst2.SetTo(0, fuzzy.dst2)
+'    End Sub
+'End Class
+
+
+
+
+
+
+
+Public Class Fuzzy_PointTracker
+    Inherits VBparent
+    Dim fuzzy As Fuzzy_Basics
+    Dim pTrack As Kalman_PointTracker
+    Dim flood As FloodFill_8bit
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        fuzzy = New Fuzzy_Basics(ocvb)
+        flood = New FloodFill_8bit(ocvb)
+        pTrack = New Kalman_PointTracker(ocvb)
+        fuzzy.sliders.Visible = False
+
+        ocvb.desc = "FloodFill the regions defined as solid"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        fuzzy.src = src
+        fuzzy.Run(ocvb)
+        dst2 = fuzzy.dst1
+
+        flood.src = fuzzy.dst1
+        flood.Run(ocvb)
+
+
+        pTrack.queryPoints = flood.basics.centroids
+        pTrack.queryRects = flood.basics.rects
+        pTrack.queryMasks = flood.basics.masks
+        pTrack.Run(ocvb)
+
+        label2 = CStr(pTrack.viewObjects.Count) + " regions were found"
+        dst1 = pTrack.dst1
     End Sub
 End Class

@@ -355,7 +355,7 @@ Public Class Palette_BuildGradientColorMap
         End If
         gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
         dst1 = Palette_Custom_Apply(src, gradientColorMap)
-        dst2 = gradientColorMap
+        If standalone Then dst2 = gradientColorMap
     End Sub
 End Class
 
