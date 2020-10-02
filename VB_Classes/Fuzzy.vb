@@ -126,58 +126,6 @@ End Class
 
 
 
-'Public Class Fuzzy_Tracker
-'    Inherits VBparent
-'    Public fuzzy As Fuzzy_ContoursDepth
-'    Public pTrack As Kalman_PointTracker
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
-'        pTrack = New Kalman_PointTracker(ocvb)
-'        fuzzy = New Fuzzy_ContoursDepth(ocvb)
-
-'        sliders.Setup(ocvb, caller)
-'        sliders.setupTrackBar(0, "Desired number of objects", 1, 50, 10)
-
-'        ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        fuzzy.src = src
-'        fuzzy.Run(ocvb)
-'        dst1 = fuzzy.dst1
-
-'        pTrack.queryRects.Clear()
-'        pTrack.queryPoints.Clear()
-'        Dim minX As Double, maxX As Double
-'        Dim minY As Double, maxY As Double
-'        For Each c In fuzzy.sortContours
-'            Dim contours = fuzzy.contours(c.Value.Item0)
-'            Dim points = New cv.Mat(contours.Length, 1, cv.MatType.CV_32SC2, contours.ToArray)
-'            Dim center = points.Sum()
-'            points = New cv.Mat(contours.Length, 2, cv.MatType.CV_32S, contours.ToArray)
-'            points.Col(0).MinMaxIdx(minX, maxX)
-'            points.Col(1).MinMaxIdx(minY, maxY)
-'            pTrack.queryPoints.Add(New cv.Point2f(center.Item(0) / contours.Length, center.Item(1) / contours.Length))
-'            pTrack.queryRects.Add(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-'            pTrack.queryColors.Add(c.Value.Item1) ' this is the gray scale color of the mask...
-'            pTrack.queryContourMats.Add(points.Clone) ' this is the index into the contours that will be used to outline the region...
-'        Next
-'        pTrack.dst1 = fuzzy.dst1
-'        pTrack.Run(ocvb)
-'        label1 = CStr(pTrack.viewObjects.Count) + " regions were found in the image."
-
-'        Static contourSlider = findSlider("Threshold of contour points")
-'        Dim desired = sliders.trackbar(0).Value
-'        If pTrack.viewObjects.Count > desired Then
-'            contourSlider.value += 1
-'        Else
-'            If desired - pTrack.viewObjects.Count > 3 Then contourSlider.value -= 1
-'        End If
-'    End Sub
-'End Class
-
-
-
-
 
 
 
@@ -325,42 +273,6 @@ Public Class Fuzzy_TrackerDepthClick
     End Sub
 End Class
 
-
-
-
-
-
-
-'Public Class Fuzzy_Contours
-'    Inherits VBparent
-'    Dim options As Contours_Basics
-'    Public fuzzy As Fuzzy_Basics
-'    Public contours As cv.Point()()
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
-'        options = New Contours_Basics(ocvb) ' we need all the options
-'        fuzzy = New Fuzzy_Basics(ocvb)
-
-'        ocvb.desc = "Use contours to outline solids"
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        options.setOptions()
-'        fuzzy.src = src
-'        fuzzy.Run(ocvb)
-
-'        contours = cv.Cv2.FindContoursAsArray(fuzzy.dst2, options.retrievalMode, options.ApproximationMode)
-
-'        dst1 = fuzzy.dst1
-'        dst2 = fuzzy.dst1.Clone
-'        For i = 0 To contours.Length - 1
-'            Dim len = contours(i).Length
-'            For j = 0 To len
-'                dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-'            Next
-'        Next
-'        dst2.SetTo(0, fuzzy.dst2)
-'    End Sub
-'End Class
 
 
 
