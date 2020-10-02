@@ -72,6 +72,7 @@ Public Class Coherence_Basics
         Next
         dst1(srcRect) = src
         dst1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
+        dst2.SetTo(0)
     End Sub
 End Class
 
