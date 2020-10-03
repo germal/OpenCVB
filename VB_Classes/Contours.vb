@@ -218,6 +218,7 @@ End Class
 Public Class Contours_Depth
     Inherits VBparent
     Public trim As Depth_InRange
+    Public contours As New List(Of cv.Point)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         trim = New Depth_InRange(ocvb)
@@ -234,13 +235,17 @@ Public Class Contours_Depth
         Dim maxIndex As Integer
         Dim maxNodes As Integer
         For i = 0 To contours0.Length - 1
-            Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
-            If maxNodes < contours.Length Then
+            Dim c = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
+            If maxNodes < c.Length Then
                 maxIndex = i
-                maxNodes = contours.Length
+                maxNodes = c.Length
             End If
         Next
         cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+        contours.Clear()
+        For Each ct In contours0(maxIndex)
+            contours.Add(ct)
+        Next
     End Sub
 End Class
 
@@ -251,12 +256,13 @@ End Class
 
 Public Class Contours_Prediction
     Inherits VBparent
-    Dim contours As Contours_Depth
+    Dim outline As Contours_Depth
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        contours = New Contours_Depth(ocvb)
+        ReDim kalman.input(2 - 1)
+        outline = New Contours_Depth(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)
@@ -266,7 +272,23 @@ Public Class Contours_Prediction
         ocvb.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        contours.Run(ocvb)
-        dst1 = contours.dst2
+        outline.Run(ocvb)
+        dst1 = outline.dst2
+        dst2.SetTo(0)
+        Dim stepSize = sliders.trackbar(0).Value
+        Dim len = outline.contours.Count
+        kalman.input = {outline.contours(0).X, outline.contours(0).Y}
+        kalman.Run(ocvb)
+        Dim origin = New cv.Point(kalman.output(0), kalman.output(1))
+        For i = 0 To outline.contours.Count - 1 Step stepSize
+            Dim pt1 = New cv.Point2f(kalman.output(0), kalman.output(1))
+            kalman.input = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
+            kalman.Run(ocvb)
+            Dim pt2 = New cv.Point2f(kalman.output(0), kalman.output(1))
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        Next
+        dst2.Line(New cv.Point(kalman.output(0), kalman.output(1)), origin, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+
+        label1 = "There were " + CStr(outline.contours.Count) + " points in this contour"
     End Sub
 End Class
