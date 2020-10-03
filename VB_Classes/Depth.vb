@@ -977,19 +977,17 @@ Public Class Depth_ColorMap
     Dim Palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 3)
-
         Palette = New Palette_Basics(ocvb)
-        Dim colormapRadio = findRadio("Jet")
-        colormapRadio.Checked = True
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 5)
+        sliders.setupTrackBar(1, "Depth ColorMap Beta", 1, 100, 3)
 
         ocvb.desc = "Display the depth as a color map"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim alpha = sliders.trackbar(0).Value / 100
-        cv.Cv2.ConvertScaleAbs(getDepth32f(ocvb), Palette.src, alpha)
-        Palette.src = ocvb.RGBDepth
+        Dim beta = sliders.trackbar(1).Value
+        cv.Cv2.ConvertScaleAbs(getDepth32f(ocvb), Palette.src, alpha, beta)
         Palette.Run(ocvb)
         dst1 = Palette.dst1
         dst2 = Palette.dst2
@@ -1224,17 +1222,17 @@ Public Class Depth_Smoothing
         smooth.src = getDepth32f(ocvb)
         smooth.Run(ocvb)
         Dim input = smooth.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
-        input.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        input.ConvertTo(mats.mat(0), cv.MatType.CV_8UC1)
         Dim tmp As New cv.Mat
         cv.Cv2.Add(smooth.dst2, smooth.dst1, tmp)
-        mats.mat(0) = tmp.InRange(0, 255)
+        mats.mat(1) = tmp.InRange(0, 255)
 
         reduction.src = smooth.src
         reduction.Run(ocvb)
         reduction.dst1.ConvertTo(reducedDepth, cv.MatType.CV_32F)
         colorize.src = reducedDepth
         colorize.Run(ocvb)
-        mats.mat(1) = colorize.dst1
+        dst1 = colorize.dst1
         mats.Run(ocvb)
         dst2 = mats.dst1
         label1 = smooth.label1
