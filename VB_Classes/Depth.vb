@@ -981,6 +981,9 @@ Public Class Depth_ColorMap
         sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 3)
 
         Palette = New Palette_Basics(ocvb)
+        Dim colormapRadio = findRadio("Jet")
+        colormapRadio.Checked = True
+
         ocvb.desc = "Display the depth as a color map"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -1180,7 +1183,6 @@ Public Class Depth_SmoothingMat
         Static lastDepth = trim.dst2 ' the far depth needs to be smoothed
         If lastDepth.Size <> trim.dst2.Size Then lastDepth = trim.dst2
 
-        dst1 = New cv.Mat
         cv.Cv2.Subtract(lastDepth, trim.dst2, dst1)
 
         Static thresholdSlider = findSlider("Threshold in millimeters")
@@ -1202,27 +1204,40 @@ End Class
 Public Class Depth_Smoothing
     Inherits VBparent
     Dim smooth As Depth_SmoothingMat
+    Dim reduction As Reduction_Basics
+    Public reducedDepth As New cv.Mat
+    Public mats As Mat_4to1
+    Public colorize As Depth_ColorMap
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        colorize = New Depth_ColorMap(ocvb)
+        mats = New Mat_4to1(ocvb)
+        reduction = New Reduction_Basics(ocvb)
+        Dim reductionRadio = findRadio("Use bitwise reduction")
+        reductionRadio.Checked = True
         smooth = New Depth_SmoothingMat(ocvb)
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Smooth the dst2 output "
-        check.Box(0).Checked = True
-
+        label2 = "Mask of depth that is smooth"
         ocvb.desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         smooth.src = getDepth32f(ocvb)
         smooth.Run(ocvb)
-        dst1 = smooth.dst1
-        If check.Box(0).Checked Then
-            cv.Cv2.Add(smooth.dst2, dst1, dst2)
-            label2 = "Depth with smoothing applied"
-        Else
-            dst2 = smooth.dst2
-            label2 = "Depth without smoothing "
-        End If
+        Dim input = smooth.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
+        input.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        Dim tmp As New cv.Mat
+        cv.Cv2.Add(smooth.dst2, smooth.dst1, tmp)
+        mats.mat(0) = tmp.InRange(0, 255)
+
+        reduction.src = smooth.src
+        reduction.Run(ocvb)
+        reduction.dst1.ConvertTo(reducedDepth, cv.MatType.CV_32F)
+        colorize.src = reducedDepth
+        colorize.Run(ocvb)
+        mats.mat(1) = colorize.dst1
+        mats.Run(ocvb)
+        dst2 = mats.dst1
+        label1 = smooth.label1
     End Sub
 End Class
 

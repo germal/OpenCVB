@@ -215,16 +215,16 @@ Public Class VBparent : Implements IDisposable
             End If
         Next
     End Sub
-    Private Function MakeSureImage8uC3(ByVal src As cv.Mat) As cv.Mat
-        If src.Type = cv.MatType.CV_32F Then
+    Private Function MakeSureImage8uC3(ByVal input As cv.Mat) As cv.Mat
+        If input.Type = cv.MatType.CV_32F Then
             ' it must be a 1 channel 32f image so convert it to 8-bit and let it get converted to RGB below
-            src = src.Normalize(0, 255, cv.NormTypes.MinMax)
-            src.ConvertTo(src, cv.MatType.CV_8UC1)
+            input = input.Normalize(0, 255, cv.NormTypes.MinMax)
+            input.ConvertTo(input, cv.MatType.CV_8UC1)
         End If
-        If src.Channels = 1 And src.Type = cv.MatType.CV_8UC1 Then
-            src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If input.Channels = 1 And input.Type = cv.MatType.CV_8UC1 Then
+            input = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
-        Return src
+        Return input
     End Function
     Public Sub NextFrame(ocvb As VBocvb)
         If standalone Then src = ocvb.color

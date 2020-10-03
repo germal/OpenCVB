@@ -143,11 +143,9 @@ Public Class Mat_4to1
         End If
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
-            If mat(i).Empty = False Then
-                If tmp.Channels <> dst1.Channels Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-                dst1(roi) = tmp.Resize(nSize)
-            End If
+            If tmp.Channels <> dst1.Channels Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
+            dst1(roi) = tmp.Resize(nSize)
         Next
         If noLines = False Then
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, 2)
