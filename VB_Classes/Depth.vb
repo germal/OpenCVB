@@ -996,34 +996,6 @@ End Class
 
 
 
-Public Class Depth_Holes
-    Inherits VBparent
-    Public holeMask As New cv.Mat
-    Public borderMask As New cv.Mat
-    Dim element As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Amount of dilation around depth holes", 1, 10, 1)
-
-        label2 = "Shadow Edges (use sliders to expand)"
-        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
-        ocvb.desc = "Identify holes in the depth image."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-        If standalone Then dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        borderMask = holeMask.Dilate(element, Nothing, sliders.trackbar(0).Value)
-        cv.Cv2.BitwiseXor(borderMask, holeMask, borderMask)
-        If standalone Then
-            dst2.SetTo(0)
-            ocvb.RGBDepth.CopyTo(dst2, borderMask)
-        End If
-    End Sub
-End Class
-
-
 
 
 
@@ -1412,53 +1384,6 @@ End Class
 
 
 
-'Public Class Depth_Reduction
-'    Inherits VBparent
-'    Dim gCloudIMU As Depth_PointCloudInRange_IMU
-'    Dim reduction As Reduction_KNN_Color
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
-
-'        reduction = New Reduction_KNN_Color(ocvb)
-'        gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
-
-'        ocvb.desc = "Find discrete depth levels and their centroids"
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        reduction.src = src
-'        reduction.Run(ocvb)
-'        dst2 = reduction.dst1.Clone()
-'        label2 = reduction.label1
-
-'        Static maxZslider = findSlider("InRange Max Depth (mm)")
-'        maxZ = maxZslider.value
-
-'        gCloudIMU.src = ocvb.pointCloud
-'        gCloudIMU.Run(ocvb)
-
-'        Static reductionSlider = findSlider("Reduction factor")
-'        Dim levels As Integer = CInt(maxZ >> reductionSlider.Value) + 1
-'        Dim levelSize = maxZ / levels
-'        label1 = "There are " + CStr(levels) + " discrete depth levels to " + CStr(maxZ) + " mm's"
-
-'        Dim depth32f = gCloudIMU.split(2)
-'        depth32f *= 1024 ' convert to mm's
-'        depth32f = depth32f.Resize(src.Size)
-'        dst1.SetTo(0)
-'        For i = 2 To levels - 1
-'            Dim tmp = depth32f.Threshold(levelSize * i, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-'            Dim mask = depth32f.Threshold(levelSize * (i - 1), 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-'            mask = mask.SetTo(0, tmp)
-'            dst1.SetTo(ocvb.scalarColors(i Mod 255), mask)
-'        Next
-'    End Sub
-'End Class
-
-
-
-
-
-
 Public Class Depth_Edges
     Inherits VBparent
     Dim edges As Edges_Laplacian
@@ -1475,5 +1400,75 @@ Public Class Depth_Edges
         edges.Run(ocvb)
         dst1 = edges.dst2
         dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_Holes
+    Inherits VBparent
+    Public holeMask As New cv.Mat
+    Public borderMask As New cv.Mat
+    Dim element As New cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
+        sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
+
+        label2 = "Shadow Edges (use sliders to expand)"
+        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
+        ocvb.desc = "Identify holes in the depth image."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        holeMask = holeMask.Dilate(element, Nothing, sliders.trackbar(1).Value)
+        dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+
+        borderMask = holeMask.Dilate(element, Nothing, sliders.trackbar(0).Value)
+        cv.Cv2.BitwiseXor(borderMask, holeMask, borderMask)
+        If standalone Then
+            dst2.SetTo(0)
+            ocvb.RGBDepth.CopyTo(dst2, borderMask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_HolesOverTime
+    Inherits VBparent
+    Dim holes As Depth_Holes
+    Dim recentImages As New List(Of cv.Mat)
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        holes = New Depth_Holes(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Number of images to retain", 0, 10, 3)
+
+        label2 = "Latest hole mask"
+        ocvb.desc = "Integrate memory holes over time to identify unstable depth"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        holes.Run(ocvb)
+        recentImages.Add(holes.holeMask)
+
+        dst2 = recentImages.ElementAt(0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        For Each img In recentImages
+            cv.Cv2.BitwiseOr(dst1, img, dst1)
+        Next
+        label1 = "Depth holes integrated over the past " + CStr(recentImages.Count) + " images"
+        If recentImages.Count >= sliders.trackbar(0).Value Then
+            recentImages.RemoveAt(0)
+        End If
     End Sub
 End Class

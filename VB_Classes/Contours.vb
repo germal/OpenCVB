@@ -121,36 +121,6 @@ End Class
 
 
 
-Public Class Contours_Depth
-    Inherits VBparent
-    Public trim As Depth_InRange
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        trim = New Depth_InRange(ocvb)
-        ocvb.desc = "Find and draw the contour of the depth foreground."
-        label1 = "DepthContour input"
-        label2 = "DepthContour output"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
-        dst1 = trim.dst1
-        dst2.SetTo(0)
-        Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim maxIndex As integer
-        Dim maxNodes As integer
-        For i = 0 To contours0.Length - 1
-            Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
-            If maxNodes < contours.Length Then
-                maxIndex = i
-                maxNodes = contours.Length
-            End If
-        Next
-        cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
-    End Sub
-End Class
-
-
 
 Public Class Contours_RGB
     Inherits VBparent
@@ -238,5 +208,65 @@ Public Class Contours_RemoveLines
 
         dst2(dstRect) = tmp.Resize(dstSize)
         cv.Cv2.ImShow("Altered image at original resolution", tmp)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contours_Depth
+    Inherits VBparent
+    Public trim As Depth_InRange
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        trim = New Depth_InRange(ocvb)
+        ocvb.desc = "Find and draw the contour of the depth foreground."
+        label1 = "DepthContour input"
+        label2 = "DepthContour output"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        trim.src = getDepth32f(ocvb)
+        trim.Run(ocvb)
+        dst1 = trim.dst1
+        dst2.SetTo(0)
+        Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim maxIndex As Integer
+        Dim maxNodes As Integer
+        For i = 0 To contours0.Length - 1
+            Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
+            If maxNodes < contours.Length Then
+                maxIndex = i
+                maxNodes = contours.Length
+            End If
+        Next
+        cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contours_Prediction
+    Inherits VBparent
+    Dim contours As Contours_Depth
+    Dim kalman As Kalman_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        kalman = New Kalman_Basics(ocvb)
+        contours = New Contours_Depth(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)
+
+        label1 = "Original contour image"
+        label2 = "Image after smoothing with Kalman_Basics"
+        ocvb.desc = "Predict the next contour point with Kalman to smooth the outline"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        contours.Run(ocvb)
+        dst1 = contours.dst2
     End Sub
 End Class
