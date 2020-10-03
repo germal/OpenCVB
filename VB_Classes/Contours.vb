@@ -157,6 +157,7 @@ Public Class Contours_RGB
             points.Add(New cv.Point(hull(i).X, hull(i).Y))
         Next
         listOfPoints.Add(points)
+        dst1.SetTo(0)
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         dst2.SetTo(0)
@@ -288,7 +289,6 @@ Public Class Contours_Prediction
             dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         Next
         dst2.Line(New cv.Point(kalman.output(0), kalman.output(1)), origin, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-
         label1 = "There were " + CStr(outline.contours.Count) + " points in this contour"
     End Sub
 End Class

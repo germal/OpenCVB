@@ -3,6 +3,9 @@ Imports cv = OpenCvSharp
 Public Class Smoothing_Exterior
 	Inherits VBparent
 	Dim hull As Hull_Basics
+	Public inputPoints As List(Of cv.Point)
+	Public smoothPoints As List(Of cv.Point)
+	Public plotColor = cv.Scalar.Yellow
 	Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
 		Dim spline As New List(Of cv.Point)
 		' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
@@ -51,17 +54,18 @@ Public Class Smoothing_Exterior
 		ocvb.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
-		If ocvb.frameCount Mod 30 Then Exit Sub
+		If standalone Then
+			dst1.SetTo(0)
+			If ocvb.frameCount Mod 30 Then Exit Sub
 
-		hull.src = src
-		hull.Run(ocvb)
-		Dim nextHull = hull.hull
+			hull.src = src
+			hull.Run(ocvb)
+			Dim nextHull = hull.hull
 
-		dst1.SetTo(0)
-		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
-
-		Dim smoothPoints = getSplineInterpolationCatmullRom(points, sliders.trackbar(0).Value)
-		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, cv.Scalar.Yellow)
+			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
+		End If
+		smoothPoints = getSplineInterpolationCatmullRom(inputPoints, sliders.trackbar(0).Value)
+		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, plotColor)
 	End Sub
 End Class
 
@@ -73,6 +77,9 @@ End Class
 Public Class Smoothing_Interior
 	Inherits VBparent
 	Dim hull As Hull_Basics
+	Public inputPoints As List(Of cv.Point)
+	Public smoothPoints As List(Of cv.Point)
+	Public plotColor = cv.Scalar.Yellow
 	Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
 		'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
 		'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
@@ -126,20 +133,65 @@ Public Class Smoothing_Interior
 		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
-		If ocvb.frameCount Mod 30 Then Exit Sub
+		If standalone Then
+			If ocvb.frameCount Mod 30 Then Exit Sub
 
-		hull.src = src
-		hull.Run(ocvb)
-		Dim nextHull = hull.hull
+			hull.src = src
+			hull.Run(ocvb)
+			Dim nextHull = hull.hull
 
-		dst1.SetTo(0)
-		Dim points = drawPoly(dst1, nextHull, cv.Scalar.White)
-
-		Dim smoothPoints2d = getCurveSmoothingChaikin(points, sliders.trackbar(1).Value / 100, sliders.trackbar(0).Value)
+			dst1.SetTo(0)
+			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
+		End If
+		Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, sliders.trackbar(1).Value / 100, sliders.trackbar(0).Value)
 		Dim smoothPoints As New List(Of cv.Point)
 		For i = 0 To smoothPoints2d.Count - 1
 			smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
 		Next
-		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, cv.Scalar.Yellow)
+		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, plotColor)
+	End Sub
+End Class
+
+
+
+
+
+
+Public Class Smoothing_Contours
+	Inherits VBparent
+	Dim outline As Contours_Depth
+	Dim smoothE As Smoothing_Exterior
+	Dim smoothI As Smoothing_Interior
+	Public Sub New(ocvb As VBocvb)
+		initParent(ocvb)
+		outline = New Contours_Depth(ocvb)
+		smoothE = New Smoothing_Exterior(ocvb)
+		smoothI = New Smoothing_Interior(ocvb)
+		smoothE.plotColor = cv.Scalar.Blue
+		smoothI.plotColor = cv.Scalar.Blue
+
+		sliders.Setup(ocvb, caller)
+		sliders.setupTrackBar(0, "Step size when adding points (1 is identity)", 1, 500, 3)
+
+		radio.Setup(ocvb, caller, 2)
+		radio.check(0).Text = "Interior smoothing"
+		radio.check(1).Text = "Exterior smoothing"
+		radio.check(1).Checked = True
+
+		ocvb.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
+	End Sub
+	Public Sub Run(ocvb As VBocvb)
+		outline.Run(ocvb)
+
+		Dim stepsize = sliders.trackbar(0).Value
+		Dim smooth As Object
+		If radio.check(0).Checked Then smooth = smoothI Else smooth = smoothE
+		smooth.inputPoints = New List(Of cv.Point)
+		For i = 0 To outline.contours.Count - 1 Step stepsize
+			smooth.inputPoints.Add(New cv.Point2f(outline.contours(i).X, outline.contours(i).Y))
+		Next
+		smooth.dst1 = outline.dst2
+		smooth.Run(ocvb)
+		dst1 = smooth.dst1
 	End Sub
 End Class

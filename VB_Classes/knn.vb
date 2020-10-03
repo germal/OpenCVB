@@ -703,3 +703,48 @@ Public Class KNN_StabilizeRegions
 
     End Sub
 End Class
+
+
+
+
+
+
+Public Class KNN_Contours
+    Inherits VBparent
+    Dim outline As Contours_Depth
+    Dim knn As KNN_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        outline = New Contours_Depth(ocvb)
+        knn = New KNN_Basics(ocvb)
+        ocvb.desc = "Use KNN to streamline the outline of a contour"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        outline.Run(ocvb)
+        dst1 = outline.dst2
+
+        knn.knnQT.trainingPoints.Clear()
+        If ocvb.frameCount = 0 Then
+            For i = 0 To outline.contours.Count - 1
+                knn.knnQT.trainingPoints.Add(New cv.Point2f(outline.contours(i).X, outline.contours(i).Y))
+            Next
+        Else
+            knn.knnQT.queryPoints.Clear()
+            For i = 0 To outline.contours.Count - 1
+                knn.knnQT.queryPoints.Add(New cv.Point2f(outline.contours(i).X, outline.contours(i).Y))
+            Next
+        End If
+
+        knn.Run(ocvb)
+
+        Dim queries = New cv.Mat(knn.knnQT.queryPoints.Count, 2, cv.MatType.CV_32F, knn.knnQT.queryPoints.ToArray)
+        Dim trainData = New cv.Mat(knn.knnQT.trainingPoints.Count, 2, cv.MatType.CV_32F, knn.knnQT.trainingPoints.ToArray)
+        dst2.SetTo(0)
+        For i = 0 To knn.neighbors.Rows - 1
+            Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
+            cv.Cv2.Circle(dst2, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            Dim pt = trainData.Get(Of cv.Point2f)(knn.neighbors.Get(Of Single)(i, 0), 0)
+            dst2.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
+End Class
