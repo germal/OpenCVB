@@ -578,6 +578,337 @@ Public Class Kalman_PointTracker
             If queryMasks.Count > 0 Then dst1.SetTo(0)
             Dim inputRect = New cv.Rect
             viewObjects.Clear()
+            For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
+                inputRect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
+                Dim pt1 = knn.basics.knnQT.trainingPoints(i)
+                Dim matchIndex = -1
+                If matches.Contains(pt1) Then
+                    matchIndex = matches.IndexOf(pt1)
+                    inputRect = queryRects(matchIndex)
+                End If
+                If matchIndex >= 0 Then
+                    kalman(i).input = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+                    Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
+                    If useKalmanCheck.Checked Then
+                        kalman(i).Run(ocvb)
+                    Else
+                        kalman(i).output = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+                    End If
+
+                    Dim vo = New viewObject
+                    vo.centroid = New cv.Point(kalman(i).output(0), kalman(i).output(1))
+
+                    Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
+                    If outRect.X < 0 Then outRect.X = 0
+                    If outRect.Y < 0 Then outRect.Y = 0
+                    If outRect.X + outRect.Width > src.Width Then outRect.Width = src.Width - outRect.X
+                    If outRect.Y + outRect.Height > src.Height Then outRect.Height = src.Height - outRect.Y
+                    If outRect.Width < 0 Then outRect.Width = 1
+                    If outRect.Height < 0 Then outRect.Height = 1
+                    vo.rectView = outRect
+
+                    Dim pt = vo.centroid
+                    If pt.X < 0 Then pt.X = 0
+                    If pt.X >= src.Width Then pt.X = src.Width - 1
+                    If pt.Y < 0 Then pt.Y = 0
+                    If pt.Y >= src.Height Then pt.Y = src.Height - 1
+
+                    vo.preKalmanRect = inputRect
+                    If matchIndex < queryMasks.Count Then
+                        If queryMasks(matchIndex).Size <> src.Size Then vo.mask = queryMasks(matchIndex) Else vo.mask = queryMasks(matchIndex)(vo.preKalmanRect)
+                    End If
+
+                    If kalman(i).vo.mask Is Nothing Then
+                        If queryColors.Count = 0 Then vo.LayoutColor = ocvb.scalarColors(i Mod 255) Else vo.LayoutColor = queryColors(matchIndex)
+                        kalman(i).vo = vo
+                    Else
+                        vo.LayoutColor = kalman(i).vo.LayoutColor
+                    End If
+                    If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(matchIndex)
+                    viewObjects.Add(inputRect.Width * inputRect.Height, vo)
+                End If
+            Next
+
+            Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
+            Dim incr = 255 / viewObjects.Count
+            ' render masks first so they don't cover circles or rectangles below
+            For i = 0 To viewObjects.Count - 1
+                Dim vo = viewObjects.ElementAt(i).Value
+                If vo.mask IsNot Nothing Then
+                    Dim r = vo.preKalmanRect
+                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
+                End If
+            Next
+
+            If drawRectangleCheck.checked Then
+                For i = 0 To viewObjects.Count - 1
+                    Dim vw = viewObjects.ElementAt(i).Value
+                    Dim pt = vw.centroid
+                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Rectangle(vw.rectView, cv.Scalar.White, 1)
+                Next
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+'Public Class Kalman_PointTrackList
+'    Inherits VBparent
+'    Public knn As KNN_1_to_1
+'    Dim topView As PointCloud_Kalman_TopView
+'    Public kalman As New List(Of Kalman_Basics)
+'    Public queryPoints As New List(Of cv.Point2f)
+'    Public queryRects As New List(Of cv.Rect)
+'    Public queryMasks As New List(Of cv.Mat)
+'    Public queryContourMats As New List(Of cv.Mat) ' the points for the contours in a cv.mat
+'    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+'    Public Sub New(ocvb As VBocvb)
+'        initParent(ocvb)
+'        If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
+
+'        knn = New KNN_1_to_1(ocvb)
+'        check.Setup(ocvb, caller, 1)
+'        check.Box(0).Text = "Draw rectangle for each mask"
+'        check.Box(0).Checked = True
+
+'        sliders.Setup(ocvb, caller)
+'        sliders.setupTrackBar(0, "Track n objects", 1, 50, 10)
+'        allocateKalman(ocvb, sliders.trackbar(0).Value)
+
+'        hideForm("Thread_Grid Slider Options")
+'        hideForm("Palette_BuildGradientColorMap Slider Options")
+'        label2 = "Initial color values for each centroid"
+'        ocvb.desc = "Use KNN to track points and Kalman to smooth the results"
+'    End Sub
+'    Private Sub allocateKalman(ocvb As VBocvb, count As Integer)
+'        If kalman.Count > 0 Then
+'            For i = 0 To kalman.Count - 1
+'                kalman(i).Dispose()
+'            Next
+'        End If
+'        For i = 0 To count - 1
+'            kalman.Add(New Kalman_Basics(ocvb))
+'            ReDim kalman(i).input(6 - 1)
+'            ReDim kalman(i).output(6 - 1)
+'        Next
+'    End Sub
+'    Public Sub Run(ocvb As VBocvb)
+'        If standalone Then
+'            topView.Run(ocvb)
+'            dst1 = topView.dst1
+'            Exit Sub
+'        End If
+
+'        ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
+'        Dim nObjects = sliders.trackbar(0).Value
+'        If kalman.Count <> nObjects Then allocateKalman(ocvb, nObjects)
+
+'        knn.basics.knnQT.trainingPoints.Clear()
+'        ' The previous generation's query points becomes the trainingpoints for the current generation here.
+'        For i = 0 To kalman.Count - 1
+'            If kalman(i).input(0) >= 0 Then knn.basics.knnQT.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+'        Next
+
+'        knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
+'        knn.Run(ocvb)
+
+'        Dim matches As New List(Of cv.Point2f)(knn.matchedPoints)
+'        If matches IsNot Nothing Then ' first pass condition.
+'            For i = 0 To matches.Count - 1
+'                If matches(i).X < 0 Then
+'                    For j = 0 To kalman.Count - 1
+'                        If kalman(j).input(0) < 0 Then
+'                            kalman(j).input = {knn.basics.knnQT.queryPoints(i).X, knn.basics.knnQT.queryPoints(i).Y, 0, 0, 0, 0}
+'                            Exit For
+'                        End If
+'                    Next
+'                End If
+'            Next
+
+'            If queryMasks.Count > 0 Then dst1.SetTo(0)
+'            viewObjects.Clear()
+'            Dim maskIndex As Integer
+'            Dim colorIncr = Math.Truncate(255 / nObjects)
+'            For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
+'                maskIndex = -1
+'                Dim inputRect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
+'                Dim pt1 = knn.basics.knnQT.trainingPoints(i)
+'                Dim matchIndex As Integer
+'                If matches.Contains(pt1) Then
+'                    matchIndex = matches.IndexOf(pt1)
+'                    Dim qpt = queryPoints(matchIndex)
+'                    For k = 0 To queryRects.Count - 1
+'                        If queryPoints(k) = qpt Then
+'                            inputRect = queryRects(k)
+'                            maskIndex = k
+'                            Exit For
+'                        End If
+'                    Next
+'                    If maskIndex >= 0 Then
+'                        kalman(i).input = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+'                        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
+'                        If useKalmanCheck.Checked Then
+'                            kalman(i).Run(ocvb)
+'                        Else
+'                            kalman(i).output = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+'                        End If
+'                    End If
+'                Else
+'                    i = i
+'                End If
+
+'                If maskIndex >= 0 And kalman(i).output IsNot Nothing Then
+'                    Dim vo = New viewObject
+'                    vo.centroid = New cv.Point(kalman(i).output(0), kalman(i).output(1))
+
+'                    Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
+'                    If outRect.X < 0 Then outRect.X = 0
+'                    If outRect.Y < 0 Then outRect.Y = 0
+'                    If outRect.X + outRect.Width > src.Width Then outRect.Width = src.Width - outRect.X
+'                    If outRect.Y + outRect.Height > src.Height Then outRect.Height = src.Height - outRect.Y
+'                    If outRect.Width < 0 Then outRect.Width = 1
+'                    If outRect.Height < 0 Then outRect.Height = 1
+'                    vo.rectView = outRect
+
+'                    Dim pt = vo.centroid
+'                    If pt.X < 0 Then pt.X = 0
+'                    If pt.X >= src.Width Then pt.X = src.Width - 1
+'                    If pt.Y < 0 Then pt.Y = 0
+'                    If pt.Y >= src.Height Then pt.Y = src.Height - 1
+
+'                    vo.preKalmanRect = inputRect
+'                    If maskIndex < queryMasks.Count Then
+'                        If queryMasks(maskIndex).Size <> src.Size Then vo.mask = queryMasks(maskIndex) Else vo.mask = queryMasks(maskIndex)(vo.preKalmanRect)
+'                    End If
+
+'                    vo.LayoutColor = colorIncr * maskIndex
+'                    If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(maskIndex)
+'                    viewObjects.Add(inputRect.Width * inputRect.Height, vo)
+'                End If
+'            Next
+
+'            Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
+'            Dim incr = 255 / viewObjects.Count
+'            ' render masks first so they don't cover circles or rectangles below
+'            For i = 0 To viewObjects.Count - 1
+'                Dim vo = viewObjects.ElementAt(i).Value
+'                If vo.mask IsNot Nothing Then
+'                    Dim r = vo.preKalmanRect
+'                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
+'                End If
+'            Next
+
+'            If drawRectangleCheck.checked Then
+'                For i = 0 To viewObjects.Count - 1
+'                    Dim vw = viewObjects.ElementAt(i).Value
+'                    Dim pt = vw.centroid
+'                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+'                    cv.Cv2.Circle(dst1, pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+'                    dst1.Rectangle(vw.rectView, cv.Scalar.White, 1)
+'                Next
+'            End If
+'        End If
+'    End Sub
+'End Class
+
+
+
+
+
+
+Public Class Kalman_PointTrackerGood
+    Inherits VBparent
+    Public knn As KNN_1_to_1
+    Dim newCentroids As New List(Of cv.Point2f)
+    Dim topView As PointCloud_Kalman_TopView
+    Public kalman As New List(Of Kalman_Basics)
+    Public queryPoints As New List(Of cv.Point2f)
+    Public queryRects As New List(Of cv.Rect)
+    Public queryMasks As New List(Of cv.Mat)
+    Public queryColors As New List(Of Integer)
+    Public queryContourMats As New List(Of cv.Mat) ' the points for the contours in a cv.mat
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
+
+        knn = New KNN_1_to_1(ocvb)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Draw rectangle for each mask"
+        check.Box(0).Checked = True
+
+        allocateKalman(ocvb, 16) ' allocate some kalman objects
+
+        hideForm("Thread_Grid Slider Options")
+        hideForm("Palette_BuildGradientColorMap Slider Options")
+        label2 = "Initial color values for each centroid"
+        ocvb.desc = "Use KNN to track points and Kalman to smooth the results"
+    End Sub
+    Private Sub allocateKalman(ocvb As VBocvb, count As Integer)
+        For i = kalman.Count To count - 1
+            kalman.Add(New Kalman_Basics(ocvb))
+            ReDim kalman(i).input(6 - 1)
+            If i < queryPoints.Count Then
+                kalman(i).input = New Single() {queryPoints(i).X, queryPoints(i).Y, 0, 0, 0, 0}
+            Else
+                kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
+                kalman(i).output = New Single() {-1, -1, 0, 0, 0, 0}
+            End If
+        Next
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If standalone Then
+            topView.Run(ocvb)
+            dst1 = topView.dst1
+            Exit Sub
+        End If
+
+        ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
+        If kalman.Count < queryPoints.Count + newCentroids.Count Then allocateKalman(ocvb, queryPoints.Count + newCentroids.Count)
+
+        knn.basics.knnQT.trainingPoints.Clear()
+        ' The previous generation's query points becomes the trainingpoints for the current generation here.
+        For i = 0 To kalman.Count - 1
+            If kalman(i).input(0) >= 0 Then knn.basics.knnQT.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+        Next
+
+        If newCentroids.Count > 0 Then
+            ' when the queries outnumber the trainingpoints, some new queries need to be added.
+            Dim qIndex As Integer
+            For i = knn.basics.knnQT.trainingPoints.Count To kalman.Count - 1
+                If qIndex >= newCentroids.Count Then Exit For
+                knn.basics.knnQT.trainingPoints.Add(newCentroids(qIndex))
+                kalman(i).input = {newCentroids(qIndex).X, newCentroids(qIndex).Y, 0, 0, 0, 0}
+                qIndex += 1
+                If qIndex >= kalman.Count Then Exit Sub ' we don't have enough kalman filters to handle this level of queries so restart
+            Next
+        End If
+        newCentroids.Clear()
+
+        knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
+        knn.Run(ocvb)
+
+        Dim matches As New List(Of cv.Point2f)(knn.matchedPoints)
+        If matches IsNot Nothing Then ' first pass condition.
+            For i = 0 To matches.Count - 1
+                If matches(i).X < 0 Then
+                    For j = 0 To kalman.Count - 1
+                        If kalman(j).input(0) < 0 Then
+                            kalman(j).input = {knn.basics.knnQT.queryPoints(i).X, knn.basics.knnQT.queryPoints(i).Y, 0, 0, 0, 0}
+                            Exit For
+                        End If
+                    Next
+                End If
+            Next
+
+            If queryMasks.Count > 0 Then dst1.SetTo(0)
+            Dim inputRect = New cv.Rect
+            viewObjects.Clear()
             Dim maskIndex As Integer
             For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
                 maskIndex = -1
@@ -663,6 +994,3 @@ Public Class Kalman_PointTracker
         End If
     End Sub
 End Class
-
-
-

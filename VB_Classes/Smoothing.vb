@@ -171,7 +171,7 @@ Public Class Smoothing_Contours
 		smoothI.plotColor = cv.Scalar.Blue
 
 		sliders.Setup(ocvb, caller)
-		sliders.setupTrackBar(0, "Step size when adding points (1 is identity)", 1, 500, 3)
+		sliders.setupTrackBar(0, "Step size when adding points (1 is identity)", 1, 500, 30)
 
 		radio.Setup(ocvb, caller, 2)
 		radio.check(0).Text = "Interior smoothing"
@@ -193,5 +193,6 @@ Public Class Smoothing_Contours
 		smooth.dst1 = outline.dst2
 		smooth.Run(ocvb)
 		dst1 = smooth.dst1
+		label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
 	End Sub
 End Class

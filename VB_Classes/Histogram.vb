@@ -537,9 +537,10 @@ Public Class Histogram_2D_TopView
         Static inRangeSlider = findSlider("InRange Max Depth")
         Dim zRange = inRangeSlider.Value / 1000
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
-        If dst1.Size <> src.Size Then src = src.Resize(dst1.Size)
-        trimPC.src = src
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        If dst1.Size <> input.Size Then input = input.Resize(dst1.Size)
+        trimPC.src = input
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 
@@ -595,9 +596,10 @@ Public Class Histogram_2D_SideView
         Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
         trimPC = If(useIMUcheckbox.Checked, gCloudIMU, gCloud)
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
-        If dst1.Size <> src.Size Then src = src.Resize(dst1.Size)
-        trimPC.src = src
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        If dst1.Size <> input.Size Then input = input.Resize(dst1.Size)
+        trimPC.src = input
         trimPC.Run(ocvb)
         dst2 = trimPC.dst1
 

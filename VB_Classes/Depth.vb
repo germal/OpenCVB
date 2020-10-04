@@ -1360,15 +1360,15 @@ Public Class Depth_PointCloudInRange_IMU
                 split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
             End If
 
-            If standalone = False Then
-                Static reductionRadio = findRadio("No reduction")
-                If reductionRadio.checked = False Then
-                    split(2) *= 1000
-                    split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-                    reduction.Run(ocvb)
-                    split(2) = reduction.dst1 / 1000
-                End If
+            '  If standalone = False Then
+            Static reductionRadio = findRadio("No reduction")
+            If reductionRadio.checked = False Then
+                split(2) *= 1000
+                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run(ocvb)
+                split(2) = reduction.dst1 / 1000
             End If
+            ' End If
             cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
             Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)

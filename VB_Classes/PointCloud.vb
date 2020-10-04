@@ -795,6 +795,7 @@ Public Class PointCloud_HistTopView
         If src.Type = cv.MatType.CV_32FC3 Then hist.src = src
         hist.Run(ocvb)
         dst1 = hist.dst1
+        If standalone Then dst2 = hist.dst2
     End Sub
 End Class
 
