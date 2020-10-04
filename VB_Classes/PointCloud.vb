@@ -922,7 +922,7 @@ Public Class PointCloud_WallsFloors
         both = New PointCloud_HistBothViews(ocvb)
 
         Dim histThresholdSlider = findSlider("Histogram threshold")
-        histThresholdSlider.Value = 100
+        histThresholdSlider.Value = 20
 
         label1 = "Top View: wall candidates in red"
         label2 = "Side View: floors/ceiling candidates in red"
@@ -945,5 +945,44 @@ Public Class PointCloud_WallsFloors
         floorDetect.Run(ocvb)
         dst2 = floorDetect.dst1
         floorsLines = floorDetect.lineMat
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_Snapshot
+    Inherits VBparent
+    Dim sideView As Histogram_2D_SideView
+    Dim topView As Histogram_2D_TopView
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
+        topView = New Histogram_2D_TopView(ocvb)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Take a snapshot"
+        check.Box(0).Checked = True
+
+        label1 = "Snapshot of side view"
+        label2 = "Snapshot of top view"
+        ocvb.desc = "Study a point cloud in a single snapshot"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static pcSnap As New cv.Mat
+        If check.Box(0).Checked Then
+            check.Box(0).Checked = False
+            pcSnap = ocvb.pointCloud
+        End If
+        sideView.src = pcSnap
+        sideView.Run(ocvb)
+        dst1 = sideView.dst1.Resize(src.Size)
+
+        topView.src = pcSnap
+        topView.Run(ocvb)
+        dst2 = topView.dst1.Resize(src.Size)
     End Sub
 End Class

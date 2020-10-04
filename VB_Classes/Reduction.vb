@@ -186,17 +186,18 @@ Public Class Reduction_Depth
         ocvb.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If src.Type = cv.MatType.CV_32S Then
-            reduction.src = src
+        Dim input = src
+        If input.Type = cv.MatType.CV_32S Then
+            reduction.src = input
         Else
-            src = getDepth32f(ocvb)
-            src.ConvertTo(reduction.src, cv.MatType.CV_32S)
+            input = getDepth32f(ocvb)
+            input.ConvertTo(reduction.src, cv.MatType.CV_32S)
         End If
         reduction.Run(ocvb)
         reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
         colorizer.src = dst1
         colorizer.Run(ocvb)
-        dst2 = colorizer.dst1
+        dst1 = colorizer.dst1
         label1 = reduction.label1
     End Sub
 End Class

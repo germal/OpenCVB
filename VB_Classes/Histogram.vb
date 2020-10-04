@@ -521,6 +521,8 @@ Public Class Histogram_2D_TopView
         initParent(ocvb)
         gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
         gCloud = New Depth_PointCloudInRange(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
@@ -542,7 +544,6 @@ Public Class Histogram_2D_TopView
         If dst1.Size <> input.Size Then input = input.Resize(dst1.Size)
         trimPC.src = input
         trimPC.Run(ocvb)
-        dst2 = trimPC.dst1
 
         pixelsPerMeter = src.Height / zRange
         trimPC.split(XorYdata).ConvertTo(trimPC.split(XorYdata), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * zRange)
@@ -582,6 +583,8 @@ Public Class Histogram_2D_SideView
 
         gCloudIMU = New Depth_PointCloudInRange_IMU(ocvb)
         gCloud = New Depth_PointCloudInRange(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
@@ -601,7 +604,6 @@ Public Class Histogram_2D_SideView
         If dst1.Size <> input.Size Then input = input.Resize(dst1.Size)
         trimPC.src = input
         trimPC.Run(ocvb)
-        dst2 = trimPC.dst1
 
         pixelsPerMeter = src.Height / maxZ
         trimPC.split(XorYdata).ConvertTo(trimPC.split(XorYdata), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)

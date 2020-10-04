@@ -851,11 +851,10 @@ Future Work
 The plan is to continue adding more algorithms. There are numerous published
 algorithms on the web but there is also the task to combine the different
 algorithms in OpenCVB. The current edition of the code contains examples of
-compound algorithms and more will arrive in future releases. The class-oriented
-structure of the code almost enforces reuse because any algorithm with sliders
-or check boxes suggests reusing an existing class rather than provide another
-with similar set of sliders and check boxes. The options forms for combined
-algorithms are automatically cascaded for easy selection.
+compound algorithms and more will arrive in future releases. The code almost
+enforces reuse because any algorithm with sliders or check boxes encourages
+reuse rather than duplicate a similar set of sliders and check boxes. The
+options for combined algorithms are automatically cascaded for easy selection.
 
 Acknowledgements
 ================
