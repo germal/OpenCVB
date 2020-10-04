@@ -22,8 +22,8 @@ Public Class Contours_Basics
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
 
-        radio.Text = caller + " Retrieval Mode Options"
-        radio1.Text = caller + " ContourApproximation Mode"
+        radio.Text = caller + " Retrieval Mode Radio Options"
+        radio1.Text = caller + " ContourApproximation Mode Radio Options"
         radio1.Show()
         rotatedRect = New Draw_rotatedRectangles(ocvb)
         rotatedRect.rect.sliders.trackbar(0).Value = 5
@@ -62,11 +62,10 @@ Public Class Contours_Basics
 
         Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
-            '    Dim img32sc1 As New cv.Mat
-            '    src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
-            '    contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
-            '    img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-            contours0 = cv.Cv2.FindContoursAsArray(src, cv.RetrievalModes.Tree, ApproximationMode)
+            Dim img32sc1 As New cv.Mat
+            src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
+            contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
+            img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         Else
             contours0 = cv.Cv2.FindContoursAsArray(src, retrievalMode, ApproximationMode)
         End If

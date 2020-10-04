@@ -14,6 +14,8 @@ Public Class Fuzzy_Basics
 
         options = New Contours_Basics(ocvb)
         options.rotatedRect.rect.sliders.Visible = False
+        Dim floodRadio = findRadio("FloodFill")
+        If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
 
         palette = New Palette_Basics(ocvb)
         reduction = New Reduction_Basics(ocvb)
@@ -301,7 +303,6 @@ Public Class Fuzzy_PointTracker
 
         flood.src = fuzzy.dst1
         flood.Run(ocvb)
-
 
         pTrack.queryPoints = flood.basics.centroids
         pTrack.queryRects = flood.basics.rects
