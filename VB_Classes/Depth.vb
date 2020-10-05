@@ -590,6 +590,8 @@ Module Depth_Colorizer_CPP_Module
 End Module
 
 
+
+
 Public Class Depth_Colorizer_CPP
     Inherits VBparent
     Dim dcPtr As IntPtr
@@ -1256,7 +1258,7 @@ End Class
 Public Class Depth_PointCloudInRange
     Inherits VBparent
     Public histOpts As Histogram_ProjectionOptions
-    Public Mask As New cv.Mat
+    Public mask As New cv.Mat
     Public maxMeters As Double
     Public split() As cv.Mat
     Public reduction As Reduction_Depth
@@ -1271,7 +1273,7 @@ Public Class Depth_PointCloudInRange
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxMeters = inRangeSlider.Value / 1000
+        maxZ = inRangeSlider.Value / 1000
         dst2.SetTo(0)
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
@@ -1282,101 +1284,18 @@ Public Class Depth_PointCloudInRange
             split(2) *= 1000
             split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
             reduction.Run(ocvb)
-            split(2) = reduction.dst1 / 1000
+            split(2) = reduction.reducedDepth32F / 1000
         End If
 
         Dim tmp As New cv.Mat
-        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxMeters), Mask)
+        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), mask)
         Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-        Mask = Mask.SetTo(0, zeroDepth)
+        mask = mask.SetTo(0, zeroDepth)
 
-        dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size)
+        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size)
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
-' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloudInRange_IMU
-    Inherits VBparent
-    Public histOpts As Histogram_ProjectionOptions
-    Public Mask As New cv.Mat
-    Public split(3 - 1) As cv.Mat
-    Public imu As IMU_GVector
-    Public xRotation As Boolean = True
-    Public zRotation As Boolean = True
-    Public reduction As Reduction_Depth
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        reduction = New Reduction_Depth(ocvb)
-        histOpts = New Histogram_ProjectionOptions(ocvb)
-        If standalone Then histOpts.check.Visible = False
-        imu = New IMU_GVector(ocvb)
-        If standalone Then imu.kalman.check.Visible = False
-
-        label1 = "Mask for depth values that are in-range"
-        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If standalone Then src = ocvb.pointCloud
-
-        Static rangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = rangeSlider.Value / 1000
-        Dim tSplit = cv.Cv2.Split(src)
-        split = tSplit
-
-        If ocvb.parms.IMU_Present = False Then
-            ocvb.trueText("IMU unavailable for this camera")
-        Else
-            imu.Run(ocvb)
-            If zRotation Then
-                '[cos(a) -sin(a) 0]
-                '[sin(a)  cos(a) 0]
-                '[0      0       1] rotate the point cloud around the z-axis.
-                Dim yZ(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
-
-                split(0) = yZ(0, 0) * tSplit(0) + yZ(0, 1) * tSplit(1)
-                split(1) = yZ(1, 0) * tSplit(0) + yZ(1, 1) * tSplit(1)
-                split(2) = tSplit(2)
-                tSplit = split
-            End If
-
-            If xRotation Then
-                '[1      0       0] rotate the point cloud around the x-axis.
-                '[0 cos(a) -sin(a)]
-                '[0 sin(a)  cos(a)]
-                Dim xZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
-
-                split(0) = tSplit(0)
-                split(1) = xZ(1, 1) * tSplit(1) + xZ(1, 2) * tSplit(2)
-                split(2) = xZ(2, 1) * tSplit(1) + xZ(2, 2) * tSplit(2)
-            End If
-
-            '  If standalone = False Then
-            Static reductionRadio = findRadio("No reduction")
-            If reductionRadio.checked = False Then
-                split(2) *= 1000
-                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-                reduction.Run(ocvb)
-                split(2) = reduction.dst1 / 1000
-            End If
-            ' End If
-            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
-            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-            Mask = Mask.SetTo(0, zeroDepth)
-            dst1 = Mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size)
-            dst2 = split(2).ConvertScaleAbs(255).Resize(dst1.Size)
-        End If
-    End Sub
-End Class
 
 
 
@@ -1403,41 +1322,6 @@ Public Class Depth_Edges
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Depth_Holes
-    Inherits VBparent
-    Public holeMask As New cv.Mat
-    Public borderMask As New cv.Mat
-    Dim element As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
-        sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
-
-        label2 = "Shadow Edges (use sliders to expand)"
-        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
-        ocvb.desc = "Identify holes in the depth image."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-        holeMask = holeMask.Dilate(element, Nothing, sliders.trackbar(1).Value)
-        dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-
-        borderMask = holeMask.Dilate(element, Nothing, sliders.trackbar(0).Value)
-        cv.Cv2.BitwiseXor(borderMask, holeMask, borderMask)
-        If standalone Then
-            dst2.SetTo(0)
-            ocvb.RGBDepth.CopyTo(dst2, borderMask)
-        End If
-    End Sub
-End Class
 
 
 
@@ -1470,5 +1354,360 @@ Public Class Depth_HolesOverTime
         If recentImages.Count >= sliders.trackbar(0).Value Then
             recentImages.RemoveAt(0)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloudInRange_IMU
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public Mask As New cv.Mat
+    Public split(3 - 1) As cv.Mat
+    Public imu As IMU_GVector
+    Public xRotation As Boolean = True
+    Public zRotation As Boolean = True
+    Public reduction As Reduction_Depth
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        reduction = New Reduction_Depth(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+        imu = New IMU_GVector(ocvb)
+        If standalone Then imu.kalman.check.Visible = False
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If standalone Then input = ocvb.pointCloud
+
+        Static rangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = rangeSlider.Value / 1000
+
+        Dim tSplit = cv.Cv2.Split(input)
+        split = tSplit
+
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            imu.Run(ocvb)
+            If zRotation Then
+                '[cos(a) -sin(a) 0]
+                '[sin(a)  cos(a) 0]
+                '[0      0       1] rotate the point cloud around the z-axis.
+                Dim xY(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
+
+                split(0) = xY(0, 0) * tSplit(0) + xY(0, 1) * tSplit(1)
+                split(1) = xY(1, 0) * tSplit(0) + xY(1, 1) * tSplit(1)
+                split(2) = tSplit(2)
+                tSplit = split
+            End If
+
+            If xRotation Then
+                '[1      0       0] rotate the point cloud around the x-axis.
+                '[0 cos(a) -sin(a)]
+                '[0 sin(a)  cos(a)]
+                Dim yZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
+
+                split(0) = tSplit(0)
+                split(1) = yZ(1, 1) * tSplit(1) + yZ(1, 2) * tSplit(2)
+                split(2) = yZ(2, 1) * tSplit(1) + yZ(2, 2) * tSplit(2)
+                tSplit = split
+            End If
+
+            '  If standalone = False Then
+            Static reductionRadio = findRadio("No reduction")
+            If reductionRadio.checked = False Then
+                split(2) *= 1000
+                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run(ocvb)
+                split(2) = reduction.reducedDepth32F / 1000
+            End If
+            ' End If
+            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
+            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            Mask = Mask.SetTo(0, zeroDepth)
+            dst1 = Mask.Resize(dst1.Size)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloudRotationY
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public split(3 - 1) As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Rotate the PointCloud around the y-axis using a slider."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If standalone Then
+            input = ocvb.pointCloud
+            split = input.Split
+        End If
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            Static rangeSlider = findSlider("InRange Max Depth (mm)")
+            maxZ = rangeSlider.Value / 1000
+            Static radiansSlider = findSlider("Angle to rotate around y-axis")
+            Dim radians = radiansSlider.Value / 57.2958
+
+            '[cos(a) 0  -sin(a)] rotate the point cloud around the y-axis.
+            '[0      1       0 ]
+            '[sin(a) 0   cos(a)]
+            Dim xZ(,) = {{0, 1, 0}, {0, Math.Cos(-radians), -Math.Sin(-radians)}, {0, Math.Sin(-radians), Math.Cos(-radians)}}
+            split(0) = xZ(0, 0) * split(0) + xZ(0, 2) * split(2)
+            split(1) = split(1)
+            split(2) = xZ(2, 0) * split(0) + xZ(2, 2) * split(2)
+
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), mask)
+            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            mask = mask.SetTo(0, zeroDepth)
+            dst1 = mask.Resize(ocvb.color.Size)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_Holes
+    Inherits VBparent
+    Public holeMask As New cv.Mat
+    Public borderMask As New cv.Mat
+    Dim element As New cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
+        sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
+
+        label2 = "Shadow Edges (use sliders to expand)"
+        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
+        ocvb.desc = "Identify holes in the depth image."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        holeMask = holeMask.Dilate(element, Nothing, sliders.trackbar(1).Value)
+        dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        borderMask = holeMask.Dilate(element, Nothing, sliders.trackbar(0).Value)
+        cv.Cv2.BitwiseXor(borderMask, holeMask, borderMask)
+        If standalone Then
+            dst2.SetTo(0)
+            ocvb.RGBDepth.CopyTo(dst2, borderMask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_TooClose
+    Inherits VBparent
+    Public holes As Depth_Holes
+    Public minVal As Double
+    Public depth32f As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        holes = New Depth_Holes(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Amount of depth padded to minimum depth (mm)", 1, 4000, 1000)
+
+        label2 = "Non-Zero depth mask"
+        ocvb.desc = "Tests to determine if the camera is too close"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        holes.Run(ocvb)
+        cv.Cv2.BitwiseNot(holes.holeMask, dst2)
+        depth32f = getDepth32f(ocvb)
+        Dim maxval As Double
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        depth32f.MinMaxLoc(minVal, maxval, minLoc, maxLoc, dst2)
+        cv.Cv2.InRange(depth32f, cv.Scalar.All(minVal), cv.Scalar.All(minVal + sliders.trackbar(0).Value), dst1)
+
+        depth32f.MinMaxLoc(minVal, maxval, minLoc, maxLoc, dst1)
+        label1 = "Min Z = " + Format(minVal, "#0") + " Max Z = " + Format(maxval, "#0")
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_NoiseRemovalMask
+    Inherits VBparent
+    Public noise As Depth_TooClose
+    Public flood As FloodFill_8bit
+    Dim padSlider As System.Windows.Forms.TrackBar
+    Public depth32fNoiseRemoved As New cv.Mat
+    Public noiseMask As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        flood = New FloodFill_8bit(ocvb)
+        noise = New Depth_TooClose(ocvb)
+        padSlider = findSlider("Amount of depth padded to minimum depth (mm)")
+        hideForm("Palette_BuildGradientColorMap Slider Options")
+        hideForm("Palette_Basics Radio Options")
+
+        ocvb.desc = "Use the 'Too Close' test to remove (some) noisy depth"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        noise.Run(ocvb)
+        dst1 = noise.dst1
+
+        flood.src = dst1
+        flood.Run(ocvb)
+        dst2 = flood.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+
+        depth32fNoiseRemoved = noise.depth32f
+        noiseMask = dst1.Clone
+        noiseMask.SetTo(0, dst2)
+        depth32fNoiseRemoved.SetTo(0, noiseMask)
+
+        label1 = "Depth values between " + Format(noise.minVal, "#0") + " and " + Format(padSlider.Value + noise.minVal, "#0")
+        label2 = "Mask of solid depth < " + CStr(padSlider.Value)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_TooCloseCentroids
+    Inherits VBparent
+    Dim depth As Depth_NoiseRemovalMask
+    Public tooClosePoints As New List(Of cv.Point2f)
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        depth = New Depth_NoiseRemovalMask(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Size of rejected rects that are likely too close", 1, 500, 250)
+        sliders.setupTrackBar(1, "Percent of zero depth in rejected rect", 1, 100, 20) ' Empircally determined - subject to change!
+
+        ocvb.desc = "Plot the rejected centroids and rects in FloodFill - search for points that are too close"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        depth.Run(ocvb)
+        dst2 = depth.noiseMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = depth.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each pt In depth.flood.basics.rejectedCentroids
+            dst1.Circle(pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
+
+        Static maxPixelSlider = findSlider("Size of rejected rects that are likely too close")
+        Static percentSlider = findSlider("Percent of zero depth in rejected rect")
+        Dim maxPixels = maxPixelSlider.value
+        Dim holes = depth.noise.holes.holeMask
+        Dim percentThreshold = percentSlider.value / 100
+        tooClosePoints.Clear()
+        For Each r In depth.flood.basics.rejectedRects
+            If r.Width * r.Height < maxPixels And r.Width > 0 And r.Height > 0 Then
+                ' if the rect is surrounded by largely zero depth, then it is likely noise from being too close
+                Dim percentZero = holes(r).CountNonZero() / (r.Width * r.Height)
+                If percentZero > percentThreshold Then
+                    dst2.Rectangle(r, cv.Scalar.Yellow, -1)
+                    tooClosePoints.Add(New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2))
+                End If
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_TooCloseCluster
+    Inherits VBparent
+    Dim rejects As Depth_TooCloseCentroids
+    Dim knn2d As KNN_Point2d
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        knn2d = New KNN_Point2d(ocvb)
+        rejects = New Depth_TooCloseCentroids(ocvb)
+        label2 = "Red are recent rejects, white older"
+        ocvb.desc = "Cluster rejected rect's in area too close to the camera"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        rejects.Run(ocvb)
+        dst1 = rejects.dst2
+
+        knn2d.knn.knnQT.trainingPoints = New List(Of cv.Point2f)(knn2d.knn.knnQT.queryPoints)
+        knn2d.knn.knnQT.queryPoints = New List(Of cv.Point2f)(rejects.tooClosePoints)
+        knn2d.Run(ocvb)
+        If ocvb.frameCount Mod 10 = 0 Then dst2.SetTo(0)
+        For i = 0 To knn2d.knn.knnQT.queryPoints.Count - 1
+            Dim qPoint = knn2d.knn.knnQT.queryPoints.ElementAt(i)
+            cv.Cv2.Circle(dst2, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            Dim pt = knn2d.knn.knnQT.trainingPoints.ElementAt(knn2d.knn.neighbors.Get(Of Single)(i, 0))
+            cv.Cv2.Circle(dst2, pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+            Dim distance = Math.Sqrt((pt.X - qPoint.X) * (pt.X - qPoint.X) + (pt.Y - qPoint.Y) * (pt.Y - qPoint.Y))
+            If distance < src.Width / 10 Then dst2.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_NoiseRemovedAndColorized
+    Inherits VBparent
+    Dim colorize As Depth_Colorizer_CPP
+    Dim depth As Depth_NoiseRemovalMask
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        colorize = New Depth_Colorizer_CPP(ocvb)
+        depth = New Depth_NoiseRemovalMask(ocvb)
+        label2 = "Solid depth (white) with likely noise (white pixels)"
+        ocvb.desc = "Colorize Depth after some noise has been removed."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        depth.Run(ocvb)
+        dst2 = depth.dst1
+
+        colorize.src = depth.depth32fNoiseRemoved
+        colorize.run(ocvb)
+        dst1 = colorize.dst1
     End Sub
 End Class

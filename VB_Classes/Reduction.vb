@@ -178,6 +178,7 @@ Public Class Reduction_Depth
     Inherits VBparent
     Dim reduction As Reduction_Basics
     Dim colorizer As Depth_Colorizer_CPP
+    Public reducedDepth32F As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
@@ -194,8 +195,8 @@ Public Class Reduction_Depth
             input.ConvertTo(reduction.src, cv.MatType.CV_32S)
         End If
         reduction.Run(ocvb)
-        reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-        colorizer.src = dst1
+        reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
+        colorizer.src = reducedDepth32F
         colorizer.Run(ocvb)
         dst1 = colorizer.dst1
         label1 = reduction.label1
@@ -226,5 +227,53 @@ Public Class Reduction_PointCloud
         split(2) = dst1 / 1000
         cv.Cv2.Merge(split, newPointCloud)
         dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Reduction_Lines
+    Inherits VBparent
+    Dim sideView As Histogram_2D_SideView
+    Dim topView As Histogram_2D_TopView
+    Dim rotate As Transform_Rotate
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
+        topView = New Histogram_2D_TopView(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        rotate = New Transform_Rotate(ocvb)
+        Dim angleSlider = findSlider("Angle")
+        Dim xSlider = findSlider("Rotation center X")
+        Dim ySlider = findSlider("Rotation center Y")
+        angleSlider.Value = 0
+        xSlider.Value = src.Width / 2
+        ySlider.Value = src.Height
+
+
+        ocvb.desc = "Present both the top and side view to minimize pixel counts."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        sideView.Run(ocvb)
+        dst1 = sideView.dst1.Resize(src.Size)
+
+        label1 = "Side View: " + CStr(dst1.CountNonZero()) + " pixels"
+
+        topView.Run(ocvb)
+        dst2 = topView.dst1.Resize(src.Size)
+
+        rotate.src = dst2
+        rotate.Run(ocvb)
+        dst2 = rotate.dst1
+        label2 = "Top View: " + CStr(dst2.CountNonZero()) + " pixels"
     End Sub
 End Class

@@ -784,7 +784,8 @@ Public Class PointCloud_HistTopView
         initParent(ocvb)
 
         hist = New Histogram_2D_TopView(ocvb)
-        hist.histOpts.check.Box(0).Checked = False
+        Static histCheckbox = findCheckBox("Use IMU gravity vector")
+        histCheckbox.Checked = False
 
         Static reductionRadio = findRadio("No reduction")
         reductionRadio.checked = True
@@ -810,7 +811,8 @@ Public Class PointCloud_HistSideView
         initParent(ocvb)
 
         hist = New Histogram_2D_SideView(ocvb)
-        hist.histOpts.check.Box(0).Checked = False
+        Static histCheckbox = findCheckBox("Use IMU gravity vector")
+        histCheckbox.Checked = False
 
         Static reductionRadio = findRadio("No reduction")
         reductionRadio.checked = True

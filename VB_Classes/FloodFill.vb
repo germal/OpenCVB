@@ -6,6 +6,8 @@ Public Class FloodFill_Basics
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
+    Public rejectedCentroids As New List(Of cv.Point2f)
+    Public rejectedRects As New List(Of cv.Rect)
 
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
@@ -43,6 +45,8 @@ Public Class FloodFill_Basics
         maskSizes.Clear()
         rects.Clear()
         centroids.Clear()
+        rejectedCentroids.Clear()
+        rejectedRects.Clear()
 
         maskPlus.SetTo(0)
         Dim ignoreMasks = initialMask.Clone()
@@ -61,6 +65,9 @@ Public Class FloodFill_Basics
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
                         centroids.Add(centroid)
+                    Else
+                        rejectedRects.Add(rect)
+                        rejectedCentroids.Add(New cv.Point2f(rect.X + rect.Width / 2, rect.Y + rect.Height / 2))
                     End If
                     ' Mask off any object that is too small or previously identified
                     cv.Cv2.BitwiseOr(ignoreMasks, maskPlus(maskRect), ignoreMasks)

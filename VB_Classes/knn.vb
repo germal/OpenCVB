@@ -54,56 +54,6 @@ End Class
 
 
 
-
-
-Public Class KNN_Point2d
-    Inherits VBparent
-    Public knn As KNN_Basics
-    Public findXnearest As Integer = 1
-    Public responseSet() As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        knn = New KNN_Basics(ocvb)
-        If standalone Then knn.knnQT.useRandomData = True
-
-        ocvb.desc = "Use KNN to find n matching points for each query."
-        label1 = "Yellow=Queries, Blue=Best Responses"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If standalone Then
-            dst1.SetTo(0)
-            For i = 0 To knn.knnQT.trainingPoints.Count - 1
-                cv.Cv2.Circle(dst1, knn.knnQT.trainingPoints(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-            Next
-            Static nearestCountSlider = findSlider("KNN k nearest points")
-            findXnearest = nearestCountSlider.Value
-        End If
-
-        knn.Run(ocvb)
-
-        ReDim responseSet(knn.knnQT.queryPoints.Count * findXnearest - 1)
-        Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        For i = 0 To knn.knnQT.queryPoints.Count - 1
-            query.Set(Of cv.Point2f)(0, 0, knn.knnQT.queryPoints(i))
-            knn.knn.FindNearest(query, findXnearest, results, neighbors)
-            For j = 0 To neighbors.Cols - 1
-                Dim index = neighbors.Get(Of Single)(0, j)
-                responseSet(i * findXnearest + j) = CInt(index)
-            Next
-            If standalone Then
-                For j = 0 To findXnearest - 1
-                    dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
-                Next
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
 Public Class KNN_QueryTrain
     Inherits VBparent
     Public trainingPoints As New List(Of cv.Point2f)
@@ -464,103 +414,6 @@ End Class
 
 
 
-
-Public Class KNN_Cluster2D
-    Inherits VBparent
-    Dim knn As KNN_Point2d
-    Public cityPositions() As cv.Point
-    Public cityOrder() As Integer
-    Public distances() As Integer
-    Dim numberOfCities As Integer
-    Dim closedRegions As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        knn = New KNN_Point2d(ocvb)
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "KNN - number of cities", 10, 1000, 100)
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Demo Mode (continuous update)"
-        check.Box(0).Checked = True
-
-        label1 = ""
-        ocvb.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
-    End Sub
-    Private Sub cluster(ocvb As VBocvb, result As cv.Mat)
-        Dim alreadyTaken As New List(Of Integer)
-        For i = 0 To numberOfCities - 1
-            For j = 1 To numberOfCities - 1
-                Dim nearestCity = knn.responseSet(i * knn.findXnearest + j)
-                ' the last entry will never have a city to connect to so just connect with the nearest.
-                If i = numberOfCities - 1 Then
-                    cityOrder(i) = nearestCity
-                    Exit For
-                End If
-                If alreadyTaken.Contains(nearestCity) = False Then
-                    cityOrder(i) = nearestCity
-                    alreadyTaken.Add(nearestCity)
-                    Exit For
-                End If
-            Next
-        Next
-        For i = 0 To cityOrder.Length - 1
-            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * fontsize)
-        Next
-
-        closedRegions = 0
-        For y = 0 To result.Rows - 1
-            For x = 0 To result.Cols - 1
-                If result.Get(Of cv.Vec3b)(y, x) = cv.Scalar.Black Then
-                    Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), ocvb.vecColors(closedRegions Mod ocvb.vecColors.Length))
-                    If byteCount > 10 Then closedRegions += 1 ' there are fake regions due to anti-alias like features that appear when drawing.
-                End If
-            Next
-        Next
-        For i = 0 To cityOrder.Length - 1
-            result.Circle(cityPositions(i), 4 * fontsize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Next
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        ' If they changed Then number of elements in the set
-        Static demoModeCheck = findCheckBox("Demo Mode")
-        Static cityCountSlider = findSlider("KNN - number of cities")
-
-        If cityCountSlider.Value <> numberOfCities Or demoModeCheck.Checked Then
-            numberOfCities = cityCountSlider.Value
-            knn.findXnearest = numberOfCities
-
-            ReDim cityPositions(numberOfCities - 1)
-            ReDim cityOrder(numberOfCities - 1)
-
-            Dim gen As New System.Random()
-            Dim r As New cv.RNG(gen.Next(0, 1000000))
-            For i = 0 To numberOfCities - 1
-                cityPositions(i).X = r.Uniform(0, src.Width)
-                cityPositions(i).Y = r.Uniform(0, src.Height)
-            Next
-
-            ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
-            Dim trainingSlider = findSlider("KNN Train count")
-            Dim querySlider = findSlider("KNN Query count")
-            knn.knn.knnQT.trainingPoints.Clear()
-            knn.knn.knnQT.queryPoints.Clear()
-            For i = 0 To numberOfCities - 1
-                knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
-                knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
-            Next
-            knn.Run(ocvb)
-            dst1.SetTo(0)
-            cluster(ocvb, dst1)
-            ocvb.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class KNN_DepthClusters
     Inherits VBparent
     Public blobs As Blob_DepthClusters
@@ -745,6 +598,157 @@ Public Class KNN_Contours
             cv.Cv2.Circle(dst2, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
             Dim pt = trainData.Get(Of cv.Point2f)(knn.neighbors.Get(Of Single)(i, 0), 0)
             dst2.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class KNN_Cluster2DCities
+    Inherits VBparent
+    Dim knn As KNN_Point2d
+    Public cityPositions() As cv.Point
+    Public cityOrder() As Integer
+    Public distances() As Integer
+    Dim numberOfCities As Integer
+    Dim closedRegions As Integer
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        knn = New KNN_Point2d(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "KNN - number of points", 10, 1000, 100)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Demo Mode (continuous update)"
+        check.Box(0).Checked = True
+
+        label1 = ""
+        ocvb.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
+    End Sub
+    Public Sub cluster(ocvb As VBocvb, result As cv.Mat)
+        Dim alreadyTaken As New List(Of Integer)
+        For i = 0 To numberOfCities - 1
+            For j = 1 To numberOfCities - 1
+                Dim nearestCity = knn.responseSet(i * knn.findXnearest + j)
+                ' the last entry will never have a city to connect to so just connect with the nearest.
+                If i = numberOfCities - 1 Then
+                    cityOrder(i) = nearestCity
+                    Exit For
+                End If
+                If alreadyTaken.Contains(nearestCity) = False Then
+                    cityOrder(i) = nearestCity
+                    alreadyTaken.Add(nearestCity)
+                    Exit For
+                End If
+            Next
+        Next
+        For i = 0 To cityOrder.Length - 1
+            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * fontsize)
+        Next
+
+        closedRegions = 0
+        For y = 0 To result.Rows - 1
+            For x = 0 To result.Cols - 1
+                If result.Get(Of cv.Vec3b)(y, x) = cv.Scalar.Black Then
+                    Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), ocvb.vecColors(closedRegions Mod ocvb.vecColors.Length))
+                    If byteCount > 10 Then closedRegions += 1 ' there are fake regions due to anti-alias like features that appear when drawing.
+                End If
+            Next
+        Next
+        For i = 0 To cityOrder.Length - 1
+            result.Circle(cityPositions(i), 4 * fontsize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        ' If they changed Then number of elements in the set
+        Static demoModeCheck = findCheckBox("Demo Mode")
+        Static cityCountSlider = findSlider("KNN - number of points")
+
+        If cityCountSlider.Value <> numberOfCities Or demoModeCheck.Checked Then
+            numberOfCities = cityCountSlider.Value
+            knn.findXnearest = numberOfCities
+
+            ReDim cityPositions(numberOfCities - 1)
+            ReDim cityOrder(numberOfCities - 1)
+
+            Dim gen As New System.Random()
+            Dim r As New cv.RNG(gen.Next(0, 1000000))
+            For i = 0 To numberOfCities - 1
+                cityPositions(i).X = r.Uniform(0, src.Width)
+                cityPositions(i).Y = r.Uniform(0, src.Height)
+            Next
+
+            ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
+            Dim trainingSlider = findSlider("KNN Train count")
+            Dim querySlider = findSlider("KNN Query count")
+            knn.knn.knnQT.trainingPoints.Clear()
+            knn.knn.knnQT.queryPoints.Clear()
+            For i = 0 To numberOfCities - 1
+                knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
+                knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
+            Next
+            knn.Run(ocvb)
+
+            dst1.SetTo(0)
+            cluster(ocvb, dst1)
+            ocvb.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KNN_Point2d
+    Inherits VBparent
+    Public knn As KNN_Basics
+    Public findXnearest As Integer = 1
+    Public responseSet() As Integer
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        knn = New KNN_Basics(ocvb)
+        If standalone Then knn.knnQT.useRandomData = True
+
+        ocvb.desc = "Use KNN to find n matching points for each query."
+        label1 = "Yellow=Queries, Blue=Best Responses"
+    End Sub
+    Public Sub prepareImage(dst As cv.Mat)
+        dst.SetTo(0)
+        For i = 0 To knn.knnQT.trainingPoints.Count - 1
+            cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+        Next
+        Static nearestCountSlider = findSlider("KNN k nearest points")
+        findXnearest = nearestCountSlider.Value
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If standalone Then prepareImage(dst1)
+
+        knn.Run(ocvb)
+
+        ReDim responseSet(knn.knnQT.queryPoints.Count * findXnearest - 1)
+        Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
+        For i = 0 To knn.knnQT.queryPoints.Count - 1
+            query.Set(Of cv.Point2f)(0, 0, knn.knnQT.queryPoints(i))
+            knn.knn.FindNearest(query, findXnearest, results, neighbors)
+            For j = 0 To neighbors.Cols - 1
+                Dim index = neighbors.Get(Of Single)(0, j)
+                responseSet(i * findXnearest + j) = CInt(index)
+            Next
+            If standalone Then
+                For j = 0 To findXnearest - 1
+                    dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                Next
+            End If
         Next
     End Sub
 End Class

@@ -32,7 +32,7 @@ Public Class Transform_Rotate
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Angle", 0, 360, 30)
+        sliders.setupTrackBar(0, "Angle", -180, 180, 30)
         sliders.setupTrackBar(1, "Scale Factor", 1, 100, 100)
         sliders.setupTrackBar(2, "Rotation center X", 1, src.Width, src.Width / 2)
         sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
