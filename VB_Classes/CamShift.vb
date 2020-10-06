@@ -64,7 +64,9 @@ Public Class CamShift_Basics
         End If
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)
-        If trackBox.Size.Width > 0 Then dst1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        If trackBox.Size.Width > 0 Then
+            dst1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        End If
     End Sub
 End Class
 

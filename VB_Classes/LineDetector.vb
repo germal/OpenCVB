@@ -18,10 +18,13 @@ Public Class LineDetector_Basics
         ocvb.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        lines = ld.Detect(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        lines = ld.Detect(input)
         src.CopyTo(dst1)
         src.CopyTo(dst2)
-        Dim thickness = sliders.trackbar(0).Value
+        Static thicknessSlider = findSlider("Line thickness")
+        Dim thickness = thicknessSlider.Value
 
         For Each v In lines
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And

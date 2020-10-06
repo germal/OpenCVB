@@ -240,40 +240,33 @@ Public Class Reduction_Lines
     Inherits VBparent
     Dim sideView As Histogram_2D_SideView
     Dim topView As Histogram_2D_TopView
-    Dim rotate As Transform_Rotate
+    Public lDetect As LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sideView = New Histogram_2D_SideView(ocvb)
         topView = New Histogram_2D_TopView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
+        Dim reductionRadio = findRadio("Use simple reduction")
         reductionRadio.Checked = True
 
         Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 20
+        histSlider.Value = 500
 
-        rotate = New Transform_Rotate(ocvb)
-        Dim angleSlider = findSlider("Angle")
-        Dim xSlider = findSlider("Rotation center X")
-        Dim ySlider = findSlider("Rotation center Y")
-        angleSlider.Value = 0
-        xSlider.Value = src.Width / 2
-        ySlider.Value = src.Height
-
-
+        lDetect = New LineDetector_Basics(ocvb)
         ocvb.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         sideView.Run(ocvb)
-        dst1 = sideView.dst1.Resize(src.Size)
-
+        dst1 = sideView.dst1
+        'lDetect.src = sideView.dst1.Resize(src.Size)
+        'lDetect.Run(ocvb)
+        'dst1 = lDetect.dst1.Clone
         label1 = "Side View: " + CStr(dst1.CountNonZero()) + " pixels"
 
         topView.Run(ocvb)
-        dst2 = topView.dst1.Resize(src.Size)
-
-        rotate.src = dst2
-        rotate.Run(ocvb)
-        dst2 = rotate.dst1
+        dst2 = topView.dst1
+        'lDetect.src = topView.dst1.Resize(src.Size)
+        'lDetect.Run(ocvb)
+        'dst2 = lDetect.dst1
         label2 = "Top View: " + CStr(dst2.CountNonZero()) + " pixels"
     End Sub
 End Class

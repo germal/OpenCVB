@@ -367,6 +367,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Python\Coherence.py" />
+    <Content Include="Python\Dither_Burkes.py" />
     <Content Include="Python\FunHouseMirror_PS.py" />
     <Content Include="Python\GeneticDrawing.py" />
     <Content Include="Python\GetRotationMatrix2d.py" />
