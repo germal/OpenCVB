@@ -245,11 +245,11 @@ Public Class Reduction_Lines
         initParent(ocvb)
         sideView = New Histogram_2D_SideView(ocvb)
         topView = New Histogram_2D_TopView(ocvb)
-        Dim reductionRadio = findRadio("Use simple reduction")
+        Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
 
         Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 500
+        histSlider.Value = 20
 
         lDetect = New LineDetector_Basics(ocvb)
         ocvb.desc = "Present both the top and side view to minimize pixel counts."
@@ -257,16 +257,16 @@ Public Class Reduction_Lines
     Public Sub Run(ocvb As VBocvb)
         sideView.Run(ocvb)
         dst1 = sideView.dst1
-        'lDetect.src = sideView.dst1.Resize(src.Size)
-        'lDetect.Run(ocvb)
-        'dst1 = lDetect.dst1.Clone
-        label1 = "Side View: " + CStr(dst1.CountNonZero()) + " pixels"
+        lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1.Clone
+        ' label1 = "Side View: " + CStr(dst1.CountNonZero()) + " pixels"
 
         topView.Run(ocvb)
         dst2 = topView.dst1
-        'lDetect.src = topView.dst1.Resize(src.Size)
-        'lDetect.Run(ocvb)
-        'dst2 = lDetect.dst1
-        label2 = "Top View: " + CStr(dst2.CountNonZero()) + " pixels"
+        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst2 = lDetect.dst1
+        ' label2 = "Top View: " + CStr(dst2.CountNonZero()) + " pixels"
     End Sub
 End Class

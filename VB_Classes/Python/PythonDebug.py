@@ -1,85 +1,82 @@
-"""
-Implementation Burke's algorithm (dithering)
-https://github.com/TheAlgorithms/Python/blob/master/digital_image_processing/dithering/burkes.py
-"""
+'''
+Watershed segmentation
+=========
+
+This program demonstrates the watershed segmentation algorithm
+in OpenCV: watershed().
+
+Usage
+-----
+watershed.py [image filename]
+
+Keys
+----
+  1-7   - switch marker color
+  SPACE - update segmentation
+  r     - reset
+  a     - toggle autoupdate
+  ESC   - exit
+
+'''
+import sys
+import os
+
 import numpy as np
-from cv2 import destroyAllWindows, imread, imshow, waitKey
+import cv2 as cv
 
+from common import Sketcher
 
-class Burkes:
-    """
-    Burke's algorithm is using for converting grayscale image to black and white version
-    Source: Source: https://en.wikipedia.org/wiki/Dither
-    Note:
-        * Best results are given with threshold= ~1/2 * max greyscale value.
-        * This implementation get RGB image and converts it to greyscale in runtime.
-    """
+title_window = 'Watershed.py'
 
-    def __init__(self, input_img, threshold: int):
-        self.min_threshold = 0
-        # max greyscale value for #FFFFFF
-        self.max_threshold = int(self.get_greyscale(255, 255, 255))
+class App:
+    def __init__(self, fn):
+        self.img = cv.imread(fn)
+        if self.img is None:
+            raise Exception('Failed to load image file: %s' % fn)
 
-        if not self.min_threshold < threshold < self.max_threshold:
-            raise ValueError(f"Factor value should be from 0 to {self.max_threshold}")
+        h, w = self.img.shape[:2]
+        self.markers = np.zeros((h, w), np.int32)
+        self.markers_vis = self.img.copy()
+        self.cur_marker = 1
+        self.colors = np.int32( list(np.ndindex(2, 2, 2)) ) * 255
 
-        self.input_img = input_img
-        self.threshold = threshold
-        self.width, self.height = self.input_img.shape[1], self.input_img.shape[0]
+        self.auto_update = True
+        self.sketch = Sketcher('img', [self.markers_vis, self.markers], self.get_colors)
 
-        # error table size (+4 columns and +1 row) greater than input image because of
-        # lack of if statements
-        self.error_table = [
-            [0 for _ in range(self.height + 4)] for __ in range(self.width + 1)
-        ]
-        self.output_img = np.ones((self.width, self.height, 3), np.uint8) * 255
+    def get_colors(self):
+        return list(map(int, self.colors[self.cur_marker])), self.cur_marker
 
-    @classmethod
-    def get_greyscale(cls, blue: int, green: int, red: int) -> float:
-        """
-        >>> Burkes.get_greyscale(3, 4, 5)
-        3.753
-        """
-        return 0.114 * blue + 0.587 * green + 0.2126 * red
+    def watershed(self):
+        m = self.markers.copy()
+        cv.watershed(self.img, m)
+        overlay = self.colors[np.maximum(m, 0)]
+        vis = cv.addWeighted(self.img, 0.5, overlay, 0.5, 0.0, dtype=cv.CV_8UC3)
+        cv.imshow(title_window, vis)
 
-    def process(self) -> None:
-        for y in range(self.height):
-            for x in range(self.width):
-                greyscale = int(self.get_greyscale(*self.input_img[y][x]))
-                if self.threshold > greyscale + self.error_table[y][x]:
-                    self.output_img[y][x] = (0, 0, 0)
-                    current_error = greyscale + self.error_table[x][y]
-                else:
-                    self.output_img[y][x] = (255, 255, 255)
-                    current_error = greyscale + self.error_table[x][y] - 255
-                """
-                Burkes error propagation (`*` is current pixel):
-                                 *          8/32        4/32
-                2/32    4/32    8/32    4/32    2/32
-                """
-                self.error_table[y][x + 1] += int(8 / 32 * current_error)
-                self.error_table[y][x + 2] += int(4 / 32 * current_error)
-                self.error_table[y + 1][x] += int(8 / 32 * current_error)
-                self.error_table[y + 1][x + 1] += int(4 / 32 * current_error)
-                self.error_table[y + 1][x + 2] += int(2 / 32 * current_error)
-                self.error_table[y + 1][x - 1] += int(4 / 32 * current_error)
-                self.error_table[y + 1][x - 2] += int(2 / 32 * current_error)
+    def run(self):
+        while cv.getWindowProperty('img', 0) != -1 or cv.getWindowProperty('watershed', 0) != -1:
+            ch = cv.waitKey(50)
+            if ch == 27:
+                break
+            if ch >= ord('1') and ch <= ord('7'):
+                self.cur_marker = ch - ord('0')
+                print('marker: ', self.cur_marker)
+            if ch == ord(' ') or (self.sketch.dirty and self.auto_update):
+                self.watershed()
+                self.sketch.dirty = False
+            if ch in [ord('a'), ord('A')]:
+                self.auto_update = not self.auto_update
+                print('auto_update if', ['off', 'on'][self.auto_update])
+            if ch in [ord('r'), ord('R')]:
+                self.markers[:] = 0
+                self.markers_vis[:] = self.img
+                self.sketch.show()
 
-
-if __name__ == "__main__":
-    # create Burke's instances with original images in greyscale
-    burkes_instances = [
-        Burkes(imread('../../Data/Lena.jpg', 1), threshold)
-        for threshold in (126, 130)  #for threshold in (1, 126, 130, 140)
-    ]
-
-    for burkes in burkes_instances:
-        burkes.process()
-
-    for burkes in burkes_instances:
-        imshow(
-            f"Original image with dithering threshold: {burkes.threshold}",
-            burkes.output_img,
-        )
-
-    waitKey(0)
+if __name__ == '__main__':
+    print(__doc__)
+    import sys
+    try:
+        fn = sys.argv[1]
+    except:
+        fn = '../../Data/fruits.jpg'
+    App(cv.samples.findFile(fn)).run()

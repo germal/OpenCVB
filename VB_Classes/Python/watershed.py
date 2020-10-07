@@ -51,7 +51,7 @@ class App:
         cv.watershed(self.img, m)
         overlay = self.colors[np.maximum(m, 0)]
         vis = cv.addWeighted(self.img, 0.5, overlay, 0.5, 0.0, dtype=cv.CV_8UC3)
-        cv.imshow('watershed', vis)
+        cv.imshow(title_window, vis)
 
     def run(self):
         while cv.getWindowProperty('img', 0) != -1 or cv.getWindowProperty('watershed', 0) != -1:
@@ -71,8 +71,6 @@ class App:
                 self.markers[:] = 0
                 self.markers_vis[:] = self.img
                 self.sketch.show()
-        cv.destroyAllWindows()
-
 
 if __name__ == '__main__':
     print(__doc__)

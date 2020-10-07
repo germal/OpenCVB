@@ -5,6 +5,7 @@ Public Class LineDetector_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lines As cv.Vec4f()
+    Public drawLines = False
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
@@ -34,7 +35,7 @@ Public Class LineDetector_Basics
                 dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
-        If standalone Then
+        If standalone Or drawLines Then
             label2 = "Drawn with DrawSegment (thickness=1)"
             ld.DrawSegments(dst2, lines, False)
         End If
