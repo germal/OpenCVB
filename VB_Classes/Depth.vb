@@ -1748,11 +1748,15 @@ Public Class Depth_PointCloud_IMU
     Public yRotation As Boolean = False
     Public zRotation As Boolean = True
     Public reduction As Reduction_Depth
+    Public invert As Mat_Inverse
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
+
+        invert = New Mat_Inverse(ocvb)
+        invert.validateInverse = True
 
         reduction = New Reduction_Depth(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
@@ -1760,7 +1764,8 @@ Public Class Depth_PointCloud_IMU
         imu = New IMU_GVector(ocvb)
         If standalone Then imu.kalman.check.Visible = False
 
-        label1 = "Mask for depth values that are in-range"
+        label1 = ""
+        label2 = "Mask for depth values that are in-range"
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -1802,7 +1807,7 @@ Public Class Depth_PointCloud_IMU
             '[cx -sx    0]  [1  0   0 ] 
             '[sx  cx    0]  [0  cz -sz]
             '[0   0     1]  [0  sz  cz]
-            Dim roto(,) = {{cx + 0 * -sx + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+            Dim roto(,) As Single = {{cx + 0 * -sx + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
                            {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                            {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
@@ -1821,7 +1826,11 @@ Public Class Depth_PointCloud_IMU
             cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
             Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)
-            dst1 = Mask.Resize(dst1.Size)
+            dst2 = Mask.Resize(dst1.Size)
+            If standalone Then
+                invert.matrix = roto
+                invert.Run(ocvb)
+            End If
         End If
     End Sub
 End Class

@@ -321,49 +321,127 @@ Public Class Mat_MultiplyReview
         ocvb.desc = "Review matrix multiplication"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim m = 2, n = 3, p = 3, q = 3
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
         Dim nextLine = ""
         flow.msgs.Add("Matrix a")
-        For i = 0 To m - 1
+        For i = 0 To a.GetLength(0) - 1
             nextLine = ""
-            For j = 0 To n - 1
-                nextLine += CStr(a(i, j)) + " "
+            For j = 0 To a.GetLength(1) - 1
+                nextLine += CStr(a(i, j)) + vbTab
             Next
             flow.msgs.Add(nextLine)
         Next
 
         flow.msgs.Add("Matrix b")
-        For i = 0 To p - 1
+        For i = 0 To b.GetLength(0) - 1
             nextLine = ""
-            For j = 0 To q - 1
-                nextLine += CStr(b(i, j)) + " "
+            For j = 0 To b.GetLength(1) - 1
+                nextLine += CStr(b(i, j)) + vbTab
             Next
             flow.msgs.Add(nextLine)
         Next
 
-        Dim c(m, q) As Integer
-        Dim input(m, q) As String
-        For i = 0 To m - 1
-            For j = 0 To q - 1
+        Dim c(a.GetLength(0) - 1, a.GetLength(1) - 1) As Integer
+        Dim input(a.GetLength(0) - 1, a.GetLength(1) - 1) As String
+        For i = 0 To c.GetLength(0) - 1
+            For j = 0 To c.GetLength(1) - 1
                 input(i, j) = ""
-                For k = 0 To n - 1
+                For k = 0 To c.GetLength(1) - 1
                     c(i, j) += a(i, k) * b(k, j)
-                    input(i, j) += CStr(a(i, k)) + "*" + CStr(b(k, j)) + If(k < n - 1, " + ", vbTab)
+                    input(i, j) += CStr(a(i, k)) + "*" + CStr(b(k, j)) + If(k < c.GetLength(1) - 1, " + ", vbTab)
                 Next
             Next
         Next
 
 
         flow.msgs.Add("Matrix c = a X b")
-        For i = 0 To m - 1
+        For i = 0 To a.GetLength(0) - 1
             nextLine = ""
-            For j = 0 To n - 1
+            For j = 0 To a.GetLength(1) - 1
                 nextLine += CStr(c(i, j)) + " = " + input(i, j)
             Next
             flow.msgs.Add(nextLine)
         Next
+
+        flow.Run(ocvb)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://stackoverflow.com/questions/11015119/inverse-matrix-opencv-matrix-inv-not-working-properly
+Public Class Mat_Inverse
+    Inherits VBparent
+    Dim flow As Font_FlowText
+    Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
+    Public validateInverse As Boolean
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        flow = New Font_FlowText(ocvb)
+        radio.Setup(ocvb, caller, 6)
+        radio.check(0).Text = "Cholesky"
+        radio.check(1).Text = "Eig (works but results are incorrect)"
+        radio.check(2).Text = "LU"
+        radio.check(3).Text = "Normal (not working)"
+        radio.check(4).Text = "QR (not working)"
+        radio.check(5).Text = "SVD (works but results are incorrect)"
+        radio.check(0).Checked = True
+        radio.check(3).Enabled = False ' not accepted!
+        radio.check(4).Enabled = False ' not accepted!
+
+        ocvb.desc = "Given a 3x3 matrix, invert it and present results."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim nextline = ""
+
+        Dim decompType = cv.DecompTypes.Cholesky
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                decompType = Choose(i + 1, cv.DecompTypes.Cholesky, cv.DecompTypes.Eig, cv.DecompTypes.LU, cv.DecompTypes.Normal,
+                                         cv.DecompTypes.QR, cv.DecompTypes.SVD)
+            End If
+        Next
+
+        If standalone Or validateInverse Then
+            flow.msgs.Add("Matrix Input")
+            For i = 0 To matrix.GetLength(0) - 1
+                nextline = ""
+                For j = 0 To matrix.GetLength(1) - 1
+                    nextline += CStr(matrix(i, j)) + vbTab
+                Next
+                flow.msgs.Add(nextline)
+            Next
+        End If
+
+        Dim inverse As New cv.Mat
+        Dim input = New cv.Mat(3, 3, cv.MatType.CV_32F, matrix)
+        cv.Cv2.Invert(input, inverse, decompType)
+
+        If standalone Or validateInverse Then
+            flow.msgs.Add("Matrix Inverse")
+            For i = 0 To matrix.GetLength(0) - 1
+                nextline = ""
+                For j = 0 To matrix.GetLength(1) - 1
+                    nextline += CStr(inverse.Get(Of Single)(j, i)) + vbTab
+                Next
+                flow.msgs.Add(nextline)
+            Next
+
+            Dim identity = (input * inverse).ToMat
+
+            flow.msgs.Add("Verify Inverse is correct")
+            For i = 0 To matrix.GetLength(0) - 1
+                nextline = ""
+                For j = 0 To matrix.GetLength(1) - 1
+                    nextline += CStr(identity.Get(Of Single)(j, i)) + vbTab
+                Next
+                flow.msgs.Add(nextline)
+            Next
+        End If
 
         flow.Run(ocvb)
     End Sub
