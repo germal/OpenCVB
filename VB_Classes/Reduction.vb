@@ -260,13 +260,11 @@ Public Class Reduction_Lines
         lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1.Clone
-        ' label1 = "Side View: " + CStr(dst1.CountNonZero()) + " pixels"
 
         topView.Run(ocvb)
         dst2 = topView.dst1
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst2 = lDetect.dst1
-        ' label2 = "Top View: " + CStr(dst2.CountNonZero()) + " pixels"
     End Sub
 End Class

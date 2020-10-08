@@ -1363,143 +1363,6 @@ End Class
 
 
 
-' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
-' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloudInRange_IMU
-    Inherits VBparent
-    Public histOpts As Histogram_ProjectionOptions
-    Public Mask As New cv.Mat
-    Public split(3 - 1) As cv.Mat
-    Public imu As IMU_GVector
-    Public xRotation As Boolean = True
-    Public zRotation As Boolean = True
-    Public reduction As Reduction_Depth
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        reduction = New Reduction_Depth(ocvb)
-        histOpts = New Histogram_ProjectionOptions(ocvb)
-        If standalone Then histOpts.check.Visible = False
-        imu = New IMU_GVector(ocvb)
-        If standalone Then imu.kalman.check.Visible = False
-
-        label1 = "Mask for depth values that are in-range"
-        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If standalone Then input = ocvb.pointCloud
-
-        Static rangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = rangeSlider.Value / 1000
-
-        Dim tSplit = cv.Cv2.Split(input)
-        split = tSplit
-
-        If ocvb.parms.IMU_Present = False Then
-            ocvb.trueText("IMU unavailable for this camera")
-        Else
-            imu.Run(ocvb)
-            If zRotation Then
-                '[cos(a) -sin(a) 0]
-                '[sin(a)  cos(a) 0]
-                '[0      0       1] rotate the point cloud around the z-axis.
-                Dim xY(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
-
-                split(0) = xY(0, 0) * tSplit(0) + xY(0, 1) * tSplit(1)
-                split(1) = xY(1, 0) * tSplit(0) + xY(1, 1) * tSplit(1)
-                split(2) = tSplit(2)
-                tSplit = split
-            End If
-
-            If xRotation Then
-                '[1      0       0] rotate the point cloud around the x-axis.
-                '[0 cos(a) -sin(a)]
-                '[0 sin(a)  cos(a)]
-                Dim yZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
-
-                split(0) = tSplit(0)
-                split(1) = yZ(1, 1) * tSplit(1) + yZ(1, 2) * tSplit(2)
-                split(2) = yZ(2, 1) * tSplit(1) + yZ(2, 2) * tSplit(2)
-                tSplit = split
-            End If
-
-            '  If standalone = False Then
-            Static reductionRadio = findRadio("No reduction")
-            If reductionRadio.checked = False Then
-                split(2) *= 1000
-                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-                reduction.Run(ocvb)
-                split(2) = reduction.reducedDepth32F / 1000
-            End If
-            ' End If
-            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
-            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-            Mask = Mask.SetTo(0, zeroDepth)
-            dst1 = Mask.Resize(dst1.Size)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
-' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloudRotationY
-    Inherits VBparent
-    Public histOpts As Histogram_ProjectionOptions
-    Public split(3 - 1) As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        histOpts = New Histogram_ProjectionOptions(ocvb)
-        If standalone Then histOpts.check.Visible = False
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
-
-        label1 = "Mask for depth values that are in-range"
-        ocvb.desc = "Rotate the PointCloud around the y-axis using a slider."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If standalone Then
-            input = ocvb.pointCloud
-            split = input.Split
-        End If
-        If ocvb.parms.IMU_Present = False Then
-            ocvb.trueText("IMU unavailable for this camera")
-        Else
-            Static rangeSlider = findSlider("InRange Max Depth (mm)")
-            maxZ = rangeSlider.Value / 1000
-            Static radiansSlider = findSlider("Angle to rotate around y-axis")
-            Dim radians = radiansSlider.Value / 57.2958
-
-            '[cos(a) 0  -sin(a)] rotate the point cloud around the y-axis.
-            '[0      1       0 ]
-            '[sin(a) 0   cos(a)]
-            Dim xZ(,) = {{0, 1, 0}, {0, Math.Cos(-radians), -Math.Sin(-radians)}, {0, Math.Sin(-radians), Math.Cos(-radians)}}
-            split(0) = xZ(0, 0) * split(0) + xZ(0, 2) * split(2)
-            split(1) = split(1)
-            split(2) = xZ(2, 0) * split(0) + xZ(2, 2) * split(2)
-
-            Dim mask As New cv.Mat
-            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), mask)
-            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-            mask = mask.SetTo(0, zeroDepth)
-            dst1 = mask.Resize(ocvb.color.Size)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Depth_Holes
     Inherits VBparent
@@ -1709,5 +1572,256 @@ Public Class Depth_NoiseRemovedAndColorized
         colorize.src = depth.depth32fNoiseRemoved
         colorize.run(ocvb)
         dst1 = colorize.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloudRotationY
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public split(3 - 1) As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Rotate the PointCloud around the y-axis using a slider."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If standalone Then
+            input = ocvb.pointCloud
+            split = input.Split
+        End If
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            Static rangeSlider = findSlider("InRange Max Depth (mm)")
+            maxZ = rangeSlider.Value / 1000
+            Static radiansSlider = findSlider("Angle to rotate around y-axis")
+            Dim radians = radiansSlider.Value / 57.2958
+
+            '[cos(a) 0  -sin(a)] rotate the point cloud around the y-axis.
+            '[0      1       0 ]
+            '[sin(a) 0   cos(a)]
+            Dim xZ(,) = {{0, 1, 0}, {0, Math.Cos(-radians), -Math.Sin(-radians)}, {0, Math.Sin(-radians), Math.Cos(-radians)}}
+            split(0) = xZ(0, 0) * split(0) + xZ(0, 2) * split(2)
+            split(1) = split(1)
+            split(2) = xZ(2, 0) * split(0) + xZ(2, 2) * split(2)
+
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), mask)
+            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            mask = mask.SetTo(0, zeroDepth)
+            dst1 = mask.Resize(ocvb.color.Size)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloud_IMU_Old
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public Mask As New cv.Mat
+    Public split(3 - 1) As cv.Mat
+    Public imu As IMU_GVector
+    Public xRotation As Boolean = True
+    Public yRotation As Boolean = False
+    Public zRotation As Boolean = True
+    Public reduction As Reduction_Depth
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
+
+        reduction = New Reduction_Depth(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+        imu = New IMU_GVector(ocvb)
+        If standalone Then imu.kalman.check.Visible = False
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If standalone Then input = ocvb.pointCloud
+
+        Static rangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = rangeSlider.Value / 1000
+
+        Dim tSplit = cv.Cv2.Split(input)
+        split = tSplit
+
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            imu.Run(ocvb)
+            If zRotation Then
+                '[cos(a) -sin(a) 0]
+                '[sin(a)  cos(a) 0]
+                '[0      0       1] rotate the point cloud around the z-axis.
+                Dim xY(,) = {{Math.Cos(-imu.angleX), -Math.Sin(-imu.angleX), 0}, {Math.Sin(-imu.angleX), Math.Cos(-imu.angleX), 0}, {0, 0, 1}}
+
+                split(0) = xY(0, 0) * tSplit(0) + xY(0, 1) * tSplit(1)
+                split(1) = xY(1, 0) * tSplit(0) + xY(1, 1) * tSplit(1)
+                split(2) = tSplit(2)
+                tSplit = split
+            End If
+
+            If xRotation Then
+                '[1      0       0] rotate the point cloud around the x-axis.
+                '[0 cos(a) -sin(a)]
+                '[0 sin(a)  cos(a)]
+                Dim yZ(,) = {{1, 0, 0}, {0, Math.Cos(-imu.angleZ), -Math.Sin(-imu.angleZ)}, {0, Math.Sin(-imu.angleZ), Math.Cos(-imu.angleZ)}}
+
+                split(0) = tSplit(0)
+                split(1) = yZ(1, 1) * tSplit(1) + yZ(1, 2) * tSplit(2)
+                split(2) = yZ(2, 1) * tSplit(1) + yZ(2, 2) * tSplit(2)
+                tSplit = split
+            End If
+
+            ' this is not normally used.  Y-axis orientation cannot be determined from the gravity vector.
+            If yRotation Then
+                Static radiansSlider = findSlider("Angle to rotate around y-axis")
+                Dim radians = radiansSlider.Value / 57.2958
+                '[cos(a) 0  -sin(a)] rotate the point cloud around the y-axis.
+                '[0      1       0 ]
+                '[sin(a) 0   cos(a)]
+                Dim xZ(,) = {{0, 1, 0}, {0, Math.Cos(-radians), -Math.Sin(-radians)}, {0, Math.Sin(-radians), Math.Cos(-radians)}}
+                split(0) = xZ(0, 0) * split(0) + xZ(0, 2) * split(2)
+                split(1) = split(1)
+                split(2) = xZ(2, 0) * split(0) + xZ(2, 2) * split(2)
+            End If
+
+            Static reductionRadio = findRadio("No reduction")
+            If reductionRadio.checked = False Then
+                split(2) *= 1000
+                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run(ocvb)
+                split(2) = reduction.reducedDepth32F / 1000
+            End If
+
+            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
+            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            Mask = Mask.SetTo(0, zeroDepth)
+            dst1 = Mask.Resize(dst1.Size)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloud_IMU
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public Mask As New cv.Mat
+    Public split(3 - 1) As cv.Mat
+    Public imu As IMU_GVector
+    Public xRotation As Boolean = True
+    Public yRotation As Boolean = False
+    Public zRotation As Boolean = True
+    Public reduction As Reduction_Depth
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
+
+        reduction = New Reduction_Depth(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+        imu = New IMU_GVector(ocvb)
+        If standalone Then imu.kalman.check.Visible = False
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If standalone Then input = ocvb.pointCloud
+
+        Static rangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = rangeSlider.Value / 1000
+
+        split = cv.Cv2.Split(input)
+
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            imu.Run(ocvb)
+            '[cos(a) -sin(a)    0       ]
+            '[sin(a)  cos(a)    0       ]
+            '[0       0         1       ] rotate the point cloud around the z-axis.
+            Dim cx = Math.Cos(-imu.angleX)
+            Dim sx = Math.Sin(-imu.angleX)
+
+            '[cos(a)  0         -sin(a) ] rotate the point cloud around the y-axis.
+            '[0       1         0       ]
+            '[sin(a)  0         cos(a)  ]
+            Dim cy = 1
+            Dim sy = 0
+
+            '[1       0         0       ] rotate the point cloud around the x-axis.
+            '[0       cos(a)    -sin(a) ]
+            '[0       sin(a)    cos(a)  ]
+            Dim cz = Math.Cos(-imu.angleZ)
+            Dim sz = Math.Sin(-imu.angleZ)
+
+            Dim xY(,) = {{cx, -sx, 0}, {sx, cx, 0}, {0, 0, 1}}
+            Dim yZ(,) = {{1, 0, 0}, {0, cz, -sz}, {0, sz, cz}}
+            Dim xZ(,) = {{0, 1, 0}, {0, cy, -sy}, {0, sy, cy}}
+
+
+            '[cx -sx    0]  [1  0   0 ] 
+            '[sx  cx    0]  [0  cz -sz]
+            '[0   0     1]  [0  sz  cz]
+            Dim roto(,) = {{cx + 0 * -sx + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                           {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                           {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+
+            split(0) = roto(0, 0) * split(0) + roto(0, 1) * split(1) + roto(0, 2) * split(2)
+            split(1) = roto(1, 0) * split(0) + roto(1, 1) * split(1) + roto(1, 2) * split(2)
+            split(2) = roto(2, 0) * split(0) + roto(2, 1) * split(1) + roto(2, 2) * split(2)
+
+            Static reductionRadio = findRadio("No reduction")
+            If reductionRadio.checked = False Then
+                split(2) *= 1000
+                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run(ocvb)
+                split(2) = reduction.reducedDepth32F / 1000
+            End If
+
+            cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), Mask)
+            Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+            Mask = Mask.SetTo(0, zeroDepth)
+            dst1 = Mask.Resize(dst1.Size)
+        End If
     End Sub
 End Class

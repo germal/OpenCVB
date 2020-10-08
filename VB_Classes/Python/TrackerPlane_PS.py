@@ -65,7 +65,7 @@ class PlaneTracker:
         self.frame_points = []
 
     def add_target(self, image, rect, data=None):
-        print("Flann has been failing here recently.  Not sure why.  Needs work here.")
+        print("Flann has been failing here recently.  Not sure why.  Needs work here - look for add_target function.")
         '''Add a new tracking target.'''
         #x0, y0, x1, y1 = rect
         #raw_points, raw_descrs = self.detect_features(image)

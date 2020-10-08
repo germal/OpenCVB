@@ -988,3 +988,89 @@ Public Class PointCloud_Snapshot
         dst2 = topView.dst1.Resize(src.Size)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_TopView
+    Inherits VBparent
+    Dim topView As Histogram_2D_TopView
+    Dim kTopView As PointCloud_Kalman_TopView
+    Public lDetect As LineDetector_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        kTopView = New PointCloud_Kalman_TopView(ocvb)
+        topView = New Histogram_2D_TopView(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        lDetect = New LineDetector_Basics(ocvb)
+        label1 = "Top view aligned using the IMU gravity vector"
+        label2 = "Top view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the top view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        topView.Run(ocvb)
+        dst1 = topView.dst1.Clone()
+        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+
+        imuCheck.checked = False
+        kTopView.Run(ocvb)
+        dst2 = kTopView.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_SideView
+    Inherits VBparent
+    Dim sideView As Histogram_2D_SideView
+    Dim kSideView As PointCloud_Kalman_SideView
+    Public lDetect As LineDetector_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        kSideView = New PointCloud_Kalman_SideView(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        lDetect = New LineDetector_Basics(ocvb)
+        label1 = "side view aligned using the IMU gravity vector"
+        label2 = "side view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the side view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        sideView.Run(ocvb)
+        dst1 = sideView.dst1.Clone()
+        lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+
+        imuCheck.checked = False
+        kSideView.Run(ocvb)
+        dst2 = kSideView.dst1
+    End Sub
+End Class

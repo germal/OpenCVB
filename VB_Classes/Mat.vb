@@ -15,6 +15,11 @@ End Class
 
 
 
+
+
+
+
+
 Public Class Mat_PointToMat
     Inherits VBparent
     Dim mask As Random_Points
@@ -39,6 +44,9 @@ Public Class Mat_PointToMat
         Next
     End Sub
 End Class
+
+
+
 
 
 
@@ -70,6 +78,10 @@ End Class
 
 
 
+
+
+
+
 Public Class Mat_Transpose
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
@@ -85,6 +97,9 @@ Public Class Mat_Transpose
         dst2 = trBack.ToMat.Resize(src.Size())
     End Sub
 End Class
+
+
+
 
 
 
@@ -158,6 +173,10 @@ End Class
 
 
 
+
+
+
+
 Public Class Mat_2to1
     Inherits VBparent
     Dim mat1 As cv.Mat
@@ -194,6 +213,10 @@ Public Class Mat_2to1
         End If
     End Sub
 End Class
+
+
+
+
 
 
 
@@ -284,3 +307,64 @@ Public Class Mat_Managed
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Mat_MultiplyReview
+    Inherits VBparent
+    Dim flow As Font_FlowText
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        flow = New Font_FlowText(ocvb)
+        ocvb.desc = "Review matrix multiplication"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim m = 2, n = 3, p = 3, q = 3
+        Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
+        Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
+        Dim nextLine = ""
+        flow.msgs.Add("Matrix a")
+        For i = 0 To m - 1
+            nextLine = ""
+            For j = 0 To n - 1
+                nextLine += CStr(a(i, j)) + " "
+            Next
+            flow.msgs.Add(nextLine)
+        Next
+
+        flow.msgs.Add("Matrix b")
+        For i = 0 To p - 1
+            nextLine = ""
+            For j = 0 To q - 1
+                nextLine += CStr(b(i, j)) + " "
+            Next
+            flow.msgs.Add(nextLine)
+        Next
+
+        Dim c(m, q) As Integer
+        Dim input(m, q) As String
+        For i = 0 To m - 1
+            For j = 0 To q - 1
+                input(i, j) = ""
+                For k = 0 To n - 1
+                    c(i, j) += a(i, k) * b(k, j)
+                    input(i, j) += CStr(a(i, k)) + "*" + CStr(b(k, j)) + If(k < n - 1, " + ", vbTab)
+                Next
+            Next
+        Next
+
+
+        flow.msgs.Add("Matrix c = a X b")
+        For i = 0 To m - 1
+            nextLine = ""
+            For j = 0 To n - 1
+                nextLine += CStr(c(i, j)) + " = " + input(i, j)
+            Next
+            flow.msgs.Add(nextLine)
+        Next
+
+        flow.Run(ocvb)
+    End Sub
+End Class
