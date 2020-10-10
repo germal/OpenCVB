@@ -379,6 +379,7 @@ Public Class Mat_Inverse
     Dim flow As Font_FlowText
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
+    Public inverse As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         flow = New Font_FlowText(ocvb)
@@ -417,7 +418,6 @@ Public Class Mat_Inverse
             Next
         End If
 
-        Dim inverse As New cv.Mat
         Dim input = New cv.Mat(3, 3, cv.MatType.CV_32F, matrix)
         cv.Cv2.Invert(input, inverse, decompType)
 
