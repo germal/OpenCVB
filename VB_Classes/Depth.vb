@@ -1646,8 +1646,9 @@ Public Class Depth_PointCloud_IMU
     Public xRotation As Boolean = True
     Public zRotation As Boolean = True
     Public reduction As Reduction_Depth
-    Public invert As Mat_Inverse
+    Dim invert As Mat_Inverse
     Public gMatrix(,) As Single
+    Public gInverted As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1655,7 +1656,7 @@ Public Class Depth_PointCloud_IMU
         sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
 
         invert = New Mat_Inverse(ocvb)
-        invert.validateInverse = True
+        If standalone Then invert.validateInverse = True
 
         reduction = New Reduction_Depth(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
@@ -1669,7 +1670,7 @@ Public Class Depth_PointCloud_IMU
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
-        If standalone Then input = ocvb.pointCloud
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
 
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = rangeSlider.Value / 1000
@@ -1681,17 +1682,17 @@ Public Class Depth_PointCloud_IMU
         Else
             imu.Run(ocvb)
             Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
-            '[cos(a) -sin(a)    0       ]
-            '[sin(a)  cos(a)    0       ]
-            '[0       0         1       ] rotate the point cloud around the z-axis.
+            '[cos(a) -sin(a)    0]
+            '[sin(a)  cos(a)    0]
+            '[0       0         1] rotate the point cloud around the z-axis.
             If zRotation Then
                 cx = Math.Cos(-imu.angleX)
                 sx = Math.Sin(-imu.angleX)
             End If
 
-            '[cos(a)  0         -sin(a) ] rotate the point cloud around the y-axis.
-            '[0       1         0       ]
-            '[sin(a)  0         cos(a)  ]
+            '[cos(a)  0         -sin(a)] rotate the point cloud around the y-axis.
+            '[0       1         0      ]
+            '[sin(a)  0         cos(a) ]
             Static radiansSlider = findSlider("Angle to rotate around y-axis")
             Dim radians = radiansSlider.Value / 57.2958
             If radians <> 0 Then
@@ -1700,14 +1701,15 @@ Public Class Depth_PointCloud_IMU
                 Dim xZ(,) = {{0, Math.Cos(-radians), -Math.Sin(-radians)}, {0, 1, 0}, {0, Math.Sin(-radians), Math.Cos(-radians)}}
             End If
 
-            '[1       0         0       ] rotate the point cloud around the x-axis.
-            '[0       cos(a)    -sin(a) ]
-            '[0       sin(a)    cos(a)  ]
+            '[1       0         0      ] rotate the point cloud around the x-axis.
+            '[0       cos(a)    -sin(a)]
+            '[0       sin(a)    cos(a) ]
             If xRotation Then
                 cz = Math.Cos(-imu.angleZ)
                 sz = Math.Sin(-imu.angleZ)
             End If
 
+            ' could use OpenCV for this but this makes it clearer.
             '[cx -sx    0]  [1  0   0 ] 
             '[sx  cx    0]  [0  cz -sz]
             '[0   0     1]  [0  sz  cz]
@@ -1715,6 +1717,7 @@ Public Class Depth_PointCloud_IMU
                       {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
+            ' could use OpenCV for this but this makes it clearer.
             '           [cy  0   -sy]
             ' [gMatrix] [0   1    0]
             '           [sy  0    cy]
@@ -1740,10 +1743,9 @@ Public Class Depth_PointCloud_IMU
             Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)
             dst2 = Mask.Resize(dst1.Size)
-            If standalone Then
-                invert.matrix = gMatrix
-                invert.Run(ocvb)
-            End If
+            invert.matrix = gMatrix
+            invert.Run(ocvb)
+            gInverted = invert.inverse
         End If
     End Sub
 End Class

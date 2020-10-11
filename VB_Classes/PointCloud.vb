@@ -1001,8 +1001,8 @@ End Class
 
 Public Class PointCloud_IMU_TopView
     Inherits VBparent
-    Dim topView As Histogram_2D_TopView
-    Dim kTopView As PointCloud_Kalman_TopView
+    Public topView As Histogram_2D_TopView
+    Public kTopView As PointCloud_Kalman_TopView
     Public lDetect As LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -1043,8 +1043,8 @@ End Class
 
 Public Class PointCloud_IMU_SideView
     Inherits VBparent
-    Dim sideView As Histogram_2D_SideView
-    Dim kSideView As PointCloud_Kalman_SideView
+    Public sideView As Histogram_2D_SideView
+    Public kSideView As PointCloud_Kalman_SideView
     Public lDetect As LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -1063,8 +1063,12 @@ Public Class PointCloud_IMU_SideView
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
+        sideView.src = input
         sideView.Run(ocvb)
         dst1 = sideView.dst1.Clone()
         lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1074,5 +1078,131 @@ Public Class PointCloud_IMU_SideView
         imuCheck.checked = False
         kSideView.Run(ocvb)
         dst2 = kSideView.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_FindFloor
+    Inherits VBparent
+    Dim sideIMU As PointCloud_IMU_SideView
+    Dim flow As Font_FlowText
+    Dim mats As Mat_4to1
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        mats = New Mat_4to1(ocvb)
+        flow = New Font_FlowText(ocvb)
+        sideIMU = New PointCloud_IMU_SideView(ocvb)
+        ocvb.desc = "Find the floor in a side view oriented by gravity vector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        sideIMU.src = input
+        sideIMU.Run(ocvb)
+        mats.mat(0) = sideIMU.dst1
+        mats.mat(1) = sideIMU.dst2
+        Dim gInverted = sideIMU.sideView.gCloudIMU.gInverted
+        Dim nextLine As String
+        flow.msgs.Add("The inversion matrix for line end points")
+        For i = 0 To 3 - 1
+            nextLine = ""
+            For j = 0 To 3 - 1
+                nextLine += Format(gInverted.Get(Of Single)(i, j), "#0.00") + vbTab
+            Next
+            flow.msgs.Add(nextLine)
+        Next
+        Dim lines = sideIMU.lDetect.lines
+        Dim sortedLines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+        For Each line In lines
+            sortedLines.Add(line.Item1, line)
+        Next
+
+        Dim flatTest = 10
+
+        If sortedLines.Count > 0 Then
+            Dim noCeiling As Boolean, noFloor As Boolean
+            Dim firstVal = sortedLines.ElementAt(0).Value
+            If Math.Abs(firstVal.Item1 - firstVal.Item3) >= flatTest Then noFloor = True ' not a very good floor! 
+            If noFloor = False Then mats.mat(0).Line(New cv.Point(0, firstVal.Item1), New cv.Point(mats.mat(0).Width, firstVal.Item1), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+
+            Dim lastVal = sortedLines.ElementAt(sortedLines.Count - 1).Value
+            If Math.Abs(lastVal.Item1 - lastVal.Item3) >= flatTest Then noCeiling = True  ' not a very good ceiling! 
+            If noCeiling = False Then mats.mat(0).Line(New cv.Point(0, lastVal.Item1), New cv.Point(mats.mat(0).Width, lastVal.Item1), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+
+            Dim fsize = fontsize / 0.15
+            If fsize > 1.5 Then fsize = 1.5
+            If noFloor = False Then cv.Cv2.PutText(mats.mat(0), "Floor", New cv.Point(10, firstVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            If noCeiling = False Then cv.Cv2.PutText(mats.mat(0), "Ceiling", New cv.Point(10, lastVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+
+            Dim p1 = New cv.Vec3f(firstVal.Item0, firstVal.Item1, 1)
+            Dim m1 = New cv.Mat(3, 1, cv.MatType.CV_32F, p1)
+            Dim t1 = (gInverted * m1).ToMat
+            Dim p2 = New cv.Vec3f(firstVal.Item2, firstVal.Item3, 1)
+            Dim m2 = New cv.Mat(3, 1, cv.MatType.CV_32F, p2)
+            Dim t2 = (gInverted * m2).ToMat
+            Dim pt1 = New cv.Point2f(t1.Get(Of Single)(0, 0), t1.Get(Of Single)(0, 2))
+            Dim pt2 = New cv.Point2f(t2.Get(Of Single)(0, 0), t2.Get(Of Single)(0, 2))
+            mats.mat(1).Line(pt1, pt2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
+            dst1 = mats.mat(0)
+            dst2 = mats.mat(1)
+            ' flow.Run(ocvb)
+            'mats.Run(ocvb)
+            'dst2 = mats.dst1
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_SideFrustrum
+    Inherits VBparent
+    Public fakePC As New cv.Mat
+    Dim sideView As Histogram_2D_SideView
+    Dim cmats As PointCloud_Colorize
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 0
+        cmats = New PointCloud_Colorize(ocvb)
+
+        Dim useIMUcheckbox = findCheckBox("Use IMU gravity vector")
+        useIMUcheckbox.Checked = False
+
+        hideForm("Depth_PointCloud_IMU Slider Options")
+        hideForm("Histogram_ProjectionOptions CheckBox Options")
+
+        ocvb.desc = "Translate only the frustrum with gravity"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
+        Dim z As Single
+        Dim zIncr = maxZ / (ocvb.pointCloud.Height / 2)
+        Dim split = ocvb.pointCloud.Split()
+
+        Dim m = split(2)
+        m.SetTo(0)
+        For i = 0 To m.Rows / 2 - 1
+            Dim r = New cv.Rect(m.Height / 2 - i - 1, m.Height / 2 - i - 1, (i + 1) * 2, (i + 1) * 2)
+            split(2).Rectangle(r, cv.Scalar.All(z), 1)
+            z += zIncr
+        Next
+
+        cv.Cv2.Merge(split, fakePC)
+
+        sideView.src = fakePC
+        sideView.Run(ocvb)
+        dst1 = sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
+        dst1 = cmats.CameraLocationSide(ocvb, dst1)
     End Sub
 End Class

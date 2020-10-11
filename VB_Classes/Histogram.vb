@@ -956,7 +956,7 @@ Public Class Histogram_2D_TopViewX
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
         pcTrim = If(imuCheckBox.Checked, gCloudIMU, gCloud)
 
-        Dim input = src
+        Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
         pcTrim.src = input
         pcTrim.Run(ocvb)
@@ -1051,10 +1051,9 @@ Public Class Histogram_2D_SideView
     Dim pcTrim As Object
     Dim histOpts As Histogram_ProjectionOptions
     Dim gCloud As Depth_PointCloudInRange
-    Dim gCloudIMU As Depth_PointCloud_IMU
+    Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
-    ' Dim yRotation As Depth_PointCloudRotationY
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1062,8 +1061,6 @@ Public Class Histogram_2D_SideView
         gCloud = New Depth_PointCloudInRange(ocvb)
         Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
-
-        'yRotation = New Depth_PointCloudRotationY(ocvb)
 
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.sliders.trackbar(0).Value = 1
@@ -1082,15 +1079,6 @@ Public Class Histogram_2D_SideView
         If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
         pcTrim.src = input
         pcTrim.Run(ocvb)
-
-        ' y-rotation Is 0 - except when trying to minimize pixels in a resulting histogram.
-        'Static radiansSlider = findSlider("Angle to rotate around y-axis")
-        'Dim radians = radiansSlider.Value / 57.2958
-        'If radians <> 0 Then
-        '    yRotation.split = pcTrim.split
-        '    yRotation.Run(ocvb)
-        '    pcTrim.split = yRotation.split
-        'End If
 
         pixelsPerMeter = src.Height / maxZ
         Dim yData As Integer = 1
