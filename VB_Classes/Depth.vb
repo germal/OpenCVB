@@ -1675,8 +1675,6 @@ Public Class Depth_PointCloud_IMU
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = rangeSlider.Value / 1000
 
-        split = cv.Cv2.Split(input)
-
         If ocvb.parms.IMU_Present = False Then
             ocvb.trueText("IMU unavailable for this camera")
         Else
@@ -1694,7 +1692,7 @@ Public Class Depth_PointCloud_IMU
             '[0       1         0      ]
             '[sin(a)  0         cos(a) ]
             Static radiansSlider = findSlider("Angle to rotate around y-axis")
-            Dim radians = radiansSlider.Value / 57.2958
+            Dim radians = radiansSlider.Value * 57.2958
             If radians <> 0 Then
                 cy = Math.Cos(-radians)
                 sy = Math.Sin(-radians)
@@ -1721,15 +1719,43 @@ Public Class Depth_PointCloud_IMU
             '           [cy  0   -sy]
             ' [gMatrix] [0   1    0]
             '           [sy  0    cy]
+            Dim g = gMatrix
             If radians <> 0 Then
-                Dim g = gMatrix
                 gMatrix = {{g(0, 0) * cy + g(0, 1) * 0 + g(0, 2) * -sy, g(0, 0) * 0 + g(0, 1) * 1 + g(0, 2) * 0, g(0, 0) * sy + g(0, 1) * 0 + g(0, 2) * cy},
                            {g(1, 0) * cy + g(1, 1) * 0 + g(1, 2) * -sy, g(1, 0) * 0 + g(1, 1) * 1 + g(1, 2) * 0, g(1, 0) * sy + g(1, 1) * 0 + g(1, 2) * cy},
                            {g(2, 0) * cy + g(2, 1) * 0 + g(2, 2) * -sy, g(2, 0) * 0 + g(2, 1) * 1 + g(2, 2) * 0, g(2, 0) * sy + g(2, 1) * 0 + g(2, 2) * cy}}
+                g = gMatrix
             End If
-            split(0) = gMatrix(0, 0) * split(0) + gMatrix(0, 1) * split(1) + gMatrix(0, 2) * split(2)
-            split(1) = gMatrix(1, 0) * split(0) + gMatrix(1, 1) * split(1) + gMatrix(1, 2) * split(2)
-            split(2) = gMatrix(2, 0) * split(0) + gMatrix(2, 1) * split(1) + gMatrix(2, 2) * split(2)
+
+            Dim v = New cv.Vec3f(1, 1, 1)
+            input.Set(Of cv.Vec3f)(0, 0, 0, v) ' use this to measure transformation angles.
+
+            split = cv.Cv2.Split(input)
+            split(0) = g(0, 0) * split(0) + g(0, 1) * split(1) + g(0, 2) * split(2)
+            split(1) = g(1, 0) * split(0) + g(1, 1) * split(1) + g(1, 2) * split(2)
+            split(2) = g(2, 0) * split(0) + g(2, 1) * split(1) + g(2, 2) * split(2)
+
+            v = New cv.Vec3f(split(0).Get(Of Single)(0, 0),
+                             split(1).Get(Of Single)(0, 0),
+                             split(2).Get(Of Single)(0, 0))
+            Dim newLen = Math.Sqrt(v.Item0 * v.Item0 + v.Item1 * v.Item1 + v.Item2 * v.Item2)
+            Dim angleX = Math.Acos(v.Item0 / newLen)
+            Dim angleY = Math.Acos(v.Item1 / newLen)
+            Dim angleZ = Math.Acos(v.Item2 / newLen)
+            If Single.IsNaN(angleX) Then Dim i = 0
+            'Console.WriteLine(" angle x = " + Format(angleX * 57.2958, "#0.0") +
+            '                  " angle y = " + Format(angleY * 57.2958, "#0.0") +
+            '                  " angle z = " + Format(angleZ * 57.2958, "#0.0"))
+
+            ' Dim vec = New cv.Vec3f(split(0).Get(Of Single)(0, 0), split(1).Get(Of Single)(0, 0), split(2).Get(Of Single)(0, 0))
+            'Console.WriteLine("x = " + Format(vec.Item0, "#0.00") + " y  = " + Format(vec.Item1, "#0.00") + " z = " + Format(vec.Item2, "#0.00"))
+
+            ' this doesn't fail but it doesn't rotate the output...
+            'Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+            'Dim testInput = input.Reshape(1, input.Rows * input.Cols)
+            'Dim testOutput = (testInput * gMat).ToMat
+            'Dim result = testOutput.Reshape(3, input.Rows)
+            'split = cv.Cv2.Split(result)
 
             Static reductionRadio = findRadio("No reduction")
             If reductionRadio.checked = False Then
@@ -1743,6 +1769,7 @@ Public Class Depth_PointCloud_IMU
             Dim zeroDepth = split(2).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
             Mask = Mask.SetTo(0, zeroDepth)
             dst2 = Mask.Resize(dst1.Size)
+
             invert.matrix = gMatrix
             invert.Run(ocvb)
             gInverted = invert.inverse

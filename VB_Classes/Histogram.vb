@@ -1080,7 +1080,7 @@ Public Class Histogram_2D_SideView
         pcTrim.src = input
         pcTrim.Run(ocvb)
 
-        pixelsPerMeter = src.Height / maxZ
+        pixelsPerMeter = dst1.Height / maxZ
         Dim yData As Integer = 1
         Dim zData As Integer = 2
         pcTrim.split(yData).ConvertTo(pcTrim.split(yData), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)
@@ -1089,14 +1089,17 @@ Public Class Histogram_2D_SideView
         Dim histinput As New cv.Mat
         cv.Cv2.Merge(pcTrim.split, histinput)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, src.Height), New cv.Rangef(0, src.Width)}
-        Dim histSize() = {src.Height, src.Width}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
+        Dim histSize() = {dst1.Height, dst1.Width}
         cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {zData, yData}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        ' histOutput.Set(Of Single)(ocvb.pointCloud.Height / 2, ocvb.pointCloud.Width, 10000)
+
         histOutput = histOutput.Flip(cv.FlipMode.X)
         Static histThresholdSlider = findSlider("Histogram threshold")
-        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(src.Size)
+        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        Dim rect As New cv.Rect((src.Width - src.Height) / 2, 0, src.Height, src.Height)
+        Dim rect As New cv.Rect((dst1.Width - dst1.Height) / 2, 0, dst1.Height, dst1.Height)
         cv.Cv2.Rotate(dst1(rect), dst1(rect), cv.RotateFlags.Rotate90Clockwise)
         cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
     End Sub

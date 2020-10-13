@@ -29,17 +29,18 @@ End Class
 
 Public Class Transform_Rotate
     Inherits VBparent
+    Public imageCenter As cv.Point2f
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Angle", -180, 180, 30)
-        sliders.setupTrackBar(1, "Scale Factor", 1, 100, 100)
+        sliders.setupTrackBar(1, "Scale Factor% (100% means no scaling)", 1, 100, 100)
         sliders.setupTrackBar(2, "Rotation center X", 1, src.Width, src.Width / 2)
         sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
+        imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
         dst1.Circle(imageCenter, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
