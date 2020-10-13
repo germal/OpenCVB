@@ -998,111 +998,6 @@ End Class
 
 
 
-
-Public Class PointCloud_IMU_TopView
-    Inherits VBparent
-    Public topView As Histogram_2D_TopView
-    Public kTopView As PointCloud_Kalman_TopView
-    Public lDetect As LineDetector_Basics
-    Dim rotate As Transform_Rotate
-    Dim angleSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        rotate = New Transform_Rotate(ocvb)
-        angleSlider = findSlider("Angle")
-        angleSlider.Value = 0
-
-
-        kTopView = New PointCloud_Kalman_TopView(ocvb)
-        topView = New Histogram_2D_TopView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
-
-        Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 20
-
-        lDetect = New LineDetector_Basics(ocvb)
-        label1 = "Top view aligned using the IMU gravity vector"
-        label2 = "Top view aligned without using the IMU gravity vector"
-        ocvb.desc = "Present the top view with and without the IMU filter."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.checked = True
-        topView.Run(ocvb)
-        dst1 = topView.dst1.Clone()
-        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lDetect.Run(ocvb)
-        dst1 = lDetect.dst1
-
-        Dim angle = angleSlider.Value
-        Static xSlider = findSlider("Rotation center X")
-        Static ySlider = findSlider("Rotation center Y")
-        xSlider.value = topCameraPoint.X
-        ySlider.value = topCameraPoint.Y
-        rotate.src = dst1
-        rotate.Run(ocvb)
-        dst1 = rotate.dst1
-
-        imuCheck.checked = False
-        kTopView.Run(ocvb)
-        dst2 = kTopView.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class PointCloud_IMU_SideView
-    Inherits VBparent
-    Public sideView As Histogram_2D_SideView
-    Public kSideView As PointCloud_Kalman_SideView
-    Public lDetect As LineDetector_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        kSideView = New PointCloud_Kalman_SideView(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
-
-        Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 20
-
-        lDetect = New LineDetector_Basics(ocvb)
-        label1 = "side view aligned using the IMU gravity vector"
-        label2 = "side view aligned without using the IMU gravity vector"
-        ocvb.desc = "Present the side view with and without the IMU filter."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
-
-        Static imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.checked = True
-        sideView.src = input
-        sideView.Run(ocvb)
-        dst1 = sideView.dst1.Clone()
-        lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lDetect.Run(ocvb)
-        dst1 = lDetect.dst1
-
-        imuCheck.checked = False
-        kSideView.Run(ocvb)
-        dst2 = kSideView.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class PointCloud_FindFloor
     Inherits VBparent
     Dim sideIMU As PointCloud_IMU_SideView
@@ -1418,5 +1313,239 @@ Public Class PointCloud_DistanceClick
 
         dst1.Circle(sideCameraPoint, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         dst1.Line(New cv.Point(sideCameraPoint.X, 0), New cv.Point(sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_TopView
+    Inherits VBparent
+    Public topView As Histogram_2D_TopView
+    Public kTopView As PointCloud_Kalman_TopView
+    Public lDetect As LineDetector_Basics
+    Dim rotate As Transform_Rotate
+    Dim angleSlider As System.Windows.Forms.TrackBar
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        rotate = New Transform_Rotate(ocvb)
+        angleSlider = findSlider("Angle")
+        angleSlider.Value = 0
+
+
+        kTopView = New PointCloud_Kalman_TopView(ocvb)
+        topView = New Histogram_2D_TopView(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        lDetect = New LineDetector_Basics(ocvb)
+        label1 = "Top view aligned using the IMU gravity vector"
+        label2 = "Top view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the top view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        topView.Run(ocvb)
+        dst1 = topView.dst1.Clone()
+        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
+        Dim angleX = topView.gCloudIMU.imu.angleX
+        Dim angleY = topView.gCloudIMU.imu.angleY
+        Dim angleZ = topView.gCloudIMU.imu.angleZ
+        'Console.WriteLine(" Angle X = " + Format(angleZ * 57.2958, "#0.00") +
+        '                  " Angle Y = " + Format(angleZ * 57.2958, "#0.00") +
+        '                  " Angle Z = " + Format(angleZ * 57.2958, "#0.00"))
+        Dim fsize = fontsize * 1.5
+        For i = 1 To CInt(maxZ)
+            Dim yMeter = CInt(dst1.Height * i / (maxZ * Math.Cos(angleZ)))
+            dst1.Line(New cv.Point(0, yMeter), New cv.Point(dst1.Width, yMeter), cv.Scalar.White, 1)
+            cv.Cv2.PutText(dst1, CStr(maxZ - i) + "m", New cv.Point(10, yMeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
+        Dim angle = angleSlider.Value
+        Static xSlider = findSlider("Rotation center X")
+        Static ySlider = findSlider("Rotation center Y")
+        xSlider.value = topCameraPoint.X
+        ySlider.value = topCameraPoint.Y
+        rotate.src = dst1
+        rotate.Run(ocvb)
+        dst1 = rotate.dst1
+
+        imuCheck.checked = False
+        kTopView.Run(ocvb)
+        dst2 = kTopView.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_SideView
+    Inherits VBparent
+    Public sideView As Histogram_2D_SideView
+    Public kSideView As PointCloud_Kalman_SideView
+    Public lDetect As LineDetector_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        kSideView = New PointCloud_Kalman_SideView(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        lDetect = New LineDetector_Basics(ocvb)
+        label1 = "side view aligned using the IMU gravity vector"
+        label2 = "side view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the side view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        sideView.src = input
+        sideView.Run(ocvb)
+        dst1 = sideView.dst1.Clone()
+        lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+
+        imuCheck.checked = False
+        kSideView.Run(ocvb)
+        dst2 = kSideView.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_TopViewNew
+    Inherits VBparent
+    Public topView As Histogram_2D_TopViewNew
+    Public kTopView As PointCloud_Kalman_TopView
+    Public lDetect As LineDetector_Basics
+    Dim rotate As Transform_Rotate
+    Dim angleSlider As System.Windows.Forms.TrackBar
+    Dim cmats As PointCloud_Colorize
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        cmats = New PointCloud_Colorize(ocvb)
+        rotate = New Transform_Rotate(ocvb)
+        angleSlider = findSlider("Angle")
+        angleSlider.Value = 0
+
+        kTopView = New PointCloud_Kalman_TopView(ocvb)
+        topView = New Histogram_2D_TopViewNew(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        lDetect = New LineDetector_Basics(ocvb)
+        label1 = "Top view aligned using the IMU gravity vector"
+        label2 = "Top view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the top view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        topView.Run(ocvb)
+        dst1 = topView.dst1.Clone()
+        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
+        Dim angle = angleSlider.Value
+        Static xSlider = findSlider("Rotation center X")
+        Static ySlider = findSlider("Rotation center Y")
+        xSlider.value = topCameraPoint.X
+        ySlider.value = topCameraPoint.Y
+        rotate.src = dst1
+        rotate.Run(ocvb)
+        dst1 = rotate.dst1
+        dst1 = cmats.CameraLocationBot(ocvb, dst1)
+
+        imuCheck.checked = False
+        kTopView.Run(ocvb)
+        dst2 = kTopView.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_SideViewNew
+    Inherits VBparent
+    Public sideView As Histogram_2D_SideViewNew
+    Public kSideView As PointCloud_Kalman_SideView
+    Public lDetect As LineDetector_Basics
+    Dim cmats As PointCloud_Colorize
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        cmats = New PointCloud_Colorize(ocvb)
+        kSideView = New PointCloud_Kalman_SideView(ocvb)
+        sideView = New Histogram_2D_SideViewNew(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        lDetect = New LineDetector_Basics(ocvb)
+        label1 = "side view aligned using the IMU gravity vector"
+        label2 = "side view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the side view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        sideView.src = input
+        sideView.Run(ocvb)
+        dst1 = sideView.dst1.Clone()
+        lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+        dst1 = cmats.CameraLocationSide(ocvb, dst1)
+        imuCheck.checked = False
+        kSideView.Run(ocvb)
+        dst2 = kSideView.dst1
     End Sub
 End Class

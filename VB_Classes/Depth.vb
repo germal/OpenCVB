@@ -1255,51 +1255,6 @@ End Class
 
 
 
-Public Class Depth_PointCloudInRange
-    Inherits VBparent
-    Public histOpts As Histogram_ProjectionOptions
-    Public mask As New cv.Mat
-    Public maxMeters As Double
-    Public split() As cv.Mat
-    Public reduction As Reduction_Depth
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        reduction = New Reduction_Depth(ocvb)
-        histOpts = New Histogram_ProjectionOptions(ocvb)
-        If standalone Then histOpts.check.Visible = False
-
-        label1 = "Mask for depth values that are in-range"
-        ocvb.desc = "Show PointCloud while varying the max depth."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
-        dst2.SetTo(0)
-
-        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
-        split = cv.Cv2.Split(src)
-
-        Static reductionRadio = findRadio("No reduction")
-        If reductionRadio.checked = False Then
-            split(2) *= 1000
-            split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-            reduction.Run(ocvb)
-            split(2) = reduction.reducedDepth32F / 1000
-        End If
-
-        Dim tmp As New cv.Mat
-        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), mask)
-        Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-        mask = mask.SetTo(0, zeroDepth)
-
-        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size)
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1652,9 +1607,6 @@ Public Class Depth_PointCloud_IMU
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Angle to rotate around y-axis", -180, 180, 0)
-
         invert = New Mat_Inverse(ocvb)
         If standalone Then invert.validateInverse = True
 
@@ -1684,27 +1636,16 @@ Public Class Depth_PointCloud_IMU
             '[sin(a)  cos(a)    0]
             '[0       0         1] rotate the point cloud around the z-axis.
             If zRotation Then
-                cx = Math.Cos(-imu.angleX)
-                sx = Math.Sin(-imu.angleX)
-            End If
-
-            '[cos(a)  0         -sin(a)] rotate the point cloud around the y-axis.
-            '[0       1         0      ]
-            '[sin(a)  0         cos(a) ]
-            Static radiansSlider = findSlider("Angle to rotate around y-axis")
-            Dim radians = radiansSlider.Value * 57.2958
-            If radians <> 0 Then
-                cy = Math.Cos(-radians)
-                sy = Math.Sin(-radians)
-                Dim xZ(,) = {{0, Math.Cos(-radians), -Math.Sin(-radians)}, {0, 1, 0}, {0, Math.Sin(-radians), Math.Cos(-radians)}}
+                cx = Math.Cos(imu.angleX)
+                sx = Math.Sin(imu.angleX)
             End If
 
             '[1       0         0      ] rotate the point cloud around the x-axis.
             '[0       cos(a)    -sin(a)]
             '[0       sin(a)    cos(a) ]
             If xRotation Then
-                cz = Math.Cos(-imu.angleZ)
-                sz = Math.Sin(-imu.angleZ)
+                cz = Math.Cos(imu.angleZ)
+                sz = Math.Sin(imu.angleZ)
             End If
 
             ' could use OpenCV for this but this makes it clearer.
@@ -1715,47 +1656,19 @@ Public Class Depth_PointCloud_IMU
                       {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-            ' could use OpenCV for this but this makes it clearer.
-            '           [cy  0   -sy]
-            ' [gMatrix] [0   1    0]
-            '           [sy  0    cy]
-            Dim g = gMatrix
-            If radians <> 0 Then
-                gMatrix = {{g(0, 0) * cy + g(0, 1) * 0 + g(0, 2) * -sy, g(0, 0) * 0 + g(0, 1) * 1 + g(0, 2) * 0, g(0, 0) * sy + g(0, 1) * 0 + g(0, 2) * cy},
-                           {g(1, 0) * cy + g(1, 1) * 0 + g(1, 2) * -sy, g(1, 0) * 0 + g(1, 1) * 1 + g(1, 2) * 0, g(1, 0) * sy + g(1, 1) * 0 + g(1, 2) * cy},
-                           {g(2, 0) * cy + g(2, 1) * 0 + g(2, 2) * -sy, g(2, 0) * 0 + g(2, 1) * 1 + g(2, 2) * 0, g(2, 0) * sy + g(2, 1) * 0 + g(2, 2) * cy}}
-                g = gMatrix
-            End If
-
-            Dim v = New cv.Vec3f(1, 1, 1)
-            input.Set(Of cv.Vec3f)(0, 0, 0, v) ' use this to measure transformation angles.
-
             split = cv.Cv2.Split(input)
+
+            Dim g = gMatrix
             split(0) = g(0, 0) * split(0) + g(0, 1) * split(1) + g(0, 2) * split(2)
             split(1) = g(1, 0) * split(0) + g(1, 1) * split(1) + g(1, 2) * split(2)
             split(2) = g(2, 0) * split(0) + g(2, 1) * split(1) + g(2, 2) * split(2)
 
-            v = New cv.Vec3f(split(0).Get(Of Single)(0, 0),
-                             split(1).Get(Of Single)(0, 0),
-                             split(2).Get(Of Single)(0, 0))
-            Dim newLen = Math.Sqrt(v.Item0 * v.Item0 + v.Item1 * v.Item1 + v.Item2 * v.Item2)
-            Dim angleX = Math.Acos(v.Item0 / newLen)
-            Dim angleY = Math.Acos(v.Item1 / newLen)
-            Dim angleZ = Math.Acos(v.Item2 / newLen)
-            If Single.IsNaN(angleX) Then Dim i = 0
-            'Console.WriteLine(" angle x = " + Format(angleX * 57.2958, "#0.0") +
-            '                  " angle y = " + Format(angleY * 57.2958, "#0.0") +
-            '                  " angle z = " + Format(angleZ * 57.2958, "#0.0"))
-
-            ' Dim vec = New cv.Vec3f(split(0).Get(Of Single)(0, 0), split(1).Get(Of Single)(0, 0), split(2).Get(Of Single)(0, 0))
-            'Console.WriteLine("x = " + Format(vec.Item0, "#0.00") + " y  = " + Format(vec.Item1, "#0.00") + " z = " + Format(vec.Item2, "#0.00"))
-
             ' this doesn't fail but it doesn't rotate the output...
-            'Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
-            'Dim testInput = input.Reshape(1, input.Rows * input.Cols)
-            'Dim testOutput = (testInput * gMat).ToMat
-            'Dim result = testOutput.Reshape(3, input.Rows)
-            'split = cv.Cv2.Split(result)
+            Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+            Dim testInput = input.Reshape(1, input.Rows * input.Cols)
+            Dim testOutput = (testInput * gMat).ToMat
+            Dim result = testOutput.Reshape(3, input.Rows)
+            split = cv.Cv2.Split(result)
 
             Static reductionRadio = findRadio("No reduction")
             If reductionRadio.checked = False Then
@@ -1773,6 +1686,176 @@ Public Class Depth_PointCloud_IMU
             invert.matrix = gMatrix
             invert.Run(ocvb)
             gInverted = invert.inverse
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_PointCloudInRange
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public mask As New cv.Mat
+    Public maxMeters As Double
+    Public split() As cv.Mat
+    Public pointCloud As cv.Mat
+    Public reduction As Reduction_Depth
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        reduction = New Reduction_Depth(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Show PointCloud while varying the max depth."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+        dst2.SetTo(0)
+
+        If src.Type <> cv.MatType.CV_32FC3 Then src = ocvb.pointCloud
+        split = cv.Cv2.Split(src)
+
+        Static reductionRadio = findRadio("No reduction")
+        If reductionRadio.checked = False Then
+            split(2) *= 1000
+            split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+            reduction.Run(ocvb)
+            split(2) = reduction.reducedDepth32F / 1000
+        End If
+
+        cv.Cv2.InRange(split(2), cv.Scalar.All(0), cv.Scalar.All(maxZ), mask)
+        Dim zeroDepth = split(2).Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+        mask = mask.SetTo(0, zeroDepth)
+
+        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(ocvb.color.Size)
+    End Sub
+End Class
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloud_IMUNew
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public Mask As New cv.Mat
+    Public pointCloud As cv.Mat
+    Public imu As IMU_GVector
+    Public xRotation As Boolean = True
+    Public zRotation As Boolean = True
+    Public reduction As Reduction_Depth
+    Public gMatrix(,) As Single
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        reduction = New Reduction_Depth(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+        imu = New IMU_GVector(ocvb)
+        If standalone Then imu.kalman.check.Visible = False
+
+        label1 = ""
+        label2 = "Mask for depth values that are in-range"
+        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+
+        Static rangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = rangeSlider.Value / 1000
+
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            imu.Run(ocvb)
+            Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
+            '[cos(a) -sin(a)    0]
+            '[sin(a)  cos(a)    0]
+            '[0       0         1] rotate the point cloud around the z-axis.
+            If zRotation Then
+                cx = Math.Cos(imu.angleX)
+                sx = Math.Sin(imu.angleX)
+            End If
+
+            '[1       0         0      ] rotate the point cloud around the x-axis.
+            '[0       cos(a)    -sin(a)]
+            '[0       sin(a)    cos(a) ]
+            If xRotation Then
+                cz = Math.Cos(imu.angleZ)
+                sz = Math.Sin(imu.angleZ)
+            End If
+
+            ' could use OpenCV for this but this makes it clearer.
+            '[cx -sx    0]  [1  0   0 ] 
+            '[sx  cx    0]  [0  cz -sz]
+            '[0   0     1]  [0  sz  cz]
+            gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                      {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                      {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+
+            Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+            Dim gInput = input.Reshape(1, input.Rows * input.Cols)
+            Dim gOutput = (gInput * gMat).ToMat
+            pointCloud = gOutput.Reshape(3, input.Rows)
+
+            Static reductionRadio = findRadio("No reduction")
+            If reductionRadio.checked = False Then
+                Dim split = cv.Cv2.Split(pointCloud)
+                split(2) *= 1000
+                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run(ocvb)
+                split(2) = reduction.reducedDepth32F / 1000
+                cv.Cv2.Merge(split, pointCloud)
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_PointCloudInRangeNew
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public mask As New cv.Mat
+    Public maxMeters As Double
+    Public pointCloud As cv.Mat
+    Public reduction As Reduction_Depth
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        reduction = New Reduction_Depth(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Show PointCloud while varying the max depth."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+        dst2.SetTo(0)
+
+        pointCloud = src
+        If pointCloud.Type <> cv.MatType.CV_32FC3 Then pointCloud = ocvb.pointCloud
+
+        Static reductionRadio = findRadio("No reduction")
+        If reductionRadio.checked = False Then
+            Dim split = cv.Cv2.Split(src)
+            split(2) *= 1000
+            split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+            reduction.Run(ocvb)
+            split(2) = reduction.reducedDepth32F / 1000
+            cv.Cv2.Merge(split, pointCloud)
         End If
     End Sub
 End Class
