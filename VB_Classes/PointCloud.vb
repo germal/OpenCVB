@@ -494,7 +494,7 @@ Public Class PointCloud_Kalman_TopView
     Inherits VBparent
     Public pTrack As Kalman_PointTracker
     Public flood As FloodFill_8bit
-    Public histogram As PointCloud_HistTopView
+    Public histogram As Histogram_2D_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
@@ -504,7 +504,7 @@ Public Class PointCloud_Kalman_TopView
         flood = New FloodFill_8bit(ocvb)
         flood.basics.sliders.trackbar(0).Value = 100
         pTrack = New Kalman_PointTracker(ocvb)
-        histogram = New PointCloud_HistTopView(ocvb)
+        histogram = New Histogram_2D_TopView(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
@@ -516,7 +516,7 @@ Public Class PointCloud_Kalman_TopView
         histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = histogram.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
         If flood.dst1.Channels = 3 Then pTrack.src = flood.dst1 Else pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -543,7 +543,7 @@ End Class
 Public Class PointCloud_Kalman_SideView
     Inherits VBparent
     Public flood As Floodfill_Identifiers
-    Public histogram As PointCloud_HistSideView
+    Public histogram As Histogram_2D_SideView
     Public pTrack As Kalman_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
@@ -553,7 +553,7 @@ Public Class PointCloud_Kalman_SideView
         cmats = New PointCloud_Colorize(ocvb)
         flood = New Floodfill_Identifiers(ocvb)
         flood.basics.sliders.trackbar(0).Value = 100
-        histogram = New PointCloud_HistSideView(ocvb)
+        histogram = New Histogram_2D_SideView(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
@@ -566,7 +566,7 @@ Public Class PointCloud_Kalman_SideView
         histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = histogram.hist.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = histogram.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
         pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -777,69 +777,14 @@ End Class
 
 
 
-
-
-Public Class PointCloud_HistTopView
-    Inherits VBparent
-    Public hist As Histogram_2D_TopView
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        hist = New Histogram_2D_TopView(ocvb)
-        Static histCheckbox = findCheckBox("Use IMU gravity vector")
-        histCheckbox.Checked = False
-
-        Static reductionRadio = findRadio("No reduction")
-        reductionRadio.checked = True
-
-        ocvb.desc = "Display the histogram with and without adjusting for gravity"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If src.Type = cv.MatType.CV_32FC3 Then hist.src = src
-        hist.Run(ocvb)
-        dst1 = hist.dst1
-        If standalone Then dst2 = hist.dst2
-    End Sub
-End Class
-
-
-
-
-
-Public Class PointCloud_HistSideView
-    Inherits VBparent
-    Public hist As Histogram_2D_SideView
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        hist = New Histogram_2D_SideView(ocvb)
-        Static histCheckbox = findCheckBox("Use IMU gravity vector")
-        histCheckbox.Checked = False
-
-        Static reductionRadio = findRadio("No reduction")
-        reductionRadio.checked = True
-
-        ocvb.desc = "Display the histogram with and without adjusting for gravity"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If src.Type = cv.MatType.CV_32FC3 Then hist.src = src
-        hist.Run(ocvb)
-        dst1 = hist.dst1
-    End Sub
-End Class
-
-
-
-
-
 Public Class PointCloud_HistBothViews
     Inherits VBparent
-    Dim topView As PointCloud_HistTopView
-    Dim sideView As PointCloud_HistSideView
+    Dim topView As Histogram_2D_TopView
+    Dim sideView As Histogram_2D_SideView
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        topView = New PointCloud_HistTopView(ocvb)
-        sideView = New PointCloud_HistSideView(ocvb)
+        topView = New Histogram_2D_TopView(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
 
         label1 = "Histogram Top View"
         label2 = "Histogram Side View"
