@@ -377,11 +377,11 @@ End Class
 Public Class OpenGL_GravityTransform
     Inherits VBparent
     Public ogl As OpenGL_Basics
-    Public gCloud As Depth_PointCloud_IMUNew
+    Public gCloud As Depth_PointCloud_IMU
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        gCloud = New Depth_PointCloud_IMUNew(ocvb)
+        gCloud = New Depth_PointCloud_IMU(ocvb)
         gCloud.histOpts = New Histogram_ProjectionOptions(ocvb)
 
         ogl = New OpenGL_Basics(ocvb)

@@ -781,11 +781,11 @@ End Class
 
 Public Class PointCloud_HistTopView
     Inherits VBparent
-    Public hist As Histogram_2D_TopViewNew
+    Public hist As Histogram_2D_TopView
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        hist = New Histogram_2D_TopViewNew(ocvb)
+        hist = New Histogram_2D_TopView(ocvb)
         Static histCheckbox = findCheckBox("Use IMU gravity vector")
         histCheckbox.Checked = False
 
@@ -808,11 +808,11 @@ End Class
 
 Public Class PointCloud_HistSideView
     Inherits VBparent
-    Public hist As Histogram_2D_SideViewNew
+    Public hist As Histogram_2D_SideView
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        hist = New Histogram_2D_SideViewNew(ocvb)
+        hist = New Histogram_2D_SideView(ocvb)
         Static histCheckbox = findCheckBox("Use IMU gravity vector")
         histCheckbox.Checked = False
 
@@ -860,154 +860,16 @@ End Class
 
 
 
-Public Class PointCloud_WallsFloors_Kalman
-    Inherits VBparent
-    Dim walls As PointCloud_WallsFloors
-    Dim pTrackWall As Kalman_PointTracker
-    Dim pTrackFloor As Kalman_PointTracker
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        walls = New PointCloud_WallsFloors(ocvb)
-        Dim drawCheckbox = findCheckBox("FLD - Draw lines on input image")
-        drawCheckbox.Checked = False ' we will draw them below.
-        pTrackWall = New Kalman_PointTracker(ocvb)
-        pTrackFloor = New Kalman_PointTracker(ocvb)
-        Dim drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
-        drawRectangleCheck.Checked = False
-
-        hideForm("Kalman_PointTracker CheckBox Options")
-        hideForm("Palette_Basics Radio Options")
-
-        ocvb.desc = "Use Kalman to smooth results of wall/floor detection"
-    End Sub
-    Private Sub runTrack(ocvb As VBocvb, ByRef dst As cv.Mat, pTrack As Object, mat As cv.Mat, vo As SortedList(Of Single, viewObject))
-        pTrack.queryPoints.Clear()
-        pTrack.queryRects.Clear()
-        For j = 0 To mat.Rows - 1
-            Dim nextVec = mat.Get(Of cv.Vec6f)(j, 0)
-            pTrack.queryPoints.Add(New cv.Point2f(nextVec.Item0, nextVec.Item1))
-            pTrack.queryRects.Add(New cv.Rect(nextVec.Item2, nextVec.Item3, 0, 0))
-        Next
-
-        pTrack.Run(ocvb)
-
-        For j = 0 To vo.Count - 1
-            Dim vw = vo.ElementAt(j).Value
-            Dim pt1 = vw.centroid
-            Dim pt2 = New cv.Point2f(vw.rectView.X, vw.rectView.Y)
-            dst.Line(pt1, pt2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-        Next
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        walls.Run(ocvb)
-        dst1 = walls.dst1
-        dst2 = walls.dst2
-
-        runTrack(ocvb, dst1, pTrackWall, walls.wallLines, pTrackWall.viewObjects)
-        runTrack(ocvb, dst2, pTrackFloor, walls.floorsLines, pTrackFloor.viewObjects)
-    End Sub
-End Class
-
-
-
-
-
-Public Class PointCloud_WallsFloors
-    Inherits VBparent
-    Dim both As PointCloud_HistBothViews
-    Public wallDetect As lineDetector_FLD_CPP
-    Public floorDetect As lineDetector_FLD_CPP
-    Public wallLines As cv.Mat
-    Public floorsLines As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        wallDetect = New lineDetector_FLD_CPP(ocvb)
-        floorDetect = New lineDetector_FLD_CPP(ocvb)
-        both = New PointCloud_HistBothViews(ocvb)
-
-        Dim histThresholdSlider = findSlider("Histogram threshold")
-        histThresholdSlider.Value = 20
-
-        label1 = "Top View: wall candidates in red"
-        label2 = "Side View: floors/ceiling candidates in red"
-        ocvb.desc = "Use the top down view to detect walls with a line detector algorithm"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If ocvb.frameCount = 0 Then checkIMU.checked = True
-        both.src = src
-        both.Run(ocvb)
-        dst1 = both.dst1
-        dst2 = both.dst2
-
-        wallDetect.src = dst1
-        wallDetect.Run(ocvb)
-        dst1 = wallDetect.dst1
-        wallLines = wallDetect.lineMat
-
-        floorDetect.src = dst2
-        floorDetect.Run(ocvb)
-        dst2 = floorDetect.dst1
-        floorsLines = floorDetect.lineMat
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class PointCloud_Snapshot
-    Inherits VBparent
-    Dim sideView As Histogram_2D_SideViewNew
-    Dim topView As Histogram_2D_TopViewNew
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sideView = New Histogram_2D_SideViewNew(ocvb)
-        topView = New Histogram_2D_TopViewNew(ocvb)
-
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Take a snapshot"
-        check.Box(0).Checked = True
-
-        label1 = "Snapshot of side view"
-        label2 = "Snapshot of top view"
-        ocvb.desc = "Study a point cloud in a single snapshot"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static pcSnap As New cv.Mat
-        If check.Box(0).Checked Then
-            check.Box(0).Checked = False
-            pcSnap = ocvb.pointCloud
-        End If
-        sideView.src = pcSnap
-        sideView.Run(ocvb)
-        dst1 = sideView.dst1.Resize(src.Size)
-
-        topView.src = pcSnap
-        topView.Run(ocvb)
-        dst2 = topView.dst1.Resize(src.Size)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class PointCloud_FindFloor
     Inherits VBparent
-    Dim sideIMU As PointCloud_IMU_SideViewNew
-    Dim flow As Font_FlowText
+    Dim sideIMU As PointCloud_IMU_SideView
     Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         mats = New Mat_4to1(ocvb)
-        flow = New Font_FlowText(ocvb)
-        sideIMU = New PointCloud_IMU_SideViewNew(ocvb)
+        sideIMU = New PointCloud_IMU_SideView(ocvb)
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -1018,15 +880,6 @@ Public Class PointCloud_FindFloor
         mats.mat(0) = sideIMU.dst1
         mats.mat(1) = sideIMU.dst2
         Dim gInverted = sideIMU.sideView.gCloudIMU.gInverted
-        Dim nextLine As String
-        flow.msgs.Add("The inversion matrix for line end points")
-        For i = 0 To 3 - 1
-            nextLine = ""
-            For j = 0 To 3 - 1
-                nextLine += Format(gInverted.Get(Of Single)(i, j), "#0.00") + vbTab
-            Next
-            flow.msgs.Add(nextLine)
-        Next
         Dim lines = sideIMU.lDetect.lines
         Dim sortedLines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
         For Each line In lines
@@ -1050,10 +903,12 @@ Public Class PointCloud_FindFloor
             If lineLen < lengthTest Or angleLen > angleTest Then noCeiling = True  ' not a very good line! 
             If noCeiling = False Then mats.mat(0).Line(New cv.Point(0, lastVal.Item1), New cv.Point(mats.mat(0).Width, lastVal.Item1), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
 
-            Dim fsize = fontsize / 0.15
-            If fsize > 1.5 Then fsize = 1.5
-            If noFloor = False Then cv.Cv2.PutText(mats.mat(0), "Floor", New cv.Point(10, firstVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            If noCeiling = False Then cv.Cv2.PutText(mats.mat(0), "Ceiling", New cv.Point(10, lastVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            If noFloor = False Then
+                cv.Cv2.PutText(mats.mat(0), "Floor", New cv.Point(src.Width * 0.8, firstVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            End If
+            If noCeiling = False Then
+                cv.Cv2.PutText(mats.mat(0), "Ceiling", New cv.Point(src.Width * 0.8, lastVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            End If
 
             Dim p1 = New cv.Vec3f(firstVal.Item0, firstVal.Item1, 1)
             Dim m1 = New cv.Mat(3, 1, cv.MatType.CV_32F, p1)
@@ -1066,9 +921,6 @@ Public Class PointCloud_FindFloor
             mats.mat(1).Line(pt1, pt2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
             dst1 = mats.mat(0)
             dst2 = mats.mat(1)
-            ' flow.Run(ocvb)
-            'mats.Run(ocvb)
-            'dst2 = mats.dst1
         End If
     End Sub
 End Class
@@ -1081,12 +933,12 @@ End Class
 Public Class PointCloud_FrustrumSide
     Inherits VBparent
     Public fakePC As New cv.Mat
-    Dim sideView As Histogram_2D_SideViewNew
+    Dim sideView As Histogram_2D_SideView
     Dim cmats As PointCloud_Colorize
     Dim inRangeSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        sideView = New Histogram_2D_SideViewNew(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
         cmats = New PointCloud_Colorize(ocvb)
@@ -1186,14 +1038,14 @@ Public Class PointCloud_FrustrumTop
     Inherits VBparent
     Public fakePC As New cv.Mat
     Dim frustrum As PointCloud_FrustrumSide
-    Dim topView As Histogram_2D_TopViewNew
+    Dim topView As Histogram_2D_TopView
     Dim cmats As PointCloud_Colorize
     Dim inRangeSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         frustrum = New PointCloud_FrustrumSide(ocvb)
 
-        topView = New Histogram_2D_TopViewNew(ocvb)
+        topView = New Histogram_2D_TopView(ocvb)
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
         cmats = New PointCloud_Colorize(ocvb)
@@ -1264,13 +1116,13 @@ End Class
 Public Class PointCloud_DistanceClick
     Inherits VBparent
     Dim inverse As Mat_Inverse
-    Dim sideIMU As PointCloud_IMU_SideViewNew
+    Dim sideIMU As PointCloud_IMU_SideView
     Dim points As New List(Of cv.Point)
     Dim clicks As New List(Of cv.Point)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         inverse = New Mat_Inverse(ocvb)
-        sideIMU = New PointCloud_IMU_SideViewNew(ocvb)
+        sideIMU = New PointCloud_IMU_SideView(ocvb)
         label1 = "Click anywhere to get distance from camera and x dist"
         ocvb.desc = "Click to find distance from the camera"
     End Sub
@@ -1323,7 +1175,7 @@ End Class
 
 Public Class PointCloud_IMU_TopViewNew
     Inherits VBparent
-    Public topView As Histogram_2D_TopViewNew
+    Public topView As Histogram_2D_TopView
     Public kTopView As PointCloud_Kalman_TopView
     Public lDetect As LineDetector_Basics
     Dim rotate As Transform_Rotate
@@ -1338,7 +1190,7 @@ Public Class PointCloud_IMU_TopViewNew
         angleSlider.Value = 0
 
         kTopView = New PointCloud_Kalman_TopView(ocvb)
-        topView = New Histogram_2D_TopViewNew(ocvb)
+        topView = New Histogram_2D_TopView(ocvb)
         Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
 
@@ -1384,25 +1236,25 @@ End Class
 
 
 
-Public Class PointCloud_IMU_SideViewNew
+Public Class PointCloud_IMU_SideView
     Inherits VBparent
-    Public sideView As Histogram_2D_SideViewNew
+    Public sideView As Histogram_2D_SideView
     Public kSideView As PointCloud_Kalman_SideView
     Public lDetect As LineDetector_Basics
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        lDetect = New LineDetector_Basics(ocvb)
         cmats = New PointCloud_Colorize(ocvb)
         kSideView = New PointCloud_Kalman_SideView(ocvb)
-        sideView = New Histogram_2D_SideViewNew(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
         Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20
 
-        lDetect = New LineDetector_Basics(ocvb)
         label1 = "side view aligned using the IMU gravity vector"
         label2 = "side view aligned without using the IMU gravity vector"
         ocvb.desc = "Present the side view with and without the IMU filter."
@@ -1416,7 +1268,7 @@ Public Class PointCloud_IMU_SideViewNew
         sideView.src = input
         sideView.Run(ocvb)
         dst1 = sideView.dst1.Clone()
-        lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
         dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
