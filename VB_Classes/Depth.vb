@@ -1592,7 +1592,7 @@ End Class
 
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloud_IMU
+Public Class Depth_PointCloud_IMUX
     Inherits VBparent
     Public histOpts As Histogram_ProjectionOptions
     Public Mask As New cv.Mat
@@ -1748,18 +1748,26 @@ Public Class Depth_PointCloud_IMUNew
     Public Mask As New cv.Mat
     Public pointCloud As cv.Mat
     Public imu As IMU_GVector
-    Public xRotation As Boolean = True
-    Public zRotation As Boolean = True
     Public reduction As Reduction_Depth
     Public gMatrix(,) As Single
+    Dim invert As Mat_Inverse
+    Public gInverted As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        invert = New Mat_Inverse(ocvb)
+        If standalone Then invert.validateInverse = True
         reduction = New Reduction_Depth(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.check.Visible = False
         imu = New IMU_GVector(ocvb)
         If standalone Then imu.kalman.check.Visible = False
+
+        check.Setup(ocvb, caller, 2)
+        check.Box(0).Text = "X-Rotation with gravity vector"
+        check.Box(1).Text = "Z-Rotation with gravity vector"
+        check.Box(0).Checked = True
+        check.Box(1).Checked = True
 
         label1 = ""
         label2 = "Mask for depth values that are in-range"
@@ -1780,7 +1788,7 @@ Public Class Depth_PointCloud_IMUNew
             '[cos(a) -sin(a)    0]
             '[sin(a)  cos(a)    0]
             '[0       0         1] rotate the point cloud around the z-axis.
-            If zRotation Then
+            If check.Box(1).Checked Then
                 cx = Math.Cos(imu.angleX)
                 sx = Math.Sin(imu.angleX)
             End If
@@ -1788,7 +1796,7 @@ Public Class Depth_PointCloud_IMUNew
             '[1       0         0      ] rotate the point cloud around the x-axis.
             '[0       cos(a)    -sin(a)]
             '[0       sin(a)    cos(a) ]
-            If xRotation Then
+            If check.Box(0).Checked Then
                 cz = Math.Cos(imu.angleZ)
                 sz = Math.Sin(imu.angleZ)
             End If
@@ -1815,6 +1823,10 @@ Public Class Depth_PointCloud_IMUNew
                 split(2) = reduction.reducedDepth32F / 1000
                 cv.Cv2.Merge(split, pointCloud)
             End If
+
+            invert.matrix = gMatrix
+            invert.Run(ocvb)
+            gInverted = invert.inverse
         End If
     End Sub
 End Class

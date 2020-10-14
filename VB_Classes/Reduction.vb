@@ -238,13 +238,13 @@ End Class
 
 Public Class Reduction_Lines
     Inherits VBparent
-    Dim sideView As Histogram_2D_SideView
-    Dim topView As Histogram_2D_TopView
+    Dim sideView As Histogram_2D_SideViewNew
+    Dim topView As Histogram_2D_TopViewNew
     Public lDetect As LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
-        topView = New Histogram_2D_TopView(ocvb)
+        sideView = New Histogram_2D_SideViewNew(ocvb)
+        topView = New Histogram_2D_TopViewNew(ocvb)
         Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
 

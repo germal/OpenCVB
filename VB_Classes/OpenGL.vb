@@ -377,11 +377,11 @@ End Class
 Public Class OpenGL_GravityTransform
     Inherits VBparent
     Public ogl As OpenGL_Basics
-    Public gCloud As Depth_PointCloud_IMU
+    Public gCloud As Depth_PointCloud_IMUNew
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        gCloud = New Depth_PointCloud_IMU(ocvb)
+        gCloud = New Depth_PointCloud_IMUNew(ocvb)
         gCloud.histOpts = New Histogram_ProjectionOptions(ocvb)
 
         ogl = New OpenGL_Basics(ocvb)
@@ -397,26 +397,28 @@ Public Class OpenGL_GravityTransform
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        Static xRotateCheck = findCheckBox("X-Rotation with gravity vector")
+        Static zRotateCheck = findCheckBox("Z-Rotation with gravity vector")
         If radio.check(0).Checked Then
-            gCloud.xRotation = True
-            gCloud.zRotation = False
+            xRotateCheck.checked = True
+            zRotateCheck.checked = False
         End If
         If radio.check(1).Checked Then
-            gCloud.xRotation = False
-            gCloud.zRotation = True
+            xRotateCheck.checked = False
+            zRotateCheck.checked = True
         End If
         If radio.check(2).Checked Then
-            gCloud.xRotation = True
-            gCloud.zRotation = True
+            xRotateCheck.checked = True
+            zRotateCheck.checked = True
         End If
         If radio.check(3).Checked Then
-            gCloud.xRotation = False
-            gCloud.zRotation = False
+            xRotateCheck.checked = False
+            zRotateCheck.checked = False
         End If
 
         gCloud.src = ocvb.pointCloud
         gCloud.Run(ocvb)
-        cv.Cv2.Merge(gCloud.split, ogl.pointCloudInput)
+        ogl.pointCloudInput = gCloud.pointCloud
 
         ogl.src = src
         ogl.Run(ocvb)
