@@ -108,11 +108,8 @@ Public Class Reduction_KNN_Color
     Public reduction As Reduction_Floodfill
     Public pTrack As KNN_PointTracker
     Dim highlight As Highlight_Basics
-    Dim drawRC As Draw_ViewObjects
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-
-        drawRC = New Draw_ViewObjects(ocvb)
 
         pTrack = New KNN_PointTracker(ocvb)
         reduction = New Reduction_Floodfill(ocvb)
@@ -130,9 +127,7 @@ Public Class Reduction_KNN_Color
         pTrack.queryRects = New List(Of cv.Rect)(reduction.flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(reduction.flood.masks)
         pTrack.Run(ocvb)
-        drawRC.src = pTrack.dst1
-        drawRC.Run(ocvb)
-        dst1 = drawRC.dst1
+        dst1 = pTrack.dst1
 
         If standalone Then
             highlight.viewObjects = pTrack.drawRC.viewObjects

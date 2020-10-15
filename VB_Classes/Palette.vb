@@ -69,7 +69,6 @@ Public Class Palette_Basics
             dst2 = gradMap.gradientColorMap.Resize(dst2.Size)
         Else
             cv.Cv2.ApplyColorMap(src, dst1, colormap)
-            Console.WriteLine("colormap index = " + CStr(colormap))
         End If
     End Sub
 End Class
@@ -347,7 +346,8 @@ Public Class Palette_BuildGradientColorMap
         Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Static saveGradCount = -1
-        Dim gradCount = sliders.trackbar(0).Value
+        Static transitionSlider = findSlider("Number of color transitions (Used only with Random)")
+        Dim gradCount = transitionSlider.Value
         If saveGradCount <> gradCount Then
             saveGradCount = gradCount
             Dim gradMat As New cv.Mat
@@ -401,7 +401,8 @@ Public Class Palette_DepthColorMap
                 dst2(r) = gradientColorMap
             Next
         End If
-        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(sliders.trackbar(0).Value / 100)
+        Static cvtScaleSlider = findSlider("Convert and Scale value X100")
+        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(cvtScaleSlider.Value / 100)
         dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
         holes.Run(ocvb)
