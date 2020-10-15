@@ -13,7 +13,7 @@ Public Class Contours_Basics
         radio.check(2).Text = "FloodFill"
         radio.check(3).Text = "List"
         radio.check(4).Text = "Tree"
-        radio.check(4).Checked = True
+        radio.check(2).Checked = True
 
         radio1.Setup(ocvb, caller, 4)
         radio1.check(0).Text = "ApproxNone"
@@ -31,15 +31,16 @@ Public Class Contours_Basics
         label2 = "FindContours output"
     End Sub
     Public Sub setOptions()
-        Static frm = findForm("Contours_Basics Radio Options")
+        Static frm = findForm("Contours_Basics ContourApproximation Mode Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
                 Exit For
             End If
         Next
-        For i = 0 To radio1.check.Count - 1
-            If radio1.check(i).Checked Then
+        Static frm1 = findForm("Contours_Basics Retrieval Mode Radio Options")
+        For i = 0 To frm1.check.length - 1
+            If frm1.check(i).Checked Then
                 ApproximationMode = Choose(i + 1, cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
                                               cv.ContourApproximationModes.ApproxTC89KCOS, cv.ContourApproximationModes.ApproxTC89L1)
                 Exit For
