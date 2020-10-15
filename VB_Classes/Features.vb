@@ -36,12 +36,12 @@ End Class
 Public Class Features_PointTracker
     Inherits VBparent
     Dim features As Features_GoodFeatures
-    Dim pTrack As Kalman_PointTracker
+    Dim pTrack As KNN_PointTracker
     Dim rRadius = 10
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         features = New Features_GoodFeatures(ocvb)
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
         Dim drawRectCheck = findCheckBox("Draw rectangle and centroid for each mask")
         drawRectCheck.Checked = False
 

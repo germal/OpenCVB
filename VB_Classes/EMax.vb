@@ -223,14 +223,14 @@ End Class
 
 Public Class EMax_PointTracker
     Inherits VBparent
-    Dim pTrack As Kalman_PointTracker
+    Dim pTrack As KNN_PointTracker
     Dim emax As EMax_Centroids
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         emax = New EMax_Centroids(ocvb)
 
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
         Dim rectCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         rectCheckbox.Checked = False
         Dim floodMinSlider = findSlider("FloodFill Minimum Size")

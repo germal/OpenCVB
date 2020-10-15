@@ -106,15 +106,15 @@ End Class
 Public Class Reduction_KNN_Color
     Inherits VBparent
     Public reduction As Reduction_Floodfill
-    Public pTrack As Kalman_PointTracker
+    Public pTrack As KNN_PointTracker
     Dim highlight As Highlight_Basics
-    Dim drawRC As Kalman_ViewObjects
+    Dim drawRC As Draw_ViewObjects
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        drawRC = New Kalman_ViewObjects(ocvb)
+        drawRC = New Draw_ViewObjects(ocvb)
 
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
         reduction = New Reduction_Floodfill(ocvb)
         If standalone Then highlight = New Highlight_Basics(ocvb)
 

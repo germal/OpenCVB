@@ -594,3 +594,54 @@ Public Class Draw_OverlappingRectangles
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Draw_ViewObjects
+    Inherits VBparent
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public palette As Palette_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        palette = New Palette_Basics(ocvb)
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Draw rectangle and centroid for each mask"
+        check.Box(0).Checked = True
+
+        ocvb.desc = "Draw rectangles and centroids"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If standalone Then
+            ocvb.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
+        Else
+            Dim incr = If(viewObjects.Count < 10, 25, 255 / viewObjects.Count)  'reduces flicker of slightly different colors when < 10
+            palette.src = src * cv.Scalar.All(incr) ' spread the colors 
+            palette.Run(ocvb)
+            dst1 = palette.dst1
+
+            ' render masks first so they don't cover circles or rectangles below
+            For i = 0 To viewObjects.Count - 1
+                Dim vo = viewObjects.ElementAt(i).Value
+                If vo.mask IsNot Nothing Then
+                    Dim r = vo.preKalmanRect
+                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
+                End If
+            Next
+
+            Static drawRectangleCheck = findCheckBox("Draw rectangle and centroid for each mask")
+            If drawRectangleCheck.checked Then
+                For i = 0 To viewObjects.Count - 1
+                    Dim vw = viewObjects.ElementAt(i).Value
+                    Dim pt = vw.centroid
+                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Rectangle(vw.rectView, cv.Scalar.White, 1)
+                Next
+            End If
+        End If
+    End Sub
+End Class

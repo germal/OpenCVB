@@ -161,14 +161,14 @@ End Class
 Public Class CComp_PointTracker
     Inherits VBparent
     Public basics As CComp_Basics
-    Public pTrack As Kalman_PointTracker
+    Public pTrack As KNN_PointTracker
     Public highlight As Highlight_Basics
     Public trackPoints As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         highlight = New Highlight_Basics(ocvb)
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
         basics = New CComp_Basics(ocvb)
 
         ocvb.desc = "Track connected componenent centroids and use it to match coloring"

@@ -285,13 +285,13 @@ End Class
 Public Class Fuzzy_PointTracker
     Inherits VBparent
     Dim fuzzy As Fuzzy_Basics
-    Dim pTrack As Kalman_PointTracker
+    Dim pTrack As KNN_PointTracker
     Dim flood As FloodFill_8bit
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         fuzzy = New Fuzzy_Basics(ocvb)
         flood = New FloodFill_8bit(ocvb)
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
         fuzzy.sliders.Visible = False
 
         ocvb.desc = "FloodFill the regions defined as solid"

@@ -492,7 +492,7 @@ End Class
 
 Public Class PointCloud_Kalman_TopView
     Inherits VBparent
-    Public pTrack As Kalman_PointTracker
+    Public pTrack As KNN_PointTracker
     Public flood As FloodFill_8bit
     Public histogram As Histogram_2D_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
@@ -503,7 +503,7 @@ Public Class PointCloud_Kalman_TopView
         cmats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_8bit(ocvb)
         flood.basics.sliders.trackbar(0).Value = 100
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
         histogram = New Histogram_2D_TopView(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
@@ -547,7 +547,7 @@ Public Class PointCloud_Kalman_SideView
     Inherits VBparent
     Public flood As Floodfill_Identifiers
     Public histogram As Histogram_2D_SideView
-    Public pTrack As Kalman_PointTracker
+    Public pTrack As KNN_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
@@ -557,7 +557,7 @@ Public Class PointCloud_Kalman_SideView
         flood = New Floodfill_Identifiers(ocvb)
         flood.basics.sliders.trackbar(0).Value = 100
         histogram = New Histogram_2D_SideView(ocvb)
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub

@@ -195,10 +195,10 @@ End Class
 Public Class FeatureLess_PointTracker
     Inherits VBparent
     Public fLess As Featureless_Basics
-    Public pTrack As Kalman_PointTracker
+    Public pTrack As KNN_PointTracker
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        pTrack = New Kalman_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker(ocvb)
         fLess = New Featureless_Basics(ocvb)
         label1 = "After point tracker"
         label2 = "Before point tracker"
