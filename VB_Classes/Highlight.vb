@@ -16,7 +16,7 @@ Public Class Highlight_Basics
         If standalone Then
             reduction.src = src
             reduction.Run(ocvb)
-            viewObjects = reduction.pTrack.vwo.viewObjects
+            viewObjects = reduction.pTrack.drawRC.viewObjects
             src = reduction.dst1
         End If
 

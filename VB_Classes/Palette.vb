@@ -507,8 +507,8 @@ Public Class Palette_ObjectColors
 
         Dim depth32f = getDepth32f(ocvb)
         Dim blobList As New SortedList(Of Single, Integer)
-        For i = 0 To reduction.pTrack.vwo.viewObjects.Count - 1
-            Dim vo = reduction.pTrack.vwo.viewObjects.Values(i)
+        For i = 0 To reduction.pTrack.drawRC.viewObjects.Count - 1
+            Dim vo = reduction.pTrack.drawRC.viewObjects.Values(i)
             If vo.mask IsNot Nothing Then
                 Dim mask = vo.mask.Clone
                 Dim r = vo.preKalmanRect
@@ -526,7 +526,7 @@ Public Class Palette_ObjectColors
         gray = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For i = 0 To blobList.Count - 1
             Dim index = blobList.ElementAt(i).Value
-            Dim blob = reduction.pTrack.vwo.viewObjects.Values(index)
+            Dim blob = reduction.pTrack.drawRC.viewObjects.Values(index)
             gray(blob.preKalmanRect).SetTo(i + 1, blob.mask)
         Next
         dst1 = gray * Math.Floor(255 / blobList.Count) ' map to 0-255
@@ -536,7 +536,7 @@ Public Class Palette_ObjectColors
         dst1.SetTo(0, gray.ConvertScaleAbs(255))
         For i = 0 To blobList.Count - 1
             Dim index = blobList.ElementAt(i).Value
-            Dim blob = reduction.pTrack.vwo.viewObjects.Values(index)
+            Dim blob = reduction.pTrack.drawRC.viewObjects.Values(index)
             dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * fontsize, 30 * fontsize), cv.Scalar.Black, -1)
             ocvb.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next

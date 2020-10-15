@@ -490,7 +490,7 @@ Public Class KNN_SmoothAverage
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         knn = New KNN_DepthClusters(ocvb)
-        Dim drawCheckbox = findCheckBox("Draw rectangle for each mask")
+        Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         drawCheckbox.Checked = False
 
         sliders.Setup(ocvb, caller)
@@ -531,7 +531,7 @@ Public Class KNN_StabilizeRegions
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         knn = New KNN_DepthClusters(ocvb)
-        Dim drawCheckbox = findCheckBox("Draw rectangle for each mask")
+        Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         drawCheckbox.Checked = False
 
         flood = New FloodFill_8bit(ocvb)

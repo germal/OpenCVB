@@ -42,7 +42,7 @@ Public Class Features_PointTracker
         initParent(ocvb)
         features = New Features_GoodFeatures(ocvb)
         pTrack = New Kalman_PointTracker(ocvb)
-        Dim drawRectCheck = findCheckBox("Draw rectangle for each mask")
+        Dim drawRectCheck = findCheckBox("Draw rectangle and centroid for each mask")
         drawRectCheck.Checked = False
 
         label1 = "Good features without Kalman"
@@ -71,7 +71,7 @@ Public Class Features_PointTracker
         pTrack.Run(ocvb)
 
         dst2.SetTo(0)
-        For Each obj In pTrack.vwo.viewObjects
+        For Each obj In pTrack.drawRC.viewObjects
             Dim r = obj.Value.rectView
             If r.Width > 0 And r.Height > 0 Then
                 If r.X + r.Width < dst2.Width And r.Y + r.Height < dst2.Height Then src(obj.Value.rectView).CopyTo(dst2(obj.Value.rectView))

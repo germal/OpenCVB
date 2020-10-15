@@ -231,7 +231,7 @@ Public Class EMax_PointTracker
         emax = New EMax_Centroids(ocvb)
 
         pTrack = New Kalman_PointTracker(ocvb)
-        Dim rectCheckbox = findCheckBox("Draw rectangle for each mask")
+        Dim rectCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         rectCheckbox.Checked = False
         Dim floodMinSlider = findSlider("FloodFill Minimum Size")
         floodMinSlider.Value = 100

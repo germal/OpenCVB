@@ -346,7 +346,7 @@ Public Class PointCloud_Objects
             saveSideViewFlag = SideViewFlag
             measure = If(SideViewFlag, measureSide, measureTop)
         End If
-        Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
+        Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measure.Run(ocvb)
         dst1 = measure.dst1
@@ -372,8 +372,8 @@ Public Class PointCloud_Objects
         End If
 
         viewObjects.Clear()
-        For i = 0 To measure.pTrack.viewObjects.Count - 1
-            Dim r = measure.pTrack.viewObjects.Values(i).rectView
+        For i = 0 To measure.pTrack.drawRC.viewObjects.Count - 1
+            Dim r = measure.pTrack.drawRC.viewObjects.Values(i).rectView
 
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
             Dim pixeldistance = src.Height - r.Y - r.Height
@@ -399,7 +399,7 @@ Public Class PointCloud_Objects
             If lineHalf = 0 Then Continue For
             If drawLines Then dst1.Line(drawPt1, drawpt2, cv.Scalar.Yellow, 3)
 
-            Dim vo = measure.pTrack.viewObjects.Values(i)
+            Dim vo = measure.pTrack.drawRC.viewObjects.Values(i)
             Dim addlen As Single = 0
             ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge
             If SideViewFlag Then
@@ -496,12 +496,9 @@ Public Class PointCloud_Kalman_TopView
     Public flood As FloodFill_8bit
     Public histogram As Histogram_2D_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
-    Dim drawRC As Kalman_ViewObjects
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-
-        drawRC = New Kalman_ViewObjects(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_8bit(ocvb)
@@ -527,9 +524,10 @@ Public Class PointCloud_Kalman_TopView
         pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
         pTrack.Run(ocvb)
-        drawRC.src = flood.dst1
-        drawRC.Run(ocvb)
-        dst1 = drawRC.dst1
+
+        pTrack.drawRC.src = flood.dst1
+        pTrack.drawRC.Run(ocvb)
+        dst1 = pTrack.drawRC.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
@@ -551,12 +549,9 @@ Public Class PointCloud_Kalman_SideView
     Public histogram As Histogram_2D_SideView
     Public pTrack As Kalman_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
-    Dim drawRC As Kalman_ViewObjects
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-
-        drawRC = New Kalman_ViewObjects(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
         flood = New Floodfill_Identifiers(ocvb)
@@ -582,9 +577,10 @@ Public Class PointCloud_Kalman_SideView
         pTrack.queryRects = New List(Of cv.Rect)(flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.masks)
         pTrack.Run(ocvb)
-        drawRC.src = flood.dst1
-        drawRC.Run(ocvb)
-        dst1 = drawRC.dst1
+
+        pTrack.drawRC.src = flood.dst1
+        pTrack.drawRC.Run(ocvb)
+        dst1 = pTrack.drawRC.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1, 1)
@@ -673,7 +669,7 @@ Public Class PointCloud_BothViews
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static showRectanglesCheck = findCheckBox("Draw rectangle for each mask")
+        Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
         Dim depth32f = getDepth32f(ocvb)
@@ -1166,9 +1162,6 @@ Public Class PointCloud_IMU_TopView
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
 
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
-
         Dim angle = angleSlider.Value
         Static xSlider = findSlider("Rotation center X")
         Static ySlider = findSlider("Rotation center Y")
@@ -1215,18 +1208,15 @@ Public Class PointCloud_IMU_SideView
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
-
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
-        sideView.src = input
         sideView.Run(ocvb)
         dst1 = sideView.dst1.Clone()
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
         dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
+
         imuCheck.checked = False
         kSideView.Run(ocvb)
         dst2 = kSideView.dst1

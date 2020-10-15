@@ -309,7 +309,7 @@ Public Class Fuzzy_PointTracker
         pTrack.queryMasks = flood.basics.masks
         pTrack.Run(ocvb)
 
-        label2 = CStr(pTrack.vwo.viewObjects.Count) + " regions were found"
+        label2 = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
         dst1 = pTrack.dst1
     End Sub
 End Class

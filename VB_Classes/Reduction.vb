@@ -135,14 +135,14 @@ Public Class Reduction_KNN_Color
         dst1 = drawRC.dst1
 
         If standalone Then
-            highlight.viewObjects = pTrack.vwo.viewObjects
+            highlight.viewObjects = pTrack.drawRC.viewObjects
             highlight.src = dst1
             highlight.Run(ocvb)
             dst1 = highlight.dst1
         End If
 
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        label1 = "There were " + CStr(pTrack.vwo.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        label1 = "There were " + CStr(pTrack.drawRC.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
 
