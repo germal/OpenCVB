@@ -31,8 +31,9 @@ Public Class Contours_Basics
         label2 = "FindContours output"
     End Sub
     Public Sub setOptions()
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("Contours_Basics Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
                 Exit For
             End If

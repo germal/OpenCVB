@@ -524,10 +524,7 @@ Public Class PointCloud_Kalman_TopView
         pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
         pTrack.Run(ocvb)
-
-        pTrack.drawRC.src = flood.dst1
-        pTrack.drawRC.Run(ocvb)
-        dst1 = pTrack.drawRC.dst1
+        dst1 = pTrack.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
@@ -577,10 +574,7 @@ Public Class PointCloud_Kalman_SideView
         pTrack.queryRects = New List(Of cv.Rect)(flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.masks)
         pTrack.Run(ocvb)
-
-        pTrack.drawRC.src = flood.dst1
-        pTrack.drawRC.Run(ocvb)
-        dst1 = pTrack.drawRC.dst1
+        dst1 = pTrack.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1, 1)

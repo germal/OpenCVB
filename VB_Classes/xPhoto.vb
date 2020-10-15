@@ -88,8 +88,9 @@ Public Class xPhoto_OilPaint_CPP
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim colorCode As integer = cv.ColorConversionCodes.BGR2GRAY
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("xPhoto_OilPaint_CPP Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 colorCode = Choose(i + 1, cv.ColorConversionCodes.BGR2GRAY, cv.ColorConversionCodes.BGR2HSV, cv.ColorConversionCodes.BGR2YUV,
                                    cv.ColorConversionCodes.BGR2XYZ, cv.ColorConversionCodes.BGR2Lab)
                 Exit For

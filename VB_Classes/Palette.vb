@@ -12,15 +12,18 @@ Public Class Palette_Basics
         gradMap = New Palette_BuildGradientColorMap(ocvb)
 
         radio.Setup(ocvb, caller, 21)
-        For i = 0 To radio.check.Count - 1
-            radio.check(i).Text = mapNames(i)
+        Static frm = findForm("Palette_Basics Radio Options")
+        For i = 0 To frm.check.length - 1
+            frm.check(i).Text = mapNames(i)
         Next
-        radio.check(5).Checked = True
+        Dim hsvRadio = findRadio("Hsv")
+        hsvRadio.Checked = True
         ocvb.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("Palette_Basics Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 Dim scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
                                            cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
                                            cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
@@ -66,6 +69,7 @@ Public Class Palette_Basics
             dst2 = gradMap.gradientColorMap.Resize(dst2.Size)
         Else
             cv.Cv2.ApplyColorMap(src, dst1, colormap)
+            Console.WriteLine("colormap index = " + CStr(colormap))
         End If
     End Sub
 End Class
@@ -114,7 +118,8 @@ Public Class Palette_LinearPolar
             Dim c = i * 255 / dst1.Rows
             dst1.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
-        Dim iFlag = getInterpolationRadioButtons(radio)
+        Static frm = findForm("Palette_LinearPolar Radio Options")
+        Dim iFlag = getInterpolationRadioButtons(radio, frm)
         Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
         Dim radius = sliders.trackbar(0).Value ' msRNG.next(0, dst1.Cols)
         dst2.SetTo(0)

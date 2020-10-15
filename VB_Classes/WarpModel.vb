@@ -33,8 +33,9 @@ Public Class WarpModel_Input
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim img As New cv.Mat
-        For i = 0 To radio.check.Count - 1
-            Dim nextRadio = radio.check(i)
+        Static frm = findForm("WarpModel_Input Radio Options")
+        For i = 0 To frm.check.length - 1
+            Dim nextRadio = frm.check(i)
             If nextRadio.Checked Then
                 Dim photo As New FileInfo(ocvb.parms.homeDir + "Data\Prokudin\" + nextRadio.Text)
                 img = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
@@ -121,8 +122,9 @@ Public Class WarpModel_FindTransformECC_CPP
         input.Run(ocvb)
         dst1 = input.dst1
 
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then warpMode = i
+        Static frm = findForm("WarpModel_FindTransformECC_CPP Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then warpMode = i
         Next
 
         If input.check.Box(0).Checked Then

@@ -104,8 +104,9 @@ Public Class OpticalFlow_DenseOptions
         polySigma = 1.5
         If polyN <= 5 Then polySigma = 1.1
 
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("OpticalFlow_DenseOptions Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 OpticalFlowFlags = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
                                                      cv.OpticalFlowFlags.PyrAReady, cv.OpticalFlowFlags.PyrBReady, cv.OpticalFlowFlags.UseInitialFlow)
                 Exit For
@@ -255,8 +256,9 @@ Public Class OpticalFlow_Sparse
         dst2 = src.Clone()
 
         Dim OpticalFlowFlag As cv.OpticalFlowFlags
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("OpticalFlow_Sparse Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 OpticalFlowFlag = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
                                                      cv.OpticalFlowFlags.PyrAReady, cv.OpticalFlowFlags.PyrBReady, cv.OpticalFlowFlags.UseInitialFlow)
                 Exit For

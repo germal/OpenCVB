@@ -129,7 +129,8 @@ Public Class Fractal_MandelbrotZoomColor
         initParent(ocvb)
         mandel = New Fractal_MandelbrotZoom(ocvb)
         palette = New Palette_Basics(ocvb)
-        palette.radio.check(5).Checked = True
+        Dim hsvRadio = findRadio("Hsv")
+        hsvRadio.Checked = True
         ocvb.desc = "Classic Mandelbrot in color"
     End Sub
     Public Sub Run(ocvb As VBocvb)

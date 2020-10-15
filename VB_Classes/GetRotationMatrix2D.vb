@@ -11,10 +11,10 @@ Module GetRotationMatrix
         radio.check(6).Text = radioName + " with WarpInverseMap"
         radio.check(3).Checked = True
     End Sub
-    Public Function getInterpolationRadioButtons(radio As OptionsRadioButtons) As cv.InterpolationFlags
+    Public Function getInterpolationRadioButtons(radio As OptionsRadioButtons, frm As Object) As cv.InterpolationFlags
         Dim warpFlag As cv.InterpolationFlags
-        For i = 0 To radio.check.Length - 1
-            If radio.check(i).Checked Then
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
                                     cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
                 Exit For
@@ -44,7 +44,8 @@ Public Class GetRotationMatrix2D_Basics
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        warpFlag = getInterpolationRadioButtons(radio)
+        Static frm = findForm("GetRotationMatrix2D_Basics Radio Options")
+        warpFlag = getInterpolationRadioButtons(radio, frm)
 
         Dim angle = sliders.trackbar(0).Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)

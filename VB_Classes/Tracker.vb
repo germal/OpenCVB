@@ -116,10 +116,11 @@ Public Class Tracker_Methods
         ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static saveMethod As integer
+        Static saveMethod As Integer
 
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked = True Then
+        Static frm = findForm("Tracker_Methods Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked = True Then
                 tracker.trackerIndex = i
                 label1 = "Method: " + radio.check(i).Text
                 Exit For

@@ -38,8 +38,9 @@ Public Class Filter_NormalizedKernel
     Public Sub Run(ocvb As VBocvb)
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
         Dim normType = cv.NormTypes.L1
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("Filter_NormalizedKernel Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 normType = Choose(i + 1, cv.NormTypes.INF, cv.NormTypes.L1, cv.NormTypes.L2, cv.NormTypes.MinMax)
                 Exit For
             End If

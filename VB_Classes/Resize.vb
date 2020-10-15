@@ -14,8 +14,9 @@ Public Class Resize_Basics
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim resizeFlag = getInterpolationRadioButtons(radio)
-        if standalone Then
+        Static frm = findForm("Resize_Basics Radio Options")
+        Dim resizeFlag = getInterpolationRadioButtons(radio, frm)
+        If standalone Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
             If ocvb.drawRect.Width <> 0 Then roi = ocvb.drawRect
 

@@ -19,14 +19,15 @@ Public Class BGSubtract_Basics_CPP
         ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("BGSubtract_Basics_CPP Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 If currMethod = i Then
                     Exit For
                 Else
                     If ocvb.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
                     currMethod = i
-                    label1 = "Method = " + radio.check(i).Text
+                    label1 = "Method = " + frm.check(i).Text
                     bgfs = BGSubtract_BGFG_Open(currMethod)
                 End If
             End If
@@ -59,7 +60,7 @@ Public Class BGSubtract_MotionDetect_MT
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         radio.Setup(ocvb, caller, 6)
-        For i = 0 To radio.check.Count - 1
+        For i = 0 To radio.check.Length - 1
             radio.check(i).Text = CStr(2 ^ i) + " threads"
         Next
         radio.check(0).Text = "1 thread"
@@ -71,8 +72,9 @@ Public Class BGSubtract_MotionDetect_MT
         If ocvb.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("BGSubtract_MotionDetect_MT Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 threadData = Choose(i + 1, New cv.Vec3i(1, width, height), New cv.Vec3i(2, width / 2, height), New cv.Vec3i(4, width / 2, height / 2),
                                            New cv.Vec3i(8, width / 4, height / 2), New cv.Vec3i(16, width / 4, height / 4), New cv.Vec3i(32, width / 8, height / 4))
                 Exit For

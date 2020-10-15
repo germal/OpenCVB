@@ -5,7 +5,6 @@ Public Class Kalman_Basics
     Dim kalman() As Kalman_Simple
     Public input(4 - 1) As Single
     Public output(4 - 1) As Single
-    Public vo As viewObject
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         check.Setup(ocvb, caller, 1)

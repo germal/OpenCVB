@@ -33,8 +33,9 @@ Public Class MatchTemplate_Basics
         End If
 
         matchOption = cv.TemplateMatchModes.CCoeffNormed
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("MatchTemplate_Basics Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 matchOption = Choose(i + 1, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed, cv.TemplateMatchModes.CCorr,
                                             cv.TemplateMatchModes.CCorrNormed, cv.TemplateMatchModes.SqDiff, cv.TemplateMatchModes.SqDiffNormed)
                 matchText = Choose(i + 1, "CCoeff", "CCoeffNormed", "CCorr", "CCorrNormed", "SqDiff", "SqDiffNormed")
@@ -107,8 +108,9 @@ Public Class MatchTemplate_DrawRect
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         radio.Setup(ocvb, caller, 6)
-        For i = 0 To radio.check.Count - 1
-            radio.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
+        Static frm = findForm("MatchTemplate_DrawRect Radio Options")
+        For i = 0 To frm.check.length - 1
+            frm.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
         radio.check(5).Checked = True
         If standalone Then ocvb.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
@@ -126,8 +128,9 @@ Public Class MatchTemplate_DrawRect
             ocvb.drawRectClear = True
         End If
         Dim matchMethod As cv.TemplateMatchModes
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("MatchTemplate_DrawRect Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 matchMethod = Choose(i + 1, cv.TemplateMatchModes.SqDiff, cv.TemplateMatchModes.SqDiffNormed, cv.TemplateMatchModes.CCorr,
                                           cv.TemplateMatchModes.CCorrNormed, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed)
                 Exit For

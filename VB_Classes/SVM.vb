@@ -21,10 +21,12 @@ Public Class SVM_Options
 
         radio.Setup(ocvb, caller, 4)
         radio.check(0).Text = "kernel Type = Linear"
-        radio.check(0).Checked = True
-        radio.check(1).Text = "kernel Type = Poly"
+        radio.check(1).Text = "kernel Type = Poly (not working)"
+        radio.check(1).Enabled = False
         radio.check(2).Text = "kernel Type = RBF"
-        radio.check(3).Text = "kernel Type = Sigmoid"
+        radio.check(2).Checked = True
+        radio.check(3).Text = "kernel Type = Sigmoid (not working)"
+        radio.check(3).Enabled = False
 
         radio1.Setup(ocvb, caller, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
@@ -41,15 +43,17 @@ Public Class SVM_Options
         ocvb.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
-        For i = 0 To radio.check.Length - 1
-            If radio.check(i).Checked Then
+        Static frm = findForm("SVM_Options Kernel Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 kernelType = Choose(i + 1, cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid)
                 Exit For
             End If
         Next
 
-        For i = 0 To radio.check.Length - 1
-            If radio.check(i).Checked Then
+        Static frm1 = findForm("SVM_Options SVM Type Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 SVMType = Choose(i + 1, cv.ML.SVM.Types.CSvc, cv.ML.SVM.Types.EpsSvr, cv.ML.SVM.Types.NuSvc, cv.ML.SVM.Types.NuSvr, cv.ML.SVM.Types.OneClass)
                 Exit For
             End If
@@ -103,7 +107,7 @@ Public Class SVM_Basics
         svmOptions = New SVM_Options(ocvb)
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         label1 = "SVM_Basics input data"
-        label2 = "Results - line is ground truth"
+        label2 = "Results - white line is ground truth"
     End Sub
 
     Public Sub Run(ocvb As VBocvb)

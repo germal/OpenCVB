@@ -99,7 +99,8 @@ Public Class WarpAffine_Basics
         ocvb.desc = "Use WarpAffine to transform input images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim warpFlag = getInterpolationRadioButtons(radio)
+        Static frm = findForm("WarpAffine_Basics Radio Options")
+        Dim warpFlag = getInterpolationRadioButtons(radio, frm)
 
         Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)
         Dim angle = sliders.trackbar(0).Value

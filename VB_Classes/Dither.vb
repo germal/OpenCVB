@@ -88,11 +88,12 @@ Public Class Dither_Basics
         sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
 
         radio.Setup(ocvb, caller, 24)
-        For i = 0 To radio.check.Count - 1
-            radio.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
-                                     "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
-                                     "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
-                                     "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra")
+        Static frm = findForm("Dither_Basics Radio Options")
+        For i = 0 To frm.check.length - 1
+            frm.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
+                                       "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
+                                       "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
+                                       "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra")
         Next
         radio.check(4).Checked = True ' this one was interesting...
 
@@ -102,8 +103,9 @@ Public Class Dither_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim radioIndex As Integer
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then radioIndex = i
+        Static frm = findForm("Dither_Basics Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then radioIndex = i
         Next
         Select Case radioIndex
             Case 5, 12, 20, 22

@@ -893,16 +893,14 @@ Public Class KNN_PointTracker
                         If queryMasks(matchIndex).Size <> src.Size Then vo.mask = queryMasks(matchIndex) Else vo.mask = queryMasks(matchIndex)(vo.preKalmanRect)
                     End If
 
-                    If kalman(i).vo.mask Is Nothing Then
-                        vo.LayoutColor = i Mod 255
-                        kalman(i).vo = vo
-                    Else
-                        vo.LayoutColor = kalman(i).vo.LayoutColor
-                    End If
+                    vo.LayoutColor = i Mod 255
                     If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(matchIndex)
                     drawRC.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
                 End If
             Next
+
+            drawRC.Run(ocvb)
+            dst1 = drawRC.dst1
         End If
     End Sub
 End Class

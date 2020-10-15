@@ -142,6 +142,12 @@ Public Class VBparent : Implements IDisposable
             End If
         Next
     End Sub
+    Public Function findForm(title As String) As Object
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
+        Next
+        Return Nothing
+    End Function
     Public Function findSlider(opt As String) As TrackBar
         While 1
             Try
