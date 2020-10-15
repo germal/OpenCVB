@@ -47,6 +47,13 @@ Module PointCloud
             Return -1
         End Function
     End Class
+    Public Class compareAllowIdenticalInteger : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a >= b Then Return 1
+            Return -1
+        End Function
+    End Class
     Public Function findNearestPoint(detailPoint As cv.Point, viewObjects As SortedList(Of Single, viewObject)) As Integer
         Dim minIndex As Integer
         Dim minDistance As Single = Single.MaxValue
@@ -806,67 +813,142 @@ End Class
 
 
 
-
 Public Class PointCloud_FindFloor
     Inherits VBparent
     Dim sideIMU As PointCloud_IMU_SideView
-    Dim mats As Mat_4to1
+    Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
+    Public gleftPoint As cv.Point2f
+    Public grightPoint As cv.Point2f
+    Public leftPoint As cv.Point2f
+    Public rightPoint As cv.Point2f
+    Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        mats = New Mat_4to1(ocvb)
+        kalman = New Kalman_Basics(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 10)
+        sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
         sideIMU = New PointCloud_IMU_SideView(ocvb)
+        label1 = "Side View oriented toward gravity"
+        label2 = "Side View without gravity vector"
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
-        sideIMU.src = input
-        sideIMU.Run(ocvb)
-        mats.mat(0) = sideIMU.dst1
-        mats.mat(1) = sideIMU.dst2
-        Dim gInverted = sideIMU.sideView.gCloudIMU.gInverted
-        Dim lines = sideIMU.lDetect.lines
-        Dim sortedLines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
-        For Each line In lines
-            sortedLines.Add(line.Item1, line)
-        Next
 
-        Dim angleTest = 5
-        Dim lengthTest = 10
-
-        If sortedLines.Count > 0 Then
-            Dim noCeiling As Boolean, noFloor As Boolean
-            Dim firstVal = sortedLines.ElementAt(0).Value
-            Dim lineLen = Math.Abs(firstVal.Item0 - firstVal.Item2)
-            Dim angleLen = Math.Abs(firstVal.Item1 - firstVal.Item3)
-            If lineLen < lengthTest Or angleLen > angleTest Then noFloor = True ' not a very good line! 
-            If noFloor = False Then mats.mat(0).Line(New cv.Point(0, firstVal.Item1), New cv.Point(mats.mat(0).Width, firstVal.Item1), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-
-            Dim lastVal = sortedLines.ElementAt(sortedLines.Count - 1).Value
-            lineLen = Math.Abs(lastVal.Item0 - lastVal.Item2)
-            angleLen = Math.Abs(lastVal.Item1 - lastVal.Item3)
-            If lineLen < lengthTest Or angleLen > angleTest Then noCeiling = True  ' not a very good line! 
-            If noCeiling = False Then mats.mat(0).Line(New cv.Point(0, lastVal.Item1), New cv.Point(mats.mat(0).Width, lastVal.Item1), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-
-            If noFloor = False Then
-                cv.Cv2.PutText(mats.mat(0), "Floor", New cv.Point(src.Width * 0.8, firstVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            End If
-            If noCeiling = False Then
-                cv.Cv2.PutText(mats.mat(0), "Ceiling", New cv.Point(src.Width * 0.8, lastVal.Item1 - 5), cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            End If
-
-            Dim p1 = New cv.Vec3f(firstVal.Item0, firstVal.Item1, 1)
-            Dim m1 = New cv.Mat(3, 1, cv.MatType.CV_32F, p1)
-            Dim t1 = (gInverted * m1).ToMat
-            Dim p2 = New cv.Vec3f(firstVal.Item2, firstVal.Item3, 1)
-            Dim m2 = New cv.Mat(3, 1, cv.MatType.CV_32F, p2)
-            Dim t2 = (gInverted * m2).ToMat
-            Dim pt1 = New cv.Point2f(t1.Get(Of Single)(0, 0), t1.Get(Of Single)(0, 2))
-            Dim pt2 = New cv.Point2f(t2.Get(Of Single)(0, 0), t2.Get(Of Single)(0, 2))
-            mats.mat(1).Line(pt1, pt2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
-            dst1 = mats.mat(0)
-            dst2 = mats.mat(1)
+        Static saveFrameCount = -1
+        If saveFrameCount <> ocvb.frameCount Then
+            saveFrameCount = ocvb.frameCount
+            sideIMU.src = input
+            sideIMU.Run(ocvb)
+            dst1 = sideIMU.dst1
+            dst2 = sideIMU.dst2
+            Dim gInverted = sideIMU.sideView.gCloudIMU.gInverted
+            Dim lines = sideIMU.lDetect.lines
         End If
+
+        Static angleSlider = findSlider("Threshold for y-displacement of line")
+        Static lenSlider = findSlider("Threshold for length of line")
+        Dim angleTest = angleSlider.value
+        Dim lengthTest = lenSlider.value
+
+        If sideIMU.lDetect.lines.Count > 0 Then
+            Dim leftPoints As New List(Of cv.Point2f)
+            Dim rightPoints As New List(Of cv.Point2f)
+            Dim sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+            If floorRun = False Then  sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalInteger)
+            For Each line In sideIMU.lDetect.lines
+                sortedLines.Add(line.Item1, line)
+            Next
+            For i = 0 To sortedLines.Count - 1
+                Dim line = sortedLines.ElementAt(i).Value
+                Dim pf1 = New cv.Point2f(line.Item0, line.Item1)
+                Dim pf2 = New cv.Point2f(line.Item2, line.Item3)
+                If Math.Abs(pf1.X - pf2.X) > lengthTest And Math.Abs(pf1.Y - pf2.Y) < angleTest Then
+                    If pf1.X < pf2.X Then
+                        leftPoints.Add(pf1)
+                        rightPoints.Add(pf2)
+                    Else
+                        leftPoints.Add(pf2)
+                        rightPoints.Add(pf1)
+                    End If
+                Else
+                    Exit For
+                End If
+            Next
+
+            If leftPoints.Count > 0 Then
+                Dim leftMat = New cv.Mat(leftPoints.Count, 1, cv.MatType.CV_32FC2, leftPoints.ToArray)
+                Dim rightMat = New cv.Mat(rightPoints.Count, 1, cv.MatType.CV_32FC2, rightPoints.ToArray)
+                Dim meanLeft = leftMat.Mean()
+                Dim meanRight = rightMat.Mean()
+                gleftPoint = New cv.Point2f(meanLeft.Item(0) - 50, meanLeft.Item(1))
+                grightPoint = New cv.Point2f(meanLeft.Item(0) + 200, meanRight.Item(1))
+
+                kalman.input(0) = gleftPoint.X
+                kalman.Run(ocvb)
+                gleftPoint.X = kalman.output(0)
+                grightPoint.X = kalman.output(0) + 200
+
+                dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_FindCeiling
+    Inherits VBparent
+    Dim floor As PointCloud_FindFloor
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        floor = New PointCloud_FindFloor(ocvb)
+        floor.floorRun = False ' we are looking for ceilings.
+        label1 = floor.label1
+        label2 = floor.label2
+        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        floor.Run(ocvb)
+
+        dst1 = floor.dst1
+        dst2 = floor.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_FindCeilingAndFloor1
+    Inherits VBparent
+    Dim floor As PointCloud_FindFloor
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        floor = New PointCloud_FindFloor(ocvb)
+        label1 = floor.label1
+        label2 = floor.label2
+        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        floor.floorRun = True ' we are looking for ceilings.
+        floor.Run(ocvb)
+
+        dst1 = floor.dst1.Clone
+        dst2 = floor.dst2.Clone
+
+        floor.floorRun = False ' we are looking for ceilings.
+        floor.Run(ocvb)
+        dst1.Line(floor.leftPoint, floor.rightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
