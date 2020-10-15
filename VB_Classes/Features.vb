@@ -71,7 +71,7 @@ Public Class Features_PointTracker
         pTrack.Run(ocvb)
 
         dst2.SetTo(0)
-        For Each obj In pTrack.viewObjects
+        For Each obj In pTrack.vwo.viewObjects
             Dim r = obj.Value.rectView
             If r.Width > 0 And r.Height > 0 Then
                 If r.X + r.Width < dst2.Width And r.Y + r.Height < dst2.Height Then src(obj.Value.rectView).CopyTo(dst2(obj.Value.rectView))

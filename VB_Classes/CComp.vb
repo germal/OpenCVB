@@ -185,7 +185,7 @@ Public Class CComp_PointTracker
             pTrack.Run(ocvb)
             dst1 = pTrack.dst1
 
-            highlight.viewObjects = pTrack.viewObjects
+            highlight.viewObjects = pTrack.vwo.viewObjects
             highlight.src = dst1
             highlight.Run(ocvb)
             dst1 = highlight.dst1

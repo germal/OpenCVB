@@ -108,8 +108,11 @@ Public Class Reduction_KNN_Color
     Public reduction As Reduction_Floodfill
     Public pTrack As Kalman_PointTracker
     Dim highlight As Highlight_Basics
+    Dim drawRC As Kalman_ViewObjects
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+
+        drawRC = New Kalman_ViewObjects(ocvb)
 
         pTrack = New Kalman_PointTracker(ocvb)
         reduction = New Reduction_Floodfill(ocvb)
@@ -127,17 +130,19 @@ Public Class Reduction_KNN_Color
         pTrack.queryRects = New List(Of cv.Rect)(reduction.flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(reduction.flood.masks)
         pTrack.Run(ocvb)
-        dst1 = pTrack.dst1
+        drawRC.src = pTrack.dst1
+        drawRC.Run(ocvb)
+        dst1 = drawRC.dst1
 
         If standalone Then
-            highlight.viewObjects = pTrack.viewObjects
+            highlight.viewObjects = pTrack.vwo.viewObjects
             highlight.src = dst1
             highlight.Run(ocvb)
             dst1 = highlight.dst1
         End If
 
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        label1 = "There were " + CStr(pTrack.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        label1 = "There were " + CStr(pTrack.vwo.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
 

@@ -476,6 +476,52 @@ End Class
 
 
 
+
+
+Public Class Kalman_ViewObjects
+    Inherits VBparent
+    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Draw rectangle for each mask"
+        check.Box(0).Checked = True
+
+        ocvb.desc = "Draw rectangles and centroids"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If standalone Then
+            ocvb.trueText("Kalman_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
+        Else
+            dst1 = src
+            Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
+            Dim incr = 255 / viewObjects.Count
+            ' render masks first so they don't cover circles or rectangles below
+            For i = 0 To viewObjects.Count - 1
+                Dim vo = viewObjects.ElementAt(i).Value
+                If vo.mask IsNot Nothing Then
+                    Dim r = vo.preKalmanRect
+                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
+                End If
+            Next
+
+            If drawRectangleCheck.checked Then
+                For i = 0 To viewObjects.Count - 1
+                    Dim vw = viewObjects.ElementAt(i).Value
+                    Dim pt = vw.centroid
+                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                    dst1.Rectangle(vw.rectView, cv.Scalar.White, 1)
+                Next
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
 Public Structure viewObject
     Dim centroid As cv.Point2f
     Dim preKalmanRect As cv.Rect
@@ -499,22 +545,18 @@ Public Class Kalman_PointTracker
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
-    Public queryColors As New List(Of Integer)
     Public queryContourMats As New List(Of cv.Mat) ' the points for the contours in a cv.mat
-    Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public vwo As Kalman_ViewObjects
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         If standalone Then topView = New PointCloud_Kalman_TopView(ocvb)
 
-        knn = New KNN_1_to_1(ocvb)
-        check.Setup(ocvb, caller, 1)
-        check.Box(0).Text = "Draw rectangle for each mask"
-        check.Box(0).Checked = True
+        vwo = New Kalman_ViewObjects(ocvb)
 
+        knn = New KNN_1_to_1(ocvb)
         allocateKalman(ocvb, 16) ' allocate some kalman objects
 
         hideForm("Thread_Grid Slider Options")
-        hideForm("Palette_BuildGradientColorMap Slider Options")
         ocvb.desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
     Private Sub allocateKalman(ocvb As VBocvb, count As Integer)
@@ -576,7 +618,7 @@ Public Class Kalman_PointTracker
 
             If queryMasks.Count > 0 Then dst1.SetTo(0)
             Dim inputRect = New cv.Rect
-            viewObjects.Clear()
+            vwo.viewObjects.Clear()
             For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
                 inputRect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
                 Dim pt1 = knn.basics.knnQT.trainingPoints(i)
@@ -616,36 +658,15 @@ Public Class Kalman_PointTracker
                     End If
 
                     If kalman(i).vo.mask Is Nothing Then
-                        If queryColors.Count = 0 Then vo.LayoutColor = ocvb.scalarColors(i Mod 255) Else vo.LayoutColor = queryColors(matchIndex)
+                        vo.LayoutColor = i Mod 255
                         kalman(i).vo = vo
                     Else
                         vo.LayoutColor = kalman(i).vo.LayoutColor
                     End If
                     If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(matchIndex)
-                    viewObjects.Add(inputRect.Width * inputRect.Height, vo)
+                    vwo.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
                 End If
             Next
-
-            Static drawRectangleCheck = findCheckBox("Draw rectangle for each mask")
-            Dim incr = 255 / viewObjects.Count
-            ' render masks first so they don't cover circles or rectangles below
-            For i = 0 To viewObjects.Count - 1
-                Dim vo = viewObjects.ElementAt(i).Value
-                If vo.mask IsNot Nothing Then
-                    Dim r = vo.preKalmanRect
-                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
-                End If
-            Next
-
-            If drawRectangleCheck.checked Then
-                For i = 0 To viewObjects.Count - 1
-                    Dim vw = viewObjects.ElementAt(i).Value
-                    Dim pt = vw.centroid
-                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-                    cv.Cv2.Circle(dst1, pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                    dst1.Rectangle(vw.rectView, cv.Scalar.White, 1)
-                Next
-            End If
         End If
     End Sub
 End Class

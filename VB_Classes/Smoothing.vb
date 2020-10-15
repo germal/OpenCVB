@@ -55,13 +55,13 @@ Public Class Smoothing_Exterior
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
 		If standalone Then
-			dst1.SetTo(0)
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
 			hull.src = src
 			hull.Run(ocvb)
 			Dim nextHull = hull.hull
 
+			dst1.SetTo(0)
 			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
 		End If
 		smoothPoints = getSplineInterpolationCatmullRom(inputPoints, sliders.trackbar(0).Value)

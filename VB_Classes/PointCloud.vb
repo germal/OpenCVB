@@ -496,9 +496,12 @@ Public Class PointCloud_Kalman_TopView
     Public flood As FloodFill_8bit
     Public histogram As Histogram_2D_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
+    Dim drawRC As Kalman_ViewObjects
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+
+        drawRC = New Kalman_ViewObjects(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_8bit(ocvb)
@@ -524,7 +527,9 @@ Public Class PointCloud_Kalman_TopView
         pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
         pTrack.Run(ocvb)
-        dst1 = pTrack.dst1
+        drawRC.src = flood.dst1
+        drawRC.Run(ocvb)
+        dst1 = drawRC.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
@@ -546,9 +551,12 @@ Public Class PointCloud_Kalman_SideView
     Public histogram As Histogram_2D_SideView
     Public pTrack As Kalman_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
+    Dim drawRC As Kalman_ViewObjects
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+
+        drawRC = New Kalman_ViewObjects(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
         flood = New Floodfill_Identifiers(ocvb)
@@ -574,7 +582,9 @@ Public Class PointCloud_Kalman_SideView
         pTrack.queryRects = New List(Of cv.Rect)(flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.masks)
         pTrack.Run(ocvb)
-        dst1 = pTrack.dst1
+        drawRC.src = flood.dst1
+        drawRC.Run(ocvb)
+        dst1 = drawRC.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1, 1)
@@ -1118,7 +1128,7 @@ End Class
 
 
 
-Public Class PointCloud_IMU_TopViewNew
+Public Class PointCloud_IMU_TopView
     Inherits VBparent
     Public topView As Histogram_2D_TopView
     Public kTopView As PointCloud_Kalman_TopView

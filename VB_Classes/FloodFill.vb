@@ -114,7 +114,7 @@ Public Class FloodFill_8bit
 
         allRegionMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
 
-        Dim incr = 255 / basics.masks.Count
+        Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
         palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
         palette.Run(ocvb)
         dst1.SetTo(0)
@@ -546,7 +546,7 @@ Public Class FloodFill_PointTracker
         pTrack.queryMasks = flood.basics.masks
         pTrack.Run(ocvb)
 
-        label2 = CStr(pTrack.viewObjects.Count) + " regions were found"
+        label2 = CStr(pTrack.vwo.viewObjects.Count) + " regions were found"
         dst1 = pTrack.dst1
     End Sub
 End Class
