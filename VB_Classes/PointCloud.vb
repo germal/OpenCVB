@@ -348,6 +348,9 @@ Public Class PointCloud_Objects
         ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
         Dim saveSideViewFlag As Boolean
         If measure Is Nothing Or saveSideViewFlag <> SideViewFlag Then
             saveSideViewFlag = SideViewFlag
@@ -364,7 +367,7 @@ Public Class PointCloud_Objects
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
-            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / measure.maxZ)
+            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / maxZ)
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
 
             If SideViewFlag Then
@@ -374,8 +377,8 @@ Public Class PointCloud_Objects
                 xpt1 = New cv.Point2f(topCameraPoint.X - lineHalf, src.Height - pixeldistance)
                 xpt2 = New cv.Point2f(topCameraPoint.X + lineHalf, src.Height - pixeldistance)
             End If
-            distanceSlider.Maximum = measure.maxZ * 1000
-            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Red, 3)
+            distanceSlider.Maximum = maxZ * 1000
+            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
         End If
 
         viewObjects.Clear()
@@ -812,190 +815,6 @@ End Class
 
 
 
-
-Public Class PointCloud_FrustrumSide
-    Inherits VBparent
-    Public fakePC As New cv.Mat
-    Dim sideView As Histogram_2D_SideView
-    Dim cmats As PointCloud_Colorize
-    Dim inRangeSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
-        Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 0
-        cmats = New PointCloud_Colorize(ocvb)
-
-        inRangeSlider = findSlider("InRange Max Depth (mm)")
-        inRangeSlider.Value = 4362
-
-        ocvb.desc = "Translate only the frustrum with gravity"
-    End Sub
-    Public Sub Buildfrustrum1(split() As cv.Mat)
-        maxZ = inRangeSlider.Value / 1000
-        Dim xminVal = -1.84, xmaxVal = 2.63
-        Dim yminVal = -2.2, ymaxVal = 0.9
-
-        Dim xIncr = (xmaxVal - xminVal) / split(0).Height
-        Dim yIncr = (ymaxVal - yminVal) / (split(0).Height - 100)
-        Dim zIncr = maxZ / sideCameraPoint.Y
-        For i = 0 To sideCameraPoint.Y - 1
-            Dim r = New cv.Rect(i, i, CInt(split(2).Width - i * 2), CInt(sideCameraPoint.Y * 2 - i * 2))
-            split(2).Rectangle(r, cv.Scalar.All(maxZ - i * zIncr), 1)
-        Next
-
-        For i = 0 To split(0).Width - 1
-            split(0).Set(Of Single)(0, i, xminVal + xIncr * i)
-        Next
-        For i = 1 To split(0).Height - 1
-            split(0).Row(0).CopyTo(split(0).Row(i))
-        Next
-
-        For i = 0 To split(0).Height - 1
-            split(1).Set(Of Single)(i, 0, yminVal + yIncr * i)
-        Next
-        For i = 1 To split(0).Width - 1
-            split(1).Col(0).CopyTo(split(1).Col(i))
-        Next
-
-        split(2).ConvertTo(dst2, cv.MatType.CV_8U, 255 / maxZ)
-        cv.Cv2.Merge(split, fakePC)
-    End Sub
-    Public Sub Buildfrustrum(split() As cv.Mat)
-        maxZ = inRangeSlider.Value / 1000
-        Dim xminVal = -1.84, xmaxVal = 2.63
-        Dim yminVal = -2.2, ymaxVal = 0.9
-
-        Dim minval As Double, maxval As Double
-        split(0).MinMaxLoc(minval, maxval)
-        split(1).MinMaxLoc(minval, maxval)
-
-        Dim xIncr = (xmaxVal - xminVal) / split(0).Width
-        Dim yIncr = (ymaxVal - yminVal) / split(0).Height
-        Dim zIncr = maxZ / (split(0).Height / 2)
-
-        Dim depth32f = New cv.Mat(split(2).Height, split(2).Height, cv.MatType.CV_32F, 0)
-        For i = 0 To depth32f.Height - 1
-            Dim r = New cv.Rect(i, i, CInt(depth32f.Width - i * 2), CInt(depth32f.Height - i * 2))
-            depth32f.Rectangle(r, cv.Scalar.All(maxZ - i * zIncr), 1)
-        Next
-        split(2) = depth32f.Resize(split(2).Size)
-
-        'For i = 0 To split(0).Width - 1
-        '    split(0).Set(Of Single)(0, i, xminVal + xIncr * i)
-        'Next
-        'For i = 1 To split(0).Height - 1
-        '    split(0).Row(0).CopyTo(split(0).Row(i))
-        'Next
-
-        'For i = 0 To split(0).Height - 1
-        '    split(1).Set(Of Single)(i, 0, yminVal + yIncr * i)
-        'Next
-        'For i = 1 To split(0).Width - 1
-        '    split(1).Col(0).CopyTo(split(1).Col(i))
-        'Next
-
-        split(2).ConvertTo(dst2, cv.MatType.CV_8U, 255 / maxZ)
-        cv.Cv2.Merge(split, fakePC)
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim split = ocvb.pointCloud.Split()
-        Buildfrustrum(split)
-
-        'split(0).ConvertTo(dst2, cv.MatType.CV_8U, 255 / (xmaxVal - xminVal), -xminVal * 255 / (xmaxVal - xminVal))
-        'split(1).ConvertTo(dst1, cv.MatType.CV_8U, 255 / (ymaxVal - yminVal), -yminVal * 255 / (ymaxVal - yminVal))
-
-        sideView.src = fakePC
-        sideView.Run(ocvb)
-        dst1 = sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
-        dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class PointCloud_FrustrumTop
-    Inherits VBparent
-    Public fakePC As New cv.Mat
-    Dim frustrum As PointCloud_FrustrumSide
-    Dim topView As Histogram_2D_TopView
-    Dim cmats As PointCloud_Colorize
-    Dim inRangeSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        frustrum = New PointCloud_FrustrumSide(ocvb)
-
-        topView = New Histogram_2D_TopView(ocvb)
-        Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 0
-        cmats = New PointCloud_Colorize(ocvb)
-
-        inRangeSlider = findSlider("InRange Max Depth (mm)")
-        inRangeSlider.Value = 4362
-        maxZ = inRangeSlider.Value / 1000
-
-        ocvb.desc = "Translate only the frustrum with gravity"
-    End Sub
-    Public Sub Buildfrustrum(split() As cv.Mat)
-        maxZ = inRangeSlider.Value / 1000
-        Dim xminVal = -1.84, xmaxVal = 2.63
-        Dim yminVal = -2.2, ymaxVal = 0.9
-
-        'Dim minval As Double, maxval As Double
-        'For i = 0 To split(0).Rows - 1
-        '    split(0).Row(i).MinMaxLoc(minval, maxval)
-        '    Console.WriteLine("min = " + Format(minval, "#0.00") + " max = " + Format(maxval, "#0.00"))
-        'Next
-        'split(1).MinMaxLoc(minval, maxval)
-
-        Dim xIncr = (xmaxVal - xminVal) / split(0).Width
-        Dim yIncr = (ymaxVal - yminVal) / split(0).Height
-        Dim zIncr = maxZ / (split(0).Height / 2)
-
-        Dim depth32f = New cv.Mat(split(2).Height, split(2).Height, cv.MatType.CV_32F, 0)
-        For i = 0 To depth32f.Height - 1
-            Dim r = New cv.Rect(i, i, CInt(depth32f.Width - i * 2), CInt(depth32f.Height - i * 2))
-            depth32f.Rectangle(r, cv.Scalar.All(maxZ - i * zIncr), 1)
-        Next
-        split(2) = depth32f.Resize(split(2).Size)
-
-        'For i = 0 To split(0).Width - 1
-        '    split(0).Set(Of Single)(0, i, xminVal + xIncr * i)
-        'Next
-        'For i = 1 To split(0).Height - 1
-        '    split(0).Row(0).CopyTo(split(0).Row(i))
-        'Next
-
-        'For i = 0 To split(0).Height - 1
-        '    split(1).Set(Of Single)(i, 0, yminVal + yIncr * i)
-        'Next
-        'For i = 1 To split(0).Width - 1
-        '    split(1).Col(0).CopyTo(split(1).Col(i))
-        'Next
-
-        split(2).ConvertTo(dst2, cv.MatType.CV_8U, 255 / maxZ)
-        cv.Cv2.Merge(split, fakePC)
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim split = ocvb.pointCloud.Split()
-
-        Buildfrustrum(split)
-
-        topView.src = fakePC
-        topView.Run(ocvb)
-        dst1 = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
-        dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class PointCloud_DistanceClick
     Inherits VBparent
     Dim inverse As Mat_Inverse
@@ -1160,9 +979,108 @@ End Class
 
 
 
+
+Public Class PointCloud_FrustrumTop
+    Inherits VBparent
+    Dim frustrum As PointCloud_FrustrumSide
+    Dim topView As Histogram_2D_TopView
+    Dim cmats As PointCloud_Colorize
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        frustrum = New PointCloud_FrustrumSide(ocvb)
+
+        topView = New Histogram_2D_TopView(ocvb)
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 0
+        cmats = New PointCloud_Colorize(ocvb)
+
+        ocvb.desc = "Translate only the frustrum with gravity"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
+        Static depth32f As New cv.Mat
+        If ocvb.frameCount = 0 Then
+            depth32f = frustrum.buildFrustrum(dst2.Size)
+            depth32f.ConvertTo(dst2, cv.MatType.CV_8U, 255 / maxZ)
+            frustrum.xyzDepth.src = depth32f
+            frustrum.xyzDepth.Run(ocvb)
+        End If
+
+        topView.src = frustrum.xyzDepth.xyzFrame
+        topView.Run(ocvb)
+        dst1 = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
+        dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_FrustrumSide
+    Inherits VBparent
+    Dim sideView As Histogram_2D_SideView
+    Dim cmats As PointCloud_Colorize
+    Public xyzDepth As Depth_WorldXYZ_MT
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        xyzDepth = New Depth_WorldXYZ_MT(ocvb)
+        xyzDepth.depthUnitsMeters = True
+
+        sideView = New Histogram_2D_SideView(ocvb)
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 0
+        cmats = New PointCloud_Colorize(ocvb)
+
+        ocvb.desc = "Translate only the frustrum with gravity"
+    End Sub
+    Public Function buildFrustrum(size As cv.Size) As cv.Mat
+        Dim depth32f = New cv.Mat(size, cv.MatType.CV_32F, 0)
+        Dim x = size.Width / 2
+        Dim y = size.Height / 2
+        Dim zIncr = maxZ / (size.Height / 2)
+        Dim r As cv.Rect
+        For i = 0 To size.Height / 2 - 1
+            r = New cv.Rect(x - i, y - i, i * 2, i * 2)
+            depth32f.Rectangle(r, cv.Scalar.All(i * zIncr), 1)
+        Next
+        Return depth32f
+    End Function
+    Public Sub Run(ocvb As VBocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
+        Static depth32f As New cv.Mat
+        If ocvb.frameCount = 0 Then
+            depth32f = buildFrustrum(dst2.Size)
+            depth32f.ConvertTo(dst2, cv.MatType.CV_8U, 255 / maxZ)
+            xyzDepth.src = depth32f
+            xyzDepth.Run(ocvb)
+        End If
+
+        sideView.src = xyzDepth.xyzFrame
+        sideView.Run(ocvb)
+
+        dst1 = sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
+        dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class PointCloud_FindFloor
     Inherits VBparent
-    Dim sideIMU As PointCloud_IMU_SideView
+    Public sideIMU As PointCloud_IMU_SideView
     Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
     Public gleftPoint As cv.Point2f
     Public grightPoint As cv.Point2f
@@ -1175,7 +1093,8 @@ Public Class PointCloud_FindFloor
         sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
         sideIMU = New PointCloud_IMU_SideView(ocvb)
 
-        hideForm("Histogram_ProjectOptions CheckBox Options")
+        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU to find the floor and ceiling - no options to turn it off.
+
         label1 = "Side View oriented toward gravity"
         label2 = "Side View without gravity vector"
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
@@ -1316,12 +1235,10 @@ End Class
 Public Class PointCloud_FindFloorInverse
     Inherits VBparent
     Dim floor As PointCloud_FindCeilingAndFloor
-    Dim inverse As Mat_Inverse
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         floor = New PointCloud_FindCeilingAndFloor(ocvb)
-        inverse = New Mat_Inverse(ocvb)
 
         ocvb.desc = "Find the floor and ceiling in the unrotated histogram using the inverse transform."
     End Sub
@@ -1329,5 +1246,6 @@ Public Class PointCloud_FindFloorInverse
         floor.Run(ocvb)
         dst1 = floor.dst1
         dst2 = floor.dst2
+        Dim gInverted = floor.floor.sideIMU.sideView.gCloudIMU.gInverted
     End Sub
 End Class

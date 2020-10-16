@@ -1143,7 +1143,10 @@ Public Class Histogram_2D_SideView
         dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         Dim rect As New cv.Rect((dst1.Width - dst1.Height) / 2, 0, dst1.Height, dst1.Height)
-        cv.Cv2.Rotate(dst1(rect), dst1(rect), cv.RotateFlags.Rotate90Clockwise)
+        Dim tmp = dst1(rect).Clone
+
+        dst1.SetTo(0)
+        cv.Cv2.Rotate(tmp, dst1(rect), cv.RotateFlags.Rotate90Clockwise)
         cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
     End Sub
 End Class

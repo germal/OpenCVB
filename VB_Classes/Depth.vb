@@ -273,84 +273,6 @@ End Module
 
 
 
-Public Class Depth_WorldXYZ
-    Inherits VBparent
-    Public xyzFrame As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
-        ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim depth32f = (getDepth32f(ocvb) * 0.001).ToMat ' convert to meters.
-        Dim xy As New cv.Point3f
-        For xy.Y = 0 To xyzFrame.Height - 1
-            For xy.X = 0 To xyzFrame.Width - 1
-                xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
-                If xy.Z <> 0 Then
-                    Dim width = getWorldCoordinatesD(ocvb, xy)
-                    xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, width)
-                End If
-            Next
-        Next
-        ocvb.trueText("OpenGL data prepared.")
-    End Sub
-    Public Sub Close()
-        xyzFrame.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Depth_WorldXYZ_MT
-    Inherits VBparent
-    Dim grid As Thread_Grid
-    Dim trim As Depth_InRange
-    Public xyzFrame As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 32
-        gridHeightSlider.Value = 32
-
-        trim = New Depth_InRange(ocvb)
-
-        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
-        ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
-        grid.Run(ocvb)
-
-        xyzFrame.SetTo(0)
-        Dim depth32f = (trim.depth32f * 0.001).ToMat ' convert to meters.
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        Sub(roi)
-            Dim xy As New cv.Point3f
-            For xy.Y = roi.Y To roi.Y + roi.Height - 1
-                For xy.X = roi.X To roi.X + roi.Width - 1
-                    xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
-                    If xy.Z <> 0 Then
-                        Dim width = getWorldCoordinatesD(ocvb, xy)
-                        xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, width)
-                    End If
-                Next
-            Next
-        End Sub)
-        ocvb.trueText("OpenGL data prepared.")
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Depth_MeanStdev_MT
     Inherits VBparent
@@ -1610,7 +1532,7 @@ Public Class Depth_PointCloud_IMU
                 Dim gOutput = (gInput * gMat).ToMat
                 pointCloud = gOutput.Reshape(3, input.Rows)
             Else
-                pointCloud = ocvb.pointCloud.Clone
+                pointCloud = input.Clone
             End If
 
             Static reductionRadio = findRadio("No reduction")
@@ -1627,5 +1549,86 @@ Public Class Depth_PointCloud_IMU
             invert.Run(ocvb)
             gInverted = invert.inverse
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_WorldXYZ
+    Inherits VBparent
+    Public xyzFrame As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
+        ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim depth32f = (getDepth32f(ocvb) * 0.001).ToMat ' convert to meters.
+        Dim xy As New cv.Point3f
+        For xy.Y = 0 To xyzFrame.Height - 1
+            For xy.X = 0 To xyzFrame.Width - 1
+                xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
+                If xy.Z <> 0 Then
+                    Dim xyz = getWorldCoordinates(ocvb, xy)
+                    xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, xyz)
+                End If
+            Next
+        Next
+        If standalone Then ocvb.trueText("OpenGL data prepared.")
+    End Sub
+    Public Sub Close()
+        xyzFrame.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_WorldXYZ_MT
+    Inherits VBparent
+    Dim grid As Thread_Grid
+    Dim trim As Depth_InRange
+    Public xyzFrame As cv.Mat
+    Public depthUnitsMeters = False
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        grid = New Thread_Grid(ocvb)
+        trim = New Depth_InRange(ocvb)
+
+        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
+        ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        trim.src = src
+        If trim.src.Type <> cv.MatType.CV_32F Then trim.src = getDepth32f(ocvb)
+        trim.Run(ocvb)
+        grid.Run(ocvb)
+
+        xyzFrame.SetTo(0)
+        Dim depth32f = If(depthUnitsMeters, trim.depth32f, (trim.depth32f * 0.001).ToMat) ' convert to meters.
+        Dim multX = ocvb.pointCloud.Width / depth32f.Width
+        Dim multY = ocvb.pointCloud.Height / depth32f.Height
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+              Sub(roi)
+                  Dim xy As New cv.Point3f
+                  For y = roi.Y To roi.Y + roi.Height - 1
+                      For x = roi.X To roi.X + roi.Width - 1
+                          xy.X = x * multX
+                          xy.Y = y * multY
+                          xy.Z = depth32f.Get(Of Single)(y, x)
+                          If xy.Z <> 0 Then
+                              Dim xyz = getWorldCoordinates(ocvb, xy)
+                              xyzFrame.Set(Of cv.Point3f)(y, x, xyz)
+                          End If
+                      Next
+                  Next
+              End Sub)
+        If standalone Then ocvb.trueText("OpenGL data prepared.")
     End Sub
 End Class
