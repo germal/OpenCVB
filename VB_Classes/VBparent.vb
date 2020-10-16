@@ -38,6 +38,7 @@ Public Class VBparent : Implements IDisposable
     Public msRNG As New System.Random
     Dim algorithm As Object
     Public fontsize As Single
+    Public dotSize As Integer
     Public resFactor As Single ' resolution is often a factor in sizing tasks.
     Public caller As String
     Public topCameraPoint As cv.Point
@@ -62,12 +63,15 @@ Public Class VBparent : Implements IDisposable
         Select Case ocvb.color.Width
             Case 320
                 fontsize = ocvb.color.Width / 1280
+                dotSize = 3
                 resFactor = 0.1
             Case 640
                 fontsize = ocvb.color.Width / 1280
+                dotSize = 7
                 resFactor = 0.3
             Case 1280
                 fontsize = 1
+                dotSize = 15
                 resFactor = 1
         End Select
 

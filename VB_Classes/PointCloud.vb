@@ -97,7 +97,6 @@ Public Class PointCloud_Colorize
     Dim palette As Palette_Gradient
     Public rect As cv.Rect
     Public shift As Integer
-    Dim centroidRadius As Integer
     Dim arcSize As Integer
     Public startangle As Integer
 
@@ -105,7 +104,7 @@ Public Class PointCloud_Colorize
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
         Dim fsize = fontsize * 1.5
-        dst.Circle(topCameraPoint, centroidRadius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(topCameraPoint, dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = maxZ - 1 To 0 Step -1
             Dim ymeter = CInt(dst.Height * i / (maxZ * rotationFactor))
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
@@ -138,7 +137,7 @@ Public Class PointCloud_Colorize
         Dim fsize = fontsize * 1.5
 
         Dim shift = (src.Width - src.Height) / 2
-        dst.Circle(sideCameraPoint, centroidRadius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(sideCameraPoint, dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
             Dim xmeter = CInt(dst.Height * i / (maxZ * rotationFactor))
             dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
@@ -168,8 +167,6 @@ Public Class PointCloud_Colorize
     End Function
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-
-        centroidRadius = src.Width / 100
 
         palette = New Palette_Gradient(ocvb)
         palette.color1 = cv.Scalar.Yellow
@@ -815,65 +812,6 @@ End Class
 
 
 
-Public Class PointCloud_DistanceClick
-    Inherits VBparent
-    Dim inverse As Mat_Inverse
-    Dim sideIMU As PointCloud_IMU_SideView
-    Dim points As New List(Of cv.Point)
-    Dim clicks As New List(Of cv.Point)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        inverse = New Mat_Inverse(ocvb)
-        sideIMU = New PointCloud_IMU_SideView(ocvb)
-        label1 = "Click anywhere to get distance from camera and x dist"
-        ocvb.desc = "Click to find distance from the camera"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static saveMaxZ As Single
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
-
-        If maxZ <> saveMaxZ Then
-            clicks.Clear()
-            points.Clear()
-            saveMaxZ = maxZ
-        End If
-
-        sideIMU.Run(ocvb)
-        dst1 = sideIMU.dst1
-        dst2 = sideIMU.dst2
-
-        If ocvb.mouseClickFlag Then
-            clicks.Add(ocvb.mouseClickPoint)
-            Dim invertMat = sideIMU.sideView.gCloudIMU.gInverted
-            Dim vec = New cv.Mat(3, 1, cv.MatType.CV_32F, {ocvb.mouseClickPoint.X, ocvb.mouseClickPoint.Y, 0})
-            Dim origLoc = (invertMat * vec).ToMat
-            Dim newLoc = New cv.Point(CInt(origLoc.Get(Of Integer)(0, 0)), CInt(origLoc.Get(Of Integer)(0, 1)))
-            points.Add(newLoc)
-        End If
-
-        For Each pt In points
-            dst2.Circle(pt, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Next
-        For Each pt In clicks
-            dst1.Circle(pt, 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(pt, 10, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim pixelsPerMeter = dst2.Height / maxZ
-            Dim side1 = (pt.X - sideCameraPoint.X)
-            Dim side2 = (pt.Y - sideCameraPoint.Y)
-            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
-            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt)
-        Next
-
-        dst1.Circle(sideCameraPoint, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst1.Line(New cv.Point(sideCameraPoint.X, 0), New cv.Point(sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class PointCloud_IMU_TopView
     Inherits VBparent
@@ -1247,5 +1185,63 @@ Public Class PointCloud_FindFloorInverse
         dst1 = floor.dst1
         dst2 = floor.dst2
         Dim gInverted = floor.floor.sideIMU.sideView.gCloudIMU.gInverted
+    End Sub
+End Class
+
+
+
+
+
+Public Class PointCloud_DistanceClick
+    Inherits VBparent
+    Dim inverse As Mat_Inverse
+    Dim sideIMU As PointCloud_IMU_SideView
+    Dim points As New List(Of cv.Point)
+    Dim clicks As New List(Of cv.Point)
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        inverse = New Mat_Inverse(ocvb)
+        sideIMU = New PointCloud_IMU_SideView(ocvb)
+        label1 = "Click anywhere to get distance from camera and x dist"
+        ocvb.desc = "Click to find distance from the camera"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static saveMaxZ As Single
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
+        If maxZ <> saveMaxZ Then
+            clicks.Clear()
+            points.Clear()
+            saveMaxZ = maxZ
+        End If
+
+        sideIMU.Run(ocvb)
+        dst1 = sideIMU.dst1
+        dst2 = sideIMU.dst2
+
+        If ocvb.mouseClickFlag Then
+            clicks.Add(ocvb.mouseClickPoint)
+            Dim invertMat = sideIMU.sideView.gCloudIMU.gInverted
+            Dim vec = New cv.Mat(3, 1, cv.MatType.CV_32F, {ocvb.mouseClickPoint.X, ocvb.mouseClickPoint.Y, 0})
+            Dim origLoc = (invertMat * vec).ToMat
+            Dim newLoc = New cv.Point(CInt(origLoc.Get(Of Integer)(0, 0)), CInt(origLoc.Get(Of Integer)(0, 1)))
+            points.Add(newLoc)
+        End If
+
+        For Each pt In points
+            dst2.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
+        For Each pt In clicks
+            dst1.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            Dim pixelsPerMeter = dst2.Height / maxZ
+            Dim side1 = (pt.X - sideCameraPoint.X)
+            Dim side2 = (pt.Y - sideCameraPoint.Y)
+            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
+            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt)
+        Next
+
+        dst1.Line(New cv.Point(sideCameraPoint.X, 0), New cv.Point(sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
     End Sub
 End Class

@@ -33,7 +33,7 @@ Public Class Annealing_Basics_CPP
     Public Sub drawMap(ocvb As VBocvb)
         dst1.SetTo(0)
         For i = 0 To cityOrder.Length - 1
-            dst1.Circle(cityPositions(i), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(cityPositions(i), dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
         cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), cv.HersheyFonts.HersheyComplex, fontsize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)

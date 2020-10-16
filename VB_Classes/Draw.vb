@@ -638,8 +638,8 @@ Public Class Draw_ViewObjects
                 For i = 0 To viewObjects.Count - 1
                     Dim vw = viewObjects.ElementAt(i).Value
                     Dim pt = vw.centroid
-                    cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-                    cv.Cv2.Circle(dst1, pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, pt, dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, pt, dotSize - 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
                     dst1.Rectangle(vw.rectView, cv.Scalar.White, 1)
                 Next
             End If

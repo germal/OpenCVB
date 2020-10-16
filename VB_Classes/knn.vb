@@ -724,7 +724,7 @@ Public Class KNN_Point2d
     Public Sub prepareImage(dst As cv.Mat)
         dst.SetTo(0)
         For i = 0 To knn.knnQT.trainingPoints.Count - 1
-            cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+            cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
         Next
         Static nearestCountSlider = findSlider("KNN k nearest points")
         findXnearest = nearestCountSlider.Value
@@ -746,7 +746,7 @@ Public Class KNN_Point2d
             If standalone Then
                 For j = 0 To findXnearest - 1
                     dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 Next
             End If
         Next
