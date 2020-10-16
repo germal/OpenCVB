@@ -556,6 +556,15 @@ In the OpenCVB user interface, the top left image is the RGB and top right is
 depth. Algorithm results are in the bottom left and right or additional OpenGL,
 Python, or HighGUI windows.
 
+![](media/4460c4f42f9eea5f23fe1cd19da22346.png)
+
+*The bottom left is a side-view of the depth data that has been rotated using
+the IMU gravity vector. The rotation facilitates finding the 2 horizontal yellow
+lines in the bottom left image that identify the floor and ceiling in the image.
+If the floor or ceiling is not visible, the yellow lines are not shown. The
+bottom right image is the same side-view of the depth data before it was rotated
+with the IMU gravity vector.*
+
 ![](media/d484f0049c87c9cd2ea7f99a61d12215.png)
 
 *The bottom left is a top-down view of the point cloud data for an Intel D455
