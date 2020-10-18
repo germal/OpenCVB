@@ -1468,21 +1468,18 @@ Public Class Depth_PointCloud_IMU
     Public imu As IMU_GVector
     Public reduction As Reduction_Depth
     Public gMatrix(,) As Single
-    Dim invert As Mat_Inverse
-    Public gInverted As cv.Mat
+    Public leftFrustrum As cv.Point3f
+    Public rightFrustrum As cv.Point3f
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        invert = New Mat_Inverse(ocvb)
-        If standalone Then invert.validateInverse = True
         reduction = New Reduction_Depth(ocvb)
         imu = New IMU_GVector(ocvb)
         histOpts = New Histogram_ProjectionOptions(ocvb)
         If standalone Then histOpts.check.Visible = False
         If standalone Then imu.kalman.check.Visible = False
 
-        label1 = ""
-        label2 = "Mask for depth values that are in-range"
+        label1 = "Mask for depth values that are in-range"
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -1526,28 +1523,54 @@ Public Class Depth_PointCloud_IMU
             Static imuCheckBox = findCheckBox("Use IMU gravity vector")
             Dim changeRequested = True
             If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
+            Dim split = cv.Cv2.Split(input)
             If imuCheckBox.checked And changeRequested Then
+                Dim mask As New cv.Mat
+                cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
+                cv.Cv2.BitwiseNot(dst1, mask)
+                dst1 = dst1.Resize(dst1.Size)
+                input.SetTo(0, mask)
+
+                ' After rotation this will define the projection of the New frustrum
+                Dim ptMaxZ = 1.0
+                Dim pt = New cv.Point3f(input.Width, 0, ptMaxZ)
+                Dim i As Integer
+                For i = 0 To input.Height - 1
+                    pt.Y = i
+                    input.Set(Of cv.Point3f)(i, pt.X, getWorldCoordinates(ocvb, pt))
+                Next
+
                 Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
                 Dim gInput = input.Reshape(1, input.Rows * input.Cols)
                 Dim gOutput = (gInput * gMat).ToMat
                 pointCloud = gOutput.Reshape(3, input.Rows)
+
+                For i = 0 To input.Height - 1
+                    leftFrustrum = pointCloud.Get(Of cv.Point3f)(i, pt.X)
+                    If leftFrustrum.Z > 0 And leftFrustrum.Z < maxZ Then Exit For
+                Next
+                'Console.Write("i = " + CStr(i) + "  left x =" + Format(leftFrustrum.X, "#0.0") + " y =" + Format(leftFrustrum.Y, "#0.0") + " z =" + Format(leftFrustrum.Z, "#0.0"))
+                For i = input.Height - 1 To 0 Step -1
+                    rightFrustrum = pointCloud.Get(Of cv.Point3f)(i, pt.X)
+                    If leftFrustrum.Z < pt.Z Then
+                        If rightFrustrum.Z > 0 And rightFrustrum.Z < ptMaxZ Then Exit For
+                    Else
+                        If rightFrustrum.Z > 0 And rightFrustrum.Z > ptMaxZ Then Exit For
+                    End If
+                Next
+                ' Console.WriteLine(vbTab + " i = " + CStr(i) + " right x =" + Format(rightFrustrum.X, "#0.0") + " y =" + Format(rightFrustrum.Y, "#0.0") + " z =" + Format(rightFrustrum.Z, "#0.0"))
             Else
                 pointCloud = input.Clone
             End If
 
             Static reductionRadio = findRadio("No reduction")
             If reductionRadio.checked = False Then
-                Dim split = cv.Cv2.Split(pointCloud)
-                split(2) *= 1000
-                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                Split(2) *= 1000
+                Split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
                 reduction.Run(ocvb)
                 split(2) = reduction.reducedDepth32F / 1000
                 cv.Cv2.Merge(split, pointCloud)
             End If
-
-            invert.matrix = gMatrix
-            invert.Run(ocvb)
-            gInverted = invert.inverse
         End If
     End Sub
 End Class

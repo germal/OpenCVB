@@ -1031,7 +1031,7 @@ Public Class PointCloud_FindFloor
         sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
         sideIMU = New PointCloud_IMU_SideView(ocvb)
 
-        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU to find the floor and ceiling - no options to turn it off.
+        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU to find the floor and ceiling - no options should turn it off.
 
         label1 = "Side View oriented toward gravity"
         label2 = "Side View without gravity vector"
@@ -1048,7 +1048,6 @@ Public Class PointCloud_FindFloor
             sideIMU.Run(ocvb)
             dst1 = sideIMU.dst1
             dst2 = sideIMU.dst2
-            Dim gInverted = sideIMU.sideView.gCloudIMU.gInverted
             Dim lines = sideIMU.lDetect.lines
         End If
 
@@ -1170,28 +1169,6 @@ End Class
 
 
 
-Public Class PointCloud_FindFloorInverse
-    Inherits VBparent
-    Dim floor As PointCloud_FindCeilingAndFloor
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        floor = New PointCloud_FindCeilingAndFloor(ocvb)
-
-        ocvb.desc = "Find the floor and ceiling in the unrotated histogram using the inverse transform."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        floor.Run(ocvb)
-        dst1 = floor.dst1
-        dst2 = floor.dst2
-        Dim gInverted = floor.floor.sideIMU.sideView.gCloudIMU.gInverted
-    End Sub
-End Class
-
-
-
-
-
 Public Class PointCloud_DistanceClick
     Inherits VBparent
     Dim inverse As Mat_Inverse
@@ -1202,6 +1179,7 @@ Public Class PointCloud_DistanceClick
         initParent(ocvb)
         inverse = New Mat_Inverse(ocvb)
         sideIMU = New PointCloud_IMU_SideView(ocvb)
+        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU - no options should turn it off.
         label1 = "Click anywhere to get distance from camera and x dist"
         ocvb.desc = "Click to find distance from the camera"
     End Sub
@@ -1222,11 +1200,6 @@ Public Class PointCloud_DistanceClick
 
         If ocvb.mouseClickFlag Then
             clicks.Add(ocvb.mouseClickPoint)
-            Dim invertMat = sideIMU.sideView.gCloudIMU.gInverted
-            Dim vec = New cv.Mat(3, 1, cv.MatType.CV_32F, {ocvb.mouseClickPoint.X, ocvb.mouseClickPoint.Y, 0})
-            Dim origLoc = (invertMat * vec).ToMat
-            Dim newLoc = New cv.Point(CInt(origLoc.Get(Of Integer)(0, 0)), CInt(origLoc.Get(Of Integer)(0, 1)))
-            points.Add(newLoc)
         End If
 
         For Each pt In points
