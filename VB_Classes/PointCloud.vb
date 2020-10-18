@@ -873,50 +873,6 @@ End Class
 
 
 
-Public Class PointCloud_IMU_SideView
-    Inherits VBparent
-    Public sideView As Histogram_2D_SideView
-    Public kSideView As PointCloud_Kalman_SideView
-    Public lDetect As LineDetector_Basics
-    Dim cmats As PointCloud_Colorize
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        lDetect = New LineDetector_Basics(ocvb)
-        cmats = New PointCloud_Colorize(ocvb)
-        kSideView = New PointCloud_Kalman_SideView(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
-
-        Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 20
-
-        label1 = "side view aligned using the IMU gravity vector"
-        label2 = "side view aligned without using the IMU gravity vector"
-        ocvb.desc = "Present the side view with and without the IMU filter."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.checked = True
-        sideView.Run(ocvb)
-        dst1 = sideView.dst1.Clone()
-        lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lDetect.Run(ocvb)
-        dst1 = lDetect.dst1
-        dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
-
-        imuCheck.checked = False
-        kSideView.Run(ocvb)
-        dst2 = kSideView.dst1
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class PointCloud_FrustrumTop
     Inherits VBparent
@@ -1171,13 +1127,11 @@ End Class
 
 Public Class PointCloud_DistanceClick
     Inherits VBparent
-    Dim inverse As Mat_Inverse
     Dim sideIMU As PointCloud_IMU_SideView
     Dim points As New List(Of cv.Point)
     Dim clicks As New List(Of cv.Point)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        inverse = New Mat_Inverse(ocvb)
         sideIMU = New PointCloud_IMU_SideView(ocvb)
         hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU - no options should turn it off.
         label1 = "Click anywhere to get distance from camera and x dist"
@@ -1216,5 +1170,78 @@ Public Class PointCloud_DistanceClick
         Next
 
         dst1.Line(New cv.Point(sideCameraPoint.X, 0), New cv.Point(sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_SideView
+    Inherits VBparent
+    Public sideView As Histogram_2D_SideView
+    Public kSideView As PointCloud_Kalman_SideView
+    Public lDetect As LineDetector_Basics
+    Dim cmats As PointCloud_Colorize
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        lDetect = New LineDetector_Basics(ocvb)
+        cmats = New PointCloud_Colorize(ocvb)
+        kSideView = New PointCloud_Kalman_SideView(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        label1 = "side view aligned using the IMU gravity vector"
+        label2 = "side view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the side view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        sideView.Run(ocvb)
+        dst1 = sideView.dst1.Clone()
+        lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+        dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
+
+        imuCheck.checked = False
+        kSideView.Run(ocvb)
+        dst2 = kSideView.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_MeterLine
+    Inherits VBparent
+    Dim sideIMU As Histogram_2D_SideView
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sideIMU = New Histogram_2D_SideView(ocvb)
+        Static thresholdSlider = findSlider("Histogram threshold")
+        thresholdSlider.value = 0
+        ocvb.desc = "Find the line 1 meter from the camera plane in the rotated image - PointCloud_IMU_SideView without line detector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+
+        sideIMU.Run(ocvb)
+        dst1 = sideIMU.dst1
+        imuCheck.checked = False
+
+        sideIMU.Run(ocvb)
+        dst2 = sideIMU.dst1
     End Sub
 End Class

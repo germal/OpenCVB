@@ -1458,129 +1458,6 @@ End Class
 
 
 
-' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
-' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloud_IMU
-    Inherits VBparent
-    Public histOpts As Histogram_ProjectionOptions
-    Public Mask As New cv.Mat
-    Public pointCloud As cv.Mat
-    Public imu As IMU_GVector
-    Public reduction As Reduction_Depth
-    Public gMatrix(,) As Single
-    Public leftFrustrum As cv.Point3f
-    Public rightFrustrum As cv.Point3f
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        reduction = New Reduction_Depth(ocvb)
-        imu = New IMU_GVector(ocvb)
-        histOpts = New Histogram_ProjectionOptions(ocvb)
-        If standalone Then histOpts.check.Visible = False
-        If standalone Then imu.kalman.check.Visible = False
-
-        label1 = "Mask for depth values that are in-range"
-        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
-
-        Static rangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = rangeSlider.Value / 1000
-
-        If ocvb.parms.IMU_Present = False Then
-            ocvb.trueText("IMU unavailable for this camera")
-        Else
-            imu.Run(ocvb)
-            Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
-            '[cos(a) -sin(a)    0]
-            '[sin(a)  cos(a)    0]
-            '[0       0         1] rotate the point cloud around the z-axis.
-            Static zCheckbox = findCheckBox("Z-Rotation with gravity vector")
-            If zCheckbox.Checked Then
-                cx = Math.Cos(imu.angleX)
-                sx = Math.Sin(imu.angleX)
-            End If
-
-            '[1       0         0      ] rotate the point cloud around the x-axis.
-            '[0       cos(a)    -sin(a)]
-            '[0       sin(a)    cos(a) ]
-            Static xCheckbox = findCheckBox("X-Rotation with gravity vector")
-            If xCheckbox.Checked Then
-                cz = Math.Cos(imu.angleZ)
-                sz = Math.Sin(imu.angleZ)
-            End If
-
-            ' could use OpenCV for this but this makes it clearer.
-            '[cx -sx    0]  [1  0   0 ] 
-            '[sx  cx    0]  [0  cz -sz]
-            '[0   0     1]  [0  sz  cz]
-            gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
-                      {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
-                      {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
-
-            Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-            Dim changeRequested = True
-            If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
-            Dim split = cv.Cv2.Split(input)
-            If imuCheckBox.checked And changeRequested Then
-                Dim mask As New cv.Mat
-                cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
-                cv.Cv2.BitwiseNot(dst1, mask)
-                dst1 = dst1.Resize(dst1.Size)
-                input.SetTo(0, mask)
-
-                ' After rotation this will define the projection of the New frustrum
-                Dim ptMaxZ = 1.0
-                Dim pt = New cv.Point3f(input.Width, 0, ptMaxZ)
-                Dim i As Integer
-                For i = 0 To input.Height - 1
-                    pt.Y = i
-                    input.Set(Of cv.Point3f)(i, pt.X, getWorldCoordinates(ocvb, pt))
-                Next
-
-                Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
-                Dim gInput = input.Reshape(1, input.Rows * input.Cols)
-                Dim gOutput = (gInput * gMat).ToMat
-                pointCloud = gOutput.Reshape(3, input.Rows)
-
-                For i = 0 To input.Height - 1
-                    leftFrustrum = pointCloud.Get(Of cv.Point3f)(i, pt.X)
-                    If leftFrustrum.Z > 0 And leftFrustrum.Z < maxZ Then Exit For
-                Next
-                'Console.Write("i = " + CStr(i) + "  left x =" + Format(leftFrustrum.X, "#0.0") + " y =" + Format(leftFrustrum.Y, "#0.0") + " z =" + Format(leftFrustrum.Z, "#0.0"))
-                For i = input.Height - 1 To 0 Step -1
-                    rightFrustrum = pointCloud.Get(Of cv.Point3f)(i, pt.X)
-                    If leftFrustrum.Z < pt.Z Then
-                        If rightFrustrum.Z > 0 And rightFrustrum.Z < ptMaxZ Then Exit For
-                    Else
-                        If rightFrustrum.Z > 0 And rightFrustrum.Z > ptMaxZ Then Exit For
-                    End If
-                Next
-                ' Console.WriteLine(vbTab + " i = " + CStr(i) + " right x =" + Format(rightFrustrum.X, "#0.0") + " y =" + Format(rightFrustrum.Y, "#0.0") + " z =" + Format(rightFrustrum.Z, "#0.0"))
-            Else
-                pointCloud = input.Clone
-            End If
-
-            Static reductionRadio = findRadio("No reduction")
-            If reductionRadio.checked = False Then
-                Split(2) *= 1000
-                Split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-                reduction.Run(ocvb)
-                split(2) = reduction.reducedDepth32F / 1000
-                cv.Cv2.Merge(split, pointCloud)
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Depth_WorldXYZ
     Inherits VBparent
     Public xyzFrame As cv.Mat
@@ -1655,3 +1532,110 @@ Public Class Depth_WorldXYZ_MT
         If standalone Then ocvb.trueText("OpenGL data prepared.")
     End Sub
 End Class
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloud_IMU
+    Inherits VBparent
+    Public histOpts As Histogram_ProjectionOptions
+    Public Mask As New cv.Mat
+    Public pointCloud As cv.Mat
+    Public imu As IMU_GVector
+    Public reduction As Reduction_Depth
+    Public gMatrix(,) As Single
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        reduction = New Reduction_Depth(ocvb)
+        imu = New IMU_GVector(ocvb)
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.check.Visible = False
+        If standalone Then imu.kalman.check.Visible = False
+
+        label1 = "Mask for depth values that are in-range"
+        ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+
+        Static rangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = rangeSlider.Value / 1000
+
+        If ocvb.parms.IMU_Present = False Then
+            ocvb.trueText("IMU unavailable for this camera")
+        Else
+            imu.Run(ocvb)
+            Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
+            '[cos(a) -sin(a)    0]
+            '[sin(a)  cos(a)    0]
+            '[0       0         1] rotate the point cloud around the z-axis.
+            Static zCheckbox = findCheckBox("Z-Rotation with gravity vector")
+            If zCheckbox.Checked Then
+                cx = Math.Cos(imu.angleX)
+                sx = Math.Sin(imu.angleX)
+            End If
+
+            '[1       0         0      ] rotate the point cloud around the x-axis.
+            '[0       cos(a)    -sin(a)]
+            '[0       sin(a)    cos(a) ]
+            Static xCheckbox = findCheckBox("X-Rotation with gravity vector")
+            If xCheckbox.Checked Then
+                cz = Math.Cos(imu.angleZ)
+                sz = Math.Sin(imu.angleZ)
+            End If
+
+            ' could use OpenCV for this but this makes it clearer.
+            '[cx -sx    0]  [1  0   0 ] 
+            '[sx  cx    0]  [0  cz -sz]
+            '[0   0     1]  [0  sz  cz]
+            gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                      {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                      {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+
+            Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+            Dim changeRequested = True
+            If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
+            Dim split = cv.Cv2.Split(input)
+            If imuCheckBox.checked And changeRequested Then
+                Dim mask As New cv.Mat
+                cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
+                cv.Cv2.BitwiseNot(dst1, mask)
+                dst1 = dst1.Resize(dst1.Size)
+                input.SetTo(0, mask)
+
+                ' These 4 points will mark a 1-meter distance plane after rotation
+                Dim pt = New cv.Point3f(0, 0, 1.0) ' all points are 1 meter from the plane of the camera.
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                pt.Y = input.Height - 1
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                pt.X = input.Width - 1
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                pt.Y = 0
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+
+                Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+                Dim gInput = input.Reshape(1, input.Rows * input.Cols)
+                Dim gOutput = (gInput * gMat).ToMat
+                pointCloud = gOutput.Reshape(3, input.Rows)
+            Else
+                pointCloud = input.Clone
+            End If
+
+            Static reductionRadio = findRadio("No reduction")
+            If reductionRadio.checked = False Then
+                Split(2) *= 1000
+                Split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run(ocvb)
+                split(2) = reduction.reducedDepth32F / 1000
+                cv.Cv2.Merge(split, pointCloud)
+            End If
+        End If
+    End Sub
+End Class
+

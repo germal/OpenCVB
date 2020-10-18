@@ -1106,7 +1106,8 @@ Public Class Histogram_2D_SideView
     Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
-    Public leftFrustrum As cv.Point
+    Public markers(2 - 1) As cv.Point2f
+    Dim sidePt As cv.Point2f
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1120,6 +1121,18 @@ Public Class Histogram_2D_SideView
         label1 = "ZY (Side View)"
         ocvb.desc = "Create a 2D histogram for depth in ZY (side view.)"
     End Sub
+    Private Function rotatePoint(pt As cv.Point2f) As cv.Point2f
+        Dim w = gCloudIMU.pointCloud.Width
+        Dim h = gCloudIMU.pointCloud.Height
+        Dim rPt = New cv.Point2f(pt.X - h, pt.Y - h)
+        rPt = New cv.Point2f(-rPt.Y, rPt.X)
+        Return New cv.Point2f((rPt.X + sidePt.X) * dst1.Width / w, (rPt.Y + sidePt.Y) * dst1.Height / h)
+    End Function
+    Private Function computeFrustrumLine(marker As cv.Point2f) As cv.Point2f
+        Dim m = (marker.Y - sidePt.Y) / (marker.X - sidePt.X)
+        Dim b = marker.Y - marker.X * m
+        Return New cv.Point2f(dst1.Width, m * dst1.Width + b)
+    End Function
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
@@ -1128,20 +1141,38 @@ Public Class Histogram_2D_SideView
 
         Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
-        Dim split = cv.Cv2.Split(gCloudIMU.pointCloud)
 
+        Dim split = cv.Cv2.Split(gCloudIMU.pointCloud)
         pixelsPerMeter = dst1.Height / maxZ
         split(1).ConvertTo(split(1), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ) ' pixelsPerMeter * maxZ to keep units the same in x and y!
         split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
-
-        Dim leftOffset = (dst1.Width - dst1.Height) / 2
-        Dim sizeRatio = dst1.Height / split(1).Height
-        Dim pt1 = New cv.Point2f(gCloudIMU.leftFrustrum.Y * pixelsPerMeter + pixelsPerMeter * maxZ, split(2).Height - gCloudIMU.leftFrustrum.Z * pixelsPerMeter)
-        Dim leftPt = New cv.Point(pt1.X * sizeRatio, pt1.Y * sizeRatio)
-        Dim pt2 = New cv.Point2f(gCloudIMU.rightFrustrum.Y * pixelsPerMeter + pixelsPerMeter * maxZ, gCloudIMU.rightFrustrum.Z * pixelsPerMeter)
-        Dim rightPt = New cv.Point(pt2.X * dst1.Width / split(1).Width, dst1.Height - pt2.Y * dst1.Height / split(1).Height)
-
         cv.Cv2.Merge(split, gCloudIMU.pointCloud)
+
+        ' Get the 4 points that mark the 1-meter plane in the rotated image.
+        Dim frustrum(4 - 1) As cv.Point3f
+        frustrum(0) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
+        frustrum(1) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
+        frustrum(2) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, 0)
+        frustrum(3) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
+
+        Dim minVal = Single.MaxValue, maxVal = Single.MinValue
+        Dim minIndex As Integer, maxIndex As Integer
+        For i = 0 To frustrum.Count - 1
+            If minVal > frustrum(i).Y Then
+                minVal = frustrum(i).Y
+                minIndex = i
+            End If
+            If maxVal < frustrum(i).Y Then
+                maxVal = frustrum(i).Y
+                maxIndex = i
+            End If
+        Next
+
+        Dim w = gCloudIMU.pointCloud.Width
+        Dim h = gCloudIMU.pointCloud.Height
+        sidePt = New cv.Point(CInt((w - h) / 2), CInt(h - (w - h) / 2))
+        markers(0) = rotatePoint(New cv.Point2f(frustrum(minIndex).Y, split(1).Height - frustrum(minIndex).Z))
+        markers(1) = rotatePoint(New cv.Point2f(frustrum(maxIndex).Y, split(1).Height - frustrum(maxIndex).Z))
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
         Dim histSize() = {dst1.Height, dst1.Width}
@@ -1151,24 +1182,24 @@ Public Class Histogram_2D_SideView
         Static histThresholdSlider = findSlider("Histogram threshold")
         dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        Dim leftOffset = (dst1.Width - dst1.Height) / 2
         Dim rect As New cv.Rect(leftOffset, 0, dst1.Height, dst1.Height)
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        pt1 *= sizeRatio
-        dst2.Circle(pt1, dotSize, cv.Scalar.Aqua, -1, cv.LineTypes.AntiAlias)
-        dst2.Line(topCameraPoint, pt1, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
-        'dst2.Circle(pt2, dotSize, cv.Scalar.yellow, -1, cv.LineTypes.AntiAlias)
-        '  dst2.Circle(rightPt, dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst2.Circle(topCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
         Dim tmp = dst1(rect).Clone
         dst1.SetTo(0)
         cv.Cv2.Rotate(tmp, dst1(rect), cv.RotateFlags.Rotate90Clockwise)
         cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
-        dst1.Circle(sideCameraPoint, dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        pt1 = New cv.Point(pt1.X - topCameraPoint.X, pt1.Y - topCameraPoint.Y)
-        pt1 = New cv.Point(-pt1.Y, pt1.X)
-        leftFrustrum = New cv.Point(pt1.X + sideCameraPoint.X, pt1.Y + sideCameraPoint.Y)
-        dst1.Circle(leftFrustrum, dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2.Circle(sidePt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+
+        Dim c = New cv.Point((markers(0).X + markers(1).X) / 2, (markers(0).Y + markers(1).Y) / 2)
+        Dim newPixelsPerMeter = Math.Sqrt((c.X - sidePt.X) * (c.X - sidePt.X) + (c.Y - sidePt.Y) * (c.Y - sidePt.Y))
+        label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
+
+        Dim sizeRatio = dst1.Width / gCloudIMU.pointCloud.Width
+        dst2.Line(sidePt * sizeRatio, computeFrustrumLine(markers(0) * sizeRatio), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        dst2.Line(sidePt * sizeRatio, computeFrustrumLine(markers(1) * sizeRatio), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+
+        dst2.Line(markers(0), markers(1), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
