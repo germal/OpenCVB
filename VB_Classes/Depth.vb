@@ -1598,6 +1598,16 @@ Public Class Depth_PointCloud_IMU
                       {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
+            ' These 4 points will mark a 1-meter distance plane with or without rotation
+            Dim pt1 = New cv.Point3f(0, 0, 1.0)
+            Dim pt2 = New cv.Point3f(0, input.Height - 1, 1.0)
+            Dim pt3 = New cv.Point3f(input.Width - 1, input.Height - 1, 1.0)
+            Dim pt4 = New cv.Point3f(0, input.Height, 1.0)
+            input.Set(Of cv.Point3f)(pt1.Y, pt1.X, getWorldCoordinates(ocvb, pt1))
+            input.Set(Of cv.Point3f)(pt2.Y, pt2.X, getWorldCoordinates(ocvb, pt2))
+            input.Set(Of cv.Point3f)(pt3.Y, pt3.X, getWorldCoordinates(ocvb, pt3))
+            input.Set(Of cv.Point3f)(pt4.Y, pt4.X, getWorldCoordinates(ocvb, pt4))
+
             Static imuCheckBox = findCheckBox("Use IMU gravity vector")
             Dim changeRequested = True
             If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
@@ -1606,18 +1616,8 @@ Public Class Depth_PointCloud_IMU
                 Dim mask As New cv.Mat
                 cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
                 cv.Cv2.BitwiseNot(dst1, mask)
-                dst1 = dst1.Resize(dst1.Size)
                 input.SetTo(0, mask)
-
-                ' These 4 points will mark a 1-meter distance plane after rotation
-                Dim pt = New cv.Point3f(0, 0, 1.0) ' all points are 1 meter from the plane of the camera.
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                pt.Y = input.Height - 1
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                pt.X = input.Width - 1
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                pt.Y = 0
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                If standalone Then dst1 = dst1.Resize(dst1.Size)
 
                 Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
                 Dim gInput = input.Reshape(1, input.Rows * input.Cols)

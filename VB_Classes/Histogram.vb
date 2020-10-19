@@ -932,132 +932,14 @@ End Class
 
 
 
-'Public Class Histogram_2D_TopView
-'    Inherits VBparent
-'    Dim histOpts As Histogram_ProjectionOptions
-'    Dim pcTrim As Object
-'    Dim gCloud As Depth_PointCloudInRange
-'    Public gCloudIMU As Depth_PointCloud_IMU
-'    Public histOutput As New cv.Mat
-'    Public pixelsPerMeter As Single
-'    Public rotateY As Boolean = False
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
-'        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
-'        gCloud = New Depth_PointCloudInRange(ocvb)
-'        Dim reductionRadio = findRadio("No reduction")
-'        reductionRadio.Checked = True
-
-'        histOpts = New Histogram_ProjectionOptions(ocvb)
-'        If standalone Then histOpts.sliders.trackbar(0).Value = 1
-
-'        label1 = "XZ (Top View)"
-'        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        Static inRangeSlider = findSlider("InRange Max Depth")
-'        maxZ = inRangeSlider.Value / 1000
-
-'        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-'        pcTrim = If(imuCheckBox.Checked, gCloudIMU, gCloud)
-
-'        Dim input = src
-'        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
-'        pcTrim.src = input
-'        pcTrim.Run(ocvb)
-
-'        pixelsPerMeter = src.Height / maxZ
-'        Dim xData As Integer = 0
-'        Dim zData As Integer = 2
-'        pcTrim.split(xData).ConvertTo(pcTrim.split(xData), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)
-'        pcTrim.split(zData).ConvertTo(pcTrim.split(zData), cv.MatType.CV_32F, pixelsPerMeter)
-
-'        Dim histinput As New cv.Mat
-'        cv.Cv2.Merge(pcTrim.split, histinput)
-
-'        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
-'        Dim histSize() = {dst1.Height, dst1.Width}
-'        cv.Cv2.CalcHist(New cv.Mat() {histinput}, New Integer() {zData, xData}, New cv.Mat, histOutput, 2, histSize, ranges)
-'        histOutput = histOutput.Flip(cv.FlipMode.X)
-'        Static histThresholdSlider = findSlider("Histogram threshold")
-'        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-'        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-'    End Sub
-'End Class
-
-
-
-
-
-
-'Public Class Histogram_2D_SideView
-'    Inherits VBparent
-'    Dim pcTrim As Object
-'    Dim histOpts As Histogram_ProjectionOptions
-'    Dim gCloud As Depth_PointCloudInRange
-'    Public gCloudIMU As Depth_PointCloud_IMU
-'    Public histOutput As New cv.Mat
-'    Public pixelsPerMeter As Single
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
-
-'        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
-'        gCloud = New Depth_PointCloudInRange(ocvb)
-'        Dim reductionRadio = findRadio("No reduction")
-'        reductionRadio.Checked = True
-
-'        histOpts = New Histogram_ProjectionOptions(ocvb)
-'        If standalone Then histOpts.sliders.trackbar(0).Value = 1
-
-'        label1 = "ZY (Side View)"
-'        ocvb.desc = "Create a 2D histogram for depth in ZY (side view.)"
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
-'        maxZ = inRangeSlider.Value / 1000
-
-'        Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-'        pcTrim = If(useIMUcheckbox.Checked, gCloudIMU, gCloud)
-
-'        Dim input = src
-'        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
-'        pcTrim.src = input
-'        pcTrim.Run(ocvb)
-
-'        pixelsPerMeter = src.Height / maxZ
-'        Dim split = cv.Cv2.Split(pcTrim.PointCloud)
-'        split(1).ConvertTo(split(0), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)
-'        split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
-'        cv.Cv2.Merge(split, pcTrim.pointcloud)
-
-'        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
-'        Dim histSize() = {dst1.Height, dst1.Width}
-'        cv.Cv2.CalcHist(New cv.Mat() {pcTrim.pointcloud}, New Integer() {2, 1}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-'        histOutput = histOutput.Flip(cv.FlipMode.X)
-'        Static histThresholdSlider = findSlider("Histogram threshold")
-'        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-'        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-'        Dim rect As New cv.Rect((dst1.Width - dst1.Height) / 2, 0, dst1.Height, dst1.Height)
-'        cv.Cv2.Rotate(dst1(rect), dst1(rect), cv.RotateFlags.Rotate90Clockwise)
-'        cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-Public Class Histogram_2D_TopView
+Public Class Histogram_2D_TopViewOld
     Inherits VBparent
     Dim histOpts As Histogram_ProjectionOptions
     Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
     Public rotateY As Boolean = False
+    Public markers(2 - 1) As cv.Point2f
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
@@ -1100,6 +982,7 @@ End Class
 
 
 
+
 Public Class Histogram_2D_SideView
     Inherits VBparent
     Dim histOpts As Histogram_ProjectionOptions
@@ -1107,7 +990,6 @@ Public Class Histogram_2D_SideView
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
     Public markers(2 - 1) As cv.Point2f
-    Dim sidePt As cv.Point2f
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1122,14 +1004,11 @@ Public Class Histogram_2D_SideView
         ocvb.desc = "Create a 2D histogram for depth in ZY (side view.)"
     End Sub
     Private Function rotatePoint(pt As cv.Point2f) As cv.Point2f
-        Dim w = gCloudIMU.pointCloud.Width
-        Dim h = gCloudIMU.pointCloud.Height
-        Dim rPt = New cv.Point2f(pt.X - h, pt.Y - h)
-        rPt = New cv.Point2f(-rPt.Y, rPt.X)
-        Return New cv.Point2f((rPt.X + sidePt.X) * dst1.Width / w, (rPt.Y + sidePt.Y) * dst1.Height / h)
+        Dim rPt = New cv.Point2f(-(pt.Y - dst1.Height), pt.X - dst1.Height)
+        Return New cv.Point2f((rPt.X + sideCameraPoint.X), (rPt.Y + sideCameraPoint.Y))
     End Function
     Private Function computeFrustrumLine(marker As cv.Point2f) As cv.Point2f
-        Dim m = (marker.Y - sidePt.Y) / (marker.X - sidePt.X)
+        Dim m = (marker.Y - sideCameraPoint.Y) / (marker.X - sideCameraPoint.X)
         Dim b = marker.Y - marker.X * m
         Return New cv.Point2f(dst1.Width, m * dst1.Width + b)
     End Function
@@ -1144,11 +1023,16 @@ Public Class Histogram_2D_SideView
 
         Dim split = cv.Cv2.Split(gCloudIMU.pointCloud)
         pixelsPerMeter = dst1.Height / maxZ
+
+        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+        Dim anchor = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, 0)
+        If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
+
         split(1).ConvertTo(split(1), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ) ' pixelsPerMeter * maxZ to keep units the same in x and y!
         split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
         cv.Cv2.Merge(split, gCloudIMU.pointCloud)
 
-        ' Get the 4 points that mark the 1-meter plane in the rotated image.
+        ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
         Dim frustrum(4 - 1) As cv.Point3f
         frustrum(0) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
         frustrum(1) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
@@ -1168,11 +1052,8 @@ Public Class Histogram_2D_SideView
             End If
         Next
 
-        Dim w = gCloudIMU.pointCloud.Width
-        Dim h = gCloudIMU.pointCloud.Height
-        sidePt = New cv.Point(CInt((w - h) / 2), CInt(h - (w - h) / 2))
-        markers(0) = rotatePoint(New cv.Point2f(frustrum(minIndex).Y, split(1).Height - frustrum(minIndex).Z))
-        markers(1) = rotatePoint(New cv.Point2f(frustrum(maxIndex).Y, split(1).Height - frustrum(maxIndex).Z))
+        markers(0) = rotatePoint(New cv.Point2f(frustrum(minIndex).Y, dst1.Height - frustrum(minIndex).Z))
+        markers(1) = rotatePoint(New cv.Point2f(frustrum(maxIndex).Y, dst1.Height - frustrum(maxIndex).Z))
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
         Dim histSize() = {dst1.Height, dst1.Width}
@@ -1186,20 +1067,100 @@ Public Class Histogram_2D_SideView
         Dim rect As New cv.Rect(leftOffset, 0, dst1.Height, dst1.Height)
 
         Dim tmp = dst1(rect).Clone
+
         dst1.SetTo(0)
         cv.Cv2.Rotate(tmp, dst1(rect), cv.RotateFlags.Rotate90Clockwise)
         cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(sidePt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-        Dim c = New cv.Point((markers(0).X + markers(1).X) / 2, (markers(0).Y + markers(1).Y) / 2)
-        Dim newPixelsPerMeter = Math.Sqrt((c.X - sidePt.X) * (c.X - sidePt.X) + (c.Y - sidePt.Y) * (c.Y - sidePt.Y))
-        label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
+        ' the markers have to be to the right of the camera or the camera is nearly upside down.
+        If imuCheckBox.checked And markers(0).X > sideCameraPoint.X And markers(1).X > sideCameraPoint.X Then
+            dst2.Circle(sideCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-        Dim sizeRatio = dst1.Width / gCloudIMU.pointCloud.Width
-        dst2.Line(sidePt * sizeRatio, computeFrustrumLine(markers(0) * sizeRatio), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-        dst2.Line(sidePt * sizeRatio, computeFrustrumLine(markers(1) * sizeRatio), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            Dim newPixelsPerMeter = Math.Sqrt((markers(0).X - sideCameraPoint.X) * (markers(0).X - sideCameraPoint.X) +
+                                              (markers(0).Y - sideCameraPoint.Y) * (markers(0).Y - sideCameraPoint.Y)) / anchor.Z
+            label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
 
-        dst2.Line(markers(0), markers(1), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            Dim p = computeFrustrumLine(markers(0))
+            dst2.Line(sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            p = computeFrustrumLine(markers(1))
+            dst2.Line(sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Histogram_2D_TopView
+    Inherits VBparent
+    Dim histOpts As Histogram_ProjectionOptions
+    Public gCloudIMU As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public pixelsPerMeter As Single
+    Public rotateY As Boolean = False
+    Public markers(2 - 1) As cv.Point2f
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.sliders.trackbar(0).Value = 1
+
+        label1 = "XZ (Top View)"
+        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static inRangeSlider = findSlider("InRange Max Depth")
+        maxZ = inRangeSlider.Value / 1000
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        gCloudIMU.src = input
+        gCloudIMU.Run(ocvb)
+
+        pixelsPerMeter = src.Height / maxZ
+        Dim split = cv.Cv2.Split(gCloudIMU.pointCloud)
+        split(0).ConvertTo(split(0), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)
+        split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
+        cv.Cv2.Merge(split, gCloudIMU.pointCloud)
+
+        ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
+        Dim frustrum(4 - 1) As cv.Point3f
+        frustrum(0) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
+        frustrum(1) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
+        frustrum(2) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, 0)
+        frustrum(3) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
+
+        Dim minVal = Single.MaxValue, maxVal = Single.MinValue
+        Dim minIndex As Integer, maxIndex As Integer
+        For i = 0 To frustrum.Count - 1
+            If minVal > frustrum(i).Y Then
+                minVal = frustrum(i).Y
+                minIndex = i
+            End If
+            If maxVal < frustrum(i).Y Then
+                maxVal = frustrum(i).Y
+                maxIndex = i
+            End If
+        Next
+
+        markers(0) = New cv.Point2f(frustrum(minIndex).X, dst1.Height - frustrum(minIndex).Z)
+        markers(1) = New cv.Point2f(frustrum(maxIndex).X, dst1.Height - frustrum(maxIndex).Z)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
+        Dim histSize() = {dst1.Height, dst1.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
     End Sub
 End Class
