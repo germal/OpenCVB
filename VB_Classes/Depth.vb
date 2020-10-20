@@ -1603,7 +1603,7 @@ Public Class Depth_PointCloud_IMU
             Dim pt1 = New cv.Point3f(0, 0, z)
             Dim pt2 = New cv.Point3f(0, input.Height - 1, z)
             Dim pt3 = New cv.Point3f(input.Width - 1, input.Height - 1, z)
-            Dim pt4 = New cv.Point3f(0, input.Height, z)
+            Dim pt4 = New cv.Point3f(0, input.Height - 1, z)
             input.Set(Of cv.Point3f)(pt1.Y, pt1.X, getWorldCoordinates(ocvb, pt1))
             input.Set(Of cv.Point3f)(pt2.Y, pt2.X, getWorldCoordinates(ocvb, pt2))
             input.Set(Of cv.Point3f)(pt3.Y, pt3.X, getWorldCoordinates(ocvb, pt3))

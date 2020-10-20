@@ -1038,6 +1038,8 @@ Public Class Histogram_2D_SideView
                 dst2.Line(sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
             End If
         End If
+        dst2.Circle(markers(0), dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(markers(1), dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
