@@ -1145,5 +1145,7 @@ Public Class Histogram_2D_TopView
             Dim color = Choose(i + 1, cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
             dst2.Circle(New cv.Point(frustrum(i).X, dst1.Height - frustrum(i).Z), dotSize, color, -1, cv.LineTypes.AntiAlias)
         Next
+        'dst2.Circle(markers(0), dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        'dst2.Circle(markers(1), dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

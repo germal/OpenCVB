@@ -16,7 +16,7 @@ Public Class Palette_Basics
         For i = 0 To frm.check.length - 1
             frm.check(i).Text = mapNames(i)
         Next
-        Dim hsvRadio = findRadio("Hsv")
+        Dim hsvRadio = findRadio("Hot")
         hsvRadio.Checked = True
         ocvb.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub

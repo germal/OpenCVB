@@ -1548,6 +1548,7 @@ Public Class Depth_PointCloud_IMU
     Public imu As IMU_GVector
     Public reduction As Reduction_Depth
     Public gMatrix(,) As Single
+    Public gMat As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1600,27 +1601,19 @@ Public Class Depth_PointCloud_IMU
 
             ' These 4 points will mark a 1-meter distance plane with or without rotation
             Dim z = 1.0
-            Dim pt1 = New cv.Point3f(0, 0, z)
-            Dim pt2 = New cv.Point3f(0, input.Height - 1, z)
-            Dim pt3 = New cv.Point3f(input.Width - 1, input.Height - 1, z)
-            Dim pt4 = New cv.Point3f(0, input.Height - 1, z)
-            input.Set(Of cv.Point3f)(pt1.Y, pt1.X, getWorldCoordinates(ocvb, pt1))
-            input.Set(Of cv.Point3f)(pt2.Y, pt2.X, getWorldCoordinates(ocvb, pt2))
-            input.Set(Of cv.Point3f)(pt3.Y, pt3.X, getWorldCoordinates(ocvb, pt3))
-            input.Set(Of cv.Point3f)(pt4.Y, pt4.X, getWorldCoordinates(ocvb, pt4))
-
+            Dim pt = New cv.Point3f(0, 0, z)
             For i = 0 To input.Height - 1
-                pt1 = New cv.Point3f(0, i, z)
-                input.Set(Of cv.Point3f)(pt1.Y, pt1.X, getWorldCoordinates(ocvb, pt1))
-                pt1 = New cv.Point3f(input.Width - 1, i, z)
-                input.Set(Of cv.Point3f)(pt1.Y, pt1.X, getWorldCoordinates(ocvb, pt1))
+                pt = New cv.Point3f(0, i, z)
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                pt = New cv.Point3f(input.Width - 1, i, z)
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
             Next
 
             For i = 0 To input.Width - 1
-                pt1 = New cv.Point3f(i, 0, z)
-                input.Set(Of cv.Point3f)(pt1.Y, pt1.X, getWorldCoordinates(ocvb, pt1))
-                pt1 = New cv.Point3f(i, input.Height - 1, z)
-                input.Set(Of cv.Point3f)(pt1.Y, pt1.X, getWorldCoordinates(ocvb, pt1))
+                pt = New cv.Point3f(i, 0, z)
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                pt = New cv.Point3f(i, input.Height - 1, z)
+                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
             Next
 
             Static imuCheckBox = findCheckBox("Use IMU gravity vector")
@@ -1634,7 +1627,7 @@ Public Class Depth_PointCloud_IMU
                 input.SetTo(0, mask)
                 If standalone Then dst1 = dst1.Resize(dst1.Size)
 
-                Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+                gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
                 Dim gInput = input.Reshape(1, input.Rows * input.Cols)
                 Dim gOutput = (gInput * gMat).ToMat
                 pointCloud = gOutput.Reshape(3, input.Rows)
@@ -1644,8 +1637,8 @@ Public Class Depth_PointCloud_IMU
 
             Static reductionRadio = findRadio("No reduction")
             If reductionRadio.checked = False Then
-                Split(2) *= 1000
-                Split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                split(2) *= 1000
+                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
                 reduction.Run(ocvb)
                 split(2) = reduction.reducedDepth32F / 1000
                 cv.Cv2.Merge(split, pointCloud)
