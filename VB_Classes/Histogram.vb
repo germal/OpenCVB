@@ -939,6 +939,7 @@ Public Class Histogram_2D_SideView
     Public histOutput As New cv.Mat
     Public pixelsPerMeter As Single
     Public markers(2 - 1) As cv.Point2f
+    Public rotatedPixelsPerMeter As Integer
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1021,22 +1022,20 @@ Public Class Histogram_2D_SideView
         cv.Cv2.Rotate(tmp, dst1(rect), cv.RotateFlags.Rotate90Clockwise)
         cv.Cv2.Rotate(histOutput(rect), histOutput(rect), cv.RotateFlags.Rotate90Clockwise)
 
-        If standalone Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        rotatedPixelsPerMeter = Math.Sqrt((markers(0).X - sideCameraPoint.X) * (markers(0).X - sideCameraPoint.X) +
+                                          (markers(0).Y - sideCameraPoint.Y) * (markers(0).Y - sideCameraPoint.Y)) / anchor.Z
 
-            ' the markers have to be to the right of the camera or the camera is nearly upside down.
-            If imuCheckBox.checked And markers(0).X > sideCameraPoint.X And markers(1).X > sideCameraPoint.X Then
-                dst2.Circle(sideCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        ' the markers have to be to the right of the camera or the camera is nearly upside down.
+        If imuCheckBox.checked And markers(0).X > sideCameraPoint.X And markers(1).X > sideCameraPoint.X Then
+            dst2.Circle(sideCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-                Dim newPixelsPerMeter = Math.Sqrt((markers(0).X - sideCameraPoint.X) * (markers(0).X - sideCameraPoint.X) +
-                                                      (markers(0).Y - sideCameraPoint.Y) * (markers(0).Y - sideCameraPoint.Y)) / anchor.Z
-                label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
+            label2 = Format(rotatedPixelsPerMeter, "#0.0") + " pixels per meter"
 
-                Dim p = computeFrustrumLine(markers(0))
-                dst2.Line(sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-                p = computeFrustrumLine(markers(1))
-                dst2.Line(sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-            End If
+            Dim p = computeFrustrumLine(markers(0))
+            dst2.Line(sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            p = computeFrustrumLine(markers(1))
+            dst2.Line(sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
         End If
         dst2.Circle(markers(0), dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         dst2.Circle(markers(1), dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
@@ -1126,22 +1125,20 @@ Public Class Histogram_2D_TopView
         dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
-        If standalone Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            ' the markers have to be to the right of the camera or the camera is nearly upside down.
-            If imuCheckBox.checked And markers(0).Y < topCameraPoint.Y And markers(1).Y < topCameraPoint.Y Then
-                dst2.Circle(topCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        ' the markers have to be to the right of the camera or the camera is nearly upside down.
+        If imuCheckBox.checked And markers(0).Y < topCameraPoint.Y And markers(1).Y < topCameraPoint.Y Then
+            dst2.Circle(topCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-                Dim newPixelsPerMeter = Math.Sqrt((markers(0).X - topCameraPoint.X) * (markers(0).X - topCameraPoint.X) +
-                                                  (markers(0).Y - topCameraPoint.Y) * (markers(0).Y - topCameraPoint.Y)) / anchor.Z
-                label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
+            Dim newPixelsPerMeter = Math.Sqrt((markers(0).X - topCameraPoint.X) * (markers(0).X - topCameraPoint.X) +
+                                                      (markers(0).Y - topCameraPoint.Y) * (markers(0).Y - topCameraPoint.Y)) / anchor.Z
+            label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
 
-                Dim p = computeFrustrumLine(markers(0), 0)
-                dst2.Line(topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-                p = computeFrustrumLine(markers(1), dst1.width)
-                dst2.Line(topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-            End If
+            Dim p = computeFrustrumLine(markers(0), 0)
+            dst2.Line(topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            p = computeFrustrumLine(markers(1), dst1.Width)
+            dst2.Line(topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
         End If
 
         For i = 0 To frustrum.Count - 1

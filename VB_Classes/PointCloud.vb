@@ -982,14 +982,17 @@ Public Class PointCloud_FindFloor
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 10)
-        sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
         sideIMU = New PointCloud_IMU_SideView(ocvb)
+
+        Dim paletteRadio = findRadio("Hot")
+        paletteRadio.Checked = True
 
         hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU to find the floor and ceiling - no options should turn it off.
 
-        label1 = "Side View oriented toward gravity"
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 10)
+        sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 10)
+
         label2 = "Side View without gravity vector"
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
     End Sub
@@ -1053,6 +1056,7 @@ Public Class PointCloud_FindFloor
                 dst1.Line(gleftPoint, grightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
             End If
         End If
+        label1 = "Side View with gravity - PixPerMeter = " + CStr(CInt(sideIMU.sideView.rotatedPixelsPerMeter))
     End Sub
 End Class
 
@@ -1125,58 +1129,6 @@ End Class
 
 
 
-Public Class PointCloud_DistanceClick
-    Inherits VBparent
-    Dim sideIMU As PointCloud_IMU_SideView
-    Dim points As New List(Of cv.Point)
-    Dim clicks As New List(Of cv.Point)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sideIMU = New PointCloud_IMU_SideView(ocvb)
-        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU - no options should turn it off.
-        label1 = "Click anywhere to get distance from camera and x dist"
-        ocvb.desc = "Click to find distance from the camera"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Static saveMaxZ As Single
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
-
-        If maxZ <> saveMaxZ Then
-            clicks.Clear()
-            points.Clear()
-            saveMaxZ = maxZ
-        End If
-
-        sideIMU.Run(ocvb)
-        dst1 = sideIMU.dst1
-        dst2 = sideIMU.dst2
-
-        If ocvb.mouseClickFlag Then
-            clicks.Add(ocvb.mouseClickPoint)
-        End If
-
-        For Each pt In points
-            dst2.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Next
-        For Each pt In clicks
-            dst1.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(pt, dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim pixelsPerMeter = dst2.Height / maxZ
-            Dim side1 = (pt.X - sideCameraPoint.X)
-            Dim side2 = (pt.Y - sideCameraPoint.Y)
-            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
-            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt)
-        Next
-
-        dst1.Line(New cv.Point(sideCameraPoint.X, 0), New cv.Point(sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class PointCloud_IMU_SideView
@@ -1206,7 +1158,7 @@ Public Class PointCloud_IMU_SideView
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
         sideView.Run(ocvb)
-        dst1 = sideView.dst1.Clone()
+        dst1 = sideView.dst2.Clone()
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
@@ -1243,5 +1195,57 @@ Public Class PointCloud_MeterLine
 
         sideIMU.Run(ocvb)
         dst2 = sideIMU.dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class PointCloud_DistanceSideClick
+    Inherits VBparent
+    Dim sideIMU As PointCloud_IMU_SideView
+    Dim points As New List(Of cv.Point)
+    Dim clicks As New List(Of cv.Point)
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sideIMU = New PointCloud_IMU_SideView(ocvb)
+        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU - no options should turn it off.
+        Dim paletteRadio = findRadio("Hot")
+        paletteRadio.Checked = True
+        label1 = "Click anywhere to get distance from camera and x dist"
+        ocvb.desc = "Click to find distance from the camera in the rotated side view"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static saveMaxZ As Single
+        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
+        maxZ = inRangeSlider.Value / 1000
+
+        If maxZ <> saveMaxZ Then
+            clicks.Clear()
+            points.Clear()
+            saveMaxZ = maxZ
+        End If
+
+        sideIMU.Run(ocvb)
+        dst1 = sideIMU.dst1
+        dst2 = sideIMU.dst2
+
+        If ocvb.mouseClickFlag Then clicks.Add(ocvb.mouseClickPoint)
+
+        For Each pt In points
+            dst2.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
+        For Each pt In clicks
+            dst1.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            Dim pixelsPerMeter = dst2.Height / maxZ
+            Dim side1 = (pt.X - sideCameraPoint.X)
+            Dim side2 = (pt.Y - sideCameraPoint.Y)
+            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
+            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt)
+        Next
+
+        dst1.Line(New cv.Point(sideCameraPoint.X, 0), New cv.Point(sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
     End Sub
 End Class
