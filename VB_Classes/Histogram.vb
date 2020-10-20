@@ -963,7 +963,7 @@ Public Class Histogram_2D_SideView
     End Function
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud.Clone
         gCloudIMU.src = input
         gCloudIMU.Run(ocvb)
 
@@ -1080,7 +1080,7 @@ Public Class Histogram_2D_TopView
         maxZ = inRangeSlider.Value / 1000
 
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud.Clone
         gCloudIMU.src = input
         gCloudIMU.Run(ocvb)
 

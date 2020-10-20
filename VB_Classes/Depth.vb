@@ -1562,7 +1562,7 @@ Public Class Depth_PointCloud_IMU
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud.Clone()
 
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = rangeSlider.Value / 1000
@@ -1599,7 +1599,7 @@ Public Class Depth_PointCloud_IMU
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
             ' These 4 points will mark a 1-meter distance plane with or without rotation
-            Dim z = 3.0
+            Dim z = 1.0
             Dim pt1 = New cv.Point3f(0, 0, z)
             Dim pt2 = New cv.Point3f(0, input.Height - 1, z)
             Dim pt3 = New cv.Point3f(input.Width - 1, input.Height - 1, z)
