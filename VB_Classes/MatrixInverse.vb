@@ -44,7 +44,7 @@ Public Class MatrixInverse_Basics_CS
 
         If standalone Then matrix.bVector = defaultBVector
 
-        Dim result = matrix.Run(input) ' C# class Run - not ocvbClass...
+        Dim result = matrix.Run(input) ' C# class Run - see MatrixInverse.cs file...
 
         Dim outstr = printMatrixResults(input, result)
         ocvb.trueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log.")

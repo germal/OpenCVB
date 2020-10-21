@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports MathNet.Spatial.Euclidean
 Public Class LineDetector_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector

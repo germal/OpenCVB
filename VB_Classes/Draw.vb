@@ -660,20 +660,22 @@ Public Class Draw_Frustrum
         xyzDepth = New Depth_WorldXYZ_MT(ocvb)
         xyzDepth.depthUnitsMeters = True
 
-        Dim imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.Checked = False
+        If standalone = False Then
+            Dim imuCheck = findCheckBox("Use IMU gravity vector")
+            imuCheck.Checked = False
+        End If
         ocvb.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount = 0 Then
             ocvb.pointCloud.SetTo(0)
             Dim dst2 = New cv.Mat(src.Height, src.Height, cv.MatType.CV_32F, 0)
-            Dim x = src.Height / 2
-            Dim y = src.Height / 2
+            Dim x = src.Height / 2 - 1
+            Dim y = src.Height / 2 - 1
             Dim zIncr = maxZ / y
             Dim r As cv.Rect
             For i = 0 To src.Height / 2 - 1
-                r = New cv.Rect(x - i, y - i, i * 2, i * 2)
+                r = New cv.Rect(x - i, y - i, i * 2, (i + 1) * 2)
                 dst2.Rectangle(r, cv.Scalar.All(i * zIncr), 1)
             Next
             dst1 = dst2.Resize(src.Size)
