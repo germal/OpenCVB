@@ -255,12 +255,16 @@ Public Class Reduction_Lines
         ocvb.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
+        sideView.src = input
         sideView.Run(ocvb)
         dst1 = sideView.dst1
         lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1.Clone
 
+        topView.src = input
         topView.Run(ocvb)
         dst2 = topView.dst1
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
