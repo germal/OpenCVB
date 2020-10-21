@@ -355,6 +355,9 @@ Public Class PointCloud_Objects
         End If
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
+        measure.src = input
         measure.Run(ocvb)
         dst1 = measure.dst1
         label1 = measure.label1
@@ -569,7 +572,9 @@ Public Class PointCloud_Kalman_SideView
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        histogram.src = src
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
+        histogram.src = input
         histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
@@ -623,6 +628,9 @@ Public Class PointCloud_BackProject
                 ocvb.mouseClickFlag = False ' absorb the mouse click here only
             End If
         End If
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
+        both.src = input
         both.Run(ocvb)
 
         mats.mat(0) = both.dst1
@@ -675,7 +683,11 @@ Public Class PointCloud_BothViews
 
         Dim depth32f = getDepth32f(ocvb)
 
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
+        topPixel.src = input
         topPixel.Run(ocvb)
+        sidePixel.src = input
         sidePixel.Run(ocvb)
         Dim maxZ = topPixel.measure.maxZ
 
@@ -761,8 +773,8 @@ Public Class PointCloud_BothViews
         End If
 
         If vw.Count > 0 Then
-            If roi.X + roi.Width > src.Width Then roi.Width = src.Width - roi.X
-            If roi.Y + roi.Height > src.Height Then roi.Height = src.Height - roi.Y
+            If roi.X + roi.Width > depth32f.Width Then roi.Width = depth32f.Width - roi.X
+            If roi.Y + roi.Height > depth32f.Height Then roi.Height = depth32f.Height - roi.Y
             If roi.Width > 0 And roi.Height > 0 Then
                 backMatMask.SetTo(0)
                 cv.Cv2.InRange(depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
