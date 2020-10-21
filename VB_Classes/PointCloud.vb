@@ -998,6 +998,7 @@ Public Class PointCloud_IMU_SideView
     Public Sub Run(ocvb As VBocvb)
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
+        sideView.src = src
         sideView.Run(ocvb)
         dst1 = sideView.dst2.Clone()
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1006,6 +1007,7 @@ Public Class PointCloud_IMU_SideView
         dst1.Circle(sideCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
         imuCheck.checked = False
+        kSideView.src = src
         kSideView.Run(ocvb)
         dst2 = kSideView.dst1
     End Sub
@@ -1092,7 +1094,7 @@ Public Class PointCloud_FindFloor
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
 
         Static saveFrameCount = -1
         If saveFrameCount <> ocvb.frameCount Then
@@ -1251,6 +1253,7 @@ Public Class PointCloud_FindFloorPlane
         ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        floor.src = pointcloud
         floor.Run(ocvb)
         dst2 = floor.sideIMU.sideView.dst2
         dst2.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Red, 5)
