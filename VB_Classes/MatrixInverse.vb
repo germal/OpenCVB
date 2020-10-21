@@ -24,32 +24,32 @@ End Module
 
 
 
-'' https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
-'Public Class MatrixInverse_Basics_CS
-'    Inherits ocvbClass
-'    Public matrix As New MatrixInverse ' NOTE: C# class
-'    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
-'    Dim defaultBVector() As Double = {12, 7, 7, 13}
-'    Dim input As cv.Mat
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
-'        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-'        ocvb.desc = "Manually invert a matrix"
-'    End Sub
-'    Public Sub Run(ocvb As VBocvb)
-'        If input.Width <> input.Height Then
-'            ocvb.trueText("The src matrix must be square!"))
-'            Exit Sub
-'        End If
+' https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
+Public Class MatrixInverse_Basics_CS
+    Inherits VBparent
+    Public matrix As New MatrixInverse ' NOTE: C# class
+    Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
+    Dim defaultBVector() As Double = {12, 7, 7, 13}
+    Dim input As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
+        ocvb.desc = "Manually invert a matrix"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If input.Width <> input.Height Then
+            ocvb.trueText("The src matrix must be square!")
+            Exit Sub
+        End If
 
-'        If standalone Then matrix.bVector = defaultBVector
+        If standalone Then matrix.bVector = defaultBVector
 
-'        Dim result = matrix.Run(input) ' C# class Run - not ocvbClass...
+        Dim result = matrix.Run(input) ' C# class Run - not ocvbClass...
 
-'        Dim outstr = printMatrixResults(input, result)
-'        ocvb.trueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log."))
-'    End Sub
-'End Class
+        Dim outstr = printMatrixResults(input, result)
+        ocvb.trueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log.")
+    End Sub
+End Class
 
 
 
