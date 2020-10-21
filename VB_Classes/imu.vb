@@ -66,7 +66,7 @@ Public Class IMU_Stabilizer
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(3 - 1)
+        ReDim kalman.kInput(3 - 1)
         ocvb.desc = "Stabilize the image with the IMU data."
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
@@ -84,11 +84,11 @@ Public Class IMU_Stabilizer
         Dim sx = 1 ' assume no scaling is taking place.
         Dim sy = 1 ' assume no scaling is taking place.
 
-        kalman.input = {dx, dy, da}
+        kalman.kInput = {dx, dy, da}
         kalman.Run(ocvb)
-        dx = kalman.output(0)
-        dy = kalman.output(1)
-        da = kalman.output(2)
+        dx = kalman.kOutput(0)
+        dy = kalman.kOutput(1)
+        da = kalman.kOutput(2)
 
         Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
         smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
@@ -502,7 +502,7 @@ Public Class IMU_GVector
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(6 - 1)
+        ReDim kalman.kInput(6 - 1)
         ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -519,17 +519,17 @@ Public Class IMU_GVector
         angleY = Math.Atan2(gx, gy) - cv.Cv2.PI / 2
         angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
-        kalman.input = {gx, gy, gz, angleX, angleY, angleZ}
+        kalman.kInput = {gx, gy, gz, angleX, angleY, angleZ}
 
         If kalman.check.Box(0).Checked Then
             kalman.Run(ocvb)
-            gx = kalman.output(0)
-            gy = kalman.output(1)
-            gz = kalman.output(2)
+            gx = kalman.kOutput(0)
+            gy = kalman.kOutput(1)
+            gz = kalman.kOutput(2)
 
-            angleX = kalman.output(3)
-            angleY = kalman.output(4)
-            angleZ = kalman.output(5)
+            angleX = kalman.kOutput(3)
+            angleY = kalman.kOutput(4)
+            angleZ = kalman.kOutput(5)
         End If
 
         If standalone Then

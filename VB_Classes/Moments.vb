@@ -14,7 +14,7 @@ Public Class Moments_Basics
         If standalone Then foreground = New kMeans_Depth_FG_BG(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(2 - 1) ' 2 elements - cv.point
+        ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
 
         label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the provided mask file."
@@ -29,10 +29,10 @@ Public Class Moments_Basics
 
         Dim center As cv.Point2f
         If kalman.check.Box(0).Checked Or useKalman Then
-            kalman.input(0) = m.M10 / m.M00
-            kalman.input(1) = m.M01 / m.M00
+            kalman.kInput(0) = m.M10 / m.M00
+            kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(ocvb)
-            center = New cv.Point2f(kalman.output(0), kalman.output(1))
+            center = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
@@ -52,7 +52,7 @@ Public Class Moments_CentroidKalman
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(2 - 1) ' 2 elements - cv.point
+        ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
 
         foreground = New kMeans_Depth_FG_BG(ocvb)
 
@@ -65,10 +65,10 @@ Public Class Moments_CentroidKalman
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(mask, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
-            kalman.input(0) = m.M10 / m.M00
-            kalman.input(1) = m.M01 / m.M00
+            kalman.kInput(0) = m.M10 / m.M00
+            kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(ocvb)
-            dst1.Circle(New cv.Point(kalman.output(0), kalman.output(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub
 End Class

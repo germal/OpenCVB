@@ -355,9 +355,6 @@ Public Class PointCloud_Objects
         End If
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        measure.src = input
         measure.Run(ocvb)
         dst1 = measure.dst1
         label1 = measure.label1
@@ -468,9 +465,6 @@ Public Class PointCloud_Objects_TopView
         ocvb.desc = "Display only the top view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        view.src = input
         view.Run(ocvb)
         dst1 = view.dst1
     End Sub
@@ -491,9 +485,6 @@ Public Class PointCloud_Objects_SideView
         ocvb.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        view.src = input
         view.Run(ocvb)
         dst1 = view.dst1
     End Sub
@@ -526,9 +517,6 @@ Public Class PointCloud_Kalman_TopView
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        histogram.src = input
         histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
@@ -578,9 +566,6 @@ Public Class PointCloud_Kalman_SideView
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        histogram.src = input
         histogram.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
@@ -634,9 +619,6 @@ Public Class PointCloud_BackProject
                 ocvb.mouseClickFlag = False ' absorb the mouse click here only
             End If
         End If
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        both.src = input
         both.Run(ocvb)
 
         mats.mat(0) = both.dst1
@@ -689,11 +671,7 @@ Public Class PointCloud_BothViews
 
         Dim depth32f = getDepth32f(ocvb)
 
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        topPixel.src = input
         topPixel.Run(ocvb)
-        sidePixel.src = input
         sidePixel.Run(ocvb)
         Dim maxZ = topPixel.measure.maxZ
 
@@ -816,13 +794,9 @@ Public Class PointCloud_HistBothViews
         ocvb.desc = "Show the histogram for both the side and top views"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        topView.src = input
         topView.Run(ocvb)
         dst1 = topView.dst1
 
-        sideView.src = input
         sideView.Run(ocvb)
         dst2 = sideView.dst1
     End Sub
@@ -865,9 +839,6 @@ Public Class PointCloud_IMU_TopView
     Public Sub Run(ocvb As VBocvb)
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        topView.src = input
         topView.Run(ocvb)
         dst1 = topView.dst1.Clone()
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -885,7 +856,6 @@ Public Class PointCloud_IMU_TopView
         dst1 = cmats.CameraLocationBot(ocvb, dst1, Math.Cos(topView.gCloudIMU.imu.angleZ))
 
         imuCheck.checked = False
-        kTopView.src = input
         kTopView.Run(ocvb)
         dst2 = kTopView.dst1
     End Sub
@@ -926,7 +896,7 @@ Public Class PointCloud_FrustrumTop
             frustrum.xyzDepth.Run(ocvb)
         End If
 
-        topView.src = frustrum.xyzDepth.xyzFrame
+        ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         topView.Run(ocvb)
         dst1 = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
         dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
@@ -982,7 +952,7 @@ Public Class PointCloud_FrustrumSide
             xyzDepth.Run(ocvb)
         End If
 
-        sideView.src = xyzDepth.xyzFrame
+        ocvb.pointCloud = xyzDepth.xyzFrame
         sideView.Run(ocvb)
 
         dst1 = sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
@@ -1022,9 +992,6 @@ Public Class PointCloud_IMU_SideView
     Public Sub Run(ocvb As VBocvb)
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        sideView.src = input
         sideView.Run(ocvb)
         dst1 = sideView.dst2.Clone()
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1033,7 +1000,6 @@ Public Class PointCloud_IMU_SideView
         dst1.Circle(sideCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
         imuCheck.checked = False
-        kSideView.src = input
         kSideView.Run(ocvb)
         dst2 = kSideView.dst1
     End Sub
@@ -1067,9 +1033,6 @@ Public Class PointCloud_DistanceSideClick
             saveMaxZ = maxZ
         End If
 
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        sideIMU.src = input
         sideIMU.Run(ocvb)
         dst1 = sideIMU.dst1
         dst2 = sideIMU.dst2
@@ -1122,13 +1085,9 @@ Public Class PointCloud_FindFloor
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-
         Static saveFrameCount = -1
         If saveFrameCount <> ocvb.frameCount Then
             saveFrameCount = ocvb.frameCount
-            sideIMU.src = input
             sideIMU.Run(ocvb)
             dst1 = sideIMU.dst1
             dst2 = sideIMU.dst2
@@ -1178,11 +1137,11 @@ Public Class PointCloud_FindFloor
                 rightMat.MinMaxLoc(minVal, maxVal)
                 grightPoint = New cv.Point(maxVal, meanRight.Item(1))
 
-                kalman.input(0) = gleftPoint.X
-                kalman.input(1) = grightPoint.X
+                kalman.kInput(0) = gleftPoint.X
+                kalman.kInput(1) = grightPoint.X
                 kalman.Run(ocvb)
-                gleftPoint.X = kalman.output(0)
-                grightPoint.X = kalman.output(1)
+                gleftPoint.X = kalman.kOutput(0)
+                grightPoint.X = kalman.kOutput(1)
             End If
             dst1.Line(gleftPoint, grightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
         End If
@@ -1208,9 +1167,6 @@ Public Class PointCloud_FindCeiling
         ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        floor.src = input
         floor.Run(ocvb)
 
         dst1 = floor.dst1
@@ -1241,9 +1197,6 @@ Public Class PointCloud_FindCeilingAndFloor
     End Sub
     Public Sub Run(ocvb As VBocvb)
         floor.floorRun = True ' we are looking for ceilings.
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        floor.src = input
         floor.Run(ocvb)
         floorLeft = floor.gleftPoint
         floorRight = floor.grightPoint
@@ -1252,7 +1205,6 @@ Public Class PointCloud_FindCeilingAndFloor
         dst2 = floor.dst2.Clone
 
         floor.floorRun = False ' we are looking for ceilings.
-        floor.src = input
         floor.Run(ocvb)
         ceilingLeft = floor.gleftPoint
         ceilingRight = floor.grightPoint
@@ -1289,7 +1241,7 @@ Public Class PointCloud_FindFloorPlane
         ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        floor.src = pointcloud
+        floor.src = ocvb.pointCloud
         floor.Run(ocvb)
         dst2 = floor.sideIMU.sideView.dst2
         dst2.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Red, 5)

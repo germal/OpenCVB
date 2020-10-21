@@ -263,7 +263,7 @@ Public Class Contours_Prediction
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(2 - 1)
+        ReDim kalman.kInput(2 - 1)
         outline = New Contours_Depth(ocvb)
 
         sliders.Setup(ocvb, caller)
@@ -279,17 +279,17 @@ Public Class Contours_Prediction
         dst2.SetTo(0)
         Dim stepSize = sliders.trackbar(0).Value
         Dim len = outline.contours.Count
-        kalman.input = {outline.contours(0).X, outline.contours(0).Y}
+        kalman.kInput = {outline.contours(0).X, outline.contours(0).Y}
         kalman.Run(ocvb)
-        Dim origin = New cv.Point(kalman.output(0), kalman.output(1))
+        Dim origin = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         For i = 0 To outline.contours.Count - 1 Step stepSize
-            Dim pt1 = New cv.Point2f(kalman.output(0), kalman.output(1))
-            kalman.input = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
+            Dim pt1 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+            kalman.kInput = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
             kalman.Run(ocvb)
-            Dim pt2 = New cv.Point2f(kalman.output(0), kalman.output(1))
+            Dim pt2 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
             dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         Next
-        dst2.Line(New cv.Point(kalman.output(0), kalman.output(1)), origin, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), origin, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         label1 = "There were " + CStr(outline.contours.Count) + " points in this contour"
     End Sub
 End Class

@@ -798,18 +798,18 @@ Public Class KNN_PointTracker
     Private Sub allocateKalman(ocvb As VBocvb, count As Integer)
         For i = kalman.Count To count - 1
             kalman.Add(New Kalman_Basics(ocvb))
-            ReDim kalman(i).input(6 - 1)
+            ReDim kalman(i).kInput(6 - 1)
             If i < queryPoints.Count Then
-                kalman(i).input = New Single() {queryPoints(i).X, queryPoints(i).Y, 0, 0, 0, 0}
+                kalman(i).kInput = New Single() {queryPoints(i).X, queryPoints(i).Y, 0, 0, 0, 0}
             Else
-                kalman(i).input = New Single() {-1, -1, 0, 0, 0, 0}
-                kalman(i).output = New Single() {-1, -1, 0, 0, 0, 0}
+                kalman(i).kInput = New Single() {-1, -1, 0, 0, 0, 0}
+                kalman(i).kOutput = New Single() {-1, -1, 0, 0, 0, 0}
             End If
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
-            topView.src = pointcloud
+            topView.src = ocvb.pointCloud
             topView.Run(ocvb)
             dst1 = topView.dst1
             Exit Sub
@@ -821,7 +821,7 @@ Public Class KNN_PointTracker
         knn.basics.knnQT.trainingPoints.Clear()
         ' The previous generation's query points becomes the trainingpoints for the current generation here.
         For i = 0 To kalman.Count - 1
-            If kalman(i).input(0) >= 0 Then knn.basics.knnQT.trainingPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+            If kalman(i).kInput(0) >= 0 Then knn.basics.knnQT.trainingPoints.Add(New cv.Point2f(kalman(i).kInput(0), kalman(i).kInput(1)))
         Next
 
         If newCentroids.Count > 0 Then
@@ -830,7 +830,7 @@ Public Class KNN_PointTracker
             For i = knn.basics.knnQT.trainingPoints.Count To kalman.Count - 1
                 If qIndex >= newCentroids.Count Then Exit For
                 knn.basics.knnQT.trainingPoints.Add(newCentroids(qIndex))
-                kalman(i).input = {newCentroids(qIndex).X, newCentroids(qIndex).Y, 0, 0, 0, 0}
+                kalman(i).kInput = {newCentroids(qIndex).X, newCentroids(qIndex).Y, 0, 0, 0, 0}
                 qIndex += 1
                 If qIndex >= kalman.Count Then Exit Sub ' we don't have enough kalman filters to handle this level of queries so restart
             Next
@@ -845,8 +845,8 @@ Public Class KNN_PointTracker
             For i = 0 To matches.Count - 1
                 If matches(i).X < 0 Then
                     For j = 0 To kalman.Count - 1
-                        If kalman(j).input(0) < 0 Then
-                            kalman(j).input = {knn.basics.knnQT.queryPoints(i).X, knn.basics.knnQT.queryPoints(i).Y, 0, 0, 0, 0}
+                        If kalman(j).kInput(0) < 0 Then
+                            kalman(j).kInput = {knn.basics.knnQT.queryPoints(i).X, knn.basics.knnQT.queryPoints(i).Y, 0, 0, 0, 0}
                             Exit For
                         End If
                     Next
@@ -857,24 +857,24 @@ Public Class KNN_PointTracker
             Dim inputRect = New cv.Rect
             drawRC.viewObjects.Clear()
             For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
-                inputRect = New cv.Rect(kalman(i).input(2), kalman(i).input(3), kalman(i).input(4), kalman(i).input(5))
+                inputRect = New cv.Rect(kalman(i).kInput(2), kalman(i).kInput(3), kalman(i).kInput(4), kalman(i).kInput(5))
                 Dim pt1 = knn.basics.knnQT.trainingPoints(i)
                 Dim matchIndex = -1
                 If matches.Contains(pt1) Then
                     matchIndex = matches.IndexOf(pt1)
                     inputRect = queryRects(matchIndex)
-                    kalman(i).input = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+                    kalman(i).kInput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
                     Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
                     If useKalmanCheck.Checked Then
                         kalman(i).Run(ocvb)
                     Else
-                        kalman(i).output = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
+                        kalman(i).kOutput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
                     End If
 
                     Dim vo = New viewObject
-                    vo.centroid = New cv.Point(kalman(i).output(0), kalman(i).output(1))
+                    vo.centroid = New cv.Point(kalman(i).kOutput(0), kalman(i).kOutput(1))
 
-                    Dim outRect = New cv.Rect(kalman(i).output(2), kalman(i).output(3), kalman(i).output(4), kalman(i).output(5))
+                    Dim outRect = New cv.Rect(kalman(i).kOutput(2), kalman(i).kOutput(3), kalman(i).kOutput(4), kalman(i).kOutput(5))
                     If outRect.X < 0 Then outRect.X = 0
                     If outRect.Y < 0 Then outRect.Y = 0
                     If outRect.X + outRect.Width > src.Width Then outRect.Width = src.Width - outRect.X

@@ -179,22 +179,22 @@ End Class
 
 Public Class Video_MinCircle
     Inherits VBparent
-    Dim input As Video_MinRect
+    Dim video As Video_MinRect
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        input = New Video_MinRect(ocvb)
+        video = New Video_MinRect(ocvb)
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        input.Run(ocvb)
-        dst1 = input.dst1
-        dst2 = input.dst2
+        video.Run(ocvb)
+        dst1 = video.dst1
+        dst2 = video.dst2
 
         Dim center As New cv.Point2f
         Dim radius As Single
-        If input.contours IsNot Nothing Then
-            For i = 0 To input.contours.Length - 1
-                cv.Cv2.MinEnclosingCircle(input.contours(i), center, radius)
+        If video.contours IsNot Nothing Then
+            For i = 0 To video.contours.Length - 1
+                cv.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
                 dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         End If

@@ -239,13 +239,13 @@ Public Class Histogram_KalmanSmoothed
 
         label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
-        ReDim kalman.input(plotHist.bins - 1)
+        ReDim kalman.kInput(plotHist.bins - 1)
         For i = 0 To plotHist.bins - 1
-            kalman.input(i) = histogram.Get(Of Single)(i, 0)
+            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
         Next
         kalman.Run(ocvb)
         For i = 0 To plotHist.bins - 1
-            histogram.Set(Of Single)(i, 0, kalman.output(i))
+            histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
         plotHist.hist = histogram
@@ -337,13 +337,13 @@ Public Class Histogram_DepthValleys
     End Sub
     Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
-        ReDim kalman.input(hist.plotHist.hist.Rows - 1)
+        ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1
-            kalman.input(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
+            kalman.kInput(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
         kalman.Run(ocvb)
         For i = 0 To hist.plotHist.hist.Rows - 1
-            hist.plotHist.hist.Set(Of Single)(i, 0, kalman.output(i))
+            hist.plotHist.hist.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
         Dim depthIncr = CInt(hist.trim.sliders.trackbar(1).Value / hist.sliders.trackbar(0).Value) ' each bar represents this number of millimeters
@@ -351,13 +351,13 @@ Public Class Histogram_DepthValleys
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 2 To kalman.output.Length - 3
-            Dim prev2 = If(i > 2, kalman.output(i - 2), 0)
-            Dim prev = If(i > 1, kalman.output(i - 1), 0)
-            Dim curr = kalman.output(i)
-            Dim post = If(i < kalman.output.Length - 1, kalman.output(i + 1), 0)
-            Dim post2 = If(i < kalman.output.Length - 2, kalman.output(i + 2), 0)
-            pointCount += kalman.output(i)
+        For i = 2 To kalman.kOutput.Length - 3
+            Dim prev2 = If(i > 2, kalman.kOutput(i - 2), 0)
+            Dim prev = If(i > 1, kalman.kOutput(i - 1), 0)
+            Dim curr = kalman.kOutput(i)
+            Dim post = If(i < kalman.kOutput.Length - 1, kalman.kOutput(i + 1), 0)
+            Dim post2 = If(i < kalman.kOutput.Length - 2, kalman.kOutput(i + 2), 0)
+            pointCount += kalman.kOutput(i)
             If prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1 Then
                 If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
                     startEndDepth = New cv.Point(startDepth, i * depthIncr)
@@ -965,9 +965,6 @@ Public Class Histogram_2D_SideView
         Return New cv.Point2f(dst1.Width, m * dst1.Width + b)
     End Function
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        gCloudIMU.src = input
         gCloudIMU.Run(ocvb)
 
         Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
@@ -986,10 +983,10 @@ Public Class Histogram_2D_SideView
 
         ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
         Dim frustrum(4 - 1) As cv.Point3f
-        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
-        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
+        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, ocvb.pointCloud.Width - 1)
+        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, ocvb.pointCloud.Width - 1)
         frustrum(2) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
-        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
+        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, 0)
 
         Dim minVal = Single.MaxValue, maxVal = Single.MinValue
         Dim minIndex As Integer, maxIndex As Integer
@@ -1084,9 +1081,6 @@ Public Class Histogram_2D_TopView
         Static inRangeSlider = findSlider("InRange Max Depth")
         maxZ = inRangeSlider.Value / 1000
 
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        gCloudIMU.src = input
         gCloudIMU.Run(ocvb)
 
         Dim anchor = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
@@ -1100,10 +1094,10 @@ Public Class Histogram_2D_TopView
 
         ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
         Dim frustrum(4 - 1) As cv.Point3f
-        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
-        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
+        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, ocvb.pointCloud.Width - 1)
+        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, ocvb.pointCloud.Width - 1)
         frustrum(2) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
-        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
+        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, 0)
 
         Dim minVal = Single.MaxValue, maxVal = Single.MinValue
         Dim minIndex As Integer, maxIndex As Integer

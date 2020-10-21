@@ -1147,9 +1147,9 @@ Public Class OpenCVB
                 task.ocvb.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
                 task.ocvb.leftView = camera.leftView.Resize(resolutionXY)
                 task.ocvb.rightView = camera.rightView.Resize(resolutionXY)
-                task.ocvb.pointCloud = camera.PointCloud
+                task.ocvb.pointCloud = camera.PointCloud.clone
 
-                task.ocvb.depth16 = camera.depth16
+                task.ocvb.depth16 = camera.depth16.clone
                 task.ocvb.transformationMatrix = camera.transformationMatrix
                 task.ocvb.IMU_TimeStamp = camera.IMU_TimeStamp
                 task.ocvb.IMU_Barometer = camera.IMU_Barometer

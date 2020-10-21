@@ -47,9 +47,8 @@ Public Class Harris_Features_CPP
         Harris_Features = Harris_Features_Open()
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Marshal.Copy(input.Data, srcData, 0, srcData.Length)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim threshold = sliders.trackbar(0).Value / 10000
         Dim neighborhood = sliders.trackbar(1).Value
         If neighborhood Mod 2 = 0 Then neighborhood += 1

@@ -373,7 +373,7 @@ Public Class Draw_ClipLine
     Dim pt2 As cv.Point
     Dim rect As cv.Rect
     Private Sub setup()
-        ReDim kalman.input(8)
+        ReDim kalman.kInput(8)
         Dim r = initRandomRect(dst2.Width, dst2.Height, 25)
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
@@ -392,14 +392,14 @@ Public Class Draw_ClipLine
     End Sub
     Public Sub Run(ocvb As VBocvb)
         dst2 = src
-        kalman.input = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
+        kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(ocvb)
-        Dim p1 = New cv.Point(CInt(kalman.output(0)), CInt(kalman.output(1)))
-        Dim p2 = New cv.Point(CInt(kalman.output(2)), CInt(kalman.output(3)))
+        Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
+        Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
 
-        If kalman.output(6) < 5 Then kalman.output(6) = 5 ' don't let the width/height get too small...
-        If kalman.output(7) < 5 Then kalman.output(7) = 5
-        Dim r = New cv.Rect(kalman.output(4), kalman.output(5), kalman.output(6), kalman.output(7))
+        If kalman.kOutput(6) < 5 Then kalman.kOutput(6) = 5 ' don't let the width/height get too small...
+        If kalman.kOutput(7) < 5 Then kalman.kOutput(7) = 5
+        Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
 
         Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
         dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
@@ -446,13 +446,13 @@ Public Class Draw_Arc
         startAngle = msRNG.Next(1, 360)
         endAngle = msRNG.Next(1, 360)
 
-        kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
+        kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(7 - 1)
+        ReDim kalman.kInput(7 - 1)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, src.Width / 8, src.Width / 16)
@@ -468,12 +468,12 @@ Public Class Draw_Arc
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If kalman.check.Box(0).Checked Then
-            kalman.input = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
+            kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             kalman.Run(ocvb)
         Else
-            kalman.output = kalman.input ' do nothing...
+            kalman.kOutput = kalman.kInput ' do nothing...
         End If
-        Dim r = New cv.Rect(kalman.output(0), kalman.output(1), kalman.output(2), kalman.output(3))
+        Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
         If r.Width <= 5 Then r.Width = 5
         If r.Height <= 5 Then r.Height = 5
         Dim rr = New cv.RotatedRect(New cv.Point2f(r.X, r.Y), New cv.Size2f(r.Width, r.Height), angle)
@@ -484,9 +484,9 @@ Public Class Draw_Arc
             dst1.Ellipse(rr, color, thickness, cv.LineTypes.AntiAlias)
             drawRotatedOutline(rr, dst1, ocvb.scalarColors(colorIndex))
         Else
-            Dim angle = kalman.output(4)
-            Dim startAngle = kalman.output(5)
-            Dim endAngle = kalman.output(6)
+            Dim angle = kalman.kOutput(4)
+            Dim startAngle = kalman.kOutput(5)
+            Dim endAngle = kalman.kOutput(6)
             If radio.check(1).Checked Then thickness = -1
             dst1.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
                          angle, startAngle, endAngle, color, thickness, cv.LineTypes.AntiAlias)

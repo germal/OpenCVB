@@ -85,8 +85,8 @@ Public Class DNN_Basics
 
         For i = 0 To kalman.Count - 1
             kalman(i) = New Kalman_Basics(ocvb)
-            ReDim kalman(i).input(4 - 1)
-            ReDim kalman(i).output(4 - 1)
+            ReDim kalman(i).kInput(4 - 1)
+            ReDim kalman(i).kOutput(4 - 1)
         Next
 
         dnnWidth = src.Height ' height is always smaller than width...
@@ -129,10 +129,10 @@ Public Class DNN_Basics
                 Dim confidence = detectionMat.Get(Of Single)(i, 2)
                 If confidence > confidenceThreshold Then
                     Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
-                    If kalman(i).input(0) = 0 And kalman(i).input(1) = 0 Then
+                    If kalman(i).kInput(0) = 0 And kalman(i).kInput(1) = 0 Then
                         kPoints.Add(New cv.Point2f(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top))
                     Else
-                        kPoints.Add(New cv.Point2f(kalman(i).input(0), kalman(i).input(1)))
+                        kPoints.Add(New cv.Point2f(kalman(i).kInput(0), kalman(i).kInput(1)))
                     End If
                 End If
             Next
@@ -160,9 +160,9 @@ Public Class DNN_Basics
                     Next
 
                     If minIndex < kalman.Count Then
-                        kalman(minIndex).input = {rect.X, rect.Y, rect.Width, rect.Height}
+                        kalman(minIndex).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
                         kalman(minIndex).Run(ocvb)
-                        rect = New cv.Rect(kalman(minIndex).output(0), kalman(minIndex).output(1), kalman(minIndex).output(2), kalman(minIndex).output(3))
+                        rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
                     dst2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
                     rect.Width = src.Width / 12
@@ -175,8 +175,8 @@ Public Class DNN_Basics
             ' reinitialize any unused kalman filters.
             For i = kPoints.Count To activeKalman - 1
                 If i < kalman.Count Then
-                    kalman(i).input(0) = 0
-                    kalman(i).input(1) = 0
+                    kalman(i).kInput(0) = 0
+                    kalman(i).kInput(1) = 0
                 End If
             Next
         End If

@@ -93,7 +93,7 @@ End Module
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_FindTransformECC_CPP
     Inherits VBparent
-    Public input As WarpModel_Input
+    Public warp As WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
     Public src1 As New cv.Mat
@@ -113,26 +113,26 @@ Public Class WarpModel_FindTransformECC_CPP
         radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
         radio.check(0).Checked = True
 
-        input = New WarpModel_Input(ocvb)
+        warp = New WarpModel_Input(ocvb)
 
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        input.src = src
-        input.Run(ocvb)
-        dst1 = input.dst1
+        warp.src = src
+        warp.Run(ocvb)
+        dst1 = warp.dst1
 
         Static frm = findForm("WarpModel_FindTransformECC_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then warpMode = i
         Next
 
-        If input.check.Box(0).Checked Then
-            src1 = input.gradient(0)
-            src2 = input.gradient(1)
+        If warp.check.Box(0).Checked Then
+            src1 = warp.gradient(0)
+            src2 = warp.gradient(1)
         Else
-            src1 = input.rgb(0)
-            src2 = input.rgb(1)
+            src1 = warp.rgb(0)
+            src2 = warp.rgb(1)
         End If
 
         If radio.check(2).Checked Or radio.check(3).Checked Then
@@ -159,8 +159,8 @@ Public Class WarpModel_FindTransformECC_CPP
         End If
         Marshal.Copy(matPtr, warpMatrix, 0, warpMatrix.Length)
 
-        rgb1 = input.rgb(0)
-        rgb2 = input.rgb(1)
+        rgb1 = warp.rgb(0)
+        rgb2 = warp.rgb(1)
         If warpMode <> 3 Then
             Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
             cv.Cv2.WarpAffine(rgb2, aligned, warpMat, rgb1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
@@ -203,19 +203,19 @@ Public Class WarpModel_AlignImages
     Public Sub Run(ocvb As VBocvb)
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
-            If ecc.input.check.Box(0).Checked Then
-                ecc.src1 = Choose(i + 1, ecc.input.gradient(0), ecc.input.gradient(0))
-                ecc.src2 = Choose(i + 1, ecc.input.gradient(1), ecc.input.gradient(2))
+            If ecc.warp.check.Box(0).Checked Then
+                ecc.src1 = Choose(i + 1, ecc.warp.gradient(0), ecc.warp.gradient(0))
+                ecc.src2 = Choose(i + 1, ecc.warp.gradient(1), ecc.warp.gradient(2))
             Else
-                ecc.src1 = Choose(i + 1, ecc.input.rgb(0), ecc.input.rgb(0))
-                ecc.src2 = Choose(i + 1, ecc.input.rgb(1), ecc.input.rgb(2))
+                ecc.src1 = Choose(i + 1, ecc.warp.rgb(0), ecc.warp.rgb(0))
+                ecc.src2 = Choose(i + 1, ecc.warp.rgb(1), ecc.warp.rgb(2))
             End If
             ecc.src = src
             ecc.Run(ocvb)
             aligned(i) = ecc.aligned.Clone()
         Next
 
-        Dim mergeInput() = {ecc.input.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red
+        Dim mergeInput() = {ecc.warp.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
         dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged

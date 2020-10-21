@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class Kalman_Basics
     Inherits VBparent
     Dim kalman() As Kalman_Simple
-    Public input(4 - 1) As Single
-    Public output(4 - 1) As Single
+    Public kInput(4 - 1) As Single
+    Public kOutput(4 - 1) As Single
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         check.Setup(ocvb, caller, 1)
@@ -15,7 +15,7 @@ Public Class Kalman_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static saveDimension As Integer = -1
-        If saveDimension <> input.Length Then
+        If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
                     For i = 0 To kalman.Count - 1
@@ -23,34 +23,34 @@ Public Class Kalman_Basics
                     Next
                 End If
             End If
-            saveDimension = input.Length
-            ReDim kalman(input.Length - 1)
-            For i = 0 To input.Length - 1
+            saveDimension = kInput.Length
+            ReDim kalman(kInput.Length - 1)
+            For i = 0 To kInput.Length - 1
                 kalman(i) = New Kalman_Simple()
             Next
-            ReDim output(input.Count - 1)
+            ReDim kOutput(kInput.Count - 1)
         End If
 
         Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
         If useKalmanCheck.Checked Then
             For i = 0 To kalman.Length - 1
-                kalman(i).inputReal = input(i)
+                kalman(i).inputReal = kInput(i)
                 kalman(i).Run(ocvb)
                 If Double.IsNaN(kalman(i).stateResult) Then kalman(i).stateResult = kalman(i).inputReal ' kalman failure...
-                output(i) = kalman(i).stateResult
+                kOutput(i) = kalman(i).stateResult
             Next
         Else
-            output = input ' do nothing to the input.
+            kOutput = kInput ' do nothing to the input.
         End If
 
         If standalone Then
             dst1 = src.Clone()
-            Dim rect = New cv.Rect(CInt(output(0)), CInt(output(1)), CInt(output(2)), CInt(output(3)))
+            Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
             Static lastRect = rect
             If rect = lastRect Then
                 Dim r = initRandomRect(src.Width, src.Height, 50)
-                input = New Single() {r.X, r.Y, r.Width, r.Height}
+                kInput = New Single() {r.X, r.Y, r.Width, r.Height}
             End If
             lastRect = rect
             dst1.Rectangle(rect, cv.Scalar.White, 6)
@@ -198,8 +198,8 @@ Public Class Kalman_MousePredict
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(2 - 1)
-        ReDim kalman.output(2 - 1)
+        ReDim kalman.kInput(2 - 1)
+        ReDim kalman.kOutput(2 - 1)
 
         lineWidth = src.Width / 300
         label1 = "Red is real mouse, white is prediction"
@@ -209,11 +209,11 @@ Public Class Kalman_MousePredict
         If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = ocvb.mousePoint
-        kalman.input(0) = ocvb.mousePoint.X
-        kalman.input(1) = ocvb.mousePoint.Y
-        Dim lastStateResult = New cv.Point(kalman.output(0), kalman.output(1))
+        kalman.kInput(0) = ocvb.mousePoint.X
+        kalman.kInput(1) = ocvb.mousePoint.Y
+        Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         kalman.Run(ocvb)
-        cv.Cv2.Line(dst1, New cv.Point(kalman.output(0), kalman.output(1)), lastStateResult, cv.Scalar.All(255), lineWidth, cv.LineTypes.AntiAlias)
+        cv.Cv2.Line(dst1, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(dst1, ocvb.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, cv.LineTypes.AntiAlias)
         lastRealMouse = ocvb.mousePoint
     End Sub
@@ -228,13 +228,13 @@ End Class
 Public Class Kalman_CVMat
     Inherits VBparent
     Dim kalman() As Kalman_Simple
-    Public input As cv.Mat
     Public output As cv.Mat
     Dim basics As Kalman_Basics
+    Public input As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         basics = New Kalman_Basics(ocvb)
-        ReDim basics.input(4 - 1)
+        ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
         ocvb.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"

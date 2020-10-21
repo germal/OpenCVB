@@ -27,7 +27,7 @@ Public Class Etch_ASketch
     End Sub
     Public Sub Run(ocvb As VBocvb)
         keys.Run(ocvb)
-        Dim Input = New List(Of String)(keys.input)
+        Dim Input = New List(Of String)(keys.keyInput)
 
         If check.Box(1).Checked Then
             Input.Clear() ' ignore any keyboard input when in Demo mode.

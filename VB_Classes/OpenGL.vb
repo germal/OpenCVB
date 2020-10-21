@@ -419,7 +419,7 @@ Public Class OpenGL_GravityTransform
             zRotateCheck.checked = False
         End If
 
-        gCloud.src = pointcloud
+        gCloud.src = ocvb.pointCloud
         gCloud.Run(ocvb)
 
         ogl.pointCloudInput = gCloud.imuPointCloud

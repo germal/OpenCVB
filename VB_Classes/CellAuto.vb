@@ -4,7 +4,7 @@ Public Class CellAuto_Basics
     Inherits VBparent
     Public i18 As New List(Of String)
     Dim inputCombo = "111,110,101,100,011,010,001,000"
-    Dim input(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
+    Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         i18.Add("00011110 Rule 30 (chaotic)")
@@ -48,8 +48,8 @@ Public Class CellAuto_Basics
                 Dim x1 = dst.Get(Of Byte)(y, x - 1)
                 Dim x2 = dst.Get(Of Byte)(y, x)
                 Dim x3 = dst.Get(Of Byte)(y, x + 1)
-                For i = 0 To input.GetUpperBound(0) - 1
-                    If x1 = input(i, 0) And x2 = input(i, 1) And x3 = input(i, 2) Then
+                For i = 0 To cellInput.GetUpperBound(0) - 1
+                    If x1 = cellInput(i, 0) And x2 = cellInput(i, 1) And x3 = cellInput(i, 2) Then
                         dst.Set(Of Byte)(y + 1, x, outcomes(i))
                         Exit For
                     End If

@@ -58,12 +58,12 @@ End Class
 
 Public Class Blob_Detector_CS
     Inherits VBparent
-    Dim input As Blob_Input
+    Dim blob As Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        input = New Blob_Input(ocvb)
-        input.updateFrequency = 1 ' it is pretty fast but sloppy...
+        blob = New Blob_Input(ocvb)
+        blob.updateFrequency = 1 ' it is pretty fast but sloppy...
         check.Setup(ocvb, caller, 5)
         check.Box(0).Text = "FilterByArea"
         check.Box(1).Text = "FilterByCircularity"
@@ -97,9 +97,9 @@ Public Class Blob_Detector_CS
         blobParams.MinDistBetweenBlobs = 10
         blobParams.MinRepeatability = 1
 
-        input.src = src
-        input.Run(ocvb)
-        dst1 = input.dst1
+        blob.src = src
+        blob.Run(ocvb)
+        dst1 = blob.dst1
         dst2 = dst1.EmptyClone
 
         ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
@@ -111,11 +111,11 @@ End Class
 
 Public Class Blob_RenderBlobs
     Inherits VBparent
-    Dim input As Blob_Input
+    Dim blob As Blob_Input
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        input = New Blob_Input(ocvb)
-        input.updateFrequency = 1
+        blob = New Blob_Input(ocvb)
+        blob.updateFrequency = 1
 
         ocvb.desc = "Use connected components to find blobs."
         label1 = "Input blobs"
@@ -123,9 +123,9 @@ Public Class Blob_RenderBlobs
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.frameCount Mod 100 = 0 Then
-            input.src = src
-            input.Run(ocvb)
-            dst1 = input.dst1
+            blob.src = src
+            blob.Run(ocvb)
+            dst1 = blob.dst1
             Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.BinaryInv)
             Dim labelView = dst1.EmptyClone
@@ -140,8 +140,8 @@ Public Class Blob_RenderBlobs
             dst2.SetTo(0)
             cc.FilterByBlob(dst1, dst2, maxBlob)
 
-            For Each blob In cc.Blobs.Skip(1)
-                dst1.Rectangle(blob.Rect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+            For Each b In cc.Blobs.Skip(1)
+                dst1.Rectangle(b.Rect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub
@@ -223,16 +223,16 @@ Public Class Blob_Rectangles
             ReDim kalman(blobsToShow - 1)
             For i = 0 To blobsToShow - 1
                 kalman(i) = New Kalman_Basics(ocvb)
-                ReDim kalman(i).input(4 - 1)
+                ReDim kalman(i).kInput(4 - 1)
             Next
         End If
 
         label1 = "Showing top " + CStr(blobsToShow) + " of the " + CStr(blobs.rects.Count) + " blobs found "
         For i = 0 To blobsToShow - 1
             Dim rect = sortedBlobs.ElementAt(i).Key
-            kalman(i).input = {rect.X, rect.Y, rect.Width, rect.Height}
+            kalman(i).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
             kalman(i).Run(ocvb)
-            rect = New cv.Rect(kalman(i).output(0), kalman(i).output(1), kalman(i).output(2), kalman(i).output(3))
+            rect = New cv.Rect(kalman(i).kOutput(0), kalman(i).kOutput(1), kalman(i).kOutput(2), kalman(i).kOutput(3))
             dst1.Rectangle(rect, ocvb.scalarColors(i Mod 255), 2)
         Next
     End Sub
@@ -253,7 +253,7 @@ Public Class Blob_Largest
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(4 - 1)
+        ReDim kalman.kInput(4 - 1)
 
         blobs = New Blob_DepthClusters(ocvb)
         ocvb.desc = "Gather all the blob data and display the largest."
@@ -268,9 +268,9 @@ Public Class Blob_Largest
             dst1.SetTo(0)
             Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
             src.CopyTo(dst1, masks(maskIndex))
-            kalman.input = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
+            kalman.kInput = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
             kalman.Run(ocvb)
-            Dim res = kalman.output
+            Dim res = kalman.kOutput
             Dim rect = New cv.Rect(CInt(res(0)), CInt(res(1)), CInt(res(2)), CInt(res(3)))
             dst1.Rectangle(rect, cv.Scalar.Red, 2)
         End If

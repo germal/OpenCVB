@@ -131,7 +131,7 @@ Public Class Depth_Foreground
         trim = New Depth_InRange(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(4 - 1) ' cv.rect...
+        ReDim kalman.kInput(4 - 1) ' cv.rect...
         hideForm("Kalman_Basics CheckBox Options")
 
         label1 = "Blue is current, red is kalman, green is trusted"
@@ -176,10 +176,10 @@ Public Class Depth_Foreground
             If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
             dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            kalman.input = {xx, yy, rectSize, rectSize}
+            kalman.kInput = {xx, yy, rectSize, rectSize}
             kalman.Run(ocvb)
             Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
-            Dim kRect = New cv.Rect(kalman.output(0), kalman.output(1), kalman.output(2), kalman.output(3))
+            Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
             dst1.Rectangle(kRect, cv.Scalar.Red, 2)
             dst1.Rectangle(nextRect, cv.Scalar.Blue, 2)
             If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
@@ -838,10 +838,10 @@ Public Class Depth_LocalMinMax_Kalman_MT
         grid.Run(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(grid.roiList.Count * 4 - 1)
+        ReDim kalman.kInput(grid.roiList.Count * 4 - 1)
 
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.input(4 - 1)
+        ReDim kalman.kInput(4 - 1)
 
         label1 = "Red is min distance, blue is max distance"
         ocvb.desc = "Find minimum depth in each segment."
@@ -852,10 +852,10 @@ Public Class Depth_LocalMinMax_Kalman_MT
         Dim mask = depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
-        If grid.roiList.Count * 4 <> kalman.input.Length Then
+        If grid.roiList.Count * 4 <> kalman.kInput.Length Then
             If kalman IsNot Nothing Then kalman.Dispose()
             kalman = New Kalman_Basics(ocvb)
-            ReDim kalman.input(grid.roiList.Count * 4 - 1)
+            ReDim kalman.kInput(grid.roiList.Count * 4 - 1)
         End If
 
         dst1 = src.Clone()
@@ -868,10 +868,10 @@ Public Class Depth_LocalMinMax_Kalman_MT
             Dim minPt As cv.Point, maxPt As cv.Point
             cv.Cv2.MinMaxLoc(depth32f(roi), minVal, maxVal, minPt, maxPt, mask(roi))
             If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
-            kalman.input(i * 4) = minPt.X
-            kalman.input(i * 4 + 1) = minPt.Y
-            kalman.input(i * 4 + 2) = maxPt.X
-            kalman.input(i * 4 + 3) = maxPt.Y
+            kalman.kInput(i * 4) = minPt.X
+            kalman.kInput(i * 4 + 1) = minPt.Y
+            kalman.kInput(i * 4 + 2) = maxPt.X
+            kalman.kInput(i * 4 + 3) = maxPt.Y
         End Sub)
 
         kalman.Run(ocvb)
@@ -880,8 +880,8 @@ Public Class Depth_LocalMinMax_Kalman_MT
         Dim radius = 5
         For i = 0 To grid.roiList.Count - 1
             Dim roi = grid.roiList(i)
-            Dim ptmin = New cv.Point2f(kalman.output(i * 4) + roi.X, kalman.output(i * 4 + 1) + roi.Y)
-            Dim ptmax = New cv.Point2f(kalman.output(i * 4 + 2) + roi.X, kalman.output(i * 4 + 3) + roi.Y)
+            Dim ptmin = New cv.Point2f(kalman.kOutput(i * 4) + roi.X, kalman.kOutput(i * 4 + 1) + roi.Y)
+            Dim ptmax = New cv.Point2f(kalman.kOutput(i * 4 + 2) + roi.X, kalman.kOutput(i * 4 + 3) + roi.Y)
             ptmin = validatePoint2f(ptmin)
             ptmax = validatePoint2f(ptmax)
             subdiv.Insert(ptmin)
@@ -1563,9 +1563,6 @@ Public Class Depth_PointCloud_IMU
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = rangeSlider.Value / 1000
 
@@ -1604,38 +1601,38 @@ Public Class Depth_PointCloud_IMU
                 ' These 4 points will mark a 1-meter distance plane with or without rotation
                 Dim z = 1.0
                 Dim pt = New cv.Point3f(0, 0, z)
-                For i = 0 To input.Height - 1
+                For i = 0 To ocvb.pointCloud.Height - 1
                     pt = New cv.Point3f(0, i, z)
-                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                    pt = New cv.Point3f(input.Width - 1, i, z)
-                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                    pt = New cv.Point3f(ocvb.pointCloud.Width - 1, i, z)
+                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
                 Next
 
-                For i = 0 To input.Width - 1
+                For i = 0 To ocvb.pointCloud.Width - 1
                     pt = New cv.Point3f(i, 0, z)
-                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                    pt = New cv.Point3f(i, input.Height - 1, z)
-                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                    pt = New cv.Point3f(i, ocvb.pointCloud.Height - 1, z)
+                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
                 Next
             End If
 
             Static imuCheckBox = findCheckBox("Use IMU gravity vector")
             Dim changeRequested = True
             If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
-            Dim split = cv.Cv2.Split(input)
+            Dim split = cv.Cv2.Split(ocvb.pointCloud)
             If imuCheckBox.checked And changeRequested Then
                 Dim mask As New cv.Mat
                 cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
                 cv.Cv2.BitwiseNot(dst1, mask)
-                input.SetTo(0, mask)
+                ocvb.pointCloud.SetTo(0, mask)
                 If standalone Then dst1 = dst1.Resize(dst1.Size)
 
                 gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
-                Dim gInput = input.Reshape(1, input.Rows * input.Cols)
+                Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
                 Dim gOutput = (gInput * gMat).ToMat
-                imuPointCloud = gOutput.Reshape(3, input.Rows)
+                imuPointCloud = gOutput.Reshape(3, ocvb.pointCloud.Rows)
             Else
-                imuPointCloud = input.Clone
+                imuPointCloud = ocvb.pointCloud.Clone
             End If
 
             Static reductionRadio = findRadio("No reduction")

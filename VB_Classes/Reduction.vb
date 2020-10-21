@@ -187,12 +187,11 @@ Public Class Reduction_Depth
         ocvb.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type = cv.MatType.CV_32S Then
-            reduction.src = input
+        If src.Type = cv.MatType.CV_32S Then
+            reduction.src = src
         Else
-            input = getDepth32f(ocvb)
-            input.ConvertTo(reduction.src, cv.MatType.CV_32S)
+            src = getDepth32f(ocvb)
+            src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         End If
         reduction.Run(ocvb)
         reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
@@ -255,16 +254,12 @@ Public Class Reduction_Lines
         ocvb.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
-        sideView.src = input
         sideView.Run(ocvb)
         dst1 = sideView.dst1
         lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1.Clone
 
-        topView.src = input
         topView.Run(ocvb)
         dst2 = topView.dst1
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)

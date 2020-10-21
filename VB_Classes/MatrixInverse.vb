@@ -59,7 +59,7 @@ End Module
 Public Class MatrixInverse_OpenCV
     Inherits VBparent
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
-    Dim input As cv.Mat
+    Public input As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
