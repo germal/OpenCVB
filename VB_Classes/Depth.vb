@@ -1544,11 +1544,12 @@ Public Class Depth_PointCloud_IMU
     Inherits VBparent
     Public histOpts As Histogram_ProjectionOptions
     Public Mask As New cv.Mat
-    Public pointCloud As cv.Mat
+    Public imuPointCloud As cv.Mat
     Public imu As IMU_GVector
     Public reduction As Reduction_Depth
     Public gMatrix(,) As Single
     Public gMat As New cv.Mat
+    Public includeFrustrum As Boolean
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1563,7 +1564,7 @@ Public Class Depth_PointCloud_IMU
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud.Clone()
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
 
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = rangeSlider.Value / 1000
@@ -1599,22 +1600,24 @@ Public Class Depth_PointCloud_IMU
                       {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-            ' These 4 points will mark a 1-meter distance plane with or without rotation
-            Dim z = 1.0
-            Dim pt = New cv.Point3f(0, 0, z)
-            For i = 0 To input.Height - 1
-                pt = New cv.Point3f(0, i, z)
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                pt = New cv.Point3f(input.Width - 1, i, z)
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            Next
+            If includeFrustrum Then
+                ' These 4 points will mark a 1-meter distance plane with or without rotation
+                Dim z = 1.0
+                Dim pt = New cv.Point3f(0, 0, z)
+                For i = 0 To input.Height - 1
+                    pt = New cv.Point3f(0, i, z)
+                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                    pt = New cv.Point3f(input.Width - 1, i, z)
+                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                Next
 
-            For i = 0 To input.Width - 1
-                pt = New cv.Point3f(i, 0, z)
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                pt = New cv.Point3f(i, input.Height - 1, z)
-                input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            Next
+                For i = 0 To input.Width - 1
+                    pt = New cv.Point3f(i, 0, z)
+                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                    pt = New cv.Point3f(i, input.Height - 1, z)
+                    input.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                Next
+            End If
 
             Static imuCheckBox = findCheckBox("Use IMU gravity vector")
             Dim changeRequested = True
@@ -1630,9 +1633,9 @@ Public Class Depth_PointCloud_IMU
                 gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
                 Dim gInput = input.Reshape(1, input.Rows * input.Cols)
                 Dim gOutput = (gInput * gMat).ToMat
-                pointCloud = gOutput.Reshape(3, input.Rows)
+                imuPointCloud = gOutput.Reshape(3, input.Rows)
             Else
-                pointCloud = input.Clone
+                imuPointCloud = input.Clone
             End If
 
             Static reductionRadio = findRadio("No reduction")
@@ -1641,7 +1644,7 @@ Public Class Depth_PointCloud_IMU
                 split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
                 reduction.Run(ocvb)
                 split(2) = reduction.reducedDepth32F / 1000
-                cv.Cv2.Merge(split, pointCloud)
+                cv.Cv2.Merge(split, imuPointCloud)
             End If
         End If
     End Sub

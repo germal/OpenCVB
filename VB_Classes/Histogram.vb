@@ -944,6 +944,8 @@ Public Class Histogram_2D_SideView
         initParent(ocvb)
 
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        gCloudIMU.includeFrustrum = True
+
         Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
 
@@ -964,30 +966,30 @@ Public Class Histogram_2D_SideView
     End Function
     Public Sub Run(ocvb As VBocvb)
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud.Clone
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
         gCloudIMU.src = input
         gCloudIMU.Run(ocvb)
 
         Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        Dim split = cv.Cv2.Split(gCloudIMU.pointCloud)
+        Dim split = cv.Cv2.Split(gCloudIMU.imuPointCloud)
         pixelsPerMeter = dst1.Height / maxZ
 
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        Dim anchor = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, 0)
+        Dim anchor = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
         If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
 
         split(1).ConvertTo(split(1), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ) ' pixelsPerMeter * maxZ to keep units the same in x and y!
         split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
-        cv.Cv2.Merge(split, gCloudIMU.pointCloud)
+        cv.Cv2.Merge(split, gCloudIMU.imuPointCloud)
 
         ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
         Dim frustrum(4 - 1) As cv.Point3f
-        frustrum(0) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
-        frustrum(1) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
-        frustrum(2) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, 0)
-        frustrum(3) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
+        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
+        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
+        frustrum(2) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
+        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
 
         Dim minVal = Single.MaxValue, maxVal = Single.MinValue
         Dim minIndex As Integer, maxIndex As Integer
@@ -1007,7 +1009,7 @@ Public Class Histogram_2D_SideView
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
         Dim histSize() = {dst1.Height, dst1.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.pointCloud}, New Integer() {2, 1}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {2, 1}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
         Static histThresholdSlider = findSlider("Histogram threshold")
@@ -1061,6 +1063,8 @@ Public Class Histogram_2D_TopView
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        gCloudIMU.includeFrustrum = True
+
         Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
 
@@ -1081,25 +1085,25 @@ Public Class Histogram_2D_TopView
         maxZ = inRangeSlider.Value / 1000
 
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC3 Then input = ocvb.pointCloud.Clone
+        If input.Type <> cv.MatType.CV_32FC3 Then input = pointcloud
         gCloudIMU.src = input
         gCloudIMU.Run(ocvb)
 
-        Dim anchor = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, 0)
+        Dim anchor = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
         If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
 
         pixelsPerMeter = src.Height / maxZ
-        Dim split = cv.Cv2.Split(gCloudIMU.pointCloud)
+        Dim split = cv.Cv2.Split(gCloudIMU.imuPointCloud)
         split(0).ConvertTo(split(0), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)
         split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
-        cv.Cv2.Merge(split, gCloudIMU.pointCloud)
+        cv.Cv2.Merge(split, gCloudIMU.imuPointCloud)
 
         ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
         Dim frustrum(4 - 1) As cv.Point3f
-        frustrum(0) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
-        frustrum(1) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
-        frustrum(2) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(0, 0)
-        frustrum(3) = gCloudIMU.pointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
+        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, input.Width - 1)
+        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, input.Width - 1)
+        frustrum(2) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
+        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(input.Height - 1, 0)
 
         Dim minVal = Single.MaxValue, maxVal = Single.MinValue
         Dim minIndex As Integer, maxIndex As Integer
@@ -1119,7 +1123,7 @@ Public Class Histogram_2D_TopView
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
         Dim histSize() = {dst1.Height, dst1.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
         Static histThresholdSlider = findSlider("Histogram threshold")
         dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)

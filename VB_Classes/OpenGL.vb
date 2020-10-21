@@ -384,6 +384,9 @@ Public Class OpenGL_GravityTransform
         gCloud = New Depth_PointCloud_IMU(ocvb)
         gCloud.histOpts = New Histogram_ProjectionOptions(ocvb)
 
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
@@ -416,10 +419,10 @@ Public Class OpenGL_GravityTransform
             zRotateCheck.checked = False
         End If
 
-        gCloud.src = ocvb.pointCloud
+        gCloud.src = pointcloud
         gCloud.Run(ocvb)
-        ogl.pointCloudInput = gCloud.pointCloud
 
+        ogl.pointCloudInput = gCloud.imuPointCloud
         ogl.src = src
         ogl.Run(ocvb)
     End Sub

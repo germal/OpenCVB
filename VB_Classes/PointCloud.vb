@@ -1238,9 +1238,13 @@ Public Class PointCloud_FindFloorPlane
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+        inverse = New Mat_Inverse(ocvb)
         flow = New Font_FlowText(ocvb)
         floor = New PointCloud_FindFloor(ocvb)
-        inverse = New Mat_Inverse(ocvb)
+
+        hideForm("Reduction_Basics Radio Options")
+        hideForm("Reduction_Basics Slider Options")
+        hideForm("FloodFill_Basics Slider Options")
 
         label1 = "Plane equation input"
         label2 = "Side view rotated with gravity vector - floor is in red"

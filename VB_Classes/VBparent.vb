@@ -30,9 +30,10 @@ Public Class VBparent : Implements IDisposable
     Public sliders As New OptionsSliders
     Public pyStream As PyStream_Basics = Nothing
     Public standalone As Boolean
-    Public src As New cv.Mat
-    Public dst1 As New cv.Mat
-    Public dst2 As New cv.Mat
+    Public src As cv.Mat
+    Public pointcloud As cv.Mat
+    Public dst1 As cv.Mat
+    Public dst2 As cv.Mat
     Public label1 As String
     Public label2 As String
     Public msRNG As New System.Random
@@ -237,7 +238,8 @@ Public Class VBparent : Implements IDisposable
         Return input
     End Function
     Public Sub NextFrame(ocvb As VBocvb)
-        If standalone Then src = ocvb.color
+        If standalone Then src = ocvb.color.Clone
+        If standalone Then pointcloud = ocvb.pointCloud.Clone
         If src.Width <> dst1.Width Or src.Width <> dst2.Width Then
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
