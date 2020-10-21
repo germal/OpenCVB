@@ -1026,7 +1026,7 @@ Public Class Histogram_2D_SideView
                                           (markers(0).Y - sideCameraPoint.Y) * (markers(0).Y - sideCameraPoint.Y)) / anchor.Z
 
         ' the markers have to be to the right of the camera or the camera is nearly upside down.
-        If imuCheckBox.checked And markers(0).X > sideCameraPoint.X And markers(1).X > sideCameraPoint.X Then
+        If imuCheckBox.checked And markers(0).X > sideCameraPoint.X And markers(1).X > sideCameraPoint.X And gCloudIMU.includeFrustrum Then
             dst2.Circle(sideCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
             label2 = Format(rotatedPixelsPerMeter, "#0.0") + " pixels per meter"

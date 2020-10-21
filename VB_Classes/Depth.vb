@@ -1598,7 +1598,7 @@ Public Class Depth_PointCloud_IMU
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
             If includeFrustrum Then
-                ' These 4 points will mark a 1-meter distance plane with or without rotation
+                ' These marks the outline of the frustrum in the pointcloud at 1 meter
                 Dim z = 1.0
                 Dim pt = New cv.Point3f(0, 0, z)
                 For i = 0 To ocvb.pointCloud.Height - 1

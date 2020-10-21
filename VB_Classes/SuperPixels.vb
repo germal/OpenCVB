@@ -178,7 +178,7 @@ Public Class SuperPixel_WithLineDetector
         lines.src = src
         lines.Run(ocvb)
         dst2 = lines.dst1
-        pixels.src = dst2
+        pixels.src = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         pixels.Run(ocvb)
         dst1 = pixels.dst1
     End Sub

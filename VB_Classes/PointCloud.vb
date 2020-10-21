@@ -870,31 +870,28 @@ End Class
 
 Public Class PointCloud_FrustrumTop
     Inherits VBparent
-    Dim frustrum As PointCloud_FrustrumSide
+    Dim frustrum As Draw_Frustrum
     Dim topView As Histogram_2D_TopView
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        frustrum = New PointCloud_FrustrumSide(ocvb)
 
         topView = New Histogram_2D_TopView(ocvb)
+
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
         cmats = New PointCloud_Colorize(ocvb)
+        frustrum = New Draw_Frustrum(ocvb)
 
+        label2 = "Draw_Frustrum output"
         ocvb.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        topView.gCloudIMU.includeFrustrum = False
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        Static depth32f As New cv.Mat
-        If ocvb.frameCount = 0 Then
-            depth32f = frustrum.buildFrustrum(dst2.Size)
-            depth32f.ConvertTo(dst2, cv.MatType.CV_8U, 255 / maxZ)
-            frustrum.xyzDepth.src = depth32f
-            frustrum.xyzDepth.Run(ocvb)
-        End If
+        If ocvb.frameCount = 0 Then frustrum.Run(ocvb)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         topView.Run(ocvb)
@@ -912,51 +909,35 @@ End Class
 
 Public Class PointCloud_FrustrumSide
     Inherits VBparent
+    Dim frustrum As Draw_Frustrum
     Dim sideView As Histogram_2D_SideView
     Dim cmats As PointCloud_Colorize
-    Public xyzDepth As Depth_WorldXYZ_MT
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        xyzDepth = New Depth_WorldXYZ_MT(ocvb)
-        xyzDepth.depthUnitsMeters = True
-
         sideView = New Histogram_2D_SideView(ocvb)
+
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
         cmats = New PointCloud_Colorize(ocvb)
+        frustrum = New Draw_Frustrum(ocvb)
 
+        label2 = "Draw_Frustrum output"
         ocvb.desc = "Translate only the frustrum with gravity"
     End Sub
-    Public Function buildFrustrum(size As cv.Size) As cv.Mat
-        Dim depth32f = New cv.Mat(size, cv.MatType.CV_32F, 0)
-        Dim x = size.Width / 2
-        Dim y = size.Height / 2
-        Dim zIncr = maxZ / (size.Height / 2)
-        Dim r As cv.Rect
-        For i = 0 To size.Height / 2 - 1
-            r = New cv.Rect(x - i, y - i, i * 2, i * 2)
-            depth32f.Rectangle(r, cv.Scalar.All(i * zIncr), 1)
-        Next
-        Return depth32f
-    End Function
     Public Sub Run(ocvb As VBocvb)
+        sideView.gCloudIMU.includeFrustrum = False
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        Static depth32f As New cv.Mat
-        If ocvb.frameCount = 0 Then
-            depth32f = buildFrustrum(dst2.Size)
-            depth32f.ConvertTo(dst2, cv.MatType.CV_8U, 255 / maxZ)
-            xyzDepth.src = depth32f
-            xyzDepth.Run(ocvb)
-        End If
+        If ocvb.frameCount = 0 Then frustrum.Run(ocvb)
 
-        ocvb.pointCloud = xyzDepth.xyzFrame
+        ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         sideView.Run(ocvb)
 
         dst1 = sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
         dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
+        dst2 = frustrum.dst1
     End Sub
 End Class
 
