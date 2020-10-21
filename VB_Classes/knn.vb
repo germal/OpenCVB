@@ -809,6 +809,7 @@ Public Class KNN_PointTracker
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then
+            topView.src = pointcloud
             topView.Run(ocvb)
             dst1 = topView.dst1
             Exit Sub
