@@ -35,6 +35,11 @@ Module Plane_Exports
         Dim y = CSng((p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
     End Function
+    Public Function buildPlaneEquation(plane As cv.Vec4f, centroid As cv.Point3f) As cv.Vec4f
+        Dim magnitude = Math.Sqrt(plane.Item0 * plane.Item0 + plane.Item1 * plane.Item1 + plane.Item2 * plane.Item2)
+        Dim normal = New cv.Point3f(plane.Item0 / magnitude, plane.Item1 / magnitude, plane.Item2 / magnitude)
+        Return New cv.Vec4f(normal.X, normal.Y, normal.Z, -(normal.X * centroid.X + normal.Y * centroid.Y + normal.Z * centroid.Z))
+    End Function
     ' compute plane equation from the worlddepth points.
     ' Based on: http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
     Public Function computePlaneEquation(worldDepth As List(Of cv.Point3f)) As cv.Vec4f
@@ -80,9 +85,7 @@ Module Plane_Exports
             plane.Item2 = 1
         End If
 
-        Dim magnitude = Math.Sqrt(plane.Item0 * plane.Item0 + plane.Item1 * plane.Item1 + plane.Item2 * plane.Item2)
-        Dim normal = New cv.Point3f(plane.Item0 / magnitude, plane.Item1 / magnitude, plane.Item2 / magnitude)
-        Return New cv.Vec4f(normal.X, normal.Y, normal.Z, -(normal.X * centroid.X + normal.Y * centroid.Y + normal.Z * centroid.Z))
+        Return buildPlaneEquation(plane, centroid)
     End Function
 End Module
 

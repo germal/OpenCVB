@@ -20,8 +20,8 @@ Public Class LineDetector_Basics
     Public Sub Run(ocvb As VBocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         lines = ld.Detect(src)
-        src.CopyTo(dst1)
         src.CopyTo(dst2)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Static thicknessSlider = findSlider("Line thickness")
         Dim thickness = thicknessSlider.Value
 

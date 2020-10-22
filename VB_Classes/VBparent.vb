@@ -39,6 +39,7 @@ Public Class VBparent : Implements IDisposable
     Dim algorithm As Object
     Public fontsize As Single
     Public dotSize As Integer
+    Public lineSize As Integer
     Public resFactor As Single ' resolution is often a factor in sizing tasks.
     Public caller As String
     Public topCameraPoint As cv.Point
@@ -64,14 +65,17 @@ Public Class VBparent : Implements IDisposable
             Case 320
                 fontsize = ocvb.color.Width / 1280
                 dotSize = 3
+                lineSize = 1
                 resFactor = 0.1
             Case 640
                 fontsize = ocvb.color.Width / 1280
                 dotSize = 7
+                lineSize = 2
                 resFactor = 0.3
             Case 1280
                 fontsize = 1
                 dotSize = 15
+                lineSize = 4
                 resFactor = 1
         End Select
 
