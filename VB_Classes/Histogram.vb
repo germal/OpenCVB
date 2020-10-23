@@ -1063,7 +1063,7 @@ Public Class Histogram_2D_SideView
                 sliders.trackbar(1).Value = Choose(ocvb.resolutionIndex, -9, -18, -40)
             Case VB_Classes.ActiveTask.algParms.D455
                 ' https://www.intelrealsense.com/depth-camera-d455/
-                sliders.trackbar(0).Value = Choose(ocvb.resolutionIndex, 173, 175, 176)
+                sliders.trackbar(0).Value = Choose(ocvb.resolutionIndex, 173, 175, 174)
                 sliders.trackbar(1).Value = Choose(ocvb.resolutionIndex, -9, -20, -40)
             Case VB_Classes.ActiveTask.algParms.MyntD1000
                 ' https://www.mynteye.com/pages/mynt-eye-d

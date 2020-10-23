@@ -23,7 +23,7 @@ Public Class OpenCVB
     Dim border As Integer = 6
     Dim BothFirstAndLastReady As Boolean
     Dim camera As Object
-    Dim cameraRS2Generic As Object ' used only to initialize D435i and L515
+    Dim cameraRS2Generic As Object ' used only to initialize D435i
     Dim cameraD435i As Object
     Dim cameraD455 As Object
     ' Dim cameraL515 As Object
@@ -154,7 +154,6 @@ Public Class OpenCVB
         optionsForm.OptionsDialog_Load(sender, e)
 
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
-        ' optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         'optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("T265")
@@ -195,7 +194,6 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.StereoLabsZED2
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.MyntD1000
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D435i
-            'If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.L515
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D455
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
                 MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D455, D435i, Kinect 4 Azure, MyntEyeD 1000, or StereoLabs Zed2.")

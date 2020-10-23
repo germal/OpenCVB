@@ -41,7 +41,6 @@ public:
 private:
 
 	rs2::context ctx;
-	bool lidarCam;
 
 public:
 	~RealSense2Camera(){}
@@ -60,23 +59,17 @@ public:
 		throw std::runtime_error("Device does not have a depth sensor");
 	}
 
-	RealSense2Camera(int w, int h, bool IMUPresent, bool _lidarCam)
+	RealSense2Camera(int w, int h, bool IMUPresent)
 	{
-		lidarCam = _lidarCam;
 		rs2_error* e = 0;
 		width = w;
 		height = h;
 
 		rs2::config cfg;
 		cfg.enable_stream(RS2_STREAM_COLOR, width, height, RS2_FORMAT_BGR8);
-		if (lidarCam)
-		{
-			cfg.enable_stream(RS2_STREAM_DEPTH, 1024, 768, RS2_FORMAT_Z16);
-		} else {
-			cfg.enable_stream(RS2_STREAM_DEPTH, width, height, RS2_FORMAT_Z16);
-			cfg.enable_stream(RS2_STREAM_INFRARED, 1, width, height, RS2_FORMAT_Y8);
-			cfg.enable_stream(RS2_STREAM_INFRARED, 2, width, height, RS2_FORMAT_Y8);
-		}
+		cfg.enable_stream(RS2_STREAM_DEPTH, width, height, RS2_FORMAT_Z16);
+		cfg.enable_stream(RS2_STREAM_INFRARED, 1, width, height, RS2_FORMAT_Y8);
+		cfg.enable_stream(RS2_STREAM_INFRARED, 2, width, height, RS2_FORMAT_Y8);
 
 		if (IMUPresent)
 		{
@@ -91,12 +84,8 @@ public:
 		auto stream = profiles.get_stream(RS2_STREAM_COLOR);
 		intrinsicsLeft = stream.as<rs2::video_stream_profile>().get_intrinsics();
 		auto fromStream = profiles.get_stream(RS2_STREAM_COLOR);
-		if (lidarCam == false)
-		{
-			auto toStream = profiles.get_stream(RS2_STREAM_INFRARED);
-			extrinsics = fromStream.get_extrinsics_to(toStream);
-		}
-
+		auto toStream = profiles.get_stream(RS2_STREAM_INFRARED);
+		extrinsics = fromStream.get_extrinsics_to(toStream);
 	}
 
 	void waitForFrame()
@@ -109,9 +98,9 @@ public:
 
 
 extern "C" __declspec(dllexport)
-int *RS2Open(int w, int h, bool IMUPresent, bool lidarCam)
+int *RS2Open(int w, int h, bool IMUPresent)
 {
-	RealSense2Camera* tp = new RealSense2Camera(w, h, IMUPresent, lidarCam);
+	RealSense2Camera* tp = new RealSense2Camera(w, h, IMUPresent);
 	return (int *)tp;
 }
 

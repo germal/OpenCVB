@@ -5,7 +5,7 @@ Imports cv = OpenCvSharp
 
 Module RS2_Module_CPP
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RS2Open(width As integer, height As integer, IMUPresent As Boolean, lidarCam As Boolean) As IntPtr
+    Public Function RS2Open(width As Integer, height As Integer, IMUPresent As Boolean) As IntPtr
     End Function
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub RS2WaitForFrame(tp As IntPtr)
@@ -74,7 +74,6 @@ Public Class CameraRS2
     Public deviceNum As Integer
     Dim intrinsicsLeft As rs.Intrinsics
     Public pc As New rs.PointCloud
-    Dim lidarCam As Boolean
     Public cameraName As String
     Dim lidarRect As New cv.Rect
     Dim lidarWidth = 1024
@@ -89,10 +88,9 @@ Public Class CameraRS2
         Dim Devices = ctx.QueryDevices()
         Return Devices(index).Info(0)
     End Function
-    Public Sub initialize(fps As integer)
+    Public Sub initialize(fps As Integer)
         deviceName = cameraName ' devicename is used to determine that the camera has been initialized.
-        lidarCam = If(deviceName = "Intel RealSense L515", True, False)
-        cPtr = RS2Open(width, height, IMU_Present, lidarCam)
+        cPtr = RS2Open(width, height, IMU_Present)
         depthScale = RS2DepthScale(cPtr) * 1000
         Dim intrin = RS2intrinsicsLeft(cPtr)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
@@ -104,10 +102,8 @@ Public Class CameraRS2
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
         lidarRect = New cv.Rect((width - lidarWidth) / 2, 0, lidarWidth, height)
-        leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0) ' lidarCam won't have these so initialize here.
+        leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
-        cv.Cv2.PutText(rightView, "Intel RealSense L515 camera has no right view", New cv.Point(10, 200), cv.HersheyFonts.HersheyComplex, 1.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(leftView, "Intel RealSense L515 camera has no left view", New cv.Point(10, 200), cv.HersheyFonts.HersheyComplex, 1.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Or cPtr = 0 Then Exit Sub
@@ -117,24 +113,20 @@ Public Class CameraRS2
         SyncLock bufferLock
             color = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone()
 
-            If lidarCam = False Then
-                Dim accelFrame = RS2Accel(cPtr)
-                If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
-                IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
+            Dim accelFrame = RS2Accel(cPtr)
+            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+            IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
-                Dim gyroFrame = RS2Gyro(cPtr)
-                If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+            Dim gyroFrame = RS2Gyro(cPtr)
+            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
-                Static imuStartTime = RS2IMUTimeStamp(cPtr)
-                IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
-            End If
+            Static imuStartTime = RS2IMUTimeStamp(cPtr)
+            IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
 
             RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2RGBDepth(cPtr)).Clone()
             depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, RS2RawDepth(cPtr)) * depthScale
-            If lidarCam = False Then
-                leftView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).Clone()
-                rightView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2RightRaw(cPtr)).Clone()
-            End If
+            leftView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).Clone()
+            rightView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2RightRaw(cPtr)).Clone()
             pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone()
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock

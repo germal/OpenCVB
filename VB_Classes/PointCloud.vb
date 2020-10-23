@@ -80,11 +80,15 @@ Module PointCloud
         Next
         Return minIndex
     End Function
+    ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
+    ' https://www.intelrealsense.com/depth-camera-d455/
+    ' https://www.mynteye.com/pages/mynt-eye-d
+    ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
+    ' https://www.intelrealsense.com/depth-camera-d435i/
     ' order of cameras is the same as the order on the options form - keep them consistent!
     ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455
     Public hFOVangles() As Single = {90, 100, 105, 70, 86}
-    ' Public vFOVangles() As Single = {(180 - 59) / 2, (180 - 72) / 2, (180 - 58) / 2, (180 - 42.5) / 2, 57}
-    Public vFOVangles() As Single = {60.5, 54, 61, 68.75, 57}
+    Public vFOVangles() As Single = {60.5, 54, 61, 68.75, 57} ' all values from the specification.
 End Module
 
 
@@ -176,12 +180,6 @@ Public Class PointCloud_Colorize
         palette.color2 = cv.Scalar.Blue
         palette.frameModulo = 1
         arcSize = src.Width / 10
-
-        If standalone Then
-            sliders.Setup(ocvb, caller)
-            sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
-            sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2)
-        End If
 
         palette.Run(ocvb)
         dst1 = palette.dst1
@@ -362,7 +360,7 @@ Public Class PointCloud_Objects
         dst1 = measure.dst1
         label1 = measure.label1
 
-        Dim FOV = If(SideViewFlag, vFOVangles(ocvb.parms.cameraIndex), hFOVangles(ocvb.parms.cameraIndex))
+        Dim FOV = If(SideViewFlag, (180 -  vFOVangles(ocvb.parms.cameraIndex))  /2, hFOVangles(ocvb.parms.cameraIndex))
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
@@ -585,7 +583,7 @@ Public Class PointCloud_Kalman_SideView
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1, 1)
-        Dim FOV = vFOVangles(ocvb.parms.cameraIndex)
+        Dim FOV = (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
         label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
