@@ -24,14 +24,8 @@ Public Class Surf_Basics_CS
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            fisheye.Run(ocvb)
-            srcLeft = fisheye.leftView
-            srcRight = fisheye.rightView
-        Else
-            srcLeft = ocvb.leftView
-            srcRight = ocvb.rightView
-        End If
+        srcLeft = ocvb.leftView
+        srcRight = ocvb.rightView
         Dim doubleSize As New cv.Mat
         CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.trackbar(0).Value, radio.check(0).Checked)
 
@@ -61,8 +55,6 @@ Public Class Surf_Basics
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then fisheye.Run(ocvb)
-
         surf.src = src
         surf.Run(ocvb)
         dst1 = surf.dst1

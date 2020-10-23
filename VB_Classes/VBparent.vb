@@ -37,13 +37,7 @@ Public Class VBparent : Implements IDisposable
     Public label2 As String
     Public msRNG As New System.Random
     Dim algorithm As Object
-    Public fontsize As Single
-    Public dotSize As Integer
-    Public lineSize As Integer
-    Public resFactor As Single ' resolution is often a factor in sizing tasks.
     Public caller As String
-    Public topCameraPoint As cv.Point
-    Public sideCameraPoint As cv.Point
     Public Const MAXZ_DEFAULT = 4
     Public maxZ As Single = MAXZ_DEFAULT
     Public desc As String
@@ -61,26 +55,7 @@ Public Class VBparent : Implements IDisposable
         src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
-        Select Case ocvb.color.Width
-            Case 320
-                fontsize = ocvb.color.Width / 1280
-                dotSize = 3
-                lineSize = 1
-                resFactor = 0.1
-            Case 640
-                fontsize = ocvb.color.Width / 1280
-                dotSize = 7
-                lineSize = 2
-                resFactor = 0.3
-            Case 1280
-                fontsize = 1
-                dotSize = 15
-                lineSize = 4
-                resFactor = 1
-        End Select
 
-        topCameraPoint = New cv.Point(CInt(src.Height), CInt(src.Height))
-        sideCameraPoint = New cv.Point(CInt((src.Width - src.Height) / 2), CInt(src.Height - (src.Width - src.Height) / 2))
     End Sub
     Public Sub NextFrame(ocvb As VBocvb)
         If standalone Then src = ocvb.color

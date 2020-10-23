@@ -186,7 +186,7 @@ Public Class Plot_OverTime
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
         If standalone Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, fontsize * 2)
+        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, ocvb.fontSize * 2)
     End Sub
 End Class
 
@@ -237,7 +237,7 @@ Public Class Plot_Histogram
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
                 cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
             Next
-            AddPlotScale(dst1, 0, maxVal, fontsize * 2)
+            AddPlotScale(dst1, 0, maxVal, ocvb.fontSize * 2)
         End If
     End Sub
 End Class
@@ -251,7 +251,7 @@ Module Plot_OpenCV_Module
     Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As integer, dstptr As IntPtr, rows As integer, cols As integer)
     End Sub
 
-    Public Sub AddPlotScale(dst1 As cv.Mat, minVal As Double, maxVal As Double, fontsize As Double)
+    Public Sub AddPlotScale(dst1 As cv.Mat, minVal As Double, maxVal As Double, fontSize As Double)
         ' draw a scale along the side
         Dim spacer = CInt(dst1.Height / 5)
         Dim spaceVal = CInt((maxVal - minVal) / 5)
@@ -264,10 +264,10 @@ Module Plot_OpenCV_Module
             Dim nextVal = (maxVal - spaceVal * i)
             If maxVal > 1000 Then
                 cv.Cv2.PutText(dst1, Format(nextVal / 1000, "###,###,##0.0") + "k", New cv.Point(pt1.X + 5, pt1.Y - 4),
-                           cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Beige, 2)
+                           cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.Beige, 2)
             Else
                 cv.Cv2.PutText(dst1, Format(nextVal, "##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
-                           cv.HersheyFonts.HersheyComplexSmall, fontsize, cv.Scalar.Beige, 2)
+                           cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.Beige, 2)
             End If
         Next
     End Sub

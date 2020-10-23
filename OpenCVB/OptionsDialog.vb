@@ -89,8 +89,8 @@ Public Class OptionsDialog
             cameraRadioButton(i).BringToFront()
             cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
             cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
-            cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "Intel RealSense T265", "StereoLabs ZED 2 camera",
-                                               "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense L515", "Intel RealSense D455")
+            cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "StereoLabs ZED 2 camera",
+                                               "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense D455")
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
 

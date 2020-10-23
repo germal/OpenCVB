@@ -69,11 +69,7 @@ Public Class Undistort_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
 
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            sliders.setupTrackBar(1, "undistort intrinsics coeff's", -100000, 100000, 100)
-        Else
-            sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
-        End If
+        sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
         sliders.setupTrackBar(2, "undistort stereo height", 1, src.Rows, src.Rows)
         sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 

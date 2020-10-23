@@ -1614,6 +1614,7 @@ Public Class Depth_PointCloud_IMU
                     pt = New cv.Point3f(i, ocvb.pointCloud.Height - 1, z)
                     ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
                 Next
+
             End If
 
             Static imuCheckBox = findCheckBox("Use IMU gravity vector")

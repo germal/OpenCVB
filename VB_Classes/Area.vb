@@ -37,7 +37,7 @@ Public Class Area_MinTriangle_CPP
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
             srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
-            dst1.Circle(srcPoints(i), dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(srcPoints(i), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim input As New cv.Mat(numberOfPoints, 1, cv.MatType.CV_32FC2, srcPoints)
@@ -90,7 +90,7 @@ Public Class Area_MinRect
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
             srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
-            dst1.Circle(srcPoints(i), dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(srcPoints(i), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         minRect = cv.Cv2.MinAreaRect(srcPoints)
@@ -163,7 +163,7 @@ Public Class Area_FindNonZero
         dst2 = gray.EmptyClone().SetTo(0)
         ' mark the points so they are visible...
         For i = 0 To srcPoints.Length - 1
-            dst2.Circle(srcPoints(i), dotSize + 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(srcPoints(i), ocvb.dotSize + 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf

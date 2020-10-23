@@ -340,30 +340,30 @@ Public Class Puzzle_Solver
             Select Case src.Height
                 Case 180
                     factor = 4
-                    fontsize = 0.4
+                    ocvb.fontSize = 0.4
                 Case 360
                     factor = 2
-                    fontsize = 0.7
+                    ocvb.fontSize = 0.7
                 Case 720
                     factor = 1
-                    fontsize = 1.8
+                    ocvb.fontSize = 1.8
             End Select
             If radio.check(0).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 256 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 180 / factor
-                fontsize /= 2
+                ocvb.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value * 3 / 4
             ElseIf radio.check(1).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 128 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 90 / factor
-                fontsize /= 2
+                ocvb.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 3
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value * 3 / 4
             Else
                 puzzle.grid.sliders.trackbar(0).Value = 64 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 90 / factor
-                fontsize /= 2
+                ocvb.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             End If
@@ -451,7 +451,7 @@ Public Class Puzzle_Solver
                         Dim correlationRight = tmp.Get(Of Single)(0, 0)
                         If check.Box(1).Checked And correlationRight < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + yxOffset, y + yyOffset),
-                                       cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                                       cv.HersheyFonts.HersheySimplex, ocvb.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                         End If
                     End If
 
@@ -464,7 +464,7 @@ Public Class Puzzle_Solver
 
                         If check.Box(1).Checked And correlationBottom < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + xxOffset, y + xyOffset),
-                                       cv.HersheyFonts.HersheySimplex, fontsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                                       cv.HersheyFonts.HersheySimplex, ocvb.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                         End If
                     End If
                 Next

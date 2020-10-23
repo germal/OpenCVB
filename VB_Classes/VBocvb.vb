@@ -60,11 +60,41 @@ Public Class VBocvb
     Public scalarColors(255) As cv.Scalar
     Public vecColors(255) As cv.Vec3b
     Public desc As String
+    Public topCameraPoint As cv.Point
+    Public sideCameraPoint As cv.Point
+    Public fontSize As Single
+    Public dotSize As Integer
+    Public lineSize As Integer
+    Public resfactor As Single ' resolution is often a factor in sizing tasks.
+    Public resolutionIndex As Integer
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         TTtextData = New List(Of TTtext)
+
+        topCameraPoint = New cv.Point(CInt(color.Height), CInt(color.Height))
+        sideCameraPoint = New cv.Point(CInt((color.Width - color.Height) / 2), CInt(color.Height - (color.Width - color.Height) / 2) - 40)
+        Select Case color.Width
+            Case 320
+                fontSize = color.Width / 1280
+                dotSize = 3
+                lineSize = 1
+                resfactor = 0.1
+                resolutionIndex = 1
+            Case 640
+                fontSize = color.Width / 1280
+                dotSize = 7
+                lineSize = 2
+                resfactor = 0.3
+                resolutionIndex = 2
+            Case 1280
+                fontSize = 1
+                dotSize = 15
+                lineSize = 4
+                resfactor = 1
+                resolutionIndex = 3
+        End Select
     End Sub
     Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, x, y, picTag)

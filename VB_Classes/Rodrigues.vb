@@ -42,8 +42,7 @@ Public Class Rodrigues_ValidateVector
         ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.StereoLabsZED2 And
-            ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.T265Camera Then
+        If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.StereoLabsZED2 Then
             dst2.SetTo(0)
             ocvb.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
             Exit Sub
@@ -68,10 +67,6 @@ Public Class Rodrigues_ValidateVector
         output += vbTab + Format(ocvb.parms.IMU_RotationVector.X, "#0.000000000") + vbTab
         output += vbTab + Format(ocvb.parms.IMU_RotationVector.Y, "#0.000000000") + vbTab
         output += vbTab + Format(ocvb.parms.IMU_RotationVector.Z, "#0.000000000") + vbTab
-
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            output += "The T265 does not provide the Rotation Matrix but it is calculated from the Rotation Vector."
-        End If
         ocvb.trueText(output)
     End Sub
 End Class

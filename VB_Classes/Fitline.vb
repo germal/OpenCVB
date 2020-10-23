@@ -133,7 +133,7 @@ Public Class Fitline_RawInput
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
             If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
-            Dim dotSize = 2
+            Dim rdotSize = 2
             Dim width = src.Width
             Dim height = src.Height
 
@@ -145,7 +145,7 @@ Public Class Fitline_RawInput
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(points(i), dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(points(i), rdotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -166,7 +166,7 @@ Public Class Fitline_RawInput
             Dim highLight = cv.Scalar.White
             If check.Box(0).Checked Then
                 highLight = cv.Scalar.Gray
-                dotSize = 5
+                ocvb.dotSize = 5
             End If
             For i = 0 To sliders.trackbar(1).Value - 1
                 Dim noiseOffsetX = (Rnd() * 2 - 1) * sliders.trackbar(2).Value
@@ -177,7 +177,7 @@ Public Class Fitline_RawInput
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(pt, dotSize, highLight, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(pt, ocvb.dotSize, highLight, -1, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub

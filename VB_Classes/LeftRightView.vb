@@ -10,13 +10,9 @@ Public Class LeftRightView_Basics
             Case VB_Classes.ActiveTask.algParms.D435i, VB_Classes.ActiveTask.algParms.StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case VB_Classes.ActiveTask.algParms.Kinect4AzureCam, VB_Classes.ActiveTask.algParms.L515
+            Case VB_Classes.ActiveTask.algParms.Kinect4AzureCam
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
-                sliders.trackbar(0).Value = 0
-            Case VB_Classes.ActiveTask.algParms.T265Camera
-                label1 = "Raw Left View Image (clipped to fit)"
-                label2 = "Raw Right Right Image (clipped to fit)"
                 sliders.trackbar(0).Value = 0
         End Select
     End Sub
@@ -50,14 +46,6 @@ Public Class LeftRightView_CompareUndistorted
             Case VB_Classes.ActiveTask.algParms.D435i, VB_Classes.ActiveTask.algParms.StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case VB_Classes.ActiveTask.algParms.Kinect4AzureCam, VB_Classes.ActiveTask.algParms.L515
-                label1 = "Infrared Image"
-                label2 = "There is only one infrared image"
-                sliders.trackbar(0).Value = 0
-            Case VB_Classes.ActiveTask.algParms.T265Camera
-                label1 = "Undistorted Slices of Left and Right Views"
-                label2 = "Undistorted Right Image"
-                sliders.trackbar(0).Value = 50
         End Select
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
@@ -65,15 +53,9 @@ Public Class LeftRightView_CompareUndistorted
         Dim sliceY = sliders.trackbar(1).Value
         Dim slideHeight = sliders.trackbar(2).Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            fisheye.src = src
-            fisheye.Run(ocvb)
-            leftInput = fisheye.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            rightInput = fisheye.rightView
-        Else
-            leftInput = ocvb.leftView
-            rightInput = ocvb.rightView
-        End If
+
+        leftInput = ocvb.leftView
+        rightInput = ocvb.rightView
 
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
         dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
@@ -105,14 +87,10 @@ Public Class LeftRightView_CompareRaw
             Case VB_Classes.ActiveTask.algParms.D435i, VB_Classes.ActiveTask.algParms.StereoLabsZED2,
                 label1 = "Left Image"
                 label2 = "Right Image"
-            Case VB_Classes.ActiveTask.algParms.Kinect4AzureCam, VB_Classes.ActiveTask.algParms.L515
+            Case VB_Classes.ActiveTask.algParms.Kinect4AzureCam
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
                 sliders.trackbar(0).Value = 0
-            Case VB_Classes.ActiveTask.algParms.T265Camera
-                label1 = "Raw Left View Image"
-                label2 = "Raw Right Right Image"
-                sliders.trackbar(0).Value = 50
         End Select
         lrView = New LeftRightView_Basics(ocvb)
         lrView.sliders.Hide()

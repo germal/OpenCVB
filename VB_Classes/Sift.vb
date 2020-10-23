@@ -23,12 +23,7 @@ Public Class Sift_Basics_CS
     Public Sub Run(ocvb As VBocvb)
         Dim doubleSize As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            fisheye.Run(ocvb)
-            siftCS.Run(fisheye.leftView, fisheye.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
-        Else
-            siftCS.Run(ocvb.leftView, ocvb.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
-        End If
+        siftCS.Run(ocvb.leftView, ocvb.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
 
         doubleSize(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
         doubleSize(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
@@ -69,14 +64,9 @@ Public Class Sift_Basics_CS_MT
     Public Sub Run(ocvb As VBocvb)
         Dim leftView As cv.Mat
         Dim rightView As cv.Mat
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            fisheye.Run(ocvb)
-            leftView = fisheye.leftView
-            rightView = fisheye.rightView
-        Else
-            leftView = ocvb.leftView
-            rightView = ocvb.rightView
-        End If
+
+        leftView = ocvb.leftView
+        rightView = ocvb.rightView
         grid.Run(ocvb)
 
         Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)

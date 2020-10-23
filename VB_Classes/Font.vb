@@ -35,11 +35,11 @@ Public Class Font_TrueType
         ocvb.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim fontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
+        Dim gfontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        ocvb.trueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(fontSize) + vbCrLf +
-                                   "Use the Settings button above to change the font name and size.")
+        ocvb.trueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(gfontSize) + vbCrLf +
+                      "Use the Settings button above to change the font name and size.")
     End Sub
 End Class
 

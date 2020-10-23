@@ -648,7 +648,7 @@ Public Class KNN_Cluster2DCities
             Next
         Next
         For i = 0 To cityOrder.Length - 1
-            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * fontsize)
+            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * ocvb.fontSize)
         Next
 
         closedRegions = 0
@@ -661,7 +661,7 @@ Public Class KNN_Cluster2DCities
             Next
         Next
         For i = 0 To cityOrder.Length - 1
-            result.Circle(cityPositions(i), 4 * fontsize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            result.Circle(cityPositions(i), 4 * ocvb.fontSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -721,7 +721,7 @@ Public Class KNN_Point2d
         ocvb.desc = "Use KNN to find n matching points for each query."
         label1 = "Yellow=Queries, Blue=Best Responses"
     End Sub
-    Public Sub prepareImage(dst As cv.Mat)
+    Public Sub prepareImage(dst As cv.Mat, dotSize As Integer)
         dst.SetTo(0)
         For i = 0 To knn.knnQT.trainingPoints.Count - 1
             cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
@@ -730,7 +730,7 @@ Public Class KNN_Point2d
         findXnearest = nearestCountSlider.Value
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If standalone Then prepareImage(dst1)
+        If standalone Then prepareImage(dst1, ocvb.dotSize)
 
         knn.Run(ocvb)
 
@@ -746,7 +746,7 @@ Public Class KNN_Point2d
             If standalone Then
                 For j = 0 To findXnearest - 1
                     dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 Next
             End If
         Next

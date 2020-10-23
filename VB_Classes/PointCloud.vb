@@ -80,8 +80,11 @@ Module PointCloud
         Next
         Return minIndex
     End Function
-    Public hFOVangles() As Single = {90, 0, 100, 78, 70, 70, 86}  ' T265 has no point cloud so there is a 0 where it would have been.
-    Public vFOVangles() As Single = {60, 0, 55, 65, 69, 67, 60}  ' T265 has no point cloud so there is a 0 where it would have been.
+    ' order of cameras is the same as the order on the options form - keep them consistent!
+    ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455
+    Public hFOVangles() As Single = {90, 100, 105, 70, 86}
+    ' Public vFOVangles() As Single = {(180 - 59) / 2, (180 - 72) / 2, (180 - 58) / 2, (180 - 42.5) / 2, 57}
+    Public vFOVangles() As Single = {60.5, 54, 61, 68.75, 57}
 End Module
 
 
@@ -103,8 +106,8 @@ Public Class PointCloud_Colorize
     Public Function CameraLocationBot(ocvb As VBocvb, dst As cv.Mat, rotationFactor As Single) As cv.Mat
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
-        Dim fsize = fontsize * 1.5
-        dst.Circle(topCameraPoint, dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+        Dim fsize = ocvb.fontSize * 1.5
+        dst.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = maxZ - 1 To 0 Step -1
             Dim ymeter = CInt(dst.Height * i / (maxZ * rotationFactor))
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
@@ -114,30 +117,30 @@ Public Class PointCloud_Colorize
         ' draw the arc showing the camera FOV
         Dim startAngle = If(standalone, sliders.trackbar(0).Value, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim xloc = topCameraPoint.X + x
+        Dim xloc = ocvb.topCameraPoint.X + x
 
         Dim fovRight = New cv.Point(xloc, 0)
-        Dim fovLeft = New cv.Point(topCameraPoint.X - x, fovRight.Y)
+        Dim fovLeft = New cv.Point(ocvb.topCameraPoint.X - x, fovRight.Y)
 
-        dst.Ellipse(topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(ocvb.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst.Width / 2 + shift, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(topCameraPoint.X - shift, topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(topCameraPoint.X + shift, topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(ocvb.topCameraPoint.X - shift, ocvb.topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(ocvb.topCameraPoint.X + shift, ocvb.topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Return dst
     End Function
     Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat, rotationFactor As Single) As cv.Mat
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
-        Dim fsize = fontsize * 1.5
+        Dim fsize = ocvb.fontSize * 1.5
 
         Dim shift = (src.Width - src.Height) / 2
-        dst.Circle(sideCameraPoint, dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = 0 To maxZ
             Dim xmeter = CInt(dst.Height * i / (maxZ * rotationFactor))
             dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
@@ -145,23 +148,23 @@ Public Class PointCloud_Colorize
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = If(standalone, sliders.trackbar(1).Value, vFOVangles(ocvb.parms.cameraIndex))
+        Dim startAngle = If(standalone, sliders.trackbar(1).Value, (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2)
         Dim y = (dst.Width - shift) / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim yloc = sideCameraPoint.Y - y
+        Dim yloc = ocvb.sideCameraPoint.Y - y
 
         Dim fovTop = New cv.Point(dst.Width, yloc)
-        Dim fovBot = New cv.Point(dst.Width, sideCameraPoint.Y + y)
+        Dim fovBot = New cv.Point(dst.Width, ocvb.sideCameraPoint.Y + y)
 
-        dst.Ellipse(sideCameraPoint, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(sideCameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(sideCameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Ellipse(ocvb.sideCameraPoint, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Ellipse(ocvb.sideCameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst.Line(ocvb.sideCameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(src.Width * 0.02, sideCameraPoint.Y)
+        Dim labelLocation = New cv.Point(src.Width * 0.02, ocvb.sideCameraPoint.Y)
         cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
                        cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, sideCameraPoint.Y + shift / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, sideCameraPoint.Y - shift / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(sideCameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y + shift / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y - shift / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst.Line(ocvb.sideCameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
     End Function
@@ -177,7 +180,7 @@ Public Class PointCloud_Colorize
         If standalone Then
             sliders.Setup(ocvb, caller)
             sliders.setupTrackBar(0, "Top View angle for FOV", 0, 180, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
-            sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, vFOVangles(ocvb.parms.cameraIndex))
+            sliders.setupTrackBar(1, "Side View angle for FOV", 0, 180, (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2)
         End If
 
         palette.Run(ocvb)
@@ -368,11 +371,11 @@ Public Class PointCloud_Objects
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
 
             If SideViewFlag Then
-                xpt1 = New cv.Point2f(sideCameraPoint.X + pixeldistance, sideCameraPoint.Y - lineHalf)
-                xpt2 = New cv.Point2f(sideCameraPoint.X + pixeldistance, sideCameraPoint.Y + lineHalf)
+                xpt1 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y - lineHalf)
+                xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)
             Else
-                xpt1 = New cv.Point2f(topCameraPoint.X - lineHalf, src.Height - pixeldistance)
-                xpt2 = New cv.Point2f(topCameraPoint.X + lineHalf, src.Height - pixeldistance)
+                xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
+                xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
             End If
             distanceSlider.Maximum = maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
@@ -384,21 +387,21 @@ Public Class PointCloud_Objects
 
             Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
             Dim pixeldistance = src.Height - r.Y - r.Height
-            xpt1 = New cv.Point2f(topCameraPoint.X - lineHalf, src.Height - pixeldistance)
-            xpt2 = New cv.Point2f(topCameraPoint.X + lineHalf, src.Height - pixeldistance)
-            Dim coneleft = Math.Max(Math.Max(xpt1.X, r.X), topCameraPoint.X - lineHalf)
-            Dim coneRight = Math.Min(Math.Min(xpt2.X, r.X + r.Width), topCameraPoint.X + lineHalf)
+            xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
+            Dim coneleft = Math.Max(Math.Max(xpt1.X, r.X), ocvb.topCameraPoint.X - lineHalf)
+            Dim coneRight = Math.Min(Math.Min(xpt2.X, r.X + r.Width), ocvb.topCameraPoint.X + lineHalf)
             Dim drawPt1 = New cv.Point2f(coneleft, r.Y + r.Height)
             Dim drawpt2 = New cv.Point2f(coneRight, r.Y + r.Height)
 
             If SideViewFlag Then
-                lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - sideCameraPoint.X))
-                pixeldistance = r.X - sideCameraPoint.X
-                xpt1 = New cv.Point2f(sideCameraPoint.X + pixeldistance, sideCameraPoint.Y - lineHalf)
-                xpt2 = New cv.Point2f(sideCameraPoint.X + pixeldistance, sideCameraPoint.Y + lineHalf)
+                lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - ocvb.sideCameraPoint.X))
+                pixeldistance = r.X - ocvb.sideCameraPoint.X
+                xpt1 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y - lineHalf)
+                xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)
 
-                coneleft = Math.Max(Math.Max(xpt1.Y, r.Y), sideCameraPoint.Y - lineHalf)
-                coneRight = Math.Min(Math.Min(xpt2.Y, r.Y + r.Height), sideCameraPoint.Y + lineHalf)
+                coneleft = Math.Max(Math.Max(xpt1.Y, r.Y), ocvb.sideCameraPoint.Y - lineHalf)
+                coneRight = Math.Min(Math.Min(xpt2.Y, r.Y + r.Height), ocvb.sideCameraPoint.Y + lineHalf)
                 drawPt1 = New cv.Point2f(r.X, coneleft)
                 drawpt2 = New cv.Point2f(r.X, coneRight)
             End If
@@ -410,14 +413,14 @@ Public Class PointCloud_Objects
             Dim addlen As Single = 0
             ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge
             If SideViewFlag Then
-                If Not (sideCameraPoint.Y > r.Y And sideCameraPoint.Y < r.Y + r.Height) Then
-                    If r.Y > sideCameraPoint.Y Then
-                        addlen = r.Width * (r.Y - sideCameraPoint.Y) / (r.X + r.Width - sideCameraPoint.X)
+                If Not (ocvb.sideCameraPoint.Y > r.Y And ocvb.sideCameraPoint.Y < r.Y + r.Height) Then
+                    If r.Y > ocvb.sideCameraPoint.Y Then
+                        addlen = r.Width * (r.Y - ocvb.sideCameraPoint.Y) / (r.X + r.Width - ocvb.sideCameraPoint.X)
                         If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y), New cv.Point2f(r.X, r.Y - addlen), cv.Scalar.Yellow, 3)
                         r = New cv.Rect(r.X, r.Y - addlen, r.Width, coneRight - coneleft - addlen)
                         If coneRight - addlen >= xpt2.Y Then coneRight -= addlen
                     Else
-                        addlen = r.Width * (sideCameraPoint.Y - r.Y) / (r.X + r.Width - sideCameraPoint.X)
+                        addlen = r.Width * (ocvb.sideCameraPoint.Y - r.Y) / (r.X + r.Width - ocvb.sideCameraPoint.X)
                         If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
                         r = New cv.Rect(r.X, r.Y + addlen, r.Width, coneRight - coneleft + addlen)
                         coneleft += addlen
@@ -427,13 +430,13 @@ Public Class PointCloud_Objects
                 Dim newHeight = src.Height * (addlen + coneRight - coneleft) / (lineHalf * 2)
                 vo.rectFront = New cv.Rect(r.X, newY, r.Width, newHeight)
             Else
-                If Not (topCameraPoint.X > r.X And topCameraPoint.X < r.X + r.Width) Then
-                    If r.X > topCameraPoint.X Then
-                        addlen = r.Height * Math.Abs(r.X - topCameraPoint.X) / (src.Height - r.Y)
+                If Not (ocvb.topCameraPoint.X > r.X And ocvb.topCameraPoint.X < r.X + r.Width) Then
+                    If r.X > ocvb.topCameraPoint.X Then
+                        addlen = r.Height * Math.Abs(r.X - ocvb.topCameraPoint.X) / (src.Height - r.Y)
                         If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                         coneleft -= addlen
                     Else
-                        addlen = r.Height * (topCameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
+                        addlen = r.Height * (ocvb.topCameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
                         If drawLines Then dst1.Line(New cv.Point2f(r.X + r.Width, r.Y + r.Height), New cv.Point2f(r.X + r.Width + addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                         If coneleft - addlen >= xpt1.X Then coneleft -= addlen
                     End If
@@ -571,6 +574,7 @@ Public Class PointCloud_Kalman_SideView
         Static sliderHistThreshold = findSlider("Histogram threshold")
         flood.src = histogram.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
+        dst2 = histogram.dst1
 
         pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         pTrack.queryPoints = New List(Of cv.Point2f)(flood.centroids)
@@ -718,8 +722,8 @@ Public Class PointCloud_BothViews
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwTop.Values(minIndex).rectFront
 
-            minDepth = maxZ * (topCameraPoint.Y - rView.Y - rView.Height) / src.Height
-            maxDepth = maxZ * (topCameraPoint.Y - rView.Y) / src.Height
+            minDepth = maxZ * (ocvb.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
+            maxDepth = maxZ * (ocvb.topCameraPoint.Y - rView.Y) / src.Height
             Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
             If pixelPerMeter > 0 Then
                 widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
@@ -739,8 +743,8 @@ Public Class PointCloud_BothViews
             Dim rView = vwSide.Values(minIndex).rectView
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwSide.Values(minIndex).rectFront
-            minDepth = maxZ * (rView.X - sideCameraPoint.X) / src.Height
-            maxDepth = maxZ * (rView.X + rView.Width - sideCameraPoint.X) / src.Height
+            minDepth = maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
+            maxDepth = maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
 
             Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
             If pixelPerMeter > 0 Then
@@ -848,8 +852,8 @@ Public Class PointCloud_IMU_TopView
         Dim angle = angleSlider.Value
         Static xSlider = findSlider("Rotation center X")
         Static ySlider = findSlider("Rotation center Y")
-        xSlider.value = topCameraPoint.X
-        ySlider.value = topCameraPoint.Y
+        xSlider.value = ocvb.topCameraPoint.X
+        ySlider.value = ocvb.topCameraPoint.Y
         rotate.src = dst1
         rotate.Run(ocvb)
         dst1 = rotate.dst1
@@ -979,7 +983,48 @@ Public Class PointCloud_IMU_SideView
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
-        dst1.Circle(sideCameraPoint, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_IMU_SideCompare
+    Inherits VBparent
+    Public sideView As Histogram_2D_SideView
+    Public kSideView As PointCloud_Kalman_SideView
+    Public lDetect As LineDetector_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        lDetect = New LineDetector_Basics(ocvb)
+        lDetect.drawLines = True
+        kSideView = New PointCloud_Kalman_SideView(ocvb)
+        sideView = New Histogram_2D_SideView(ocvb)
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        Dim histSlider = findSlider("Histogram threshold")
+        histSlider.Value = 20
+
+        label1 = "side view aligned using the IMU gravity vector"
+        label2 = "side view aligned without using the IMU gravity vector"
+        ocvb.desc = "Present the side view with and without the IMU filter."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheck = findCheckBox("Use IMU gravity vector")
+        imuCheck.checked = True
+        sideView.Run(ocvb)
+        dst1 = sideView.dst2.Clone()
+        lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.Run(ocvb)
+        dst1 = lDetect.dst1
+        dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
         imuCheck.checked = False
         kSideView.Run(ocvb)
@@ -1022,22 +1067,181 @@ Public Class PointCloud_DistanceSideClick
         If ocvb.mouseClickFlag Then clicks.Add(ocvb.mouseClickPoint)
 
         For Each pt In points
-            dst2.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next
         For Each pt In clicks
-            dst1.Circle(pt, dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(pt, dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
             Dim pixelsPerMeter = dst2.Height / maxZ
-            Dim side1 = (pt.X - sideCameraPoint.X)
-            Dim side2 = (pt.Y - sideCameraPoint.Y)
+            Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
+            Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
             Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
             ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt)
         Next
 
-        dst1.Line(New cv.Point(sideCameraPoint.X, 0), New cv.Point(sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
+        dst1.Line(New cv.Point(ocvb.sideCameraPoint.X, 0), New cv.Point(ocvb.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
     End Sub
 End Class
 
+
+
+
+
+
+Public Class PointCloud_FindCeiling
+    Inherits VBparent
+    Public floor As PointCloud_FindFloor
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        floor = New PointCloud_FindFloor(ocvb)
+        floor.floorRun = False ' we are looking for ceilings.
+        label1 = floor.label1
+        label2 = floor.label2
+        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        floor.Run(ocvb)
+
+        dst1 = floor.dst1
+        dst2 = floor.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_FindCeilingAndFloor
+    Inherits VBparent
+    Public floor As PointCloud_FindFloor
+    Public floorLeft As cv.Point2f
+    Public floorRight As cv.Point2f
+    Public ceilingLeft As cv.Point2f
+    Public ceilingRight As cv.Point2f
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        floor = New PointCloud_FindFloor(ocvb)
+        label1 = floor.label1
+        label2 = floor.label2
+        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        floor.floorRun = True ' we are looking for ceilings.
+        floor.Run(ocvb)
+        floorLeft = floor.gleftPoint
+        floorRight = floor.grightPoint
+
+        dst1 = floor.dst1.Clone
+        dst2 = floor.dst2.Clone
+
+        floor.floorRun = False ' we are looking for ceilings.
+        floor.Run(ocvb)
+        ceilingLeft = floor.gleftPoint
+        ceilingRight = floor.grightPoint
+
+        dst1.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_FindFloorPlane
+    Inherits VBparent
+    Public floor As PointCloud_FindFloor
+    Dim inverse As Mat_Inverse
+    Public planeTriangle As cv.Mat
+    Public planeEquationRotated As mn.Plane
+    Public planeEquation As mn.Plane
+    Dim flow As Font_FlowText
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        inverse = New Mat_Inverse(ocvb)
+        flow = New Font_FlowText(ocvb)
+        floor = New PointCloud_FindFloor(ocvb)
+
+        hideForm("Reduction_Basics Radio Options")
+        hideForm("Reduction_Basics Slider Options")
+        hideForm("FloodFill_Basics Slider Options")
+
+        label1 = "Plane equation input"
+        label2 = "Side view rotated with gravity vector - floor is in red"
+        ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        floor.src = ocvb.pointCloud
+        floor.Run(ocvb)
+        dst2 = floor.sideIMU.sideView.dst2
+        dst2.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Red, 5)
+
+        Dim pixelsPerMeter = floor.sideIMU.sideView.rotatedPixelsPerMeter
+        Dim distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.gleftPoint.X) * (ocvb.sideCameraPoint.X - floor.gleftPoint.X) +
+                                ((ocvb.sideCameraPoint.Y - floor.gleftPoint.Y) * (ocvb.sideCameraPoint.Y - floor.gleftPoint.Y))) / pixelsPerMeter
+        Dim pts(3 - 1) As cv.Point3f
+        pts(0) = New cv.Point3f(0, 0, distance)
+        pts(1) = New cv.Point3f(ocvb.pointCloud.Width, 0, distance)
+        distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.grightPoint.X) * (ocvb.sideCameraPoint.X - floor.grightPoint.X) +
+                            ((ocvb.sideCameraPoint.Y - floor.grightPoint.Y) * (ocvb.sideCameraPoint.Y - floor.grightPoint.Y))) / pixelsPerMeter
+        pts(2) = New cv.Point3f(0, 0, distance)
+        pts(0) = getWorldCoordinates(ocvb, pts(0))
+        pts(1) = getWorldCoordinates(ocvb, pts(1))
+        pts(2) = getWorldCoordinates(ocvb, pts(2))
+
+        Dim p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
+        Dim p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
+        Dim p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
+
+        If p1 <> p2 And p2 <> p3 And p1 <> p3 Then
+            planeEquationRotated = mn.Plane.FromPoints(p1, p2, p3)
+
+            Dim ptsMat = New cv.Mat(pts.Length, 1, cv.MatType.CV_32FC3, pts)
+
+            inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
+            inverse.Run(ocvb)
+
+            Dim gInput = ptsMat.Reshape(1, ptsMat.Rows * ptsMat.Cols)
+            Dim gOutput = (gInput * inverse.inverse).ToMat
+            gOutput = gOutput.Reshape(3, ptsMat.Rows) ' these are the coordinates for the plane equation in the original image depth view
+
+            pts(0) = gOutput.Get(Of cv.Point3f)(0, 0)
+            pts(1) = gOutput.Get(Of cv.Point3f)(1, 0)
+            pts(2) = gOutput.Get(Of cv.Point3f)(2, 0)
+            p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
+            p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
+            p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
+
+            planeEquation = mn.Plane.FromPoints(p1, p2, p3)
+
+            If standalone Then
+                flow.msgs.Add(vbNewLine + "3D coordinates:")
+                flow.msgs.Add("X" + vbTab + "Y" + vbTab + "Z")
+                For i = 0 To gOutput.Rows - 1
+                    Dim pt = gOutput.Get(Of cv.Point3f)(i, 0)
+                    flow.msgs.Add(Format(pt.X, "#0.000") + vbTab + Format(pt.Y, "#0.000") + vbTab + Format(pt.Z, "#0.000"))
+                Next
+
+                flow.msgs.Add(vbCrLf + "Plane Equation Rotated by gravity vector:")
+                flow.msgs.Add(Format(planeEquationRotated.A, "#0.000") + vbTab + Format(planeEquationRotated.B, "#0.000") + vbTab +
+                          Format(planeEquationRotated.C, "#0.000") + vbTab + Format(planeEquationRotated.D, "#0.000"))
+
+                flow.msgs.Add(vbCrLf + "Plane Equation in original point cloud:")
+                flow.msgs.Add(Format(planeEquation.A, "#0.000") + vbTab + Format(planeEquation.B, "#0.000") + vbTab +
+                          Format(planeEquation.C, "#0.000") + vbTab + Format(planeEquation.D, "#0.000"))
+
+                flow.msgs.Add("-------------------------------------")
+
+                flow.Run(ocvb)
+            End If
+        End If
+    End Sub
+End Class
 
 
 
@@ -1057,7 +1261,7 @@ Public Class PointCloud_FindFloor
 
         kalman = New Kalman_Basics(ocvb)
 
-        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU to find the floor and ceiling - no options should turn it off.
+        ' hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU to find the floor and ceiling - no options should turn it off.
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 5)
@@ -1134,170 +1338,9 @@ Public Class PointCloud_FindFloor
                 gleftPoint = New cv.Point2f
                 grightPoint = New cv.Point2f
             End If
-            dst1.Line(gleftPoint, grightPoint, cv.Scalar.Yellow, lineSize, cv.LineTypes.AntiAlias)
-            End If
-        label1 = "Side View with gravity - PixPerMeter = " + CStr(CInt(sideIMU.sideView.rotatedPixelsPerMeter))
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class PointCloud_FindCeiling
-    Inherits VBparent
-    Public floor As PointCloud_FindFloor
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        floor = New PointCloud_FindFloor(ocvb)
-        floor.floorRun = False ' we are looking for ceilings.
-        label1 = floor.label1
-        label2 = floor.label2
-        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        floor.Run(ocvb)
-
-        dst1 = floor.dst1
-        dst2 = floor.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class PointCloud_FindCeilingAndFloor
-    Inherits VBparent
-    Public floor As PointCloud_FindFloor
-    Public floorLeft As cv.Point2f
-    Public floorRight As cv.Point2f
-    Public ceilingLeft As cv.Point2f
-    Public ceilingRight As cv.Point2f
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        floor = New PointCloud_FindFloor(ocvb)
-        label1 = floor.label1
-        label2 = floor.label2
-        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        floor.floorRun = True ' we are looking for ceilings.
-        floor.Run(ocvb)
-        floorLeft = floor.gleftPoint
-        floorRight = floor.grightPoint
-
-        dst1 = floor.dst1.Clone
-        dst2 = floor.dst2.Clone
-
-        floor.floorRun = False ' we are looking for ceilings.
-        floor.Run(ocvb)
-        ceilingLeft = floor.gleftPoint
-        ceilingRight = floor.grightPoint
-
-        dst1.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class PointCloud_FindFloorPlane
-    Inherits VBparent
-    Dim floor As PointCloud_FindFloor
-    Dim inverse As Mat_Inverse
-    Public planeTriangle As cv.Mat
-    Public planeEquationRotated As mn.Plane
-    Public planeEquation As mn.Plane
-    Dim flow As Font_FlowText
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        inverse = New Mat_Inverse(ocvb)
-        flow = New Font_FlowText(ocvb)
-        floor = New PointCloud_FindFloor(ocvb)
-
-        hideForm("Reduction_Basics Radio Options")
-        hideForm("Reduction_Basics Slider Options")
-        hideForm("FloodFill_Basics Slider Options")
-
-        label1 = "Plane equation input"
-        label2 = "Side view rotated with gravity vector - floor is in red"
-        ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        floor.src = ocvb.pointCloud
-        floor.Run(ocvb)
-        dst2 = floor.sideIMU.sideView.dst2
-        dst2.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Red, 5)
-
-        Dim pixelsPerMeter = floor.sideIMU.sideView.rotatedPixelsPerMeter
-        Dim distance = Math.Sqrt((sideCameraPoint.X - floor.gleftPoint.X) * (sideCameraPoint.X - floor.gleftPoint.X) +
-                                ((sideCameraPoint.Y - floor.gleftPoint.Y) * (sideCameraPoint.Y - floor.gleftPoint.Y))) / pixelsPerMeter
-        Dim pts(3 - 1) As cv.Point3f
-        pts(0) = New cv.Point3f(0, 0, distance)
-        pts(1) = New cv.Point3f(ocvb.pointCloud.Width, 0, distance)
-        distance = Math.Sqrt((sideCameraPoint.X - floor.grightPoint.X) * (sideCameraPoint.X - floor.grightPoint.X) +
-                            ((sideCameraPoint.Y - floor.grightPoint.Y) * (sideCameraPoint.Y - floor.grightPoint.Y))) / pixelsPerMeter
-        pts(2) = New cv.Point3f(0, 0, distance)
-        pts(0) = getWorldCoordinates(ocvb, pts(0))
-        pts(1) = getWorldCoordinates(ocvb, pts(1))
-        pts(2) = getWorldCoordinates(ocvb, pts(2))
-
-        Dim p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
-        Dim p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
-        Dim p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
-
-        If p1 <> p2 And p2 <> p3 And p1 <> p3 Then
-            planeEquationRotated = mn.Plane.FromPoints(p1, p2, p3)
-
-            Dim ptsMat = New cv.Mat(pts.Length, 1, cv.MatType.CV_32FC3, pts)
-
-            inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
-            inverse.Run(ocvb)
-
-            Dim gInput = ptsMat.Reshape(1, ptsMat.Rows * ptsMat.Cols)
-            Dim gOutput = (gInput * inverse.inverse).ToMat
-            gOutput = gOutput.Reshape(3, ptsMat.Rows) ' these are the coordinates for the plane equation in the original image depth view
-
-            pts(0) = gOutput.Get(Of cv.Point3f)(0, 0)
-            pts(1) = gOutput.Get(Of cv.Point3f)(1, 0)
-            pts(2) = gOutput.Get(Of cv.Point3f)(2, 0)
-            p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
-            p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
-            p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
-
-            planeEquation = mn.Plane.FromPoints(p1, p2, p3)
-
-            If standalone Then
-                flow.msgs.Add(vbNewLine + "3D coordinates:")
-                flow.msgs.Add("X" + vbTab + "Y" + vbTab + "Z")
-                For i = 0 To gOutput.Rows - 1
-                    Dim pt = gOutput.Get(Of cv.Point3f)(i, 0)
-                    flow.msgs.Add(Format(pt.X, "#0.000") + vbTab + Format(pt.Y, "#0.000") + vbTab + Format(pt.Z, "#0.000"))
-                Next
-
-                flow.msgs.Add(vbCrLf + "Plane Equation Rotated by gravity vector:")
-                flow.msgs.Add(Format(planeEquationRotated.A, "#0.000") + vbTab + Format(planeEquationRotated.B, "#0.000") + vbTab +
-                          Format(planeEquationRotated.C, "#0.000") + vbTab + Format(planeEquationRotated.D, "#0.000"))
-
-                flow.msgs.Add(vbCrLf + "Plane Equation in original point cloud:")
-                flow.msgs.Add(Format(planeEquation.A, "#0.000") + vbTab + Format(planeEquation.B, "#0.000") + vbTab +
-                          Format(planeEquation.C, "#0.000") + vbTab + Format(planeEquation.D, "#0.000"))
-
-                flow.msgs.Add("-------------------------------------")
-
-                flow.Run(ocvb)
-            End If
+            dst1.Line(gleftPoint, grightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
         End If
+        label1 = "Side View with gravity - PixPerMeter = " + CStr(CInt(sideIMU.sideView.rotatedPixelsPerMeter))
     End Sub
 End Class
 
@@ -1308,36 +1351,48 @@ End Class
 
 Public Class PointCloud_FindFloor2D
     Inherits VBparent
-    Dim plane As PointCloud_FindFloorPlane
+    Public floor As PointCloud_FindFloor
+    Dim floorMask As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        plane = New PointCloud_FindFloorPlane(ocvb)
-        label1 = plane.label2
+        floor = New PointCloud_FindFloor(ocvb)
+        floorMask = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
         ocvb.desc = "Mark pixels in RGB depth that are in the floor plane."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
-        plane.Run(ocvb)
-        dst2 = plane.dst2
-        Static lastGravityLine As cv.Mat = plane.dst2
-        dst1 = ocvb.RGBDepth.Resize(ocvb.pointCloud.Size)
-        ' Dim depth32f = getDepth32f(ocvb).Resize(ocvb.pointCloud.Size)
-        Dim pEq = plane.planeEquation
-        Dim white = New cv.Vec3b(255, 255, 255)
-        Dim black = New cv.Vec3b(0, 0, 0)
-        For y = 0 To ocvb.pointCloud.Height - 1
-            For x = 0 To ocvb.pointCloud.Width - 1
-                Dim p = ocvb.pointCloud.Get(Of cv.Point3f)(y, x)
-                ' If depth32f.Get(Of Single)(y, x) > maxZ Then dst1.Set(Of cv.Vec3b)(y, x, black)
-                If p.Z > 0 Then
-                    Dim p3d = New mn.Point3D(p.X / maxZ, p.Y / maxZ, p.Z / maxZ)
-                    Dim dist = pEq.AbsoluteDistanceTo(p3d)
-                    If dist < 0.1 Then dst1.Set(Of cv.Vec3b)(y, x, white)
-                End If
+        Exit Sub
+        floorMask.SetTo(0)
+        floor.Run(ocvb)
+        dst1 = ocvb.RGBDepth
+        dst2 = floor.dst1
+        Dim floorPoint = CInt((floor.gleftPoint.Y + floor.grightPoint.Y) / 2)
+        If floorPoint <> 0 Then
+            floorPoint += ocvb.sideCameraPoint.X
+            Dim lineHeight = ocvb.lineSize * 5
+            floorMask.Line(New cv.Point(floorPoint, 0), New cv.Point(floorPoint, floorMask.Width), cv.Scalar.White, lineHeight, cv.LineTypes.AntiAlias)
+            Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud ' the rotated point cloud
+
+            Dim histOutput As New cv.Mat
+            Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Width), New cv.Rangef(0, dst1.Height)}
+            Dim histSize() = {dst1.Width, dst1.Height}
+            cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+            Dim white = New cv.Vec3b(255, 255, 255)
+            Dim nSize = ocvb.pointCloud.Width / floorMask.Width
+            For y = 0 To imuPC.Height - 1 Step nSize
+                For x = 0 To imuPC.Width - 1 Step nSize
+                    Dim xyz = imuPC.Get(Of cv.Point3f)(y, x)
+                    Dim yy = CInt(xyz.Z)
+                    ' Console.Write(CStr(CInt(yy)) + "," + CStr(CInt(xyz.Y)) + " ")
+                    If yy > floorPoint - lineHeight / 2 Then
+                        If floorMask.Get(Of Byte)(CInt(xyz.Z / nSize), CInt(yy / nSize)) = 255 Then dst1.Set(Of cv.Vec3b)(y / nSize, x / nSize, white)
+                    End If
+                Next
             Next
-        Next
-        dst1 = dst1.Resize(dst2.Size)
+            Console.WriteLine(" ")
+        End If
     End Sub
 End Class
 

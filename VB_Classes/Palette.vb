@@ -543,7 +543,7 @@ Public Class Palette_ObjectColors
         For i = 0 To blobList.Count - 1
             Dim index = blobList.ElementAt(i).Value
             Dim blob = reduction.pTrack.drawRC.viewObjects.Values(index)
-            dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * fontsize, 30 * fontsize), cv.Scalar.Black, -1)
+            dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * ocvb.fontSize, 30 * ocvb.fontSize), cv.Scalar.Black, -1)
             ocvb.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
         label1 = CStr(blobList.Count) + " regions between " + Format(minDepth / 1000, "0.0") + " and " + Format(maxDepth / 1000, "0.0") + "meters"

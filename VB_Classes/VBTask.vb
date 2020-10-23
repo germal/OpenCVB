@@ -58,12 +58,10 @@ Public Class ActiveTask : Implements IDisposable
         Public extrinsics As Extrinsics_VB
 
         Public Const Kinect4AzureCam As Integer = 0
-        Public Const T265Camera As Integer = 1
-        Public Const StereoLabsZED2 As Integer = 2
-        Public Const MyntD1000 As Integer = 3
-        Public Const D435i As Integer = 4
-        Public Const L515 As Integer = 5
-        Public Const D455 As Integer = 6
+        Public Const StereoLabsZED2 As Integer = 1
+        Public Const MyntD1000 As Integer = 2
+        Public Const D435i As Integer = 3
+        Public Const D455 As Integer = 4
     End Structure
     Private Sub buildColors(ocvb As VBocvb)
         Dim vec As cv.Scalar, r As Integer = 120, b As Integer = 255, g As Integer = 0

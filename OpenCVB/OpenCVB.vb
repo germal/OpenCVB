@@ -26,11 +26,11 @@ Public Class OpenCVB
     Dim cameraRS2Generic As Object ' used only to initialize D435i and L515
     Dim cameraD435i As Object
     Dim cameraD455 As Object
-    Dim cameraL515 As Object
+    ' Dim cameraL515 As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
-    Dim cameraT265 As Object
+    ' Dim cameraT265 As Object
     Dim cameraTaskHandle As Thread
     Dim camPic(displayFrames - 1) As PictureBox
     Dim cameraRefresh As Boolean
@@ -154,11 +154,11 @@ Public Class OpenCVB
         optionsForm.OptionsDialog_Load(sender, e)
 
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
+        ' optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) = USBenumeration("Intel(R) RealSense(TM) 515 RGB")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("T265")
-        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = 0 Then optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("Movidius MA2X5X")
+        'optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("T265")
+        'If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = 0 Then optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("Movidius MA2X5X")
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
@@ -192,14 +192,13 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) Then
                 optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.Kinect4AzureCam
             End If
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.StereoLabsZED2
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.MyntD1000
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D435i
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.L515
+            'If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.L515) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.L515
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D455
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D435i, D455, D415, D435, L515, Kinect 4 Azure, T265, MyntEyeD 1000, or StereoLabs Zed2.")
+                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D455, D435i, Kinect 4 Azure, MyntEyeD 1000, or StereoLabs Zed2.")
                 End
             End If
         End If
@@ -243,14 +242,6 @@ Public Class OpenCVB
                     cameraD435i = New CameraRS2
                     cameraD435i.IMU_Present = True
                     cameraD435i.cameraName = deviceName
-                Case "Intel RealSense L515"
-                    cameraL515 = New CameraRS2
-                    cameraL515.IMU_Present = False ' no IMU!!!
-                    cameraL515.cameraName = deviceName
-                Case "Intel RealSense T265"
-                    cameraT265 = New CameraT265
-                    cameraT265.IMU_Present = True
-                    cameraT265.cameraName = deviceName
             End Select
         Next
         cameraKinect = New CameraKinect
@@ -392,7 +383,15 @@ Public Class OpenCVB
     End Sub
     Public Sub updateCamera()
         ' order is same as in optionsdialog enum
-        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraT265, cameraZed2, cameraMyntD, cameraD435i, cameraL515, cameraD455)
+        Try
+            camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455)
+        Catch ex As Exception
+            camera = cameraKinect
+        End Try
+        If camera Is Nothing Then
+            camera = cameraKinect
+            optionsForm.cameraIndex = 0
+        End If
         If camera.devicename = "" Then
             camera.width = camWidth
             camera.height = camHeight

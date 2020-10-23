@@ -50,19 +50,10 @@ Public Class FishEye_Rectified
         label2 = "Right View"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.cameraIndex = VB_Classes.ActiveTask.algParms.T265Camera Then
-            leftView = src ' the left view is rectified in the camera interface code.  Only the right view needs to be rectified here.
-
-            Dim tmp = ocvb.rightView.Resize(ocvb.pointCloud.Size())
-            Dim rightTmp = New cv.Mat(t265Original.Height, t265Original.Width, cv.MatType.CV_8U, 255) ' 848, 800
-            tmp(t265Rect).CopyTo(rightTmp(New cv.Rect((848 - 763) / 2, (800 - 720) / 2, t265Rect.Width, t265Rect.Height)))
-            rightView = rightTmp.Remap(rightViewMap1, rightViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
-        Else
-            label1 = "Left View (no fisheye lens present)"
-            label2 = "Right View (no fisheye lens present)"
-            leftView = ocvb.leftView
-            rightView = ocvb.rightView
-        End If
+        label1 = "Left View (no fisheye lens present)"
+        label2 = "Right View (no fisheye lens present)"
+        leftView = ocvb.leftView
+        rightView = ocvb.rightView
         dst1 = leftView
         dst2 = rightView
     End Sub
@@ -79,10 +70,6 @@ Public Class FishEye_Raw
         ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.cameraIndex <> VB_Classes.ActiveTask.algParms.T265Camera Then
-            ocvb.trueText("Only the T265 camera is has FishEye images at this point.", 10, 100)
-            Exit Sub
-        End If
         label1 = "Left Fisheye Image"
         label2 = "Right Fisheye Image"
         dst1 = ocvb.leftView

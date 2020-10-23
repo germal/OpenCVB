@@ -19,7 +19,7 @@ Public Class Featureless_Basics
         sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
         sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, resFactor * 500)
+        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, ocvb.resfactor * 500)
 
         flood = New FloodFill_8bit(ocvb)
 
