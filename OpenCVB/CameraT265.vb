@@ -81,7 +81,6 @@ Public Class CameraT265
         deviceName = "Intel T265"
         cameraName = deviceName
         deviceCount = 1
-        IMU_Present = True
 
         cPtr = T265Open(width, height)
         rawWidth = T265RawWidth(cPtr)

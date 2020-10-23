@@ -81,14 +81,14 @@ Module PointCloud
         Return minIndex
     End Function
     ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
-    ' https://www.intelrealsense.com/depth-camera-d455/
-    ' https://www.mynteye.com/pages/mynt-eye-d
     ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
+    ' https://www.mynteye.com/pages/mynt-eye-d
+    ' https://www.intelrealsense.com/depth-camera-d455/
     ' https://www.intelrealsense.com/depth-camera-d435i/
     ' order of cameras is the same as the order on the options form - keep them consistent!
     ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455
-    Public hFOVangles() As Single = {90, 100, 105, 70, 86}
-    Public vFOVangles() As Single = {60.5, 54, 61, 68.75, 57} ' all values from the specification.
+    Public hFOVangles() As Single = {90, 104, 105, 69.4, 86} ' all values from the specification.
+    Public vFOVangles() As Single = {59, 72, 58, 42.5, 57} ' all values from the specification.
 End Module
 
 
@@ -119,7 +119,7 @@ Public Class PointCloud_Colorize
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = If(standalone, sliders.trackbar(0).Value, 90 - hFOVangles(ocvb.parms.cameraIndex) / 2)
+        Dim startAngle = If(standalone, sliders.trackbar(0).Value, (180 - hFOVangles(ocvb.parms.cameraIndex)) / 2)
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim xloc = ocvb.topCameraPoint.X + x
 
@@ -360,13 +360,13 @@ Public Class PointCloud_Objects
         dst1 = measure.dst1
         label1 = measure.label1
 
-        Dim FOV = If(SideViewFlag, (180 -  vFOVangles(ocvb.parms.cameraIndex))  /2, hFOVangles(ocvb.parms.cameraIndex))
+        Dim FOV = If(SideViewFlag, vFOVangles(ocvb.parms.cameraIndex) / 2, hFOVangles(ocvb.parms.cameraIndex) / 2)
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
             Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / maxZ)
-            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * pixeldistance)
+            Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
             If SideViewFlag Then
                 xpt1 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y - lineHalf)
@@ -383,7 +383,7 @@ Public Class PointCloud_Objects
         For i = 0 To measure.pTrack.drawRC.viewObjects.Count - 1
             Dim r = measure.pTrack.drawRC.viewObjects.Values(i).rectView
 
-            Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (src.Height - (r.Y + r.Height)))
+            Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * (src.Height - (r.Y + r.Height)))
             Dim pixeldistance = src.Height - r.Y - r.Height
             xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
             xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
@@ -393,7 +393,7 @@ Public Class PointCloud_Objects
             Dim drawpt2 = New cv.Point2f(coneRight, r.Y + r.Height)
 
             If SideViewFlag Then
-                lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * (r.X - ocvb.sideCameraPoint.X))
+                lineHalf = CInt(Math.Tan(FOV * 0.0174533) * (r.X - ocvb.sideCameraPoint.X))
                 pixeldistance = r.X - ocvb.sideCameraPoint.X
                 xpt1 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y - lineHalf)
                 xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)

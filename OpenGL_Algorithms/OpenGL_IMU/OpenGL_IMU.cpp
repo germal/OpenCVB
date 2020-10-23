@@ -193,8 +193,6 @@ int main(int argc, char * argv[])
 
 		readPipeAndMemMap();
 
-		if (IMU_Present == false){ printf("IMU is not present."); return 0; }
-
 		glPointSize((float)pointSize);
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
 

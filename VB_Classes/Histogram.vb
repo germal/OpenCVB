@@ -926,112 +926,6 @@ End Class
 
 
 
-Public Class Histogram_2D_TopView
-    Inherits VBparent
-    Dim histOpts As Histogram_ProjectionOptions
-    Public gCloudIMU As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Public pixelsPerMeter As Single
-    Public rotateY As Boolean = False
-    Public markers(2 - 1) As cv.Point2f
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
-        gCloudIMU.includeFrustrum = True
-
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
-
-        histOpts = New Histogram_ProjectionOptions(ocvb)
-        If standalone Then histOpts.sliders.trackbar(0).Value = 1
-
-        label1 = "XZ (Top View)"
-        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
-    End Sub
-    Private Function computeFrustrumLine(ocvb As VBocvb, marker As cv.Point2f, x As Integer) As cv.Point2f
-        Dim m = (marker.Y - ocvb.topCameraPoint.Y) / (marker.X - ocvb.topCameraPoint.X)
-        Dim b = marker.Y - marker.X * m
-        Return New cv.Point2f(x, m * x + b)
-    End Function
-    Public Sub Run(ocvb As VBocvb)
-        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        Static inRangeSlider = findSlider("InRange Max Depth")
-        maxZ = inRangeSlider.Value / 1000
-
-        gCloudIMU.Run(ocvb)
-
-        Dim anchor = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
-        If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
-
-        pixelsPerMeter = src.Height / maxZ
-        Dim split = cv.Cv2.Split(gCloudIMU.imuPointCloud)
-        split(0).ConvertTo(split(0), cv.MatType.CV_32F, pixelsPerMeter, pixelsPerMeter * maxZ)
-        split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
-        cv.Cv2.Merge(split, gCloudIMU.imuPointCloud)
-
-        ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
-        Dim frustrum(4 - 1) As cv.Point3f
-        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, ocvb.pointCloud.Width - 1)
-        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, ocvb.pointCloud.Width - 1)
-        frustrum(2) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
-        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, 0)
-
-        Dim minVal = Single.MaxValue, maxVal = Single.MinValue
-        Dim minIndex As Integer, maxIndex As Integer
-        For i = 0 To frustrum.Count - 1
-            If minVal > frustrum(i).X Then
-                minVal = frustrum(i).X
-                minIndex = i
-            End If
-            If maxVal < frustrum(i).X Then
-                maxVal = frustrum(i).X
-                maxIndex = i
-            End If
-        Next
-
-        markers(0) = New cv.Point2f(frustrum(minIndex).X, dst1.Height - frustrum(minIndex).Z)
-        markers(1) = New cv.Point2f(frustrum(maxIndex).X, dst1.Height - frustrum(maxIndex).Z)
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
-        Dim histSize() = {dst1.Height, dst1.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
-        histOutput = histOutput.Flip(cv.FlipMode.X)
-        Static histThresholdSlider = findSlider("Histogram threshold")
-        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        ' the markers have to be to the right of the camera or the camera is nearly upside down.
-        If imuCheckBox.checked And markers(0).Y < ocvb.topCameraPoint.Y And markers(1).Y < ocvb.topCameraPoint.Y Then
-            dst2.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-
-            Dim newPixelsPerMeter = Math.Sqrt((markers(0).X - ocvb.topCameraPoint.X) * (markers(0).X - ocvb.topCameraPoint.X) +
-                                                      (markers(0).Y - ocvb.topCameraPoint.Y) * (markers(0).Y - ocvb.topCameraPoint.Y)) / anchor.Z
-            label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
-
-            Dim p = computeFrustrumLine(ocvb, markers(0), 0)
-            dst2.Line(ocvb.topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-            p = computeFrustrumLine(ocvb, markers(1), dst1.Width)
-            dst2.Line(ocvb.topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-        End If
-
-        For i = 0 To frustrum.Count - 1
-            Dim color = Choose(i + 1, cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
-            dst2.Circle(New cv.Point(frustrum(i).X, dst1.Height - frustrum(i).Z), ocvb.dotSize, color, -1, cv.LineTypes.AntiAlias)
-        Next
-        'dst2.Circle(markers(0), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        'dst2.Circle(markers(1), ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Histogram_2D_SideView
     Inherits VBparent
     Dim histOpts As Histogram_ProjectionOptions
@@ -1040,6 +934,8 @@ Public Class Histogram_2D_SideView
     Public pixelsPerMeter As Single
     Public markers(2 - 1) As cv.Point2f
     Public rotatedPixelsPerMeter As Integer
+    Dim frustrumSlider As Windows.Forms.TrackBar
+    Dim cameraYSlider As Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1054,29 +950,31 @@ Public Class Histogram_2D_SideView
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 1000, 200)
-        sliders.setupTrackBar(1, "SideCameraPoint.x", -100, 100, -40)
+        sliders.setupTrackBar(1, "SideCameraPoint.Y", -100, 100, -40)
+        frustrumSlider = findSlider("SideView Frustrum adjustment")
+        cameraYSlider = findSlider("SideCameraPoint.Y")
 
         Select Case ocvb.parms.cameraIndex
             Case VB_Classes.ActiveTask.algParms.Kinect4AzureCam
                 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
-                sliders.trackbar(0).Value = Choose(ocvb.resolutionIndex, 170, 172, 175)
-                sliders.trackbar(1).Value = Choose(ocvb.resolutionIndex, -9, -18, -40)
+                frustrumSlider.Value = Choose(ocvb.resolutionIndex, 170, 172, 175)
+                cameraYSlider.Value = Choose(ocvb.resolutionIndex, -9, -18, -40)
             Case VB_Classes.ActiveTask.algParms.D455
                 ' https://www.intelrealsense.com/depth-camera-d455/
-                sliders.trackbar(0).Value = Choose(ocvb.resolutionIndex, 173, 175, 174)
-                sliders.trackbar(1).Value = Choose(ocvb.resolutionIndex, -9, -20, -40)
+                frustrumSlider.Value = Choose(ocvb.resolutionIndex, 173, 175, 174)
+                cameraYSlider.Value = Choose(ocvb.resolutionIndex, -9, -20, -40)
             Case VB_Classes.ActiveTask.algParms.MyntD1000
                 ' https://www.mynteye.com/pages/mynt-eye-d
-                sliders.trackbar(0).Value = 210
-                sliders.trackbar(1).Value = Choose(ocvb.resolutionIndex, -12, -25, -46)
+                frustrumSlider.Value = 205
+                cameraYSlider.Value = Choose(ocvb.resolutionIndex, -12, -25, -44)
             Case VB_Classes.ActiveTask.algParms.StereoLabsZED2
                 ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
-                sliders.trackbar(0).Value = Choose(ocvb.resolutionIndex, 188, 188, 189)
-                sliders.trackbar(1).Value = Choose(ocvb.resolutionIndex, -10, -21, -39)
+                frustrumSlider.Value = Choose(ocvb.resolutionIndex, 188, 188, 189)
+                cameraYSlider.Value = Choose(ocvb.resolutionIndex, -10, -21, -39)
             Case VB_Classes.ActiveTask.algParms.D435i
                 ' https://www.intelrealsense.com/depth-camera-d435i/
-                sliders.trackbar(0).Value = Choose(ocvb.resolutionIndex, 175, 176, 175)
-                sliders.trackbar(1).Value = Choose(ocvb.resolutionIndex, -7, -15, -33)
+                frustrumSlider.Value = Choose(ocvb.resolutionIndex, 175, 176, 175)
+                cameraYSlider.Value = Choose(ocvb.resolutionIndex, -7, -15, -33)
         End Select
 
         label1 = "ZY (Side View)"
@@ -1097,7 +995,7 @@ Public Class Histogram_2D_SideView
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = inRangeSlider.Value / 1000
 
-        ocvb.sideCameraPoint = New cv.Point(CInt((src.Width - src.Height) / 2), CInt(src.Height - (src.Width - src.Height) / 2 + sliders.trackbar(1).Value))
+        ocvb.sideCameraPoint = New cv.Point(CInt((src.Width - src.Height) / 2), CInt(src.Height - (src.Width - src.Height) / 2 + cameraYSlider.Value))
 
         pixelsPerMeter = dst1.Height / maxZ
 
@@ -1106,8 +1004,8 @@ Public Class Histogram_2D_SideView
         If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
 
         Dim split = cv.Cv2.Split(gCloudIMU.imuPointCloud)
-        Dim test = sliders.trackbar(0).Value / 100
-        split(1).ConvertTo(split(1), cv.MatType.CV_32F, pixelsPerMeter * test, pixelsPerMeter * maxZ) ' pixelsPerMeter * maxZ to keep units the same in x and y!
+        Dim frustrumAdjust = frustrumSlider.Value / 100
+        split(1).ConvertTo(split(1), cv.MatType.CV_32F, pixelsPerMeter * frustrumAdjust, pixelsPerMeter * maxZ) ' pixelsPerMeter * maxZ to keep units the same in x and y!
         split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
         cv.Cv2.Merge(split, gCloudIMU.imuPointCloud)
 
@@ -1165,5 +1063,143 @@ Public Class Histogram_2D_SideView
         End If
         dst2.Circle(markers(0), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         dst2.Circle(markers(1), ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Histogram_2D_TopView
+    Inherits VBparent
+    Dim histOpts As Histogram_ProjectionOptions
+    Public gCloudIMU As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public pixelsPerMeter As Single
+    Public rotateY As Boolean = False
+    Public markers(2 - 1) As cv.Point2f
+    Dim frustrumSlider As Windows.Forms.TrackBar
+    Dim cameraXSlider As Windows.Forms.TrackBar
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        gCloudIMU.includeFrustrum = True
+
+        Dim reductionRadio = findRadio("No reduction")
+        reductionRadio.Checked = True
+
+        histOpts = New Histogram_ProjectionOptions(ocvb)
+        If standalone Then histOpts.sliders.trackbar(0).Value = 1
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 1000, 200)
+        sliders.setupTrackBar(1, "TopCameraPoint.X", -100, 100, -40)
+        frustrumSlider = findSlider("TopView Frustrum adjustment")
+        cameraXSlider = findSlider("TopCameraPoint.X")
+
+        Select Case ocvb.parms.cameraIndex
+            Case VB_Classes.ActiveTask.algParms.Kinect4AzureCam
+                ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
+                frustrumSlider.Value = Choose(ocvb.resolutionIndex, 99, 99, 99)
+                cameraXSlider.Value = Choose(ocvb.resolutionIndex, 0, 0, -5)
+            Case VB_Classes.ActiveTask.algParms.D455
+                ' https://www.intelrealsense.com/depth-camera-d455/
+                frustrumSlider.Value = 99
+                cameraXSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.MyntD1000
+                ' https://www.mynteye.com/pages/mynt-eye-d
+                frustrumSlider.Value = 170
+                cameraXSlider.Value = 4
+            Case VB_Classes.ActiveTask.algParms.StereoLabsZED2
+                ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
+                frustrumSlider.Value = Choose(ocvb.resolutionIndex, 109, 110, 112)
+                cameraXSlider.Value = Choose(ocvb.resolutionIndex, 8, 20, 41)
+            Case VB_Classes.ActiveTask.algParms.D435i
+                ' https://www.intelrealsense.com/depth-camera-d435i/
+                frustrumSlider.Value = 100
+                cameraXSlider.Value = 0
+        End Select
+
+        label1 = "XZ (Top View)"
+        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
+    End Sub
+    Private Function computeFrustrumLine(ocvb As VBocvb, marker As cv.Point2f, x As Integer) As cv.Point2f
+        Dim m = (marker.Y - ocvb.topCameraPoint.Y) / (marker.X - ocvb.topCameraPoint.X)
+        Dim b = marker.Y - marker.X * m
+        Return New cv.Point2f(x, m * x + b)
+    End Function
+    Public Sub Run(ocvb As VBocvb)
+        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+        Static inRangeSlider = findSlider("InRange Max Depth")
+        maxZ = inRangeSlider.Value / 1000
+
+        ocvb.topCameraPoint = New cv.Point(CInt(src.Height + cameraXSlider.Value), CInt(src.Height))
+
+        gCloudIMU.Run(ocvb)
+
+        Dim anchor = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
+        If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
+
+        pixelsPerMeter = src.Height / maxZ
+        Dim split = cv.Cv2.Split(gCloudIMU.imuPointCloud)
+        Dim frustrumAdjust = frustrumSlider.Value / 100
+        split(0).ConvertTo(split(0), cv.MatType.CV_32F, pixelsPerMeter * frustrumAdjust, pixelsPerMeter * maxZ)
+        split(2).ConvertTo(split(2), cv.MatType.CV_32F, pixelsPerMeter)
+        cv.Cv2.Merge(split, gCloudIMU.imuPointCloud)
+
+        ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
+        Dim frustrum(4 - 1) As cv.Point3f
+        frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, ocvb.pointCloud.Width - 1)
+        frustrum(1) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, ocvb.pointCloud.Width - 1)
+        frustrum(2) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
+        frustrum(3) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, 0)
+
+        Dim minVal = Single.MaxValue, maxVal = Single.MinValue
+        Dim minIndex As Integer, maxIndex As Integer
+        For i = 0 To frustrum.Count - 1
+            If minVal > frustrum(i).X Then
+                minVal = frustrum(i).X
+                minIndex = i
+            End If
+            If maxVal < frustrum(i).X Then
+                maxVal = frustrum(i).X
+                maxIndex = i
+            End If
+        Next
+
+        markers(0) = New cv.Point2f(frustrum(minIndex).X, dst1.Height - frustrum(minIndex).Z)
+        markers(1) = New cv.Point2f(frustrum(maxIndex).X, dst1.Height - frustrum(maxIndex).Z)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Height), New cv.Rangef(0, dst1.Width)}
+        Dim histSize() = {dst1.Height, dst1.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        ' the markers have to be to the right of the camera or the camera is nearly upside down.
+        If imuCheckBox.checked And markers(0).Y < ocvb.topCameraPoint.Y And markers(1).Y < ocvb.topCameraPoint.Y Then
+            dst2.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+
+            Dim newPixelsPerMeter = Math.Sqrt((markers(0).X - ocvb.topCameraPoint.X) * (markers(0).X - ocvb.topCameraPoint.X) +
+                                                      (markers(0).Y - ocvb.topCameraPoint.Y) * (markers(0).Y - ocvb.topCameraPoint.Y)) / anchor.Z
+            label2 = Format(newPixelsPerMeter, "#0.0") + " pixels per meter"
+
+            Dim p = computeFrustrumLine(ocvb, markers(0), 0)
+            dst2.Line(ocvb.topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            p = computeFrustrumLine(ocvb, markers(1), dst1.Width)
+            dst2.Line(ocvb.topCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        End If
+
+        For i = 0 To frustrum.Count - 1
+            Dim color = Choose(i + 1, cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red)
+            dst2.Circle(New cv.Point(frustrum(i).X, dst1.Height - frustrum(i).Z), ocvb.dotSize, color, -1, cv.LineTypes.AntiAlias)
+        Next
+        'dst2.Circle(markers(0), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        'dst2.Circle(markers(1), ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

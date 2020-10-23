@@ -55,7 +55,6 @@ Public Class VBparent : Implements IDisposable
         src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
-
     End Sub
     Public Sub NextFrame(ocvb As VBocvb)
         If standalone Then src = ocvb.color

@@ -26,11 +26,9 @@ Public Class OpenCVB
     Dim cameraRS2Generic As Object ' used only to initialize D435i
     Dim cameraD435i As Object
     Dim cameraD455 As Object
-    ' Dim cameraL515 As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
-    ' Dim cameraT265 As Object
     Dim cameraTaskHandle As Thread
     Dim camPic(displayFrames - 1) As PictureBox
     Dim cameraRefresh As Boolean
@@ -156,8 +154,6 @@ Public Class OpenCVB
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
-        'optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("T265")
-        'If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = 0 Then optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.T265Camera) = USBenumeration("Movidius MA2X5X")
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
@@ -223,7 +219,7 @@ Public Class OpenCVB
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
         End If
 
-        For i = 0 To VB_Classes.ActiveTask.algParms.MyntD1000
+        For i = 0 To VB_Classes.ActiveTask.algParms.D455
             If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
         Next
 
@@ -234,11 +230,13 @@ Public Class OpenCVB
             Select Case deviceName
                 Case "Intel RealSense D455"
                     cameraD455 = New CameraRS2
-                    cameraD455.IMU_Present = True
+                    cameraD455.deviceIndex = i
+                    cameraD455.serialNumber = cameraRS2Generic.querySerialNumber(i)
                     cameraD455.cameraName = deviceName
                 Case "Intel RealSense D435I"
                     cameraD435i = New CameraRS2
-                    cameraD435i.IMU_Present = True
+                    cameraD435i.deviceIndex = i
+                    cameraD435i.serialNumber = cameraRS2Generic.querySerialNumber(i)
                     cameraD435i.cameraName = deviceName
             End Select
         Next
@@ -1016,7 +1014,6 @@ Public Class OpenCVB
 
         Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.IMU_RotationMatrix(9 - 1)
-        parms.IMU_Present = camera.IMU_Present
         parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
         parms.IMU_RotationVector = camera.IMU_RotationVector
 

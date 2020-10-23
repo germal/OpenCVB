@@ -33,7 +33,6 @@ Public Class Camera
     Public deviceCount As integer
     Public deviceName As String = ""
     Public Extrinsics_VB As VB_Classes.ActiveTask.Extrinsics_VB
-    Public IMU_Present As Boolean
     Public intrinsicsLeft_VB As VB_Classes.ActiveTask.intrinsics_VB
     Public intrinsicsRight_VB As VB_Classes.ActiveTask.intrinsics_VB
     Public colorBytes() As Byte
@@ -45,6 +44,7 @@ Public Class Camera
     Public pointCloudBytes() As Byte
 
     Public serialNumber As String
+    Public deviceIndex As Integer
     Public failedImageCount As integer
     Public modelInverse As Boolean
     Public newImagesAvailable As Boolean

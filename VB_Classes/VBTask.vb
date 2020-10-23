@@ -50,7 +50,6 @@ Public Class ActiveTask : Implements IDisposable
         Public NumPyEnabled As Boolean
         Public testAllRunning As Boolean
         Public IMU_RotationMatrix() As Single
-        Public IMU_Present As Boolean
         Public IMU_RotationVector As cv.Point3f
 
         Public intrinsicsLeft As intrinsics_VB

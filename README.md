@@ -1,3 +1,14 @@
+Recent changes:
+===============
+
+-   Dropped support for Intel T265 camera (no point cloud) and the Intel
+    RealSense L515 (no IMU). All supported cameras have a point cloud and IMU.
+
+-   Tree view – some of the algorithms are a combination of several other
+    algorithms. A tree view was built to display the hierarchy.
+
+-   There are now over 750 algorithms implemented.
+
 Introduction
 ============
 

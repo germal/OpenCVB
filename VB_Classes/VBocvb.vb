@@ -73,8 +73,6 @@ Public Class VBocvb
         result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         TTtextData = New List(Of TTtext)
 
-        topCameraPoint = New cv.Point(CInt(color.Height), CInt(color.Height))
-        sideCameraPoint = New cv.Point(CInt((color.Width - color.Height) / 2), CInt(color.Height - (color.Width - color.Height) / 2) - 40)
         Select Case color.Width
             Case 320
                 fontSize = color.Width / 1280

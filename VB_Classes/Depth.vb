@@ -1566,84 +1566,80 @@ Public Class Depth_PointCloud_IMU
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         maxZ = rangeSlider.Value / 1000
 
-        If ocvb.parms.IMU_Present = False Then
-            ocvb.trueText("IMU unavailable for this camera")
-        Else
-            imu.Run(ocvb)
-            Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
-            '[cos(a) -sin(a)    0]
-            '[sin(a)  cos(a)    0]
-            '[0       0         1] rotate the point cloud around the z-axis.
-            Static zCheckbox = findCheckBox("Z-Rotation with gravity vector")
-            If zCheckbox.Checked Then
-                cx = Math.Cos(imu.angleX)
-                sx = Math.Sin(imu.angleX)
-            End If
+        imu.Run(ocvb)
+        Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
+        '[cos(a) -sin(a)    0]
+        '[sin(a)  cos(a)    0]
+        '[0       0         1] rotate the point cloud around the z-axis.
+        Static zCheckbox = findCheckBox("Z-Rotation with gravity vector")
+        If zCheckbox.Checked Then
+            cx = Math.Cos(imu.angleX)
+            sx = Math.Sin(imu.angleX)
+        End If
 
-            '[1       0         0      ] rotate the point cloud around the x-axis.
-            '[0       cos(a)    -sin(a)]
-            '[0       sin(a)    cos(a) ]
-            Static xCheckbox = findCheckBox("X-Rotation with gravity vector")
-            If xCheckbox.Checked Then
-                cz = Math.Cos(imu.angleZ)
-                sz = Math.Sin(imu.angleZ)
-            End If
+        '[1       0         0      ] rotate the point cloud around the x-axis.
+        '[0       cos(a)    -sin(a)]
+        '[0       sin(a)    cos(a) ]
+        Static xCheckbox = findCheckBox("X-Rotation with gravity vector")
+        If xCheckbox.Checked Then
+            cz = Math.Cos(imu.angleZ)
+            sz = Math.Sin(imu.angleZ)
+        End If
 
-            ' could use OpenCV for this but this makes it clearer.
-            '[cx -sx    0]  [1  0   0 ] 
-            '[sx  cx    0]  [0  cz -sz]
-            '[0   0     1]  [0  sz  cz]
-            gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+        ' could use OpenCV for this but this makes it clearer.
+        '[cx -sx    0]  [1  0   0 ] 
+        '[sx  cx    0]  [0  cz -sz]
+        '[0   0     1]  [0  sz  cz]
+        gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
                       {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-            If includeFrustrum Then
-                ' These marks the outline of the frustrum in the pointcloud at 1 meter
-                Dim z = 1.0
-                Dim pt = New cv.Point3f(0, 0, z)
-                For i = 0 To ocvb.pointCloud.Height - 1
-                    pt = New cv.Point3f(0, i, z)
-                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                    pt = New cv.Point3f(ocvb.pointCloud.Width - 1, i, z)
-                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                Next
+        If includeFrustrum Then
+            ' These marks the outline of the frustrum in the pointcloud at 1 meter
+            Dim z = 1.0
+            Dim pt = New cv.Point3f(0, 0, z)
+            For i = 0 To ocvb.pointCloud.Height - 1
+                pt = New cv.Point3f(0, i, z)
+                ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                pt = New cv.Point3f(ocvb.pointCloud.Width - 1, i, z)
+                ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+            Next
 
-                For i = 0 To ocvb.pointCloud.Width - 1
-                    pt = New cv.Point3f(i, 0, z)
-                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                    pt = New cv.Point3f(i, ocvb.pointCloud.Height - 1, z)
-                    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-                Next
+            For i = 0 To ocvb.pointCloud.Width - 1
+                pt = New cv.Point3f(i, 0, z)
+                ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+                pt = New cv.Point3f(i, ocvb.pointCloud.Height - 1, z)
+                ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
+            Next
 
-            End If
+        End If
 
-            Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-            Dim changeRequested = True
-            If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
-            Dim split = cv.Cv2.Split(ocvb.pointCloud)
-            If imuCheckBox.checked And changeRequested Then
-                Dim mask As New cv.Mat
-                cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
-                cv.Cv2.BitwiseNot(dst1, mask)
-                ocvb.pointCloud.SetTo(0, mask)
-                If standalone Then dst1 = dst1.Resize(dst1.Size)
+        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+        Dim changeRequested = True
+        If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
+        Dim split = cv.Cv2.Split(ocvb.pointCloud)
+        If imuCheckBox.checked And changeRequested Then
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
+            cv.Cv2.BitwiseNot(dst1, mask)
+            ocvb.pointCloud.SetTo(0, mask)
+            If standalone Then dst1 = dst1.Resize(dst1.Size)
 
-                gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
-                Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
-                Dim gOutput = (gInput * gMat).ToMat
-                imuPointCloud = gOutput.Reshape(3, ocvb.pointCloud.Rows)
-            Else
-                imuPointCloud = ocvb.pointCloud.Clone
-            End If
+            gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+            Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
+            Dim gOutput = (gInput * gMat).ToMat
+            imuPointCloud = gOutput.Reshape(3, ocvb.pointCloud.Rows)
+        Else
+            imuPointCloud = ocvb.pointCloud.Clone
+        End If
 
-            Static reductionRadio = findRadio("No reduction")
-            If reductionRadio.checked = False Then
-                split(2) *= 1000
-                split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-                reduction.Run(ocvb)
-                split(2) = reduction.reducedDepth32F / 1000
-                cv.Cv2.Merge(split, imuPointCloud)
-            End If
+        Static reductionRadio = findRadio("No reduction")
+        If reductionRadio.checked = False Then
+            split(2) *= 1000
+            split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+            reduction.Run(ocvb)
+            split(2) = reduction.reducedDepth32F / 1000
+            cv.Cv2.Merge(split, imuPointCloud)
         End If
     End Sub
 End Class

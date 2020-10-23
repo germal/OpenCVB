@@ -71,7 +71,6 @@ Public Class CameraKinect
         cPtr = KinectOpen()
         deviceName = "Kinect for Azure"
         cameraName = deviceName
-        IMU_Present = True
         If cPtr <> 0 Then
             deviceCount = KinectDeviceCount(cPtr)
             Dim strPtr = KinectDeviceName(cPtr) ' The width and height of the image are set in the constructor.

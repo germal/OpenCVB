@@ -59,23 +59,29 @@ public:
 		throw std::runtime_error("Device does not have a depth sensor");
 	}
 
-	RealSense2Camera(int w, int h, bool IMUPresent)
+	RealSense2Camera(int w, int h, int deviceIndex)
 	{
 		rs2_error* e = 0;
 		width = w;
 		height = h;
 
 		rs2::config cfg;
+
+		string serialNumber;
+		for (auto&& dev : ctx.query_devices())
+		{
+			serialNumber = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
+			if (deviceIndex-- == 0) break;
+		}
+
+		cfg.enable_device(serialNumber);
 		cfg.enable_stream(RS2_STREAM_COLOR, width, height, RS2_FORMAT_BGR8);
 		cfg.enable_stream(RS2_STREAM_DEPTH, width, height, RS2_FORMAT_Z16);
 		cfg.enable_stream(RS2_STREAM_INFRARED, 1, width, height, RS2_FORMAT_Y8);
 		cfg.enable_stream(RS2_STREAM_INFRARED, 2, width, height, RS2_FORMAT_Y8);
 
-		if (IMUPresent)
-		{
-			cfg.enable_stream(RS2_STREAM_GYRO);
-			cfg.enable_stream(RS2_STREAM_ACCEL);
-		}
+		cfg.enable_stream(RS2_STREAM_GYRO);
+		cfg.enable_stream(RS2_STREAM_ACCEL);
 
 		profiles = pipeline.start(cfg);
 
@@ -98,9 +104,9 @@ public:
 
 
 extern "C" __declspec(dllexport)
-int *RS2Open(int w, int h, bool IMUPresent)
+int *RS2Open(int w, int h, int deviceIndex)
 {
-	RealSense2Camera* tp = new RealSense2Camera(w, h, IMUPresent);
+	RealSense2Camera* tp = new RealSense2Camera(w, h, deviceIndex);
 	return (int *)tp;
 }
 

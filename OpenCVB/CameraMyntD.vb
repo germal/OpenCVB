@@ -145,7 +145,6 @@ Public Class CameraMyntD
             intrinsicsRight_VB.coeffs(3) = intrinsics.p2
             intrinsicsRight_VB.coeffs(4) = intrinsics.k3
 
-            IMU_Present = True
             IMUtask = New Task(Sub() IMUdataCollection())
             IMUtask.Start()
         End If

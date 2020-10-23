@@ -217,7 +217,7 @@ static void readPipeAndMemMap()
 	accel_data.z = (float)sharedMem[23];
 
 	timestamp = sharedMem[24];
-	IMU_Present = (int)sharedMem[25];
+	IMU_Present = true; // (int)sharedMem[25];
 
 	Eye.x = (float)sharedMem[26];
 	Eye.y = (float)sharedMem[27];

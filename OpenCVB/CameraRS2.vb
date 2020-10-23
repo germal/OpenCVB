@@ -5,7 +5,7 @@ Imports cv = OpenCvSharp
 
 Module RS2_Module_CPP
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RS2Open(width As Integer, height As Integer, IMUPresent As Boolean) As IntPtr
+    Public Function RS2Open(width As Integer, height As Integer, serialNumber As Integer) As IntPtr
     End Function
     <DllImport(("Cam_RS2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub RS2WaitForFrame(tp As IntPtr)
@@ -88,9 +88,13 @@ Public Class CameraRS2
         Dim Devices = ctx.QueryDevices()
         Return Devices(index).Info(0)
     End Function
+    Public Function querySerialNumber(index As Integer) As String
+        Dim Devices = ctx.QueryDevices()
+        Return Devices(index).Info(1)
+    End Function
     Public Sub initialize(fps As Integer)
         deviceName = cameraName ' devicename is used to determine that the camera has been initialized.
-        cPtr = RS2Open(width, height, IMU_Present)
+        cPtr = RS2Open(width, height, deviceIndex)
         depthScale = RS2DepthScale(cPtr) * 1000
         Dim intrin = RS2intrinsicsLeft(cPtr)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)

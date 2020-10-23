@@ -108,7 +108,6 @@ Public Class CameraZED2
         cPtr = Zed2Open(width, height, 60)
         deviceName = "StereoLabs ZED 2"
         cameraName = deviceName
-        IMU_Present = True
         If cPtr <> 0 Then
             deviceCount = 1
             Dim serialNumber = Zed2SerialNumber(cPtr)

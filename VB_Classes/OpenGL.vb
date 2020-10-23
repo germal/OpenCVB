@@ -50,7 +50,7 @@ Public Class OpenGL_Basics
                                      dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                      ocvb.IMU_AngularVelocity.X, ocvb.IMU_AngularVelocity.Y, ocvb.IMU_AngularVelocity.Z,
                                      ocvb.IMU_Acceleration.X, ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z, ocvb.IMU_TimeStamp,
-                                     If(ocvb.parms.IMU_Present, 1, 0), eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
+                                     1, eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
                                      scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
                                      imageLabel.Length)
         Next
@@ -235,12 +235,8 @@ Public Class OpenGL_IMU
     Public Sub Run(ocvb As VBocvb)
         imu.Run(ocvb)
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
-        If ocvb.parms.IMU_Present Then
-            ogl.src = src
-            ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
-        Else
-            ocvb.trueText("No IMU present on this RealSense device", 20, 100)
-        End If
+        ogl.src = src
+        ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
     End Sub
 End Class
 
