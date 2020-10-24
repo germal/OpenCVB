@@ -115,7 +115,7 @@ Public Class PointCloud_Colorize
             cv.Cv2.PutText(dst, CStr(ocvb.maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
-        ' draw the arc showing the camera FOV
+        ' draw the arc enclosing the camera FOV
         Dim startAngle = (180 - hFOVangles(ocvb.parms.cameraIndex)) / 2
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim xloc = ocvb.topCameraPoint.X + x

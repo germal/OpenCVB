@@ -1035,9 +1035,11 @@ Public Class Histogram_2D_SideView
     Public markers(2 - 1) As cv.Point2f
     Public rotatedPixelsPerMeter As Integer
     Dim cameraYSlider As Windows.Forms.TrackBar
+    Dim cmat As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        cmat = New PointCloud_Colorize(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 1000, 57)
 
@@ -1067,6 +1069,9 @@ Public Class Histogram_2D_SideView
         Dim anchor = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
         If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
 
+        Static frustrumSlider = findSlider("SideView Frustrum adjustment")
+        Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+
         ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
         Dim frustrum(4 - 1) As cv.Point3f
         frustrum(0) = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, ocvb.pointCloud.Width - 1)
@@ -1077,6 +1082,7 @@ Public Class Histogram_2D_SideView
         Dim minVal = Single.MaxValue, maxVal = Single.MinValue
         Dim minIndex As Integer, maxIndex As Integer
         For i = 0 To frustrum.Count - 1
+            frustrum(i).Y = frustrum(i).Y * fFactor * src.Height / ocvb.maxZ
             If minVal > frustrum(i).Y Then
                 minVal = frustrum(i).Y
                 minIndex = i
@@ -1085,11 +1091,10 @@ Public Class Histogram_2D_SideView
                 maxVal = frustrum(i).Y
                 maxIndex = i
             End If
+            frustrum(i).Z *= src.Width / ocvb.maxZ
         Next
 
-        Static frustrumSlider = findSlider("SideView Frustrum adjustment")
-        Dim frustrumAdjust = frustrumSlider.Value / 100
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.maxZ * frustrumAdjust / 2, ocvb.maxZ * frustrumAdjust / 2), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-fFactor, fFactor), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {dst1.Height, dst1.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
@@ -1099,6 +1104,9 @@ Public Class Histogram_2D_SideView
 
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+            dst2 = cmat.CameraLocationSide(ocvb, dst2, 1)
+            dst2.Circle(ocvb.sideCameraPoint, src.Width / ocvb.maxZ, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             rotatedPixelsPerMeter = Math.Sqrt((markers(0).X - ocvb.sideCameraPoint.X) * (markers(0).X - ocvb.sideCameraPoint.X) +
                                               (markers(0).Y - ocvb.sideCameraPoint.Y) * (markers(0).Y - ocvb.sideCameraPoint.Y)) / anchor.Z
 
