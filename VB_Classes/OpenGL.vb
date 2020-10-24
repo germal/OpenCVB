@@ -379,41 +379,12 @@ Public Class OpenGL_GravityTransform
 
         gCloud = New Depth_PointCloud_IMU(ocvb)
 
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
-
         ogl = New OpenGL_Basics(ocvb)
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-
-        radio.Setup(ocvb, caller, 4)
-        radio.check(0).Text = "Rotate around X-axis using gravity vector"
-        radio.check(1).Text = "Rotate around Z-axis using gravity vector"
-        radio.check(2).Text = "Rotate around both X-axis and Z-axis using gravity vector"
-        radio.check(3).Text = "No rotation"
-        radio.check(2).Checked = True
 
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static xRotateCheck = findCheckBox("X-Rotation with gravity vector")
-        Static zRotateCheck = findCheckBox("Z-Rotation with gravity vector")
-        If radio.check(0).Checked Then
-            xRotateCheck.checked = True
-            zRotateCheck.checked = False
-        End If
-        If radio.check(1).Checked Then
-            xRotateCheck.checked = False
-            zRotateCheck.checked = True
-        End If
-        If radio.check(2).Checked Then
-            xRotateCheck.checked = True
-            zRotateCheck.checked = True
-        End If
-        If radio.check(3).Checked Then
-            xRotateCheck.checked = False
-            zRotateCheck.checked = False
-        End If
-
         gCloud.src = ocvb.pointCloud
         gCloud.Run(ocvb)
 

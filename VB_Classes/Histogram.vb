@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
+Imports mn = MathNet.Spatial.Euclidean
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics
     Inherits VBparent
@@ -1104,6 +1104,9 @@ Public Class Histogram_2D_SideView
 
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+
+
 
             dst2 = cmat.CameraLocationSide(ocvb, dst2, 1)
             dst2.Circle(ocvb.sideCameraPoint, src.Width / ocvb.maxZ, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
