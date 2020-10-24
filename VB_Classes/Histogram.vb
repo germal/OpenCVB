@@ -951,6 +951,7 @@ Public Class Histogram_2D_SideView
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 1000, 200)
         sliders.setupTrackBar(1, "SideCameraPoint.Y", -100, 100, -40)
+        sliders.setupTrackBar(2, "SideCameraPoint.Y", 0, 200, 30)
         frustrumSlider = findSlider("SideView Frustrum adjustment")
         cameraYSlider = findSlider("SideCameraPoint.Y")
 
@@ -1036,8 +1037,19 @@ Public Class Histogram_2D_SideView
         Dim histSize() = {dst1.Width, dst1.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
+        Dim test = histOutput.ConvertScaleAbs(255)
+        test = test.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        test.Circle(markers(0), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        test.Circle(markers(1), ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.ImShow("test", test)
+
         Static histThresholdSlider = findSlider("Histogram threshold")
         Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Dim rFactor0 = sliders.trackbar(2).Value / 100 ' markers(0).Y / dst1.Height
+        Dim rFactor1 = markers(1).Y / dst1.Height
+        markers(0) = New cv.Point2f(markers(0).X, markers(0).Y * rFactor0)
+        markers(1) = New cv.Point2f(markers(1).X, markers(1).Y * rFactor1)
+
         Dim centerHist As New cv.Rect(ocvb.sideCameraPoint.X, 0, tmp.Height, tmp.Height)
         histOutput = New cv.Mat(tmp.Size, cv.MatType.CV_32F, 0)
         Dim rectHist = New cv.Rect(0, 0, dst1.Height, dst1.Height)
@@ -1050,7 +1062,7 @@ Public Class Histogram_2D_SideView
         rotatedPixelsPerMeter = Math.Sqrt((markers(0).X - ocvb.sideCameraPoint.X) * (markers(0).X - ocvb.sideCameraPoint.X) +
                                           (markers(0).Y - ocvb.sideCameraPoint.Y) * (markers(0).Y - ocvb.sideCameraPoint.Y)) / anchor.Z
 
-        ' the markers have to be to the right of the camera or the camera is nearly upside down.
+        ' the markers have to be to the right of the camera or the camera is upside down.
         If imuCheckBox.checked And markers(0).X > ocvb.sideCameraPoint.X And markers(1).X > ocvb.sideCameraPoint.X And gCloudIMU.includeFrustrum Then
             dst2.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
