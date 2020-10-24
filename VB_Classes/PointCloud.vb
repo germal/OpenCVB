@@ -106,20 +106,17 @@ Public Class PointCloud_Colorize
     Public shift As Integer
     Dim arcSize As Integer
     Public startangle As Integer
-
     Public Function CameraLocationBot(ocvb As VBocvb, dst As cv.Mat, rotationFactor As Single) As cv.Mat
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
         Dim fsize = ocvb.fontSize * 1.5
         dst.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
-        For i = maxZ - 1 To 0 Step -1
-            Dim ymeter = CInt(dst.Height * i / (maxZ * rotationFactor))
+        For i = ocvb.maxZ - 1 To 0 Step -1
+            Dim ymeter = CInt(dst.Height * i / (ocvb.maxZ * rotationFactor))
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst, CStr(ocvb.maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = If(standalone, sliders.trackbar(0).Value, (180 - hFOVangles(ocvb.parms.cameraIndex)) / 2)
+        Dim startAngle = (180 - hFOVangles(ocvb.parms.cameraIndex)) / 2
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim xloc = ocvb.topCameraPoint.X + x
 
@@ -139,21 +136,18 @@ Public Class PointCloud_Colorize
         Return dst
     End Function
     Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat, rotationFactor As Single) As cv.Mat
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
         Dim fsize = ocvb.fontSize * 1.5
 
-        Dim shift = (src.Width - src.Height) / 2
         dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
-        For i = 0 To maxZ
-            Dim xmeter = CInt(dst.Height * i / (maxZ * rotationFactor))
-            dst.Line(New cv.Point(shift + xmeter, 0), New cv.Point(shift + xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(shift + xmeter + 10, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        For i = 1 To ocvb.maxZ
+            Dim xmeter = CInt(dst.Width * i / (ocvb.maxZ * rotationFactor))
+            dst.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         ' draw the arc showing the camera FOV
-        Dim startAngle = If(standalone, sliders.trackbar(1).Value, (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2)
-        Dim y = (dst.Width - shift) / Math.Tan(startAngle * cv.Cv2.PI / 180)
+        Dim startAngle = (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2
+        Dim y = dst.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
         Dim yloc = ocvb.sideCameraPoint.Y - y
 
         Dim fovTop = New cv.Point(dst.Width, yloc)
@@ -163,11 +157,11 @@ Public Class PointCloud_Colorize
         dst.Ellipse(ocvb.sideCameraPoint, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(ocvb.sideCameraPoint, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        Dim labelLocation = New cv.Point(src.Width * 0.02, ocvb.sideCameraPoint.Y)
+        Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
         cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
                        cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y + shift / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y - shift / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(ocvb.sideCameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
@@ -179,7 +173,7 @@ Public Class PointCloud_Colorize
         palette.color1 = cv.Scalar.Yellow
         palette.color2 = cv.Scalar.Blue
         palette.frameModulo = 1
-        arcSize = src.Width / 10
+        arcSize = src.Width / 15
 
         palette.Run(ocvb)
         dst1 = palette.dst1
@@ -346,9 +340,6 @@ Public Class PointCloud_Objects
         ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Dim inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
-
         Dim saveSideViewFlag As Boolean
         If measure Is Nothing Or saveSideViewFlag <> SideViewFlag Then
             saveSideViewFlag = SideViewFlag
@@ -365,7 +356,7 @@ Public Class PointCloud_Objects
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
-            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / maxZ)
+            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / ocvb.maxZ)
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
             If SideViewFlag Then
@@ -375,7 +366,7 @@ Public Class PointCloud_Objects
                 xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
                 xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
             End If
-            distanceSlider.Maximum = maxZ * 1000
+            distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
         End If
 
@@ -500,28 +491,27 @@ Public Class PointCloud_Kalman_TopView
     Inherits VBparent
     Public pTrack As KNN_PointTracker
     Public flood As FloodFill_8bit
-    Public histogram As Histogram_2D_TopView
+    Public topView As Histogram_2D_TopView
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        pTrack = New KNN_PointTracker(ocvb)
         cmats = New PointCloud_Colorize(ocvb)
         flood = New FloodFill_8bit(ocvb)
-        flood.basics.sliders.trackbar(0).Value = 100
-        pTrack = New KNN_PointTracker(ocvb)
-        histogram = New Histogram_2D_TopView(ocvb)
+        Dim minFloodSlider = findSlider("FloodFill Minimum Size")
+        minFloodSlider.Value = 100
+        topView = New Histogram_2D_TopView(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
 
-        histogram.Run(ocvb)
+        topView.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = histogram.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = topView.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run(ocvb)
 
         If flood.dst1.Channels = 3 Then pTrack.src = flood.dst1 Else pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -535,8 +525,8 @@ Public Class PointCloud_Kalman_TopView
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
         Dim FOV = hFOVangles(ocvb.parms.cameraIndex)
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
-        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(maxZ, "0.0") + " meters"
+        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * ocvb.maxZ)
+        label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(ocvb.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -548,31 +538,28 @@ End Class
 Public Class PointCloud_Kalman_SideView
     Inherits VBparent
     Public flood As Floodfill_Identifiers
-    Public histogram As Histogram_2D_SideView
+    Public sideView As Histogram_2D_SideView
     Public pTrack As KNN_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        pTrack = New KNN_PointTracker(ocvb)
         cmats = New PointCloud_Colorize(ocvb)
         flood = New Floodfill_Identifiers(ocvb)
-        flood.basics.sliders.trackbar(0).Value = 100
-        histogram = New Histogram_2D_SideView(ocvb)
-        pTrack = New KNN_PointTracker(ocvb)
+        Dim minFloodSlider = findSlider("FloodFill Minimum Size")
+        minFloodSlider.Value = 100
+        sideView = New Histogram_2D_SideView(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
-
-        histogram.Run(ocvb)
+        sideView.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
-        flood.src = histogram.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = sideView.histOutput.ConvertScaleAbs(255)
         flood.Run(ocvb)
-        dst2 = histogram.dst1
 
         pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         pTrack.queryPoints = New List(Of cv.Point2f)(flood.centroids)
@@ -582,11 +569,16 @@ Public Class PointCloud_Kalman_SideView
         dst1 = pTrack.dst1
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU.Checked = False Then dst1 = cmats.CameraLocationSide(ocvb, dst1, 1)
+        If checkIMU.Checked = False Then
+            dst1 = cmats.CameraLocationSide(ocvb, dst1, 1)
+        Else
+            dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
+        End If
+
         Dim FOV = (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
-        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * maxZ)
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(maxZ, "0.0") + " meters"
+        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * ocvb.maxZ)
+        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(ocvb.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -814,26 +806,21 @@ Public Class PointCloud_IMU_TopView
     Public topView As Histogram_2D_TopView
     Public kTopView As PointCloud_Kalman_TopView
     Public lDetect As LineDetector_Basics
-    Dim rotate As Transform_Rotate
     Dim angleSlider As System.Windows.Forms.TrackBar
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         cmats = New PointCloud_Colorize(ocvb)
-        rotate = New Transform_Rotate(ocvb)
-        angleSlider = findSlider("Angle")
-        angleSlider.Value = 0
+        lDetect = New LineDetector_Basics(ocvb)
+        lDetect.drawLines = True
 
         kTopView = New PointCloud_Kalman_TopView(ocvb)
         topView = New Histogram_2D_TopView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20
 
-        lDetect = New LineDetector_Basics(ocvb)
         label1 = "Top view aligned using the IMU gravity vector"
         label2 = "Top view aligned without using the IMU gravity vector"
         ocvb.desc = "Present the top view with and without the IMU filter."
@@ -842,27 +829,17 @@ Public Class PointCloud_IMU_TopView
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
         topView.Run(ocvb)
-        dst1 = topView.dst1.Clone()
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
 
-        Dim angle = angleSlider.Value
-        Static xSlider = findSlider("Rotation center X")
-        Static ySlider = findSlider("Rotation center Y")
-        xSlider.value = ocvb.topCameraPoint.X
-        ySlider.value = ocvb.topCameraPoint.Y
-        rotate.src = dst1
-        rotate.Run(ocvb)
-        dst1 = rotate.dst1
-        dst1 = cmats.CameraLocationBot(ocvb, dst1, Math.Cos(topView.gCloudIMU.imu.angleZ))
-
-        imuCheck.checked = False
-        kTopView.Run(ocvb)
-        dst2 = kTopView.dst1
+        If standalone Then
+            imuCheck.checked = False
+            kTopView.Run(ocvb)
+            dst2 = cmats.CameraLocationBot(ocvb, kTopView.dst1, Math.Cos(topView.gCloudIMU.imu.angleZ))
+        End If
     End Sub
 End Class
-
 
 
 
@@ -890,10 +867,8 @@ Public Class PointCloud_FrustrumTop
     End Sub
     Public Sub Run(ocvb As VBocvb)
         topView.gCloudIMU.includeFrustrum = False
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
 
-        If ocvb.frameCount = 0 Then frustrum.Run(ocvb)
+        frustrum.Run(ocvb)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         topView.Run(ocvb)
@@ -929,10 +904,8 @@ Public Class PointCloud_FrustrumSide
     End Sub
     Public Sub Run(ocvb As VBocvb)
         sideView.gCloudIMU.includeFrustrum = False
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
 
-        If ocvb.frameCount = 0 Then frustrum.Run(ocvb)
+        frustrum.Run(ocvb)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         sideView.Run(ocvb)
@@ -951,37 +924,43 @@ End Class
 
 
 
+
 Public Class PointCloud_IMU_SideView
     Inherits VBparent
     Public sideView As Histogram_2D_SideView
     Public kSideView As PointCloud_Kalman_SideView
     Public lDetect As LineDetector_Basics
+    Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        cmats = New PointCloud_Colorize(ocvb)
         lDetect = New LineDetector_Basics(ocvb)
         lDetect.drawLines = True
+
         kSideView = New PointCloud_Kalman_SideView(ocvb)
         sideView = New Histogram_2D_SideView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20
 
-        label1 = "side view aligned using the IMU gravity vector"
-        label2 = "side view aligned without using the IMU gravity vector"
+        label1 = "side view AFTER align/threshold using gravity vector"
+        If standalone Then label2 = "side view BEFORE align/threshold using gravity vector"
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static imuCheck = findCheckBox("Use IMU gravity vector")
         imuCheck.checked = True
         sideView.Run(ocvb)
-        dst1 = sideView.dst2.Clone()
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
-        dst1 = lDetect.dst1
-        dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst1 = cmats.CameraLocationSide(ocvb, lDetect.dst1, 1)
+
+        If standalone Then
+            imuCheck.checked = False
+            kSideView.Run(ocvb)
+            dst2 = kSideView.dst1
+        End If
     End Sub
 End Class
 
@@ -1004,14 +983,12 @@ Public Class PointCloud_IMU_SideCompare
         lDetect.drawLines = True
         kSideView = New PointCloud_Kalman_SideView(ocvb)
         sideView = New Histogram_2D_SideView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20
 
-        label1 = "side view aligned using the IMU gravity vector"
-        label2 = "side view aligned without using the IMU gravity vector"
+        label1 = "side view AFTER align/threshold using gravity vector"
+        label2 = "side view BEFORE align/threshold using gravity vector"
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -1043,19 +1020,18 @@ Public Class PointCloud_DistanceSideClick
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sideIMU = New PointCloud_IMU_SideView(ocvb)
-        hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU - no options should turn it off.
         label1 = "Click anywhere to get distance from camera and x dist"
         ocvb.desc = "Click to find distance from the camera in the rotated side view"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static saveMaxZ As Single
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
+        ocvb.maxZ = inRangeSlider.Value / 1000
 
-        If maxZ <> saveMaxZ Then
+        If ocvb.maxZ <> saveMaxZ Then
             clicks.Clear()
             points.Clear()
-            saveMaxZ = maxZ
+            saveMaxZ = ocvb.maxZ
         End If
 
         sideIMU.Run(ocvb)
@@ -1070,7 +1046,7 @@ Public Class PointCloud_DistanceSideClick
         For Each pt In clicks
             dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim pixelsPerMeter = dst2.Height / maxZ
+            Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
             Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
             Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
             Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
@@ -1259,8 +1235,6 @@ Public Class PointCloud_FindFloor
 
         kalman = New Kalman_Basics(ocvb)
 
-        ' hideForm("Histogram_ProjectionOptions CheckBox Options") ' we need the IMU to find the floor and ceiling - no options should turn it off.
-
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 5)
         sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
@@ -1358,9 +1332,6 @@ Public Class PointCloud_FindFloor2D
         ocvb.desc = "Mark pixels in RGB depth that are in the floor plane."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = inRangeSlider.Value / 1000
-        Exit Sub
         floorMask.SetTo(0)
         floor.Run(ocvb)
         dst1 = ocvb.RGBDepth

@@ -38,8 +38,6 @@ Public Class VBparent : Implements IDisposable
     Public msRNG As New System.Random
     Dim algorithm As Object
     Public caller As String
-    Public Const MAXZ_DEFAULT = 4
-    Public maxZ As Single = MAXZ_DEFAULT
     Public desc As String
     Dim callStack = ""
     Public Sub initParent(ocvb As VBocvb)

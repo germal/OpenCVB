@@ -1140,42 +1140,6 @@ End Class
 
 
 
-Public Class Depth_InRange
-    Inherits VBparent
-    Public Mask As New cv.Mat
-    Public zeroMask As New cv.Mat
-    Public depth32f As New cv.Mat
-    Public minDepth As Double
-    Public maxDepth As Double
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "InRange Min Depth", 0, 1000, 200)
-        sliders.setupTrackBar(1, "InRange Max Depth", 200, 10000, 1400)
-        label1 = "Depth values that are in-range"
-        label2 = "Depth values that are out of range (and < 8m)"
-        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
-        minDepth = sliders.trackbar(0).Value
-        maxDepth = sliders.trackbar(1).Value
-        If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
-        cv.Cv2.InRange(depth32f, cv.Scalar.All(minDepth), cv.Scalar.All(maxDepth), Mask)
-        cv.Cv2.BitwiseNot(Mask, zeroMask)
-        dst1 = depth32f.Clone.SetTo(0, zeroMask)
-        dst2 = depth32f.Clone.SetTo(0, Mask)
-        If standalone Then
-            depth32f.SetTo(0, zeroMask)
-            dst2 = dst2.Threshold(8000, 8000, cv.ThresholdTypes.Trunc)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1538,33 +1502,78 @@ End Class
 
 
 
+
+Public Class Depth_InRange
+    Inherits VBparent
+    Public Mask As New cv.Mat
+    Public zeroMask As New cv.Mat
+    Public depth32f As New cv.Mat
+    Public minDepth As Double
+    Public maxDepth As Double
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 1000, 200)
+        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 10000, 4000)
+        sliders.setupTrackBar(2, "Histogram threshold", 0, 3000, 10)
+        label1 = "Depth values that are in-range"
+        label2 = "Depth values that are out of range (and < 8m)"
+        ocvb.desc = "Show depth with OpenCV using varying min and max depths."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
+        minDepth = sliders.trackbar(0).Value
+        maxDepth = sliders.trackbar(1).Value
+        If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
+        cv.Cv2.InRange(depth32f, cv.Scalar.All(minDepth), cv.Scalar.All(maxDepth), Mask)
+        cv.Cv2.BitwiseNot(Mask, zeroMask)
+        ocvb.pointCloud.SetTo(0, zeroMask.Resize(ocvb.pointCloud.Size))
+        If standalone Then
+            dst1 = depth32f.Clone.SetTo(0, zeroMask)
+            dst2 = depth32f.Clone.SetTo(0, Mask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_PointCloud_IMU
     Inherits VBparent
-    Public histOpts As Histogram_ProjectionOptions
     Public Mask As New cv.Mat
     Public imuPointCloud As cv.Mat
     Public imu As IMU_GVector
-    Public reduction As Reduction_Depth
     Public gMatrix(,) As Single
     Public gMat As New cv.Mat
     Public includeFrustrum As Boolean
+    Dim inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        reduction = New Reduction_Depth(ocvb)
         imu = New IMU_GVector(ocvb)
-        histOpts = New Histogram_ProjectionOptions(ocvb)
-        If standalone Then histOpts.check.Visible = False
-        If standalone Then imu.kalman.check.Visible = False
+        inrange = New Depth_InRange(ocvb)
+
+        check.Setup(ocvb, caller, 3)
+        check.Box(0).Text = "Use IMU gravity vector"
+        check.Box(1).Text = "X-Rotation with gravity vector"
+        check.Box(2).Text = "Z-Rotation with gravity vector"
+        check.Box(0).Checked = True
+        check.Box(1).Checked = True
+        check.Box(2).Checked = True
 
         label1 = "Mask for depth values that are in-range"
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
-        maxZ = rangeSlider.Value / 1000
+        ocvb.maxZ = rangeSlider.Value / 1000
+
+        inrange.Run(ocvb) ' 
 
         imu.Run(ocvb)
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
@@ -1594,7 +1603,8 @@ Public Class Depth_PointCloud_IMU
                       {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                       {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        If includeFrustrum Then
+        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+        If includeFrustrum And imuCheckBox.checked Then
             ' These marks the outline of the frustrum in the pointcloud at 1 meter
             Dim z = 1.0
             Dim pt = New cv.Point3f(0, 0, z)
@@ -1611,16 +1621,14 @@ Public Class Depth_PointCloud_IMU
                 pt = New cv.Point3f(i, ocvb.pointCloud.Height - 1, z)
                 ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
             Next
-
         End If
 
-        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
         Dim changeRequested = True
         If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
         Dim split = cv.Cv2.Split(ocvb.pointCloud)
         If imuCheckBox.checked And changeRequested Then
             Dim mask As New cv.Mat
-            cv.Cv2.InRange(split(2), 0.01, maxZ, dst1)
+            cv.Cv2.InRange(split(2), 0.01, ocvb.maxZ, dst1)
             cv.Cv2.BitwiseNot(dst1, mask)
             ocvb.pointCloud.SetTo(0, mask)
             If standalone Then dst1 = dst1.Resize(dst1.Size)
@@ -1632,15 +1640,5 @@ Public Class Depth_PointCloud_IMU
         Else
             imuPointCloud = ocvb.pointCloud.Clone
         End If
-
-        Static reductionRadio = findRadio("No reduction")
-        If reductionRadio.checked = False Then
-            split(2) *= 1000
-            split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-            reduction.Run(ocvb)
-            split(2) = reduction.reducedDepth32F / 1000
-            cv.Cv2.Merge(split, imuPointCloud)
-        End If
     End Sub
 End Class
-

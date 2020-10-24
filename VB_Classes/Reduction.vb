@@ -209,7 +209,6 @@ End Class
 Public Class Reduction_PointCloud
     Inherits VBparent
     Dim reduction As Reduction_Basics
-    Public newPointCloud As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         reduction = New Reduction_Basics(ocvb)
@@ -224,7 +223,7 @@ Public Class Reduction_PointCloud
         reduction.dst1.ConvertTo(dst2, cv.MatType.CV_32F)
         dst1 = dst2.Resize(ocvb.pointCloud.Size)
         split(2) = dst1 / 1000
-        cv.Cv2.Merge(split, newPointCloud)
+        cv.Cv2.Merge(split, ocvb.pointCloud)
         dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
     End Sub
 End Class
@@ -240,30 +239,39 @@ Public Class Reduction_Lines
     Dim sideView As Histogram_2D_SideView
     Dim topView As Histogram_2D_TopView
     Public lDetect As LineDetector_Basics
+    Dim reduction As Reduction_PointCloud
+    Dim cmat As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+
+        cmat = New PointCloud_Colorize(ocvb)
         sideView = New Histogram_2D_SideView(ocvb)
+        sideView.gCloudIMU.includeFrustrum = False
         topView = New Histogram_2D_TopView(ocvb)
-        Dim reductionRadio = findRadio("No reduction")
-        reductionRadio.Checked = True
+        topView.gCloudIMU.includeFrustrum = False
+        reduction = New Reduction_PointCloud(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 20
-
+        histSlider.Value = 1
         lDetect = New LineDetector_Basics(ocvb)
+
+        label1 = "Gravity rotated Side View with detected lines"
+        label2 = "Gravity rotated Top View width detected lines"
         ocvb.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        reduction.Run(ocvb)
+
         sideView.Run(ocvb)
         dst1 = sideView.dst1
         lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
-        dst1 = lDetect.dst1.Clone
+        dst1 = cmat.CameraLocationSide(ocvb, lDetect.dst1, 1)
 
         topView.Run(ocvb)
         dst2 = topView.dst1
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
-        dst2 = lDetect.dst1
+        dst2 = cmat.CameraLocationBot(ocvb, lDetect.dst1, 1)
     End Sub
 End Class

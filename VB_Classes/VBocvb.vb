@@ -67,6 +67,8 @@ Public Class VBocvb
     Public lineSize As Integer
     Public resfactor As Single ' resolution is often a factor in sizing tasks.
     Public resolutionIndex As Integer
+    Public Const MAXZ_DEFAULT = 4
+    Public maxZ As Single = MAXZ_DEFAULT
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

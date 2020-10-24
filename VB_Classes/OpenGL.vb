@@ -378,7 +378,6 @@ Public Class OpenGL_GravityTransform
         initParent(ocvb)
 
         gCloud = New Depth_PointCloud_IMU(ocvb)
-        gCloud.histOpts = New Histogram_ProjectionOptions(ocvb)
 
         Dim reductionRadio = findRadio("No reduction")
         reductionRadio.Checked = True
@@ -442,11 +441,10 @@ Public Class OpenGL_Reduced
         ocvb.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        reduction.src = ocvb.pointCloud
         reduction.Run(ocvb)
         dst1 = reduction.dst1
 
-        ogl.pointCloudInput = reduction.newPointCloud
+        ogl.pointCloudInput = ocvb.pointCloud
         ogl.src = src
         ogl.Run(ocvb)
     End Sub

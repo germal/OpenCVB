@@ -58,8 +58,6 @@ Here are the requirements:
 
     -   Mynt Eye D 1000
 
-    -   Intel RealSense L515 – a Lidar-based camera without an IMU
-
     -   Intel RealSense D455 – the latest in the series of Intel RealSense
         cameras
 
@@ -357,10 +355,9 @@ Camera Interface
 ================
 
 All the camera code is isolated in the “camera” class – see cameraRS2.vb,
-cameraKinect.vb, cameraMynt.vb, cameraZed2.vb or cameraT265.vb. There are no
-references to camera interfaces anywhere else in the code. Isolating the camera
-support from the algorithms strips the code to just the essential OpenCV API’s
-needed.
+cameraKinect.vb, cameraMynt.vb, or cameraZed2.vb. There are no references to
+camera interfaces anywhere else in the code. Isolating the camera support from
+the algorithms strips the code to just the essential OpenCV API’s needed.
 
 For example, the Kinect for Azure camera support is isolated to the
 cameraKinect.vb class and a supporting Kinect4Azure DLL that provides all the
