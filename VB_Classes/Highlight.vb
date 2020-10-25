@@ -10,7 +10,7 @@ Public Class Highlight_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         If standalone Then reduction = New Reduction_KNN_Color(ocvb)
-        ocvb.desc = "Highlight the rectangle and centroid nearest the mouse click"
+        ocvb.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If standalone Then

@@ -894,6 +894,63 @@ End Class
 
 
 
+Public Class Histogram_HighlightSide
+    Inherits VBparent
+    Public sideview As Histogram_2D_SideView
+    Public topview As Histogram_2D_TopView
+    Dim palette As Palette_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        palette = New Palette_Basics(ocvb)
+        sideview = New Histogram_2D_SideView(ocvb)
+        topview = New Histogram_2D_TopView(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
+
+        ocvb.desc = "Highlight the histogram projections where concentrations are highest"
+    End Sub
+    Private Function plotHighlights(ocvb As VBocvb, histOutput As cv.Mat, dst As cv.Mat) As String
+        Dim tmp = histOutput.Resize(New cv.Size(histOutput.Width / 10, histOutput.Height / 10))
+        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        For y = 0 To tmp.Height - 1
+            For x = 1 To tmp.Width - 1 ' skip the first column to avoid count at 0,0,0 in world coordinates (the count of points with no depth)
+                Dim val = tmp.Get(Of Single)(y, x)
+                If val > 10 Then
+                    pts.Add(val, New cv.Point(x * 10, y * 10))
+                End If
+            Next
+        Next
+
+        Static topXslider = findSlider("Display the top x highlights")
+        Dim topX = topXslider.value
+        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
+            Dim pt = pts.ElementAt(i).Value
+            dst.Circle(pt, ocvb.dotSize, cv.Scalar.All((i * 27 + 100) Mod 255), -1, cv.LineTypes.AntiAlias)
+        Next
+        palette.src = dst
+        palette.Run(ocvb)
+        Return CStr(pts.Count) + " highlights. Max=" + CStr(pts.ElementAt(0).Key)
+    End Function
+    Public Sub Run(ocvb As VBocvb)
+        sideview.Run(ocvb)
+        dst1 = sideview.dst1
+        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
+        label1 = "Side View with " + plotHighlights(ocvb, sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst1 = palette.dst1.Clone
+
+        topview.Run(ocvb)
+        dst2 = topview.dst1
+        label2 = "Top View with " + plotHighlights(ocvb, topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst2 = palette.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class Histogram_2D_TopView
     Inherits VBparent
@@ -1041,7 +1098,7 @@ Public Class Histogram_2D_SideView
 
         cmat = New PointCloud_Colorize(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 1000, 57)
+        sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
 
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
         gCloudIMU.includeFrustrum = True
@@ -1071,6 +1128,7 @@ Public Class Histogram_2D_SideView
 
         Static frustrumSlider = findSlider("SideView Frustrum adjustment")
         Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+        Dim pixelsPerMeter = src.Width / ocvb.maxZ
 
         ' Get the 4 points that mark the 1-meter frustrum in the rotated image.
         Dim frustrum(4 - 1) As cv.Point3f
@@ -1104,9 +1162,6 @@ Public Class Histogram_2D_SideView
 
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-
-
 
             dst2 = cmat.CameraLocationSide(ocvb, dst2, 1)
             dst2.Circle(ocvb.sideCameraPoint, src.Width / ocvb.maxZ, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
