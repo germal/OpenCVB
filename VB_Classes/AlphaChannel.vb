@@ -18,11 +18,10 @@ Public Class AlphaChannel_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fg.Run(ocvb)
-        dst1 = fg.dst1.ConvertScaleAbs(255)
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
         Dim split() = cv.Cv2.Split(src)
-        split(3) = dst1
+        split(3) = fg.depthMask
         cv.Cv2.Merge(split, src)
         alpha.AlphaPic.Image = cvext.BitmapConverter.ToBitmap(src, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
     End Sub
@@ -48,9 +47,8 @@ Public Class AlphaChannel_Blend
     End Sub
     Public Sub Run(ocvb As VBocvb)
         fg.Run(ocvb)
-        Dim mask = fg.dst1.ConvertScaleAbs(255)
         dst2.SetTo(0)
-        src.CopyTo(dst2, mask)
+        src.CopyTo(dst2, fg.noDepthMask)
 
         Static transparencySlider = findSlider("Transparency amount")
         Dim alpha = transparencySlider.Value / 255

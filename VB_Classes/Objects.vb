@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Object_Basics
     Inherits VBparent
-    Dim trim As Depth_InRange
+    Dim inrange As Depth_InRange
     Dim ccomp As CComp_ColorDepth
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
 
         ccomp = New CComp_ColorDepth(ocvb)
 
@@ -14,15 +14,15 @@ Public Class Object_Basics
         ocvb.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
+        inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
         If standalone Then
-            dst1 = trim.Mask
-            dst2 = trim.zeroMask
+            dst1 = inrange.depthMask
+            dst2 = inrange.noDepthMask
         End If
 
         ccomp.src.SetTo(0)
-        src.CopyTo(ccomp.src, trim.Mask)
+        src.CopyTo(ccomp.src, inrange.depthMask)
         ccomp.Run(ocvb)
         dst1 = ccomp.dst1
     End Sub

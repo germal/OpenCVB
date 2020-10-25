@@ -518,7 +518,7 @@ Public Class Palette_ObjectColors
             If vo.mask IsNot Nothing Then
                 Dim mask = vo.mask.Clone
                 Dim r = vo.preKalmanRect
-                mask.SetTo(0, inrange.zeroMask(r)) ' count only points with depth
+                mask.SetTo(0, inrange.noDepthMask(r)) ' count only points with depth
                 Dim countDepthPixels = mask.CountNonZero()
                 If countDepthPixels > 30 Then
                     Dim depth = depth32f(r).Mean(mask)

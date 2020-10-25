@@ -262,28 +262,28 @@ End Class
 
 Public Class Histogram_Depth
     Inherits VBparent
-    Public trim As Depth_InRange
+    Public inrange As Depth_InRange
     Public plotHist As Plot_Histogram
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         plotHist = New Plot_Histogram(ocvb)
 
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
 
         ocvb.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
-        plotHist.minRange = trim.sliders.trackbar(0).Value
-        plotHist.maxRange = trim.sliders.trackbar(1).Value
+        inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
+        plotHist.minRange = inrange.sliders.trackbar(0).Value
+        plotHist.maxRange = inrange.sliders.trackbar(1).Value
         plotHist.bins = sliders.trackbar(0).Value
 
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
-        cv.Cv2.CalcHist(New cv.Mat() {trim.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {inrange.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         If standalone Then
             plotHist.Run(ocvb)
@@ -328,7 +328,7 @@ Public Class Histogram_DepthValleys
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         hist = New Histogram_Depth(ocvb)
-        hist.trim.sliders.trackbar(1).Value = 5000 ' depth to 5 meters.
+        hist.inrange.sliders.trackbar(1).Value = 5000 ' depth to 5 meters.
         hist.sliders.trackbar(0).Value = 40 ' number of bins.
 
         kalman = New Kalman_Basics(ocvb)
@@ -346,7 +346,7 @@ Public Class Histogram_DepthValleys
             hist.plotHist.hist.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
-        Dim depthIncr = CInt(hist.trim.sliders.trackbar(1).Value / hist.sliders.trackbar(0).Value) ' each bar represents this number of millimeters
+        Dim depthIncr = CInt(hist.inrange.sliders.trackbar(1).Value / hist.sliders.trackbar(0).Value) ' each bar represents this number of millimeters
         Dim pointCount = hist.plotHist.hist.Get(Of Single)(0, 0) + hist.plotHist.hist.Get(Of Single)(1, 0)
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
@@ -368,7 +368,7 @@ Public Class Histogram_DepthValleys
             End If
         Next
 
-        startEndDepth = New cv.Point(startDepth, hist.trim.sliders.trackbar(1).Value)
+        startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.trackbar(1).Value)
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
 
         rangeBoundaries.Clear()
@@ -431,14 +431,14 @@ End Class
 
 Public Class Histogram_2D_XZ_YZ
     Inherits VBparent
-    Dim trim As Depth_InRange
+    Dim inrange As Depth_InRange
     Dim xyz As Mat_ImageXYZ_MT
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         xyz = New Mat_ImageXYZ_MT(ocvb)
 
-        trim = New Depth_InRange(ocvb)
-        trim.sliders.trackbar(1).Value = 1500 ' up to x meters away
+        inrange = New Depth_InRange(ocvb)
+        inrange.sliders.trackbar(1).Value = 1500 ' up to x meters away
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram X bins", 1, src.Cols, 30)
@@ -452,8 +452,8 @@ Public Class Histogram_2D_XZ_YZ
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
         Dim zbins = sliders.trackbar(2).Value
-        Dim minRange = trim.sliders.trackbar(0).Value
-        Dim maxRange = trim.sliders.trackbar(1).Value
+        Dim minRange = inrange.sliders.trackbar(0).Value
+        Dim maxRange = inrange.sliders.trackbar(1).Value
 
         Dim histogram As New cv.Mat
 

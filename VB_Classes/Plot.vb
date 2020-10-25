@@ -287,7 +287,7 @@ Public Class Plot_Depth
         hist = New Histogram_Depth(ocvb)
         hist.sliders.trackbar(0).Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.trackbar(0).Value = 200 ' a lot more bins in a plot than a bar chart.
-        hist.trim.sliders.trackbar(1).Value = 5000 ' up to x meters.
+        hist.inrange.sliders.trackbar(1).Value = 5000 ' up to x meters.
 
         plot = New Plot_Basics_CPP(ocvb)
 
@@ -295,8 +295,8 @@ Public Class Plot_Depth
     End Sub
     Public Sub Run(ocvb As VBocvb)
         hist.Run(ocvb)
-        Dim inRangeMin = hist.trim.sliders.trackbar(0).Value
-        Dim inRangeMax = hist.trim.sliders.trackbar(1).Value
+        Dim inRangeMin = hist.inrange.sliders.trackbar(0).Value
+        Dim inRangeMax = hist.inrange.sliders.trackbar(1).Value
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         For i = 0 To plot.srcX.Length - 1

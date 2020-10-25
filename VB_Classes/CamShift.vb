@@ -90,12 +90,12 @@ Public Class CamShift_Foreground
         Static depthMin As integer
         Static depthMax As integer
         If camshift.trackBox.Size.Width < 50 Then restartRequested = True
-        If fore.trim.sliders.trackbar(0).Value <> depthMin Then
-            depthMin = fore.trim.sliders.trackbar(0).Value
+        If fore.inrange.sliders.trackbar(0).Value <> depthMin Then
+            depthMin = fore.inrange.sliders.trackbar(0).Value
             restartRequested = True
         End If
-        If fore.trim.sliders.trackbar(1).Value <> depthMax Then
-            depthMax = fore.trim.sliders.trackbar(1).Value
+        If fore.inrange.sliders.trackbar(1).Value <> depthMax Then
+            depthMax = fore.inrange.sliders.trackbar(1).Value
             restartRequested = True
         End If
         If restartRequested Then fore.Run(ocvb)

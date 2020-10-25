@@ -125,22 +125,22 @@ End Class
 
 Public Class Contours_RGB
     Inherits VBparent
-    Dim trim As Depth_InRange
+    Dim inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
+        inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        img.SetTo(0, trim.zeroMask)
+        img.SetTo(0, inrange.noDepthMask)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim maxIndex As integer
-        Dim maxNodes As integer
+        Dim maxIndex As Integer
+        Dim maxNodes As Integer
         For i = 0 To contours0.Length - 1
             Dim contours = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
             If maxNodes < contours.Length Then
@@ -162,7 +162,7 @@ Public Class Contours_RGB
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         dst2.SetTo(0)
-        src.CopyTo(dst2, trim.zeroMask)
+        src.CopyTo(dst2, inrange.noDepthMask)
     End Sub
 End Class
 
@@ -219,21 +219,21 @@ End Class
 
 Public Class Contours_Depth
     Inherits VBparent
-    Public trim As Depth_InRange
+    Public inrange As Depth_InRange
     Public contours As New List(Of cv.Point)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
         ocvb.desc = "Find and draw the contour of the depth foreground."
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
-        dst1 = trim.dst1
+        inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
+        dst1 = inrange.noDepthMask
         dst2.SetTo(0)
-        Dim contours0 = cv.Cv2.FindContoursAsArray(trim.Mask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours0 = cv.Cv2.FindContoursAsArray(inrange.depthMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
         Dim maxNodes As Integer
         For i = 0 To contours0.Length - 1

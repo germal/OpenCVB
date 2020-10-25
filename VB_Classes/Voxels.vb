@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT
     Inherits VBparent
-    Public trim As Depth_InRange
+    Public inrange As Depth_InRange
     Public grid As Thread_Grid
     Public voxels(1) As Single
     Public voxelMat As cv.Mat
@@ -13,7 +13,7 @@ Public Class Voxels_Basics_MT
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
 
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
@@ -30,8 +30,8 @@ Public Class Voxels_Basics_MT
     Public Sub Run(ocvb As VBocvb)
         Dim split() = ocvb.pointCloud.Split()
 
-        trim.src = split(2) * 1000
-        trim.Run(ocvb)
+        inrange.src = split(2) * 1000
+        inrange.Run(ocvb)
         Static minSlider = findSlider("InRange Min Depth")
         Static maxSlider = findSlider("InRange Max Depth")
         minDepth = minSlider.Value
@@ -46,9 +46,9 @@ Public Class Voxels_Basics_MT
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
-            Dim count = trim.Mask(roi).CountNonZero()
+            Dim count = inrange.depthMask(roi).CountNonZero()
             If count > 0 Then
-                voxels(i) = trim.src(roi).Mean(trim.Mask(roi)).Item(0)
+                voxels(i) = inrange.src(roi).Mean(inrange.depthMask(roi)).Item(0)
             Else
                 voxels(i) = 0
             End If
@@ -69,7 +69,7 @@ Public Class Voxels_Basics_MT
                         Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
                                                   ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
                                                   ((256 - v) * nearColor(2) + v * farColor(2)) >> 8)
-                        img(roi).SetTo(color, trim.Mask(roi))
+                        img(roi).SetTo(color, inrange.depthMask(roi))
                     End If
                 End Sub)
             dst2 = img.Resize(dst1.Size)

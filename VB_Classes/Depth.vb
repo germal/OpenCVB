@@ -122,26 +122,25 @@ End Class
 
 Public Class Depth_Foreground
     Inherits VBparent
-    Public trim As Depth_InRange
+    Public inrange As Depth_InRange
     Public kalman As Kalman_Basics
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
+        Dim maxDepthSlider = findSlider("InRange Max Depth (mm)")
+        maxDepthSlider.Value = 1500 ' just 1.5 meters or less...
 
         kalman = New Kalman_Basics(ocvb)
-        ReDim kalman.kInput(4 - 1) ' cv.rect...
-        hideForm("Kalman_Basics CheckBox Options")
 
         label1 = "Blue is current, red is kalman, green is trusted"
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
-        dst1 = trim.dst1.ConvertScaleAbs(255)
-        Dim tmp = trim.dst1.ConvertScaleAbs(255)
+        inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
+        Dim tmp = inrange.depthMask.Clone
         ' find the largest blob and use that as the body.  Head is highest in the image.
         Dim blobSize As New List(Of Integer)
         Dim blobLocation As New List(Of cv.Point)
@@ -174,7 +173,7 @@ Public Class Depth_Foreground
             Dim yy = blobLocation.Item(maxIndex).Y
             If xx < 0 Then xx = 0
             If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
-            dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst1 = inrange.depthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             kalman.kInput = {xx, yy, rectSize, rectSize}
             kalman.Run(ocvb)
@@ -437,25 +436,25 @@ End Class
 
 Public Class Depth_Palette
     Inherits VBparent
-    Public trim As Depth_InRange
+    Public inrange As Depth_InRange
     Dim customColorMap As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        trim = New Depth_InRange(ocvb)
-        trim.sliders.trackbar(1).Value = 5000
+        inrange = New Depth_InRange(ocvb)
+        inrange.sliders.trackbar(1).Value = 5000
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
         ocvb.desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
-        Dim minDepth = trim.sliders.trackbar(0).Value
-        Dim maxDepth = trim.sliders.trackbar(1).Value
+        inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
+        Dim minDepth = inrange.sliders.trackbar(0).Value
+        Dim maxDepth = inrange.sliders.trackbar(1).Value
 
-        Dim depthNorm = (trim.depth32f * 255 / (maxDepth - minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
+        Dim depthNorm = (inrange.depth32f * 255 / (maxDepth - minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, trim.zeroMask)
+        dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, inrange.noDepthMask)
     End Sub
 End Class
 
@@ -580,27 +579,27 @@ End Class
 
 Public Class Depth_ColorizerFastFade_CPP
     Inherits VBparent
-    Public trim As Depth_InRange
+    Public inrange As Depth_InRange
     Dim dcPtr As IntPtr
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         dcPtr = Depth_Colorizer2_Open()
 
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
 
         label2 = "Mask from Depth_InRange"
-        ocvb.desc = "Display depth data with inrange trim.  Higher contrast than others - yellow to blue always present."
+        ocvb.desc = "Display depth data with inrange inrange.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
-        dst2 = trim.Mask
+        inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
+        dst2 = inrange.depthMask
 
-        If standalone Then src = trim.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If standalone Then src = inrange.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, trim.maxDepth)
+        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, inrange.maxDepth)
         handleSrc.Free()
 
         If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
@@ -1059,10 +1058,11 @@ End Class
 
 Public Class Depth_SmoothingMat
     Inherits VBparent
-    Public trim As Depth_InRange
+    Public inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
+        inrange.depth32fAfterMasking = True
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 10)
@@ -1072,18 +1072,18 @@ Public Class Depth_SmoothingMat
     Public Sub Run(ocvb As VBocvb)
         If standalone Then src = getDepth32f(ocvb)
         Dim rect = If(ocvb.drawRect.Width <> 0, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
-        trim.src = src(rect)
-        trim.Run(ocvb)
-        Static lastDepth = trim.dst2 ' the far depth needs to be smoothed
-        If lastDepth.Size <> trim.dst2.Size Then lastDepth = trim.dst2
+        inrange.src = src(rect)
+        inrange.Run(ocvb)
+        Static lastDepth = inrange.dst2 ' the far depth needs to be smoothed
+        If lastDepth.Size <> inrange.dst2.Size Then lastDepth = inrange.dst2
 
-        cv.Cv2.Subtract(lastDepth, trim.dst2, dst1)
+        cv.Cv2.Subtract(lastDepth, inrange.dst2, dst1)
 
         Static thresholdSlider = findSlider("Threshold in millimeters")
         Dim mmThreshold = CSng(thresholdSlider.Value)
         dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv).Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
-        cv.Cv2.Add(trim.dst2, dst1, dst2)
-        lastDepth = trim.dst2
+        cv.Cv2.Add(inrange.dst2, dst1, dst2)
+        lastDepth = inrange.dst2
 
         Static inrangeMinSlider = findSlider("InRange Min Depth")
         Static inrangeMaxSlider = findSlider("InRange Max Depth")
@@ -1411,7 +1411,7 @@ Public Class Depth_NoiseRemovedAndColorized
         dst2 = depth.dst1
 
         colorize.src = depth.depth32fNoiseRemoved
-        colorize.run(ocvb)
+        colorize.Run(ocvb)
         dst1 = colorize.dst1
     End Sub
 End Class
@@ -1457,25 +1457,25 @@ End Class
 Public Class Depth_WorldXYZ_MT
     Inherits VBparent
     Dim grid As Thread_Grid
-    Dim trim As Depth_InRange
+    Dim inrange As Depth_InRange
     Public xyzFrame As cv.Mat
     Public depthUnitsMeters = False
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         grid = New Thread_Grid(ocvb)
-        trim = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange(ocvb)
 
         xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
         ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        trim.src = src
-        If trim.src.Type <> cv.MatType.CV_32F Then trim.src = getDepth32f(ocvb)
-        trim.Run(ocvb)
+        inrange.src = src
+        If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = getDepth32f(ocvb)
+        inrange.Run(ocvb)
         grid.Run(ocvb)
 
         xyzFrame.SetTo(0)
-        Dim depth32f = If(depthUnitsMeters, trim.depth32f, (trim.depth32f * 0.001).ToMat) ' convert to meters.
+        Dim depth32f = If(depthUnitsMeters, inrange.depth32f, (inrange.depth32f * 0.001).ToMat) ' convert to meters.
         Dim multX = ocvb.pointCloud.Width / depth32f.Width
         Dim multY = ocvb.pointCloud.Height / depth32f.Height
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
@@ -1505,11 +1505,12 @@ End Class
 
 Public Class Depth_InRange
     Inherits VBparent
-    Public Mask As New cv.Mat
-    Public zeroMask As New cv.Mat
+    Public depthMask As New cv.Mat
+    Public noDepthMask As New cv.Mat
     Public depth32f As New cv.Mat
     Public minDepth As Double
     Public maxDepth As Double
+    Public depth32fAfterMasking As Boolean
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
@@ -1525,12 +1526,12 @@ Public Class Depth_InRange
         minDepth = sliders.trackbar(0).Value
         maxDepth = sliders.trackbar(1).Value
         If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
-        cv.Cv2.InRange(depth32f, cv.Scalar.All(minDepth), cv.Scalar.All(maxDepth), Mask)
-        cv.Cv2.BitwiseNot(Mask, zeroMask)
-        ocvb.pointCloud.SetTo(0, zeroMask.Resize(ocvb.pointCloud.Size))
-        If standalone Then
-            dst1 = depth32f.Clone.SetTo(0, zeroMask)
-            dst2 = depth32f.Clone.SetTo(0, Mask)
+        cv.Cv2.InRange(depth32f, cv.Scalar.All(minDepth), cv.Scalar.All(maxDepth), depthMask)
+        cv.Cv2.BitwiseNot(depthMask, noDepthMask)
+        ocvb.pointCloud.SetTo(0, noDepthMask.Resize(ocvb.pointCloud.Size))
+        If standalone Or depth32fAfterMasking Then
+            dst1 = depth32f.Clone.SetTo(0, noDepthMask)
+            dst2 = depth32f.Clone.SetTo(0, depthMask)
         End If
     End Sub
 End Class
