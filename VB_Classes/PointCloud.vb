@@ -80,15 +80,6 @@ Module PointCloud
         Next
         Return minIndex
     End Function
-    ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
-    ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
-    ' https://www.mynteye.com/pages/mynt-eye-d
-    ' https://www.intelrealsense.com/depth-camera-d455/
-    ' https://www.intelrealsense.com/depth-camera-d435i/
-    ' order of cameras is the same as the order on the options form - keep them consistent!
-    ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455
-    Public hFOVangles() As Single = {90, 104, 105, 69.4, 86} ' all values from the specification.
-    Public vFOVangles() As Single = {59, 72, 58, 42.5, 57} ' all values from the specification.
 End Module
 
 
@@ -115,7 +106,7 @@ Public Class PointCloud_Colorize
         Next
 
         ' draw the arc enclosing the camera FOV
-        Dim startAngle = (180 - hFOVangles(ocvb.parms.cameraIndex)) / 2
+        Dim startAngle = (180 - ocvb.hFov) / 2
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
 
         Dim fovRight = New cv.Point(ocvb.topCameraPoint.X + x, 0)
@@ -131,22 +122,20 @@ Public Class PointCloud_Colorize
         dst.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Return dst
     End Function
-    Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat, rotationFactor As Single) As cv.Mat
+    Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat) As cv.Mat
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
         Dim fsize = ocvb.fontSize * 1.5
 
         dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = 1 To ocvb.maxZ
-            Dim xmeter = CInt(dst.Width * i / (ocvb.maxZ * rotationFactor))
+            Dim xmeter = CInt(dst.Width * i / ocvb.maxZ)
             dst.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
-        Static frustrumSlider = findSlider("SideView Frustrum adjustment")
-        Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
-        Dim fovAngle = vFOVangles(ocvb.parms.cameraIndex)
+        Dim fovAngle = ocvb.vFov
         Dim markerx = dst.Width / ocvb.maxZ
-        Dim markery = markerx * Math.Sin((fovAngle / 2) * cv.Cv2.PI / 180) * fFactor
+        Dim markery = markerx * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
         dst.Circle(New cv.Point(markerx, ocvb.sideCameraPoint.Y - markery), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         dst.Circle(New cv.Point(markerx, ocvb.sideCameraPoint.Y + markery), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
 
@@ -353,7 +342,7 @@ Public Class PointCloud_Objects
         dst1 = measure.dst1
         label1 = measure.label1
 
-        Dim FOV = If(SideViewFlag, vFOVangles(ocvb.parms.cameraIndex) / 2, hFOVangles(ocvb.parms.cameraIndex) / 2)
+        Dim FOV = If(SideViewFlag, ocvb.vFov / 2, ocvb.hFov / 2)
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
@@ -438,7 +427,7 @@ Public Class PointCloud_Objects
             End If
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
-        dst1 = If(SideViewFlag, cmats.CameraLocationSide(ocvb, dst1, 1), cmats.CameraLocationBot(ocvb, dst1, 1))
+        dst1 = If(SideViewFlag, cmats.CameraLocationSide(ocvb, dst1), cmats.CameraLocationBot(ocvb, dst1, 1))
     End Sub
 End Class
 
@@ -525,7 +514,7 @@ Public Class PointCloud_Kalman_TopView
 
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
-        Dim FOV = hFOVangles(ocvb.parms.cameraIndex)
+        Dim FOV = ocvb.hFov
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * ocvb.maxZ)
         label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(ocvb.maxZ, "0.0") + " meters"
@@ -570,14 +559,9 @@ Public Class PointCloud_Kalman_SideView
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
 
-        Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU.Checked = False Then
-            dst1 = cmats.CameraLocationSide(ocvb, dst1, 1)
-        Else
-            dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
-        End If
+        dst1 = cmats.CameraLocationSide(ocvb, dst1)
 
-        Dim FOV = (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2
+        Dim FOV = (180 - ocvb.vFov) / 2
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * ocvb.maxZ)
         label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(ocvb.maxZ, "0.0") + " meters"
@@ -767,7 +751,7 @@ Public Class PointCloud_BothViews
         Static checkIMU = findCheckBox("Use IMU gravity vector")
         If checkIMU.Checked = False Then
             dst1 = cmats.CameraLocationBot(ocvb, dst1, 1)
-            dst2 = cmats.CameraLocationSide(ocvb, dst2, 1)
+            dst2 = cmats.CameraLocationSide(ocvb, dst2)
         End If
     End Sub
 End Class
@@ -909,7 +893,7 @@ Public Class PointCloud_FrustrumSide
         sideView.Run(ocvb)
 
         dst1 = sideView.dst1
-        dst1 = cmats.CameraLocationSide(ocvb, dst1, Math.Cos(sideView.gCloudIMU.imu.angleZ))
+        dst1 = cmats.CameraLocationSide(ocvb, dst1)
         dst2 = frustrum.dst1
     End Sub
 End Class
@@ -952,7 +936,7 @@ Public Class PointCloud_IMU_SideView
         sideView.Run(ocvb)
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
-        dst1 = cmats.CameraLocationSide(ocvb, lDetect.dst1, 1)
+        dst1 = cmats.CameraLocationSide(ocvb, lDetect.dst1)
 
         If standalone Then
             imuCheck.checked = False

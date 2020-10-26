@@ -1565,10 +1565,6 @@ Public Class Depth_PointCloud_IMU
         check.Box(1).Checked = True
         check.Box(2).Checked = True
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "test x", -10000, 10000, -100)
-        sliders.setupTrackBar(1, "test y", -1000, 1000, -100)
-
         label1 = "Mask for depth values that are in-range"
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
@@ -1606,11 +1602,12 @@ Public Class Depth_PointCloud_IMU
                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
+
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        Dim changeRequested = True
-        If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
+        Dim xOrYChecked = True
+        If xCheckbox.checked = False And zCheckbox.checked = False Then xOrYChecked = False
         Dim split = cv.Cv2.Split(ocvb.pointCloud)
-        If imuCheckBox.checked And changeRequested Then
+        If imuCheckBox.checked And xOrYChecked Then
             Dim mask As New cv.Mat
             cv.Cv2.InRange(split(2), 0.01, ocvb.maxZ, dst1)
             cv.Cv2.BitwiseNot(dst1, mask)

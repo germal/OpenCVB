@@ -7,10 +7,10 @@ Imports py = Python.Runtime
 Public Class OptionsDialog
     Dim numPyEnabled As Boolean = False
 
-    Public cameraIndex As integer ' an index into the cameraRadioButton array.
+    Public cameraIndex As Integer ' an index into the cameraRadioButton array.
 
-    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) As integer
-    Public cameraRadioButton(VB_Classes.ActiveTask.algParms.D455) As RadioButton
+    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.D455) As Integer
+    Public cameraRadioButton(VB_Classes.ActiveTask.algParms.camName.D455) As RadioButton
     Public cameraTotalCount As Integer = 0
 
     Public Const lowRes = 0
@@ -97,7 +97,7 @@ Public Class OptionsDialog
         OpenCVB.resolutionSetting = GetSetting("OpenCVB", "resolutionXY", "resolutionXY", medRes)
         saveResolution()
 
-        cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.D435i)
+        cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.camName.D435i)
         cameraRadioButton(cameraIndex).Checked = True
 
         ShowLabels.Checked = GetSetting("OpenCVB", "ShowLabels", "ShowLabels", False)

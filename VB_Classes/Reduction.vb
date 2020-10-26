@@ -264,7 +264,7 @@ Public Class Reduction_Lines
         dst1 = sideView.dst1
         lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
-        dst1 = cmat.CameraLocationSide(ocvb, lDetect.dst1, 1)
+        dst1 = cmat.CameraLocationSide(ocvb, lDetect.dst1)
 
         topView.Run(ocvb)
         dst2 = topView.dst1

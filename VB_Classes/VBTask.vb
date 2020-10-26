@@ -21,7 +21,6 @@ Module Algorithm_Module
         a = temp
     End Sub
 End Module
-
 Public Class ActiveTask : Implements IDisposable
     Public ocvb As VBocvb
     Dim algoList As New algorithmList
@@ -41,7 +40,16 @@ Public Class ActiveTask : Implements IDisposable
     Public Structure algParms
         ' these are parameters needed early in the task initialization, either by the algorithm constructor or the VBparent initialization or
         ' one-time only constants needed by the algorithms.
-        Public cameraIndex As Integer
+        Public cameraName As camName
+        Public camIndex As Integer
+        Public Enum camName
+            Kinect4AzureCam
+            StereoLabsZED2
+            MyntD1000
+            D435i
+            D455
+        End Enum
+
         Public PythonExe As String
         Public homeDir As String
         Public useRecordedData As Boolean
@@ -55,12 +63,6 @@ Public Class ActiveTask : Implements IDisposable
         Public intrinsicsLeft As intrinsics_VB
         Public intrinsicsRight As intrinsics_VB
         Public extrinsics As Extrinsics_VB
-
-        Public Const Kinect4AzureCam As Integer = 0
-        Public Const StereoLabsZED2 As Integer = 1
-        Public Const MyntD1000 As Integer = 2
-        Public Const D435i As Integer = 3
-        Public Const D455 As Integer = 4
     End Structure
     Private Sub buildColors(ocvb As VBocvb)
         Dim vec As cv.Scalar, r As Integer = 120, b As Integer = 255, g As Integer = 0
@@ -127,6 +129,31 @@ Public Class ActiveTask : Implements IDisposable
                    "Problem likely originated with the UIindexer.")
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
+        Select Case parms.cameraName
+            Case VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam
+                ocvb.parms.camIndex = 0
+            Case VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2
+                ocvb.parms.camIndex = 1
+            Case VB_Classes.ActiveTask.algParms.camName.MyntD1000
+                ocvb.parms.camIndex = 2
+            Case VB_Classes.ActiveTask.algParms.camName.D435i
+                ocvb.parms.camIndex = 3
+            Case VB_Classes.ActiveTask.algParms.camName.D455
+                ocvb.parms.camIndex = 4
+        End Select
+        ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
+        ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
+        ' https://www.mynteye.com/pages/mynt-eye-d
+        ' https://www.intelrealsense.com/depth-camera-d435i/
+        ' https://www.intelrealsense.com/depth-camera-d455/
+        ' order of cameras is the same as the order above...
+        ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455
+        Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86} ' all values from the specification.
+        Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57} ' all values from the specification.
+
+        ocvb.hFov = hFOVangles(ocvb.parms.camIndex)
+        ocvb.vFov = vFOVangles(ocvb.parms.camIndex)
+
         layoutOptions(location)
     End Sub
     Public Sub RunAlgorithm()

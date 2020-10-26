@@ -151,14 +151,14 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
-        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) > 0 And myntSDKready = False Then
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
+        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.MyntD1000) > 0 And myntSDKready = False Then
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
             If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
                 MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
                    "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
@@ -170,9 +170,9 @@ Public Class OpenCVB
                 SaveSetting("OpenCVB", "myntSDKready", "myntSDKready", False)
             End If
         End If
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) = USBenumeration("ZED 2")
-        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) > 0 And zed2SDKready = False Then
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2) = USBenumeration("ZED 2")
+        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2) > 0 And zed2SDKready = False Then
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2) = 0 ' hardware is present but dll is not installed yet.
             If GetSetting("OpenCVB", "zed2SDKready", "zed2SDKready", True) Then
                 MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
@@ -184,13 +184,13 @@ Public Class OpenCVB
 
         ' if the default camera is not present, try to find another.
         If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) Then
-                optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.Kinect4AzureCam
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam) Then
+                optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam
             End If
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.StereoLabsZED2
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.MyntD1000
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D435i
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.D455
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camName.MyntD1000
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camName.D435i
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camName.D455
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
                 MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D455, D435i, Kinect 4 Azure, MyntEyeD 1000, or StereoLabs Zed2.")
                 End
@@ -214,12 +214,12 @@ Public Class OpenCVB
                    "was not installed in:" + vbCrLf + vbCrLf + kinectDLL.FullName + vbCrLf + vbCrLf +
                    "Did a new Version get installed?" + vbCrLf +
                    "Support for the Kinect camera may not work up you update the code near this message.")
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.Kinect4AzureCam) = 0 ' we can't use this device
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam) = 0 ' we can't use this device
         Else
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
         End If
 
-        For i = 0 To VB_Classes.ActiveTask.algParms.D455
+        For i = 0 To VB_Classes.ActiveTask.algParms.camName.D455
             If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
         Next
 
@@ -1019,8 +1019,6 @@ Public Class OpenCVB
 
         ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
         If AvailableAlgorithms.Text.Contains("OpenGL") Or AvailableAlgorithms.Text.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
-
-        parms.cameraIndex = optionsForm.cameraIndex ' index of active camera
 
         parms.PythonExe = optionsForm.PythonExeName.Text
 

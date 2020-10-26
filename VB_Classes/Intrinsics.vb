@@ -16,14 +16,14 @@ Public Class intrinsicsLeft_Basics
         Next
         If ocvb.parms.intrinsicsLeft.FOV IsNot Nothing Then
             If ocvb.parms.intrinsicsLeft.FOV(0) = 0 Then
-                ttStr += "Approximate FOV in x = " + CStr(hFOVangles(ocvb.parms.cameraIndex)) + vbCrLf +
-                         "Approximate FOV in y = " + CStr(vFOVangles(ocvb.parms.cameraIndex)) + vbCrLf
+                ttStr += "Approximate FOV in x = " + CStr(ocvb.hFov) + vbCrLf +
+                         "Approximate FOV in y = " + CStr(ocvb.vFov) + vbCrLf
             Else
                 ttStr += "FOV in x = " + CStr(ocvb.parms.intrinsicsLeft.FOV(0)) + vbCrLf + "FOV in y = " + CStr(ocvb.parms.intrinsicsLeft.FOV(1)) + vbCrLf
             End If
         Else
-            ttStr += "Approximate FOV in x = " + CStr(hFOVangles(ocvb.parms.cameraIndex)) + vbCrLf +
-                     "Approximate FOV in y = " + CStr(vFOVangles(ocvb.parms.cameraIndex)) + vbCrLf
+            ttStr += "Approximate FOV in x = " + CStr(ocvb.hFov) + vbCrLf +
+                     "Approximate FOV in y = " + CStr(ocvb.vFov) + vbCrLf
         End If
         ocvb.trueText(ttStr)
 
