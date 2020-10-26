@@ -1155,7 +1155,7 @@ Public Class PointCloud_FindFloorPlane
         dst2 = floor.sideIMU.sideView.dst2
         dst2.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Red, 5)
 
-        Dim pixelsPerMeter = floor.sideIMU.sideView.rotatedPixelsPerMeter
+        Dim pixelsPerMeter = dst2.Width / ocvb.maxZ
         Dim distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.gleftPoint.X) * (ocvb.sideCameraPoint.X - floor.gleftPoint.X) +
                                 ((ocvb.sideCameraPoint.Y - floor.gleftPoint.Y) * (ocvb.sideCameraPoint.Y - floor.gleftPoint.Y))) / pixelsPerMeter
         Dim pts(3 - 1) As cv.Point3f
@@ -1312,7 +1312,7 @@ Public Class PointCloud_FindFloor
             End If
             dst1.Line(gleftPoint, grightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
         End If
-        label1 = "Side View with gravity - PixPerMeter = " + CStr(CInt(sideIMU.sideView.rotatedPixelsPerMeter))
+        label1 = "Side View with gravity "
     End Sub
 End Class
 
