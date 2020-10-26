@@ -105,7 +105,6 @@ Public Class PointCloud_Colorize
     Public rect As cv.Rect
     Public shift As Integer
     Dim arcSize As Integer
-    Public startangle As Integer
     Public Function CameraLocationBot(ocvb As VBocvb, dst As cv.Mat, rotationFactor As Single) As cv.Mat
         Dim fsize = ocvb.fontSize * 1.5
         dst.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
@@ -118,9 +117,8 @@ Public Class PointCloud_Colorize
         ' draw the arc enclosing the camera FOV
         Dim startAngle = (180 - hFOVangles(ocvb.parms.cameraIndex)) / 2
         Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim xloc = ocvb.topCameraPoint.X + x
 
-        Dim fovRight = New cv.Point(xloc, 0)
+        Dim fovRight = New cv.Point(ocvb.topCameraPoint.X + x, 0)
         Dim fovLeft = New cv.Point(ocvb.topCameraPoint.X - x, fovRight.Y)
 
         dst.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
@@ -130,12 +128,11 @@ Public Class PointCloud_Colorize
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst.Width / 2 + shift, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(ocvb.topCameraPoint.X - shift, ocvb.topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(ocvb.topCameraPoint.X + shift, ocvb.topCameraPoint.Y - 5), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Return dst
     End Function
     Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat, rotationFactor As Single) As cv.Mat
+        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
         Dim fsize = ocvb.fontSize * 1.5
 
         dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
@@ -145,12 +142,19 @@ Public Class PointCloud_Colorize
             cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
-        ' draw the arc showing the camera FOV
-        Dim startAngle = (180 - vFOVangles(ocvb.parms.cameraIndex)) / 2
-        Dim y = dst.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
-        Dim yloc = ocvb.sideCameraPoint.Y - y
+        Static frustrumSlider = findSlider("SideView Frustrum adjustment")
+        Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+        Dim fovAngle = vFOVangles(ocvb.parms.cameraIndex)
+        Dim markerx = dst.Width / ocvb.maxZ
+        Dim markery = markerx * Math.Sin((fovAngle / 2) * cv.Cv2.PI / 180) * fFactor
+        dst.Circle(New cv.Point(markerx, ocvb.sideCameraPoint.Y - markery), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(New cv.Point(markerx, ocvb.sideCameraPoint.Y + markery), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
 
-        Dim fovTop = New cv.Point(dst.Width, yloc)
+        ' draw the arc showing the camera FOV
+        Dim startAngle = (180 - fovAngle) / 2
+        Dim y = dst.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
+
+        Dim fovTop = New cv.Point(dst.Width, ocvb.sideCameraPoint.Y - y)
         Dim fovBot = New cv.Point(dst.Width, ocvb.sideCameraPoint.Y + y)
 
         dst.Ellipse(ocvb.sideCameraPoint, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
@@ -160,8 +164,6 @@ Public Class PointCloud_Colorize
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
         cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
                        cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst, CStr(startAngle) + " deg.", New cv.Point(labelLocation.X, ocvb.sideCameraPoint.Y / 2), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(ocvb.sideCameraPoint, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
         Return dst
@@ -866,8 +868,6 @@ Public Class PointCloud_FrustrumTop
         ocvb.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        topView.gCloudIMU.includeFrustrum = False
-
         frustrum.Run(ocvb)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
@@ -903,8 +903,6 @@ Public Class PointCloud_FrustrumSide
         ocvb.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        sideView.gCloudIMU.includeFrustrum = False
-
         frustrum.Run(ocvb)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame

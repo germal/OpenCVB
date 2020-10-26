@@ -69,6 +69,7 @@ Public Class VBocvb
     Public resolutionIndex As Integer
     Public Const MAXZ_DEFAULT = 4
     Public maxZ As Single = MAXZ_DEFAULT
+    Public v2hRatio As Single ' ratio of pixels per meter vertical to pixels per meter horizonatal
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

@@ -1541,7 +1541,6 @@ End Class
 
 
 
-
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_PointCloud_IMU
@@ -1551,10 +1550,7 @@ Public Class Depth_PointCloud_IMU
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
     Public gMat As New cv.Mat
-    Public includeFrustrum As Boolean
     Dim inrange As Depth_InRange
-    Public frustrum(4 - 1) As cv.Point3f
-    Public frustrumb4(4 - 1) As cv.Point3f
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1607,81 +1603,10 @@ Public Class Depth_PointCloud_IMU
         '[sx  cx    0]  [0  cz -sz]
         '[0   0     1]  [0  sz  cz]
         gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
-                      {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
-                      {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+                   {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                   {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        Dim z = 1.0
-        If includeFrustrum And imuCheckBox.checked Then
-            ' These marks the outline of the frustrum in the pointcloud at 1 meter
-            Dim pt = New cv.Point3f(0, 0, z)
-            'For i = 0 To ocvb.pointCloud.Height - 1
-            '    pt = New cv.Point3f(0, i, z)
-            '    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            '    pt = New cv.Point3f(ocvb.pointCloud.Width - 1, i, z)
-            '    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            'Next
-
-            'For i = 0 To ocvb.pointCloud.Width - 1
-            '    pt = New cv.Point3f(i, 0, z)
-            '    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            '    pt = New cv.Point3f(i, ocvb.pointCloud.Height - 1, z)
-            '    ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            'Next
-
-            pt = New cv.Point3f(1, 1, z)
-            ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            pt = New cv.Point3f(ocvb.pointCloud.Width - 1, ocvb.pointCloud.Height - 1, z)
-            ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-
-            pt = New cv.Point3f(ocvb.pointCloud.Width, 1, z)
-            ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-            pt = New cv.Point3f(1, ocvb.pointCloud.Height - 1, z)
-            ocvb.pointCloud.Set(Of cv.Point3f)(pt.Y, pt.X, getWorldCoordinates(ocvb, pt))
-        End If
-
-
-        'Dim testx = sliders.trackbar(0).Value / 100
-        'Dim testy = sliders.trackbar(1).Value / 100
-        'For i = 0 To src.Height - 5
-        '    Dim pt = New cv.Point3f(testx, testy, ocvb.maxZ * i / src.Height)
-        '    ocvb.pointCloud.Set(Of cv.Point3f)(i, i, pt)
-        '    ocvb.pointCloud.Set(Of cv.Point3f)(i + 1, i, pt)
-        '    ocvb.pointCloud.Set(Of cv.Point3f)(i + 2, i, pt)
-        '    ocvb.pointCloud.Set(Of cv.Point3f)(i + 3, i, pt)
-        'Next
-
-        frustrumb4(0) = ocvb.pointCloud.Get(Of cv.Point3f)(1, ocvb.pointCloud.Width - 1)
-        frustrumb4(1) = ocvb.pointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, ocvb.pointCloud.Width - 1)
-        frustrumb4(2) = ocvb.pointCloud.Get(Of cv.Point3f)(1, 1)
-        frustrumb4(3) = ocvb.pointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, 0)
-
-        Dim badIndex As Integer = -1
-        For i = 0 To frustrumb4.Count - 1
-            If frustrumb4(i).Z <> 1 Then
-                badIndex = i
-                Exit For
-            End If
-        Next
-
-        If badIndex >= 0 Then
-            Select Case badIndex
-                Case 0
-                    frustrumb4(badIndex) = New cv.Point3f(frustrumb4(badIndex + 1).X, frustrumb4(badIndex + 2).Y, z)
-                Case 1
-                    frustrumb4(badIndex) = New cv.Point3f(frustrumb4(badIndex - 1).X, frustrumb4(badIndex + 1).Y, z)
-                Case 2
-                    frustrumb4(badIndex) = New cv.Point3f(frustrumb4(badIndex + 1).X, frustrumb4(badIndex - 1).Y, z)
-                Case 3
-                    frustrumb4(badIndex) = New cv.Point3f(frustrumb4(badIndex - 1).X, frustrumb4(badIndex - 2).Y, z)
-            End Select
-        End If
-        ' Console.WriteLine("0 = " + CStr(frustrumb4(0).Y) + " 1 = " + CStr(frustrumb4(1).Y) + " 2 = " + CStr(frustrumb4(2).Y) + " 3 = " + CStr(frustrumb4(3).Y))
-        Console.WriteLine("b4 0x = " + CStr(frustrumb4(0).X) + " 0y = " + CStr(frustrumb4(0).Y) + " 0z = " + CStr(frustrumb4(0).Z) +
-                          "b4 1x = " + CStr(frustrumb4(1).X) + " 1y = " + CStr(frustrumb4(1).Y) + " 0z = " + CStr(frustrumb4(1).Z))
-        Console.WriteLine("b4 2x = " + CStr(frustrumb4(2).X) + " 2y = " + CStr(frustrumb4(2).Y) + " 0z = " + CStr(frustrumb4(2).Z) +
-                          "b4 3x = " + CStr(frustrumb4(3).X) + " 3y = " + CStr(frustrumb4(3).Y) + " 0z = " + CStr(frustrumb4(3).Z))
-
         Dim changeRequested = True
         If xCheckbox.checked = False And zCheckbox.checked = False Then changeRequested = False
         Dim split = cv.Cv2.Split(ocvb.pointCloud)
@@ -1696,14 +1621,6 @@ Public Class Depth_PointCloud_IMU
             Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
             Dim gOutput = (gInput * gMat).ToMat
             imuPointCloud = gOutput.Reshape(3, ocvb.pointCloud.Rows)
-            frustrum(0) = imuPointCloud.Get(Of cv.Point3f)(1, ocvb.pointCloud.Width - 1)
-            frustrum(1) = imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, ocvb.pointCloud.Width - 1)
-            frustrum(2) = imuPointCloud.Get(Of cv.Point3f)(1, 1)
-            frustrum(3) = imuPointCloud.Get(Of cv.Point3f)(ocvb.pointCloud.Height - 1, 1)
-            Console.WriteLine(" 0x = " + CStr(frustrum(0).X) + " 0y = " + CStr(frustrum(0).Y) + " 0z = " + CStr(frustrum(0).Z) +
-                          " 1x = " + CStr(frustrum(1).X) + " 1y = " + CStr(frustrum(1).Y) + " 0z = " + CStr(frustrum(1).Z))
-            Console.WriteLine(" 2x = " + CStr(frustrum(2).X) + " 2y = " + CStr(frustrum(2).Y) + " 0z = " + CStr(frustrum(2).Z) +
-                          " 3x = " + CStr(frustrum(3).X) + " 3y = " + CStr(frustrum(3).Y) + " 0z = " + CStr(frustrum(3).Z))
         Else
             imuPointCloud = ocvb.pointCloud.Clone
         End If

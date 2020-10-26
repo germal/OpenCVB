@@ -246,9 +246,7 @@ Public Class Reduction_Lines
 
         cmat = New PointCloud_Colorize(ocvb)
         sideView = New Histogram_2D_SideView(ocvb)
-        sideView.gCloudIMU.includeFrustrum = False
         topView = New Histogram_2D_TopView(ocvb)
-        topView.gCloudIMU.includeFrustrum = False
         reduction = New Reduction_PointCloud(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
