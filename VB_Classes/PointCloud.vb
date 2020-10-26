@@ -653,7 +653,6 @@ Public Class PointCloud_BothViews
 
         topPixel.Run(ocvb)
         sidePixel.Run(ocvb)
-        Dim maxZ = topPixel.measure.maxZ
 
         If standalone Then
             Dim instructions = "Click any centroid to get details"
@@ -698,8 +697,8 @@ Public Class PointCloud_BothViews
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwTop.Values(minIndex).rectFront
 
-            minDepth = maxZ * (ocvb.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
-            maxDepth = maxZ * (ocvb.topCameraPoint.Y - rView.Y) / src.Height
+            minDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
+            maxDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y) / src.Height
             Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
             If pixelPerMeter > 0 Then
                 widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
@@ -719,8 +718,8 @@ Public Class PointCloud_BothViews
             Dim rView = vwSide.Values(minIndex).rectView
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwSide.Values(minIndex).rectFront
-            minDepth = maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
-            maxDepth = maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
+            minDepth = ocvb.maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
+            maxDepth = ocvb.maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
 
             Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
             If pixelPerMeter > 0 Then
@@ -1336,13 +1335,11 @@ Public Class PointCloud_FindFloor2D
                 For x = 0 To imuPC.Width - 1 Step nSize
                     Dim xyz = imuPC.Get(Of cv.Point3f)(y, x)
                     Dim yy = CInt(xyz.Z)
-                    ' Console.Write(CStr(CInt(yy)) + "," + CStr(CInt(xyz.Y)) + " ")
                     If yy > floorPoint - lineHeight / 2 Then
                         If floorMask.Get(Of Byte)(CInt(xyz.Z / nSize), CInt(yy / nSize)) = 255 Then dst1.Set(Of cv.Vec3b)(y / nSize, x / nSize, white)
                     End If
                 Next
             Next
-            Console.WriteLine(" ")
         End If
     End Sub
 End Class
