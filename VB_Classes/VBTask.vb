@@ -41,8 +41,7 @@ Public Class ActiveTask : Implements IDisposable
         ' these are parameters needed early in the task initialization, either by the algorithm constructor or the VBparent initialization or
         ' one-time only constants needed by the algorithms.
         Public cameraName As camName
-        Public camIndex As Integer
-        Public Enum camName
+        Enum camName
             Kinect4AzureCam
             StereoLabsZED2
             MyntD1000
@@ -129,17 +128,18 @@ Public Class ActiveTask : Implements IDisposable
                    "Problem likely originated with the UIindexer.")
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
+        Dim camIndex As Integer
         Select Case parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam
-                ocvb.parms.camIndex = 0
+                camIndex = 0
             Case VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2
-                ocvb.parms.camIndex = 1
+                camIndex = 1
             Case VB_Classes.ActiveTask.algParms.camName.MyntD1000
-                ocvb.parms.camIndex = 2
+                camIndex = 2
             Case VB_Classes.ActiveTask.algParms.camName.D435i
-                ocvb.parms.camIndex = 3
+                camIndex = 3
             Case VB_Classes.ActiveTask.algParms.camName.D455
-                ocvb.parms.camIndex = 4
+                camIndex = 4
         End Select
         ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
         ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
@@ -151,8 +151,8 @@ Public Class ActiveTask : Implements IDisposable
         Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86} ' all values from the specification.
         Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57} ' all values from the specification.
 
-        ocvb.hFov = hFOVangles(ocvb.parms.camIndex)
-        ocvb.vFov = vFOVangles(ocvb.parms.camIndex)
+        ocvb.hFov = hFOVangles(camIndex)
+        ocvb.vFov = vFOVangles(camIndex)
 
         layoutOptions(location)
     End Sub

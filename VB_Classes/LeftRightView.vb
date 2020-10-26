@@ -6,14 +6,14 @@ Public Class LeftRightView_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
         ocvb.desc = "Show the left and right views from the 3D Camera"
-        Select Case ocvb.parms.camIndex
-            Case VB_Classes.ActiveTask.algParms.camName.D435i, VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2
-                label1 = "Left Image"
-                label2 = "Right Image"
+        Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
                 sliders.trackbar(0).Value = 0
+            Case Else
+                label1 = "Left Image"
+                label2 = "Right Image"
         End Select
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -42,7 +42,7 @@ Public Class LeftRightView_CompareUndistorted
         sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
 
-        Select Case ocvb.parms.camIndex
+        Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camName.D435i, VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
@@ -83,7 +83,7 @@ Public Class LeftRightView_CompareRaw
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
         sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
         sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
-        Select Case ocvb.parms.camIndex
+        Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camName.D435i, VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2,
                 label1 = "Left Image"
                 label2 = "Right Image"
