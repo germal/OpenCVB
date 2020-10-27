@@ -1023,7 +1023,6 @@ Public Class Histogram_2D_SideView
     Inherits VBparent
     Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public markers(2 - 1) As cv.Point2f
     Dim cameraYSlider As Windows.Forms.TrackBar
     Dim frustrumSlider As Windows.Forms.TrackBar
     Dim cameraXslider As Windows.Forms.TrackBar
