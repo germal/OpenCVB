@@ -1082,10 +1082,7 @@ Public Class Histogram_2D_SideView
 
         ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraXslider.Value)
 
-        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        imuCheckBox.checked = False
         Static frustrumSlider = findSlider("SideView Frustrum adjustment")
-
         ocvb.v2hRatio = ocvb.maxZ * frustrumSlider.Value / 100 / 2
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.v2hRatio, ocvb.v2hRatio), New cv.Rangef(0, ocvb.maxZ)}
@@ -1099,18 +1096,11 @@ Public Class Histogram_2D_SideView
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            ' the markers have to be to the right of the camera or the camera is upside down.
-            If imuCheckBox.checked And markers(0).X > ocvb.sideCameraPoint.X And markers(1).X > ocvb.sideCameraPoint.X Then
+            Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+            If imuCheckBox.checked Then
                 dst2.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-                Dim p = computeFrustrumLine(ocvb, markers(0))
-                dst2.Line(ocvb.sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-                p = computeFrustrumLine(ocvb, markers(1))
-                dst2.Line(ocvb.sideCameraPoint, p, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
             End If
-            dst2.Circle(markers(0), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(markers(1), ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-
             dst2 = cmat.CameraLocationSide(ocvb, dst2)
         End If
     End Sub
