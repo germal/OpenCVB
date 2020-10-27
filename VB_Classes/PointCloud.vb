@@ -340,14 +340,14 @@ Public Class PointCloud_Objects
         Dim drawLines = showRectanglesCheck.checked
         measure.Run(ocvb)
         dst1 = measure.dst1
-        label1 = measure.label1
 
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / ocvb.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeterV))
         Dim FOV = If(SideViewFlag, ocvb.vFov / 2, ocvb.hFov / 2)
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
-            Dim pixeldistance = src.Height * ((distanceSlider.Value / 1000) / ocvb.maxZ)
+            Dim pixeldistance = src.Width * ((distanceSlider.Value / 1000) / ocvb.maxZ)
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
             If SideViewFlag Then
@@ -359,6 +359,9 @@ Public Class PointCloud_Objects
             End If
             distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
+            ocvb.trueText("Test line is " + CStr(lineHalf * 2) + " pixels or " + Format(lineHalf * 2 / ocvb.pixelsPerMeterV, "#0.00") + " meters" + vbCrLf +
+                          "Pixels per meter horizontal = " + CStr(CInt(ocvb.pixelsPerMeterH)) + vbCrLf +
+                          "Pixels per meter vertical = " + CStr(CInt(ocvb.pixelsPerMeterV)), 10, 40, 3)
         End If
 
         viewObjects.Clear()
@@ -923,7 +926,7 @@ Public Class PointCloud_IMU_SideView
         sideView = New Histogram_2D_SideView(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 20
+        histSlider.Value = 0
 
         label1 = "side view AFTER align/threshold using gravity vector"
         If standalone Then label2 = "side view BEFORE align/threshold using gravity vector"

@@ -14,7 +14,7 @@ Public Class Rodrigues_ValidateKinect
         ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam Then
+        If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             dst2.SetTo(0)
             ocvb.trueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
             Exit Sub
@@ -42,7 +42,7 @@ Public Class Rodrigues_ValidateVector
         ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2 Then
+        If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             dst2.SetTo(0)
             ocvb.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
             Exit Sub

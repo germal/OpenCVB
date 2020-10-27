@@ -40,8 +40,8 @@ Public Class ActiveTask : Implements IDisposable
     Public Structure algParms
         ' these are parameters needed early in the task initialization, either by the algorithm constructor or the VBparent initialization or
         ' one-time only constants needed by the algorithms.
-        Public cameraName As camName
-        Enum camName
+        Public cameraName As camNames
+        Enum camNames
             Kinect4AzureCam
             StereoLabsZED2
             MyntD1000
@@ -86,7 +86,7 @@ Public Class ActiveTask : Implements IDisposable
         Next
         Dim msrng As New System.Random
         For i = 0 To ocvb.vecColors.Length - 1
-            ocvb.vecColors(i) = New cv.Vec3b(msRNG.Next(100, 255), msRNG.Next(100, 255), msRNG.Next(100, 255)) ' note: cannot generate black!
+            ocvb.vecColors(i) = New cv.Vec3b(msrng.Next(100, 255), msrng.Next(100, 255), msrng.Next(100, 255)) ' note: cannot generate black!
             ocvb.scalarColors(i) = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
         Next
     End Sub
@@ -128,19 +128,6 @@ Public Class ActiveTask : Implements IDisposable
                    "Problem likely originated with the UIindexer.")
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
-        Dim camIndex As Integer
-        Select Case parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camName.Kinect4AzureCam
-                camIndex = 0
-            Case VB_Classes.ActiveTask.algParms.camName.StereoLabsZED2
-                camIndex = 1
-            Case VB_Classes.ActiveTask.algParms.camName.MyntD1000
-                camIndex = 2
-            Case VB_Classes.ActiveTask.algParms.camName.D435i
-                camIndex = 3
-            Case VB_Classes.ActiveTask.algParms.camName.D455
-                camIndex = 4
-        End Select
         ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
         ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
         ' https://www.mynteye.com/pages/mynt-eye-d
@@ -151,8 +138,8 @@ Public Class ActiveTask : Implements IDisposable
         Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86} ' all values from the specification.
         Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57} ' all values from the specification.
 
-        ocvb.hFov = hFOVangles(camIndex)
-        ocvb.vFov = vFOVangles(camIndex)
+        ocvb.hFov = hFOVangles(parms.cameraName)
+        ocvb.vFov = vFOVangles(parms.cameraName)
 
         layoutOptions(location)
     End Sub

@@ -3,7 +3,6 @@ Imports System.Windows.Forms
 Imports System.Drawing
 
 Public Class OptionsSliders
-    Public DontShow As Boolean = False
     Public trackbar() As TrackBar
     Public sLabels() As Label
     Public countLabel() As Label
