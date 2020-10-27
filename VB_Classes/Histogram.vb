@@ -994,9 +994,6 @@ Public Class Histogram_2D_TopView
 
         gCloudIMU.Run(ocvb)
 
-        Dim anchor = gCloudIMU.imuPointCloud.Get(Of cv.Point3f)(0, 0)
-        If imuCheckBox.checked = False Then anchor.Z = 1 ' anchor point is always 1 with no rotation.
-
         Static frustrumSlider = findSlider("TopView Frustrum adjustment")
         Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
 

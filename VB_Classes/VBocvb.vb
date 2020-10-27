@@ -74,6 +74,12 @@ Public Class VBocvb
     Public pixelsPerMeterV As Single
     Public hFov As Single
     Public vFov As Single
+    Public angleX As Single  ' rotation angle in radians around x-axis to align with gravity
+    Public angleY As Single  ' rotation angle in radians around y-axis to align with gravity
+    Public angleZ As Single  ' rotation angle in radians around z-axis to align with gravity
+    Public cz As Single
+    Public sz As Single
+    Public gMat As cv.Mat
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

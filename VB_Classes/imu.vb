@@ -464,9 +464,6 @@ End Class
 Public Class IMU_GVector
     Inherits VBparent
     Public kalman As Kalman_Basics
-    Public angleX As Single ' in radians.
-    Public angleY As Single ' in radians.
-    Public angleZ As Single ' in radians.
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
@@ -478,11 +475,11 @@ Public Class IMU_GVector
         Dim gy = ocvb.IMU_Acceleration.Y
         Dim gz = ocvb.IMU_Acceleration.Z
 
-        angleX = Math.Atan2(gy, gx) + cv.Cv2.PI / 2
-        angleY = Math.Atan2(gx, gy) - cv.Cv2.PI / 2
-        angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
+        ocvb.angleX = Math.Atan2(gy, gx) + cv.Cv2.PI / 2
+        ocvb.angleY = Math.Atan2(gx, gy)
+        ocvb.angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
-        kalman.kInput = {gx, gy, gz, angleX, angleY, angleZ}
+        kalman.kInput = {gx, gy, gz, ocvb.angleX, ocvb.angleY, ocvb.angleZ}
 
         If kalman.check.Box(0).Checked Then
             kalman.Run(ocvb)
@@ -490,19 +487,20 @@ Public Class IMU_GVector
             gy = kalman.kOutput(1)
             gz = kalman.kOutput(2)
 
-            angleX = kalman.kOutput(3)
-            angleY = kalman.kOutput(4)
-            angleZ = kalman.kOutput(5)
+            ocvb.angleX = kalman.kOutput(3)
+            ocvb.angleY = kalman.kOutput(4)
+            ocvb.angleZ = kalman.kOutput(5)
         End If
+        Console.WriteLine("angleX = " + CStr(ocvb.angleX) + "  angleY = " + CStr(ocvb.angleY) + "  angleZ = " + CStr(ocvb.angleZ))
 
         If standalone Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(gz, "#0.0000") + vbCrLf + vbCrLf
-            outStr += "X-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleX * 57.2958, "#0.0000") + vbCrLf
-            outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleY * 57.2958, "#0.0000") + vbCrLf
-            outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(angleZ * 57.2958, "#0.0000") + vbCrLf + vbCrLf
+            outStr += "X-axis Angle from horizontal (in degrees) = " + vbTab + Format(ocvb.angleX * 57.2958, "#0.0000") + vbCrLf
+            outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(ocvb.angleY * 57.2958, "#0.0000") + vbCrLf
+            outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(ocvb.angleZ * 57.2958, "#0.0000") + vbCrLf + vbCrLf
             ' if there is any significant acceleration other than gravity, it will be detected here.
             If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then
                 outStr += "Camera appears to be moving because the gravity vector is not 9.8.  Results may not be valid." + vbCrLf

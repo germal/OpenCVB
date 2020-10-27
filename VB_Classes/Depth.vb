@@ -1549,7 +1549,6 @@ Public Class Depth_PointCloud_IMU
     Public imuPointCloud As cv.Mat
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
-    Public gMat As New cv.Mat
     Dim inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -1559,8 +1558,8 @@ Public Class Depth_PointCloud_IMU
 
         check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Use IMU gravity vector"
-        check.Box(1).Text = "X-Rotation with gravity vector"
-        check.Box(2).Text = "Z-Rotation with gravity vector"
+        check.Box(1).Text = "X-axis rotation with gravity vector"
+        check.Box(2).Text = "Z-axis rotation with gravity vector"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
         check.Box(2).Checked = True
@@ -1569,6 +1568,8 @@ Public Class Depth_PointCloud_IMU
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        Static xCheckbox = findCheckBox("X-axis rotation with gravity vector")
+        Static zCheckbox = findCheckBox("Z-axis rotation with gravity vector")
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         ocvb.maxZ = rangeSlider.Value / 1000
 
@@ -1578,20 +1579,18 @@ Public Class Depth_PointCloud_IMU
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
         '[cos(a) -sin(a)    0]
         '[sin(a)  cos(a)    0]
-        '[0       0         1] rotate the point cloud around the z-axis.
-        Static zCheckbox = findCheckBox("Z-Rotation with gravity vector")
-        If zCheckbox.Checked Then
-            cx = Math.Cos(imu.angleX)
-            sx = Math.Sin(imu.angleX)
+        '[0       0         1] rotate the point cloud around the x-axis.
+        If xCheckbox.Checked Then
+            cz = Math.Cos(ocvb.angleZ)
+            sz = Math.Sin(ocvb.angleZ)
         End If
 
-        '[1       0         0      ] rotate the point cloud around the x-axis.
+        '[1       0         0      ] rotate the point cloud around the z-axis.
         '[0       cos(a)    -sin(a)]
         '[0       sin(a)    cos(a) ]
-        Static xCheckbox = findCheckBox("X-Rotation with gravity vector")
-        If xCheckbox.Checked Then
-            cz = Math.Cos(imu.angleZ)
-            sz = Math.Sin(imu.angleZ)
+        If zCheckbox.Checked Then
+            cx = Math.Cos(ocvb.angleX)
+            sx = Math.Sin(ocvb.angleX)
         End If
 
         ' could use OpenCV for this but this makes it clearer.
@@ -1601,7 +1600,6 @@ Public Class Depth_PointCloud_IMU
         gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
-
 
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
         Dim xOrYChecked = True
@@ -1614,9 +1612,9 @@ Public Class Depth_PointCloud_IMU
             ocvb.pointCloud.SetTo(0, mask)
             If standalone Then dst1 = dst1.Resize(dst1.Size)
 
-            gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+            ocvb.gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
             Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
-            Dim gOutput = (gInput * gMat).ToMat
+            Dim gOutput = (gInput * ocvb.gMat).ToMat
             imuPointCloud = gOutput.Reshape(3, ocvb.pointCloud.Rows)
         Else
             imuPointCloud = ocvb.pointCloud.Clone
