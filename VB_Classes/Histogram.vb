@@ -958,7 +958,7 @@ Public Class Histogram_2D_TopView
     Public histOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Dim cmat As PointCloud_Colorize
-    Dim cameraSlider As Windows.Forms.TrackBar
+    Dim cameraXSlider As Windows.Forms.TrackBar
     Dim frustrumSlider As Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -966,19 +966,31 @@ Public Class Histogram_2D_TopView
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 200, 175)
-        sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", 0, 50, 0)
+        sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
+        sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
         frustrumSlider = findSlider("TopView Frustrum adjustment")
-        cameraSlider = findSlider("TopCameraPoint.x adjustment")
+        cameraXSlider = findSlider("TopCameraPoint.x adjustment")
 
-        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Then
-            frustrumSlider.Value = 105
-            cameraSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
-        End If
-        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
-            frustrumSlider.Value = 162
-            cameraSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
-        End If
+        ' The specification for each camera spells out the vertical FOV angle
+        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
+        Select Case ocvb.parms.cameraName
+            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+                frustrumSlider.Value = 180
+                cameraXSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
+                frustrumSlider.Value = 162
+                cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
+            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
+                frustrumSlider.Value = 105
+                cameraXslider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
+            Case VB_Classes.ActiveTask.algParms.camNames.D435i
+                frustrumSlider.Value = 175
+                cameraXSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.camNames.D455
+                frustrumSlider.Value = 184
+                cameraXSlider.Value = 0
+        End Select
+
         label1 = "XZ (Top View)"
         ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
     End Sub
@@ -989,8 +1001,9 @@ Public Class Histogram_2D_TopView
     End Function
     Public Sub Run(ocvb As VBocvb)
         Static imuCheckBox = findCheckBox("Use IMU gravity vector")
+        imuCheckBox.checked = False
 
-        ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraSlider.Value, CInt(src.Height))
+        ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraXSlider.Value, CInt(src.Height))
 
         gCloudIMU.Run(ocvb)
 
@@ -1006,6 +1019,7 @@ Public Class Histogram_2D_TopView
         dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = cmat.CameraLocationBot(ocvb, dst2)
     End Sub
 End Class
 
@@ -1022,7 +1036,6 @@ Public Class Histogram_2D_SideView
     Public histOutput As New cv.Mat
     Dim cameraYSlider As Windows.Forms.TrackBar
     Dim frustrumSlider As Windows.Forms.TrackBar
-    Dim cameraXslider As Windows.Forms.TrackBar
     Dim cmat As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -1032,26 +1045,26 @@ Public Class Histogram_2D_SideView
         sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
         sliders.setupTrackBar(1, "sideCameraPoint.x adjustment", -100, 100, 0)
         frustrumSlider = findSlider("SideView Frustrum adjustment")
-        cameraXslider = findSlider("sideCameraPoint.x adjustment")
+        cameraYSlider = findSlider("sideCameraPoint.x adjustment")
 
         ' The specification for each camera spells out the vertical FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
         Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
                 frustrumSlider.Value = 58
-                cameraXslider.Value = If(ocvb.resolutionIndex = 1, -1, -2)
+                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -2)
             Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
                 frustrumSlider.Value = 53
-                cameraXslider.Value = -3
+                cameraYSlider.Value = -3
             Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
                 frustrumSlider.Value = 50
-                cameraXslider.Value = If(ocvb.resolutionIndex = 3, -8, -3)
+                cameraYSlider.Value = If(ocvb.resolutionIndex = 3, -8, -3)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
                 frustrumSlider.Value = 57
-                cameraXslider.Value = 0
+                cameraYSlider.Value = 0
             Case VB_Classes.ActiveTask.algParms.camNames.D455
                 frustrumSlider.Value = 58
-                cameraXslider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
+                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
         End Select
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
         Dim thresholdSlider = findSlider("Histogram threshold")
@@ -1076,7 +1089,7 @@ Public Class Histogram_2D_SideView
         Dim fovAngle = ocvb.vFov
         ocvb.pixelsPerMeterV = ocvb.pixelsPerMeterH * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
 
-        ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraXslider.Value)
+        ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraYSlider.Value)
 
         Static frustrumSlider = findSlider("SideView Frustrum adjustment")
         ocvb.v2hRatio = ocvb.maxZ * frustrumSlider.Value / 100 / 2

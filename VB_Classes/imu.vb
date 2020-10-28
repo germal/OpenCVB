@@ -491,7 +491,6 @@ Public Class IMU_GVector
             ocvb.angleY = kalman.kOutput(4)
             ocvb.angleZ = kalman.kOutput(5)
         End If
-        Console.WriteLine("angleX = " + CStr(ocvb.angleX) + "  angleY = " + CStr(ocvb.angleY) + "  angleZ = " + CStr(ocvb.angleZ))
 
         If standalone Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf

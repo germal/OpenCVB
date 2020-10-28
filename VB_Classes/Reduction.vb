@@ -270,6 +270,6 @@ Public Class Reduction_Lines
         dst2 = topView.dst1
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
-        dst2 = cmat.CameraLocationBot(ocvb, lDetect.dst1, 1)
+        dst2 = cmat.CameraLocationBot(ocvb, lDetect.dst1)
     End Sub
 End Class

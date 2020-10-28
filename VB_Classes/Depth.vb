@@ -1558,8 +1558,8 @@ Public Class Depth_PointCloud_IMU
 
         check.Setup(ocvb, caller, 3)
         check.Box(0).Text = "Use IMU gravity vector"
-        check.Box(1).Text = "X-axis rotation with gravity vector"
-        check.Box(2).Text = "Z-axis rotation with gravity vector"
+        check.Box(1).Text = "X-axis rotation using angleZ of the gravity vector"
+        check.Box(2).Text = "Z-axis rotation using angleX of the gravity vector"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
         check.Box(2).Checked = True
@@ -1568,8 +1568,8 @@ Public Class Depth_PointCloud_IMU
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static xCheckbox = findCheckBox("X-axis rotation with gravity vector")
-        Static zCheckbox = findCheckBox("Z-axis rotation with gravity vector")
+        Static xCheckbox = findCheckBox("X-axis rotation using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Z-axis rotation using angleX of the gravity vector")
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         ocvb.maxZ = rangeSlider.Value / 1000
 
