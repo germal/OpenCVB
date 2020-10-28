@@ -1000,9 +1000,6 @@ Public Class Histogram_2D_TopView
         Return New cv.Point2f(x, m * x + b)
     End Function
     Public Sub Run(ocvb As VBocvb)
-        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        imuCheckBox.checked = False
-
         ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraXSlider.Value, CInt(src.Height))
 
         gCloudIMU.Run(ocvb)
@@ -1018,8 +1015,10 @@ Public Class Histogram_2D_TopView
         Static histThresholdSlider = findSlider("Histogram threshold")
         dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = cmat.CameraLocationBot(ocvb, dst2)
+        If standalone Then
+            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = cmat.CameraLocationBot(ocvb, dst2)
+        End If
     End Sub
 End Class
 
@@ -1104,12 +1103,6 @@ Public Class Histogram_2D_SideView
 
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-            Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-            If imuCheckBox.checked Then
-                dst2.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-
-            End If
             dst2 = cmat.CameraLocationSide(ocvb, dst2)
         End If
     End Sub

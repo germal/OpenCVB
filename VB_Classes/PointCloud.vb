@@ -94,16 +94,26 @@ Public Class PointCloud_Colorize
     Inherits VBparent
     Dim palette As Palette_Gradient
     Public rect As cv.Rect
-    Public shift As Integer
     Dim arcSize As Integer
     Public Function CameraLocationBot(ocvb As VBocvb, dst As cv.Mat) As cv.Mat
+        Static xCheckbox = findCheckBox("X-axis rotation using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Z-axis rotation using angleX of the gravity vector")
+        Dim distanceRatio As Single = 1
+        If xCheckbox.Checked Then distanceRatio = Math.Cos(ocvb.angleZ)
         Dim fsize = ocvb.fontSize * 1.5
         dst.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = ocvb.maxZ - 1 To 0 Step -1
-            Dim ymeter = CInt(dst.Height * i / (ocvb.maxZ * Math.Cos(ocvb.angleZ)))
+            Dim ymeter = CInt(dst.Height * i / (ocvb.maxZ * distanceRatio))
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst, CStr(ocvb.maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
+
+        Dim cam = ocvb.topCameraPoint
+        Dim fovAngle = ocvb.hFov
+        Dim markery = dst.Height / (ocvb.maxZ * distanceRatio)
+        Dim markerx = markery * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
+        Dim markerLeft = New cv.Point(cam.X - markerx, dst.Height - markery)
+        Dim markerRight = New cv.Point(cam.X + markerx, dst.Height - markery)
 
         ' draw the arc enclosing the camera FOV
         Dim startAngle = (180 - ocvb.hFov) / 2
@@ -116,6 +126,11 @@ Public Class PointCloud_Colorize
         dst.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         dst.Line(ocvb.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
+        dst.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst.Width / 2 + shift, dst.Height * 15 / 16)
         cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
@@ -123,23 +138,26 @@ Public Class PointCloud_Colorize
         Return dst
     End Function
     Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat) As cv.Mat
+        Static xCheckbox = findCheckBox("X-axis rotation using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Z-axis rotation using angleX of the gravity vector")
+        Dim distanceRatio As Single = 1
+        If xCheckbox.Checked Then distanceRatio = Math.Cos(ocvb.angleZ)
         Dim fsize = ocvb.fontSize * 1.5
 
         dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = 1 To ocvb.maxZ
-            Dim xmeter = CInt(dst.Width * i / ocvb.maxZ)
+            Dim xmeter = CInt(dst.Width * i / ocvb.maxZ * distanceRatio)
             dst.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         Dim cam = ocvb.sideCameraPoint
         Dim fovAngle = ocvb.vFov
-        Dim markerx = dst.Width / ocvb.maxZ ' 1 meter with default maxz
+        Dim markerx = dst.Width / (ocvb.maxZ * distanceRatio)
         Dim markery = markerx * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
         Dim markerTop = New cv.Point(markerx, cam.Y - markery)
         Dim markerBot = New cv.Point(markerx, cam.Y + markery)
 
-        Static xCheckbox = findCheckBox("X-axis rotation using angleZ of the gravity vector")
         If xCheckbox.checked Then
             markerTop = New cv.Point(markerTop.X - cam.X, markerTop.Y - cam.Y) ' Change the origin
             markerTop = New cv.Point(markerTop.X * Math.Cos(ocvb.angleZ) - markerTop.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
@@ -151,7 +169,6 @@ Public Class PointCloud_Colorize
                                      (markerBot.Y - cam.Y) * Math.Cos(ocvb.angleZ) + (markerBot.X - cam.X) * Math.Sin(ocvb.angleZ) + cam.Y)
         End If
 
-        'Static zCheckbox = findCheckBox("Z-axis rotation using angleX of the gravity vector")
         'If zcheckbox.checked Then
         '    markerTop = New cv.Point(markerTop.X - cam.X, markerTop.Y - cam.Y) ' Change the origin
         '    markerTop = New cv.Point(markerTop.X * Math.Cos(ocvb.angleX) - markerTop.Y * Math.Sin(ocvb.angleX), ' rotate around x-axis using angleZ
@@ -166,7 +183,7 @@ Public Class PointCloud_Colorize
         dst.Circle(markerTop, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         dst.Circle(markerBot, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
 
-        ' draw the arc showing the camera FOV
+        ' draw the arc enclosing the camera FOV
         Dim startAngle = (180 - fovAngle) / 2
         Dim y = dst.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
 
