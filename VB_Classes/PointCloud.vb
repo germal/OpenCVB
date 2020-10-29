@@ -1142,18 +1142,18 @@ Public Class PointCloud_FindCeilingAndFloor
     Public Sub Run(ocvb As VBocvb)
         floor.floorRun = True ' we are looking for ceilings.
         floor.Run(ocvb)
-        floorLeft = floor.gleftPoint
-        floorRight = floor.grightPoint
+        floorLeft = floor.leftPoint
+        floorRight = floor.rightPoint
 
         dst1 = floor.dst1.Clone
         dst2 = floor.dst2.Clone
 
         floor.floorRun = False ' we are looking for ceilings.
         floor.Run(ocvb)
-        ceilingLeft = floor.gleftPoint
-        ceilingRight = floor.grightPoint
+        ceilingLeft = floor.leftPoint
+        ceilingRight = floor.rightPoint
 
-        dst1.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+        dst1.Line(floor.leftPoint, floor.rightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -1167,20 +1167,16 @@ End Class
 Public Class PointCloud_FindFloorPlane
     Inherits VBparent
     Public floor As PointCloud_FindFloor
+    Dim inrange As Depth_InRange
     Dim inverse As Mat_Inverse
-    Public planeTriangle As cv.Mat
-    Public planeEquationRotated As mn.Plane
-    Public planeEquation As mn.Plane
     Dim flow As Font_FlowText
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+
+        inrange = New Depth_InRange(ocvb)
         inverse = New Mat_Inverse(ocvb)
         flow = New Font_FlowText(ocvb)
         floor = New PointCloud_FindFloor(ocvb)
-
-        hideForm("Reduction_Basics Radio Options")
-        hideForm("Reduction_Basics Slider Options")
-        hideForm("FloodFill_Basics Slider Options")
 
         label1 = "Plane equation input"
         label2 = "Side view rotated with gravity vector - floor is in red"
@@ -1189,68 +1185,78 @@ Public Class PointCloud_FindFloorPlane
     Public Sub Run(ocvb As VBocvb)
         floor.src = ocvb.pointCloud
         floor.Run(ocvb)
-        dst2 = floor.sideIMU.sideView.dst2
-        dst2.Line(floor.gleftPoint, floor.grightPoint, cv.Scalar.Red, 5)
+        dst2 = floor.dst1
+        dst2.Line(floor.leftPoint, floor.rightPoint, cv.Scalar.Red, 5)
 
-        Dim pixelsPerMeter = dst2.Width / ocvb.maxZ
-        Dim distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.gleftPoint.X) * (ocvb.sideCameraPoint.X - floor.gleftPoint.X) +
-                                ((ocvb.sideCameraPoint.Y - floor.gleftPoint.Y) * (ocvb.sideCameraPoint.Y - floor.gleftPoint.Y))) / pixelsPerMeter
-        Dim pts(3 - 1) As cv.Point3f
-        pts(0) = New cv.Point3f(0, 0, distance)
-        pts(1) = New cv.Point3f(ocvb.pointCloud.Width, 0, distance)
-        distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.grightPoint.X) * (ocvb.sideCameraPoint.X - floor.grightPoint.X) +
-                            ((ocvb.sideCameraPoint.Y - floor.grightPoint.Y) * (ocvb.sideCameraPoint.Y - floor.grightPoint.Y))) / pixelsPerMeter
-        pts(2) = New cv.Point3f(0, 0, distance)
-        pts(0) = getWorldCoordinates(ocvb, pts(0))
-        pts(1) = getWorldCoordinates(ocvb, pts(1))
-        pts(2) = getWorldCoordinates(ocvb, pts(2))
+        Dim planeY = floor.leftPoint.Y / ocvb.pixelsPerMeterH ' +- x (in meters)
+        inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
+        inverse.Run(ocvb)
 
-        Dim p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
-        Dim p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
-        Dim p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
+        Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud
+        Dim split = imuPC.Split()
 
-        If p1 <> p2 And p2 <> p3 And p1 <> p3 Then
-            planeEquationRotated = mn.Plane.FromPoints(p1, p2, p3)
 
-            Dim ptsMat = New cv.Mat(pts.Length, 1, cv.MatType.CV_32FC3, pts)
+        inrange.src = split(1)
+        inrange.Run(ocvb)
 
-            inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
-            inverse.Run(ocvb)
+        'Dim distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.leftPoint.X) * (ocvb.sideCameraPoint.X - floor.leftPoint.X) +
+        '                        ((ocvb.sideCameraPoint.Y - floor.leftPoint.Y) * (ocvb.sideCameraPoint.Y - floor.leftPoint.Y))) / ocvb.pixelsPerMeterH
+        'Dim pts(3 - 1) As cv.Point3f
+        'pts(0) = New cv.Point3f(0, 0, distance)
+        'pts(1) = New cv.Point3f(ocvb.pointCloud.Width, 0, distance)
+        'distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.rightPoint.X) * (ocvb.sideCameraPoint.X - floor.rightPoint.X) +
+        '                    ((ocvb.sideCameraPoint.Y - floor.rightPoint.Y) * (ocvb.sideCameraPoint.Y - floor.rightPoint.Y))) / ocvb.pixelsPerMeterH
+        'pts(2) = New cv.Point3f(0, 0, distance)
+        'pts(0) = getWorldCoordinates(ocvb, pts(0))
+        'pts(1) = getWorldCoordinates(ocvb, pts(1))
+        'pts(2) = getWorldCoordinates(ocvb, pts(2))
 
-            Dim gInput = ptsMat.Reshape(1, ptsMat.Rows * ptsMat.Cols)
-            Dim gOutput = (gInput * inverse.inverse).ToMat
-            gOutput = gOutput.Reshape(3, ptsMat.Rows) ' these are the coordinates for the plane equation in the original image depth view
+        'Dim p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
+        'Dim p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
+        'Dim p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
 
-            pts(0) = gOutput.Get(Of cv.Point3f)(0, 0)
-            pts(1) = gOutput.Get(Of cv.Point3f)(1, 0)
-            pts(2) = gOutput.Get(Of cv.Point3f)(2, 0)
-            p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
-            p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
-            p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
+        'If p1 <> p2 And p2 <> p3 And p1 <> p3 Then
+        '    planeEquationRotated = mn.Plane.FromPoints(p1, p2, p3)
 
-            planeEquation = mn.Plane.FromPoints(p1, p2, p3)
+        '    Dim ptsMat = New cv.Mat(pts.Length, 1, cv.MatType.CV_32FC3, pts)
 
-            If standalone Then
-                flow.msgs.Add(vbNewLine + "3D coordinates:")
-                flow.msgs.Add("X" + vbTab + "Y" + vbTab + "Z")
-                For i = 0 To gOutput.Rows - 1
-                    Dim pt = gOutput.Get(Of cv.Point3f)(i, 0)
-                    flow.msgs.Add(Format(pt.X, "#0.000") + vbTab + Format(pt.Y, "#0.000") + vbTab + Format(pt.Z, "#0.000"))
-                Next
+        '    inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
+        '    inverse.Run(ocvb)
 
-                flow.msgs.Add(vbCrLf + "Plane Equation Rotated by gravity vector:")
-                flow.msgs.Add(Format(planeEquationRotated.A, "#0.000") + vbTab + Format(planeEquationRotated.B, "#0.000") + vbTab +
-                          Format(planeEquationRotated.C, "#0.000") + vbTab + Format(planeEquationRotated.D, "#0.000"))
+        '    Dim gInput = ptsMat.Reshape(1, ptsMat.Rows * ptsMat.Cols)
+        '    Dim gOutput = (gInput * inverse.inverse).ToMat
+        '    gOutput = gOutput.Reshape(3, ptsMat.Rows) ' these are the coordinates for the plane equation in the original image depth view
 
-                flow.msgs.Add(vbCrLf + "Plane Equation in original point cloud:")
-                flow.msgs.Add(Format(planeEquation.A, "#0.000") + vbTab + Format(planeEquation.B, "#0.000") + vbTab +
-                          Format(planeEquation.C, "#0.000") + vbTab + Format(planeEquation.D, "#0.000"))
+        '    pts(0) = gOutput.Get(Of cv.Point3f)(0, 0)
+        '    pts(1) = gOutput.Get(Of cv.Point3f)(1, 0)
+        '    pts(2) = gOutput.Get(Of cv.Point3f)(2, 0)
+        '    p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
+        '    p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
+        '    p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
 
-                flow.msgs.Add("-------------------------------------")
+        '    planeEquation = mn.Plane.FromPoints(p1, p2, p3)
 
-                flow.Run(ocvb)
-            End If
-        End If
+        '    If standalone Then
+        '        flow.msgs.Add(vbNewLine + "3D coordinates:")
+        '        flow.msgs.Add("X" + vbTab + "Y" + vbTab + "Z")
+        '        For i = 0 To gOutput.Rows - 1
+        '            Dim pt = gOutput.Get(Of cv.Point3f)(i, 0)
+        '            flow.msgs.Add(Format(pt.X, "#0.000") + vbTab + Format(pt.Y, "#0.000") + vbTab + Format(pt.Z, "#0.000"))
+        '        Next
+
+        '        flow.msgs.Add(vbCrLf + "Plane Equation Rotated by gravity vector:")
+        '        flow.msgs.Add(Format(planeEquationRotated.A, "#0.000") + vbTab + Format(planeEquationRotated.B, "#0.000") + vbTab +
+        '                  Format(planeEquationRotated.C, "#0.000") + vbTab + Format(planeEquationRotated.D, "#0.000"))
+
+        '        flow.msgs.Add(vbCrLf + "Plane Equation in original point cloud:")
+        '        flow.msgs.Add(Format(planeEquation.A, "#0.000") + vbTab + Format(planeEquation.B, "#0.000") + vbTab +
+        '                  Format(planeEquation.C, "#0.000") + vbTab + Format(planeEquation.D, "#0.000"))
+
+        '        flow.msgs.Add("-------------------------------------")
+
+        '        flow.Run(ocvb)
+        '    End If
+        'End If
     End Sub
 End Class
 
@@ -1263,8 +1269,8 @@ Public Class PointCloud_FindFloor
     Inherits VBparent
     Public sideIMU As PointCloud_IMU_SideView
     Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
-    Public gleftPoint As cv.Point2f
-    Public grightPoint As cv.Point2f
+    Public leftPoint As cv.Point2f
+    Public rightPoint As cv.Point2f
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -1276,7 +1282,6 @@ Public Class PointCloud_FindFloor
         sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 5)
         sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
 
-        label2 = "Side View without gravity vector"
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -1332,22 +1337,22 @@ Public Class PointCloud_FindFloor
 
                 Dim minVal As Double, maxVal As Double
                 leftMat.MinMaxLoc(minVal, maxVal)
-                gleftPoint = New cv.Point(minVal, meanLeft.Item(1))
+                leftPoint = New cv.Point(minVal, meanLeft.Item(1))
 
                 rightMat.MinMaxLoc(minVal, maxVal)
-                grightPoint = New cv.Point(maxVal, meanRight.Item(1))
+                rightPoint = New cv.Point(maxVal, meanRight.Item(1))
 
-                kalman.kInput(0) = gleftPoint.X
-                kalman.kInput(1) = grightPoint.X
+                kalman.kInput(0) = leftPoint.X
+                kalman.kInput(1) = rightPoint.X
                 kalman.Run(ocvb)
-                gleftPoint.X = kalman.kOutput(0)
-                grightPoint.X = kalman.kOutput(1)
+                leftPoint.X = kalman.kOutput(0)
+                rightPoint.X = kalman.kOutput(1)
             End If
-            If Math.Abs(gleftPoint.Y - grightPoint.Y) > angleTest Or leftPoints.Count = 0 Then ' should be level by this point...
-                gleftPoint = New cv.Point2f
-                grightPoint = New cv.Point2f
+            If Math.Abs(leftPoint.Y - rightPoint.Y) > angleTest Or leftPoints.Count = 0 Then ' should be level by this point...
+                leftPoint = New cv.Point2f
+                rightPoint = New cv.Point2f
             End If
-            dst1.Line(gleftPoint, grightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
+            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
         End If
         label1 = "Side View with gravity "
     End Sub
@@ -1373,7 +1378,7 @@ Public Class PointCloud_FindFloor2D
         floor.Run(ocvb)
         dst1 = ocvb.RGBDepth
         dst2 = floor.dst1
-        Dim floorPoint = CInt((floor.gleftPoint.Y + floor.grightPoint.Y) / 2)
+        Dim floorPoint = CInt((floor.leftPoint.Y + floor.rightPoint.Y) / 2)
         If floorPoint <> 0 Then
             floorPoint += ocvb.sideCameraPoint.X
             Dim lineHeight = ocvb.lineSize * 5

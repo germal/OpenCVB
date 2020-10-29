@@ -595,14 +595,19 @@ Public Class Depth_ColorizerFastFade_CPP
         inrange.Run(ocvb)
         dst2 = inrange.depthMask
 
-        If standalone Then src = inrange.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If standalone Then src = inrange.depth32f
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, inrange.maxDepth)
+        Static maxDepthSlider = findSlider("InRange Max Depth (mm)")
+        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, maxDepthSlider.value)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        If imagePtr <> 0 Then
+            Dim tmp = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+            dst1.SetTo(0)
+            tmp.CopyTo(dst1, dst2)
+        End If
     End Sub
     Public Sub Close()
         Depth_Colorizer2_Close(dcPtr)
@@ -1508,8 +1513,6 @@ Public Class Depth_InRange
     Public depthMask As New cv.Mat
     Public noDepthMask As New cv.Mat
     Public depth32f As New cv.Mat
-    Public minDepth As Double
-    Public maxDepth As Double
     Public depth32fAfterMasking As Boolean
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -1523,12 +1526,13 @@ Public Class Depth_InRange
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
-        minDepth = sliders.trackbar(0).Value
-        maxDepth = sliders.trackbar(1).Value
+        Dim minVal = sliders.trackbar(0).Value
+        Dim maxVal = sliders.trackbar(1).Value
         If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
-        cv.Cv2.InRange(depth32f, cv.Scalar.All(minDepth), cv.Scalar.All(maxDepth), depthMask)
+        cv.Cv2.InRange(depth32f, cv.Scalar.All(minVal), cv.Scalar.All(maxVal), depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
         ocvb.pointCloud.SetTo(0, noDepthMask.Resize(ocvb.pointCloud.Size))
+        depth32f.SetTo(0, noDepthMask)
         dst1 = depth32f.Clone.SetTo(0, noDepthMask)
         If standalone Or depth32fAfterMasking Then
             dst2 = depth32f.Clone.SetTo(0, depthMask)
