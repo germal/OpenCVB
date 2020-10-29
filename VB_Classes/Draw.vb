@@ -661,8 +661,8 @@ Public Class Draw_Frustrum
         xyzDepth.depthUnitsMeters = True
 
         If standalone = False Then
-            Dim imuCheck = findCheckBox("Use IMU gravity vector")
-            imuCheck.Checked = False
+            ocvb.imuXAxis = False
+            ocvb.imuZAxis = False
         End If
         ocvb.desc = "Draw a frustrum for a camera viewport"
     End Sub

@@ -96,24 +96,45 @@ Public Class PointCloud_Colorize
     Public rect As cv.Rect
     Dim arcSize As Integer
     Public Function CameraLocationBot(ocvb As VBocvb, dst As cv.Mat) As cv.Mat
-        Static xCheckbox = findCheckBox("X-axis rotation using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Z-axis rotation using angleX of the gravity vector")
         Dim distanceRatio As Single = 1
-        If xCheckbox.Checked Then distanceRatio = Math.Cos(ocvb.angleZ)
+        ' If ocvb.imuXAxis Then distanceRatio = Math.Cos(ocvb.angleZ)
         Dim fsize = ocvb.fontSize * 1.5
         dst.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
-        For i = ocvb.maxZ - 1 To 0 Step -1
-            Dim ymeter = CInt(dst.Height * i / (ocvb.maxZ * distanceRatio))
+        For i = 1 To ocvb.maxZ
+            Dim ymeter = CInt(dst.Height - dst.Height * i / (ocvb.maxZ * distanceRatio))
             dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(ocvb.maxZ - i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         Dim cam = ocvb.topCameraPoint
-        Dim fovAngle = ocvb.hFov
-        Dim markery = dst.Height / (ocvb.maxZ * distanceRatio)
-        Dim markerx = markery * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
-        Dim markerLeft = New cv.Point(cam.X - markerx, dst.Height - markery)
-        Dim markerRight = New cv.Point(cam.X + markerx, dst.Height - markery)
+        Dim marker As New cv.Point2f(cam.X, dst.Height / (ocvb.maxZ * distanceRatio))
+        Dim topLen = marker.Y * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
+        Dim sideLen = marker.Y * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
+        Dim markerLeft = New cv.Point(cam.X - topLen, dst.Height - marker.Y)
+        Dim markerRight = New cv.Point(cam.X + topLen, dst.Height - marker.Y)
+
+        'If ocvb.imuZAxis Then
+        '    Dim angle = ocvb.angleX
+        '    markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
+        '    markerLeft = New cv.Point(markerLeft.X * Math.Cos(angle) - markerLeft.Y * Math.Sin(angle), ' rotate around z-axis using anglex
+        '                              markerLeft.Y * Math.Cos(angle) + markerLeft.X * Math.Sin(angle))
+        '    markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
+
+        '    ' Same as above for markerLeft but consolidated algebraically.
+        '    markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(angle) - (markerRight.Y - cam.Y) * Math.Sin(angle) + cam.X,
+        '                               (markerRight.Y - cam.Y) * Math.Cos(angle) + (markerRight.X - cam.X) * Math.Sin(angle) + cam.Y)
+        'End If
+
+        If ocvb.imuXAxis Then
+            Dim offset = Math.Sin(ocvb.angleZ) * topLen
+            If ocvb.angleZ > 0 Then
+                markerLeft.X = markerLeft.X - offset
+                markerRight.X = markerRight.X + offset
+            Else
+                markerLeft.X = markerLeft.X + offset
+                markerRight.X = markerRight.X - offset
+            End If
+        End If
 
         ' draw the arc enclosing the camera FOV
         Dim startAngle = (180 - ocvb.hFov) / 2
@@ -138,10 +159,8 @@ Public Class PointCloud_Colorize
         Return dst
     End Function
     Public Function CameraLocationSide(ocvb As VBocvb, ByRef dst As cv.Mat) As cv.Mat
-        Static xCheckbox = findCheckBox("X-axis rotation using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Z-axis rotation using angleX of the gravity vector")
         Dim distanceRatio As Single = 1
-        If xCheckbox.Checked Then distanceRatio = Math.Cos(ocvb.angleZ)
+        ' If ocvb.imuXAxis Then distanceRatio = Math.Cos(ocvb.angleZ)
         Dim fsize = ocvb.fontSize * 1.5
 
         dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
@@ -152,39 +171,39 @@ Public Class PointCloud_Colorize
         Next
 
         Dim cam = ocvb.sideCameraPoint
-        Dim fovAngle = ocvb.vFov
-        Dim markerx = dst.Width / (ocvb.maxZ * distanceRatio)
-        Dim markery = markerx * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
-        Dim markerTop = New cv.Point(markerx, cam.Y - markery)
-        Dim markerBot = New cv.Point(markerx, cam.Y + markery)
+        Dim marker As New cv.Point2f(dst.Width / (ocvb.maxZ * distanceRatio), 0)
+        marker.Y = marker.X * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
+        Dim topLen = marker.X * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
+        Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
+        Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        If xCheckbox.checked Then
-            markerTop = New cv.Point(markerTop.X - cam.X, markerTop.Y - cam.Y) ' Change the origin
-            markerTop = New cv.Point(markerTop.X * Math.Cos(ocvb.angleZ) - markerTop.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
-                                     markerTop.Y * Math.Cos(ocvb.angleZ) + markerTop.X * Math.Sin(ocvb.angleZ))
-            markerTop = New cv.Point(markerTop.X + cam.X, markerTop.Y + cam.Y) ' Move the origin to the side camera location.
-
-            ' Same as above for markerTop but consolidated algebraically.
-            markerBot = New cv.Point((markerBot.X - cam.X) * Math.Cos(ocvb.angleZ) - (markerBot.Y - cam.Y) * Math.Sin(ocvb.angleZ) + cam.X,
-                                     (markerBot.Y - cam.Y) * Math.Cos(ocvb.angleZ) + (markerBot.X - cam.X) * Math.Sin(ocvb.angleZ) + cam.Y)
+        If ocvb.imuZAxis Then
+            Dim offset = Math.Sin(ocvb.angleX) * marker.Y
+            If ocvb.angleX > 0 Then
+                markerLeft.Y = markerLeft.Y - offset
+                markerRight.Y = markerRight.Y + offset
+            Else
+                markerLeft.Y = markerLeft.Y + offset
+                markerRight.Y = markerRight.Y - offset
+            End If
         End If
 
-        'If zcheckbox.checked Then
-        '    markerTop = New cv.Point(markerTop.X - cam.X, markerTop.Y - cam.Y) ' Change the origin
-        '    markerTop = New cv.Point(markerTop.X * Math.Cos(ocvb.angleX) - markerTop.Y * Math.Sin(ocvb.angleX), ' rotate around x-axis using angleZ
-        '                             markerTop.Y * Math.Cos(ocvb.angleX) + markerTop.X * Math.Sin(ocvb.angleX))
-        '    markerTop = New cv.Point(markerTop.X + cam.X, markerTop.Y + cam.Y) ' Move the origin to the side camera location.
+        If ocvb.imuXAxis Then
+            markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
+            markerLeft = New cv.Point(markerLeft.X * Math.Cos(ocvb.angleZ) - markerLeft.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
+                                      markerLeft.Y * Math.Cos(ocvb.angleZ) + markerLeft.X * Math.Sin(ocvb.angleZ))
+            markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
 
-        '    ' Same as above for markerTop but consolidated algebraically.
-        '    markerBot = New cv.Point((markerBot.X - cam.X) * Math.Cos(ocvb.angleX) - (markerBot.Y - cam.Y) * Math.Sin(ocvb.angleX) + cam.X,
-        '                             (markerBot.Y - cam.Y) * Math.Cos(ocvb.angleX) + (markerBot.X - cam.X) * Math.Sin(ocvb.angleX) + cam.Y)
-        'End If
+            ' Same as above for markerLeft but consolidated algebraically.
+            markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(ocvb.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(ocvb.angleZ) + cam.X,
+                                       (markerRight.Y - cam.Y) * Math.Cos(ocvb.angleZ) + (markerRight.X - cam.X) * Math.Sin(ocvb.angleZ) + cam.Y)
+        End If
 
-        dst.Circle(markerTop, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst.Circle(markerBot, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
 
         ' draw the arc enclosing the camera FOV
-        Dim startAngle = (180 - fovAngle) / 2
+        Dim startAngle = (180 - ocvb.vFov) / 2
         Dim y = dst.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
 
         Dim fovTop = New cv.Point(dst.Width, cam.Y - y)
@@ -195,8 +214,8 @@ Public Class PointCloud_Colorize
         dst.Line(cam, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst.Line(cam, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        dst.Line(cam, markerTop, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cam, markerBot, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
 
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
         cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
@@ -368,8 +387,8 @@ Public Class PointCloud_Objects
         cmats = New PointCloud_Colorize(ocvb)
         measureSide = New PointCloud_Kalman_SideView(ocvb)
         measureTop = New PointCloud_Kalman_TopView(ocvb)
-        Dim imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.Checked = False
+        ocvb.imuXAxis = False
+        ocvb.imuZAxis = False
 
         If standalone Then
             sliders.Setup(ocvb, caller, 1)
@@ -562,8 +581,7 @@ Public Class PointCloud_Kalman_TopView
         pTrack.Run(ocvb)
         dst1 = pTrack.dst1
 
-        Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU.Checked = False Then dst1 = cmats.CameraLocationBot(ocvb, dst1)
+        dst1 = cmats.CameraLocationBot(ocvb, dst1)
         Dim FOV = ocvb.hFov
         Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
         pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * ocvb.maxZ)
@@ -706,11 +724,9 @@ Public Class PointCloud_BothViews
 
         If standalone Then
             Dim instructions = "Click any centroid to get details"
-            Static useIMUcheckbox = findCheckBox("Use IMU gravity vector")
-            If useIMUcheckbox Is Nothing Then useIMUcheckbox = findCheckBox("Use IMU gravity vector")
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
-            If useIMUcheckbox.checked Then
+            If ocvb.imuXAxis Or ocvb.imuZAxis Then
                 levelCheck.Run(ocvb)
                 If levelCheck.cameraLevel Then
                     accMsg1 = "TopView - distances are APPROXIMATE - level cam"
@@ -797,11 +813,8 @@ Public Class PointCloud_BothViews
             End If
         End If
 
-        Static checkIMU = findCheckBox("Use IMU gravity vector")
-        If checkIMU.Checked = False Then
-            dst1 = cmats.CameraLocationBot(ocvb, dst1)
-            dst2 = cmats.CameraLocationSide(ocvb, dst2)
-        End If
+        dst1 = cmats.CameraLocationBot(ocvb, dst1)
+        dst2 = cmats.CameraLocationSide(ocvb, dst2)
     End Sub
 End Class
 
@@ -861,15 +874,16 @@ Public Class PointCloud_IMU_TopView
         ocvb.desc = "Present the top view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.checked = True
+        ocvb.imuXAxis = True
+        ocvb.imuZAxis = True
         topView.Run(ocvb)
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
 
         If standalone Then
-            imuCheck.checked = False
+            ocvb.imuXAxis = False
+            ocvb.imuZAxis = False
             kTopView.Run(ocvb)
             dst2 = cmats.CameraLocationBot(ocvb, kTopView.dst1)
         End If
@@ -980,15 +994,16 @@ Public Class PointCloud_IMU_SideView
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.checked = True
+        ocvb.imuXAxis = True
+        ocvb.imuZAxis = True
         sideView.Run(ocvb)
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = cmats.CameraLocationSide(ocvb, lDetect.dst1)
 
         If standalone Then
-            imuCheck.checked = False
+            ocvb.imuXAxis = False
+            ocvb.imuZAxis = False
             kSideView.Run(ocvb)
             dst2 = kSideView.dst1
         End If
@@ -1023,8 +1038,8 @@ Public Class PointCloud_IMU_SideCompare
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static imuCheck = findCheckBox("Use IMU gravity vector")
-        imuCheck.checked = True
+        ocvb.imuXAxis = True
+        ocvb.imuZAxis = True
         sideView.Run(ocvb)
         dst1 = sideView.dst2.Clone()
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1032,7 +1047,8 @@ Public Class PointCloud_IMU_SideCompare
         dst1 = lDetect.dst1
         dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-        imuCheck.checked = False
+        ocvb.imuXAxis = False
+        ocvb.imuZAxis = False
         kSideView.Run(ocvb)
         dst2 = kSideView.dst1
     End Sub

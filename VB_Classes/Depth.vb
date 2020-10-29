@@ -1556,21 +1556,21 @@ Public Class Depth_PointCloud_IMU
         imu = New IMU_GVector(ocvb)
         inrange = New Depth_InRange(ocvb)
 
-        check.Setup(ocvb, caller, 3)
-        check.Box(0).Text = "Use IMU gravity vector"
-        check.Box(1).Text = "X-axis rotation using angleZ of the gravity vector"
-        check.Box(2).Text = "Z-axis rotation using angleX of the gravity vector"
+        check.Setup(ocvb, caller, 2)
+        check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"
+        check.Box(1).Text = "Rotate pointcloud around Z-axis using angleX of the gravity vector"
         check.Box(0).Checked = True
         check.Box(1).Checked = True
-        check.Box(2).Checked = True
 
         label1 = "Mask for depth values that are in-range"
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static xCheckbox = findCheckBox("X-axis rotation using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Z-axis rotation using angleX of the gravity vector")
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
+        ocvb.imuXAxis = xCheckbox.checked
+        ocvb.imuZAxis = zCheckbox.checked
         ocvb.maxZ = rangeSlider.Value / 1000
 
         inrange.Run(ocvb) ' 
@@ -1601,11 +1601,8 @@ Public Class Depth_PointCloud_IMU
                    {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                    {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        Static imuCheckBox = findCheckBox("Use IMU gravity vector")
-        Dim xOrYChecked = True
-        If xCheckbox.checked = False And zCheckbox.checked = False Then xOrYChecked = False
         Dim split = cv.Cv2.Split(ocvb.pointCloud)
-        If imuCheckBox.checked And xOrYChecked Then
+        If ocvb.imuXAxis Or ocvb.imuZAxis Then
             Dim mask As New cv.Mat
             cv.Cv2.InRange(split(2), 0.01, ocvb.maxZ, dst1)
             cv.Cv2.BitwiseNot(dst1, mask)

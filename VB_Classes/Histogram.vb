@@ -1072,15 +1072,6 @@ Public Class Histogram_2D_SideView
         label1 = "ZY (Side View)"
         ocvb.desc = "Create a 2D histogram for depth in ZY (side view.)"
     End Sub
-    Private Function rotatePoint(ocvb As VBocvb, pt As cv.Point2f) As cv.Point2f
-        Dim rPt = New cv.Point2f(-(pt.Y - dst1.Height), pt.X - dst1.Height)
-        Return New cv.Point2f((rPt.X + ocvb.sideCameraPoint.X), (rPt.Y + ocvb.sideCameraPoint.Y))
-    End Function
-    Private Function computeFrustrumLine(ocvb As VBocvb, marker As cv.Point2f) As cv.Point2f
-        Dim m = (marker.Y - ocvb.sideCameraPoint.Y) / (marker.X - ocvb.sideCameraPoint.X)
-        Dim b = marker.Y - marker.X * m
-        Return New cv.Point2f(dst1.Width, m * dst1.Width + b)
-    End Function
     Public Sub Run(ocvb As VBocvb)
         gCloudIMU.Run(ocvb)
 

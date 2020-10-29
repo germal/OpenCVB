@@ -80,6 +80,8 @@ Public Class VBocvb
     Public cz As Single
     Public sz As Single
     Public gMat As cv.Mat
+    Public imuXAxis As Boolean
+    Public imuZAxis As Boolean
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
