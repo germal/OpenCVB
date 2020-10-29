@@ -1573,7 +1573,7 @@ Public Class Depth_PointCloud_IMU
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
         Static rangeSlider = findSlider("InRange Max Depth (mm)")
         ocvb.imuXAxis = If(ocvb.useIMU, xCheckbox.checked, False)
-        ocvb.imuZAxis = If(ocvb.useIMU, xCheckbox.checked, False)
+        ocvb.imuZAxis = If(ocvb.useIMU, zCheckbox.checked, False)
         ocvb.maxZ = rangeSlider.Value / 1000
 
         inrange.Run(ocvb)
