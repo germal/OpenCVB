@@ -1529,8 +1529,8 @@ Public Class Depth_InRange
         cv.Cv2.InRange(depth32f, cv.Scalar.All(minDepth), cv.Scalar.All(maxDepth), depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
         ocvb.pointCloud.SetTo(0, noDepthMask.Resize(ocvb.pointCloud.Size))
+        dst1 = depth32f.Clone.SetTo(0, noDepthMask)
         If standalone Or depth32fAfterMasking Then
-            dst1 = depth32f.Clone.SetTo(0, noDepthMask)
             dst2 = depth32f.Clone.SetTo(0, depthMask)
         End If
     End Sub
@@ -1565,7 +1565,7 @@ Public Class Depth_PointCloud_IMU
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
-        label1 = "Mask for depth values that are in-range"
+        label1 = "Depth range values.  Pointcloud also prepared."
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -1576,7 +1576,8 @@ Public Class Depth_PointCloud_IMU
         ocvb.imuZAxis = If(ocvb.useIMU, xCheckbox.checked, False)
         ocvb.maxZ = rangeSlider.Value / 1000
 
-        inrange.Run(ocvb) ' 
+        inrange.Run(ocvb)
+        dst1 = inrange.dst1
 
         imu.Run(ocvb)
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
@@ -1616,15 +1617,8 @@ Public Class Depth_PointCloud_IMU
                   {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
         End If
 
-        Dim split = cv.Cv2.Split(ocvb.pointCloud)
         gMatrix = gM
         If ocvb.imuXAxis Or ocvb.imuZAxis Then
-            Dim mask As New cv.Mat
-            cv.Cv2.InRange(split(2), 0.01, ocvb.maxZ, dst1)
-            cv.Cv2.BitwiseNot(dst1, mask)
-            ocvb.pointCloud.SetTo(0, mask)
-            If standalone Then dst1 = dst1.Resize(dst1.Size)
-
             ocvb.gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
             Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
             Dim gOutput = (gInput * ocvb.gMat).ToMat
