@@ -1178,6 +1178,9 @@ Public Class PointCloud_FindFloorPlane
         flow = New Font_FlowText(ocvb)
         floor = New PointCloud_FindFloor(ocvb)
 
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Height (+- range) of the floor plane in mm's", 1, 100, 10)
+
         label1 = "Plane equation input"
         label2 = "Side view rotated with gravity vector - floor is in red"
         ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
@@ -1188,75 +1191,27 @@ Public Class PointCloud_FindFloorPlane
         dst2 = floor.dst1
         dst2.Line(floor.leftPoint, floor.rightPoint, cv.Scalar.Red, 5)
 
-        Dim planeY = floor.leftPoint.Y / ocvb.pixelsPerMeterH ' +- x (in meters)
+        Dim planeY = floor.leftPoint.Y / ocvb.pixelsPerMeterH - floor.sideIMU.sideView.frustrumAdjust ' +- x (in meters)
         inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
         inverse.Run(ocvb)
 
         Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud
+
+        Static cushionSlider = findSlider("Height (+- range) of the floor plane in mm's")
+        Dim cushion = cushionSlider.value / 100
+
+        'Dim depthMask As New cv.Mat, noDepthMask As New cv.Mat
+        'cv.Cv2.InRange(imuPC, New cv.Scalar(-10, planeY - cushion, 10), New cv.Scalar(0, planeY + cushion, ocvb.maxZ), depthMask)
+        ' cv.Cv2.BitwiseNot(depthMask, noDepthMask)
+        'imuPC.SetTo(0, noDepthMask)
+        'cv.Cv2.ImShow("nodepth", noDepthMask)
+
         Dim split = imuPC.Split()
-
-
         inrange.src = split(1)
+        inrange.minVal = planeY '- cushion
+        inrange.maxVal = planeY + cushion
         inrange.Run(ocvb)
-
-        'Dim distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.leftPoint.X) * (ocvb.sideCameraPoint.X - floor.leftPoint.X) +
-        '                        ((ocvb.sideCameraPoint.Y - floor.leftPoint.Y) * (ocvb.sideCameraPoint.Y - floor.leftPoint.Y))) / ocvb.pixelsPerMeterH
-        'Dim pts(3 - 1) As cv.Point3f
-        'pts(0) = New cv.Point3f(0, 0, distance)
-        'pts(1) = New cv.Point3f(ocvb.pointCloud.Width, 0, distance)
-        'distance = Math.Sqrt((ocvb.sideCameraPoint.X - floor.rightPoint.X) * (ocvb.sideCameraPoint.X - floor.rightPoint.X) +
-        '                    ((ocvb.sideCameraPoint.Y - floor.rightPoint.Y) * (ocvb.sideCameraPoint.Y - floor.rightPoint.Y))) / ocvb.pixelsPerMeterH
-        'pts(2) = New cv.Point3f(0, 0, distance)
-        'pts(0) = getWorldCoordinates(ocvb, pts(0))
-        'pts(1) = getWorldCoordinates(ocvb, pts(1))
-        'pts(2) = getWorldCoordinates(ocvb, pts(2))
-
-        'Dim p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
-        'Dim p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
-        'Dim p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
-
-        'If p1 <> p2 And p2 <> p3 And p1 <> p3 Then
-        '    planeEquationRotated = mn.Plane.FromPoints(p1, p2, p3)
-
-        '    Dim ptsMat = New cv.Mat(pts.Length, 1, cv.MatType.CV_32FC3, pts)
-
-        '    inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
-        '    inverse.Run(ocvb)
-
-        '    Dim gInput = ptsMat.Reshape(1, ptsMat.Rows * ptsMat.Cols)
-        '    Dim gOutput = (gInput * inverse.inverse).ToMat
-        '    gOutput = gOutput.Reshape(3, ptsMat.Rows) ' these are the coordinates for the plane equation in the original image depth view
-
-        '    pts(0) = gOutput.Get(Of cv.Point3f)(0, 0)
-        '    pts(1) = gOutput.Get(Of cv.Point3f)(1, 0)
-        '    pts(2) = gOutput.Get(Of cv.Point3f)(2, 0)
-        '    p1 = New mn.Point3D(pts(0).X, pts(0).Y, pts(0).Z)
-        '    p2 = New mn.Point3D(pts(1).X, pts(1).Y, pts(1).Z)
-        '    p3 = New mn.Point3D(pts(2).X, pts(2).Y, pts(2).Z)
-
-        '    planeEquation = mn.Plane.FromPoints(p1, p2, p3)
-
-        '    If standalone Then
-        '        flow.msgs.Add(vbNewLine + "3D coordinates:")
-        '        flow.msgs.Add("X" + vbTab + "Y" + vbTab + "Z")
-        '        For i = 0 To gOutput.Rows - 1
-        '            Dim pt = gOutput.Get(Of cv.Point3f)(i, 0)
-        '            flow.msgs.Add(Format(pt.X, "#0.000") + vbTab + Format(pt.Y, "#0.000") + vbTab + Format(pt.Z, "#0.000"))
-        '        Next
-
-        '        flow.msgs.Add(vbCrLf + "Plane Equation Rotated by gravity vector:")
-        '        flow.msgs.Add(Format(planeEquationRotated.A, "#0.000") + vbTab + Format(planeEquationRotated.B, "#0.000") + vbTab +
-        '                  Format(planeEquationRotated.C, "#0.000") + vbTab + Format(planeEquationRotated.D, "#0.000"))
-
-        '        flow.msgs.Add(vbCrLf + "Plane Equation in original point cloud:")
-        '        flow.msgs.Add(Format(planeEquation.A, "#0.000") + vbTab + Format(planeEquation.B, "#0.000") + vbTab +
-        '                  Format(planeEquation.C, "#0.000") + vbTab + Format(planeEquation.D, "#0.000"))
-
-        '        flow.msgs.Add("-------------------------------------")
-
-        '        flow.Run(ocvb)
-        '    End If
-        'End If
+        dst1 = split(1)
     End Sub
 End Class
 

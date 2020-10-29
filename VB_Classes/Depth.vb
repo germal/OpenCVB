@@ -1512,6 +1512,8 @@ Public Class Depth_InRange
     Inherits VBparent
     Public depthMask As New cv.Mat
     Public noDepthMask As New cv.Mat
+    Public minVal As Single
+    Public maxVal As Single
     Public depth32f As New cv.Mat
     Public depth32fAfterMasking As Boolean
     Public Sub New(ocvb As VBocvb)
@@ -1526,17 +1528,15 @@ Public Class Depth_InRange
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
-        Dim minVal = sliders.trackbar(0).Value
-        Dim maxVal = sliders.trackbar(1).Value
+        Dim min = If(minVal <> 0, minVal, sliders.trackbar(0).Value)
+        Dim max = If(minVal <> 0, maxVal, sliders.trackbar(1).Value)
         If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
-        cv.Cv2.InRange(depth32f, cv.Scalar.All(minVal), cv.Scalar.All(maxVal), depthMask)
+        cv.Cv2.InRange(depth32f, cv.Scalar.All(min), cv.Scalar.All(max), depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
         ocvb.pointCloud.SetTo(0, noDepthMask.Resize(ocvb.pointCloud.Size))
         depth32f.SetTo(0, noDepthMask)
         dst1 = depth32f.Clone.SetTo(0, noDepthMask)
-        If standalone Or depth32fAfterMasking Then
-            dst2 = depth32f.Clone.SetTo(0, depthMask)
-        End If
+        If standalone Or depth32fAfterMasking Then dst2 = depth32f.Clone.SetTo(0, depthMask)
     End Sub
 End Class
 

@@ -979,6 +979,7 @@ Public Class Histogram_2D_SideView
     Dim cameraYSlider As Windows.Forms.TrackBar
     Dim frustrumSlider As Windows.Forms.TrackBar
     Dim cmat As PointCloud_Colorize
+    Public frustrumAdjust As Single
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1023,7 +1024,7 @@ Public Class Histogram_2D_SideView
         ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraYSlider.Value)
 
         Static frustrumSlider = findSlider("SideView Frustrum adjustment")
-        Dim frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+        frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {dst1.Height, dst1.Width}
