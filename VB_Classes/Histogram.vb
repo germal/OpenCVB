@@ -894,7 +894,7 @@ End Class
 
 
 
-Public Class Histogram_HighlightSide
+Public Class Histogram_Concentration
     Inherits VBparent
     Public sideview As Histogram_2D_SideView
     Public topview As Histogram_2D_TopView
@@ -905,6 +905,9 @@ Public Class Histogram_HighlightSide
         palette = New Palette_Basics(ocvb)
         sideview = New Histogram_2D_SideView(ocvb)
         topview = New Histogram_2D_TopView(ocvb)
+
+        Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
+        minDepthSlider.Value = 1000
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
@@ -931,7 +934,8 @@ Public Class Histogram_HighlightSide
         Next
         palette.src = dst
         palette.Run(ocvb)
-        Return CStr(pts.Count) + " highlights. Max=" + CStr(pts.ElementAt(0).Key)
+        Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
+        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
     Public Sub Run(ocvb As VBocvb)
         sideview.Run(ocvb)
@@ -946,6 +950,7 @@ Public Class Histogram_HighlightSide
         dst2 = palette.dst1.Clone
     End Sub
 End Class
+
 
 
 
@@ -1076,15 +1081,13 @@ Public Class Histogram_2D_SideView
         gCloudIMU.Run(ocvb)
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
-        Dim fovAngle = ocvb.vFov
-        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
-
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
         ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraYSlider.Value)
 
         Static frustrumSlider = findSlider("SideView Frustrum adjustment")
-        ocvb.v2hRatio = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+        Dim frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.v2hRatio, ocvb.v2hRatio), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {dst1.Height, dst1.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 

@@ -977,7 +977,7 @@ Public Class PointCloud_IMU_SideView
         sideView = New Histogram_2D_SideView(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 0
+        histSlider.Value = 20
 
         label1 = "side view AFTER align/threshold using gravity vector"
         If standalone Then label2 = "side view BEFORE align/threshold using gravity vector"

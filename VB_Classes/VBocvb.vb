@@ -69,13 +69,12 @@ Public Class VBocvb
     Public resolutionIndex As Integer
     Public Const MAXZ_DEFAULT = 4
     Public maxZ As Single = MAXZ_DEFAULT
-    Public v2hRatio As Single ' ratio of pixels per meter vertical to pixels per meter horizonatal
     Public pixelsPerMeterH As Single
     Public pixelsPerMeterV As Single
     Public hFov As Single
     Public vFov As Single
     Public angleX As Single  ' rotation angle in radians around x-axis to align with gravity
-    Public angleY As Single  ' rotation angle in radians around y-axis to align with gravity
+    Public angleY As Single  ' this angle is only used manually - no IMU connection.
     Public angleZ As Single  ' rotation angle in radians around z-axis to align with gravity
     Public cz As Single
     Public sz As Single

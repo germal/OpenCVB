@@ -1514,7 +1514,7 @@ Public Class Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 1000, 200)
+        sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 2000, 200)
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 10000, 4000)
         sliders.setupTrackBar(2, "Histogram threshold", 0, 3000, 10)
         label1 = "Depth values that are in-range"
@@ -1556,6 +1556,9 @@ Public Class Depth_PointCloud_IMU
         imu = New IMU_GVector(ocvb)
         inrange = New Depth_InRange(ocvb)
 
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Amount to rotate pointcloud around Y-axis (degrees)", -180, 180, 0)
+
         check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"
         check.Box(1).Text = "Rotate pointcloud around Z-axis using angleX of the gravity vector"
@@ -1593,15 +1596,28 @@ Public Class Depth_PointCloud_IMU
             sx = Math.Sin(ocvb.angleX)
         End If
 
-        ' could use OpenCV for this but this makes it clearer.
         '[cx -sx    0]  [1  0   0 ] 
         '[sx  cx    0]  [0  cz -sz]
         '[0   0     1]  [0  sz  cz]
-        gMatrix = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
-                   {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
-                   {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+        Dim gM(,) As Single = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                               {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                               {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+
+        Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+        Dim angleY = angleYslider.value
+        If angleY <> 0 Then
+            '[cos(a) 0 -sin(a)]
+            '[0      1       0]
+            '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
+            cy = Math.Cos(angleY * cv.Cv2.PI / 180)
+            sy = Math.Sin(angleY * cv.Cv2.PI / 180)
+            gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
+                  {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
+                  {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
+        End If
 
         Dim split = cv.Cv2.Split(ocvb.pointCloud)
+        gMatrix = gM
         If ocvb.imuXAxis Or ocvb.imuZAxis Then
             Dim mask As New cv.Mat
             cv.Cv2.InRange(split(2), 0.01, ocvb.maxZ, dst1)

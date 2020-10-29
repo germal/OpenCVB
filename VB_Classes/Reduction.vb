@@ -250,7 +250,7 @@ Public Class Reduction_Lines
         reduction = New Reduction_PointCloud(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
-        histSlider.Value = 1
+        histSlider.Value = 20
         lDetect = New LineDetector_Basics(ocvb)
 
         label1 = "Gravity rotated Side View with detected lines"
