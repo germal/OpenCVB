@@ -1077,7 +1077,7 @@ Public Class Histogram_2D_SideView
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
         Dim fovAngle = ocvb.vFov
-        ocvb.pixelsPerMeterV = ocvb.pixelsPerMeterH * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((fovAngle / 2) * cv.Cv2.PI / 180)
 
         ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraYSlider.Value)
 

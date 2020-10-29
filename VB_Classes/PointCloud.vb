@@ -113,18 +113,6 @@ Public Class PointCloud_Colorize
         Dim markerLeft = New cv.Point(cam.X - topLen, dst.Height - marker.Y)
         Dim markerRight = New cv.Point(cam.X + topLen, dst.Height - marker.Y)
 
-        'If ocvb.imuZAxis Then
-        '    Dim angle = ocvb.angleX
-        '    markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
-        '    markerLeft = New cv.Point(markerLeft.X * Math.Cos(angle) - markerLeft.Y * Math.Sin(angle), ' rotate around z-axis using anglex
-        '                              markerLeft.Y * Math.Cos(angle) + markerLeft.X * Math.Sin(angle))
-        '    markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
-
-        '    ' Same as above for markerLeft but consolidated algebraically.
-        '    markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(angle) - (markerRight.Y - cam.Y) * Math.Sin(angle) + cam.X,
-        '                               (markerRight.Y - cam.Y) * Math.Cos(angle) + (markerRight.X - cam.X) * Math.Sin(angle) + cam.Y)
-        'End If
-
         If ocvb.imuXAxis Then
             Dim offset = Math.Sin(ocvb.angleZ) * topLen
             If ocvb.angleZ > 0 Then
@@ -918,6 +906,7 @@ Public Class PointCloud_FrustrumTop
         frustrum.Run(ocvb)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
+        ocvb.useIMU = False
         topView.Run(ocvb)
         dst1 = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
         dst1 = cmats.CameraLocationBot(ocvb, dst1)
@@ -953,6 +942,7 @@ Public Class PointCloud_FrustrumSide
         frustrum.Run(ocvb)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
+        ocvb.useIMU = False
         sideView.Run(ocvb)
 
         dst1 = sideView.dst1

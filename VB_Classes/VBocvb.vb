@@ -80,6 +80,7 @@ Public Class VBocvb
     Public cz As Single
     Public sz As Single
     Public gMat As cv.Mat
+    Public useIMU As Boolean = True
     Public imuXAxis As Boolean
     Public imuZAxis As Boolean
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
