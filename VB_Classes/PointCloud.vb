@@ -1170,16 +1170,18 @@ Public Class PointCloud_FindFloorPlane
     Dim inrange As Depth_InRange
     Dim inverse As Mat_Inverse
     Dim flow As Font_FlowText
+    Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        mats = New Mat_4to1(ocvb)
         inrange = New Depth_InRange(ocvb)
         inverse = New Mat_Inverse(ocvb)
         flow = New Font_FlowText(ocvb)
         floor = New PointCloud_FindFloor(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Height (+- range) of the floor plane in mm's", 1, 100, 10)
+        sliders.setupTrackBar(0, "Cushion when estimating the floor plane (mm)", 1, 100, 10)
 
         label1 = "Plane equation input"
         label2 = "Side view rotated with gravity vector - floor is in red"
@@ -1197,7 +1199,7 @@ Public Class PointCloud_FindFloorPlane
 
         Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud
 
-        Static cushionSlider = findSlider("Height (+- range) of the floor plane in mm's")
+        Static cushionSlider = findSlider("Cushion when estimating the floor plane (mm)")
         Dim cushion = cushionSlider.value / 100
 
         'Dim depthMask As New cv.Mat, noDepthMask As New cv.Mat
@@ -1208,10 +1210,33 @@ Public Class PointCloud_FindFloorPlane
 
         Dim split = imuPC.Split()
         inrange.src = split(1)
-        inrange.minVal = planeY '- cushion
+        inrange.minVal = planeY
         inrange.maxVal = planeY + cushion
         inrange.Run(ocvb)
-        dst1 = split(1)
+        mats.mat(0) = split(1).ConvertScaleAbs(255)
+
+        Dim incr = ocvb.maxZ / split(2).Height
+        Dim tmp = New cv.Mat(split(2).Size, cv.MatType.CV_32F, 0)
+        For i = 0 To split(2).Rows - 1
+            tmp.Row(i).SetTo(i * incr)
+        Next
+        tmp.CopyTo(split(2), mats.mat(0))
+        mats.mat(0) = mats.mat(0).Resize(src.Size)
+
+        cv.Cv2.Merge(split, imuPC)
+        ocvb.gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, inverse.matrix)
+        Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
+        Dim gOutput = (gInput * ocvb.gMat).ToMat
+        ocvb.pointCloud = gOutput.Reshape(3, ocvb.pointCloud.Rows)
+
+        split = ocvb.pointCloud.Split()
+        dst1 = ocvb.color.Clone
+        mats.mat(2) = split(1).ConvertScaleAbs(255)
+        dst1.SetTo(cv.Scalar.White, mats.mat(2).Resize(src.Size))
+        mats.mat(2) = mats.mat(2).Resize(src.Size)
+
+        mats.Run(ocvb)
+        dst2 = mats.dst1
     End Sub
 End Class
 
