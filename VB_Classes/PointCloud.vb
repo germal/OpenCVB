@@ -1168,75 +1168,67 @@ Public Class PointCloud_FindFloorPlane
     Inherits VBparent
     Public floor As PointCloud_FindFloor
     Dim inrange As Depth_InRange
-    Dim inverse As Mat_Inverse
     Dim flow As Font_FlowText
-    Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        mats = New Mat_4to1(ocvb)
         inrange = New Depth_InRange(ocvb)
-        inverse = New Mat_Inverse(ocvb)
         flow = New Font_FlowText(ocvb)
         floor = New PointCloud_FindFloor(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Cushion when estimating the floor plane (mm)", 1, 100, 10)
+        sliders.setupTrackBar(0, "Cushion when estimating the floor plane (mm)", 1, 1000, 100)
 
         label1 = "Plane equation input"
         label2 = "Side view rotated with gravity vector - floor is in red"
         ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        Static cushionSlider = findSlider("Cushion when estimating the floor plane (mm)")
+        Dim cushion = cushionSlider.value / 1000
         floor.src = ocvb.pointCloud
         floor.Run(ocvb)
         dst2 = floor.dst1
-        dst2.Line(floor.leftPoint, floor.rightPoint, cv.Scalar.Red, 5)
+        Dim maskplane = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
 
-        Dim planeY = floor.leftPoint.Y / ocvb.pixelsPerMeterH - floor.sideIMU.sideView.frustrumAdjust ' +- x (in meters)
-        inverse.matrix = floor.sideIMU.sideView.gCloudIMU.gMatrix
-        inverse.Run(ocvb)
+        If floor.leftPoint.Y Then
+            Dim floorHeight = CInt(ocvb.pixelsPerMeterV * cushion)
+            If floorHeight = 0 Then floorHeight = 1
+            Dim cam = ocvb.sideCameraPoint
+            Dim pt1 = New cv.Point(0, floor.leftPoint.Y + floorHeight / 2)
+            Dim pt2 = New cv.Point(dst2.Width, floor.leftPoint.Y + floorHeight / 2)
 
-        Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, floorHeight)
 
-        Static cushionSlider = findSlider("Cushion when estimating the floor plane (mm)")
-        Dim cushion = cushionSlider.value / 100
+            Dim floorDeltaY = floor.leftPoint.Y - ocvb.sideCameraPoint.X
+            Dim floorHypotenuse = Math.Sqrt((cam.X - pt2.X) * (cam.X - pt2.X) + (cam.Y - pt2.Y) * (cam.Y - pt2.Y))
+            Dim maxAngle = Math.Acos(floorDeltaY / floorHypotenuse)
+            Dim minRow = dst2.Height * maxAngle / 180
 
-        'Dim depthMask As New cv.Mat, noDepthMask As New cv.Mat
-        'cv.Cv2.InRange(imuPC, New cv.Scalar(-10, planeY - cushion, 10), New cv.Scalar(0, planeY + cushion, ocvb.maxZ), depthMask)
-        ' cv.Cv2.BitwiseNot(depthMask, noDepthMask)
-        'imuPC.SetTo(0, noDepthMask)
-        'cv.Cv2.ImShow("nodepth", noDepthMask)
+            Dim planeY = floor.leftPoint.Y / ocvb.pixelsPerMeterH - floor.sideIMU.sideView.frustrumAdjust ' +- x (in meters)
+            Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud
+            Dim split = imuPC.Split()
+            Dim ySplit = split(1).Clone
+            inrange.src = split(1)
+            inrange.minVal = planeY
+            inrange.maxVal = planeY + cushion
+            inrange.Run(ocvb)
+            maskplane = split(1).ConvertScaleAbs(255)
 
-        Dim split = imuPC.Split()
-        inrange.src = split(1)
-        inrange.minVal = planeY
-        inrange.maxVal = planeY + cushion
-        inrange.Run(ocvb)
-        mats.mat(0) = split(1).ConvertScaleAbs(255)
+            inrange.src = ySplit
+            inrange.maxVal = planeY + cushion * 2 ' anything below the plane of the floor?
+            inrange.Run(ocvb)
+            Dim mask = split(1).ConvertScaleAbs(255)
 
-        Dim incr = ocvb.maxZ / split(2).Height
-        Dim tmp = New cv.Mat(split(2).Size, cv.MatType.CV_32F, 0)
-        For i = 0 To split(2).Rows - 1
-            tmp.Row(i).SetTo(i * incr)
-        Next
-        tmp.CopyTo(split(2), mats.mat(0))
-        mats.mat(0) = mats.mat(0).Resize(src.Size)
-
-        cv.Cv2.Merge(split, imuPC)
-        ocvb.gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, inverse.matrix)
-        Dim gInput = ocvb.pointCloud.Reshape(1, ocvb.pointCloud.Rows * ocvb.pointCloud.Cols)
-        Dim gOutput = (gInput * ocvb.gMat).ToMat
-        ocvb.pointCloud = gOutput.Reshape(3, ocvb.pointCloud.Rows)
-
-        split = ocvb.pointCloud.Split()
+            Dim incr = ocvb.maxZ / split(2).Height
+            Dim tmp = New cv.Mat(split(2).Size, cv.MatType.CV_32F, 0)
+            For i = minRow To split(2).Rows - 1
+                tmp.Row(i).SetTo(i * incr)
+            Next
+            tmp.CopyTo(split(2), maskplane)
+        End If
         dst1 = ocvb.color.Clone
-        mats.mat(2) = split(1).ConvertScaleAbs(255)
-        dst1.SetTo(cv.Scalar.White, mats.mat(2).Resize(src.Size))
-        mats.mat(2) = mats.mat(2).Resize(src.Size)
-
-        mats.Run(ocvb)
-        dst2 = mats.dst1
+        dst1.SetTo(cv.Scalar.White, maskplane.Resize(src.Size))
     End Sub
 End Class
 
@@ -1259,7 +1251,7 @@ Public Class PointCloud_FindFloor
         kalman = New Kalman_Basics(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 5)
+        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 20)
         sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
 
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
@@ -1309,6 +1301,8 @@ Public Class PointCloud_FindFloor
                 End If
             Next
 
+            Const MAX_COUNTDOWN = 5
+            Static countDown = MAX_COUNTDOWN
             If leftPoints.Count >= 2 Then
                 Dim leftMat = New cv.Mat(leftPoints.Count, 1, cv.MatType.CV_32FC2, leftPoints.ToArray)
                 Dim rightMat = New cv.Mat(rightPoints.Count, 1, cv.MatType.CV_32FC2, rightPoints.ToArray)
@@ -1327,65 +1321,22 @@ Public Class PointCloud_FindFloor
                 kalman.Run(ocvb)
                 leftPoint.X = kalman.kOutput(0)
                 rightPoint.X = kalman.kOutput(1)
-            End If
-            If Math.Abs(leftPoint.Y - rightPoint.Y) > angleTest Or leftPoints.Count = 0 Then ' should be level by this point...
-                leftPoint = New cv.Point2f
-                rightPoint = New cv.Point2f
+                If Math.Abs(leftPoint.Y - rightPoint.Y) > angleTest Or leftPoints.Count = 0 Then ' should be level by this point...
+                    leftPoint = New cv.Point2f
+                    rightPoint = New cv.Point2f
+                End If
+                countDown = MAX_COUNTDOWN
+            Else
+                countDown -= 1
+                If countDown <= 0 Then
+                    leftPoint = New cv.Point2f
+                    rightPoint = New cv.Point2f
+                End If
             End If
             dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
         End If
+        Console.WriteLine("leftpoint y = " + CStr(CInt(leftPoint.Y)))
+        If leftPoint.Y = 0 Then Dim i = 0
         label1 = "Side View with gravity "
     End Sub
 End Class
-
-
-
-
-
-
-Public Class PointCloud_FindFloor2D
-    Inherits VBparent
-    Public floor As PointCloud_FindFloor
-    Dim floorMask As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        floor = New PointCloud_FindFloor(ocvb)
-        floorMask = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-        ocvb.desc = "Mark pixels in RGB depth that are in the floor plane."
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        floorMask.SetTo(0)
-        floor.Run(ocvb)
-        dst1 = ocvb.RGBDepth
-        dst2 = floor.dst1
-        Dim floorPoint = CInt((floor.leftPoint.Y + floor.rightPoint.Y) / 2)
-        If floorPoint <> 0 Then
-            floorPoint += ocvb.sideCameraPoint.X
-            Dim lineHeight = ocvb.lineSize * 5
-            floorMask.Line(New cv.Point(floorPoint, 0), New cv.Point(floorPoint, floorMask.Width), cv.Scalar.White, lineHeight, cv.LineTypes.AntiAlias)
-            Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud ' the rotated point cloud
-
-            Dim histOutput As New cv.Mat
-            Dim ranges() = New cv.Rangef() {New cv.Rangef(0, dst1.Width), New cv.Rangef(0, dst1.Height)}
-            Dim histSize() = {dst1.Width, dst1.Height}
-            cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-            Dim white = New cv.Vec3b(255, 255, 255)
-            Dim nSize = ocvb.pointCloud.Width / floorMask.Width
-            For y = 0 To imuPC.Height - 1 Step nSize
-                For x = 0 To imuPC.Width - 1 Step nSize
-                    Dim xyz = imuPC.Get(Of cv.Point3f)(y, x)
-                    Dim yy = CInt(xyz.Z)
-                    If yy > floorPoint - lineHeight / 2 Then
-                        If floorMask.Get(Of Byte)(CInt(xyz.Z / nSize), CInt(yy / nSize)) = 255 Then dst1.Set(Of cv.Vec3b)(y / nSize, x / nSize, white)
-                    End If
-                Next
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-

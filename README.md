@@ -573,6 +573,14 @@ If the floor or ceiling is not visible, the yellow lines are not shown. The
 bottom right image is the same side-view of the depth data before it was rotated
 with the IMU gravity vector.*
 
+![](media/d0ef865f475baaadb46de4939071870c.png)
+
+*The bottom left highlights the floor that has been determined from the depth.
+The bottom right image shows side view with the line detector output in red. The
+yellow bar is the consolidation of all the lines that outline the floor. The
+white in the bottom left is the plane the yellow bar depicts projected into the
+image coordinates.*
+
 ![](media/d484f0049c87c9cd2ea7f99a61d12215.png)
 
 *The bottom left is a top-down view of the point cloud data for an Intel D455
@@ -585,13 +593,13 @@ integrated IMU on the D455 camera.*
 ![](media/e377133fbea5d03a0c3d83299aa994bd.png)
 
 *OpenGL has an infinite number of ways to view a point cloud but visualizing top
-down and side views may add the most value. The “Projection_Backproject”
-algorithm provides both a top down view and a side view and back projects the
-objects clicked into the color image in the lower left corner. A mask is also
-provided for the object. The aspect ratio of both top and side views is 1:1 to
-provide realistic dimensions and sharp, straight edges. The camera can be
-located with the red dot. These projections are available with cameras that
-include an IMU.*
+down and side views are the most satisfying complements to the image view. The
+“PointCloud_Backproject” algorithm provides both a top down view and a side view
+and back projects the objects clicked into the color image in the lower left
+corner. A mask is also provided for the object. The aspect ratio of both top and
+side views is 1:1 to provide realistic dimensions and sharp, straight edges. The
+camera can be located with the red dot. These projections are available with
+cameras that include an IMU.*
 
 ![](media/d7ca291698e8ffd637a2d6df554e00ca.png)
 
