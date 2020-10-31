@@ -1272,6 +1272,114 @@ Public Class PointCloud_FindFloor
         Dim angleTest = angleSlider.Value
         Dim lengthTest = lenSlider.value
 
+        Dim leftPoints As New List(Of cv.Point2f)
+        Dim rightPoints As New List(Of cv.Point2f)
+        Dim sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+        If sideIMU.lDetect.lines.Count > 0 Then
+            If floorRun = False Then sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalInteger)
+            For Each line In sideIMU.lDetect.lines
+                sortedLines.Add(line.Item1, line)
+            Next
+
+            Dim maxY As Integer = 0
+            For i = 0 To sortedLines.Count - 1
+                Dim line = sortedLines.ElementAt(i).Value
+                Dim pf1 = New cv.Point2f(line.Item0, line.Item1)
+                Dim pf2 = New cv.Point2f(line.Item2, line.Item3)
+                If pf1.Y > maxY Then maxY = pf1.Y
+                If pf2.Y > maxY Then maxY = pf2.Y
+                If Math.Abs(pf1.X - pf2.X) > lengthTest And Math.Abs(pf1.Y - pf2.Y) < angleTest Then
+                    If pf1.X < pf2.X Then
+                        leftPoints.Add(pf1)
+                        rightPoints.Add(pf2)
+                    Else
+                        leftPoints.Add(pf2)
+                        rightPoints.Add(pf1)
+                    End If
+                Else
+                    Exit For
+                End If
+            Next
+
+            Const MAX_COUNTDOWN = 5
+            Static countDown = MAX_COUNTDOWN
+            If leftPoints.Count >= 2 Then
+                Dim leftMat = New cv.Mat(leftPoints.Count, 1, cv.MatType.CV_32FC2, leftPoints.ToArray)
+                Dim rightMat = New cv.Mat(rightPoints.Count, 1, cv.MatType.CV_32FC2, rightPoints.ToArray)
+                Dim meanLeft = leftMat.Mean()
+                Dim meanRight = rightMat.Mean()
+
+                Dim minVal As Double, maxVal As Double
+                leftMat.MinMaxLoc(minVal, maxVal)
+                leftPoint = New cv.Point(minVal, meanLeft.Item(1))
+
+                rightMat.MinMaxLoc(minVal, maxVal)
+                rightPoint = New cv.Point(maxVal, meanRight.Item(1))
+
+                kalman.kInput(0) = leftPoint.X
+                kalman.kInput(1) = rightPoint.X
+                kalman.Run(ocvb)
+                leftPoint.X = kalman.kOutput(0)
+                rightPoint.X = kalman.kOutput(1)
+                If Math.Abs(leftPoint.Y - rightPoint.Y) > angleTest Or leftPoints.Count = 0 Then ' should be level by this point...
+                    leftPoint = New cv.Point2f
+                    rightPoint = New cv.Point2f
+                End If
+                countDown = MAX_COUNTDOWN
+            Else
+                countDown -= 1
+                If countDown <= 0 Then
+                    leftPoint = New cv.Point2f
+                    rightPoint = New cv.Point2f
+                End If
+            End If
+            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
+        End If
+        If leftPoint.X = 0 Then Dim i = 0
+        label1 = "Side View with gravity "
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_FindFloorNew
+    Inherits VBparent
+    Public sideIMU As PointCloud_IMU_SideView
+    Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
+    Public leftPoint As cv.Point2f
+    Public rightPoint As cv.Point2f
+    Dim kalman As Kalman_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sideIMU = New PointCloud_IMU_SideView(ocvb)
+
+        kalman = New Kalman_Basics(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 20)
+        sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 5)
+
+        ocvb.desc = "Find the floor in a side view oriented by gravity vector"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        Static saveFrameCount = -1
+        If saveFrameCount <> ocvb.frameCount Then
+            saveFrameCount = ocvb.frameCount
+            sideIMU.Run(ocvb)
+            dst1 = sideIMU.dst1
+            dst2 = sideIMU.dst2
+            Dim lines = sideIMU.lDetect.lines
+        End If
+
+        Static angleSlider = findSlider("Threshold for y-displacement of line")
+        Static lenSlider = findSlider("Threshold for length of line")
+
+        Dim angleTest = angleSlider.Value
+        Dim lengthTest = lenSlider.value
+
         If sideIMU.lDetect.lines.Count > 0 Then
             Dim leftPoints As New List(Of cv.Point2f)
             Dim rightPoints As New List(Of cv.Point2f)
@@ -1335,8 +1443,6 @@ Public Class PointCloud_FindFloor
             End If
             dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
         End If
-        Console.WriteLine("leftpoint y = " + CStr(CInt(leftPoint.Y)))
-        If leftPoint.Y = 0 Then Dim i = 0
         label1 = "Side View with gravity "
     End Sub
 End Class

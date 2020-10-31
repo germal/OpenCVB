@@ -20,22 +20,21 @@ interface. That is what "OpenCVB" Version 1.0 provides.
 
 In the sample output below, any of the hundreds of algorithms can be selected
 from the first combo box at the top of the form. The second combo box is used to
-group the different algorithms by OpenCV API or OpenCVB algorithm. The default
-grouping is to select “\<All\>” algorithms while other special groupings allow
-selecting Python or C++ or Multi-threaded algorithms. The text at the right side
-of the toolbar is a brief description of the algorithm. Icons on the left side
-are to (l. to r.): pause/resume the algorithm, change global settings for
-OpenCVB, run regression tests, and take a picture of the current output.
+select different groups algorithms. The default grouping is to select “\<All\>”
+algorithms while other special groupings allow selecting Python or C++
+algorithms. The text at the right side of the toolbar is a brief description of
+the algorithm. Icons on the left side are to (l. to r.): pause/resume the
+algorithm, change global settings for OpenCVB, run regression tests, and take a
+picture of the current output.
 
 ![](media/aeec548511d99538594068b76ca4b49b.png)
 
 The output images above are the RGB output (upper left), the colorized depth
 image (upper right), the output of the current algorithm (lower left) and an
 optional second image output from the algorithm (lower right). In this example
-the algorithm renders the camera point cloud as if seen from directly above in
-the lower left image while the lower right has the view from the side. Both
-perspectives show the camera field of view (FOV) and the distance to each of the
-objects.
+the lower left image shows the point cloud as if seen from directly above. The
+lower right views the same data from the side. Both perspectives show the camera
+field of view (FOV) and a scale for the distance to each of the objects.
 
 The “Sample Results” section below provides numerous additional examples.
 
@@ -61,25 +60,26 @@ Here are the requirements:
     -   Intel RealSense D455 – the latest in the series of Intel RealSense
         cameras
 
-Most of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
+All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
 Kinect for Azure has the best depth accuracy but requires more power and is not
 as portable as the Intel cameras. All the cameras use USB 3 to provide data to
-the host platform. A comparison of each camera is provided in Addendum 1.
+the host platform. A brief comparison of each camera is provided in Addendum 1.
 
 The Objective
 =============
 
 The objective is to solve many small computer vision problems and do so in a way
-that enables any of the solutions to be reused. The result is a valuable toolkit
-for solving ever bigger and more important problems. The philosophy behind this
+that enables any of the solutions to be reused. The result is a toolkit for
+solving ever bigger and more difficult problems. The philosophy behind this
 approach is that human vision is built on many trivially different approaches.
-Only the combined effort of many small results in understanding.
+Only the combined effort of many small operations produces understanding.
 
-OpenCVB is targeting only cameras that produce depth and color. These newer
-cameras have prompted a review of existing vision algorithms to see how they can
-be improved if depth is known. To enable revisiting many existing algorithms,
-this software provides a single application that can run hundreds of OpenCV
-algorithms on any of the cameras listed above.
+OpenCVB is targeting only cameras that produce depth and color and have an IMU
+to detect gravity and motion. These newer cameras have prompted a review of
+existing vision algorithms to see how they can be improved if depth is known. To
+enable revisiting many existing algorithms, this software provides a single
+application that can run hundreds of OpenCV algorithms on any of the cameras
+listed above.
 
 There are many computer vision examples on the web but too often something is
 missing. OpenCVB is designed to collect these algorithms into a single
@@ -151,8 +151,8 @@ This is the short description of install process:
 -   <https://github.com/bobdavies2000/OpenCVB> - download OpenCVB from GitHub
 
 -   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
-    and run CMake for OpenCV, OpenCV_Contrib, librealsense, and Kinect4Azure.
-    After building it will occupy about 18Gb of disk space – plan accordingly.
+    and run CMake for needed libraries. After building it will occupy about 18Gb
+    of disk space – plan accordingly.
 
     -   This will take the majority of time for the install depending on the
         network speed.
@@ -246,19 +246,19 @@ Some typical problems with new installations:
 -   Python Scripts Fail: this is likely a missing package. Run the algorithm
     “PythonPackages.py” in OpenCVB to verify that all the necessary packages are
     installed. If still failing, check the Python setting in the Options (click
-    the Settings icon for OpenCVB.) Make sure it points to the Python version
-    that was installed. Test Python scripts independently using \<OpenCVB Home
-    Directory\>/VB_Classes/Python/PythonDebug.sln.
+    the Settings icon for OpenCVB.) Make sure it points to the Python 3.x
+    version that was installed. Test Python scripts independently using
+    \<OpenCVB Home Directory\>/VB_Classes/Python/PythonDebug.sln.
 
 Build New Experiments
 =====================
 
 OpenCVB is a WinForms application and most of the algorithms were written using
-Microsoft's managed code but C++ examples are provided as well (with appropriate
-VB.Net wrappers.) Python examples don’t require a VB.Net wrapper unless you want
-to pass RGB, depth, or point cloud images to your Python script. There are
-several VB.Net examples that demonstrate how to move images to Python (see
-AddWeighted_Trackbar_PS.py as an example that is only a few lines of code.)
+Microsoft's managed code but C++ examples are provided as well - each with an
+appropriate VB.Net wrapper. Python examples don’t require a VB.Net wrapper
+unless you want to pass RGB, depth, or point cloud images to your Python script.
+There are several VB.Net examples that demonstrate how to move images to Python
+(see AddWeighted_Trackbar_PS.py as an example that is only a few lines of code.)
 
 For C++, C\#, and VB.Net writing a new experiment requires a new class to be
 added in the “VB_Classes” project. OpenCVB will automatically detect the new
@@ -273,7 +273,7 @@ Directory\>/OpenCVB.snippets” directory. After installing, access the code
 snippets with a right-click in the VB.Net code, select “Snippet/Insert Snippet”
 and select “OpenCVB.snippets”. NOTE: even C++ algorithms can use snippets, but
 each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net
-code in the snippet. The C++ portion is to be cut and pasted anywhere in the
+code in the snippet. The C++ portion is to be cut and pasted anywhere in
 OpenCVB’s “CPP_Classes” Visual Studio project.
 
 Experimental Subsets
@@ -410,9 +410,9 @@ valuable in learning which OpenGL API was controlling which feature of the 3D
 effect. Preconfiguring the sliders allows the user to program a specific setup
 for viewing 3D data.
 
-For those who prefer using the mouse to adjust the OpenGL display, the OpenGL
-code snippet provides sample code. To test a working example of OpenGL using
-just the mouse interface, see the OpenGL_Callbacks algorithm.
+OpenGL mouse and keyboard callbacks are also available. An example
+“OpenGL_Callbacks” provides everything needed. The snippets for OpenCVB can
+setup a new OpenGL example with callbacks as well.
 
 Python Interface
 ================
@@ -466,19 +466,23 @@ Python Debugging
 ================
 
 Python scripts are run in a separate address space when invoked by OpenCVB so
-Visual Studio’s Python debug environment is not available. When a Python script
-fails in OpenCVB, it may be debugged in the PythonDebug project. Here are the
-steps to debug Python:
+Visual Studio’s Python debug environment is not available directly from OpenCVB.
+When a Python script fails in OpenCVB, it may be debugged in the separate
+PythonDebug project. Here are the steps to debug Python:
 
 -   Open VB_Classes\\Python\\PythonDebug.pyproj in Visual Studio.
 
 -   Copy the failing Python script into the PythonDebug.py file, and run it.
 
 The Python script will be running in the same environment as if it were invoked
-from OpenCVB except the Python debugger will be active. For Python scripts
-requiring a stream of images or point clouds, OpenCVB is opened in a separate
-address space with the requested Python script. Images and point clouds will
-then be streamed to the failing Python script running in the debugger.
+from OpenCVB except the Python debugger will be active.
+
+All OpenCVB Python scripts can be debugged with the PythonDebug project
+including those that stream data from OpenCVB. For Python scripts requiring a
+stream of images or point clouds, the process is reversed and the OpenCVB
+executable is invoked automatically and run in a separate address space. Images
+and point clouds will then be streamed to the Python script running in the
+debugger.
 
 Visual Studio C++ Debugging
 ===========================
@@ -509,9 +513,9 @@ StereoLabs Zed 2 Support
 ========================
 
 The StereoLabs Zed 2 camera is supported but the support is turned off by
-default. To enable this support:
+default to simplify installation. To enable this support:
 
--   Download the Windows 10 SDK from
+-   Download the StereoLabs SDK from
     <https://www.stereolabs.com/developers/release/>
 
 -   Edit the CameraDefines.hpp file to turn on the interface to the Zed 2
@@ -524,10 +528,10 @@ supporting C++ project.
 Mynt Eye D 1000 Support
 =======================
 
-The Mynt Eye D 1000 camera is supported but the support is turned off by
-default. To enable this support:
+The Mynt Eye D 1000 camera is supported but the support is turned off by default
+to simplify installation. To enable this support:
 
--   Download the Windows 10 SDK from
+-   Download the Mynt SDK from
     <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
 
 -   Edit the CameraDefines.hpp file to turn on the interface to the Zed 2
@@ -586,20 +590,19 @@ image coordinates.*
 *The bottom left is a top-down view of the point cloud data for an Intel D455
 camera while the bottom right is a side view of the same point cloud. The red
 lines indicate where walls were detected. A slider controls the expected minimum
-length of a detected wall. The images are actually histograms of projections
-after correcting the point cloud data to align with the gravity vector from the
-integrated IMU on the D455 camera.*
+length of a detected wall. The images are actually histograms of point cloud
+data after aligning the point cloud with gravity from the IMU on the D455
+camera.*
 
 ![](media/e377133fbea5d03a0c3d83299aa994bd.png)
 
 *OpenGL has an infinite number of ways to view a point cloud but visualizing top
 down and side views are the most satisfying complements to the image view. The
-“PointCloud_Backproject” algorithm provides both a top down view and a side view
-and back projects the objects clicked into the color image in the lower left
-corner. A mask is also provided for the object. The aspect ratio of both top and
-side views is 1:1 to provide realistic dimensions and sharp, straight edges. The
-camera can be located with the red dot. These projections are available with
-cameras that include an IMU.*
+“PointCloud_Backproject” algorithm uses the IMU to produced both a top down view
+and a side view. Clicking on an object will back project that object into the
+color image in the lower left corner. A mask for the object is also shown. The
+aspect ratio of both top and side views is 1:1 to provide realistic dimensions
+and linear edges. The camera is identified with a red dot.*
 
 ![](media/d7ca291698e8ffd637a2d6df554e00ca.png)
 
@@ -619,7 +622,7 @@ find size and distance.*
 ![](media/916a4f7e3b53633c63bf7243a8a8a1ae.png)
 
 *A genetic drawing experiment that translates any image or camera screen grab
-into painting. The algorithm randomly alters DNA sequences describing brush
+into a painting. The algorithm randomly alters DNA sequences describing brush
 strokes.*
 
 ![](media/cd7e699a6192e4daf1d540a15e35005a.png)
@@ -633,7 +636,7 @@ colors as the histogram.*
 
 *Using the histogram to create clusters (see previous example ‘Histogram
 Valleys’) allows an algorithm to segment an entire image (see lower right
-image), creating blobs that can be measured and tracked. The black segment has
+image), creating blobs that can be measured and tracked. The black segments have
 no depth. The number of blobs can be controlled with a lower limit on the size
 of the blob.*
 
