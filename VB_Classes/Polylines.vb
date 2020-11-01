@@ -3,7 +3,7 @@ Public Class Polylines_IEnumerableExample
     Inherits VBparent
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        check.Setup(ocvb, caller, 2)
+        check.Setup(ocvb, caller, 1)
         check.Box(0).Text = "Polyline closed if checked"
         check.Box(0).Checked = True
         sliders.Setup(ocvb, caller)
