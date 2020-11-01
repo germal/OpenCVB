@@ -1017,6 +1017,10 @@ Public Class Histogram_2D_SideView
         ocvb.desc = "Create a 2D histogram for depth in ZY (side view.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        'If ocvb.reviewDSTforObject = caller Then
+        '    Console.WriteLine("testing")
+        '    ocvb.reviewObject = Me
+        'End If
         gCloudIMU.Run(ocvb)
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
@@ -1034,10 +1038,8 @@ Public Class Histogram_2D_SideView
         Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
-        If standalone Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = cmat.CameraLocationSide(ocvb, dst2)
-        End If
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = cmat.CameraLocationSide(ocvb, dst2)
     End Sub
 End Class
 

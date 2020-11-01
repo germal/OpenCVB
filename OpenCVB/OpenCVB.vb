@@ -85,6 +85,10 @@ Public Class OpenCVB
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
     Dim startAlgorithmTime As DateTime
+    Const MAX_RECENT = 10
+    Dim recentList As New List(Of String)
+    Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
+    Public reviewDSTforObject As String
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -105,6 +109,7 @@ Public Class OpenCVB
         End If
 
         HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
+        setupRecentList()
 
         ' Camera DLL's are built in Release mode even when configured for Debug (performance while debugging an algorithm is much better).  
         ' It is not likely camera interfaces will need debugging but to do so change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
@@ -372,6 +377,54 @@ Public Class OpenCVB
         End If
         AlgorithmDesc.Text = textDesc
     End Sub
+    Private Sub setupRecentList()
+        For i = 0 To MAX_RECENT - 1
+            Dim nextA = GetSetting("OpenCVB", "RecentList" + CStr(i), "RecentList" + CStr(i), "recent algorithm " + CStr(i))
+            If nextA = "" Then Exit For
+            If recentList.Contains(nextA) = False Then
+                recentList.Add(nextA)
+                recentMenu(i) = New ToolStripMenuItem() With {.Text = nextA, .Name = nextA}
+                AddHandler recentMenu(i).Click, AddressOf recentList_Clicked
+                MainMenu.DropDownItems.Add(recentMenu(i))
+            End If
+        Next
+    End Sub
+    Private Sub updateRecentList()
+        If TestAllTimer.Enabled Then Exit Sub
+        Dim copyList As List(Of String)
+        If recentList.Contains(AvailableAlgorithms.Text) Then
+            ' make it the most recent
+            copyList = New List(Of String)(recentList)
+            recentList.Clear()
+            recentList.Add(AvailableAlgorithms.Text)
+            For i = 0 To copyList.Count - 1
+                If recentList.Contains(copyList(i)) = False Then recentList.Add(copyList(i))
+            Next
+        Else
+            recentList.RemoveAt(recentList.Count - 1)
+            copyList = New List(Of String)(recentList)
+            recentList.Clear()
+            recentList.Add(AvailableAlgorithms.Text)
+            For i = 0 To copyList.Count - 1
+                If recentList.Contains(copyList(i)) = False Then recentList.Add(copyList(i))
+            Next
+        End If
+        For i = 0 To recentList.Count - 1
+            If recentList(i) <> "" Then
+                recentMenu(i).Text = recentList(i)
+                recentMenu(i).Name = recentList(i)
+                SaveSetting("OpenCVB", "RecentList" + CStr(i), "RecentList" + CStr(i), recentList(i))
+            End If
+        Next
+    End Sub
+    Private Sub recentList_Clicked(sender As Object, e As EventArgs)
+        Dim item = TryCast(sender, ToolStripMenuItem)
+        If AvailableAlgorithms.Items.Contains(item.Text) = False Then
+            ' the list of active algorithms for this group does not contain the algorithm requested so just add it!
+            AvailableAlgorithms.Items.Add(item.Text)
+        End If
+        AvailableAlgorithms.SelectedItem = item.Name
+    End Sub
     Private Sub RestartCamera()
         camera.closePipe()
         cameraTaskHandle = Nothing
@@ -604,6 +657,7 @@ Public Class OpenCVB
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
             StartAlgorithmTask()
+            updateRecentList()
         End If
     End Sub
     Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
@@ -1129,10 +1183,10 @@ Public Class OpenCVB
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
         MsgBox("The objective is to solve many small computer vision problems and do so in a way that enables " +
-               "any of the solutions to be reused. The result is a toolkit for solving ever bigger and more " +
+               "any of the examples to be reused. The result is a toolkit for solving ever bigger and more " +
                "difficult problems. The philosophy behind this approach is that human vision is built on many " +
                "seemingly trivial approaches working together. The combined effort of many small operations " +
-               "is what produces understanding.")
+               "may be the source of understanding.  The jury may continue deliberating on that for a while.")
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
@@ -1168,6 +1222,7 @@ Public Class OpenCVB
                 task.ocvb.IMU_FrameTime = camera.IMU_FrameTime
                 task.ocvb.CPU_TimeStamp = camera.CPU_TimeStamp
                 task.ocvb.CPU_FrameTime = camera.CPU_FrameTime
+                task.ocvb.reviewDSTforObject = reviewDSTforObject
             End SyncLock
 
             Try

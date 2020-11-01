@@ -28,6 +28,8 @@ Partial Class TreeviewForm
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.ReviewStandalone = New System.Windows.Forms.RadioButton()
+        Me.ReviewDST = New System.Windows.Forms.RadioButton()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -69,7 +71,7 @@ Partial Class TreeviewForm
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(738, 83)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(738, 170)
         Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
@@ -77,12 +79,36 @@ Partial Class TreeviewForm
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(199, 45)
         Me.TableLayoutPanel1.TabIndex = 0
         '
+        'ReviewStandalone
+        '
+        Me.ReviewStandalone.AutoSize = True
+        Me.ReviewStandalone.Location = New System.Drawing.Point(54, 130)
+        Me.ReviewStandalone.Name = "ReviewStandalone"
+        Me.ReviewStandalone.Size = New System.Drawing.Size(398, 24)
+        Me.ReviewStandalone.TabIndex = 3
+        Me.ReviewStandalone.TabStop = True
+        Me.ReviewStandalone.Text = "Clicking a tree entry will review its standalone results"
+        Me.ReviewStandalone.UseVisualStyleBackColor = True
+        '
+        'ReviewDST
+        '
+        Me.ReviewDST.AutoSize = True
+        Me.ReviewDST.Location = New System.Drawing.Point(54, 167)
+        Me.ReviewDST.Name = "ReviewDST"
+        Me.ReviewDST.Size = New System.Drawing.Size(508, 24)
+        Me.ReviewDST.TabIndex = 4
+        Me.ReviewDST.TabStop = True
+        Me.ReviewDST.Text = "Clicking a tree entry will review its dst1 and dst2 intermediate results"
+        Me.ReviewDST.UseVisualStyleBackColor = True
+        '
         'TreeviewForm
         '
         Me.AcceptButton = Me.OK_Button
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(943, 125)
+        Me.ClientSize = New System.Drawing.Size(943, 212)
+        Me.Controls.Add(Me.ReviewDST)
+        Me.Controls.Add(Me.ReviewStandalone)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.TreeView1)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -101,4 +127,6 @@ Partial Class TreeviewForm
     Friend WithEvents Timer1 As Timer
     Friend WithEvents OK_Button As Button
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
+    Friend WithEvents ReviewStandalone As RadioButton
+    Friend WithEvents ReviewDST As RadioButton
 End Class

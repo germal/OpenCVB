@@ -30,6 +30,7 @@ Public Class VBocvb
     Public parentRoot As String
     Public parentAlgorithm As String
     Public callTrace As New List(Of String)
+    Public callObjects As New List(Of VBparent)
 
     Public transformationMatrix() As Single
     Public fixedColors(255) As cv.Scalar
@@ -82,6 +83,8 @@ Public Class VBocvb
     Public useIMU As Boolean = True
     Public imuXAxis As Boolean
     Public imuZAxis As Boolean
+    Public reviewDSTforObject As String
+    Public reviewObject As VBparent
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

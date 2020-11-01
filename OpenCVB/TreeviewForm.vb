@@ -12,13 +12,16 @@ Public Class TreeviewForm
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Me.Timer1.Enabled = False
-        OpenCVB.AvailableAlgorithms.Text = e.Node.Text
-        If OpenCVB.AvailableAlgorithms.Text <> e.Node.Text Then
-            ' the list of active algorithms for this group does not contain the algorithm requested so just add it!
-            OpenCVB.AvailableAlgorithms.Items.Add(e.Node.Text)
+        If ReviewStandalone.Checked Then
             OpenCVB.AvailableAlgorithms.Text = e.Node.Text
+            If OpenCVB.AvailableAlgorithms.Text <> e.Node.Text Then
+                ' the list of active algorithms for this group does not contain the algorithm requested so just add it!
+                OpenCVB.AvailableAlgorithms.Items.Add(e.Node.Text)
+                OpenCVB.AvailableAlgorithms.Text = e.Node.Text
+            End If
+        Else
+            OpenCVB.reviewDSTforObject = e.Node.Text
         End If
-        Console.WriteLine(OpenCVB.AvailableAlgorithms.Text + " should be " + e.Node.Text)
     End Sub
     Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Dim split() = Me.Text.Split()
@@ -29,11 +32,15 @@ Public Class TreeviewForm
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If botDistance = 0 Then botDistance = Me.Height - Label1.Top
         Label1.Top = Me.Height - botDistance
+        ReviewStandalone.Top = Label1.Top + Label1.Height + 25
+        ReviewDST.Top = ReviewStandalone.Top + ReviewStandalone.Height + 5
         TreeView1.Height = Label1.Top - 5
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
+        ReviewStandalone.Checked = GetSetting("OpenCVB", "TreeViewReviewStandalone", "TreeViewReviewStandalone", False)
+        If ReviewStandalone.Checked = False Then ReviewDST.Checked = True
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -114,5 +121,11 @@ Public Class TreeviewForm
                 End If
             End If
         End SyncLock
+    End Sub
+    Private Sub ReviewDST_CheckedChanged(sender As Object, e As EventArgs) Handles ReviewDST.CheckedChanged
+        SaveSetting("OpenCVB", "TreeViewReviewStandalone", "TreeViewReviewStandalone", ReviewStandalone.Checked)
+    End Sub
+    Private Sub ReviewStandalone_CheckedChanged(sender As Object, e As EventArgs) Handles ReviewStandalone.CheckedChanged
+        SaveSetting("OpenCVB", "TreeViewReviewStandalone", "TreeViewReviewStandalone", ReviewStandalone.Checked)
     End Sub
 End Class
