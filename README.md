@@ -71,8 +71,9 @@ The Objective
 The objective is to solve many small computer vision problems and do so in a way
 that enables any of the solutions to be reused. The result is a toolkit for
 solving ever bigger and more difficult problems. The philosophy behind this
-approach is that human vision is built on many trivially different approaches.
-Only the combined effort of many small operations produces understanding.
+approach is that human vision is built on many seemingly trivial approaches
+working together. The combined effort of many small operations is what produces
+understanding.
 
 OpenCVB is targeting only cameras that produce depth and color and have an IMU
 to detect gravity and motion. These newer cameras have prompted a review of

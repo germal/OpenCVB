@@ -109,7 +109,7 @@ Public Class VBocvb
                 resolutionIndex = 3
         End Select
     End Sub
-    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
+    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 25, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, x, y, picTag)
         TTtextData.Add(str)
     End Sub

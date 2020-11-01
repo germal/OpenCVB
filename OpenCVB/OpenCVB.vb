@@ -861,14 +861,7 @@ Public Class OpenCVB
         picLabels(1) = "Depth:" + details
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        stopCameraThread = True
-        saveAlgorithmName = ""
-        If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
-        Application.DoEvents()
-        camera.closePipe()
-        textDesc = ""
-        saveLayout()
-        SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
+        Exit_Click(sender, e)
     End Sub
     Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
         Dim img As New Bitmap(Me.Width, Me.Height)
@@ -1122,6 +1115,24 @@ Public Class OpenCVB
             frameCount = 0
             If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
+    End Sub
+    Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
+        stopCameraThread = True
+        saveAlgorithmName = ""
+        If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
+        Application.DoEvents()
+        camera.closePipe()
+        textDesc = ""
+        saveLayout()
+        SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
+        End
+    End Sub
+    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
+        MsgBox("The objective is to solve many small computer vision problems and do so in a way that enables " +
+               "any of the solutions to be reused. The result is a toolkit for solving ever bigger and more " +
+               "difficult problems. The philosophy behind this approach is that human vision is built on many " +
+               "seemingly trivial approaches working together. The combined effort of many small operations " +
+               "is what produces understanding.")
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1

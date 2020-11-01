@@ -36,7 +36,13 @@ Partial Class OpenCVB
         Me.OpenCVkeyword = New System.Windows.Forms.ComboBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.AvailableAlgorithms = New System.Windows.Forms.ComboBox()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.MainMenu = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ExitCall = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip1.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'ToolStrip1
@@ -44,7 +50,7 @@ Partial Class OpenCVB
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.SnapShotButton, Me.TreeButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.ToolStrip1.Size = New System.Drawing.Size(1779, 58)
@@ -115,7 +121,7 @@ Partial Class OpenCVB
         '
         Me.AlgorithmDesc.AutoSize = True
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(985, 16)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(969, 50)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.Size = New System.Drawing.Size(119, 22)
         Me.AlgorithmDesc.TabIndex = 0
@@ -125,7 +131,7 @@ Partial Class OpenCVB
         '
         Me.OpenCVkeyword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.OpenCVkeyword.FormattingEnabled = True
-        Me.OpenCVkeyword.Location = New System.Drawing.Point(603, 10)
+        Me.OpenCVkeyword.Location = New System.Drawing.Point(600, 47)
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
         Me.OpenCVkeyword.Size = New System.Drawing.Size(363, 28)
         Me.OpenCVkeyword.TabIndex = 1
@@ -134,10 +140,45 @@ Partial Class OpenCVB
         '
         Me.AvailableAlgorithms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.AvailableAlgorithms.FormattingEnabled = True
-        Me.AvailableAlgorithms.Location = New System.Drawing.Point(235, 10)
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(231, 47)
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
         Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 28)
         Me.AvailableAlgorithms.TabIndex = 0
+        '
+        'MenuStrip1
+        '
+        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
+        Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.AboutToolStripMenuItem})
+        Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.MenuStrip1.Name = "MenuStrip1"
+        Me.MenuStrip1.Size = New System.Drawing.Size(1779, 33)
+        Me.MenuStrip1.TabIndex = 2
+        Me.MenuStrip1.Text = "MenuStrip1"
+        '
+        'MainMenu
+        '
+        Me.MainMenu.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExitCall, Me.ToolStripSeparator1})
+        Me.MainMenu.Name = "MainMenu"
+        Me.MainMenu.Size = New System.Drawing.Size(54, 29)
+        Me.MainMenu.Text = "&File"
+        '
+        'ExitCall
+        '
+        Me.ExitCall.Name = "ExitCall"
+        Me.ExitCall.Size = New System.Drawing.Size(270, 34)
+        Me.ExitCall.Text = "E&xit"
+        '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(267, 6)
+        '
+        'AboutToolStripMenuItem
+        '
+        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
+        Me.AboutToolStripMenuItem.Text = "About"
         '
         'OpenCVB
         '
@@ -148,11 +189,15 @@ Partial Class OpenCVB
         Me.Controls.Add(Me.OpenCVkeyword)
         Me.Controls.Add(Me.AlgorithmDesc)
         Me.Controls.Add(Me.ToolStrip1)
+        Me.Controls.Add(Me.MenuStrip1)
         Me.KeyPreview = True
+        Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "OpenCVB"
         Me.Text = "OpenCVB"
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
+        Me.MenuStrip1.ResumeLayout(False)
+        Me.MenuStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -170,4 +215,9 @@ Partial Class OpenCVB
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents AvailableAlgorithms As ComboBox
     Friend WithEvents TreeButton As ToolStripButton
+    Friend WithEvents MenuStrip1 As MenuStrip
+    Friend WithEvents MainMenu As ToolStripMenuItem
+    Friend WithEvents ExitCall As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
+    Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
 End Class
