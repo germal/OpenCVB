@@ -49,6 +49,7 @@ Public Class Draw_rectangles
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -85,6 +86,7 @@ Public Class Draw_Noise
         ocvb.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         maxNoiseWidth = sliders.trackbar(1).Value
         src.CopyTo(dst1)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
@@ -113,6 +115,7 @@ Public Class Draw_rotatedRectangles
         ocvb.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         rect.src = src
         rect.Run(ocvb)
         dst1 = rect.dst1
@@ -131,6 +134,7 @@ Public Class Draw_Ellipses
         ocvb.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -156,6 +160,7 @@ Public Class Draw_Circles
         ocvb.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.White)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -180,6 +185,7 @@ Public Class Draw_Line
         ocvb.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.White)
         For i = 0 To sliders.trackbar(0).Value - 1
@@ -209,6 +215,7 @@ Public Class Draw_Polygon
         radio.check(0).Checked = True
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -257,6 +264,7 @@ Public Class Draw_RngImage
         ocvb.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
         dst1.SetTo(cv.Scalar.White)
@@ -311,6 +319,7 @@ Public Class Draw_SymmetricalShapes
         ocvb.desc = "Generate shapes programmatically"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static rotateAngle As Single = 0
         Static fillColor = cv.Scalar.Red
         If check.Box(4).Checked Then
@@ -391,6 +400,7 @@ Public Class Draw_ClipLine
         ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst2 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(ocvb)
@@ -467,6 +477,7 @@ Public Class Draw_Arc
         ocvb.desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If kalman.check.Box(0).Checked Then
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             kalman.Run(ocvb)
@@ -544,6 +555,7 @@ Public Class Draw_OverlappingRectangles
         Return overlapping
     End Function
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then
             flood.src = src
             flood.Run(ocvb)
@@ -615,6 +627,7 @@ Public Class Draw_ViewObjects
         ocvb.desc = "Draw rectangles and centroids"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then
             ocvb.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
@@ -667,6 +680,7 @@ Public Class Draw_Frustrum
         ocvb.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         ocvb.pointCloud.SetTo(0)
         Dim dst2 = New cv.Mat(src.Height, src.Height, cv.MatType.CV_32F, 0)
         Dim x = src.Height / 2 - 1

@@ -126,6 +126,7 @@ Public Class GeneticDrawing_Basics
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         brushPercent = sliders.trackbar(3).Value
         stageTotal = sliders.trackbar(1).Value
         generationTotal = sliders.trackbar(0).Value
@@ -239,6 +240,7 @@ Public Class GeneticDrawing_Color
         ocvb.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim split() As cv.Mat
         split = cv.Cv2.Split(src)
 
@@ -295,6 +297,7 @@ Public Class GeneticDrawing_Photo
         ocvb.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 
         If inputFileName <> ocvb.openFileDialogName Or ocvb.frameCount = 0 Then
             Dim fileinfo = New FileInfo(ocvb.openFileDialogName)

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class Fibonacci_Basics
     Inherits VBparent
@@ -9,6 +9,7 @@ Public Class Fibonacci_Basics
         ocvb.desc = "Generate the fibonacci sequence using conventional code"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static a As Double = 0, b As Double = 1
         If a = 1134903170 Then
             a = 0
@@ -53,6 +54,7 @@ Public Class Fibonacci_Yield
         End While
     End Function
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
         flow.msgs.Add(Format(ocvb.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(ocvb.frameCount), "###,##0"))
         flow.Run(ocvb)

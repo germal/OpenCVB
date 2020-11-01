@@ -9,9 +9,11 @@ Public Class MeanSubtraction_Basics
         ocvb.desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim mean = cv.Cv2.Mean(src)
         cv.Cv2.Subtract(mean, src, dst1)
         Dim scalingFactor = sliders.trackbar(0).Value / 100
         dst1 *= 1 / scalingFactor
     End Sub
 End Class
+

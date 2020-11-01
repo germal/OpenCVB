@@ -77,6 +77,7 @@ Public Class OpenGL_Basics
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then pointCloudInput = ocvb.pointCloud
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
@@ -168,6 +169,7 @@ Public Class OpenGL_Options
         label1 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         OpenGL.FOV = sliders.trackbar(0).Value
         OpenGL.yaw = sliders.trackbar(1).Value
         OpenGL.pitch = sliders.trackbar(2).Value
@@ -205,6 +207,7 @@ Public Class OpenGL_Callbacks
         ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         ogl.src = src
         ogl.pointCloudInput = ocvb.pointCloud
         ogl.Run(ocvb)
@@ -233,6 +236,7 @@ Public Class OpenGL_IMU
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         imu.Run(ocvb)
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
         ogl.src = src
@@ -280,6 +284,7 @@ Public Class OpenGL_3Ddata
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim bins = sliders.trackbar(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
@@ -323,6 +328,7 @@ Public Class OpenGL_Draw3D
         ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         circle.Run(ocvb)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
@@ -349,6 +355,7 @@ Public Class OpenGL_Voxels
         ocvb.desc = "Show the voxel representation in OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         voxels.src = src
         voxels.Run(ocvb)
         Static intermediateResults = findCheckBox("Display intermediate results")
@@ -385,6 +392,7 @@ Public Class OpenGL_GravityTransform
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         gCloud.src = ocvb.pointCloud
         gCloud.Run(ocvb)
 
@@ -412,6 +420,7 @@ Public Class OpenGL_Reduced
         ocvb.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         reduction.Run(ocvb)
         dst1 = reduction.dst1
 

@@ -7,6 +7,7 @@ Public Class intrinsicsLeft_Basics
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim ttStart = 40
         Dim ttStr As String = "Width = " + CStr(src.Width) + vbTab + " height = " + CStr(src.Height) + vbCrLf
         ttStr += "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy) + vbCrLf
@@ -39,4 +40,5 @@ Public Class intrinsicsLeft_Basics
         dst2.Line(ptLoc, ttLocation, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
+
 

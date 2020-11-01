@@ -94,6 +94,7 @@ Public Class OpticalFlow_DenseOptions
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
         levels = sliders.trackbar(1).Value
         winSize = sliders.trackbar(2).Value
@@ -128,6 +129,7 @@ Public Class OpticalFlow_DenseBasics
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -172,6 +174,7 @@ Public Class OpticalFlow_DenseBasics_MT
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static oldGray As New cv.Mat
 
         If ocvb.frameCount > 0 Then
@@ -252,6 +255,7 @@ Public Class OpticalFlow_Sparse
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = src.Clone()
         dst2 = src.Clone()
 
@@ -308,3 +312,4 @@ Public Class OpticalFlow_Sparse
         End If
     End Sub
 End Class
+

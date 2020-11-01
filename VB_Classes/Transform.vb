@@ -9,6 +9,7 @@ Public Class Transform_Resize
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim resizeFactor = sliders.trackbar(0).Value / 100
         Dim w = CInt(resizeFactor * src.Width)
         Dim h = CInt(resizeFactor * src.Height)
@@ -40,6 +41,7 @@ Public Class Transform_Rotate
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
@@ -63,6 +65,7 @@ Public Class Transform_Sort
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -88,6 +91,7 @@ Public Class Transform_SortReshape
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -111,6 +115,7 @@ Public Class Transform_Affine3D
         ocvb.desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
         Static pc1 As cv.Mat
         Static pc2 As cv.Mat
@@ -160,5 +165,6 @@ Public Class Transform_Affine3D
         ocvb.trueText(output)
     End Sub
 End Class
+
 
 

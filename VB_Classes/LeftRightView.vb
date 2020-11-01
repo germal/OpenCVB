@@ -17,6 +17,7 @@ Public Class LeftRightView_Basics
         End Select
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = ocvb.leftView
         dst2 = ocvb.rightView
 
@@ -50,6 +51,7 @@ Public Class LeftRightView_CompareUndistorted
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim sliceY = sliders.trackbar(1).Value
         Dim slideHeight = sliders.trackbar(2).Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
@@ -97,6 +99,7 @@ Public Class LeftRightView_CompareRaw
         ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         lrView.Run(ocvb)
 
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
@@ -132,6 +135,7 @@ Public Class LeftRightView_Features
         label2 = "Right Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         lrView.Run(ocvb)
 
         features.src = lrView.dst2
@@ -167,6 +171,7 @@ Public Class LeftRightView_Palettized
         label2 = "Right Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         lrView.Run(ocvb)
 
         palette.src = lrView.dst1
@@ -198,6 +203,7 @@ Public Class LeftRightView_BRISK
         lrView = New LeftRightView_Basics(ocvb)
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         lrView.Run(ocvb)
         brisk.src = lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         brisk.Run(ocvb)
@@ -208,6 +214,7 @@ Public Class LeftRightView_BRISK
         dst1 = brisk.dst1
     End Sub
 End Class
+
 
 
 

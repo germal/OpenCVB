@@ -18,6 +18,7 @@ Public Class Plot_Basics
         ocvb.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         hist.src = src
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(ocvb)
@@ -48,6 +49,7 @@ Public Class Plot_Basics_CPP
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim maxX As Double = Double.MinValue
         Dim minX As Double = Double.MaxValue
         Dim maxY As Double = Double.MinValue
@@ -115,6 +117,7 @@ Public Class Plot_OverTime
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
         Dim pixelHeight = CInt(sliders.trackbar(0).Value)
@@ -207,6 +210,7 @@ Public Class Plot_Histogram
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {bins}
@@ -294,6 +298,7 @@ Public Class Plot_Depth
         ocvb.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         hist.Run(ocvb)
         Dim inRangeMin = hist.inrange.sliders.trackbar(0).Value
         Dim inRangeMax = hist.inrange.sliders.trackbar(1).Value
@@ -319,3 +324,4 @@ Public Class Plot_Depth
         End If
     End Sub
 End Class
+

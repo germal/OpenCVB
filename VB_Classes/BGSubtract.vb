@@ -19,6 +19,7 @@ Public Class BGSubtract_Basics_CPP
         ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static frm = findForm("BGSubtract_Basics_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
@@ -69,6 +70,7 @@ Public Class BGSubtract_MotionDetect_MT
         ocvb.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
@@ -123,6 +125,7 @@ Public Class BGSubtract_Basics_MT
         ocvb.desc = "Detect Motion in the color image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         grid.Run(ocvb)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.EmptyClone.SetTo(0)
@@ -155,6 +158,7 @@ Public Class BGSubtract_Depth_MT
         label2 = "Accumulated depth image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         shadow.Run(ocvb) ' get where depth is zero
         bgsub.src = ocvb.RGBDepth
         bgsub.Run(ocvb)
@@ -179,6 +183,7 @@ Public Class BGSubtract_MOG
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -205,6 +210,7 @@ Public Class BGSubtract_MOG2
         ocvb.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("MOG Learn Rate")
         MOG2.Apply(src, dst1, learnRateSlider.Value / 1000)
@@ -227,6 +233,7 @@ Public Class BGSubtract_GMG_KNN
         ocvb.desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount < 120 Then
             ocvb.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(ocvb.frameCount))
         Else
@@ -261,6 +268,7 @@ Public Class BGSubtract_MOG_RGBDepth
         ocvb.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("Learn Rate")
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
@@ -290,6 +298,7 @@ Public Class BGSubtract_MOG_Retina
         ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         bgSub.src = retina.dst2.Clone()
@@ -311,6 +320,7 @@ Public Class BGSubtract_DepthOrColorMotion
         ocvb.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         motion.src = src.Clone()
         motion.Run(ocvb)
         dst1 = motion.dst1
@@ -356,6 +366,7 @@ Public Class BGSubtract_Video
         ocvb.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         video.Run(ocvb)
         dst2 = video.dst1
         bgfg.src = dst2
@@ -401,6 +412,7 @@ Public Class BGSubtract_Synthetic_CPP
         ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount < 10 Then Exit Sub ' darker images at the start?
         If amplitude <> sliders.trackbar(0).Value Or magnitude <> sliders.trackbar(1).Value Or waveSpeed <> sliders.trackbar(2).Value Or
             objectSpeed <> sliders.trackbar(3).Value Then
@@ -446,6 +458,7 @@ Public Class BGSubtract_Synthetic
         ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         synth.src = src
         synth.Run(ocvb)
         dst2 = synth.dst1
@@ -454,3 +467,4 @@ Public Class BGSubtract_Synthetic
         dst1 = bgfg.dst1
     End Sub
 End Class
+

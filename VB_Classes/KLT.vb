@@ -22,6 +22,7 @@ Public Class KLT_Basics
         ocvb.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static prevGray As New cv.Mat
 
         If check.Box(1).Checked Or ocvb.frameCount Mod 25 = 0 Then
@@ -93,6 +94,7 @@ Public Class KLT_OpticalFlow
         ocvb.desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         klt.src = src
         klt.Run(ocvb)
         If ocvb.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
@@ -110,4 +112,5 @@ Public Class KLT_OpticalFlow
         lastpoints = klt.inputPoints
     End Sub
 End Class
+
 

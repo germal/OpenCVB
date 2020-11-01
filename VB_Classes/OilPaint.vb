@@ -20,6 +20,7 @@ Public Class OilPaint_Pointilism
         ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = src
         Dim img = src(ocvb.drawRect)
         Static saveDrawRect As New cv.Rect
@@ -91,6 +92,7 @@ Public Class OilPaint_ColorProbability
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         km.src = src
         km.Run(ocvb)
         dst1 = km.dst1
@@ -129,6 +131,7 @@ Public Class OilPaint_Manual
         ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
 
@@ -190,6 +193,7 @@ Public Class OilPaint_Manual_CS
         ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = ocvb.drawRect
@@ -222,6 +226,7 @@ Public Class OilPaint_Cartoon
         label2 = "Laplacian Edges"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim roi = ocvb.drawRect
         laplacian.src = src
         laplacian.Run(ocvb)
@@ -242,3 +247,4 @@ Public Class OilPaint_Cartoon
         Next
     End Sub
 End Class
+

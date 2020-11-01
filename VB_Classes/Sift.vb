@@ -21,6 +21,7 @@ Public Class Sift_Basics_CS
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim doubleSize As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
         siftCS.Run(ocvb.leftView, ocvb.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
@@ -62,6 +63,7 @@ Public Class Sift_Basics_CS_MT
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim leftView As cv.Mat
         Dim rightView As cv.Mat
 
@@ -88,4 +90,5 @@ Public Class Sift_Basics_CS_MT
         label1 = If(siftBasics.radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
 End Class
+
 

@@ -15,6 +15,7 @@ Public Class Reduction_Basics
         ocvb.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim reductionSlider = findSlider("Reduction factor")
         Dim reductionVal = reductionSlider.Value
         If radio.check(0).Checked Then
@@ -59,6 +60,7 @@ Public Class Reduction_Edges
         ocvb.desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         reduction.src = src
         reduction.Run(ocvb)
         dst1 = reduction.dst1.Clone
@@ -87,6 +89,7 @@ Public Class Reduction_Floodfill
         ocvb.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         reduction.src = src
         reduction.Run(ocvb)
 
@@ -119,6 +122,7 @@ Public Class Reduction_KNN_Color
         ocvb.desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(ocvb)
         dst2 = reduction.dst1
@@ -160,6 +164,7 @@ Public Class Reduction_KNN_ColorAndDepth
         ocvb.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         reduction.src = src
         reduction.Run(ocvb)
         dst1 = reduction.dst1
@@ -187,6 +192,7 @@ Public Class Reduction_Depth
         ocvb.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Type = cv.MatType.CV_32S Then
             reduction.src = src
         Else
@@ -216,6 +222,7 @@ Public Class Reduction_PointCloud
         ocvb.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim split() = ocvb.pointCloud.Split()
         split(2) *= 1000 ' convert to mm's
         split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
@@ -258,6 +265,7 @@ Public Class Reduction_Lines
         ocvb.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         reduction.Run(ocvb)
 
         sideView.Run(ocvb)
@@ -273,3 +281,4 @@ Public Class Reduction_Lines
         dst2 = cmat.CameraLocationBot(ocvb, lDetect.dst1)
     End Sub
 End Class
+

@@ -66,10 +66,10 @@ Public Class VBparent : Implements IDisposable
         If standalone And src.Width > 0 Then
             If ocvb.reviewDSTforObject <> "" And ocvb.reviewDSTforObject <> caller Then
                 Dim obj = ocvb.reviewObject
-                'dst1 = obj.dst1
-                'dst2 = obj.dst2
-                'label1 = obj.label1
-                'label2 = obj.label2
+                dst1 = obj.dst1
+                dst2 = obj.dst2
+                label1 = obj.label1
+                label2 = obj.label2
             End If
             If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
                 If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))

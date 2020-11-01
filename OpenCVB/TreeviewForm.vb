@@ -13,6 +13,7 @@ Public Class TreeviewForm
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Me.Timer1.Enabled = False
         If ReviewStandalone.Checked Then
+            OpenCVB.reviewDSTforObject = ""
             OpenCVB.AvailableAlgorithms.Text = e.Node.Text
             If OpenCVB.AvailableAlgorithms.Text <> e.Node.Text Then
                 ' the list of active algorithms for this group does not contain the algorithm requested so just add it!

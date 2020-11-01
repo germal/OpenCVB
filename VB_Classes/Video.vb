@@ -25,6 +25,7 @@ Public Class Video_Basics
         ocvb.desc = "Show a video file"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim fileInfo = New FileInfo(ocvb.openFileDialogName)
         If srcVideo <> ocvb.openFileDialogName Then
             If fileInfo.Exists = False Then
@@ -68,6 +69,7 @@ Public Class Video_CarCounting
         ocvb.desc = "Count cars in a video file"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         video.Run(ocvb)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
@@ -124,6 +126,7 @@ Public Class Video_CarCComp
         ocvb.desc = "Outline cars with a rectangle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         video.Run(ocvb)
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
@@ -155,6 +158,7 @@ Public Class Video_MinRect
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         video.Run(ocvb)
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
@@ -186,6 +190,7 @@ Public Class Video_MinCircle
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         video.Run(ocvb)
         dst1 = video.dst1
         dst2 = video.dst2
@@ -200,3 +205,4 @@ Public Class Video_MinCircle
         End If
     End Sub
 End Class
+

@@ -13,6 +13,7 @@ Public Class Keyboard_Basics
         ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
         If standalone Then
@@ -25,3 +26,4 @@ Public Class Keyboard_Basics
         End If
     End Sub
 End Class
+

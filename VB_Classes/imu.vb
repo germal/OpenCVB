@@ -16,6 +16,7 @@ Public Class IMU_Basics
         ocvb.desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
         If ocvb.frameCount = 0 Then
             lastTimeStamp = ocvb.IMU_TimeStamp
@@ -68,6 +69,7 @@ Public Class IMU_Stabilizer
         label2 = "Difference from Color Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim borderCrop = 5
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         Dim dx = ocvb.IMU_AngularVelocity.X
@@ -119,6 +121,7 @@ Public Class IMU_Magnetometer
         ocvb.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.IMU_Magnetometer = New cv.Point3f Then
             ocvb.trueText("The IMU for this camera does not have Magnetometer readings.")
         Else
@@ -143,6 +146,7 @@ Public Class IMU_Barometer
         ocvb.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.IMU_Barometer = 0 Then
             ocvb.trueText("The IMU for this camera does not have barometric pressure.")
         Else
@@ -162,6 +166,7 @@ Public Class IMU_Temperature
         ocvb.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         ocvb.trueText("IMU Temperature is " + Format(ocvb.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                       "IMU Temperature is " + Format(ocvb.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
     End Sub
@@ -192,6 +197,7 @@ Public Class IMU_FrameTime
         ocvb.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static IMUanchor As Integer = ocvb.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
         ' there can be some errant times at startup.
@@ -286,6 +292,7 @@ Public Class IMU_HostFrameTimes
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static CPUanchor As Integer = ocvb.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
         ' there can be some errant times at startup.
@@ -370,6 +377,7 @@ Public Class IMU_TotalDelay
         ocvb.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         host.Run(ocvb)
         imu.Run(ocvb)
         Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
@@ -436,6 +444,7 @@ Public Class IMU_IsCameraLevel
         ocvb.desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gx = ocvb.IMU_Acceleration.X
         Dim gy = ocvb.IMU_Acceleration.Y
         Dim gz = ocvb.IMU_Acceleration.Z
@@ -471,6 +480,7 @@ Public Class IMU_GVector
         ocvb.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gx = ocvb.IMU_Acceleration.X
         Dim gy = ocvb.IMU_Acceleration.Y
         Dim gz = ocvb.IMU_Acceleration.Z
@@ -518,3 +528,4 @@ Public Class IMU_GVector
         End If
     End Sub
 End Class
+

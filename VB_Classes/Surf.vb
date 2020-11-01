@@ -24,6 +24,7 @@ Public Class Surf_Basics_CS
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         srcLeft = ocvb.leftView
         srcRight = ocvb.rightView
         Dim doubleSize As New cv.Mat
@@ -55,6 +56,7 @@ Public Class Surf_Basics
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         surf.src = src
         surf.Run(ocvb)
         dst1 = surf.dst1
@@ -81,6 +83,7 @@ Public Class Surf_DrawMatchManual_CS
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         surf.src = src
         surf.Run(ocvb)
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -111,3 +114,4 @@ Public Class Surf_DrawMatchManual_CS
         label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub
 End Class
+

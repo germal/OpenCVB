@@ -6,6 +6,7 @@ Public Class Font_OpenCV
         ocvb.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount Mod 30 Then Exit Sub
         Dim hersheyFont = Choose(ocvb.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
                                  cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
@@ -35,6 +36,7 @@ Public Class Font_TrueType
         ocvb.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gfontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
@@ -55,6 +57,7 @@ Public Class Font_FlowText
         ocvb.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText(ocvb)' to the class constructor.")
@@ -86,3 +89,4 @@ Public Class Font_FlowText
         lastCount = msgs.Count
     End Sub
 End Class
+

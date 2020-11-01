@@ -15,6 +15,7 @@ Public Class Clone_Basics
         ocvb.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         If ocvb.drawRect = New cv.Rect Then
             mask.SetTo(255)
@@ -55,6 +56,7 @@ Public Class Clone_ColorChange
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
         clone.Run(ocvb)
@@ -82,6 +84,7 @@ Public Class Clone_IlluminationChange
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
         clone.Run(ocvb)
@@ -110,6 +113,7 @@ Public Class Clone_TextureFlattening
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
         clone.Run(ocvb)
@@ -159,6 +163,7 @@ Public Class Clone_Eagle
         ocvb.desc = "Clone an eagle into the video stream."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = src.Clone()
         If ocvb.mouseClickFlag Then
             pt = ocvb.mouseClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
@@ -198,6 +203,7 @@ Public Class Clone_Seamless
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
         If ocvb.drawRect = New cv.Rect Then
@@ -220,3 +226,4 @@ Public Class Clone_Seamless
         dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
+

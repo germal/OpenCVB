@@ -28,6 +28,7 @@ End Module
 '        ocvb.desc = "Find depth using the semi-global matching algorithm."
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
+'		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 '        If ocvb.frameCount < 10 Then Exit Sub
 '        If ocvb.parms.camIndex = Kinect4AzureCam Then
 '            ocvb.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera."))
@@ -56,3 +57,4 @@ End Module
 '        SemiGlobalMatching_Close(cPtr)
 '    End Sub
 'End Class
+

@@ -10,6 +10,7 @@ Public Class KAZE_KeypointsKAZE_CS
         label1 = "KAZE key points"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
@@ -30,6 +31,7 @@ Public Class KAZE_KeypointsAKAZE_CS
         label1 = "AKAZE key points"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
@@ -52,6 +54,7 @@ Public Class KAZE_Sample_CS
         ocvb.desc = "Match keypoints in 2 photos."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim result = CS_Kaze.Run(box, box_in_scene)
         dst1 = result.Resize(src.Size())
     End Sub
@@ -70,6 +73,7 @@ Public Class KAZE_Match_CS
         ocvb.desc = "Match keypoints in the left and right images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         red.Run(ocvb)
         dst1 = red.dst1
         dst2 = red.dst2
@@ -95,6 +99,7 @@ Public Class KAZE_LeftAligned_CS
         ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         CS_KazeLeft.GetKeypoints(ocvb.leftView)
         CS_KazeRight.GetKeypoints(ocvb.rightView)
 
@@ -131,5 +136,6 @@ Public Class KAZE_LeftAligned_CS
         label2 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
     End Sub
 End Class
+
 
 

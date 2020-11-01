@@ -50,6 +50,7 @@ Public Class Hough_Circles
         label2 = "Hough Circles found"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         circles.src = src
         circles.Run(ocvb)
         dst1 = circles.dst1
@@ -86,6 +87,7 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         edges.src = src.Clone()
         edges.Run(ocvb)
 
@@ -140,6 +142,7 @@ Public Class Hough_Lines_MT
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         grid.Run(ocvb)
 
         edges.src = src
@@ -163,4 +166,5 @@ Public Class Hough_Lines_MT
         dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
+
 

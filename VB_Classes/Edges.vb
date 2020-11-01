@@ -16,6 +16,7 @@ Public Class Edges_Basics
         label2 = "Canny using L2 Norm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim threshold1 As Integer = sliders.trackbar(0).Value
         Dim threshold2 As Integer = sliders.trackbar(1).Value
         Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
@@ -48,6 +49,7 @@ Public Class Edges_DepthAndColor
         label2 = "Edges in color and depth no dilate"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         canny.src = src
         canny.Run(ocvb)
         shadow.Run(ocvb)
@@ -78,6 +80,7 @@ Public Class Edges_Laplacian
         ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
 
@@ -104,6 +107,7 @@ Public Class Edges_Scharr
         ocvb.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
@@ -132,6 +136,7 @@ Public Class Edges_Preserving
         ocvb.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
@@ -178,6 +183,7 @@ Public Class Edges_RandomForest_CPP
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount < 100 Then ocvb.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
@@ -219,6 +225,7 @@ Public Class Edges_LeftView
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         red.Run(ocvb)
         Dim leftView = red.dst1
         sobel.src = red.dst2
@@ -247,6 +254,7 @@ Public Class Edges_ResizeAdd
         label2 = "Found edges added to grayscale image source."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
                             New cv.Range(sliders.trackbar(1).Value, gray.Cols - sliders.trackbar(1).Value))
@@ -272,6 +280,7 @@ Public Class Edges_DCTfrequency
         ocvb.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -322,6 +331,7 @@ Public Class Edges_Deriche_CPP
         ocvb.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -360,6 +370,7 @@ Public Class Edges_Sobel
         ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim kernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

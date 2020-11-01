@@ -35,6 +35,7 @@ Public Class EMax_Basics
         ocvb.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then
             ocvb.trueText("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                                     "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100)
@@ -135,6 +136,7 @@ Public Class EMax_CPP
         ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         basics.Run(ocvb)
         dst1 = basics.dst1
         Dim srcCount = basics.sliders.trackbar(0).Value
@@ -201,6 +203,7 @@ Public Class EMax_Centroids
         ocvb.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         emaxCPP.Run(ocvb)
 
         flood.src = emaxCPP.dst2.Clone
@@ -241,6 +244,7 @@ Public Class EMax_PointTracker
         ocvb.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         emax.Run(ocvb)
         dst1 = emax.dst1
 

@@ -23,6 +23,7 @@ Public Class Face_Haar_LBP
         label2 = "Faces detected with LBP"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
         dst2 = src.Clone()
@@ -42,9 +43,11 @@ Public Class Face_Haar_Alt
         label1 = "Faces detected with Haar_Alt"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
     End Sub
 End Class
+
 
 

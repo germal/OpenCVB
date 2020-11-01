@@ -54,6 +54,7 @@ Public Class Smoothing_Exterior
 		ocvb.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 		If standalone Then
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
@@ -133,6 +134,7 @@ Public Class Smoothing_Interior
 		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 		If standalone Then
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
@@ -181,6 +183,7 @@ Public Class Smoothing_Contours
 		ocvb.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 	End Sub
 	Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 		outline.Run(ocvb)
 
 		Dim stepsize = sliders.trackbar(0).Value

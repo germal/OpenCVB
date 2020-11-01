@@ -10,6 +10,7 @@ Public Class AddWeighted_Basics
         ocvb.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then
             src1 = src
             src2 = ocvb.RGBDepth
@@ -22,4 +23,5 @@ Public Class AddWeighted_Basics
         End If
     End Sub
 End Class
+
 

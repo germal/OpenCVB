@@ -14,6 +14,7 @@ Imports cv = OpenCvSharp
 '        ocvb.desc = "Test a sample EMGU usage."
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
+'		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 '        Dim data(src.Rows * src.Cols * src.ElemSize) As Byte
 '        If ocvb.parms.testAllRunning  Then
 '            ocvb.trueText("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
@@ -36,6 +37,7 @@ Imports cv = OpenCvSharp
 '        ocvb.desc = "Use the simplest possible face detector in Emgu examples."
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
+'		 If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 '        If ocvb.parms.testAllRunning  Then
 '            ocvb.trueText("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
 '                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
@@ -50,4 +52,5 @@ Imports cv = OpenCvSharp
 '        End If
 '    End Sub
 'End Class
+
 

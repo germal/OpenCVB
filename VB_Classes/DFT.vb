@@ -34,6 +34,7 @@ Public Class DFT_Basics
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)
@@ -91,6 +92,7 @@ Public Class DFT_Inverse
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -146,6 +148,7 @@ Public Class DFT_ButterworthFilter_MT
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dft.src = src
         dft.Run(ocvb)
 
@@ -211,9 +214,11 @@ Public Class DFT_ButterworthDepth
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         'bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run(ocvb)
         dst1 = bfilter.dst1
         dst2 = bfilter.dst2
     End Sub
 End Class
+

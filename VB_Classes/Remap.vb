@@ -7,6 +7,7 @@ Public Class Remap_Basics
         ocvb.desc = "Use remap to reflect an image in 4 directions."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim map_y = New cv.Mat(src.Size(), cv.MatType.CV_32F)
 
@@ -50,6 +51,7 @@ Public Class Remap_Flip
         ocvb.desc = "Use flip to remap an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
                                             "Remap_Flip - flip horizontal and vertical")
         Select Case direction
@@ -68,5 +70,6 @@ Public Class Remap_Flip
         End If
     End Sub
 End Class
+
 
 

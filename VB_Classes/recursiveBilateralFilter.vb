@@ -27,6 +27,7 @@ Public Class RecursiveBilateralFilter_CPP
         ocvb.desc = "Apply the recursive bilateral filter"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If srcData.Length <> src.Total * src.ElemSize Then ReDim srcData(src.Total * src.ElemSize - 1)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -39,4 +40,5 @@ Public Class RecursiveBilateralFilter_CPP
         RecursiveBilateralFilter_Close(rbf)
     End Sub
 End Class
+
 

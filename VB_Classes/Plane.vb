@@ -107,6 +107,7 @@ Public Class Plane_Detect
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
@@ -180,6 +181,7 @@ Public Class Plane_DetectDebug
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim depth32f = getDepth32f(ocvb)
         grid.Run(ocvb)
 
@@ -234,6 +236,7 @@ Public Class Plane_DetectDebug
         cv.Cv2.BitwiseOr(dst1, mask, dst1)
     End Sub
 End Class
+
 
 
 

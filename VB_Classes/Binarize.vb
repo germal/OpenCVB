@@ -19,6 +19,7 @@ Public Class Binarize_Basics
         ocvb.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         If standalone Then meanScalar = cv.Cv2.Mean(src)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -61,6 +62,7 @@ Public Class Binarize_OTSU
         ocvb.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst2.SetTo(0)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         binarize.meanScalar = cv.Cv2.Mean(src)
@@ -105,6 +107,7 @@ Public Class Binarize_Niblack_Sauvola
         label2 = "Binarize Sauvola"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -134,6 +137,7 @@ Public Class Binarize_Niblack_Nick
         label2 = "Binarize Nick"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -164,6 +168,7 @@ Public Class Binarize_Bernson
         ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -201,6 +206,7 @@ Public Class Binarize_Bernson_MT
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -217,4 +223,5 @@ Public Class Binarize_Bernson_MT
             End Sub)
     End Sub
 End Class
+
 

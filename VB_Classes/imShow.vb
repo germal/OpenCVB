@@ -6,7 +6,9 @@ Public Class imShow_Basics
         ocvb.desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         cv.Cv2.ImShow("color", src)
     End Sub
 End Class
+
 

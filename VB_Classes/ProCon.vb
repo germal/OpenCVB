@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class ProCon_Basics
@@ -68,6 +68,7 @@ Public Class ProCon_Basics
         End While
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If sliders.trackbar(0).Value <> buffer.Length Then
             SyncLock mutex
                 ReDim buffer(sliders.trackbar(0).Value - 1)
@@ -107,6 +108,7 @@ Public Class ProCon_Variation
         ocvb.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
             If procon.buffer(procon.tail) = -1 Then
@@ -121,5 +123,6 @@ Public Class ProCon_Variation
         procon.terminateProducer = True
     End Sub
 End Class
+
 
 

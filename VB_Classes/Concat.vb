@@ -8,6 +8,7 @@ Public Class Concat_Basics
         ocvb.desc = "Concatenate 2 images - horizontally and vertically"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(src, ocvb.RGBDepth, tmp)
         dst1 = tmp.Resize(src.Size())
@@ -31,6 +32,7 @@ Public Class Concat_4way
         ocvb.desc = "Concatenate 4 images - horizontally and vertically"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         if standalone Then
             img(0) = src
             img(1) = ocvb.RGBDepth
@@ -44,3 +46,4 @@ Public Class Concat_4way
         dst1 = tmp3.Resize(src.Size())
     End Sub
 End Class
+

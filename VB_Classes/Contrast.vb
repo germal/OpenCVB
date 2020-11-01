@@ -10,6 +10,7 @@ Public Class Contrast_POW
         ocvb.desc = "Reduce contrast with POW function"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.ConvertTo(dst2, cv.MatType.CV_32FC3)
         dst2 = dst2.Normalize()
@@ -34,6 +35,7 @@ Public Class Contrast_Basics
         ocvb.desc = "Show image with varying contrast and brightness."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         src.ConvertTo(dst1, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)
         label1 = "Brightness/Contrast"
         label2 = ""

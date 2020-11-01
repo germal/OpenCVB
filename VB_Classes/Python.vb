@@ -83,6 +83,7 @@ Public Class Python_Run
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If pyStream IsNot Nothing Then
             pyStream.src = src
             pyStream.Run(ocvb)
@@ -130,6 +131,7 @@ Public Class Python_MemMap
         End If
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then memMapValues(0) = ocvb.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
@@ -171,6 +173,7 @@ Public Class Python_SurfaceBlit
         ocvb.desc = "Stream data to Python_SurfaceBlit Python script."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If PythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
@@ -192,3 +195,4 @@ Public Class Python_SurfaceBlit
         End If
     End Sub
 End Class
+

@@ -48,6 +48,7 @@ Public Class Contours_Basics
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         setOptions()
         Dim imageInput As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -102,6 +103,7 @@ Public Class Contours_FindandDraw
         ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         rotatedRect.src = src
         rotatedRect.Run(ocvb)
@@ -133,6 +135,7 @@ Public Class Contours_RGB
         label2 = "Background"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -184,6 +187,7 @@ Public Class Contours_RemoveLines
         ocvb.desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
@@ -229,6 +233,7 @@ Public Class Contours_Depth
         label2 = "DepthContour output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         dst1 = inrange.noDepthMask
@@ -274,6 +279,7 @@ Public Class Contours_Prediction
         ocvb.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         outline.Run(ocvb)
         dst1 = outline.dst2
         dst2.SetTo(0)

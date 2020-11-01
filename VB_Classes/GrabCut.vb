@@ -14,6 +14,7 @@ Public Class GrabCut_Basics
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         contours.src = src
         contours.Run(ocvb)
         dst2 = contours.dst2
@@ -44,4 +45,5 @@ Public Class GrabCut_Basics
         src.CopyTo(dst2, mask)
     End Sub
 End Class
+
 

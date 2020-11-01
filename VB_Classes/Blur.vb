@@ -9,6 +9,7 @@ Public Class Blur_Basics
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim kernelSize As integer = sliders.trackbar(0).Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
@@ -35,6 +36,7 @@ Public Class Blur_Gaussian_CS
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
@@ -62,6 +64,7 @@ Public Class Blur_Median_CS
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
@@ -88,6 +91,7 @@ Public Class Blur_Homogeneous
         ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -116,6 +120,7 @@ Public Class Blur_Median
         ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -144,6 +149,7 @@ Public Class Blur_Bilateral
         ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -177,6 +183,7 @@ Public Class Blur_PlusHistogram
         ocvb.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         myhist.src = src
         myhist.Run(ocvb)
 
@@ -217,6 +224,7 @@ Public Class Blur_TopoMap
         ocvb.desc = "Create a topo map from the blurred image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static savePercent As Single
         Static nextPercent As Single
         If savePercent <> sliders.trackbar(0).Value Then

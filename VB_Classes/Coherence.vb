@@ -13,6 +13,7 @@ Public Class Coherence_Basics
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
         Dim blend = sliders.trackbar(1).Value / 10
         Dim str_sigma = sliders.trackbar(2).Value * 2 + 1
@@ -88,8 +89,10 @@ Public Class Coherence_Depth
         ocvb.desc = "Find coherent lines in the depth image - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         coherent.src = ocvb.RGBDepth
         coherent.Run(ocvb)
         dst1 = coherent.dst1
     End Sub
 End Class
+

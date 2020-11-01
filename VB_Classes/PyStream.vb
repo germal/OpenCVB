@@ -32,6 +32,7 @@ Public Class PyStream_Basics
         ocvb.desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim depth32f = getDepth32f(ocvb)
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
@@ -52,3 +53,4 @@ Public Class PyStream_Basics
         End If
     End Sub
 End Class
+

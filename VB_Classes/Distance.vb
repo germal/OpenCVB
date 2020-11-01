@@ -17,6 +17,7 @@ Public Class Distance_Basics
         ocvb.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         foreground.Run(ocvb)
         dst2 = foreground.dst1
         Dim fg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -36,4 +37,5 @@ Public Class Distance_Basics
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
+
 

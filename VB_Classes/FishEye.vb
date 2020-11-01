@@ -50,6 +50,7 @@ Public Class FishEye_Rectified
         label2 = "Right View"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         label1 = "Left View (no fisheye lens present)"
         label2 = "Right View (no fisheye lens present)"
         leftView = ocvb.leftView
@@ -70,9 +71,11 @@ Public Class FishEye_Raw
         ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         label1 = "Left Fisheye Image"
         label2 = "Right Fisheye Image"
         dst1 = ocvb.leftView
         dst2 = ocvb.rightView
     End Sub
 End Class
+

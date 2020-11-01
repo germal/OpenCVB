@@ -45,6 +45,7 @@ Public Class CComp_Basics
         Return count
     End Function
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         rects.Clear()
         centroids.Clear()
         masks.Clear()
@@ -142,6 +143,7 @@ Public Class CComp_Basics_FullImage
         Return count
     End Function
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.SetTo(0)
 
@@ -174,6 +176,7 @@ Public Class CComp_PointTracker
         ocvb.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         basics.src = src
         basics.Run(ocvb)
 
@@ -224,6 +227,7 @@ Public Class CComp_MaxBlobs
         ocvb.desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount < 10 Then Exit Sub
         Static thresholdSlider = findSlider("CComp threshold")
         If ocvb.frameCount = 0 Then thresholdSlider.value = 0
@@ -276,6 +280,7 @@ Public Class CComp_MaxPixels
         ocvb.desc = "Find the best CComp threshold to maximize pixels"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.frameCount < 10 Then Exit Sub
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
@@ -327,6 +332,7 @@ Public Class CComp_DepthEdges
         ocvb.desc = "Use depth edges to isolate connected components in depth"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         depth.Run(ocvb)
         If standalone Then dst2 = depth.dst2
 
@@ -358,6 +364,7 @@ Public Class CComp_EdgeMask
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         edges.src = src
         edges.Run(ocvb)
         dst1 = edges.dst1
@@ -382,6 +389,7 @@ Public Class CComp_ColorDepth
         ocvb.desc = "Color connected components based on their depth"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -419,6 +427,7 @@ Public Class CComp_InRange_MT
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -471,6 +480,7 @@ Public Class CComp_InRange
         ocvb.desc = "Connect components in specific ranges"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -516,6 +526,7 @@ Public Class CComp_Shapes
         ocvb.desc = "Use connected components to isolate objects in image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
@@ -564,6 +575,7 @@ Public Class CComp_OverlappingRectangles
         ocvb.desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         ccomp.src = src
         ccomp.Run(ocvb)
         dst1 = ccomp.dst2
@@ -581,4 +593,5 @@ Public Class CComp_OverlappingRectangles
         'Next
     End Sub
 End Class
+
 

@@ -36,6 +36,7 @@ Public Class Thread_Grid
         ocvb.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static lastWidth As integer
         Static lastHeight As integer
         Static lastBorder As integer
@@ -116,6 +117,7 @@ Public Class Thread_GridTest
         ocvb.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         grid.Run(ocvb)
         Dim mean = cv.Cv2.Mean(src)
 

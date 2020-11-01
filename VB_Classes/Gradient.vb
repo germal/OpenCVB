@@ -13,6 +13,7 @@ Public Class Gradient_Basics
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         sobel.src = src
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
@@ -40,6 +41,7 @@ Public Class Gradient_Depth
         label2 = "Phase Output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If ocvb.drawRect.Width > 0 Then sobel.src = ocvb.RGBDepth(ocvb.drawRect) Else sobel.src = ocvb.RGBDepth.Clone()
         sobel.Run(ocvb)
         Dim angle = New cv.Mat
@@ -70,6 +72,7 @@ Public Class Gradient_Flatland
         ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
         dst1 = ocvb.RGBDepth.Clone()
         dst1 /= reductionFactor
@@ -104,6 +107,7 @@ Public Class Gradient_CartToPolar
         ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run(ocvb)
 
@@ -144,6 +148,7 @@ End Class
 '        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
 '    End Sub
 '    Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 '        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
 '        gradient.Run(ocvb)
 

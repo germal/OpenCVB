@@ -8,6 +8,7 @@ Public Class Vector_Magnitude
         label1 = "Vector Magnitude"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim cVector() As Single = {1, 4, 4, 8}
         ocvb.trueText("Original vector = " + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ", " + CStr(cVector(2)) + ", " + CStr(cVector(3)), 10, 30)
         Dim coordinates As New cv.Mat(1, 4, cv.MatType.CV_32F, cVector)
@@ -32,4 +33,5 @@ Public Class Vector_Magnitude
         ocvb.trueText("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(Of Single)(0, 0)), 10, 120)
     End Sub
 End Class
+
 

@@ -35,6 +35,7 @@ Public Class Retina_Basics_CPP
         ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
@@ -99,6 +100,7 @@ Public Class Retina_Depth
         label2 = "Current depth motion result"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         dst2 = retina.dst2
@@ -108,3 +110,4 @@ Public Class Retina_Depth
         lastMotion = retina.dst2
     End Sub
 End Class
+

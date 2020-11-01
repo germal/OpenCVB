@@ -9,6 +9,7 @@ Public Class Pyramid_Basics
         ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim zoom = sliders.trackbar(0).Value
         If zoom <> 0 Then
             If zoom < 0 Then
@@ -41,9 +42,11 @@ Public Class Pyramid_Filter
         ocvb.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         laplace.src = src
         laplace.Run(ocvb)
         dst1 = laplace.dst1
     End Sub
 End Class
+
 

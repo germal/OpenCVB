@@ -22,12 +22,15 @@ Module VB_EditorMain
 
     Private Function insertLine(line As String) As Boolean
         Static insideRunFunction As Boolean
-        If Trim(line) = "Public Sub Run(ocvb As VBocvb)" Then insideRunFunction = True
-        If Trim(line) = "End Sub" And insideRunFunction Then
-            'Console.WriteLine(vbTab + vbTab + "MyBase.Finish(ocvb)")
+        'If Trim(line) = "End Sub" And insideRunFunction Then
+        If insideRunFunction Then
+            Console.WriteLine(vbTab + vbTab + "If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me")
             changeLines += 1
             insideRunFunction = False
             Return True
+        End If
+        If InStr(line, "Public Sub Run(ocvb As VBocvb)") Then
+            insideRunFunction = True
         End If
         'Console.WriteLine(line)
         Return False
@@ -50,8 +53,8 @@ Module VB_EditorMain
                 Dim line As String
                 line = nextFile.ReadLine()
                 ' deleteLine(line)
-                makeChange(line)
-                ' insertLine(line)
+                'makeChange(line)
+                insertLine(line)
             End While
             nextFile.Close()
             If saveChangeLines <> changeLines Then changeFiles.Add(fileName)
@@ -66,24 +69,29 @@ Module VB_EditorMain
                 Dim code As String = sr.ReadToEnd
                 sr.Close()
                 Dim lines = code.Split(vbCrLf)
+                sr = New StreamReader(filename)
+                For i = 0 To lines.Count - 1
+                    lines(i) = sr.ReadLine()
+                Next
                 If lines.Count = 1 Then
                     lines = code.Split(vbLf) ' just in case they don't have CR.
                 End If
-                For i = 0 To lines.Count - 1
-                    lines(i) = makeChange(Trim(lines(i)))
-                Next
+                sr.Close()
+                'For i = 0 To lines.Count - 1
+                '    lines(i) = makeChange(Trim(lines(i)))
+                'Next
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
-                    'If insertLine(lines(i)) Then
-                    '    sw.WriteLine(vbTab + vbTab + "MyBase.Finish(ocvb)")
-                    'End If
-                    'sw.WriteLine(lines(i))
-                    If deleteLine(lines(i)) Then
-                        Console.WriteLine("Deleting: " + lines(i))
-                    Else
-                        sw.Write(lines(i))
+                    If insertLine(lines(i)) Then
+                        sw.WriteLine(vbTab + vbTab + "If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me")
                     End If
+                    sw.WriteLine(lines(i))
+                    'If deleteLine(lines(i)) Then
+                    '    Console.WriteLine("Deleting: " + lines(i))
+                    'Else
+                    '    sw.Write(lines(i))
+                    'End If
                 Next
                 sw.Close()
             Next

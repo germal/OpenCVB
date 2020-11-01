@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Highlight_Basics
     Inherits VBparent
     Dim reduction As Reduction_KNN_Color
@@ -13,6 +13,7 @@ Public Class Highlight_Basics
         ocvb.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If standalone Then
             reduction.src = src
             reduction.Run(ocvb)
@@ -42,3 +43,4 @@ Public Class Highlight_Basics
         End If
     End Sub
 End Class
+

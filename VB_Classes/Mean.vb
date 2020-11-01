@@ -9,6 +9,7 @@ Public Class Mean_Basics
         ocvb.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static saveImageCount = sliders.trackbar(0).Value
         If sliders.trackbar(0).Value <> saveImageCount Then
             saveImageCount = sliders.trackbar(0).Value
@@ -27,3 +28,4 @@ Public Class Mean_Basics
         If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst1, src.Type) Else dst1 = nextImage
     End Sub
 End Class
+

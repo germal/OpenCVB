@@ -10,6 +10,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
@@ -32,6 +33,7 @@ Public Class Brightness_Hue
         ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
         cv.Cv2.Split(imghsv, hsv_planes)
@@ -55,6 +57,7 @@ Public Class Brightness_AlphaBeta
         sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub
 End Class
@@ -72,6 +75,7 @@ Public Class Brightness_Gamma
         sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static lastGamma As integer = -1
         If lastGamma <> sliders.trackbar(0).Value Then
             lastGamma = sliders.trackbar(0).Value
@@ -117,6 +121,7 @@ Public Class Brightness_WhiteBalance_CPP
         ocvb.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
         Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
@@ -158,6 +163,7 @@ Public Class Brightness_WhiteBalance
         ocvb.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim maxVal As Double, minVal As Double
@@ -216,6 +222,7 @@ Public Class Brightness_ChangeMask
         ocvb.desc = "Create a mask for the changed pixels after white balance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Static countdown = 60
         Static whiteFlag As Boolean
         If countdown = 0 Then
@@ -265,6 +272,7 @@ Public Class Brightness_PlotHist
         ocvb.desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         hist1.src = src
         hist1.Run(ocvb)
         mat2to1.mat(0) = hist1.dst1

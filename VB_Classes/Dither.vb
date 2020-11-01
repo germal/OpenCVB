@@ -102,6 +102,7 @@ Public Class Dither_Basics
         ocvb.desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim radioIndex As Integer
         Static frm = findForm("Dither_Basics Radio Options")
         For i = 0 To frm.check.length - 1
@@ -181,3 +182,4 @@ Public Class Dither_Basics
         hpixels.Free()
     End Sub
 End Class
+

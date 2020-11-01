@@ -26,6 +26,7 @@ Public Class Etch_ASketch
         ocvb.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         keys.Run(ocvb)
         Dim Input = New List(Of String)(keys.keyInput)
 
@@ -69,3 +70,4 @@ Public Class Etch_ASketch
         End If
     End Sub
 End Class
+

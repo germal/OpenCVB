@@ -27,6 +27,7 @@ Public Class Featureless_Basics
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         grid.Run(ocvb)
 
         edges.src = src
@@ -69,6 +70,7 @@ Public Class Featureless_DCT_MT
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         dct.src = src
         dct.Run(ocvb)
         dst1 = dct.dst1
@@ -121,6 +123,7 @@ Public Class FeatureLess_Prediction
         ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         fLess.src = src
         fLess.Run(ocvb)
         dst1 = fLess.dst1
@@ -205,6 +208,7 @@ Public Class FeatureLess_PointTracker
         ocvb.desc = "Track the featureless regions with point tracker"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         fLess.src = src
         fLess.Run(ocvb)
         dst2 = fLess.dst1
@@ -236,6 +240,7 @@ Public Class FeatureLess_Highlights
         ocvb.desc = "Highlight the featureless region in an RGB image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         fLessP.src = src
         fLessP.Run(ocvb)
 

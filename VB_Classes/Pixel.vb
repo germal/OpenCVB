@@ -14,6 +14,7 @@ Public Class Pixel_GetSet
         ocvb.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
@@ -61,3 +62,4 @@ Public Class Pixel_GetSet
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
+

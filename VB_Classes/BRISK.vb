@@ -11,6 +11,7 @@ Public Class BRISK_Basics
         Brisk = cv.BRISK.Create()
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         src.CopyTo(dst1)
         Dim keyPoints = Brisk.Detect(src)
 
@@ -25,4 +26,5 @@ Public Class BRISK_Basics
         If standalone Then cv.Cv2.AddWeighted(src, 0.5, dst1, 0.5, 0, dst1)
     End Sub
 End Class
+
 

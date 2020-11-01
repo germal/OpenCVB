@@ -14,6 +14,7 @@ Public Class Features_GoodFeatures
         ocvb.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.trackbar(0).Value
         Dim quality = sliders.trackbar(1).Value / 100
@@ -50,6 +51,7 @@ Public Class Features_PointTracker
         ocvb.desc = "Find good features and track them"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
 
         features.src = src
         features.Run(ocvb)
@@ -79,3 +81,4 @@ Public Class Features_PointTracker
         Next
     End Sub
 End Class
+

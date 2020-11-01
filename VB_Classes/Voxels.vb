@@ -28,6 +28,7 @@ Public Class Voxels_Basics_MT
         ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim split() = ocvb.pointCloud.Split()
 
         inrange.src = split(2) * 1000
@@ -77,3 +78,4 @@ Public Class Voxels_Basics_MT
         voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
     End Sub
 End Class
+

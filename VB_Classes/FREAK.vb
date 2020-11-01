@@ -10,6 +10,7 @@ Public Class FREAK_Basics
         ocvb.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         orb.src = src
         orb.Run(ocvb)
 
@@ -30,3 +31,4 @@ Public Class FREAK_Basics
         If fDesc.Width > 0 And fDesc.Height > 0 Then dst2 = fDesc.Resize(dst2.Size())
     End Sub
 End Class
+

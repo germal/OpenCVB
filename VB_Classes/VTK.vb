@@ -76,6 +76,7 @@ Public Class VTK_Basics
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If vtkPresent = False Then
             vtkInstructions(ocvb)
             Exit Sub
@@ -145,6 +146,7 @@ Public Class VTK_Histogram3D
         ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         If vtk.vtkPresent = False Then
             vtkInstructions(ocvb)
             Exit Sub
@@ -183,6 +185,7 @@ Public Class VTK_Histogram3D
         vtk.Run(ocvb)
     End Sub
 End Class
+
 
 
 

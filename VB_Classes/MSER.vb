@@ -30,6 +30,7 @@ Public Class MSER_Basics
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim delta = sliders.trackbar(0).Value
         Dim minArea = sliders.trackbar(1).Value
         Dim maxArea = sliders.trackbar(2).Value
@@ -101,6 +102,7 @@ Public Class MSER_Synthetic
         ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -161,6 +163,7 @@ Public Class MSER_TestSynthetic
         ocvb.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         synth.Run(ocvb)
         dst1 = synth.dst1.Clone()
         dst2 = synth.dst1
@@ -186,6 +189,7 @@ Public Class MSER_CPPStyle
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         Dim mser = cv.MSER.Create()
         Dim msers()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
@@ -223,6 +227,7 @@ Public Class MSER_Contours
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run(ocvb As VBocvb)
+		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         mser.src = src
         mser.Run(ocvb)
 
@@ -245,3 +250,4 @@ Public Class MSER_Contours
         label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"
     End Sub
 End Class
+
