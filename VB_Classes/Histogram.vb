@@ -1036,10 +1036,6 @@ Public Class Histogram_2D_SideView
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
-        'If ocvb.reviewDSTforObject = caller Then
-        '    Console.WriteLine("testing")
-        '    ocvb.reviewObject = Me
-        'End If
         gCloudIMU.Run(ocvb)
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ

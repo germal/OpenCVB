@@ -998,17 +998,19 @@ Public Class PointCloud_IMU_SideView
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
-        ocvb.imuXAxis = True
-        ocvb.imuZAxis = True
+        If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        xCheckbox.checked = True
+        zCheckbox.checked = True
         sideView.Run(ocvb)
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = cmats.CameraLocationSide(ocvb, lDetect.dst1)
 
-        If standalone Then
-            ocvb.imuXAxis = False
-            ocvb.imuZAxis = False
+        If standalone Or ocvb.reviewDSTforObject = caller Then
+            xCheckbox.checked = False
+            zCheckbox.checked = False
             kSideView.Run(ocvb)
             dst2 = kSideView.dst1
         End If
@@ -1100,11 +1102,11 @@ Public Class PointCloud_DistanceSideClick
         For Each pt In clicks
             dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
+            Dim pixelsPerMeter = dst2.Width / ocvb.maxZ
             Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
             Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
             Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
-            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt)
+            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt, 3)
         Next
 
         dst1.Line(New cv.Point(ocvb.sideCameraPoint.X, 0), New cv.Point(ocvb.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
