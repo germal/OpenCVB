@@ -6,7 +6,7 @@ Public Class Extrinsics_Basics
         ocvb.desc = "Show the depth camera extrinsics."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim nextline = "Rotation MatrixTranslation" + vbCrLf
         Dim fmt = "#0.0000"
         nextline += Format(ocvb.parms.extrinsics.rotation(0), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(1), fmt) + vbTab +

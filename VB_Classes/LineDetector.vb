@@ -18,7 +18,7 @@ Public Class LineDetector_Basics
         ocvb.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         lines = ld.Detect(src)
         src.CopyTo(dst2)
@@ -239,7 +239,7 @@ Public Class lineDetector_FLD_CPP
         ocvb.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         sortedLines.Clear()
 
         Dim length_threshold = sliders.trackbar(0).Value
@@ -283,7 +283,7 @@ Public Class LineDetector_3D_LongestLine
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
@@ -318,7 +318,7 @@ Public Class LineDetector_3D_FLD_MT
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run(ocvb)
@@ -361,7 +361,7 @@ Public Class LineDetector_3D_FitLineZ
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
         Dim useX As Boolean = check.Box(0).Checked
         linesFLD.src = src
@@ -468,7 +468,7 @@ Public Class lineDetector_FLD
         ocvb.desc = "A Fast Line Detector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         lines.Clear()
 
         Dim length_threshold = sliders.trackbar(0).Value
@@ -526,7 +526,7 @@ Public Class LineDetector_LongLines
         ocvb.desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         lDetect.src = src
         lDetect.Run(ocvb)
         dst1 = src.Clone
@@ -572,7 +572,7 @@ Public Class LineDetector_Reduction
         ocvb.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run(ocvb)
         dst2 = lDetect.dst1
@@ -603,7 +603,7 @@ Public Class LineDetector_Depth
         ocvb.desc = "Detect the lines in the depth data before trying to model the line in 3D space"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         longline.src = ocvb.RGBDepth
         longline.Run(ocvb)
         dst1 = longline.dst1

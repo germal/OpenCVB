@@ -20,7 +20,7 @@ Public Class Moments_Basics
         ocvb.desc = "Compute the centroid of the provided mask file."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             foreground.Run(ocvb)
             dst1 = foreground.dst1
@@ -61,7 +61,7 @@ Public Class Moments_CentroidKalman
         ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         foreground.Run(ocvb)
         dst1 = foreground.dst1
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

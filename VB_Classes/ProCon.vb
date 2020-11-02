@@ -68,7 +68,7 @@ Public Class ProCon_Basics
         End While
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If sliders.trackbar(0).Value <> buffer.Length Then
             SyncLock mutex
                 ReDim buffer(sliders.trackbar(0).Value - 1)
@@ -108,7 +108,7 @@ Public Class ProCon_Variation
         ocvb.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
             If procon.buffer(procon.tail) = -1 Then

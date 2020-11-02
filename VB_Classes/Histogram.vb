@@ -19,7 +19,7 @@ Public Class Histogram_Basics
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static histBinSlider = findSlider("Histogram Bins")
         bins = histBinSlider.Value
 
@@ -147,7 +147,7 @@ Public Class Histogram_NormalizeGray
         ocvb.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         histogram.src = src
         If check.Box(0).Checked Then
             cv.Cv2.Normalize(histogram.src, histogram.src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
@@ -176,7 +176,7 @@ Public Class Histogram_2D_HueSaturation
         ocvb.desc = "Create a histogram for hue and saturation."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
         Dim hbins = sliders.trackbar(0).Value
         Dim sbins = sliders.trackbar(1).Value
@@ -218,7 +218,7 @@ Public Class Histogram_KalmanSmoothed
         ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static splitIndex As Integer = -1
         Static colorName As String
         If standalone Then
@@ -278,7 +278,7 @@ Public Class Histogram_Depth
         ocvb.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         plotHist.minRange = inrange.sliders.trackbar(0).Value
@@ -340,7 +340,7 @@ Public Class Histogram_DepthValleys
         ocvb.desc = "Identify valleys in the Depth histogram."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.Run(ocvb)
         ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1
@@ -412,7 +412,7 @@ Public Class Histogram_DepthClusters
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         valleys.Run(ocvb)
         dst1 = valleys.dst1
 
@@ -455,7 +455,7 @@ Public Class Histogram_2D_XZ_YZ
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
         Dim zbins = sliders.trackbar(2).Value
@@ -507,7 +507,7 @@ Public Class Histogram_EqualizeColor
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         kalman.sliders.trackbar(0).Value = kalmanEq.sliders.trackbar(0).Value
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
@@ -558,7 +558,7 @@ Public Class Histogram_EqualizeGray
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         histogram.sliders.trackbar(0).Value = histogramEq.sliders.trackbar(0).Value
         histogram.kalman.check.Box(0).Checked = histogramEq.kalman.check.Box(0).Checked
 
@@ -598,7 +598,7 @@ Public Class Histogram_Equalize255
         ocvb.desc = "Reproduce the results of the hist.py example with existing algorithms"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         For i = 0 To 3 - 1
             If radio.check(i).Checked Then eqHist.channel = i
         Next
@@ -626,7 +626,7 @@ Public Class Histogram_Simple
         ocvb.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         plotHist.bins = sliders.trackbar(0).Value
 
@@ -675,7 +675,7 @@ Public Class Histogram_ColorsAndGray
         ocvb.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
         split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
@@ -715,7 +715,7 @@ Public Class Histogram_BackProjectionPeak
         label2 = "Grayscale Histogram"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
         hist.Run(ocvb)
         dst2 = hist.dst1
@@ -759,7 +759,7 @@ Public Class Histogram_BackProjection2D
         label2 = "Backprojection of detected hue and saturation."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
         hist.Run(ocvb)
         dst1 = hist.dst1
@@ -823,7 +823,7 @@ Public Class Histogram_HueSaturation2DPlot
         ocvb.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hueSat.src = src
         hueSat.Run(ocvb)
         mats.mat(0) = hueSat.dst1
@@ -865,7 +865,7 @@ Public Class Histogram_BackProjectionGrayscale
         ocvb.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
         hist.Run(ocvb)
         mats.mat(0) = hist.dst1
@@ -922,6 +922,7 @@ Public Class Histogram_2D_TopView
     Dim frustrumSlider As Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+
         cmat = New PointCloud_Colorize(ocvb)
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
 
@@ -942,7 +943,7 @@ Public Class Histogram_2D_TopView
                 cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
             Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
                 frustrumSlider.Value = 105
-                cameraXslider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
+                cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
                 frustrumSlider.Value = 175
                 cameraXSlider.Value = 0
@@ -960,7 +961,7 @@ Public Class Histogram_2D_TopView
         Return New cv.Point2f(x, m * x + b)
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraXSlider.Value, CInt(src.Height))
 
         gCloudIMU.Run(ocvb)
@@ -1035,7 +1036,7 @@ Public Class Histogram_2D_SideView
         ocvb.desc = "Create a 2D histogram for depth in ZY (side view.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloudIMU.Run(ocvb)
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
@@ -1117,7 +1118,7 @@ Public Class Histogram_Concentration
         Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideview.Run(ocvb)
         dst1 = sideview.dst1
         Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)

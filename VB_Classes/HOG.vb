@@ -29,7 +29,7 @@ Public Class HOG_Basics
         Next rect
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())
 

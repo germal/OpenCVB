@@ -12,7 +12,7 @@ Public Class Grayscale_Basics
         label2 = ""
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If check.Box(0).Checked Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else

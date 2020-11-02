@@ -13,7 +13,7 @@ Public Class Highlight_Basics
         ocvb.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             reduction.src = src
             reduction.Run(ocvb)

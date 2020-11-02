@@ -7,7 +7,7 @@ Public Class Solve_ByMat
         ocvb.desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)
@@ -33,7 +33,7 @@ Public Class Solve_ByArray
         ocvb.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)

@@ -12,7 +12,7 @@ Public Class Tracker_Basics
         ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.trueText("Draw a rectangle around object to be tracked.", 10, 140)
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
@@ -67,7 +67,7 @@ Public Class Tracker_MultiObject
         ocvb.desc = "Track any number of objects simultaneously - tracker algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.drawRect.Width <> 0 Then
             Dim tr = New Tracker_Basics(ocvb)
             tr.src = src
@@ -118,7 +118,7 @@ Public Class Tracker_Methods
         ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveMethod As Integer
 
         Static frm = findForm("Tracker_Methods Radio Options")

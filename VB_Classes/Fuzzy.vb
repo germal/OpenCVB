@@ -30,7 +30,7 @@ Public Class Fuzzy_Basics
         ocvb.desc = "That which is not solid is fuzzy"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         options.setOptions()
         reduction.src = src
         reduction.Run(ocvb)
@@ -119,7 +119,7 @@ Public Class Fuzzy_ContoursDepth
         ocvb.desc = "Use contours to outline solids in the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fuzzyD.src = ocvb.RGBDepth
         fuzzyD.Run(ocvb)
         dst1 = fuzzyD.dst1
@@ -142,7 +142,7 @@ Public Class Fuzzy_NeighborProof
         ocvb.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static proofFailed As Boolean = False
         If proofFailed Then Exit Sub
         fuzzy.src = src
@@ -199,7 +199,7 @@ Public Class Fuzzy_TrackerDepth
         ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fuzzy.src = ocvb.RGBDepth
         fuzzy.Run(ocvb)
         dst1 = fuzzy.dst1
@@ -258,7 +258,7 @@ Public Class Fuzzy_TrackerDepthClick
         ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         tracker.src = src
         tracker.Run(ocvb)
         dst1 = tracker.dst1
@@ -302,7 +302,7 @@ Public Class Fuzzy_PointTracker
         ocvb.desc = "FloodFill the regions defined as solid"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fuzzy.src = src
         fuzzy.Run(ocvb)
         dst2 = fuzzy.dst1

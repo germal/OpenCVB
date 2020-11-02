@@ -12,7 +12,7 @@ Public Class Depth_Median
         ocvb.desc = "Divide the depth image ahead and behind the median."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         median.src = getDepth32f(ocvb)
         median.Run(ocvb)
 
@@ -48,7 +48,7 @@ Public Class Depth_Flatland
         ocvb.desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
         dst1 = ocvb.RGBDepth / reductionFactor
         dst1 *= reductionFactor
@@ -66,7 +66,7 @@ Public Class Depth_FirstLastDistance
         ocvb.desc = "Monitor the first and last depth distances"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = getDepth32f(ocvb)
         Dim mask = depth32f.Threshold(1, 20000, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim minVal As Double, maxVal As Double
@@ -99,7 +99,7 @@ Public Class Depth_HolesRect
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb)
 
         Dim contours As cv.Point()()
@@ -142,7 +142,7 @@ Public Class Depth_Foreground
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         Dim tmp = inrange.depthMask.Clone
@@ -214,7 +214,7 @@ Public Class Depth_FlatData
         ocvb.desc = "Attempt to stabilize the depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb) ' get where depth is zero
 
         Dim mask As New cv.Mat
@@ -248,7 +248,7 @@ Public Class Depth_Zero
         ocvb.desc = "Create a mask for zero depth - depth shadow and depth out-of-range"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         cv.Cv2.InRange(getDepth32f(ocvb), 1, sliders.trackbar(0).Value, dst2)
         dst1.SetTo(0)
         ocvb.RGBDepth.CopyTo(dst1, dst2)
@@ -298,7 +298,7 @@ Public Class Depth_MeanStdev_MT
         ocvb.desc = "Collect a time series of depth and measure where the stdev is unstable.  Plan is to avoid depth where unstable."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U)
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U)
@@ -390,7 +390,7 @@ Public Class Depth_MeanStdevPlot
         ocvb.desc = "Plot the mean and stdev of the depth image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb)
 
         Dim mean As Single = 0, stdev As Single = 0
@@ -431,7 +431,7 @@ Public Class Depth_Uncertainty
         ocvb.desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         retina.src = ocvb.RGBDepth
         retina.Run(ocvb)
         dst1 = retina.dst1
@@ -457,7 +457,7 @@ Public Class Depth_Palette
         ocvb.desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         Dim minDepth = inrange.sliders.trackbar(0).Value
@@ -533,7 +533,7 @@ Public Class Depth_Colorizer_CPP
         ocvb.desc = "Display Depth image using C++ instead of VB.Net"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Type <> cv.MatType.CV_32F Then
             If standalone Then src = getDepth32f(ocvb) Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         End If
@@ -565,7 +565,7 @@ Public Class Depth_ManualTrim
         ocvb.desc = "Manually show depth with varying min and max depths."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
         Dim minDepth = sliders.trackbar(0).Value
         Dim maxDepth = sliders.trackbar(1).Value
@@ -604,7 +604,7 @@ Public Class Depth_ColorizerFastFade_CPP
         ocvb.desc = "Display depth data with inrange inrange.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         dst2 = inrange.depthMask
@@ -639,7 +639,7 @@ Public Class Depth_ColorizerVB
         ocvb.desc = "Colorize depth manually."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim src = getDepth32f(ocvb)
         Dim nearColor = New Byte() {0, 255, 255}
         Dim farColor = New Byte() {255, 0, 0}
@@ -693,7 +693,7 @@ Public Class Depth_ColorizerVB_MT
         ocvb.desc = "Colorize depth manually with multi-threading."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
 
         If standalone Then src = getDepth32f(ocvb)
@@ -761,7 +761,7 @@ Public Class Depth_Colorizer_MT
         ocvb.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
 
         If standalone Then src = getDepth32f(ocvb)
@@ -810,7 +810,7 @@ Public Class Depth_LocalMinMax_MT
         ocvb.desc = "Find min and max depth in each segment."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
         Dim depth32f = getDepth32f(ocvb)
 
@@ -869,7 +869,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
         ocvb.desc = "Find minimum depth in each segment."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
         Dim depth32f = getDepth32f(ocvb)
         Dim mask = depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
@@ -932,7 +932,7 @@ Public Class Depth_ColorMap
         ocvb.desc = "Display the depth as a color map"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim alpha = sliders.trackbar(0).Value / 100
         Dim beta = sliders.trackbar(1).Value
         cv.Cv2.ConvertScaleAbs(getDepth32f(ocvb), Palette.src, alpha, beta)
@@ -959,7 +959,7 @@ Public Class Depth_Stable
         ocvb.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then src = ocvb.RGBDepth
         mog.src = src
         mog.Run(ocvb)
@@ -990,7 +990,7 @@ Public Class Depth_Stabilizer
         ocvb.desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         stable.src = src
         stable.Run(ocvb)
 
@@ -1022,7 +1022,7 @@ Public Class Depth_Decreasing
         ocvb.desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = If(standalone, getDepth32f(ocvb), src)
         Static lastDepth As cv.Mat = depth32f.Clone()
         If lastDepth.Size <> depth32f.Size Then lastDepth = depth32f
@@ -1052,7 +1052,7 @@ Public Class Depth_Increasing
         ocvb.desc = "Identify where depth is increasing - retreating from the camera."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         depth.src = src
         depth.Run(ocvb)
         dst1 = depth.dst1
@@ -1073,7 +1073,7 @@ Public Class Depth_Punch
         ocvb.desc = "Identify the largest blob in the depth decreasing output"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         depth.src = getDepth32f(ocvb)
         depth.Run(ocvb)
         dst1 = depth.dst1
@@ -1100,7 +1100,7 @@ Public Class Depth_SmoothingMat
         ocvb.desc = "Use depth rate of change to smooth the depth values beyond close range"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then src = getDepth32f(ocvb)
         Dim rect = If(ocvb.drawRect.Width <> 0, ocvb.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
         inrange.src = src(rect)
@@ -1146,7 +1146,7 @@ Public Class Depth_Smoothing
         ocvb.desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         smooth.src = getDepth32f(ocvb)
         smooth.Run(ocvb)
         Dim input = smooth.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -1188,7 +1188,7 @@ Public Class Depth_Edges
         ocvb.desc = "Find edges in depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         edges.src = src
         edges.Run(ocvb)
         dst1 = edges.dst2
@@ -1216,7 +1216,7 @@ Public Class Depth_HolesOverTime
         ocvb.desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         holes.Run(ocvb)
         recentImages.Add(holes.holeMask)
 
@@ -1255,7 +1255,7 @@ Public Class Depth_Holes
         ocvb.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         holeMask = getDepth32f(ocvb).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         holeMask = holeMask.Dilate(element, Nothing, sliders.trackbar(1).Value)
         dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1290,7 +1290,7 @@ Public Class Depth_TooClose
         ocvb.desc = "Tests to determine if the camera is too close"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         holes.Run(ocvb)
         cv.Cv2.BitwiseNot(holes.holeMask, dst2)
         depth32f = getDepth32f(ocvb)
@@ -1327,7 +1327,7 @@ Public Class Depth_NoiseRemovalMask
         ocvb.desc = "Use the 'Too Close' test to remove (some) noisy depth"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         noise.Run(ocvb)
         dst1 = noise.dst1
 
@@ -1366,7 +1366,7 @@ Public Class Depth_TooCloseCentroids
         ocvb.desc = "Plot the rejected centroids and rects in FloodFill - search for points that are too close"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         depth.Run(ocvb)
         dst2 = depth.noiseMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst1 = depth.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1410,7 +1410,7 @@ Public Class Depth_TooCloseCluster
         ocvb.desc = "Cluster rejected rect's in area too close to the camera"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         rejects.Run(ocvb)
         dst1 = rejects.dst2
 
@@ -1446,7 +1446,7 @@ Public Class Depth_NoiseRemovedAndColorized
         ocvb.desc = "Colorize Depth after some noise has been removed."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         depth.Run(ocvb)
         dst2 = depth.dst1
 
@@ -1465,18 +1465,21 @@ End Class
 Public Class Depth_WorldXYZ
     Inherits VBparent
     Public xyzFrame As cv.Mat
+    Public depthUnitsMeters = False
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
         ocvb.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
-        Dim depth32f = (getDepth32f(ocvb) * 0.001).ToMat ' convert to meters.
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f(ocvb)
+        If depthUnitsMeters = False Then input = (input() * 0.001).ToMat
         Dim xy As New cv.Point3f
         For xy.Y = 0 To xyzFrame.Height - 1
             For xy.X = 0 To xyzFrame.Width - 1
-                xy.Z = depth32f.Get(Of Single)(xy.Y, xy.X)
+                xy.Z = input.Get(Of Single)(xy.Y, xy.X)
                 If xy.Z <> 0 Then
                     Dim xyz = getWorldCoordinates(ocvb, xy)
                     xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, xyz)
@@ -1498,27 +1501,23 @@ End Class
 Public Class Depth_WorldXYZ_MT
     Inherits VBparent
     Dim grid As Thread_Grid
-    Dim inrange As Depth_InRange
     Public xyzFrame As cv.Mat
     Public depthUnitsMeters = False
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         grid = New Thread_Grid(ocvb)
-        inrange = New Depth_InRange(ocvb)
-
         ocvb.desc = "Create OpenGL point cloud from depth data (slow)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
-        inrange.src = src
-        If inrange.src.Type <> cv.MatType.CV_32FC1 Then inrange.src = getDepth32f(ocvb)
-        inrange.Run(ocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f(ocvb)
         grid.Run(ocvb)
 
         xyzFrame = New cv.Mat(ocvb.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
-        Dim depth32f = If(depthUnitsMeters, inrange.depth32f, (inrange.depth32f * 0.001).ToMat) ' convert to meters.
-        Dim multX = ocvb.pointCloud.Width / depth32f.Width
-        Dim multY = ocvb.pointCloud.Height / depth32f.Height
+        If depthUnitsMeters = False Then input = (input * 0.001).ToMat
+        Dim multX = ocvb.pointCloud.Width / input.Width
+        Dim multY = ocvb.pointCloud.Height / input.Height
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
               Sub(roi)
                   Dim xy As New cv.Point3f
@@ -1526,7 +1525,7 @@ Public Class Depth_WorldXYZ_MT
                       For x = roi.X To roi.X + roi.Width - 1
                           xy.X = x * multX
                           xy.Y = y * multY
-                          xy.Z = depth32f.Get(Of Single)(y, x)
+                          xy.Z = input.Get(Of Single)(y, x)
                           If xy.Z <> 0 Then
                               Dim xyz = getWorldCoordinates(ocvb, xy)
                               xyzFrame.Set(Of cv.Point3f)(y, x, xyz)
@@ -1534,7 +1533,7 @@ Public Class Depth_WorldXYZ_MT
                       Next
                   Next
               End Sub)
-        If standalone Then ocvb.trueText("OpenGL data prepared.")
+        If standalone Or ocvb.intermediateReview = caller Then ocvb.trueText("OpenGL data prepared.")
     End Sub
 End Class
 
@@ -1563,7 +1562,7 @@ Public Class Depth_InRange
         ocvb.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
         Dim min = If(minVal <> 0, minVal, sliders.trackbar(0).Value)
         Dim max = If(minVal <> 0, maxVal, sliders.trackbar(1).Value)
@@ -1594,8 +1593,8 @@ Public Class Depth_PointCloud_IMU
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        imu = New IMU_GVector(ocvb)
         inrange = New Depth_InRange(ocvb)
+        imu = New IMU_GVector(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Amount to rotate pointcloud around Y-axis (degrees)", -180, 180, 0)
@@ -1610,7 +1609,7 @@ Public Class Depth_PointCloud_IMU
         ocvb.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
         Static rangeSlider = findSlider("InRange Max Depth (mm)")

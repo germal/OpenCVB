@@ -17,7 +17,7 @@ Public Class Fitline_Basics
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             draw.Run(ocvb)
             src = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
@@ -60,7 +60,7 @@ Public Class Fitline_3DBasics_MT
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hlines.src = src
         hlines.Run(ocvb)
         dst2 = hlines.dst2
@@ -132,7 +132,7 @@ Public Class Fitline_RawInput
         ocvb.desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
             If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
@@ -203,7 +203,7 @@ Public Class Fitline_EigenFit
         ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
         Static theta As Single
         Static len As Single

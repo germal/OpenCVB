@@ -33,7 +33,7 @@ Public Class Fractal_Mandelbrot
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim iterations = sliders.trackbar(0).Value
         If saveIterations <> iterations Then
             saveIterations = iterations
@@ -58,7 +58,7 @@ Public Class Fractal_Mandelbrot_MT
         ocvb.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim iterations = mandel.sliders.trackbar(0).Value
         Parallel.For(0, src.Height,
         Sub(y)
@@ -85,7 +85,7 @@ Public Class Fractal_MandelbrotZoom
         ocvb.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim iterations = mandel.sliders.trackbar(0).Value
 
         If check.Box(0).Checked Then
@@ -137,7 +137,7 @@ Public Class Fractal_MandelbrotZoomColor
         ocvb.desc = "Classic Mandelbrot in color"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         mandel.Run(ocvb)
         palette.src = mandel.dst1
         palette.Run(ocvb)
@@ -177,7 +177,7 @@ Public Class Fractal_Julia
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static savedMouse = New cv.Point(-1, -1)
         If savedMouse <> ocvb.mousePoint Or mandel.mandel.check.Box(0).Checked Then
             savedMouse = ocvb.mousePoint

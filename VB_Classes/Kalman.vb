@@ -14,7 +14,7 @@ Public Class Kalman_Basics
         ocvb.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveDimension As Integer = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -44,7 +44,7 @@ Public Class Kalman_Basics
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Then
+        If standalone Or ocvb.intermediateReview = caller Then
             dst1 = src.Clone()
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -85,7 +85,7 @@ Public Class Kalman_Compare
         ocvb.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount = 0 Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -159,7 +159,7 @@ Public Class Kalman_RotatingPoint
         ocvb.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim stateAngle = kState.Get(Of Single)(0)
 
         Dim prediction = kf.Predict()
@@ -209,7 +209,7 @@ Public Class Kalman_MousePredict
         ocvb.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = ocvb.mousePoint
@@ -244,7 +244,7 @@ Public Class Kalman_CVMat
         ocvb.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveDimension As Integer = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
@@ -316,7 +316,7 @@ Public Class Kalman_ImageSmall
         ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         resize.src = src
         resize.Run(ocvb)
@@ -352,7 +352,7 @@ Public Class Kalman_DepthSmall
         ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         kalman.src = ocvb.RGBDepth
         kalman.Run(ocvb)
         dst1 = kalman.dst1
@@ -382,7 +382,7 @@ Public Class Kalman_Depth32f
         ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = getDepth32f(ocvb)
         resize.src = depth32f
         resize.Run(ocvb)
@@ -428,7 +428,7 @@ Public Class Kalman_Single
         ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)

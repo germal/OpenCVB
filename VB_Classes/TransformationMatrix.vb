@@ -13,7 +13,7 @@ Public Class TransformationMatrix_Basics
         ocvb.desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.transformationMatrix IsNot Nothing Then
             Dim t = ocvb.transformationMatrix
             Dim mul = sliders.trackbar(0).Value

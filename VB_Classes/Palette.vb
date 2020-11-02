@@ -36,7 +36,7 @@ Public Class Palette_Basics
         Return 0
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         colormap = checkRadios()
         label1 = "ColorMap = " + mapNames(colormap)
 
@@ -89,7 +89,7 @@ Public Class Palette_Color
         ocvb.desc = "Define a color using sliders."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim b = sliders.trackbar(0).Value
         Dim g = sliders.trackbar(1).Value
         Dim r = sliders.trackbar(2).Value
@@ -114,7 +114,7 @@ Public Class Palette_LinearPolar
         sliders.setupTrackBar(0, "LinearPolar radius", 0, src.Cols, src.Cols / 2)
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1.SetTo(0)
         For i = 0 To dst1.Rows - 1
             Dim c = i * 255 / dst1.Rows
@@ -211,7 +211,7 @@ Public Class Palette_Reduction
         End Function
     End Class
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         If reductionSlider.value < 32 Then
             reductionSlider.value = 32
@@ -286,7 +286,7 @@ Public Class Palette_DrawTest
         ocvb.desc = "Experiment with palette using a drawn image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         draw.Run(ocvb)
         palette.src = draw.dst1
         palette.Run(ocvb)
@@ -309,7 +309,7 @@ Public Class Palette_Gradient
         ocvb.desc = "Create gradient image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod frameModulo = 0 Then
             If standalone Then
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -349,7 +349,7 @@ Public Class Palette_BuildGradientColorMap
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Static saveGradCount = -1
@@ -391,7 +391,7 @@ Public Class Palette_DepthColorMap
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
             Dim color2 = cv.Scalar.Red
@@ -449,7 +449,7 @@ Public Class Palette_Consistency
         ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             emax.Run(ocvb)
             src = emax.dst2
@@ -508,7 +508,7 @@ Public Class Palette_ObjectColors
         ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run(ocvb)
         dst2 = reduction.dst2
@@ -579,7 +579,7 @@ Public Class Palette_Layout2D
         ocvb.desc = "Layout the available colors in a 2D grid"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
         Dim index As Integer
         For Each r In grid.roiList

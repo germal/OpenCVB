@@ -42,7 +42,7 @@ Public Class OpenCVGL_Image_CPP
         ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.parms.testAllRunning Then
             ' It runs fine but after several cycles, it will fail with an external exception.
             ' Only happens on 'Test All' runs.  Runs fine otherwise.

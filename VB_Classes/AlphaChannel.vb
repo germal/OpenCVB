@@ -17,7 +17,7 @@ Public Class AlphaChannel_Basics
         ocvb.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fg.Run(ocvb)
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
@@ -47,7 +47,7 @@ Public Class AlphaChannel_Blend
         ocvb.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fg.Run(ocvb)
         dst2.SetTo(0)
         src.CopyTo(dst2, fg.noDepthMask)

@@ -12,7 +12,7 @@ Public Class ORB_Basics
         ocvb.desc = "Find keypoints using ORB"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(sliders.trackbar(0).Value)
         keypoints = orb.Detect(src)

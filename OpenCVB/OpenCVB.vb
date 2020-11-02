@@ -88,7 +88,7 @@ Public Class OpenCVB
     Const MAX_RECENT = 10
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
-    Public reviewDSTforObject As String
+    Public intermediateReview As String
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -472,7 +472,7 @@ Public Class OpenCVB
         If Math.Abs(width - camWidth / 2) < 2 Then width = camWidth / 2
         If Math.Abs(height - camHeight / 2) < 2 Then height = camHeight / 2
         Dim padX = 12
-        Dim padY = 40
+        Dim padY = 60
         camPic(0).Size = New Size(width, height)
         camPic(1).Size = New Size(width, height)
         camPic(2).Size = New Size(width * 2, height)
@@ -1223,7 +1223,7 @@ Public Class OpenCVB
                 task.ocvb.IMU_FrameTime = camera.IMU_FrameTime
                 task.ocvb.CPU_TimeStamp = camera.CPU_TimeStamp
                 task.ocvb.CPU_FrameTime = camera.CPU_FrameTime
-                task.ocvb.reviewDSTforObject = reviewDSTforObject
+                task.ocvb.intermediateReview = intermediateReview
             End SyncLock
 
             Try

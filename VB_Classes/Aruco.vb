@@ -9,7 +9,7 @@ Public Class Aruco_Basics
         ocvb.desc = "Show how to use the Aruco markers and rotate the image accordingly."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/aruco_markers_photo.jpg")
         Static detectorParameters = cv.Aruco.DetectorParameters.Create()
         detectorParameters.CornerRefinementMethod = cv.Aruco.CornerRefineMethod.Subpix
@@ -39,7 +39,7 @@ Public Class Aruco_CS
         ocvb.desc = "Testing the Aruco marker detection in C#"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)
         dst1 = aruco.detectedMarkers.Resize(src.Size())

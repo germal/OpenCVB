@@ -9,7 +9,7 @@ Public Class Covariance_Basics
         ocvb.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim covariance As New cv.Mat, mean = New cv.Mat
         dst2.SetTo(0)
         If standalone Then
@@ -54,7 +54,7 @@ Public Class Covariance_Test
         ocvb.desc = "Test the covariance basics algorithm."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
         covar.samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
         covar.Run(ocvb)

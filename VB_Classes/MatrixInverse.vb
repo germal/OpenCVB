@@ -37,7 +37,7 @@ Public Class MatrixInverse_Basics_CS
         ocvb.desc = "Manually invert a matrix"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If input.Width <> input.Height Then
             ocvb.trueText("The src matrix must be square!")
             Exit Sub
@@ -67,7 +67,7 @@ Public Class MatrixInverse_OpenCV
         ocvb.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If input.Width <> input.Height Then
             ocvb.trueText("The input matrix must be square!")
             Exit Sub

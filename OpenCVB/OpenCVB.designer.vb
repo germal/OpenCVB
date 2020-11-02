@@ -53,7 +53,7 @@ Partial Class OpenCVB
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(1779, 58)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1786, 58)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -147,12 +147,11 @@ Partial Class OpenCVB
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(1779, 33)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1786, 33)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -166,13 +165,13 @@ Partial Class OpenCVB
         'ExitCall
         '
         Me.ExitCall.Name = "ExitCall"
-        Me.ExitCall.Size = New System.Drawing.Size(270, 34)
+        Me.ExitCall.Size = New System.Drawing.Size(141, 34)
         Me.ExitCall.Text = "E&xit"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(267, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(138, 6)
         '
         'AboutToolStripMenuItem
         '
@@ -184,7 +183,7 @@ Partial Class OpenCVB
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1779, 1062)
+        Me.ClientSize = New System.Drawing.Size(1786, 1069)
         Me.Controls.Add(Me.AvailableAlgorithms)
         Me.Controls.Add(Me.OpenCVkeyword)
         Me.Controls.Add(Me.AlgorithmDesc)

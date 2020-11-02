@@ -13,7 +13,7 @@ Public Class Encode_Basics
         label2 = "Original decompressed"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim buf(src.Width * src.Height * src.ElemSize) As Byte
         Dim encodeParams() As integer = {options.getEncodeParameter(), options.qualityLevel}
 
@@ -72,7 +72,7 @@ Public Class Encode_Options
         Return encodeOption
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim buf(src.Width * src.Height * src.ElemSize) As Byte
 
         Dim fileExtension = ".jpg"

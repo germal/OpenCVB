@@ -241,7 +241,7 @@ Public Class Puzzle_Basics
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static width As integer
         Static height As integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or ocvb.frameCount = 0 Or restartRequested Then
@@ -310,7 +310,7 @@ Public Class Puzzle_Solver
         Return bfit
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveWidth As Integer
         If src.Height = 180 Then ' can't support the smaller tiles are the low resolution.
             radio.check(1).Enabled = False

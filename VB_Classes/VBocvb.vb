@@ -83,8 +83,8 @@ Public Class VBocvb
     Public useIMU As Boolean = True
     Public imuXAxis As Boolean
     Public imuZAxis As Boolean
-    Public reviewDSTforObject As String
-    Public reviewObject As VBparent
+    Public intermediateReview As String
+    Public intermediateObject As VBparent
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
@@ -112,7 +112,7 @@ Public Class VBocvb
                 resolutionIndex = 3
         End Select
     End Sub
-    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 25, Optional picTag As Integer = 2)
+    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, x, y, picTag)
         TTtextData.Add(str)
     End Sub

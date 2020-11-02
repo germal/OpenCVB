@@ -25,7 +25,7 @@ Public Class MatchTemplate_Basics
         ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             sample1 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
             sample2 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
@@ -72,7 +72,7 @@ Public Class MatchTemplate_RowCorrelation
         ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
@@ -122,7 +122,7 @@ Public Class MatchTemplate_DrawRect
         ocvb.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then
             If ocvb.drawRect.X + ocvb.drawRect.Width >= src.Width Then ocvb.drawRect.Width = src.Width - ocvb.drawRect.X
             If ocvb.drawRect.Y + ocvb.drawRect.Height >= src.Height Then ocvb.drawRect.Height = src.Height - ocvb.drawRect.Y
@@ -168,7 +168,7 @@ Public Class MatchTemplate_BestEntropy_MT
         ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 30 = 0 Then
             entropy.src = src
             entropy.Run(ocvb)

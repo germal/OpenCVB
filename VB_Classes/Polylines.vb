@@ -12,7 +12,7 @@ Public Class Polylines_IEnumerableExample
         ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
@@ -41,7 +41,7 @@ Public Class Polylines_Random
         ocvb.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 150 = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random

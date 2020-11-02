@@ -81,7 +81,7 @@ Public Class Undistort_Basics
         ocvb.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat
         Static kMat As cv.Mat, dMat As cv.Mat
         Dim rawWidth = ocvb.leftView.Width

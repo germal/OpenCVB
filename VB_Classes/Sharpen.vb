@@ -11,7 +11,7 @@ Public Class Sharpen_UnsharpMask
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim blurred As New cv.Mat
         Dim sigma As Double = sliders.trackbar(0).Value / 100
         Dim threshold As Double = sliders.trackbar(1).Value
@@ -39,7 +39,7 @@ Public Class Sharpen_DetailEnhance
         ocvb.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
@@ -60,7 +60,7 @@ Public Class Sharpen_Stylize
         ocvb.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)

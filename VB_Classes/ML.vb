@@ -76,7 +76,7 @@ Public Class ML_FillRGBDepth_MT
         ocvb.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb)
         grid.Run(ocvb)
         Dim depth32f = getDepth32f(ocvb)
@@ -112,7 +112,7 @@ Public Class ML_FillRGBDepth
         ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb)
         Dim minLearnCount = sliders.trackbar(0).Value
         ocvb.RGBDepth.CopyTo(dst1)
@@ -151,7 +151,7 @@ Public Class ML_DepthFromColor_MT
         ocvb.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
 
         Dim depth32f = getDepth32f(ocvb)
@@ -219,7 +219,7 @@ Public Class ML_DepthFromColor
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb)
         mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -300,7 +300,7 @@ Public Class ML_DepthFromXYColor
         ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb)
         mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -399,7 +399,7 @@ Public Class ML_EdgeDepth_MT
         ocvb.desc = "Use RGB to predict depth near edges."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
 
         Dim depth32f = getDepth32f(ocvb)
@@ -474,7 +474,7 @@ End Class
 '        Return New cv.Vec3b(vec.Get(Of Byte)(0, 0), vec.Get(Of Byte)(0, 1), vec.Get(Of Byte)(0, 2))
 '    End Function
 '    Public Sub Run(ocvb As VBocvb)
-'		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+'		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        Static lastColors As New cv.Mat
 '        If standalone Then
 '            emax.Run(ocvb)

@@ -231,7 +231,7 @@ Public Class PointCloud_Colorize
         ocvb.desc = "Create the colorizeMat's used for projections"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
     End Sub
 End Class
 
@@ -262,7 +262,7 @@ Public Class PointCloud_Raw_CPP
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
         foreground.Run(ocvb)
 
@@ -321,7 +321,7 @@ Public Class PointCloud_Raw
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
         foreground.Run(ocvb)
 
@@ -388,7 +388,7 @@ Public Class PointCloud_Objects
         ocvb.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim saveSideViewFlag As Boolean
         If measure Is Nothing Or saveSideViewFlag <> SideViewFlag Then
             saveSideViewFlag = SideViewFlag
@@ -509,7 +509,7 @@ Public Class PointCloud_Objects_TopView
         ocvb.desc = "Display only the top view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         view.Run(ocvb)
         dst1 = view.dst1
     End Sub
@@ -530,7 +530,7 @@ Public Class PointCloud_Objects_SideView
         ocvb.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         view.Run(ocvb)
         dst1 = view.dst1
     End Sub
@@ -561,7 +561,7 @@ Public Class PointCloud_Kalman_TopView
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         topView.Run(ocvb)
 
@@ -609,7 +609,7 @@ Public Class PointCloud_Kalman_SideView
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.Run(ocvb)
 
         Static sliderHistThreshold = findSlider("Histogram threshold")
@@ -656,7 +656,7 @@ Public Class PointCloud_BackProject
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.mouseClickFlag Then
             ' lower left image is the mat_4to1
             If ocvb.mousePicTag = 2 Then
@@ -711,7 +711,7 @@ Public Class PointCloud_BothViews
         ocvb.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
@@ -834,7 +834,7 @@ Public Class PointCloud_HistBothViews
         ocvb.desc = "Show the histogram for both the side and top views"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         topView.Run(ocvb)
         dst1 = topView.dst1
 
@@ -873,7 +873,7 @@ Public Class PointCloud_IMU_TopView
         ocvb.desc = "Present the top view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.useIMU = True
         topView.Run(ocvb)
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -913,11 +913,11 @@ Public Class PointCloud_FrustrumTop
         ocvb.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         frustrum.Run(ocvb)
+        dst2 = frustrum.dst1
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
-        ocvb.useIMU = False
         topView.Run(ocvb)
         dst1 = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
         dst1 = cmats.CameraLocationBot(ocvb, dst1)
@@ -950,11 +950,9 @@ Public Class PointCloud_FrustrumSide
         ocvb.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         frustrum.Run(ocvb)
 
-        Dim minVal As Single, maxVal As Single
-        frustrum.xyzDepth.xyzFrame.MinMaxLoc(minval, maxval)
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         sideView.Run(ocvb)
 
@@ -997,7 +995,7 @@ Public Class PointCloud_IMU_SideView
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
         xCheckbox.checked = True
@@ -1007,7 +1005,7 @@ Public Class PointCloud_IMU_SideView
         lDetect.Run(ocvb)
         dst1 = cmats.CameraLocationSide(ocvb, lDetect.dst1)
 
-        If standalone Or ocvb.reviewDSTforObject = caller Then
+        If standalone Or ocvb.intermediateReview = caller Then
             xCheckbox.checked = False
             zCheckbox.checked = False
             kSideView.Run(ocvb)
@@ -1044,7 +1042,7 @@ Public Class PointCloud_IMU_SideCompare
         ocvb.desc = "Present the side view with and without the IMU filter."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.useIMU = True
         sideView.Run(ocvb)
         dst1 = sideView.dst2.Clone()
@@ -1076,7 +1074,7 @@ Public Class PointCloud_DistanceSideClick
         ocvb.desc = "Click to find distance from the camera in the rotated side view"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveMaxZ As Single
         Static inRangeSlider = findSlider("InRange Max Depth (mm)")
         ocvb.maxZ = inRangeSlider.Value / 1000
@@ -1127,7 +1125,7 @@ Public Class PointCloud_FindCeiling
         ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         floor.Run(ocvb)
 
         dst1 = floor.dst1
@@ -1157,7 +1155,7 @@ Public Class PointCloud_FindCeilingAndFloor
         ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         floor.floorRun = True ' we are looking for ceilings.
         floor.Run(ocvb)
         floorLeft = floor.leftPoint
@@ -1202,7 +1200,7 @@ Public Class PointCloud_FindFloorPlane
         ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static cushionSlider = findSlider("Cushion when estimating the floor plane (mm)")
         Dim cushion = cushionSlider.value / 1000
         floor.src = ocvb.pointCloud
@@ -1276,7 +1274,7 @@ Public Class PointCloud_FindFloor
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveFrameCount = -1
         If saveFrameCount <> ocvb.frameCount Then
             saveFrameCount = ocvb.frameCount
@@ -1385,7 +1383,7 @@ Public Class PointCloud_FindFloorNew
         ocvb.desc = "Find the floor in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveFrameCount = -1
         If saveFrameCount <> ocvb.frameCount Then
             saveFrameCount = ocvb.frameCount

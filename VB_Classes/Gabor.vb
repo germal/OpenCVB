@@ -25,7 +25,7 @@ Public Class Gabor_Basics
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             ksize = sliders.trackbar(0).Value * 2 + 1
             Sigma = sliders.trackbar(1).Value
@@ -69,7 +69,7 @@ Public Class Gabor_Basics_MT
         ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         For i = 0 To gabor.Count - 1
             gabor(i).ksize = gabor(0).sliders.trackbar(0).Value * 2 + 1
             gabor(i).Sigma = gabor(0).sliders.trackbar(1).Value

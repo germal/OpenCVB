@@ -14,7 +14,7 @@ Public Class Object_Basics
         ocvb.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         If standalone Then

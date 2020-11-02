@@ -11,7 +11,7 @@ Public Class TextureFlow_Basics
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim TFdelta = sliders.trackbar(0).Value
         Dim TFblockSize = sliders.trackbar(1).Value * 2 + 1
         Dim TFksize = sliders.trackbar(2).Value * 2 + 1
@@ -43,7 +43,7 @@ Public Class TextureFlow_Depth
         ocvb.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         texture.src = ocvb.RGBDepth
         texture.Run(ocvb)
         dst1 = texture.dst1

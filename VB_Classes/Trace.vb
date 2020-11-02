@@ -26,7 +26,7 @@ Public Class Trace_OpenCV_CPP
         ocvb.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)

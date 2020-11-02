@@ -41,7 +41,7 @@ Public Class Benford_Basics
         use99 = True
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             benford.src = src
             benford.Run(ocvb)
@@ -119,7 +119,7 @@ Public Class Benford_NormalizedImage
         ocvb.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -149,7 +149,7 @@ Public Class Benford_NormalizedImage99
         ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -181,7 +181,7 @@ Public Class Benford_JPEG
         ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
@@ -212,7 +212,7 @@ Public Class Benford_JPEG99
         ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -244,7 +244,7 @@ Public Class Benford_PNG
         ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         benford.src = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
@@ -269,7 +269,7 @@ Public Class Benford_Depth
         ocvb.desc = "Apply Benford to the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         benford.src = getDepth32f(ocvb)
         benford.Run(ocvb)
         dst1 = benford.dst1
@@ -291,7 +291,7 @@ Public Class Benford_DepthRGB
         ocvb.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim jpeg = ocvb.RGBDepth.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, benford.sliders.trackbar(0).Value})
         benford.src = ocvb.RGBDepth
         benford.Run(ocvb)

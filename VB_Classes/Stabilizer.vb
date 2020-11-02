@@ -16,7 +16,7 @@ Public Class Stabilizer_Basics
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If ocvb.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -128,7 +128,7 @@ Public Class Stabilizer_BriskFeatures
         ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.CopyTo(brisk.src)
         brisk.Run(ocvb)
         stabilizer.inputFeat = brisk.features ' supply the features to track with Optical Flow
@@ -156,7 +156,7 @@ Public Class Stabilizer_HarrisFeatures
         ocvb.desc = "Stabilize the video stream using Harris detector features"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         harris.src = src
         harris.Run(ocvb)
         stabilizer.inputFeat = harris.FeaturePoints ' supply the features to track with Optical Flow
@@ -196,7 +196,7 @@ Public Class Stabilizer_Basics_CPP
         ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.trueText("this algorithm is not stable.", 10, 100)
         'Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         'handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -233,7 +233,7 @@ Public Class Stabilizer_SideBySide
         label2 = "Stabilizer_HarrisFeatures"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         original.src = src
         original.Run(ocvb)
         dst1 = original.dst1

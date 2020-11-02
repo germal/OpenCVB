@@ -36,7 +36,7 @@ Public Class SuperPixel_Basics_CPP
         ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static numSuperPixels As integer
         Static numIterations As integer
         Static prior As integer
@@ -94,7 +94,7 @@ Public Class SuperPixel_BinarizedImage
         ocvb.desc = "Create SuperPixels from a binary image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         binarize.src = src
         binarize.Run(ocvb)
 
@@ -121,7 +121,7 @@ Public Class SuperPixel_Depth
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         pixels.src = ocvb.RGBDepth.Clone()
         pixels.Run(ocvb)
         dst1 = pixels.dst1
@@ -147,7 +147,7 @@ Public Class SuperPixel_WithCanny
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         edges.src = ocvb.color.Clone()
         edges.Run(ocvb)
         pixels.src = ocvb.color.Clone()
@@ -179,7 +179,7 @@ Public Class SuperPixel_WithLineDetector
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         lines.src = src
         lines.Run(ocvb)
         dst2 = lines.dst1

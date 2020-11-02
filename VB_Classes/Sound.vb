@@ -51,7 +51,7 @@ Public Class Sound_ToPCM
         ocvb.desc = "Load an audio file, play it, and convert to PCM"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If inputFileName <> ocvb.openFileDialogName Then
             inputFileName = ocvb.openFileDialogName
             Dim fileinfo = New FileInfo(inputFileName)
@@ -141,7 +141,7 @@ Public Class Sound_SignalGenerator
         ocvb.desc = "Generate sound with a sine waveform."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static radioIndex As Integer
         If ocvb.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
             radio.check(radioIndex).Checked = False Then
@@ -214,7 +214,7 @@ Public Class Sound_Display
         ocvb.desc = "Display a sound buffer in several styles"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static useGenerated As Boolean
         If useGenerated <> check.Box(0).Checked Or sound Is Nothing Then
             useGenerated = check.Box(0).Checked

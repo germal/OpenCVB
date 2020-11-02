@@ -44,7 +44,7 @@ Public Class GetRotationMatrix2D_Basics
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static frm = findForm("GetRotationMatrix2D_Basics Radio Options")
         warpFlag = getInterpolationRadioButtons(radio, frm)
 
@@ -73,7 +73,7 @@ Public Class GetRotationMatrix2D_Box
         ocvb.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         rotation.src = src
         rotation.Run(ocvb)
         dst2 = dst1.Clone()

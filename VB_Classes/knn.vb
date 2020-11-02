@@ -16,7 +16,7 @@ Public Class KNN_Basics
         ocvb.desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Or knnQT.useRandomData Then
@@ -83,7 +83,7 @@ Public Class KNN_QueryTrain
         ocvb.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If check.Box(0).Checked = False Or useRandomData Then
             Static trainSlider = findSlider("KNN Train count")
             randomTrain.sliders.trackbar(0).Value = trainSlider.Value
@@ -135,7 +135,7 @@ Public Class KNN_1_to_1
         ocvb.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         basics.Run(ocvb)
         dst1 = basics.dst1
 
@@ -229,7 +229,7 @@ Public Class KNN_Emax
         ocvb.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
             emax.Run(ocvb)
@@ -274,7 +274,7 @@ Public Class KNN_Test
         ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
 
         knn.knnQT.queryPoints.Clear()
@@ -318,7 +318,7 @@ Public Class KNN_Test_1_to_1
         ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run(ocvb)
 
         knn.basics.knnQT.queryPoints.Clear()
@@ -358,7 +358,7 @@ Public Class KNN_Point3d
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
         If standalone Then
@@ -438,7 +438,7 @@ Public Class KNN_DepthClusters
         ocvb.desc = "Use KNN to track and color the Blob results from clustering the depth data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         blobs.Run(ocvb)
         dst1 = blobs.dst2
 
@@ -472,7 +472,7 @@ Public Class KNN_PointPresent
         ocvb.desc = "Determine if a point is present or not on the basis of the previous x frames"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         knn.src = src
         knn.Run(ocvb)
         dst1 = knn.dst2
@@ -510,7 +510,7 @@ Public Class KNN_SmoothAverage
         ocvb.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         knn.src = src
         knn.Run(ocvb)
 
@@ -551,7 +551,7 @@ Public Class KNN_StabilizeRegions
         ocvb.desc = "Identify major regions that are unstable - appearing and disappearing"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         knn.src = src
         knn.Run(ocvb)
         dst1 = knn.dst2
@@ -584,7 +584,7 @@ Public Class KNN_Contours
         ocvb.desc = "Use KNN to streamline the outline of a contour"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         outline.Run(ocvb)
         dst1 = outline.dst2
 
@@ -677,7 +677,7 @@ Public Class KNN_Cluster2DCities
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ' If they changed Then number of elements in the set
         Static demoModeCheck = findCheckBox("Demo Mode")
         Static cityCountSlider = findSlider("KNN - number of points")
@@ -743,7 +743,7 @@ Public Class KNN_Point2d
         findXnearest = nearestCountSlider.Value
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then prepareImage(dst1, ocvb.dotSize)
 
         knn.Run(ocvb)
@@ -822,7 +822,7 @@ Public Class KNN_PointTracker
         Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             topView.src = ocvb.pointCloud
             topView.Run(ocvb)

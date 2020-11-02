@@ -36,7 +36,7 @@ Public Class Hull_Basics
         label2 = "Convex Hull Input"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim Count = sliders.trackbar(0).Value
         Dim points(Count - 1) As cv.Point
         Dim pad = 4

@@ -32,7 +32,7 @@ Public Class Blob_Input
         ocvb.desc = "Test simple Blob Detector."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         rectangles.src = src
         rectangles.Run(ocvb)
         Mats.mat(0) = rectangles.dst1
@@ -81,7 +81,7 @@ Public Class Blob_Detector_CS
         label1 = "Blob_Detector_CS Input"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim blobParams = New cv.SimpleBlobDetector.Params
         blobParams.FilterByArea = check.Box(0).Checked
         blobParams.FilterByCircularity = check.Box(1).Checked
@@ -124,7 +124,7 @@ Public Class Blob_RenderBlobs
         label2 = "Showing only the largest blob in test data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 100 = 0 Then
             blob.src = src
             blob.Run(ocvb)
@@ -175,7 +175,7 @@ Public Class Blob_DepthClusters
         ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run(ocvb)
         histBlobs.src = shadow.dst1
         histBlobs.Run(ocvb)
@@ -211,7 +211,7 @@ Public Class Blob_Rectangles
         ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         blobs.Run(ocvb)
         dst1 = src.Clone()
         dst2 = blobs.dst2
@@ -264,7 +264,7 @@ Public Class Blob_Largest
         ocvb.desc = "Gather all the blob data and display the largest."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         blobs.Run(ocvb)
         dst2 = blobs.dst2
         rects = blobs.flood.fBasics.rects
@@ -298,7 +298,7 @@ Public Class Blob_LargestDepthCluster
         ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         blobs.src = src
         blobs.Run(ocvb)
         dst2 = blobs.dst2

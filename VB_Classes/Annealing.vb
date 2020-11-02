@@ -72,7 +72,7 @@ Public Class Annealing_Basics_CPP
         ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If closed = True Then Exit Sub
         If standalone Then
             If ocvb.frameCount = 0 Then
@@ -171,7 +171,7 @@ Public Class Annealing_CPP_MT
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
         Static CityCountSlider = findSlider("Anneal Number of Cities")
         If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
@@ -267,7 +267,7 @@ Public Class Annealing_Options
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static randomSlider = findSlider("Random Pixel Count")
         Dim numberOfCities = randomSlider.Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?

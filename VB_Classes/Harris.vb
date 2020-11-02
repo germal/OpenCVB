@@ -47,7 +47,7 @@ Public Class Harris_Features_CPP
         Harris_Features = Harris_Features_Open()
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim threshold = sliders.trackbar(0).Value / 10000
@@ -94,7 +94,7 @@ Public Class Harris_Detector_CPP
         Harris_Detector = Harris_Detector_Open()
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim qualityLevel = sliders.trackbar(0).Value / 100

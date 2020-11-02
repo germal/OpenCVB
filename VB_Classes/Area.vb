@@ -28,7 +28,7 @@ Public Class Area_MinTriangle_CPP
         ocvb.desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup(ocvb)
@@ -82,7 +82,7 @@ Public Class Area_MinRect
         ocvb.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup(ocvb, pointCountSlider.value)
@@ -128,7 +128,7 @@ Public Class Area_MinMotionRect
         Return gray
     End Function
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         bgSub.src = src
         bgSub.Run(ocvb)
         Dim gray As cv.Mat
@@ -153,7 +153,7 @@ Public Class Area_FindNonZero
         ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
         For i = 0 To srcPoints.Length - 1
