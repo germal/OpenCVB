@@ -874,16 +874,14 @@ Public Class PointCloud_IMU_TopView
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
-        ocvb.imuXAxis = True
-        ocvb.imuZAxis = True
+        ocvb.useIMU = True
         topView.Run(ocvb)
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = lDetect.dst1
 
         If standalone Then
-            ocvb.imuXAxis = False
-            ocvb.imuZAxis = False
+            ocvb.useIMU = False
             kTopView.Run(ocvb)
             dst2 = cmats.CameraLocationBot(ocvb, kTopView.dst1)
         End If
@@ -1047,8 +1045,7 @@ Public Class PointCloud_IMU_SideCompare
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
-        ocvb.imuXAxis = True
-        ocvb.imuZAxis = True
+        ocvb.useIMU = True
         sideView.Run(ocvb)
         dst1 = sideView.dst2.Clone()
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1056,8 +1053,7 @@ Public Class PointCloud_IMU_SideCompare
         dst1 = lDetect.dst1
         dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-        ocvb.imuXAxis = False
-        ocvb.imuZAxis = False
+        ocvb.useIMU = False
         kSideView.Run(ocvb)
         dst2 = kSideView.dst1
     End Sub
