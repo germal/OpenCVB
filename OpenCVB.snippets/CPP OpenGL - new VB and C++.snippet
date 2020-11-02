@@ -20,6 +20,7 @@ Public Class OpenGL_MyOpenGLtest
         ocvb.desc = "New class description"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+ 		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         ogl.rgbInput = ocvb.color
         ogl.Run(ocvb)
     End Sub

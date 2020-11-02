@@ -107,7 +107,7 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
         tv.ExpandAll()
-        Me.Height = 100 + entryCount * 26
+        Me.Height = 200 + entryCount * 26
         If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
     End Sub
 
