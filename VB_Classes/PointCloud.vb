@@ -955,8 +955,9 @@ Public Class PointCloud_FrustrumSide
 		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         frustrum.Run(ocvb)
 
+        Dim minVal As Single, maxVal As Single
+        frustrum.xyzDepth.xyzFrame.MinMaxLoc(minval, maxval)
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
-        ocvb.useIMU = False
         sideView.Run(ocvb)
 
         dst1 = sideView.dst1
@@ -1106,7 +1107,7 @@ Public Class PointCloud_DistanceSideClick
             Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
             Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
             Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
-            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00"), pt, 3)
+            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00") + "m", pt, 3)
         Next
 
         dst1.Line(New cv.Point(ocvb.sideCameraPoint.X, 0), New cv.Point(ocvb.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)

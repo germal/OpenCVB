@@ -1506,17 +1506,16 @@ Public Class Depth_WorldXYZ_MT
         grid = New Thread_Grid(ocvb)
         inrange = New Depth_InRange(ocvb)
 
-        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
-        ocvb.desc = "Create OpenGL point cloud from depth data (too slow to be useful)"
+        ocvb.desc = "Create OpenGL point cloud from depth data (slow)"
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
         inrange.src = src
-        If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = getDepth32f(ocvb)
+        If inrange.src.Type <> cv.MatType.CV_32FC1 Then inrange.src = getDepth32f(ocvb)
         inrange.Run(ocvb)
         grid.Run(ocvb)
 
-        xyzFrame.SetTo(0)
+        xyzFrame = New cv.Mat(ocvb.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
         Dim depth32f = If(depthUnitsMeters, inrange.depth32f, (inrange.depth32f * 0.001).ToMat) ' convert to meters.
         Dim multX = ocvb.pointCloud.Width / depth32f.Width
         Dim multY = ocvb.pointCloud.Height / depth32f.Height

@@ -82,14 +82,14 @@ Public Class Thread_Grid
                 borderList.Add(broi)
             Next
 
-            If standalone Then drawGrid(borderList)
+            If standalone Or ocvb.reviewDSTforObject = caller Then drawGrid(borderList)
 
             lastWidth = sliders.trackbar(0).Value
             lastHeight = sliders.trackbar(1).Value
             lastBorder = borderSize
         End If
 
-        If standalone Then
+        If standalone Or ocvb.reviewDSTforObject = caller Then
             src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.All(255), gridMask)
             label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +

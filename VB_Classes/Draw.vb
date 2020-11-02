@@ -671,28 +671,23 @@ Public Class Draw_Frustrum
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         xyzDepth = New Depth_WorldXYZ_MT(ocvb)
-        xyzDepth.depthUnitsMeters = True
+        xyzDepth.depthUnitsMeters = False
 
-        If standalone = False Then
-            ocvb.imuXAxis = False
-            ocvb.imuZAxis = False
-        End If
+        If standalone = False Then ocvb.useIMU = True
         ocvb.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
-        ocvb.pointCloud.SetTo(0)
-        Dim dst2 = New cv.Mat(src.Height, src.Height, cv.MatType.CV_32F, 0)
+        If ocvb.reviewDSTforObject = caller Then ocvb.reviewObject = Me
+        dst1 = New cv.Mat(src.Height, src.Height, cv.MatType.CV_32F, 0)
         Dim x = src.Height / 2 - 1
         Dim y = src.Height / 2 - 1
-        Dim zIncr = ocvb.maxZ / y
+        Dim zIncr = 1000 * ocvb.maxZ / y
         Dim r As cv.Rect
         For i = 0 To src.Height / 2 - 1
             r = New cv.Rect(x - i, y - i, i * 2, (i + 1) * 2)
-            dst2.Rectangle(r, cv.Scalar.All(i * zIncr), 1)
+            dst1.Rectangle(r, cv.Scalar.All(i * zIncr), 1)
         Next
-        dst1 = dst2.Resize(src.Size)
-        xyzDepth.src = dst1
+        xyzDepth.src = dst1.Resize(ocvb.pointCloud.Size)
         xyzDepth.Run(ocvb)
     End Sub
 End Class
