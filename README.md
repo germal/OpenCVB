@@ -72,8 +72,13 @@ The objective is to solve many small computer vision problems and do so in a way
 that enables any of the solutions to be reused. The result is a toolkit for
 solving ever bigger and more difficult problems. The philosophy behind this
 approach is that human vision is built on many seemingly trivial approaches
-working together. The combined effort of many small operations is what produces
-understanding.
+working together. Is the combined effort of many small operations what produces
+understanding? It make take years to answer that question.
+
+One key to this approach is the abundance of options with sliders and check
+boxes and radio buttons for the different choices available. There is no single
+measure for a concept but each concept needs at least one measure or choice. A
+property with a measure is at the root of every concept.
 
 OpenCVB is targeting only cameras that produce depth and color and have an IMU
 to detect gravity and motion. These newer cameras have prompted a review of

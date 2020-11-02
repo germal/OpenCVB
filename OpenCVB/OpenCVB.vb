@@ -1185,8 +1185,9 @@ Public Class OpenCVB
         MsgBox("The objective is to solve many small computer vision problems and do so in a way that enables " +
                "any of the examples to be reused. The result is a toolkit for solving ever bigger and more " +
                "difficult problems. The philosophy behind this approach is that human vision is built on many " +
-               "seemingly trivial approaches working together. The combined effort of many small operations " +
-               "may be the source of understanding.  The jury may continue deliberating on that for a while.")
+               "seemingly trivial approaches working together. Is the combined effort of many small operations " +
+               "the source of understanding?  It may take years to answer that question. " + vbCrLf + vbCrLf +
+               "Fall 2020 Fremont CA")
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
