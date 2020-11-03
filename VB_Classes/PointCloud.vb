@@ -902,12 +902,13 @@ Public Class PointCloud_FrustrumTop
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        cmats = New PointCloud_Colorize(ocvb)
+        frustrum = New Draw_Frustrum(ocvb)
+
         topView = New Histogram_2D_TopView(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
-        cmats = New PointCloud_Colorize(ocvb)
-        frustrum = New Draw_Frustrum(ocvb)
         topView.gCloudIMU.clipDepthData = False
 
         label2 = "Draw_Frustrum output"
@@ -940,13 +941,14 @@ Public Class PointCloud_FrustrumSide
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        cmats = New PointCloud_Colorize(ocvb)
+        frustrum = New Draw_Frustrum(ocvb)
+
         sideView = New Histogram_2D_SideView(ocvb)
         sideView.gCloudIMU.clipDepthData = False
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
-        cmats = New PointCloud_Colorize(ocvb)
-        frustrum = New Draw_Frustrum(ocvb)
 
         label2 = "Draw_Frustrum output"
         ocvb.desc = "Translate only the frustrum with gravity"

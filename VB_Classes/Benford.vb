@@ -300,3 +300,35 @@ Public Class Benford_DepthRGB
         label2 = benford.label2
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Benford_Primes
+    Inherits VBparent
+    Dim sieve As Sieve_Basics
+    Dim benford As Benford_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        benford = New Benford_Basics(ocvb)
+        sieve = New Sieve_Basics(ocvb)
+        Dim countSlider = findSlider("Count of desired primes")
+        countSlider.Value = countSlider.Maximum
+        ocvb.desc = "Apply Benford to a list of primes"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.frameCount = 0 Then sieve.Run(ocvb) ' only need to compute this once...
+        ocvb.trueText(CStr(sieve.primes.Count) + " primes were found")
+
+        Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
+        tmp.ConvertTo(benford.src, cv.MatType.CV_32F)
+        benford.Run(ocvb)
+        dst2 = benford.dst1
+        label2 = benford.label2
+    End Sub
+End Class

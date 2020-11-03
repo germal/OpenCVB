@@ -3,14 +3,15 @@ Imports System.Numerics
 ' https://github.com/TheAlgorithms/C-Sharp/blob/master/Algorithms/Other/SieveOfEratosthenes.cs'
 Public Class Sieve_Basics
     Inherits VBparent
+    Public primes As New List(Of Integer)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Count of desired primes", 1, 1000, 400)
+        sliders.setupTrackBar(0, "Count of desired primes", 1, 10000, 400)
 
         ocvb.desc = "Implement the Sieve of Eratothenes"
     End Sub
-    Public Function shareResults(sieveList As List(Of BigInteger)) As String
+    Public Function shareResults(sieveList As List(Of Integer)) As String
         Dim completeList As String = ""
         Dim nextList As String = "   "
         For Each n In sieveList
@@ -25,8 +26,8 @@ Public Class Sieve_Basics
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim count = sliders.trackbar(0).Value
-        Dim output = New List(Of BigInteger)()
-        Dim nextEntry As BigInteger = 2
+        Dim nextEntry As Integer = 2
+        Dim output = New List(Of Integer)
         While output.Count < sliders.trackbar(0).Value
             If output.All(Function(x)
                               If nextEntry Mod x <> 0 Then Return True
@@ -34,7 +35,11 @@ Public Class Sieve_Basics
                           End Function) Then output.Add(nextEntry)
             nextEntry += 1
         End While
-        If output.Count > 0 Then ocvb.trueText(shareResults(output))
+        If standalone Or ocvb.intermediateReview = caller Then
+            If output.Count > 0 Then ocvb.trueText(shareResults(output))
+        Else
+            primes = New List(Of Integer)(output)
+        End If
     End Sub
 End Class
 
@@ -58,3 +63,7 @@ Public Class Sieve_Basics_CS
         ocvb.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))
     End Sub
 End Class
+
+
+
+

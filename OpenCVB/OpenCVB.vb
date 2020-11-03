@@ -85,7 +85,7 @@ Public Class OpenCVB
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
     Dim startAlgorithmTime As DateTime
-    Const MAX_RECENT = 10
+    Const MAX_RECENT = 25
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Public intermediateReview As String

@@ -8,10 +8,10 @@ namespace CS_Classes
 {
     public class Sieve
     {
-        public List<BigInteger> GetPrimeNumbers(int count)
+        public List<int> GetPrimeNumbers(int count)
         {
-            var output = new List<BigInteger>();
-            for (BigInteger n = 2; output.Count < count; n++)
+            var output = new List<int>();
+            for (int n = 2; output.Count < count; n++)
             {
                 if (output.All(x => n % x != 0)) output.Add(n);
             }
