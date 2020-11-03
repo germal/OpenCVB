@@ -23,7 +23,6 @@ Partial Class OptionsDialog
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.CameraGroup = New System.Windows.Forms.GroupBox()
-        Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.LowResolution = New System.Windows.Forms.RadioButton()
         Me.HighResolution = New System.Windows.Forms.RadioButton()
@@ -47,7 +46,7 @@ Partial Class OptionsDialog
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.FontDialog1 = New System.Windows.Forms.FontDialog()
-        Me.CameraGroup.SuspendLayout()
+        Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -58,7 +57,6 @@ Partial Class OptionsDialog
         '
         'CameraGroup
         '
-        Me.CameraGroup.Controls.Add(Me.SnapToGrid)
         Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
         Me.CameraGroup.Name = "CameraGroup"
         Me.CameraGroup.Size = New System.Drawing.Size(771, 285)
@@ -66,18 +64,9 @@ Partial Class OptionsDialog
         Me.CameraGroup.TabStop = False
         Me.CameraGroup.Text = "Camera"
         '
-        'SnapToGrid
-        '
-        Me.SnapToGrid.AutoSize = True
-        Me.SnapToGrid.Location = New System.Drawing.Point(63, 248)
-        Me.SnapToGrid.Name = "SnapToGrid"
-        Me.SnapToGrid.Size = New System.Drawing.Size(354, 24)
-        Me.SnapToGrid.TabIndex = 2
-        Me.SnapToGrid.Text = "Snap to Grid (Resizes to 640x360 for display)"
-        Me.SnapToGrid.UseVisualStyleBackColor = True
-        '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.SnapToGrid)
         Me.GroupBox1.Controls.Add(Me.LowResolution)
         Me.GroupBox1.Controls.Add(Me.HighResolution)
         Me.GroupBox1.Controls.Add(Me.mediumResolution)
@@ -293,6 +282,16 @@ Partial Class OptionsDialog
         Me.Label4.TabIndex = 1
         Me.Label4.Text = "Select the font for all TrueType text"
         '
+        'SnapToGrid
+        '
+        Me.SnapToGrid.AutoSize = True
+        Me.SnapToGrid.Location = New System.Drawing.Point(331, 55)
+        Me.SnapToGrid.Name = "SnapToGrid"
+        Me.SnapToGrid.Size = New System.Drawing.Size(414, 24)
+        Me.SnapToGrid.TabIndex = 3
+        Me.SnapToGrid.Text = "Snap to Grid - unchecked leaves main form size alone"
+        Me.SnapToGrid.UseVisualStyleBackColor = True
+        '
         'OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -314,8 +313,6 @@ Partial Class OptionsDialog
         Me.ShowInTaskbar = False
         Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show
         Me.Text = "OpenCVB Global Settings"
-        Me.CameraGroup.ResumeLayout(False)
-        Me.CameraGroup.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
@@ -331,7 +328,6 @@ Partial Class OptionsDialog
 
     End Sub
     Friend WithEvents CameraGroup As GroupBox
-    Friend WithEvents SnapToGrid As CheckBox
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents HighResolution As RadioButton
     Friend WithEvents mediumResolution As RadioButton
@@ -355,4 +351,5 @@ Partial Class OptionsDialog
     Friend WithEvents FontDialog1 As FontDialog
     Friend WithEvents LowResolution As RadioButton
     Friend WithEvents EnableNumPy As CheckBox
+    Friend WithEvents SnapToGrid As CheckBox
 End Class

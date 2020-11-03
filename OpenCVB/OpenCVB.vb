@@ -282,7 +282,7 @@ Public Class OpenCVB
                         cvext.BitmapConverter.ToBitmap(imgResult, camPic(2).Image)
                     End If
                 Catch ex As Exception
-                    Console.WriteLine("Error in OpenCVB/Paint updating dst output: " + ex.Message)
+                    Console.WriteLine("OpenCVB: Error in OpenCVB/Paint updating dst output: " + ex.Message)
                 End Try
             End SyncLock
         End If
@@ -291,10 +291,10 @@ Public Class OpenCVB
             SyncLock bufferLock ' avoid updating the image while copying into it in the algorithm and camera tasks
                 If camera.color IsNot Nothing Then
                     If camera.color.width > 0 Then
+                        Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                        Dim color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
                         Try
-                            Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                            Dim color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                            cvext.BitmapConverter.ToBitmap(Color, camPic(0).Image)
+                            cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
                             cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                         Catch ex As Exception
                             Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
@@ -466,15 +466,15 @@ Public Class OpenCVB
         LineUpCamPics()
     End Sub
     Private Sub LineUpCamPics()
-        Dim width = CInt(resolutionXY.width)
-        Dim height = CInt(resolutionXY.height)
+        Dim width = CInt((Me.Width - 42) / 2)
+        Dim height = CInt(width * camHeight / camWidth)
         If Math.Abs(width - camWidth / 2) < 2 Then width = camWidth / 2
         If Math.Abs(height - camHeight / 2) < 2 Then height = camHeight / 2
         Dim padX = 12
         Dim padY = 60
         camPic(0).Size = New Size(width, height)
         camPic(1).Size = New Size(width, height)
-        camPic(2).Size = New Size(resolutionXY.width * 2, height)
+        camPic(2).Size = New Size(width * 2, height)
 
         camPic(0).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
         camPic(1).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)

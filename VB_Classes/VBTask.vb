@@ -100,7 +100,11 @@ Public Class ActiveTask : Implements IDisposable
             For Each frm In Application.OpenForms
                 If frm.name.startswith("OptionsSliders") Or frm.name.startswith("OptionsKeyboardInput") Or frm.name.startswith("OptionsAlphaBlend") Then
                     If frm.visible Then
-                        frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                        Try
+                            frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                        Catch ex As Exception
+
+                        End Try
                         indexS += 1
                     End If
                 End If
