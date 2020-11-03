@@ -667,10 +667,10 @@ End Class
 
 Public Class Draw_Frustrum
     Inherits VBparent
-    Public xyzDepth As Depth_WorldXYZ
+    Public xyzDepth As Depth_WorldXYZ_MT
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        xyzDepth = New Depth_WorldXYZ(ocvb)
+        xyzDepth = New Depth_WorldXYZ_MT(ocvb)
         xyzDepth.depthUnitsMeters = True
 
         If standalone = False Then ocvb.useIMU = True

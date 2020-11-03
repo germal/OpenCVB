@@ -908,6 +908,7 @@ Public Class PointCloud_FrustrumTop
         histSlider.Value = 0
         cmats = New PointCloud_Colorize(ocvb)
         frustrum = New Draw_Frustrum(ocvb)
+        topView.gCloudIMU.clipDepthData = False
 
         label2 = "Draw_Frustrum output"
         ocvb.desc = "Translate only the frustrum with gravity"
@@ -915,7 +916,7 @@ Public Class PointCloud_FrustrumTop
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         frustrum.Run(ocvb)
-        dst2 = frustrum.dst1
+        dst2 = frustrum.dst1.Resize(src.Size)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         topView.Run(ocvb)
@@ -940,6 +941,7 @@ Public Class PointCloud_FrustrumSide
         initParent(ocvb)
 
         sideView = New Histogram_2D_SideView(ocvb)
+        sideView.gCloudIMU.clipDepthData = False
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
@@ -952,13 +954,13 @@ Public Class PointCloud_FrustrumSide
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         frustrum.Run(ocvb)
+        dst2 = frustrum.dst1.Resize(src.Size)
 
         ocvb.pointCloud = frustrum.xyzDepth.xyzFrame
         sideView.Run(ocvb)
 
         dst1 = sideView.dst1
         dst1 = cmats.CameraLocationSide(ocvb, dst1)
-        dst2 = frustrum.dst1
     End Sub
 End Class
 

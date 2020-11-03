@@ -89,6 +89,8 @@ Public Class OpenCVB
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Public intermediateReview As String
+    Dim defaultWidth As Integer
+    Dim defaultHeight As Integer
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -286,19 +288,16 @@ Public Class OpenCVB
         End If
         If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
             cameraRefresh = False
-            Dim RGBDepth As New cv.Mat
-            Dim color As New cv.Mat
             SyncLock bufferLock ' avoid updating the image while copying into it in the algorithm and camera tasks
                 If camera.color IsNot Nothing Then
                     If camera.color.width > 0 Then
                         Try
-                            If RGBDepth.Width = 0 Then RGBDepth = New cv.Mat
-                            RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                            color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
-                            cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
+                            Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
+                            Dim color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
+                            cvext.BitmapConverter.ToBitmap(Color, camPic(0).Image)
                             cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
                         Catch ex As Exception
-                            Console.WriteLine("Error in camera update: " + ex.Message)
+                            Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
                         End Try
                     End If
                 End If
@@ -467,15 +466,15 @@ Public Class OpenCVB
         LineUpCamPics()
     End Sub
     Private Sub LineUpCamPics()
-        Dim width = CInt((Me.Width - 38) / 2)
-        Dim height = CInt(width * camHeight / camWidth)
+        Dim width = CInt(resolutionXY.width)
+        Dim height = CInt(resolutionXY.height)
         If Math.Abs(width - camWidth / 2) < 2 Then width = camWidth / 2
         If Math.Abs(height - camHeight / 2) < 2 Then height = camHeight / 2
         Dim padX = 12
         Dim padY = 60
         camPic(0).Size = New Size(width, height)
         camPic(1).Size = New Size(width, height)
-        camPic(2).Size = New Size(width * 2, height)
+        camPic(2).Size = New Size(resolutionXY.width * 2, height)
 
         camPic(0).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
         camPic(1).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
@@ -538,8 +537,8 @@ Public Class OpenCVB
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
 
-        Dim defaultWidth = camWidth * 2 / resizeForDisplay + border * 7
-        Dim defaultHeight = camHeight * 2 / resizeForDisplay + ToolStrip1.Height + border * 12
+        defaultwidth = camWidth * 2 / resizeForDisplay + border * 7
+        defaultHeight = camHeight * 2 / resizeForDisplay + ToolStrip1.Height + border * 12
         Me.Width = GetSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", defaultWidth)
         Me.Height = GetSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", defaultHeight)
         If Me.Height < 50 Then
@@ -1044,8 +1043,8 @@ Public Class OpenCVB
                 camPic(1).Left = camPic(0).Left + camPic(0).Width
                 camPic(2).Top = camPic(0).Top + camPic(0).Height
 
-                Me.Width = camPic(0).Width * 2 + 40
-                Me.Height = camPic(0).Height * 2 + 90
+                Me.Width = defaultWidth
+                Me.Height = defaultHeight
             End If
             saveLayout()
         End If
@@ -1122,6 +1121,7 @@ Public Class OpenCVB
             openFileFilter = task.ocvb.openFileFilter
             openFileDialogName = task.ocvb.openFileDialogName
             openfileDialogTitle = task.ocvb.openFileDialogTitle
+            intermediateReview = ""
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName + vbCrLf + vbCrLf)

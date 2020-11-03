@@ -1512,6 +1512,7 @@ Public Class Depth_WorldXYZ_MT
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f(ocvb)
+        grid.src = input
         grid.Run(ocvb)
 
         xyzFrame = New cv.Mat(ocvb.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
@@ -1590,6 +1591,7 @@ Public Class Depth_PointCloud_IMU
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
     Dim inrange As Depth_InRange
+    Public clipDepthData As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1617,8 +1619,12 @@ Public Class Depth_PointCloud_IMU
         ocvb.imuZAxis = If(ocvb.useIMU, zCheckbox.checked, False)
         ocvb.maxZ = rangeSlider.Value / 1000
 
-        inrange.Run(ocvb)
-        dst1 = inrange.dst1
+        If clipDepthData Then
+            inrange.Run(ocvb)
+            dst1 = inrange.dst1
+        Else
+            dst1 = getDepth32f(ocvb)
+        End If
 
         imu.Run(ocvb)
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
