@@ -30,11 +30,15 @@ Public Class FloodFill_Basics
         ocvb.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        minFloodSize = sliders.trackbar(0).Value
-        Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
-        Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
-        Dim stepSize = sliders.trackbar(3).Value
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static loDiffSlider = findSlider("FloodFill LoDiff")
+        Static hiDiffSlider = findSlider("FloodFill HiDiff")
+        Static stepSlider = findSlider("Step Size")
+        minFloodSize = minSizeSlider.Value
+        Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
+        Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
+        Dim stepSize = stepSlider.Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
@@ -57,7 +61,7 @@ Public Class FloodFill_Basics
             For x = 0 To gray.Width - 1 Step stepSize
                 If gray.Get(Of Byte)(y, x) > 0 Then
                     Dim rect As New cv.Rect
-                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
+                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(x), CInt(y)), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                     If count > minFloodSize Then
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
                         masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
@@ -123,7 +127,7 @@ Public Class FloodFill_8bit
         palette.dst1.CopyTo(dst1, allRegionMask)
 
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(basics.minFloodSize) + " pixels"
-        If standalone Then dst2 = palette.colorMat.Resize(src.Size())
+        If standalone Or ocvb.intermediateReview = caller Then dst2 = palette.colorMat.Resize(src.Size())
     End Sub
 End Class
 

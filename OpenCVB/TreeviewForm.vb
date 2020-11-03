@@ -70,7 +70,8 @@ Public Class TreeviewForm
         If OpenCVB.callTrace.Count = 0 Then Exit Sub
         Dim tv = TreeView1
         tv.Nodes.Clear()
-        Dim rootcall = Trim(OpenCVB.callTrace(0))
+        Dim calltrace = OpenCVB.callTrace
+        Dim rootcall = Trim(calltrace(0))
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
         Me.Text = title + titleStr
         Dim n = tv.Nodes.Add(title)
@@ -79,8 +80,8 @@ Public Class TreeviewForm
         Dim entryCount = 1
         For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
             Dim alldone = True
-            For i = 1 To OpenCVB.callTrace.Count - 1
-                Dim fullname = OpenCVB.callTrace(i)
+            For i = 1 To calltrace.Count - 1
+                Dim fullname = calltrace(i)
                 Dim split() = fullname.Split("\")
                 If split.Count = nodeLevel + 3 Then
                     alldone = False
@@ -90,12 +91,11 @@ Public Class TreeviewForm
                             node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
                         Else
                             Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
-                            node = getNode(tv, parent)
-                            If node Is Nothing Then
-                                node = tv.Nodes.Add(split(nodeLevel))
-                                node.Tag = parent
+                            If parent <> rootcall Then
+                                node = getNode(tv, parent)
+                                If node Is Nothing Then Continue For
+                                node = node.Nodes.Add(split(nodeLevel + 1))
                             End If
-                            node = node.Nodes.Add(split(nodeLevel + 1))
                         End If
                     Else
                         node = node.Nodes.Add(split(nodeLevel))

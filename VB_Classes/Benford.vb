@@ -292,12 +292,10 @@ Public Class Benford_DepthRGB
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim jpeg = ocvb.RGBDepth.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, benford.sliders.trackbar(0).Value})
         benford.src = ocvb.RGBDepth
         benford.Run(ocvb)
-        dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
-        dst2 = benford.dst2
-        label2 = benford.label2
+        dst1 = benford.dst2
+        label1 = benford.label2
     End Sub
 End Class
 

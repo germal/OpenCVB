@@ -44,7 +44,7 @@ Public Class Kalman_Basics
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Or ocvb.intermediateReview = caller Then
+        If standalone Then
             dst1 = src.Clone()
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
