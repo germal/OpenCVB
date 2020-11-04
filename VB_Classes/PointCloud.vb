@@ -1381,7 +1381,6 @@ Public Class PointCloud_FindFloor
             End If
         End If
 
-        If rightPoint.X < leftPoint.X Then Dim i = 0
         If leftPoint <> New cv.Point2f Then
             kalman.kInput(0) = leftPoint.X
             kalman.kInput(1) = rightPoint.X
