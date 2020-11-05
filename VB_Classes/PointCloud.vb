@@ -858,15 +858,15 @@ Public Class PointCloud_IMU_TopView
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        cmats = New PointCloud_Colorize(ocvb)
-        lDetect = New LineDetector_Basics(ocvb)
-        lDetect.drawLines = True
-
-        kTopView = New PointCloud_Kalman_TopView(ocvb)
         topView = New Histogram_2D_TopView(ocvb)
-
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20
+
+        kTopView = New PointCloud_Kalman_TopView(ocvb)
+        cmats = New PointCloud_Colorize(ocvb)
+
+        lDetect = New LineDetector_Basics(ocvb)
+        lDetect.drawLines = True
 
         label1 = "Top view aligned using the IMU gravity vector"
         label2 = "Top view aligned without using the IMU gravity vector"
@@ -1012,16 +1012,14 @@ Public Class PointCloud_IMU_SideView
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        xCheckbox.checked = True
-        zCheckbox.checked = True
+        ocvb.useIMU = True
         sideView.Run(ocvb)
         lDetect.src = sideView.dst1.Resize(ocvb.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run(ocvb)
         dst1 = cmats.CameraLocationSide(ocvb, lDetect.dst1)
 
         If standalone Or ocvb.intermediateReview = caller Then
-            xCheckbox.checked = False
-            zCheckbox.checked = False
+            ocvb.useIMU = False
             kSideView.Run(ocvb)
             dst2 = kSideView.dst1
         End If
