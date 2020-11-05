@@ -911,6 +911,11 @@ Public Class PointCloud_FrustrumTop
         histSlider.Value = 0
         topView.gCloudIMU.clipDepthData = False
 
+        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        xCheckbox.Checked = False
+        zCheckbox.Checked = False
+
         label2 = "Draw_Frustrum output"
         ocvb.desc = "Translate only the frustrum with gravity"
     End Sub
@@ -949,6 +954,11 @@ Public Class PointCloud_FrustrumSide
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
+
+        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        xCheckbox.Checked = False
+        zCheckbox.Checked = False
 
         label2 = "Draw_Frustrum output"
         ocvb.desc = "Translate only the frustrum with gravity"
@@ -1117,21 +1127,22 @@ End Class
 
 
 
-Public Class PointCloud_FindCeiling
+
+Public Class PointCloud_GVectorFloor
     Inherits VBparent
-    Public floor As PointCloud_FindFloor
+    Public floor As PointCloud_GVectorPlane
+    Dim maxDepthSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        floor = New PointCloud_FindFloor(ocvb)
-        floor.floorRun = False ' we are looking for ceilings.
-        label1 = floor.label1
-        label2 = floor.label2
-        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
+
+        floor = New PointCloud_GVectorPlane(ocvb)
+        floor.floorRun = True
+        ocvb.desc = "Find the floor plane in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        floor.Run(ocvb)
 
+        floor.Run(ocvb)
         dst1 = floor.dst1
         dst2 = floor.dst2
     End Sub
@@ -1144,36 +1155,29 @@ End Class
 
 
 
-Public Class PointCloud_FindCeilingAndFloor
+Public Class PointCloud_GVectorCeiling
     Inherits VBparent
-    Public floor As PointCloud_FindFloor
-    Public floorLeft As cv.Point2f
-    Public floorRight As cv.Point2f
-    Public ceilingLeft As cv.Point2f
-    Public ceilingRight As cv.Point2f
+    Public ceiling As PointCloud_GVectorPlane
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        floor = New PointCloud_FindFloor(ocvb)
-        label1 = floor.label1
-        label2 = floor.label2
-        ocvb.desc = "Find the Ceiling in a side view oriented by gravity vector"
+
+        ceiling = New PointCloud_GVectorPlane(ocvb)
+        ceiling.floorRun = False
+
+        Dim maxDepthSlider = findSlider("InRange Max Depth (mm)")
+        maxDepthSlider.Value = 8000
+
+        Dim cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
+        cushionSlider.Value = 200
+
+        ocvb.desc = "Find the floor and ceiling planes in a side view oriented by gravity vector"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        floor.floorRun = True ' we are looking for ceilings.
-        floor.Run(ocvb)
-        floorLeft = floor.leftPoint
-        floorRight = floor.rightPoint
 
-        dst1 = floor.dst1.Clone
-        dst2 = floor.dst2.Clone
-
-        floor.floorRun = False ' we are looking for ceilings.
-        floor.Run(ocvb)
-        ceilingLeft = floor.leftPoint
-        ceilingRight = floor.rightPoint
-
-        dst1.Line(floor.leftPoint, floor.rightPoint, cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+        ceiling.Run(ocvb)
+        dst1 = ceiling.dst1
+        dst2 = ceiling.dst2
     End Sub
 End Class
 
@@ -1184,71 +1188,79 @@ End Class
 
 
 
-Public Class PointCloud_FindFloorPlane
+Public Class PointCloud_GVectorPlane
     Inherits VBparent
-    Public floor As PointCloud_FindFloor
+    Public gPlane As PointCloud_GVectorLine
     Dim inrange As Depth_InRange
-    Dim flow As Font_FlowText
+    Public planeHeight As Integer
+    Public planePoint1 As cv.Point2f
+    Public planePoint2 As cv.Point2f
+    Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         inrange = New Depth_InRange(ocvb)
-        flow = New Font_FlowText(ocvb)
-        floor = New PointCloud_FindFloor(ocvb)
+        gPlane = New PointCloud_GVectorLine(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Cushion when estimating the floor plane (mm)", 1, 1000, 100)
+        sliders.setupTrackBar(0, "Cushion when estimating the floor or ceiling plane (mm)", 1, 1000, 100)
+        sliders.setupTrackBar(1, "Y-coordinate consistency check count", 1, 100, 5)
 
         label1 = "Plane equation input"
-        label2 = "Side view rotated with gravity vector - floor is in red"
-        ocvb.desc = "Find the floor plane and translate it back to unrotated coordinates"
+        label2 = "Side view rotated with gravity vector"
+        ocvb.desc = "Find the floor or ceiling plane and translate it back to unrotated coordinates"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static cushionSlider = findSlider("Cushion when estimating the floor plane (mm)")
+        Static cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
         Dim cushion = cushionSlider.value / 1000
-        floor.src = ocvb.pointCloud
-        floor.Run(ocvb)
-        dst2 = floor.dst1
+        gPlane.floorRun = floorRun
+        gPlane.src = ocvb.pointCloud
+        gPlane.Run(ocvb)
+        dst2 = gPlane.dst1
         Dim maskplane = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
 
-        If floor.leftPoint.Y Then
-            Dim floorHeight = CInt(ocvb.pixelsPerMeterV * cushion)
-            If floorHeight = 0 Then floorHeight = 1
+        Dim leftPoint = gPlane.leftPoint
+        Static leftPoints As New List(Of cv.Point2f)
+        If leftPoint.Y = 0 Then leftPoints.Clear() Else leftPoints.Add(leftPoint)
+
+        Static consistencySlider = findSlider("Y-coordinate consistency check count")
+        If leftPoints.Count > consistencySlider.value Then
+            planeHeight = CInt(ocvb.pixelsPerMeterV * cushion)
+            If planeHeight = 0 Then planeHeight = 1
             Dim cam = ocvb.sideCameraPoint
-            Dim pt1 = New cv.Point(0, floor.leftPoint.Y + floorHeight / 2)
-            Dim pt2 = New cv.Point(dst2.Width, floor.leftPoint.Y + floorHeight / 2)
+            planePoint1 = New cv.Point(0, leftPoint.Y + If(floorRun, planeHeight / 2, -planeHeight / 2))
+            planePoint2 = New cv.Point(dst2.Width, planePoint1.Y)
 
-            dst2.Line(pt1, pt2, cv.Scalar.Yellow, floorHeight)
+            dst2.Line(planePoint1, planePoint2, cv.Scalar.Yellow, planeHeight)
 
-            Dim floorDeltaY = floor.leftPoint.Y - ocvb.sideCameraPoint.X
-            Dim floorHypotenuse = Math.Sqrt((cam.X - pt2.X) * (cam.X - pt2.X) + (cam.Y - pt2.Y) * (cam.Y - pt2.Y))
-            Dim maxAngle = Math.Acos(floorDeltaY / floorHypotenuse)
+            Dim gPlaneDeltaY = Math.Abs(planePoint2.Y - cam.Y)
+            Dim maxAngle = Math.Atan(dst2.Width / gPlaneDeltaY) * 57.2958
             Dim minRow = dst2.Height * maxAngle / 180
 
-            Dim planeY = floor.leftPoint.Y / ocvb.pixelsPerMeterH - floor.sideIMU.sideView.frustrumAdjust ' +- x (in meters)
-            Dim imuPC = floor.sideIMU.sideView.gCloudIMU.imuPointCloud
-            Dim split = imuPC.Split()
-            Dim ySplit = split(1).Clone
+            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeterV * If(floorRun, 1, -1)
+            Dim split = gPlane.sideIMU.sideView.gCloudIMU.imuPointCloud.Split()
+            Dim ySplit = split(1)
             inrange.src = split(1)
-            inrange.minVal = planeY
-            inrange.maxVal = planeY + cushion
+            inrange.minVal = planeY - If(floorRun, 0, cushion)
+            inrange.maxVal = planeY + If(floorRun, cushion, 0)
             inrange.Run(ocvb)
             maskplane = split(1).ConvertScaleAbs(255)
 
-            inrange.src = ySplit
-            inrange.maxVal = planeY + cushion * 2 ' anything below the plane of the floor?
-            inrange.Run(ocvb)
-            Dim mask = split(1).ConvertScaleAbs(255)
-
-            Dim incr = ocvb.maxZ / split(2).Height
+            Dim incr = ocvb.maxZ / split(2).Width
             Dim tmp = New cv.Mat(split(2).Size, cv.MatType.CV_32F, 0)
-            For i = minRow To split(2).Rows - 1
-                tmp.Row(i).SetTo(i * incr)
-            Next
+            If floorRun Then
+                For i = minRow To split(2).Rows - 1
+                    tmp.Row(i).SetTo(i * incr)
+                Next
+            Else
+                For i = 0 To minRow - 1
+                    tmp.Row(i).SetTo(i * incr)
+                Next
+            End If
             tmp.CopyTo(split(2), maskplane)
-        End If
-        dst1 = ocvb.color.Clone
+            End If
+            dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskplane.Resize(src.Size))
     End Sub
 End Class
@@ -1257,7 +1269,7 @@ End Class
 
 
 
-Public Class PointCloud_FindFloor
+Public Class PointCloud_GVectorLine
     Inherits VBparent
     Public sideIMU As PointCloud_IMU_SideView
     Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
@@ -1271,7 +1283,7 @@ Public Class PointCloud_FindFloor
         kalman = New Kalman_Basics(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 20)
+        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 40)
         sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 20)
 
         ocvb.desc = "Find the floor in a side view squared up with gravity"
@@ -1294,22 +1306,27 @@ Public Class PointCloud_FindFloor
         Dim lengthTest = lenSlider.value
 
         Dim sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+        If floorRun = False Then sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalInteger)
         Dim leftPoints As New List(Of cv.Point2f)
         Dim rightPoints As New List(Of cv.Point2f)
         If sideIMU.lDetect.lines.Count > 0 Then
             For Each line In sideIMU.lDetect.lines
-                sortedLines.Add(line.Item1, line)
+                sortedLines.Add(Math.Max(line.Item1, line.Item3), line)
             Next
+        End If
 
+        If sortedLines.Count > 0 Then
             Dim bottomY = sortedLines.ElementAt(0).Key
             Dim bottomLine = sortedLines.ElementAt(0).Value
             Dim bottomCount As Integer
+            Dim bottomLength = Math.Abs(bottomLine.Item0 - bottomLine.Item2)
             Dim minLeft = Math.Min(bottomLine.Item0, bottomLine.Item2)
             Dim maxRight = Math.Max(bottomLine.Item0, bottomLine.Item2)
             For i = 1 To sortedLines.Count - 1
                 Dim nextY = sortedLines.ElementAt(i).Key
                 If Math.Abs(bottomY - nextY) <= angleTest Then
                     bottomCount += 1
+                    bottomLength += Math.Abs(bottomLine.Item0 - bottomLine.Item2)
                     Dim nextVal = sortedLines.ElementAt(i).Value
                     minLeft = Math.Min(nextVal.Item0, minLeft)
                     minLeft = Math.Min(nextVal.Item2, minLeft)
@@ -1320,7 +1337,7 @@ Public Class PointCloud_FindFloor
                 End If
             Next
 
-            If bottomCount >= 3 Then
+            If bottomCount >= 3 And bottomLength >= lengthTest Then
                 leftPoint = New cv.Point(minLeft, bottomY)
                 rightPoint = New cv.Point(maxRight, bottomY)
             Else

@@ -1556,7 +1556,7 @@ Public Class Depth_InRange
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 2000, 200)
-        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 10000, 4000)
+        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
         sliders.setupTrackBar(2, "Histogram threshold", 0, 3000, 10)
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
