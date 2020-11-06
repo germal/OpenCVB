@@ -1188,7 +1188,7 @@ End Class
 
 Public Class PointCloud_GVectorPlane
     Inherits VBparent
-    Public gPlane As PointCloud_GVectorLine
+    Public gLine As PointCloud_GVectorLine
     Dim inrange As Depth_InRange
     Public planeHeight As Integer
     Public planePoint1 As cv.Point2f
@@ -1198,11 +1198,12 @@ Public Class PointCloud_GVectorPlane
         initParent(ocvb)
 
         inrange = New Depth_InRange(ocvb)
-        gPlane = New PointCloud_GVectorLine(ocvb)
+        gLine = New PointCloud_GVectorLine(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Cushion when estimating the floor or ceiling plane (mm)", 1, 1000, 100)
         sliders.setupTrackBar(1, "Y-coordinate consistency check count", 1, 100, 5)
+        sliders.setupTrackBar(2, "Y-coordinate up/down adjustment (mm)", -4000, 4000, 0)
 
         label1 = "Plane equation input"
         label2 = "Side view rotated with gravity vector"
@@ -1212,13 +1213,13 @@ Public Class PointCloud_GVectorPlane
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
         Dim cushion = cushionSlider.value / 1000
-        gPlane.floorRun = floorRun
-        gPlane.src = ocvb.pointCloud
-        gPlane.Run(ocvb)
-        dst2 = gPlane.dst1
+        gLine.floorRun = floorRun
+        gLine.src = ocvb.pointCloud
+        gLine.Run(ocvb)
+        dst2 = gLine.dst1
         Dim maskplane = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
 
-        Dim leftPoint = gPlane.leftPoint
+        Dim leftPoint = gLine.leftPoint
         Static leftPoints As New List(Of cv.Point2f)
         If leftPoint.Y = 0 Then leftPoints.Clear() Else leftPoints.Add(leftPoint)
 
@@ -1227,7 +1228,11 @@ Public Class PointCloud_GVectorPlane
             planeHeight = CInt(ocvb.pixelsPerMeterV * cushion)
             If planeHeight = 0 Then planeHeight = 1
             Dim cam = ocvb.sideCameraPoint
-            planePoint1 = New cv.Point(0, leftPoint.Y + If(floorRun, planeHeight / 2, -planeHeight / 2))
+
+            Static adjustmentSlider = findSlider("Y-coordinate up/down adjustment (mm)")
+            Dim adjustPixels = ocvb.pixelsPerMeterV * adjustmentSlider.value / 1000
+
+            planePoint1 = New cv.Point(0, leftPoint.Y + CInt(If(floorRun, planeHeight / 2, -planeHeight / 2) + adjustPixels))
             planePoint2 = New cv.Point(dst2.Width, planePoint1.Y)
 
             dst2.Line(planePoint1, planePoint2, cv.Scalar.Yellow, planeHeight)
@@ -1236,8 +1241,8 @@ Public Class PointCloud_GVectorPlane
             Dim maxAngle = Math.Atan(dst2.Width / gPlaneDeltaY) * 57.2958
             Dim minRow = dst2.Height * maxAngle / 180
 
-            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeterV * If(floorRun, 1, -1)
-            Dim split = gPlane.sideIMU.sideView.gCloudIMU.imuPointCloud.Split()
+            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeterV * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
+            Dim split = gLine.sideIMU.sideView.gCloudIMU.imuPointCloud.Split()
             Dim ySplit = split(1)
             inrange.src = split(1)
             inrange.minVal = planeY - If(floorRun, 0, cushion)
@@ -1257,8 +1262,8 @@ Public Class PointCloud_GVectorPlane
                 Next
             End If
             tmp.CopyTo(split(2), maskplane)
-            End If
-            dst1 = ocvb.color.Clone
+        End If
+        dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskplane.Resize(src.Size))
     End Sub
 End Class

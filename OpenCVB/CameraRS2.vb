@@ -90,6 +90,7 @@ Public Class CameraRS2
     End Function
     Public Function querySerialNumber(index As Integer) As String
         Dim Devices = ctx.QueryDevices()
+        Console.WriteLine("Intel RealSense Firmware Version: " + Devices(index).Info(2))
         Return Devices(index).Info(1)
     End Function
     Public Sub initialize(fps As Integer)
