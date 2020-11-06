@@ -993,7 +993,7 @@ End Class
 
 
 
-Public Class Histogram_2D_SideView
+Public Class Histogram_SideView2D
     Inherits VBparent
     Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
@@ -1070,11 +1070,10 @@ End Class
 
 
 
-Public Class Histogram_2D_Side
+Public Class Histogram_SideData
     Inherits VBparent
     Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    ' Dim thresholdSlider As System.Windows.Forms.TrackBar
     Public meterMinY As Double
     Public meterMaxY As Double
     Public split() As cv.Mat
@@ -1096,8 +1095,9 @@ Public Class Histogram_2D_Side
         split = imuPC.Split()
 
         split(1).MinMaxLoc(meterMinY, meterMaxY)
-        If meterMinY = 0 Then meterMinY = -2 ' if the pointcloud is missing or all zeros...
-        If meterMaxY = 0 Then meterMaxY = 2
+        Const DEFAULT_Y = 2
+        If meterMinY = 0 Then meterMinY = -DEFAULT_Y ' if the pointcloud is missing or all zeros...
+        If meterMaxY = 0 Then meterMaxY = DEFAULT_Y
 
         kalman.kInput(0) = meterMinY
         kalman.kInput(1) = meterMaxY
@@ -1115,11 +1115,13 @@ Public Class Histogram_2D_Side
             meterMaxY = lastMaxY
         End If
 
+        If meterMaxY < meterMinY Or meterMaxY > ocvb.maxZ Then meterMaxY = DEFAULT_Y
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMinY, meterMaxY), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {dst1.Height, dst1.Width}
+        Dim histSize() = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        dst2 = histOutput.Threshold(0, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -1139,14 +1141,14 @@ End Class
 
 Public Class Histogram_Concentration
     Inherits VBparent
-    Public sideview As Histogram_2D_SideView
+    Public sideview As Histogram_SideView2D
     Public topview As Histogram_2D_TopView
     Dim palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         palette = New Palette_Basics(ocvb)
-        sideview = New Histogram_2D_SideView(ocvb)
+        sideview = New Histogram_SideView2D(ocvb)
         topview = New Histogram_2D_TopView(ocvb)
 
         Dim minDepthSlider = findSlider("InRange Min Depth (mm)")

@@ -243,7 +243,7 @@ End Class
 
 Public Class Reduction_Lines
     Inherits VBparent
-    Dim sideView As Histogram_2D_SideView
+    Dim sideView As Histogram_SideView2D
     Dim topView As Histogram_2D_TopView
     Public lDetect As LineDetector_Basics
     Dim reduction As Reduction_PointCloud
@@ -252,7 +252,7 @@ Public Class Reduction_Lines
         initParent(ocvb)
 
         cmat = New PointCloud_Colorize(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
+        sideView = New Histogram_SideView2D(ocvb)
         topView = New Histogram_2D_TopView(ocvb)
         reduction = New Reduction_PointCloud(ocvb)
 

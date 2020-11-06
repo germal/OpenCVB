@@ -592,7 +592,7 @@ End Class
 Public Class PointCloud_Kalman_SideView
     Inherits VBparent
     Public flood As Floodfill_Identifiers
-    Public sideView As Histogram_2D_SideView
+    Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
@@ -604,7 +604,7 @@ Public Class PointCloud_Kalman_SideView
         flood = New Floodfill_Identifiers(ocvb)
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
-        sideView = New Histogram_2D_SideView(ocvb)
+        sideView = New Histogram_SideView2D(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
@@ -823,11 +823,11 @@ End Class
 Public Class PointCloud_HistBothViews
     Inherits VBparent
     Dim topView As Histogram_2D_TopView
-    Dim sideView As Histogram_2D_SideView
+    Dim sideView As Histogram_SideView2D
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         topView = New Histogram_2D_TopView(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
+        sideView = New Histogram_SideView2D(ocvb)
 
         label1 = "Histogram Top View"
         label2 = "Histogram Side View"
@@ -941,7 +941,7 @@ End Class
 Public Class PointCloud_FrustrumSide
     Inherits VBparent
     Dim frustrum As Draw_Frustrum
-    Dim sideView As Histogram_2D_SideView
+    Dim sideView As Histogram_SideView2D
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -949,7 +949,7 @@ Public Class PointCloud_FrustrumSide
         cmats = New PointCloud_Colorize(ocvb)
         frustrum = New Draw_Frustrum(ocvb)
 
-        sideView = New Histogram_2D_SideView(ocvb)
+        sideView = New Histogram_SideView2D(ocvb)
         sideView.gCloudIMU.clipDepthData = False
 
         Dim histSlider = findSlider("Histogram threshold")
@@ -987,7 +987,7 @@ End Class
 
 Public Class PointCloud_IMU_SideView
     Inherits VBparent
-    Public sideView As Histogram_2D_SideView
+    Public sideView As Histogram_SideView2D
     Public kSideView As PointCloud_Kalman_SideView
     Public lDetect As LineDetector_Basics
     Dim cmats As PointCloud_Colorize
@@ -999,7 +999,7 @@ Public Class PointCloud_IMU_SideView
         lDetect.drawLines = True
 
         kSideView = New PointCloud_Kalman_SideView(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
+        sideView = New Histogram_SideView2D(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20
@@ -1035,7 +1035,7 @@ End Class
 
 Public Class PointCloud_IMU_SideCompare
     Inherits VBparent
-    Public sideView As Histogram_2D_SideView
+    Public sideView As Histogram_SideView2D
     Public kSideView As PointCloud_Kalman_SideView
     Public lDetect As LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
@@ -1044,7 +1044,7 @@ Public Class PointCloud_IMU_SideCompare
         lDetect = New LineDetector_Basics(ocvb)
         lDetect.drawLines = True
         kSideView = New PointCloud_Kalman_SideView(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
+        sideView = New Histogram_SideView2D(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20

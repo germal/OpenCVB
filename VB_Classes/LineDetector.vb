@@ -590,13 +590,13 @@ End Class
 Public Class LineDetector_Depth
     Inherits VBparent
     Dim longline As LineDetector_LongLines
-    Dim sideView As Histogram_2D_SideView
+    Dim sideView As Histogram_SideView2D
     Dim topView As Histogram_2D_TopView
     Dim mats As Mat_4to1
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         mats = New Mat_4to1(ocvb)
-        sideView = New Histogram_2D_SideView(ocvb)
+        sideView = New Histogram_SideView2D(ocvb)
         topView = New Histogram_2D_TopView(ocvb)
         longline = New LineDetector_LongLines(ocvb)
 
