@@ -545,7 +545,7 @@ Public Class PointCloud_Kalman_TopView
     Inherits VBparent
     Public pTrack As KNN_PointTracker
     Public flood As FloodFill_8bit
-    Public topView As Histogram_2D_TopView
+    Public topView As Histogram_TopView2D
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
@@ -556,7 +556,7 @@ Public Class PointCloud_Kalman_TopView
         flood = New FloodFill_8bit(ocvb)
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
-        topView = New Histogram_2D_TopView(ocvb)
+        topView = New Histogram_TopView2D(ocvb)
 
         ocvb.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
@@ -822,11 +822,11 @@ End Class
 
 Public Class PointCloud_HistBothViews
     Inherits VBparent
-    Dim topView As Histogram_2D_TopView
+    Dim topView As Histogram_TopView2D
     Dim sideView As Histogram_SideView2D
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        topView = New Histogram_2D_TopView(ocvb)
+        topView = New Histogram_TopView2D(ocvb)
         sideView = New Histogram_SideView2D(ocvb)
 
         label1 = "Histogram Top View"
@@ -850,7 +850,7 @@ End Class
 
 Public Class PointCloud_IMU_TopView
     Inherits VBparent
-    Public topView As Histogram_2D_TopView
+    Public topView As Histogram_TopView2D
     Public kTopView As PointCloud_Kalman_TopView
     Public lDetect As LineDetector_Basics
     Dim angleSlider As System.Windows.Forms.TrackBar
@@ -858,7 +858,7 @@ Public Class PointCloud_IMU_TopView
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        topView = New Histogram_2D_TopView(ocvb)
+        topView = New Histogram_TopView2D(ocvb)
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 20
 
@@ -897,7 +897,7 @@ End Class
 Public Class PointCloud_FrustrumTop
     Inherits VBparent
     Dim frustrum As Draw_Frustrum
-    Dim topView As Histogram_2D_TopView
+    Dim topView As Histogram_TopView2D
     Dim cmats As PointCloud_Colorize
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -905,7 +905,7 @@ Public Class PointCloud_FrustrumTop
         cmats = New PointCloud_Colorize(ocvb)
         frustrum = New Draw_Frustrum(ocvb)
 
-        topView = New Histogram_2D_TopView(ocvb)
+        topView = New Histogram_TopView2D(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0

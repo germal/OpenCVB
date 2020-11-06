@@ -912,79 +912,75 @@ End Class
 
 
 
-Public Class Histogram_2D_TopView
+
+
+Public Class Histogram_Concentration
     Inherits VBparent
-    Public gCloudIMU As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Public markers(2 - 1) As cv.Point2f
-    Dim cmat As PointCloud_Colorize
-    Dim cameraXSlider As Windows.Forms.TrackBar
-    Dim frustrumSlider As Windows.Forms.TrackBar
+    Public sideview As Histogram_SideView2D
+    Public topview As Histogram_TopView2D
+    Dim palette As Palette_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        cmat = New PointCloud_Colorize(ocvb)
-        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        palette = New Palette_Basics(ocvb)
+        sideview = New Histogram_SideView2D(ocvb)
+        topview = New Histogram_TopView2D(ocvb)
+
+        Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
+        minDepthSlider.Value = 1000
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
-        sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
-        frustrumSlider = findSlider("TopView Frustrum adjustment")
-        cameraXSlider = findSlider("TopCameraPoint.x adjustment")
+        sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
+        sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
+        sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
 
-        ' The specification for each camera spells out the vertical FOV angle
-        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
-        Select Case ocvb.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                frustrumSlider.Value = 180
-                cameraXSlider.Value = 0
-            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-                frustrumSlider.Value = 162
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
-            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
-                frustrumSlider.Value = 105
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
-            Case VB_Classes.ActiveTask.algParms.camNames.D435i
-                frustrumSlider.Value = 175
-                cameraXSlider.Value = 0
-            Case VB_Classes.ActiveTask.algParms.camNames.D455
-                frustrumSlider.Value = 184
-                cameraXSlider.Value = 0
-        End Select
-
-        label1 = "XZ (Top View)"
-        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
+        ocvb.desc = "Highlight the histogram projections where concentrations are highest"
     End Sub
-    Private Function computeFrustrumLine(ocvb As VBocvb, marker As cv.Point2f, x As Integer) As cv.Point2f
-        Dim m = (marker.Y - ocvb.topCameraPoint.Y) / (marker.X - ocvb.topCameraPoint.X)
-        Dim b = marker.Y - marker.X * m
-        Return New cv.Point2f(x, m * x + b)
+    Private Function plotHighlights(ocvb As VBocvb, histOutput As cv.Mat, dst As cv.Mat) As String
+        Static concentrationSlider = findSlider("Concentration Factor x100")
+        Dim concentrationFactor = concentrationSlider.Value / 100
+
+        Static cThresholdSlider = findSlider("Concentration Threshold")
+        Dim concentrationThreshold = cThresholdSlider.Value
+
+        Static minDepthSlider = findSlider("InRange Min Depth (mm)")
+        Dim minPixel = CInt(concentrationFactor * minDepthSlider.value * ocvb.pixelsPerMeterH / 1000)
+
+        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
+        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        For y = 0 To tmp.Height - 1
+            For x = minPixel To tmp.Width - 1
+                Dim val = tmp.Get(Of Single)(y, x)
+                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / concentrationFactor), CInt(y / concentrationFactor)))
+            Next
+        Next
+
+        Static topXslider = findSlider("Display the top x highlights")
+        Dim topX = topXslider.value
+        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
+            Dim pt = pts.ElementAt(i).Value
+            dst.Circle(pt, ocvb.dotSize, cv.Scalar.All((i * 27 + 100) Mod 255), -1, cv.LineTypes.AntiAlias)
+        Next
+        palette.src = dst
+        palette.Run(ocvb)
+        Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
+        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloudIMU.Run(ocvb)
+        sideview.Run(ocvb)
+        dst1 = sideview.dst1
+        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
+        label1 = "SideView " + plotHighlights(ocvb, sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst1 = palette.dst1.Clone
 
-        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
-        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
-        ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraXSlider.Value, CInt(src.Height))
-
-        Static frustrumSlider = findSlider("TopView Frustrum adjustment")
-        Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
-        Dim histSize() = {dst1.Height, dst1.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        histOutput = histOutput.Flip(cv.FlipMode.X)
-        Static histThresholdSlider = findSlider("Histogram threshold")
-        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        If standalone Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = cmat.CameraLocationBot(ocvb, dst2)
-        End If
+        topview.Run(ocvb)
+        dst2 = topview.dst1
+        label2 = "TopView " + plotHighlights(ocvb, topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst2 = palette.dst1.Clone
     End Sub
 End Class
+
 
 
 
@@ -1074,8 +1070,8 @@ Public Class Histogram_SideData
     Inherits VBparent
     Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public meterMinY As Double
-    Public meterMaxY As Double
+    Public meterMin As Double
+    Public meterMax As Double
     Public split() As cv.Mat
     Public cameraLevel As Integer
     Dim kalman As Kalman_Basics
@@ -1094,29 +1090,30 @@ Public Class Histogram_SideData
         Dim imuPC = gCloudIMU.imuPointCloud
         split = imuPC.Split()
 
-        split(1).MinMaxLoc(meterMinY, meterMaxY)
-        Const DEFAULT_Y = 2
-        If meterMinY = 0 Then meterMinY = -DEFAULT_Y ' if the pointcloud is missing or all zeros...
-        If meterMaxY = 0 Then meterMaxY = DEFAULT_Y
+        split(1).MinMaxLoc(meterMin, meterMax)
+        Const DEFAULT_METER = 2
+        If meterMin = 0 Then meterMin = -DEFAULT_METER ' if the pointcloud is missing or all zeros...
+        If meterMax = 0 Then meterMax = DEFAULT_METER
 
-        kalman.kInput(0) = meterMinY
-        kalman.kInput(1) = meterMaxY
+        kalman.kInput(0) = meterMin
+        kalman.kInput(1) = meterMax
         kalman.Run(ocvb)
-        meterMinY = kalman.kOutput(0)
-        meterMaxY = kalman.kOutput(1)
+        meterMin = kalman.kOutput(0)
+        meterMax = kalman.kOutput(1)
 
         Static lastMinY As Single
         Static lastMaxY As Single
-        If Math.Abs(lastMinY - meterMinY) > 0.2 Or Math.Abs(lastMaxY - meterMaxY) > 0.2 Then
-            lastMinY = meterMinY
-            lastMaxY = meterMaxY
+        ' no slider for the x below because it is not important - just a way to keep the scale from changing on every frame
+        If Math.Abs(lastMinY - meterMin) > 0.2 Or Math.Abs(lastMaxY - meterMax) > 0.2 Then
+            lastMinY = meterMin
+            lastMaxY = meterMax
         Else
-            meterMinY = lastMinY
-            meterMaxY = lastMaxY
+            meterMin = lastMinY
+            meterMax = lastMaxY
         End If
 
-        If meterMaxY < meterMinY Or meterMaxY > ocvb.maxZ Then meterMaxY = DEFAULT_Y
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMinY, meterMaxY), New cv.Rangef(0, ocvb.maxZ)}
+        If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
@@ -1125,11 +1122,11 @@ Public Class Histogram_SideData
         dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        cameraLevel = CInt(dst1.Height * Math.Abs(meterMinY) / Math.Abs(meterMaxY - meterMinY))
+        cameraLevel = CInt(dst1.Height * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
 
         dst1.Line(New cv.Point(0, cameraLevel), New cv.Point(dst1.Width, cameraLevel), cv.Scalar.Yellow, 1)
         label1 = "Camera level is " + CStr(cameraLevel) + " rows from the top (in yellow)"
-        label2 = "Top y = " + Format(meterMinY, "#0.00") + " Bottom Y = " + Format(meterMaxY, "#0.00")
+        label2 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00")
     End Sub
 End Class
 
@@ -1139,69 +1136,144 @@ End Class
 
 
 
-Public Class Histogram_Concentration
+
+Public Class Histogram_TopView2D
     Inherits VBparent
-    Public sideview As Histogram_SideView2D
-    Public topview As Histogram_2D_TopView
-    Dim palette As Palette_Basics
+    Public gCloudIMU As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public markers(2 - 1) As cv.Point2f
+    Dim cmat As PointCloud_Colorize
+    Dim cameraXSlider As Windows.Forms.TrackBar
+    Dim frustrumSlider As Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        palette = New Palette_Basics(ocvb)
-        sideview = New Histogram_SideView2D(ocvb)
-        topview = New Histogram_2D_TopView(ocvb)
-
-        Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
-        minDepthSlider.Value = 1000
+        cmat = New PointCloud_Colorize(ocvb)
+        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
-        sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
-        sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
+        sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
+        sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
+        frustrumSlider = findSlider("TopView Frustrum adjustment")
+        cameraXSlider = findSlider("TopCameraPoint.x adjustment")
 
-        ocvb.desc = "Highlight the histogram projections where concentrations are highest"
+        ' The specification for each camera spells out the vertical FOV angle
+        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
+        Select Case ocvb.parms.cameraName
+            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+                frustrumSlider.Value = 180
+                cameraXSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
+                frustrumSlider.Value = 162
+                cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
+            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
+                frustrumSlider.Value = 105
+                cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
+            Case VB_Classes.ActiveTask.algParms.camNames.D435i
+                frustrumSlider.Value = 175
+                cameraXSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.camNames.D455
+                frustrumSlider.Value = 184
+                cameraXSlider.Value = 0
+        End Select
+
+        label1 = "XZ (Top View)"
+        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
     End Sub
-    Private Function plotHighlights(ocvb As VBocvb, histOutput As cv.Mat, dst As cv.Mat) As String
-        Static concentrationSlider = findSlider("Concentration Factor x100")
-        Dim concentrationFactor = concentrationSlider.Value / 100
-
-        Static cThresholdSlider = findSlider("Concentration Threshold")
-        Dim concentrationThreshold = cThresholdSlider.Value
-
-        Static minDepthSlider = findSlider("InRange Min Depth (mm)")
-        Dim minPixel = CInt(concentrationFactor * minDepthSlider.value * ocvb.pixelsPerMeterH / 1000)
-
-        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
-        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For y = 0 To tmp.Height - 1
-            For x = minPixel To tmp.Width - 1
-                Dim val = tmp.Get(Of Single)(y, x)
-                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / concentrationFactor), CInt(y / concentrationFactor)))
-            Next
-        Next
-
-        Static topXslider = findSlider("Display the top x highlights")
-        Dim topX = topXslider.value
-        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
-            Dim pt = pts.ElementAt(i).Value
-            dst.Circle(pt, ocvb.dotSize, cv.Scalar.All((i * 27 + 100) Mod 255), -1, cv.LineTypes.AntiAlias)
-        Next
-        palette.src = dst
-        palette.Run(ocvb)
-        Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
-        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
-    End Function
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideview.Run(ocvb)
-        dst1 = sideview.dst1
-        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
-        label1 = "SideView " + plotHighlights(ocvb, sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst1 = palette.dst1.Clone
+        gCloudIMU.Run(ocvb)
 
-        topview.Run(ocvb)
-        dst2 = topview.dst1
-        label2 = "TopView " + plotHighlights(ocvb, topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst2 = palette.dst1.Clone
+        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
+        ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraXSlider.Value, CInt(src.Height))
+
+        Static frustrumSlider = findSlider("TopView Frustrum adjustment")
+        Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
+        Dim histSize() = {dst1.Height, dst1.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        If standalone Then
+            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = cmat.CameraLocationBot(ocvb, dst2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Histogram_TopData
+    Inherits VBparent
+    Public gCloudIMU As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public meterMin As Double
+    Public meterMax As Double
+    Public split() As cv.Mat
+    Public cameraLevel As Integer
+    Dim kalman As Kalman_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        kalman = New Kalman_Basics(ocvb)
+        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+
+        label1 = "XZ (Top View)"
+        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloudIMU.Run(ocvb)
+        Dim imuPC = gCloudIMU.imuPointCloud
+        split = imuPC.Split()
+
+        split(0).MinMaxLoc(meterMin, meterMax)
+        Const DEFAULT_METER = 2
+        If meterMin = 0 Then meterMin = -DEFAULT_METER ' if the pointcloud is missing or all zeros...
+        If meterMax = 0 Then meterMax = DEFAULT_METER
+
+        kalman.kInput(0) = meterMin
+        kalman.kInput(1) = meterMax
+        kalman.Run(ocvb)
+        meterMin = kalman.kOutput(0)
+        meterMax = kalman.kOutput(1)
+
+        Static lastMinX As Single
+        Static lastMaxX As Single
+        ' no slider for the x below because it is not important - just a way to keep the scale from changing on every frame
+        If Math.Abs(lastMinX - meterMin) > 0.2 Or Math.Abs(lastMaxX - meterMax) > 0.2 Then
+            lastMinX = meterMin
+            lastMaxX = meterMax
+        Else
+            meterMin = lastMinX
+            meterMax = lastMaxX
+        End If
+
+        If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
+        Dim histSize() = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        cameraLevel = CInt(dst1.Width * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
+
+        dst1.Line(New cv.Point(cameraLevel, 0), New cv.Point(cameraLevel, dst2.Height), cv.Scalar.Yellow, 1)
+        label1 = "Camera level is " + CStr(cameraLevel) + " rows from the top (in yellow)"
+        label2 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00")
     End Sub
 End Class

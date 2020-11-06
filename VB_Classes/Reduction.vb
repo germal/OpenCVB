@@ -244,7 +244,7 @@ End Class
 Public Class Reduction_Lines
     Inherits VBparent
     Dim sideView As Histogram_SideView2D
-    Dim topView As Histogram_2D_TopView
+    Dim topView As Histogram_TopView2D
     Public lDetect As LineDetector_Basics
     Dim reduction As Reduction_PointCloud
     Dim cmat As PointCloud_Colorize
@@ -253,7 +253,7 @@ Public Class Reduction_Lines
 
         cmat = New PointCloud_Colorize(ocvb)
         sideView = New Histogram_SideView2D(ocvb)
-        topView = New Histogram_2D_TopView(ocvb)
+        topView = New Histogram_TopView2D(ocvb)
         reduction = New Reduction_PointCloud(ocvb)
 
         Dim histSlider = findSlider("Histogram threshold")
