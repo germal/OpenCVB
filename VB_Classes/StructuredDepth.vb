@@ -63,29 +63,34 @@ Public Class StructuredDepth_RowSums
     Inherits VBparent
     Public side2D As Histogram_2D_Side
     Dim inrange As Depth_InRange
-    Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        kalman = New Kalman_Basics(ocvb)
         side2D = New Histogram_2D_Side(ocvb)
         inrange = New Depth_InRange(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 40)
+        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 15)
+        ' This camera is less accurate and needs wider height to describe the ceiling.
+        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D455 Then sliders.trackbar(0).Value = 25
+        ' This camera is less accurate 
+        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then sliders.trackbar(0).Value = 50
+        ' This camera is less accurate 
+        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Then sliders.trackbar(0).Value = 50
 
+        label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         ocvb.desc = "Using the point cloud histogram, calculate a sum for each row."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run(ocvb)
-        dst2 = side2D.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = side2D.dst1
 
         Dim pixelsPerMeterV = Math.Abs(side2D.meterMaxY - side2D.meterMinY) / dst2.Height
 
-        Static rowSums(dst2.Rows - 1) As Single
         Dim yCoordinate As Integer
-        For yCoordinate = 1 To rowSums.Count - 1
-            rowSums(yCoordinate) = cv.Cv2.Sum(dst2.Row(yCoordinate))
-            If rowSums(yCoordinate) - rowSums(yCoordinate - 1) > 1000 Then Exit For
+        Dim lastSum = dst2.Row(yCoordinate).Sum()
+        For yCoordinate = 1 To dst2.Height - 1
+            Dim nextSum = dst2.Row(yCoordinate).Sum()
+            If nextSum.Item(0) - lastSum.Item(0) > 5000 Then Exit For
         Next
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -93,15 +98,9 @@ Public Class StructuredDepth_RowSums
         dst2.Line(New cv.Point(0, yCoordinate), New cv.Point(dst2.Width, yCoordinate), cv.Scalar.Yellow, cushion)
 
         Dim planeHeight = cushion * pixelsPerMeterV
-        Dim cam = New cv.Point(0, side2D.histOutput.Height / 2)
 
-        Dim planeY = side2D.meterMinY * (cam.Y - yCoordinate) / cam.Y
-        If yCoordinate > cam.Y Then planeY = side2D.meterMaxY * (yCoordinate - cam.Y) / cam.Y
-
-        kalman.kInput(0) = planeY
-        kalman.Run(ocvb)
-        planeY = kalman.kOutput(0)
-        label1 = "planeY is at " + Format(planeY, "#0.00") + " meters "
+        Dim planeY = side2D.meterMinY * (side2D.cameraLevel - yCoordinate) / side2D.cameraLevel
+        If yCoordinate > side2D.cameraLevel Then planeY = side2D.meterMaxY * (yCoordinate - side2D.cameraLevel) / side2D.cameraLevel
 
         inrange.minVal = planeY - planeHeight
         inrange.maxVal = planeY + planeHeight

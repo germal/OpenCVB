@@ -1074,17 +1074,17 @@ Public Class Histogram_2D_Side
     Inherits VBparent
     Public gCloudIMU As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Dim cameraYSlider As Windows.Forms.TrackBar
-    Dim thresholdSlider As System.Windows.Forms.TrackBar
+    ' Dim thresholdSlider As System.Windows.Forms.TrackBar
     Public meterMinY As Double
     Public meterMaxY As Double
     Public split() As cv.Mat
+    Public cameraLevel As Integer
+    Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        kalman = New Kalman_Basics(ocvb)
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
-        thresholdSlider = findSlider("Histogram threshold")
-        If standalone Then thresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
         ocvb.desc = "Create a 2D histogram for depth in ZY side view that with precise y measurements in meters"
@@ -1096,31 +1096,38 @@ Public Class Histogram_2D_Side
         split = imuPC.Split()
 
         split(1).MinMaxLoc(meterMinY, meterMaxY)
+        If meterMinY = 0 Then meterMinY = -2 ' if the pointcloud is missing or all zeros...
+        If meterMaxY = 0 Then meterMaxY = 2
 
-        Dim pixelsPerMeterV = imuPC.Height / Math.Abs(meterMaxY - meterMinY)
+        kalman.kInput(0) = meterMinY
+        kalman.kInput(1) = meterMaxY
+        kalman.Run(ocvb)
+        meterMinY = kalman.kOutput(0)
+        meterMaxY = kalman.kOutput(1)
+
+        Static lastMinY As Single
+        Static lastMaxY As Single
+        If Math.Abs(lastMinY - meterMinY) > 0.2 Or Math.Abs(lastMaxY - meterMaxY) > 0.2 Then
+            lastMinY = meterMinY
+            lastMaxY = meterMaxY
+        Else
+            meterMinY = lastMinY
+            meterMaxY = lastMaxY
+        End If
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMinY, meterMaxY), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {dst1.Height, dst1.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Static histThresholdSlider = findSlider("Histogram threshold")
-        Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst2 = histOutput.Threshold(0, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim topRow As Integer
-        Dim botRow As Integer
-        For topRow = 0 To tmp.Rows - 1
-            Dim nextSum = tmp.Row(topRow).Sum
-            If nextSum.Item(0) > 0 Then Exit For
-        Next
+        cameraLevel = CInt(dst1.Height * Math.Abs(meterMinY) / Math.Abs(meterMaxY - meterMinY))
 
-        For botRow = tmp.Rows - 1 To 0 Step -1
-            Dim nextSum = tmp.Row(botRow).Sum
-            If nextSum.Item(0) > 0 Then Exit For
-        Next
-
-        Dim rect = New cv.Rect(0, topRow, tmp.Width, botRow - topRow)
-        tmp = tmp(rect).Resize(dst1.Size)
-        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst1.Line(New cv.Point(0, cameraLevel), New cv.Point(dst1.Width, cameraLevel), cv.Scalar.Yellow, 1)
+        label1 = "Camera level is " + CStr(cameraLevel) + " rows from the top (in yellow)"
+        label2 = "Top y = " + Format(meterMinY, "#0.00") + " Bottom Y = " + Format(meterMaxY, "#0.00")
     End Sub
 End Class
 
