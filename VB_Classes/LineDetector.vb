@@ -5,12 +5,13 @@ Public Class LineDetector_Basics
     Dim ld As cv.XImgProc.FastLineDetector
     Public lines As cv.Vec4f()
     Public drawLines = False
+    Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
         sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
-        sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 100) ' not used in Run below but externally...
+        sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 100)
         sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -25,6 +26,10 @@ Public Class LineDetector_Basics
         dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Static thicknessSlider = findSlider("Line thickness")
         Dim thickness = thicknessSlider.Value
+        Static pixelSlider = findSlider("Line length threshold in pixels")
+        Dim pixelThreshold = pixelSlider.value
+
+        sortlines.Clear()
 
         For Each v In lines
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
@@ -32,6 +37,11 @@ Public Class LineDetector_Basics
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                Dim pixelLen = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
+                If pixelLen > pixelThreshold Then
+                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+                    sortlines.Add(pixelLen, v)
+                End If
             End If
         Next
         If standalone Or drawLines Then

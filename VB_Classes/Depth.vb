@@ -1590,7 +1590,7 @@ Public Class Depth_PointCloud_IMU
     Public imuPointCloud As cv.Mat
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
-    Dim inrange As Depth_InRange
+    Public inrange As Depth_InRange
     Public clipDepthData As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)

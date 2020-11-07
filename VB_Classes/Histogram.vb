@@ -1223,11 +1223,13 @@ Public Class Histogram_TopData
     Public split() As cv.Mat
     Public cameraLevel As Integer
     Dim kalman As Kalman_Basics
+    Dim IntelBug As Boolean
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
         gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        If VB_Classes.ActiveTask.algParms.camNames.D455 = ocvb.parms.cameraName Then IntelBug = True
 
         label1 = "XZ (Top View)"
         ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
@@ -1238,29 +1240,39 @@ Public Class Histogram_TopData
         Dim imuPC = gCloudIMU.imuPointCloud
         split = imuPC.Split()
 
-        split(0).MinMaxLoc(meterMin, meterMax)
         Const DEFAULT_METER = 2
-        If meterMin = 0 Then meterMin = -DEFAULT_METER ' if the pointcloud is missing or all zeros...
-        If meterMax = 0 Then meterMax = DEFAULT_METER
-
-        kalman.kInput(0) = meterMin
-        kalman.kInput(1) = meterMax
-        kalman.Run(ocvb)
-        meterMin = kalman.kOutput(0)
-        meterMax = kalman.kOutput(1)
-
-        Static lastMinX As Single
-        Static lastMaxX As Single
-        ' no slider for the x below because it is not important - just a way to keep the scale from changing on every frame
-        If Math.Abs(lastMinX - meterMin) > 0.2 Or Math.Abs(lastMaxX - meterMax) > 0.2 Then
-            lastMinX = meterMin
-            lastMaxX = meterMax
+        If IntelBug Then
+            ' The point cloud x data contains bogus values well outside the possible range for x so here the values for meterMin/Max are just set to 2...
+            ' This problem does not occur on the D435i - just on the newer D455.  Hmmm..
+            ' It does not occur for the y values on either Intel device...
+            meterMin = -DEFAULT_METER
+            meterMax = DEFAULT_METER
         Else
-            meterMin = lastMinX
-            meterMax = lastMaxX
+            split(0).MinMaxLoc(meterMin, meterMax)
+            If meterMin = 0 Then meterMin = -DEFAULT_METER ' if the pointcloud is missing or all zeros...
+            If meterMax = 0 Then meterMax = DEFAULT_METER
+            If meterMax < meterMin Then meterMax = DEFAULT_METER
+            If meterMin < -ocvb.maxZ Then meterMin = -DEFAULT_METER
+            If meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
+
+            kalman.kInput(0) = meterMin
+            kalman.kInput(1) = meterMax
+            kalman.Run(ocvb)
+            meterMin = kalman.kOutput(0)
+            meterMax = kalman.kOutput(1)
+
+            Static lastMinY As Single
+            Static lastMaxY As Single
+            ' no slider for the x below because it is not important - just a way to keep the scale from changing on every frame
+            If Math.Abs(lastMinY - meterMin) > 0.2 Or Math.Abs(lastMaxY - meterMax) > 0.2 Then
+                lastMinY = meterMin
+                lastMaxY = meterMax
+            Else
+                meterMin = lastMinY
+                meterMax = lastMaxY
+            End If
         End If
 
-        If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
@@ -1273,7 +1285,7 @@ Public Class Histogram_TopData
         cameraLevel = CInt(dst1.Width * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
 
         dst1.Line(New cv.Point(cameraLevel, 0), New cv.Point(cameraLevel, dst2.Height), cv.Scalar.Yellow, 1)
-        label1 = "Camera level is " + CStr(cameraLevel) + " rows from the top (in yellow)"
+        label1 = "Camera level is " + CStr(cameraLevel) + " rows from the left (in yellow)"
         label2 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00")
     End Sub
 End Class

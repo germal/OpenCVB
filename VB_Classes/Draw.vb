@@ -373,65 +373,6 @@ End Class
 
 
 
-Public Class Draw_ClipLine
-    Inherits VBparent
-    Dim flow As Font_FlowText
-    Dim kalman As Kalman_Basics
-    Dim lastRect As cv.Rect
-    Dim pt1 As cv.Point
-    Dim pt2 As cv.Point
-    Dim rect As cv.Rect
-    Private Sub setup()
-        ReDim kalman.kInput(8)
-        Dim r = initRandomRect(dst2.Width, dst2.Height, 25)
-        pt1 = New cv.Point(r.X, r.Y)
-        pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
-        rect = initRandomRect(dst2.Width, dst2.Height, 25)
-        If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
-    End Sub
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        flow = New Font_FlowText(ocvb)
-
-        kalman = New Kalman_Basics(ocvb)
-        setup()
-
-        ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst2 = src
-        kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-        kalman.Run(ocvb)
-        Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
-        Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
-
-        If kalman.kOutput(6) < 5 Then kalman.kOutput(6) = 5 ' don't let the width/height get too small...
-        If kalman.kOutput(7) < 5 Then kalman.kOutput(7) = 5
-        Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
-
-        Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
-        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, cv.LineTypes.AntiAlias)
-
-        Static linenum = 0
-        flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
-        linenum += 1
-
-        Static hitCount = 0
-        hitCount += If(clipped, 1, 0)
-        ocvb.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
-                     CInt(src.Width / 2), 200)
-        If r = rect Then setup()
-        flow.Run(ocvb)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Draw_Arc
     Inherits VBparent
@@ -686,5 +627,116 @@ Public Class Draw_Frustrum
         Next
         xyzDepth.src = dst1.Resize(ocvb.pointCloud.Size)
         xyzDepth.Run(ocvb)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Draw_ClipLine
+    Inherits VBparent
+    Dim flow As Font_FlowText
+    Dim kalman As Kalman_Basics
+    Dim lastRect As cv.Rect
+    Dim pt1 As cv.Point
+    Dim pt2 As cv.Point
+    Dim rect As cv.Rect
+    Private Sub setup()
+        ReDim kalman.kInput(8)
+        Dim r = initRandomRect(dst2.Width, dst2.Height, 25)
+        pt1 = New cv.Point(r.X, r.Y)
+        pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
+        rect = initRandomRect(dst2.Width, dst2.Height, 25)
+        If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
+    End Sub
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        flow = New Font_FlowText(ocvb)
+
+        kalman = New Kalman_Basics(ocvb)
+        setup()
+
+        ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst2 = src
+        kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
+        kalman.Run(ocvb)
+        Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
+        Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
+
+        If kalman.kOutput(6) < 5 Then kalman.kOutput(6) = 5 ' don't let the width/height get too small...
+        If kalman.kOutput(7) < 5 Then kalman.kOutput(7) = 5
+        Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
+
+        Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
+        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
+        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, cv.LineTypes.AntiAlias)
+
+        Static linenum = 0
+        flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
+        linenum += 1
+
+        Static hitCount = 0
+        hitCount += If(clipped, 1, 0)
+        ocvb.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+                     CInt(src.Width / 2), 200)
+        If r = rect Then setup()
+        flow.Run(ocvb)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
+Public Class Draw_Intersection
+    Inherits VBparent
+    Public p1 As cv.Point2f
+    Public p2 As cv.Point2f
+    Public p3 As cv.Point2f
+    Public p4 As cv.Point2f
+    Public intersect As Boolean
+    Public intersectionPoint As cv.Point2f
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        ocvb.desc = "Determine if 2 lines intersect"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If standalone Then If ocvb.frameCount Mod 100 <> 0 Then Exit Sub
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If standalone Then
+            p1 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
+            p2 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
+            p3 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
+            p4 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
+        End If
+
+        Dim x = p3 - p1
+        Dim d1 = p2 - p1
+        Dim d2 = p4 - p3
+        Dim cross = d1.X * d2.Y - d1.Y * d2.X
+        If Math.Abs(cross) < 0.000001 Then
+            intersect = False
+            intersectionPoint = New cv.Point2f
+        Else
+            Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
+            intersectionPoint = p1 + d1 * t1
+            intersect = True
+        End If
+
+        dst1.SetTo(0)
+        dst1.Line(p1, p2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        dst1.Line(p3, p4, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+        If intersectionPoint <> New cv.Point2f Then dst1.Circle(intersectionPoint, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        If intersect Then label1 = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y)) Else label1 = "Parallel!!!"
+        If intersectionPoint.X < 0 Or intersectionPoint.X > dst1.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst1.Height Then
+            label1 += " (off screen)"
+        End If
     End Sub
 End Class

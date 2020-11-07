@@ -7,6 +7,7 @@ Public Class StructuredDepth_BasicsSide
     Public inputYCoordinate As Integer
     Dim histThresholdSlider As Windows.Forms.TrackBar
     Dim cushionSlider As Windows.Forms.TrackBar
+    Public maskPlane As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         side2D = New Histogram_SideData(ocvb)
@@ -71,10 +72,11 @@ Public Class StructuredDepth_BasicsSide
         inrange.maxVal = planeY + thicknessMeters
         inrange.src = side2D.split(1)
         inrange.Run(ocvb)
-        Dim maskPlane = inrange.depth32f.ConvertScaleAbs(255)
+        maskPlane = inrange.depth32f.ConvertScaleAbs(255)
 
         dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane.Resize(src.Size))
+        label2 = side2D.label2
     End Sub
 End Class
 
@@ -90,13 +92,14 @@ Public Class StructuredDepth_BasicsTop
     Dim inrange As Depth_InRange
     Dim histThresholdSlider As Windows.Forms.TrackBar
     Dim cushionSlider As Windows.Forms.TrackBar
+    Public maskPlane As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 15)
+        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
         sliders.setupTrackBar(1, "X-coordinate for the slice", 0, src.Width - 1, src.Width / 2)
 
         histThresholdSlider = findSlider("Histogram threshold")
@@ -124,10 +127,11 @@ Public Class StructuredDepth_BasicsTop
         inrange.maxVal = planeX + thicknessMeters
         inrange.src = top2D.split(0)
         inrange.Run(ocvb)
-        Dim maskPlane = inrange.depth32f.ConvertScaleAbs(255)
+        maskPlane = inrange.depth32f.ConvertScaleAbs(255)
 
         dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane.Resize(src.Size))
+        label2 = top2D.label2
     End Sub
 End Class
 
@@ -196,7 +200,7 @@ End Class
 
 Public Class StructuredDepth_SliceH
     Inherits VBparent
-    Dim structD As StructuredDepth_BasicsSide
+    Public structD As StructuredDepth_BasicsSide
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         structD = New StructuredDepth_BasicsSide(ocvb)
@@ -219,7 +223,7 @@ End Class
 
 Public Class StructuredDepth_SliceV
     Inherits VBparent
-    Dim structD As StructuredDepth_BasicsTop
+    Public structD As StructuredDepth_BasicsTop
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         structD = New StructuredDepth_BasicsTop(ocvb)
@@ -230,5 +234,48 @@ Public Class StructuredDepth_SliceV
         structD.Run(ocvb)
         dst1 = structD.dst1
         dst2 = structD.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class StructuredDepth_LineDetect
+    Inherits VBparent
+    Dim sliceV As StructuredDepth_SliceV
+    Dim ldetect As LineDetector_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        sliceV = New StructuredDepth_SliceV(ocvb)
+        ldetect = New LineDetector_Basics(ocvb)
+        ldetect.drawLines = True
+        ocvb.desc = "Use the line detector on the output of the structuredDepth_Slice algorithms"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sliceV.Run(ocvb)
+
+        ldetect.src = sliceV.structD.maskPlane.Resize(dst2.Size)
+        ldetect.Run(ocvb)
+
+        Static sortlines As New List(Of cv.Vec4f)
+        For Each line In ldetect.sortlines
+            If sortlines.Contains(line.Value) = False Then sortlines.Add(line.Value)
+        Next
+
+        Static thicknessSlider = findSlider("Line thickness")
+        Dim thickness = thicknessSlider.Value
+        dst2.SetTo(0)
+        For Each v In sortlines
+            Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+            Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+        Next
+
+        dst1 = sliceV.dst1
+        label1 = "Detected line count = " + CStr(sortlines.Count)
     End Sub
 End Class
