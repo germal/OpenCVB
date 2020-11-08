@@ -65,7 +65,7 @@ Public Class VBparent : Implements IDisposable
         algorithm.Run(ocvb)
         If standalone And src.Width > 0 Then
             If ocvb.intermediateReview <> "" And ocvb.intermediateReview <> caller Then
-                If ocvb.intermediateObject Is Nothing Or ocvb.intermediateReview <> ocvb.intermediateObject.caller Then
+                If ocvb.intermediateObject Is Nothing Then
                     ocvb.trueText(ocvb.intermediateReview + " is not active.", 10, 100)
                     dst1.SetTo(0)
                     dst2.SetTo(0)

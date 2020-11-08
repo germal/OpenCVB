@@ -14,8 +14,8 @@ Public Class StructuredDepth_BasicsSide
         inrange = New Depth_InRange(ocvb)
 
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 15)
-        sliders.setupTrackBar(1, "Y-coordinate for the slice", 0, src.Height - 1, src.Height / 2)
+        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
+        sliders.setupTrackBar(1, "Offset for the slice", 0, src.Height - 1, src.Height / 2)
 
         histThresholdSlider = findSlider("Histogram threshold")
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -90,27 +90,26 @@ Public Class StructuredDepth_BasicsTop
     Inherits VBparent
     Public top2D As Histogram_TopData
     Dim inrange As Depth_InRange
-    Dim histThresholdSlider As Windows.Forms.TrackBar
+    Dim sideStruct As StructuredDepth_BasicsSide
     Dim cushionSlider As Windows.Forms.TrackBar
+    Dim offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
+        sideStruct = New StructuredDepth_BasicsSide(ocvb)
 
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-        sliders.setupTrackBar(1, "X-coordinate for the slice", 0, src.Width - 1, src.Width / 2)
-
-        histThresholdSlider = findSlider("Histogram threshold")
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        offsetSlider = findSlider("Offset for the slice")
+        offsetSlider.Maximum = src.Width - 1
+        offsetSlider.Value = src.Width / 2
 
         ocvb.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xSliceSlider = findSlider("X-coordinate for the slice")
-        Dim xCoordinate = CInt(xSliceSlider.value)
+        Dim xCoordinate = offsetSlider.Value
         top2D.Run(ocvb)
         dst2 = top2D.dst1
 
@@ -208,7 +207,7 @@ Public Class StructuredDepth_SliceH
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static sliceSlider = findSlider("Y-coordinate for the slice")
+        Static sliceSlider = findSlider("Offset for the slice")
         structD.inputYCoordinate = sliceSlider.value
         structD.Run(ocvb)
         dst1 = structD.dst1
@@ -245,23 +244,54 @@ End Class
 
 Public Class StructuredDepth_LineDetect
     Inherits VBparent
+    Dim sliceH As StructuredDepth_SliceH
     Dim sliceV As StructuredDepth_SliceV
     Dim ldetect As LineDetector_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        sliceV = New StructuredDepth_SliceV(ocvb)
         ldetect = New LineDetector_Basics(ocvb)
         ldetect.drawLines = True
+        Dim lenSlider = findSlider("Line length threshold in pixels")
+        lenSlider.Value = 50
+
+        sliceH = New StructuredDepth_SliceH(ocvb)
+        sliceV = New StructuredDepth_SliceV(ocvb)
+
+        radio.Setup(ocvb, caller, 2)
+        radio.check(0).Text = "Horizontal Slice"
+        radio.check(1).Text = "Vertical Slice"
+        radio.check(1).Checked = True
+
         ocvb.desc = "Use the line detector on the output of the structuredDepth_Slice algorithms"
     End Sub
     Public Sub Run(ocvb As VBocvb)
+        Static sortlines As New List(Of cv.Vec4f)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sliceV.Run(ocvb)
+        Static saveRadio As Boolean = radio.check(1).Checked
+        Static offsetSlider = findSlider("Offset for the slice")
+        If saveRadio <> radio.check(1).Checked Then
+            saveRadio = radio.check(1).Checked
+            sortlines.Clear()
+            If radio.check(0).Checked Then
+                offsetSlider.Value = src.Height / 2
+                offsetSlider.Maximum = src.Height - 1
+            Else
+                offsetSlider.Maximum = src.Width - 1
+                offsetSlider.Value = src.Width / 2
+            End If
+        End If
+        If radio.check(0).Checked Then
+            sliceH.Run(ocvb)
+            ldetect.src = sliceH.structD.maskPlane.Resize(dst2.Size)
+        Else
+            sliceV.Run(ocvb)
+            ldetect.src = sliceV.structD.maskPlane.Resize(dst2.Size)
+        End If
 
-        ldetect.src = sliceV.structD.maskPlane.Resize(dst2.Size)
+        Dim tmp = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ldetect.src.SetTo(0, tmp) ' remove previously recognized lines...
         ldetect.Run(ocvb)
 
-        Static sortlines As New List(Of cv.Vec4f)
         For Each line In ldetect.sortlines
             If sortlines.Contains(line.Value) = False Then sortlines.Add(line.Value)
         Next
@@ -275,7 +305,7 @@ Public Class StructuredDepth_LineDetect
             dst2.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
         Next
 
-        dst1 = sliceV.dst1
+        dst1 = If(radio.check(0).Checked, sliceH.dst1, sliceV.dst1)
         label1 = "Detected line count = " + CStr(sortlines.Count)
     End Sub
 End Class

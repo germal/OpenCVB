@@ -112,6 +112,7 @@
     <Compile Include="Highlight.vb" />
     <Compile Include="ProCon.vb" />
     <Compile Include="Sieve.vb" />
+    <Compile Include="SLR.vb" />
     <Compile Include="StructuredDepth.vb" />
     <Compile Include="VBocvb.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />

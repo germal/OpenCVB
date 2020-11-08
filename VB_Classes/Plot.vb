@@ -5,7 +5,7 @@ Public Class Plot_Basics
     Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Basics
-    Public plotCount As integer = 3
+    Public plotCount As Integer = 3
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         hist = New Histogram_Basics(ocvb)
@@ -50,10 +50,6 @@ Public Class Plot_Basics_CPP
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim maxX As Double = Double.MinValue
-        Dim minX As Double = Double.MaxValue
-        Dim maxY As Double = Double.MinValue
-        Dim minY As Double = Double.MaxValue
 
         If standalone Then
             ReDim srcX(50 - 1)
@@ -63,6 +59,10 @@ Public Class Plot_Basics_CPP
                 srcY(i) = i * i * i
             Next
         End If
+        Dim maxX As Double = Double.MinValue
+        Dim minX As Double = Double.MaxValue
+        Dim maxY As Double = Double.MinValue
+        Dim minY As Double = Double.MaxValue
         For i = 0 To srcX.Length - 1
             If srcX(i) > maxX Then maxX = CInt(srcX(i))
             If srcX(i) < minX Then minX = CInt(srcX(i))
