@@ -1427,6 +1427,7 @@ Public Class PointCloud_SinglePoints
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         topView = New Histogram_TopView2D(ocvb)
+        topView.resizeHistOutput = False
         inrange = New Depth_InRange(ocvb)
         Dim histThreshold = findSlider("Histogram threshold")
         histThreshold.Value = 1

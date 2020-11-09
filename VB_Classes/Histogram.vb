@@ -998,6 +998,7 @@ Public Class Histogram_SideView2D
     Dim cmat As PointCloud_Colorize
     Public frustrumAdjust As Single
     Dim thresholdSlider As System.Windows.Forms.TrackBar
+    Public resizeHistOutput As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1046,6 +1047,7 @@ Public Class Histogram_SideView2D
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
@@ -1075,6 +1077,7 @@ Public Class Histogram_SideData
     Public split() As cv.Mat
     Public cameraLevel As Integer
     Dim kalman As Kalman_Basics
+    Public resizeHistOutput As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1115,6 +1118,7 @@ Public Class Histogram_SideData
         If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
@@ -1145,6 +1149,7 @@ Public Class Histogram_TopView2D
     Dim cmat As PointCloud_Colorize
     Dim cameraXSlider As Windows.Forms.TrackBar
     Dim frustrumSlider As Windows.Forms.TrackBar
+    Public resizeHistOutput As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1193,6 +1198,7 @@ Public Class Histogram_TopView2D
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
@@ -1224,6 +1230,7 @@ Public Class Histogram_TopData
     Public cameraLevel As Integer
     Dim kalman As Kalman_Basics
     Dim IntelBug As Boolean
+    Public resizeHistOutput As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
@@ -1275,6 +1282,7 @@ Public Class Histogram_TopData
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
