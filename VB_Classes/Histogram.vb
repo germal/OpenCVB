@@ -1045,7 +1045,7 @@ Public Class Histogram_SideView2D
         frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {dst1.Height, dst1.Width}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
@@ -1114,7 +1114,7 @@ Public Class Histogram_SideData
 
         If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {dst2.Height, dst2.Width}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
@@ -1192,7 +1192,7 @@ Public Class Histogram_TopView2D
         Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
-        Dim histSize() = {dst1.Height, dst1.Width}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
@@ -1274,7 +1274,7 @@ Public Class Histogram_TopData
         End If
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
-        Dim histSize() = {dst2.Height, dst2.Width}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")

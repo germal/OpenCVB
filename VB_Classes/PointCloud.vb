@@ -1413,3 +1413,48 @@ Public Class PointCloud_GVectorLine
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class PointCloud_SinglePoints
+    Inherits VBparent
+    Public topView As Histogram_TopView2D
+    Public inrange As Depth_InRange
+    Dim singleFrames(3 - 1) As cv.Mat
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        topView = New Histogram_TopView2D(ocvb)
+        inrange = New Depth_InRange(ocvb)
+        Dim histThreshold = findSlider("Histogram threshold")
+        histThreshold.Value = 1
+
+        label1 = "Top down view before inrange sampling"
+        label2 = "Histogram after filtering for single-only histogram bins"
+        ocvb.desc = "Find floor and ceiling using gravity aligned top-down view and selecting only single samples from histogram"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.frameCount = 0 Then
+            For i = 0 To singleFrames.Count - 1
+                singleFrames(i) = New cv.Mat(ocvb.pointCloud.Size, cv.MatType.CV_8U, 0)
+            Next
+        End If
+        topView.Run(ocvb)
+        dst1 = topView.dst1
+
+        inrange.src = topView.histOutput
+        inrange.minVal = 1
+        inrange.maxVal = 1
+        inrange.Run(ocvb)
+        Dim mask = inrange.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+
+        Dim mask8uc3 = New cv.Mat(mask.Size, cv.MatType.CV_8UC3)
+        singleFrames(ocvb.frameCount Mod singleFrames.Count) = mask
+        cv.Cv2.Merge(singleFrames, mask8uc3)
+        dst2.SetTo(0)
+        dst2.SetTo(cv.Scalar.White, mask8uc3.Resize(dst2.Size))
+    End Sub
+End Class

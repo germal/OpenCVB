@@ -45,8 +45,7 @@ Public Class StructuredDepth_BasicsH
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static reloadCheck = findCheckBox("Reload the IMU PointCloud")
-        'If reloadCheck.checked Then
-        side2D.Run(ocvb)
+        If reloadCheck.checked Then side2D.Run(ocvb)
         dst2 = side2D.dst2
 
         Dim yCoordinate = inputYCoordinate ' if zero, find the ycoordinate.
@@ -116,8 +115,7 @@ Public Class StructuredDepth_BasicsV
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         Static reloadCheck = findCheckBox("Reload the IMU PointCloud")
-        'If reloadCheck.checked Then
-        top2D.Run(ocvb)
+        If reloadCheck.checked Then top2D.Run(ocvb)
         dst2 = top2D.dst2
 
         Dim cushion = cushionSlider.Value
@@ -254,7 +252,7 @@ Public Class StructuredDepth_LineDetect
     Inherits VBparent
     Public sliceH As StructuredDepth_SliceH
     Public sliceV As StructuredDepth_SliceV
-    Dim ldetect As LineDetector_Basics
+    Public ldetect As LineDetector_Basics
     Public p1 As New List(Of cv.Point2f)
     Public p2 As New List(Of cv.Point2f)
     Public Sub New(ocvb As VBocvb)
@@ -275,6 +273,17 @@ Public Class StructuredDepth_LineDetect
 
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         ocvb.desc = "Use the line detector on the output of the structuredDepth_Slice algorithms"
+    End Sub
+    Public Sub drawLinesAndSave(dst As cv.Mat, color As cv.Scalar)
+        Static thicknessSlider = findSlider("Line thickness")
+        Dim thickness = thicknessSlider.Value
+        For Each v In ldetect.sortlines
+            Dim pt1 = New cv.Point(CInt(v.Value(0)), CInt(v.Value(1)))
+            Dim pt2 = New cv.Point(CInt(v.Value(2)), CInt(v.Value(3)))
+            p1.Add(pt1)
+            p2.Add(pt2)
+            dst.Line(pt1, pt2, color, thickness, cv.LineTypes.AntiAlias)
+        Next
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -298,15 +307,8 @@ Public Class StructuredDepth_LineDetect
         ldetect.src.SetTo(0, dst2)
         ldetect.Run(ocvb)
 
-        Dim thicknessSlider = findSlider("Line thickness")
-        Dim thickness = thicknessSlider.Value
-        For Each v In ldetect.sortlines
-            Dim pt1 = New cv.Point(CInt(v.Value(0)), CInt(v.Value(1)))
-            Dim pt2 = New cv.Point(CInt(v.Value(2)), CInt(v.Value(3)))
-            p1.Add(pt1)
-            p2.Add(pt2)
-            dst2.Line(pt1, pt2, cv.Scalar.White, thickness, cv.LineTypes.AntiAlias)
-        Next
+        dst2.SetTo(0)
+        drawLinesAndSave(dst2, cv.Scalar.White)
 
         dst1 = If(radio.check(0).Checked, sliceH.dst1, sliceV.dst1)
         label1 = "Detected line count = " + CStr(ldetect.sortlines.Count) + " total lines = " + CStr(p1.Count)
@@ -319,7 +321,7 @@ End Class
 
 
 
-Public Class StructuredDepth_LineDetect3D
+Public Class StructuredDepth_LineSweep
     Inherits VBparent
     Dim dlines As StructuredDepth_LineDetect
     Dim addW As AddWeighted_Basics
@@ -356,5 +358,79 @@ Public Class StructuredDepth_LineDetect3D
         addW.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addW.Run(ocvb)
         dst1 = addW.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class StructuredDepth_LineDetect3D
+    Inherits VBparent
+    Dim dlines As StructuredDepth_LineDetect
+    Dim addW As AddWeighted_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        addW = New AddWeighted_Basics(ocvb)
+        dlines = New StructuredDepth_LineDetect(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Slice step size in pixels", 1, 100, 50)
+
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Restart the search for lines"
+
+        ocvb.desc = "Compute a 3D slope for detected lines"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If dlines.p1.Count = 0 Or check.Box(0).Checked Then
+            check.Box(0).Checked = False
+            Static vertRadio = findRadio("Horizontal Slice")
+            Static offsetSlider = findSlider("Offset for the slice")
+            Static stepSlider = findSlider("Slice step size")
+            Dim stepsize = stepSlider.value
+            Dim offset = ocvb.frameCount Mod stepsize
+            dlines.p1.Clear()
+            dlines.p2.Clear()
+            For i = offset To offsetSlider.maximum - 1 Step stepsize
+                offsetSlider.Value = i
+                dlines.Run(ocvb)
+                If dlines.p1.Count > 10 Then Exit For
+            Next
+
+            Dim imuPC = dlines.sliceV.structD.top2D.gCloud.imuPointCloud
+            If vertRadio.checked Then imuPC = dlines.sliceH.structD.side2D.gCloud.imuPointCloud
+
+            Dim minDistance = Single.MaxValue
+            Dim p1 As cv.Point2f
+            Dim p2 As cv.Point2f
+            For i = 0 To dlines.p1.Count - 1
+                Dim pt1 = dlines.p1(i)
+                Dim z1 = imuPC.Get(Of cv.Point3f)(pt1.X, pt1.Y)
+                For j = i + 1 To dlines.p1.Count - 1
+                    Dim pt2 = dlines.p1(j)
+                    Dim z2 = imuPC.Get(Of cv.Point3f)(pt2.X, pt2.Y)
+                    Dim dist = Math.Sqrt((z1.X - z2.X) * (z1.X - z2.X) + (z1.Y - z2.Y) * (z1.Y - z2.Y) + (z1.Z - z2.Z) * (z1.Z - z2.Z))
+                    If dist < minDistance Then
+                        minDistance = dist
+                        p1 = pt1
+                        p2 = pt2
+                    End If
+                Next
+            Next
+            dst2.SetTo(0)
+            dlines.drawLinesAndSave(dst2, cv.Scalar.White)
+            dst2.Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        End If
+
+        label1 = dlines.label1
+
+        dst1 = ocvb.color
+        dst1.SetTo(cv.Scalar.White, dst2)
     End Sub
 End Class
