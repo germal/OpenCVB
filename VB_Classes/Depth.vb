@@ -1570,7 +1570,7 @@ Public Class Depth_InRange
         If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f(ocvb)
         cv.Cv2.InRange(depth32f, cv.Scalar.All(min), cv.Scalar.All(max), depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
-        ocvb.pointCloud.SetTo(0, noDepthMask.Resize(ocvb.pointCloud.Size))
+        ' ocvb.pointCloud.SetTo(0, noDepthMask.Resize(ocvb.pointCloud.Size))
         depth32f.SetTo(0, noDepthMask)
         dst1 = depth32f.Clone.SetTo(0, noDepthMask)
         If standalone Or depth32fAfterMasking Then dst2 = depth32f.Clone.SetTo(0, depthMask)

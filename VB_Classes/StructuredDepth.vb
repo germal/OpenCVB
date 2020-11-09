@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class StructuredDepth_BasicsSide
+Public Class StructuredDepth_BasicsH
     Inherits VBparent
     Public side2D As Histogram_SideData
     Dim inrange As Depth_InRange
@@ -15,7 +15,7 @@ Public Class StructuredDepth_BasicsSide
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-        sliders.setupTrackBar(1, "Offset for the slice", 0, src.Height - 1, src.Height / 2)
+        sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2)
 
         histThresholdSlider = findSlider("Histogram threshold")
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -35,13 +35,19 @@ Public Class StructuredDepth_BasicsSide
             histThresholdSlider.Value = 10 ' this camera is showing a lot of data below the ground plane.
         End If
 
+        check.Setup(ocvb, caller, 1)
+        check.Box(0).Text = "Reload the IMU PointCloud"
+        check.Box(0).Checked = True
+
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         ocvb.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static reloadCheck = findCheckBox("Reload the IMU PointCloud")
+        'If reloadCheck.checked Then
         side2D.Run(ocvb)
-        dst2 = side2D.dst1
+        dst2 = side2D.dst2
 
         Dim yCoordinate = inputYCoordinate ' if zero, find the ycoordinate.
         If inputYCoordinate = 0 Then
@@ -66,16 +72,16 @@ Public Class StructuredDepth_BasicsSide
         Dim planeY = side2D.meterMin * (side2D.cameraLevel - yCoordinate) / side2D.cameraLevel
         If yCoordinate > side2D.cameraLevel Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLevel) / (dst2.Height - side2D.cameraLevel)
 
-        Dim pixelsPerMeterV = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
-        Dim thicknessMeters = cushion * pixelsPerMeterV
+        Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
+        Dim thicknessMeters = cushion * metersPerPixel
         inrange.minVal = planeY - thicknessMeters
         inrange.maxVal = planeY + thicknessMeters
-        inrange.src = side2D.split(1)
+        inrange.src = side2D.split(1).Clone
         inrange.Run(ocvb)
-        maskPlane = inrange.depth32f.ConvertScaleAbs(255)
+        maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dst1 = ocvb.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane.Resize(src.Size))
+        dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
     End Sub
 End Class
@@ -86,11 +92,11 @@ End Class
 
 
 
-Public Class StructuredDepth_BasicsTop
+Public Class StructuredDepth_BasicsV
     Inherits VBparent
     Public top2D As Histogram_TopData
     Dim inrange As Depth_InRange
-    Dim sideStruct As StructuredDepth_BasicsSide
+    Dim sideStruct As StructuredDepth_BasicsH
     Dim cushionSlider As Windows.Forms.TrackBar
     Dim offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
@@ -98,11 +104,10 @@ Public Class StructuredDepth_BasicsTop
         initParent(ocvb)
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
-        sideStruct = New StructuredDepth_BasicsSide(ocvb)
+        sideStruct = New StructuredDepth_BasicsH(ocvb)
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
-        offsetSlider.Maximum = src.Width - 1
         offsetSlider.Value = src.Width / 2
 
         ocvb.desc = "Find and isolate planes using the top view histogram data"
@@ -110,26 +115,29 @@ Public Class StructuredDepth_BasicsTop
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
+        Static reloadCheck = findCheckBox("Reload the IMU PointCloud")
+        'If reloadCheck.checked Then
         top2D.Run(ocvb)
-        dst2 = top2D.dst1
+        dst2 = top2D.dst2
 
         Dim cushion = cushionSlider.Value
         dst2.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst2.Height), cv.Scalar.Yellow, cushion)
 
-        Dim pixelsPerMeterV = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
-        Dim thicknessMeters = cushion * pixelsPerMeterV
-
         Dim planeX = top2D.meterMin * (top2D.cameraLevel - xCoordinate) / top2D.cameraLevel
         If xCoordinate > top2D.cameraLevel Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLevel) / (dst2.Width - top2D.cameraLevel)
 
+        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
+        Dim thicknessMeters = cushion * metersPerPixel
+
         inrange.minVal = planeX - thicknessMeters
         inrange.maxVal = planeX + thicknessMeters
-        inrange.src = top2D.split(0)
+        inrange.src = top2D.split(0).Clone
         inrange.Run(ocvb)
-        maskPlane = inrange.depth32f.ConvertScaleAbs(255)
+
+        maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dst1 = ocvb.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane.Resize(src.Size))
+        dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
     End Sub
 End Class
@@ -143,10 +151,10 @@ End Class
 
 Public Class StructuredDepth_Floor
     Inherits VBparent
-    Dim structD As StructuredDepth_BasicsSide
+    Dim structD As StructuredDepth_BasicsH
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        structD = New StructuredDepth_BasicsSide(ocvb)
+        structD = New StructuredDepth_BasicsH(ocvb)
         structD.floorRun = True
         Static histThresholdSlider = findSlider("Histogram threshold")
         histThresholdSlider.value = 10 ' some cameras can show data below ground level...
@@ -178,10 +186,10 @@ End Class
 
 Public Class StructuredDepth_Ceiling
     Inherits VBparent
-    Dim structD As StructuredDepth_BasicsSide
+    Public structD As StructuredDepth_BasicsH
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        structD = New StructuredDepth_BasicsSide(ocvb)
+        structD = New StructuredDepth_BasicsH(ocvb)
         ocvb.desc = "A complementary algorithm to StructuredDepth_Floor..."
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -199,11 +207,11 @@ End Class
 
 Public Class StructuredDepth_SliceH
     Inherits VBparent
-    Public structD As StructuredDepth_BasicsSide
+    Public structD As StructuredDepth_BasicsH
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        structD = New StructuredDepth_BasicsSide(ocvb)
-        ocvb.desc = "Take a slice through the side2d projection and show it in a top-down view."
+        structD = New StructuredDepth_BasicsH(ocvb)
+        ocvb.desc = "Take a slice through the side2d projection and show it in a side view."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -222,11 +230,11 @@ End Class
 
 Public Class StructuredDepth_SliceV
     Inherits VBparent
-    Public structD As StructuredDepth_BasicsTop
+    Public structD As StructuredDepth_BasicsV
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        structD = New StructuredDepth_BasicsTop(ocvb)
-        ocvb.desc = "Take a slice through the top2d projection and show it in a side view."
+        structD = New StructuredDepth_BasicsV(ocvb)
+        ocvb.desc = "Take a slice through the top2d projection and show it in a top-down view."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -244,68 +252,109 @@ End Class
 
 Public Class StructuredDepth_LineDetect
     Inherits VBparent
-    Dim sliceH As StructuredDepth_SliceH
-    Dim sliceV As StructuredDepth_SliceV
+    Public sliceH As StructuredDepth_SliceH
+    Public sliceV As StructuredDepth_SliceV
     Dim ldetect As LineDetector_Basics
+    Public p1 As New List(Of cv.Point2f)
+    Public p2 As New List(Of cv.Point2f)
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         ldetect = New LineDetector_Basics(ocvb)
         ldetect.drawLines = True
-        Dim lenSlider = findSlider("Line length threshold in pixels")
-        lenSlider.Value = 50
 
         sliceH = New StructuredDepth_SliceH(ocvb)
         sliceV = New StructuredDepth_SliceV(ocvb)
+
+        Dim cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        cushionSlider.Value = 1
 
         radio.Setup(ocvb, caller, 2)
         radio.check(0).Text = "Horizontal Slice"
         radio.check(1).Text = "Vertical Slice"
         radio.check(1).Checked = True
 
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         ocvb.desc = "Use the line detector on the output of the structuredDepth_Slice algorithms"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-        Static sortlines As New List(Of cv.Vec4f)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static saveRadio As Boolean = radio.check(1).Checked
+
+        Static sliceRadio = findRadio("Vertical Slice")
+        Static saveRadio As Boolean = sliceRadio.Checked
         Static offsetSlider = findSlider("Offset for the slice")
-        If saveRadio <> radio.check(1).Checked Then
-            saveRadio = radio.check(1).Checked
-            sortlines.Clear()
-            If radio.check(0).Checked Then
-                offsetSlider.Value = src.Height / 2
-                offsetSlider.Maximum = src.Height - 1
-            Else
-                offsetSlider.Maximum = src.Width - 1
-                offsetSlider.Value = src.Width / 2
-            End If
+        If saveRadio <> sliceRadio.Checked Then
+            saveRadio = sliceRadio.Checked
+            offsetSlider.Value = If(sliceRadio.Checked, src.Width / 2, src.Height / 2)
+            dst2.SetTo(0)
         End If
         If radio.check(0).Checked Then
             sliceH.Run(ocvb)
-            ldetect.src = sliceH.structD.maskPlane.Resize(dst2.Size)
+            ldetect.src = sliceH.structD.maskPlane.Clone
         Else
             sliceV.Run(ocvb)
-            ldetect.src = sliceV.structD.maskPlane.Resize(dst2.Size)
+            ldetect.src = sliceV.structD.maskPlane.Clone
         End If
 
-        Dim tmp = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ldetect.src.SetTo(0, tmp) ' remove previously recognized lines...
+        ldetect.src.SetTo(0, dst2)
         ldetect.Run(ocvb)
 
-        For Each line In ldetect.sortlines
-            If sortlines.Contains(line.Value) = False Then sortlines.Add(line.Value)
-        Next
-
-        Static thicknessSlider = findSlider("Line thickness")
+        Dim thicknessSlider = findSlider("Line thickness")
         Dim thickness = thicknessSlider.Value
-        dst2.SetTo(0)
-        For Each v In sortlines
-            Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-            Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-            dst2.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+        For Each v In ldetect.sortlines
+            Dim pt1 = New cv.Point(CInt(v.Value(0)), CInt(v.Value(1)))
+            Dim pt2 = New cv.Point(CInt(v.Value(2)), CInt(v.Value(3)))
+            p1.Add(pt1)
+            p2.Add(pt2)
+            dst2.Line(pt1, pt2, cv.Scalar.White, thickness, cv.LineTypes.AntiAlias)
         Next
 
         dst1 = If(radio.check(0).Checked, sliceH.dst1, sliceV.dst1)
-        label1 = "Detected line count = " + CStr(sortlines.Count)
+        label1 = "Detected line count = " + CStr(ldetect.sortlines.Count) + " total lines = " + CStr(p1.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class StructuredDepth_LineDetect3D
+    Inherits VBparent
+    Dim dlines As StructuredDepth_LineDetect
+    Dim addW As AddWeighted_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        addW = New AddWeighted_Basics(ocvb)
+        dlines = New StructuredDepth_LineDetect(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Slice step size in pixels", 1, 100, 50)
+
+        ocvb.desc = "Compute a 3D slope for detected lines"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static reloadCheck = findCheckBox("Reload the IMU PointCloud")
+        reloadCheck.checked = True
+        dlines.Run(ocvb)
+        reloadCheck.checked = False
+        Static offsetSlider = findSlider("Offset for the slice")
+        Static stepSlider = findSlider("Slice step size")
+        Dim stepsize = stepSlider.value
+        Dim offset = ocvb.frameCount Mod stepsize
+        For i = offset To offsetSlider.maximum - 1 Step stepsize
+            offsetSlider.Value = i
+            dlines.Run(ocvb)
+        Next
+
+        dst2 = dlines.dst2
+        label1 = dlines.label1
+
+        addW.src1 = ocvb.color
+        addW.src2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        addW.Run(ocvb)
+        dst1 = addW.dst1
     End Sub
 End Class

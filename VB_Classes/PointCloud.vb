@@ -909,7 +909,7 @@ Public Class PointCloud_FrustrumTop
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
-        topView.gCloudIMU.clipDepthData = False
+        topView.gCloud.clipDepthData = False
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
@@ -950,7 +950,7 @@ Public Class PointCloud_FrustrumSide
         frustrum = New Draw_Frustrum(ocvb)
 
         sideView = New Histogram_SideView2D(ocvb)
-        sideView.gCloudIMU.clipDepthData = False
+        sideView.gCloud.clipDepthData = False
 
         Dim histSlider = findSlider("Histogram threshold")
         histSlider.Value = 0
@@ -1242,7 +1242,7 @@ Public Class PointCloud_GVectorPlane
             Dim minRow = dst2.Height * maxAngle / 180
 
             Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeterV * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
-            Dim split = gLine.sideIMU.sideView.gCloudIMU.imuPointCloud.Split()
+            Dim split = gLine.sideIMU.sideView.gCloud.imuPointCloud.Split()
             Dim ySplit = split(1)
             inrange.src = split(1)
             inrange.minVal = planeY - If(floorRun, 0, cushion)

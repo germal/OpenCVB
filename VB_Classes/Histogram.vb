@@ -991,7 +991,7 @@ End Class
 
 Public Class Histogram_SideView2D
     Inherits VBparent
-    Public gCloudIMU As Depth_PointCloud_IMU
+    Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Dim cameraYSlider As Windows.Forms.TrackBar
     Dim frustrumSlider As Windows.Forms.TrackBar
@@ -1027,7 +1027,7 @@ Public Class Histogram_SideView2D
                 frustrumSlider.Value = 58
                 cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
         End Select
-        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        gCloud = New Depth_PointCloud_IMU(ocvb)
         thresholdSlider = findSlider("Histogram threshold")
         If standalone Then thresholdSlider.Value = 1
 
@@ -1036,7 +1036,7 @@ Public Class Histogram_SideView2D
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloudIMU.Run(ocvb)
+        gCloud.Run(ocvb)
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
         ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
@@ -1046,7 +1046,7 @@ Public Class Histogram_SideView2D
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {dst1.Height, dst1.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
         Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
@@ -1068,7 +1068,7 @@ End Class
 
 Public Class Histogram_SideData
     Inherits VBparent
-    Public gCloudIMU As Depth_PointCloud_IMU
+    Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public meterMin As Double
     Public meterMax As Double
@@ -1079,15 +1079,15 @@ Public Class Histogram_SideData
         initParent(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
-        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        gCloud = New Depth_PointCloud_IMU(ocvb)
 
         label1 = "ZY (Side View)"
         ocvb.desc = "Create a 2D histogram for depth in ZY side view that with precise y measurements in meters"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloudIMU.Run(ocvb)
-        Dim imuPC = gCloudIMU.imuPointCloud
+        gCloud.Run(ocvb)
+        Dim imuPC = gCloud.imuPointCloud
         split = imuPC.Split()
 
         split(1).MinMaxLoc(meterMin, meterMax)
@@ -1124,8 +1124,8 @@ Public Class Histogram_SideData
 
         cameraLevel = CInt(dst1.Height * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
 
-        dst1.Line(New cv.Point(0, cameraLevel), New cv.Point(dst1.Width, cameraLevel), cv.Scalar.Yellow, 1)
-        label1 = "Camera level is " + CStr(cameraLevel) + " rows from the top (in yellow)"
+        dst1.Circle(New cv.Point(0, cameraLevel), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        label1 = "Camera dot below at " + CStr(cameraLevel) + " rows from the top"
         label2 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00")
     End Sub
 End Class
@@ -1139,7 +1139,7 @@ End Class
 
 Public Class Histogram_TopView2D
     Inherits VBparent
-    Public gCloudIMU As Depth_PointCloud_IMU
+    Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Dim cmat As PointCloud_Colorize
@@ -1149,7 +1149,7 @@ Public Class Histogram_TopView2D
         initParent(ocvb)
 
         cmat = New PointCloud_Colorize(ocvb)
-        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        gCloud = New Depth_PointCloud_IMU(ocvb)
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
@@ -1182,7 +1182,7 @@ Public Class Histogram_TopView2D
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloudIMU.Run(ocvb)
+        gCloud.Run(ocvb)
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
         ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
@@ -1193,7 +1193,7 @@ Public Class Histogram_TopView2D
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
         Dim histSize() = {dst1.Height, dst1.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloudIMU.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
         Static histThresholdSlider = findSlider("Histogram threshold")
@@ -1216,7 +1216,7 @@ End Class
 
 Public Class Histogram_TopData
     Inherits VBparent
-    Public gCloudIMU As Depth_PointCloud_IMU
+    Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public meterMin As Double
     Public meterMax As Double
@@ -1228,7 +1228,7 @@ Public Class Histogram_TopData
         initParent(ocvb)
 
         kalman = New Kalman_Basics(ocvb)
-        gCloudIMU = New Depth_PointCloud_IMU(ocvb)
+        gCloud = New Depth_PointCloud_IMU(ocvb)
         If VB_Classes.ActiveTask.algParms.camNames.D455 = ocvb.parms.cameraName Then IntelBug = True
 
         label1 = "XZ (Top View)"
@@ -1236,8 +1236,8 @@ Public Class Histogram_TopData
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloudIMU.Run(ocvb)
-        Dim imuPC = gCloudIMU.imuPointCloud
+        gCloud.Run(ocvb)
+        Dim imuPC = gCloud.imuPointCloud
         split = imuPC.Split()
 
         Const DEFAULT_METER = 2

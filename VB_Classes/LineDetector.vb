@@ -11,7 +11,7 @@ Public Class LineDetector_Basics
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
         sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
-        sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 100)
+        sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 50)
         sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector

@@ -392,7 +392,7 @@ Public Class OpenGL_GravityTransform
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloud.src = ocvb.pointCloud
         gCloud.Run(ocvb)
 
