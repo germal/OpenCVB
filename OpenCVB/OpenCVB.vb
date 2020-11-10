@@ -12,6 +12,7 @@ Module opencv_module
     Public callTraceLock As New Mutex(True, "callTraceLock")
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraThreadLock As New Mutex(True, "CameraThreadLock")
+    Public closeCameraLock As New Mutex(True, "closeCameraLock")
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -425,7 +426,7 @@ Public Class OpenCVB
         AvailableAlgorithms.SelectedItem = item.Name
     End Sub
     Private Sub RestartCamera()
-        camera.closePipe()
+        camera.stopCamera()
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
@@ -440,11 +441,9 @@ Public Class OpenCVB
             camera = cameraKinect
             optionsForm.cameraIndex = 0
         End If
-        If camera.devicename = "" Then
-            camera.width = camWidth
-            camera.height = camHeight
-            camera.initialize(fps)
-        End If
+        camera.width = camWidth
+        camera.height = camHeight
+        camera.initialize(fps)
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub

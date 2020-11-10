@@ -613,7 +613,7 @@ Public Class StructuredDepth_MultiSliceLines
         initParent(ocvb)
         ldetect = New LineDetector_Basics(ocvb)
         Dim lenSlider = findSlider("Line length threshold in pixels")
-        lenSlider.Value = 1000 ' don't need the yellow line...
+        lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
         multi = New StructuredDepth_MultiSlice(ocvb)
         ocvb.desc = "Detect lines in the multiSlice output"
     End Sub
@@ -633,7 +633,7 @@ End Class
 
 
 
-Public Class StructuredDepth_MultiSliceRectangles
+Public Class StructuredDepth_MultiSlicePolygon
     Inherits VBparent
     Dim multi As StructuredDepth_MultiSlice
     Public Sub New(ocvb As VBocvb)
@@ -656,7 +656,7 @@ Public Class StructuredDepth_MultiSliceRectangles
 
         dst2.SetTo(0)
         For i = 0 To contours.Length - 1
-            If contours(i).Length = 4 Then
+            If contours(i).Length >= 4 And contours(i).Length <= 8 Then
                 cv.Cv2.DrawContours(dst2, contours, i, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
             End If
         Next
