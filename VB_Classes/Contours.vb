@@ -111,8 +111,7 @@ Public Class Contours_FindandDraw
         img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Dim contours()() As cv.Point = Nothing
-        ReDim contours(contours0.Length - 1)
+        Dim contours(contours0.Length - 1)() As cv.Point
         For j = 0 To contours0.Length - 1
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
         Next

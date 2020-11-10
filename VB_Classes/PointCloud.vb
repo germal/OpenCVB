@@ -1419,7 +1419,7 @@ End Class
 
 
 
-Public Class PointCloud_SinglePoints
+Public Class PointCloud_Singletons
     Inherits VBparent
     Public topView As Histogram_TopView2D
     Public inrange As Depth_InRange
@@ -1434,7 +1434,7 @@ Public Class PointCloud_SinglePoints
 
         label1 = "Top down view before inrange sampling"
         label2 = "Histogram after filtering for single-only histogram bins"
-        ocvb.desc = "Find floor and ceiling using gravity aligned top-down view and selecting only single samples from histogram"
+        ocvb.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
