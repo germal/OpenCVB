@@ -1097,7 +1097,7 @@ Public Class Histogram_SideData
 
         split(1).MinMaxLoc(meterMin, meterMax)
 
-        top2D.setMeterMinMax(ocvb, meterMin, meterMax)
+        top2D.setMeterMinMax(ocvb, split, meterMin, meterMax)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
@@ -1224,7 +1224,7 @@ Public Class Histogram_TopData
         label1 = "XZ (Top View)"
         ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
     End Sub
-    Public Sub setMeterMinMax(ocvb As VBocvb, ByRef meterMin As Single, ByRef meterMax As Single)
+    Public Sub setMeterMinMax(ocvb As VBocvb, split() As cv.Mat, ByRef meterMin As Single, ByRef meterMax As Single)
         Const DEFAULT_METER = 2
         If IntelBug Then
             ' The point cloud x data contains bogus values well outside the possible range for x so here the values for meterMin/Max are just set to 2...
@@ -1266,7 +1266,7 @@ Public Class Histogram_TopData
         Dim imuPC = gCloud.imuPointCloud
         split = imuPC.Split()
 
-        setMeterMinMax(ocvb, meterMin, meterMax)
+        setMeterMinMax(ocvb, split, meterMin, meterMax)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
