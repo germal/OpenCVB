@@ -1475,7 +1475,7 @@ Public Class Depth_WorldXYZ
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f(ocvb)
-        If depthUnitsMeters = False Then input = (input() * 0.001).ToMat
+        If depthUnitsMeters = False Then input = (input * 0.001).ToMat
         Dim xy As New cv.Point3f
         For xy.Y = 0 To xyzFrame.Height - 1
             For xy.X = 0 To xyzFrame.Width - 1
