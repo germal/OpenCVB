@@ -983,18 +983,26 @@ Public Class OpenCVB
         ' run at all the different resolutions...
         Dim specialSingleCount = AvailableAlgorithms.Items.Count = 1
         If specialSingleCount Then saveAlgorithmName = "" ' stop the current algorith which we will restart below (only 1 algorithm in the list.)
+        Dim only1Resolution As Boolean
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Or specialSingleCount Then
-            If optionsForm.mediumResolution.Checked Then
-                optionsForm.HighResolution.Checked = True
-            ElseIf optionsForm.HighResolution.Checked Then
-                optionsForm.mediumResolution.Checked = True
+            If OptionsDialog.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Or
+               OptionsDialog.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Or
+               OptionsDialog.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
+
+                only1Resolution = True
+            Else
+                If optionsForm.mediumResolution.Checked Then
+                    optionsForm.HighResolution.Checked = True
+                ElseIf optionsForm.HighResolution.Checked Then
+                    optionsForm.mediumResolution.Checked = True
+                End If
             End If
             saveLayout()
         End If
 
-        If optionsForm.mediumResolution.Checked Then ' only change cameras when in medium resolution.
-            ' after sweeping through medium to high resolution, sweep through the cameras as well...
-            If (AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0) Then
+        If optionsForm.mediumResolution.Checked Or only1Resolution Then ' only change cameras when in medium resolution or when only 1 resolution
+            ' after sweeping through resolutions, sweep through the cameras as well...
+            If (AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0) Or specialSingleCount Then
                 Dim cameraIndex = optionsForm.cameraIndex
                 Dim saveCameraIndex = optionsForm.cameraIndex
                 cameraIndex += 1
