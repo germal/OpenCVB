@@ -159,8 +159,8 @@ Public Class CameraKinect
     Public Sub stopCamera()
         MyBase.closePipe()
         SyncLock closeCameraLock
-            KinectClose(cPtr)
-            cPtr = 0
+            'KinectClose(cPtr)
+            'cPtr = 0
         End SyncLock
     End Sub
 End Class

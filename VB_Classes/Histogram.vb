@@ -1071,16 +1071,18 @@ End Class
 Public Class Histogram_SideData
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
+    Dim top2D As Histogram_TopData
     Public histOutput As New cv.Mat
     Public meterMin As Double
     Public meterMax As Double
     Public split() As cv.Mat
-    Public cameraLevel As Integer
+    Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
     Public resizeHistOutput As Boolean = True
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        top2D = New Histogram_TopData(ocvb)
         kalman = New Kalman_Basics(ocvb)
         gCloud = New Depth_PointCloud_IMU(ocvb)
 
@@ -1094,28 +1096,9 @@ Public Class Histogram_SideData
         split = imuPC.Split()
 
         split(1).MinMaxLoc(meterMin, meterMax)
-        Const DEFAULT_METER = 2
-        If meterMin = 0 Then meterMin = -DEFAULT_METER ' if the pointcloud is missing or all zeros...
-        If meterMax = 0 Then meterMax = DEFAULT_METER
 
-        kalman.kInput(0) = meterMin
-        kalman.kInput(1) = meterMax
-        kalman.Run(ocvb)
-        meterMin = kalman.kOutput(0)
-        meterMax = kalman.kOutput(1)
+        top2D.setMeterMinMax(ocvb, meterMin, meterMax)
 
-        Static lastMinY As Single
-        Static lastMaxY As Single
-        ' no slider for the x below because it is not important - just a way to keep the scale from changing on every frame
-        If Math.Abs(lastMinY - meterMin) > 0.2 Or Math.Abs(lastMaxY - meterMax) > 0.2 Then
-            lastMinY = meterMin
-            lastMaxY = meterMax
-        Else
-            meterMin = lastMinY
-            meterMax = lastMaxY
-        End If
-
-        If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
@@ -1126,10 +1109,10 @@ Public Class Histogram_SideData
         dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        cameraLevel = CInt(dst1.Height * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
+        cameraLoc = CInt(dst1.Height * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
 
-        dst1.Circle(New cv.Point(0, cameraLevel), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        label1 = "Camera dot below at " + CStr(cameraLevel) + " rows from the top"
+        dst1.Circle(New cv.Point(0, cameraLoc), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        label1 = "Camera dot below at " + CStr(cameraLoc) + " rows from the top"
         label2 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00")
     End Sub
 End Class
@@ -1227,7 +1210,7 @@ Public Class Histogram_TopData
     Public meterMin As Double
     Public meterMax As Double
     Public split() As cv.Mat
-    Public cameraLevel As Integer
+    Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
     Dim IntelBug As Boolean
     Public resizeHistOutput As Boolean = True
@@ -1241,12 +1224,7 @@ Public Class Histogram_TopData
         label1 = "XZ (Top View)"
         ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run(ocvb)
-        Dim imuPC = gCloud.imuPointCloud
-        split = imuPC.Split()
-
+    Public Sub setMeterMinMax(ocvb As VBocvb, ByRef meterMin As Single, ByRef meterMax As Single)
         Const DEFAULT_METER = 2
         If IntelBug Then
             ' The point cloud x data contains bogus values well outside the possible range for x so here the values for meterMin/Max are just set to 2...
@@ -1268,32 +1246,43 @@ Public Class Histogram_TopData
             meterMin = kalman.kOutput(0)
             meterMax = kalman.kOutput(1)
 
-            Static lastMinY As Single
-            Static lastMaxY As Single
+            Static lastMin As Single
+            Static lastMax As Single
             ' no slider for the x below because it is not important - just a way to keep the scale from changing on every frame
-            If Math.Abs(lastMinY - meterMin) > 0.2 Or Math.Abs(lastMaxY - meterMax) > 0.2 Then
-                lastMinY = meterMin
-                lastMaxY = meterMax
+            If Math.Abs(lastMin - meterMin) > 0.2 Or Math.Abs(lastMax - meterMax) > 0.2 Then
+                lastMin = meterMin
+                lastMax = meterMax
             Else
-                meterMin = lastMinY
-                meterMax = lastMaxY
+                meterMin = lastMin
+                meterMax = lastMax
             End If
+            If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
         End If
+    End Sub
+
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloud.Run(ocvb)
+        Dim imuPC = gCloud.imuPointCloud
+        split = imuPC.Split()
+
+        setMeterMinMax(ocvb, meterMin, meterMax)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
+        histOutput = histOutput.Flip(cv.FlipMode.X)
         Static histThresholdSlider = findSlider("Histogram threshold")
         dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        cameraLevel = CInt(dst1.Width * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
+        cameraLoc = CInt(dst1.Width * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
 
-        dst1.Line(New cv.Point(cameraLevel, 0), New cv.Point(cameraLevel, dst2.Height), cv.Scalar.Yellow, 1)
-        label1 = "Camera level is " + CStr(cameraLevel) + " rows from the left (in yellow)"
+        dst1.Line(New cv.Point(cameraLoc, dst2.Height), New cv.Point(cameraLoc, 0), cv.Scalar.Yellow, 1)
+        label1 = "Camera level is " + CStr(cameraLoc) + " rows from the left (in yellow)"
         label2 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00")
     End Sub
 End Class

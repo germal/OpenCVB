@@ -688,7 +688,7 @@ Public Class PointCloud_BothViews
     Inherits VBparent
     Public topPixel As PointCloud_Objects
     Public sidePixel As PointCloud_Objects
-    Dim levelCheck As IMU_IsCameraLevel
+    Dim levelCheck As IMU_IscameraLevel
     Public detailText As String
     Public backMat As New cv.Mat
     Public backMatMask As New cv.Mat
@@ -698,7 +698,7 @@ Public Class PointCloud_BothViews
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
-        levelCheck = New IMU_IsCameraLevel(ocvb)
+        levelCheck = New IMU_IscameraLevel(ocvb)
         topPixel = New PointCloud_Objects(ocvb)
         topPixel.SideViewFlag = False
         sidePixel = New PointCloud_Objects(ocvb)

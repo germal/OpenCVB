@@ -429,7 +429,7 @@ End Class
 
 
 
-Public Class IMU_IsCameraLevel
+Public Class IMU_IscameraLevel
     Inherits VBparent
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
@@ -444,7 +444,7 @@ Public Class IMU_IsCameraLevel
         ocvb.desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gx = ocvb.IMU_Acceleration.X
         Dim gy = ocvb.IMU_Acceleration.Y
         Dim gz = ocvb.IMU_Acceleration.Z
