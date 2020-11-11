@@ -12,7 +12,6 @@ Module opencv_module
     Public callTraceLock As New Mutex(True, "callTraceLock")
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraThreadLock As New Mutex(True, "CameraThreadLock")
-    Public closeCameraLock As New Mutex(True, "closeCameraLock")
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -437,7 +436,7 @@ Public Class OpenCVB
             camera = cameraKinect
             optionsForm.cameraIndex = 0
         End If
-        camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
+        If camera.devicename = "" Then camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
@@ -1172,7 +1171,7 @@ Public Class OpenCVB
         saveAlgorithmName = ""
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         Application.DoEvents()
-        camera.closePipe()
+        camera.stopCamera()
         textDesc = ""
         saveLayout()
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)

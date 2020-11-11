@@ -38,6 +38,14 @@ Public Class OptionsDialog
         Me.Close()
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
+        If cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Or
+           cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Or
+           cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
+            mediumResolution.Enabled = False
+            If mediumResolution.Checked Then HighResolution.Checked = True
+        Else
+            mediumResolution.Enabled = True
+        End If
         cameraIndex = sender.tag
     End Sub
     Public Sub enableCameras()
@@ -46,13 +54,13 @@ Public Class OptionsDialog
         Next
     End Sub
     Public Sub saveResolution()
-        Select Case OpenCVB.resolutionXY.Height
-            Case 480
+        Select Case OpenCVB.resolutionXY.Width
+            Case 640
                 mediumResolution.Checked = True
                 OpenCVB.resolutionXY = New cv.Size(640, 480)
                 resolutionResizeFactor = 0.5
                 resolutionName = "Medium"
-            Case 720
+            Case 1280
                 HighResolution.Checked = True
                 OpenCVB.resolutionXY = New cv.Size(1280, 720)
                 resolutionResizeFactor = 1
@@ -89,8 +97,8 @@ Public Class OptionsDialog
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
 
-        OpenCVB.resolutionXY.Width = 640 ' getsetting("OpenCVB", "resolutionWidth", "resolutionWidth", 640
-        OpenCVB.resolutionXY.Height = 480 '  GetSetting("OpenCVB", "resolutionHeight", "resolutionHeight", 480
+        OpenCVB.resolutionXY.Width = GetSetting("OpenCVB", "resolutionWidth", "resolutionWidth", 640)
+        OpenCVB.resolutionXY.Height = GetSetting("OpenCVB", "resolutionHeight", "resolutionHeight", 480)
         saveResolution()
 
         cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.camNames.D435i)

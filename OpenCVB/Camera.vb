@@ -114,7 +114,7 @@ Public Class Camera
         frameCount += 1
         newImagesAvailable = True
     End Sub
-    Public Sub closePipe()
+    Public Sub stopCamera()
         pipelineClosed = True
         frameCount = 0
     End Sub
