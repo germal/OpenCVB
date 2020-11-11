@@ -61,10 +61,8 @@ Public Class OpenCVB
     Dim TreeViewDialog As TreeviewForm
     Dim openFileForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
-    Public camWidth As Integer, camHeight As Integer
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public resolutionXY As cv.Size
-    Public resolutionSetting As Integer = 1
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
@@ -90,8 +88,6 @@ Public Class OpenCVB
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Public intermediateReview As String
-    Dim defaultWidth As Integer
-    Dim defaultHeight As Integer
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -441,7 +437,7 @@ Public Class OpenCVB
             camera = cameraKinect
             optionsForm.cameraIndex = 0
         End If
-        If camera.devicename = "" Then camera.initialize(camWidth, camHeight, fps)
+        camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
@@ -456,30 +452,6 @@ Public Class OpenCVB
             TreeViewDialog.Show()
             TreeViewDialog.BringToFront()
         End If
-    End Sub
-    Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
-        If camPic(2) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
-        LineUpCamPics()
-    End Sub
-    Private Sub LineUpCamPics()
-        Dim width = CInt((Me.Width - 42) / 2)
-        Dim height = CInt(width * camHeight / camWidth)
-        If Math.Abs(width - camWidth / 2) < 2 Then width = camWidth / 2
-        If Math.Abs(height - camHeight / 2) < 2 Then height = camHeight / 2
-        Dim padX = 12
-        Dim padY = 60
-        camPic(0).Size = New Size(width, height)
-        camPic(1).Size = New Size(width, height)
-        camPic(2).Size = New Size(width * 2, height)
-
-        camPic(0).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        camPic(1).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        camPic(2).Image = New Bitmap(width * 2, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        camPic(0).Location = New Point(padX, padY)
-        camPic(1).Location = New Point(camPic(0).Left + camPic(0).Width, padY)
-        camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height)
-        saveLayout()
     End Sub
     Public Function USBenumeration(searchName As String) As Integer
         Static firstCall = 0
@@ -534,8 +506,8 @@ Public Class OpenCVB
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
 
-        defaultwidth = camWidth * 2 / resizeForDisplay + border * 7
-        defaultHeight = camHeight * 2 / resizeForDisplay + ToolStrip1.Height + border * 12
+        Dim defaultWidth = resolutionXY.Width * 2 + border * 7
+        Dim defaultHeight = resolutionXY.Height * 2 + ToolStrip1.Height + border * 12
         Me.Width = GetSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", defaultWidth)
         Me.Height = GetSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", defaultHeight)
         If Me.Height < 50 Then
@@ -547,7 +519,7 @@ Public Class OpenCVB
 
         For i = 0 To camPic.Length - 1
             If camPic(i) Is Nothing Then camPic(i) = New PictureBox()
-            camPic(i).Size = New Size(If(i < 2, camWidth / resizeForDisplay, camWidth * 2 / resizeForDisplay), camHeight / resizeForDisplay)
+            camPic(i).Size = New Size(If(i < 2, resolutionXY.Width, resolutionXY.Width * 2), resolutionXY.Height)
             AddHandler camPic(i).DoubleClick, AddressOf campic_DoubleClick
             AddHandler camPic(i).Click, AddressOf campic_Click
             AddHandler camPic(i).Paint, AddressOf campic_Paint
@@ -557,7 +529,47 @@ Public Class OpenCVB
             camPic(i).Tag = i
             Me.Controls.Add(camPic(i))
         Next
-        LineUpCamPics()
+        LineUpCamPics(resizing:=False)
+    End Sub
+    Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
+        If camPic(2) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
+        LineUpCamPics(resizing:=True)
+    End Sub
+    Private Sub LineUpCamPics(resizing As Boolean)
+        If resizing = False Then
+            If optionsForm.SnapToGrid.Checked Then
+                Select Case resolutionXY.Height
+                    Case 240
+                        Me.Width = 683
+                        Me.Height = 592
+                    Case 480
+                        Me.Width = 1321
+                        Me.Height = 1071
+                    Case 720
+                        Me.Width = 1321
+                        Me.Height = 835
+                End Select
+            End If
+        End If
+
+        Dim width = CInt((Me.Width - 42) / 2)
+        Dim height = CInt(width * resolutionXY.Height / resolutionXY.Width)
+        If Math.Abs(width - resolutionXY.Width / 2) < 2 Then width = resolutionXY.Width / 2
+        If Math.Abs(height - resolutionXY.Height / 2) < 2 Then height = resolutionXY.Height / 2
+        Dim padX = 12
+        Dim padY = 60
+        camPic(0).Size = New Size(width, height)
+        camPic(1).Size = New Size(width, height)
+        camPic(2).Size = New Size(width * 2, height)
+
+        camPic(0).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        camPic(1).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        camPic(2).Image = New Bitmap(width * 2, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        camPic(0).Location = New Point(padX, padY)
+        camPic(1).Location = New Point(camPic(0).Left + camPic(0).Width, padY)
+        camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height)
+        saveLayout()
     End Sub
     Private Sub FindPython()
         Dim pythonStr = GetSetting("OpenCVB", "PythonExe", "PythonExe", "Python.exe")
@@ -802,8 +814,8 @@ Public Class OpenCVB
                 drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                 drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                If drawRect.X + drawRect.Width > camWidth Then drawRect.Width = camWidth - drawRect.X
-                If drawRect.Y + drawRect.Height > camHeight Then drawRect.Height = camHeight - drawRect.Y
+                If drawRect.X + drawRect.Width > resolutionXY.Width Then drawRect.Width = resolutionXY.Width - drawRect.X
+                If drawRect.Y + drawRect.Height > resolutionXY.Height Then drawRect.Height = resolutionXY.Height - drawRect.Y
                 BothFirstAndLastReady = True
             End If
             mousePicTag = pic.Tag
@@ -813,7 +825,7 @@ Public Class OpenCVB
                 mousePoint.X -= camPic(0).Width
                 mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
             End If
-            Dim resizeFactor = camWidth / camPic(0).Width
+            Dim resizeFactor = resolutionXY.Width / camPic(0).Width
             mousePoint *= resizeFactor * optionsForm.resolutionResizeFactor
 
         Catch ex As Exception
@@ -900,9 +912,9 @@ Public Class OpenCVB
         Dim resolutionDesc As String = ""
         Select Case optionsForm.resolutionName
             Case "Low"
-                resolutionDesc = "320x180"
+                resolutionDesc = "320x240"
             Case "Medium"
-                resolutionDesc = "640x360"
+                resolutionDesc = "640x480"
             Case "High"
                 resolutionDesc = "1280x720"
         End Select
@@ -973,18 +985,16 @@ Public Class OpenCVB
         Dim specialSingleCount = AvailableAlgorithms.Items.Count = 1
         If specialSingleCount Then saveAlgorithmName = "" ' stop the current algorith which we will restart below (only 1 algorithm in the list.)
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Or specialSingleCount Then
-            If optionsForm.LowResolution.Checked Then
-                optionsForm.mediumResolution.Checked = True
-            ElseIf optionsForm.mediumResolution.Checked Then
+            If optionsForm.mediumResolution.Checked Then
                 optionsForm.HighResolution.Checked = True
             ElseIf optionsForm.HighResolution.Checked Then
-                optionsForm.LowResolution.Checked = True
+                optionsForm.mediumResolution.Checked = True
             End If
             saveLayout()
         End If
 
-        If optionsForm.LowResolution.Checked Then ' only change cameras when in low resolution.
-            ' after sweeping through low to high resolution, sweep through the cameras as well...
+        If optionsForm.mediumResolution.Checked Then ' only change cameras when in medium resolution.
+            ' after sweeping through medium to high resolution, sweep through the cameras as well...
             If (AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0) Then
                 Dim cameraIndex = optionsForm.cameraIndex
                 Dim saveCameraIndex = optionsForm.cameraIndex
@@ -1032,17 +1042,7 @@ Public Class OpenCVB
             If saveCurrentCamera <> optionsForm.cameraIndex Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
-            If optionsForm.SnapToGrid.Checked Then
-                camPic(0).Size = New Size(camWidth / 2, camHeight / 2)
-                camPic(1).Size = New Size(camWidth / 2, camHeight / 2)
-                camPic(2).Size = New Size(camWidth, camHeight / 2)
-
-                camPic(1).Left = camPic(0).Left + camPic(0).Width
-                camPic(2).Top = camPic(0).Top + camPic(0).Height
-
-                Me.Width = defaultWidth
-                Me.Height = defaultHeight
-            End If
+            LineUpCamPics(resizing:=False)
             saveLayout()
         End If
         StartAlgorithmTask()
@@ -1079,7 +1079,7 @@ Public Class OpenCVB
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 
-        Dim imgSize = New cv.Size(CInt(resolutionXY.width * 2), CInt(resolutionXY.Height))
+        Dim imgSize = New cv.Size(CInt(resolutionXY.Width * 2), CInt(resolutionXY.Height))
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
@@ -1107,7 +1107,7 @@ Public Class OpenCVB
             If algName = "" Then Exit Sub
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, myLocation, camWidth, camHeight)
+            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, myLocation, resolutionXY.Width, resolutionXY.Height)
             textDesc = task.ocvb.desc
             openFileInitialDirectory = task.ocvb.openFileInitialDirectory
             openFileDialogRequested = task.ocvb.openFileDialogRequested

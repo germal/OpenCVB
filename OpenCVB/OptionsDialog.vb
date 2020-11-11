@@ -19,9 +19,9 @@ Public Class OptionsDialog
 
     Public resolutionResizeFactor As Single = 1
     Public resolutionName As String = "High"
-
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
-        SaveSetting("OpenCVB", "resolutionXY", "resolutionXY", OpenCVB.resolutionSetting)
+        SaveSetting("OpenCVB", "resolutionWidth", "resolutionWidth", OpenCVB.resolutionXY.Width)
+        SaveSetting("OpenCVB", "resolutionHeight", "resolutionHeight", OpenCVB.resolutionXY.Height)
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", cameraIndex)
 
         SaveSetting("OpenCVB", "ShowLabels", "ShowLabels", ShowLabels.Checked)
@@ -46,20 +46,13 @@ Public Class OptionsDialog
         Next
     End Sub
     Public Sub saveResolution()
-        OpenCVB.camWidth = 1280
-        OpenCVB.camHeight = 720
-        Select Case OpenCVB.resolutionSetting
-            Case 0
-                LowResolution.Checked = True
-                OpenCVB.resolutionXY = New cv.Size(320, 180)
-                resolutionResizeFactor = 0.25
-                resolutionName = "Low"
-            Case 1
+        Select Case OpenCVB.resolutionXY.Height
+            Case 480
                 mediumResolution.Checked = True
-                OpenCVB.resolutionXY = New cv.Size(640, 360)
+                OpenCVB.resolutionXY = New cv.Size(640, 480)
                 resolutionResizeFactor = 0.5
                 resolutionName = "Medium"
-            Case 2
+            Case 720
                 HighResolution.Checked = True
                 OpenCVB.resolutionXY = New cv.Size(1280, 720)
                 resolutionResizeFactor = 1
@@ -96,7 +89,8 @@ Public Class OptionsDialog
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
 
-        OpenCVB.resolutionSetting = GetSetting("OpenCVB", "resolutionXY", "resolutionXY", medRes)
+        OpenCVB.resolutionXY.Width = 640 ' getsetting("OpenCVB", "resolutionWidth", "resolutionWidth", 640
+        OpenCVB.resolutionXY.Height = 480 '  GetSetting("OpenCVB", "resolutionHeight", "resolutionHeight", 480
         saveResolution()
 
         cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.camNames.D435i)
@@ -167,12 +161,9 @@ Public Class OptionsDialog
         End If
     End Sub
     Private Sub HighResolution_CheckedChanged(sender As Object, e As EventArgs) Handles HighResolution.CheckedChanged
-        OpenCVB.resolutionSetting = highRes
+        OpenCVB.resolutionXY = New cv.Size(1280, 720)
     End Sub
     Private Sub mediumResolution_CheckedChanged(sender As Object, e As EventArgs) Handles mediumResolution.CheckedChanged
-        OpenCVB.resolutionSetting = medRes
-    End Sub
-    Private Sub LowResolution_CheckedChanged(sender As Object, e As EventArgs) Handles LowResolution.CheckedChanged
-        OpenCVB.resolutionSetting = lowRes
+        OpenCVB.resolutionXY = New cv.Size(640, 480)
     End Sub
 End Class

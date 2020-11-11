@@ -24,7 +24,7 @@ Partial Class OptionsDialog
     Private Sub InitializeComponent()
         Me.CameraGroup = New System.Windows.Forms.GroupBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.LowResolution = New System.Windows.Forms.RadioButton()
+        Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.HighResolution = New System.Windows.Forms.RadioButton()
         Me.mediumResolution = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
@@ -46,7 +46,6 @@ Partial Class OptionsDialog
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.FontDialog1 = New System.Windows.Forms.FontDialog()
-        Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -67,31 +66,29 @@ Partial Class OptionsDialog
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.SnapToGrid)
-        Me.GroupBox1.Controls.Add(Me.LowResolution)
         Me.GroupBox1.Controls.Add(Me.HighResolution)
         Me.GroupBox1.Controls.Add(Me.mediumResolution)
         Me.GroupBox1.Location = New System.Drawing.Point(21, 303)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(936, 128)
+        Me.GroupBox1.Size = New System.Drawing.Size(936, 105)
         Me.GroupBox1.TabIndex = 4
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Resolution"
         '
-        'LowResolution
+        'SnapToGrid
         '
-        Me.LowResolution.AutoSize = True
-        Me.LowResolution.Location = New System.Drawing.Point(17, 25)
-        Me.LowResolution.Name = "LowResolution"
-        Me.LowResolution.Size = New System.Drawing.Size(210, 24)
-        Me.LowResolution.TabIndex = 2
-        Me.LowResolution.TabStop = True
-        Me.LowResolution.Text = "320x180 - Low resolution"
-        Me.LowResolution.UseVisualStyleBackColor = True
+        Me.SnapToGrid.AutoSize = True
+        Me.SnapToGrid.Location = New System.Drawing.Point(331, 37)
+        Me.SnapToGrid.Name = "SnapToGrid"
+        Me.SnapToGrid.Size = New System.Drawing.Size(414, 24)
+        Me.SnapToGrid.TabIndex = 3
+        Me.SnapToGrid.Text = "Snap to Grid - unchecked leaves main form size alone"
+        Me.SnapToGrid.UseVisualStyleBackColor = True
         '
         'HighResolution
         '
         Me.HighResolution.AutoSize = True
-        Me.HighResolution.Location = New System.Drawing.Point(18, 85)
+        Me.HighResolution.Location = New System.Drawing.Point(18, 67)
         Me.HighResolution.Name = "HighResolution"
         Me.HighResolution.Size = New System.Drawing.Size(223, 24)
         Me.HighResolution.TabIndex = 1
@@ -102,19 +99,19 @@ Partial Class OptionsDialog
         'mediumResolution
         '
         Me.mediumResolution.AutoSize = True
-        Me.mediumResolution.Location = New System.Drawing.Point(18, 55)
+        Me.mediumResolution.Location = New System.Drawing.Point(18, 37)
         Me.mediumResolution.Name = "mediumResolution"
         Me.mediumResolution.Size = New System.Drawing.Size(237, 24)
         Me.mediumResolution.TabIndex = 0
         Me.mediumResolution.TabStop = True
-        Me.mediumResolution.Text = "640x360 - Medium resolution"
+        Me.mediumResolution.Text = "640x480 - Medium resolution"
         Me.mediumResolution.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
-        Me.GroupBox2.Location = New System.Drawing.Point(21, 435)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 420)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(936, 143)
         Me.GroupBox2.TabIndex = 5
@@ -146,7 +143,7 @@ Partial Class OptionsDialog
         '
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(22, 584)
+        Me.GroupBox4.Location = New System.Drawing.Point(22, 571)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(935, 139)
         Me.GroupBox4.TabIndex = 8
@@ -179,7 +176,7 @@ Partial Class OptionsDialog
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 729)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 719)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(936, 146)
         Me.GroupBox6.TabIndex = 9
@@ -248,7 +245,7 @@ Partial Class OptionsDialog
         Me.GroupBox3.Controls.Add(Me.fontInfo)
         Me.GroupBox3.Controls.Add(Me.Button1)
         Me.GroupBox3.Controls.Add(Me.Label4)
-        Me.GroupBox3.Location = New System.Drawing.Point(18, 881)
+        Me.GroupBox3.Location = New System.Drawing.Point(18, 873)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(936, 116)
         Me.GroupBox3.TabIndex = 12
@@ -281,16 +278,6 @@ Partial Class OptionsDialog
         Me.Label4.Size = New System.Drawing.Size(255, 20)
         Me.Label4.TabIndex = 1
         Me.Label4.Text = "Select the font for all TrueType text"
-        '
-        'SnapToGrid
-        '
-        Me.SnapToGrid.AutoSize = True
-        Me.SnapToGrid.Location = New System.Drawing.Point(331, 55)
-        Me.SnapToGrid.Name = "SnapToGrid"
-        Me.SnapToGrid.Size = New System.Drawing.Size(414, 24)
-        Me.SnapToGrid.TabIndex = 3
-        Me.SnapToGrid.Text = "Snap to Grid - unchecked leaves main form size alone"
-        Me.SnapToGrid.UseVisualStyleBackColor = True
         '
         'OptionsDialog
         '
@@ -349,7 +336,6 @@ Partial Class OptionsDialog
     Friend WithEvents Label4 As Label
     Friend WithEvents fontInfo As Label
     Friend WithEvents FontDialog1 As FontDialog
-    Friend WithEvents LowResolution As RadioButton
     Friend WithEvents EnableNumPy As CheckBox
     Friend WithEvents SnapToGrid As CheckBox
 End Class
