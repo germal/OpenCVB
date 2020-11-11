@@ -43,23 +43,27 @@ public:
 	k4a_device_configuration_t config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 	char outMsg[10000];
 	Mat color;
+	int colorRows, colorCols, colorBuffSize;
 
 private:
 	k4a_capture_t capture = NULL;
 	const int32_t TIMEOUT_IN_MS = 1000;
 	size_t infraredSize = 0;
 	k4a_image_t point_cloud = NULL;
-	int colorRows = 720, colorCols = 1280, colorBuffSize = 1280*720;
 	k4a_image_t depthInColor;
 public:
 	~KinectCamera()
 	{
 	}
-	KinectCamera()
+	KinectCamera() {}
+	KinectCamera(int width, int height)
 	{
 		deviceCount = k4a_device_get_installed_count();
 		if (deviceCount > 0)
 		{
+			colorCols = width;
+			colorRows = height;
+			colorBuffSize = width * height;
 			device = NULL;
 			if (K4A_RESULT_SUCCEEDED != k4a_device_open(K4A_DEVICE_DEFAULT, &device)) { deviceCount = 0; return; }
 
@@ -159,9 +163,9 @@ int KinectDeviceCount(KinectCamera *kc)
 }
 
 extern "C" __declspec(dllexport)
-int *KinectOpen()
+int *KinectOpen(int width, int height)
 {
-	KinectCamera *kc = new KinectCamera();
+	KinectCamera *kc = new KinectCamera(width, height);
 	if (kc->deviceCount == 0) return 0;
 	kcPtr = kc;
 	return (int *)kc;

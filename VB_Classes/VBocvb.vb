@@ -85,21 +85,22 @@ Public Class VBocvb
     Public imuZAxis As Boolean
     Public intermediateReview As String
     Public intermediateObject As VBparent
-    Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect)
+    Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect, pointcloudWidth As Integer, pointcloudHeight As Integer)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        pointCloud = New cv.Mat(pointcloudHeight, pointcloudWidth, cv.MatType.CV_32FC3, cv.Scalar.All(0))
         result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         TTtextData = New List(Of TTtext)
 
         Select Case color.Width
             Case 320
-                fontSize = color.Width / 1280
+                fontSize = color.Width / pointCloud.Width
                 dotSize = 3
                 lineSize = 1
                 resfactor = 0.1
                 resolutionIndex = 1
             Case 640
-                fontSize = color.Width / 1280
+                fontSize = color.Width / pointCloud.Width
                 dotSize = 7
                 lineSize = 2
                 resfactor = 0.3

@@ -94,7 +94,9 @@ Public Class CameraMyntD
     Private Sub IMUdataCollection()
         MyntDtaskIMU(cPtr)
     End Sub
-    Public Sub initialize(fps As integer)
+    Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
+        width = _width
+        height = _height
         cPtr = MyntDOpen(width, height, 30)
         deviceName = "MyntEyeD 1000"
         cameraName = deviceName

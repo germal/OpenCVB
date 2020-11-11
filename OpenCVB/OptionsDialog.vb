@@ -46,6 +46,8 @@ Public Class OptionsDialog
         Next
     End Sub
     Public Sub saveResolution()
+        OpenCVB.camWidth = 1280
+        OpenCVB.camHeight = 720
         Select Case OpenCVB.resolutionSetting
             Case 0
                 LowResolution.Checked = True

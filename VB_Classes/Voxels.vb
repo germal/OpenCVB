@@ -31,12 +31,15 @@ Public Class Voxels_Basics_MT
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split() = ocvb.pointCloud.Split()
 
-        inrange.src = split(2) * 1000
-        inrange.Run(ocvb)
         Static minSlider = findSlider("InRange Min Depth")
         Static maxSlider = findSlider("InRange Max Depth")
         minDepth = minSlider.Value
         maxDepth = maxSlider.Value
+
+        inrange.minVal = minDepth
+        inrange.maxVal = maxDepth
+        inrange.src = split(2) * 1000
+        inrange.Run(ocvb)
 
         grid.src = split(2)
         grid.Run(ocvb)

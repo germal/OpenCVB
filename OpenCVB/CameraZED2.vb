@@ -104,7 +104,9 @@ Public Class CameraZED2
         Dim height As Int64
     End Structure
 
-    Public Sub initialize(fps As integer)
+    Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
+        width = _width
+        height = _height
         cPtr = Zed2Open(width, height, 60)
         deviceName = "StereoLabs ZED 2"
         cameraName = deviceName

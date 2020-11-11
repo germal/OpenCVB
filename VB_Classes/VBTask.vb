@@ -119,10 +119,10 @@ Public Class ActiveTask : Implements IDisposable
             Console.WriteLine("Error in layoutOptions: " + ex.Message)
         End Try
     End Sub
-    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, location As cv.Rect)
+    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, location As cv.Rect, camWidth As Integer, camHeight As Integer)
         optionLocation = New cv.Point(location.X, location.Y + location.Height)
         Randomize() ' just in case anyone uses VB.Net's Rnd
-        ocvb = New VBocvb(resolution, parms, location)
+        ocvb = New VBocvb(resolution, parms, location, camWidth, camHeight)
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
         ocvb.parms = parms
         buildColors(ocvb)
