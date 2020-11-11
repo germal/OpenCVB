@@ -96,7 +96,9 @@ Public Class CameraRS2
         Console.WriteLine("Intel RealSense Firmware Version: " + Devices(index).Info(2))
         Return Devices(index).Info(1)
     End Function
-    Public Sub initialize(fps As Integer)
+    Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
+        width = _width
+        height = _height
         deviceName = cameraName ' devicename is used to determine that the camera has been initialized.
         cPtr = RS2Open(width, height, deviceIndex)
         depthScale = RS2DepthScale(cPtr) * 1000

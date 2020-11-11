@@ -15,7 +15,7 @@ Public Class OpenGL_Basics
     Dim rgbBuffer(0) As Byte
     Dim dataBuffer(0) As Byte
     Dim pointCloudBuffer(0) As Byte
-    Public memMapValues(49) As Double ' more than needed - buffer for growth.
+    Public memMapValues(38) As Double
     Public pointSize As integer = 2
     Public dataInput As New cv.Mat
     Public FOV As Single = 150
@@ -52,7 +52,7 @@ Public Class OpenGL_Basics
                                      ocvb.IMU_Acceleration.X, ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z, ocvb.IMU_TimeStamp,
                                      1, eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
                                      scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
-                                     imageLabel.Length)
+                                     imageLabel.Length, pointCloudInput.Width, pointCloudInput.Height)
         Next
     End Sub
     Private Sub startOpenGLWindow(ocvb As VBocvb, pcSize As Integer)
@@ -78,7 +78,7 @@ Public Class OpenGL_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then pointCloudInput = ocvb.pointCloud
+        If pointCloudInput.Width = 0 Then pointCloudInput = ocvb.pointCloud
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb, pcSize)
@@ -93,6 +93,7 @@ Public Class OpenGL_Basics
         Dim rgb = src.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
         If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
         If dataBuffer.Length <> dataInput.Total * dataInput.ElemSize Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
+
         memMapUpdate(ocvb)
 
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)

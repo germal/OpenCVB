@@ -61,9 +61,9 @@ Public Class OpenCVB
     Dim TreeViewDialog As TreeviewForm
     Dim openFileForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
-    Dim camWidth As Integer = 1280, camHeight As Integer = 720
+    Public camWidth As Integer, camHeight As Integer
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
-    Public resolutionXY = New cv.Size(1280, 720)
+    Public resolutionXY As cv.Size
     Public resolutionSetting As Integer = 1
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
@@ -441,9 +441,7 @@ Public Class OpenCVB
             camera = cameraKinect
             optionsForm.cameraIndex = 0
         End If
-        camera.width = camWidth
-        camera.height = camHeight
-        camera.initialize(fps)
+        If camera.devicename = "" Then camera.initialize(camWidth, camHeight, fps)
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
@@ -1109,7 +1107,7 @@ Public Class OpenCVB
             If algName = "" Then Exit Sub
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, myLocation)
+            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, myLocation, camWidth, camHeight)
             textDesc = task.ocvb.desc
             openFileInitialDirectory = task.ocvb.openFileInitialDirectory
             openFileDialogRequested = task.ocvb.openFileDialogRequested

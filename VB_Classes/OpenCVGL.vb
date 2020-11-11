@@ -37,7 +37,7 @@ Public Class OpenCVGL_Image_CPP
             sliders.trackbar(2).Value = 0 ' pitch
             sliders.trackbar(3).Value = 0 ' roll
 
-            OpenCVGL_Image_Open(1280, 720)
+            OpenCVGL_Image_Open(ocvb.pointCloud.Width, ocvb.pointCloud.Height)
         End If
         ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub

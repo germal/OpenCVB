@@ -140,6 +140,8 @@ static double timestamp;
 static float timeConversionUnits = 1000.0f;
 static int IMU_Present = false;
 static int imageLabelBufferSize = 0;
+static int pointcloudWidth;
+static int pointcloudHeight;
 static char imageLabel[1000];
 
 /* alpha indicates the part that gyro and accelerometer take in computation of theta; higher alpha gives more weight to gyro, but too high
@@ -231,6 +233,8 @@ static void readPipeAndMemMap()
 	timeConversionUnits = (float)sharedMem[33];
 	imuAlphaFactor = (float)sharedMem[34];
 	imageLabelBufferSize = (int)sharedMem[35];
+	pointcloudWidth = (int)sharedMem[36];
+	pointcloudHeight = (int)sharedMem[37];
 
 	DWORD dwRead;
 	if ((int)sharedMem[7] != rgbBufferSize)
@@ -266,9 +270,9 @@ static void readPipeAndMemMap()
 	if (rgbBufferSize != dwRead * 4)
 	{
 		Mat tmp = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
-		imageWidth = 1280;
-		imageHeight = 720;
-		resize(tmp, rgbMat, cv::Size(1280, 720)); // point cloud is always at 1280x720
+		imageHeight = pointcloudHeight;
+		imageWidth = pointcloudWidth;
+		resize(tmp, rgbMat, cv::Size(pointcloudWidth, pointcloudHeight)); 
 	} else {
 		rgbMat = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
 	}

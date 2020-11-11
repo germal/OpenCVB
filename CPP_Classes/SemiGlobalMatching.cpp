@@ -45,7 +45,7 @@ public:
 				}
 			}
 		}
-		disparityMapstage2 = Mat(Size(leftImage.cols, leftImage.rows), CV_8UC1, Scalar::all(0));
+		disparityMapstage2 = Mat(Size(cols, rows), CV_8UC1, Scalar::all(0));
 	}
 	void Run()
 	{

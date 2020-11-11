@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Imports rs = Intel.RealSense
 Module Kinect_Interface
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function KinectOpen() As IntPtr
+    Public Function KinectOpen(width As Integer, height As Integer) As IntPtr
     End Function
     <DllImport(("Cam_Kinect4.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function KinectDeviceCount(cPtr As IntPtr) As integer
@@ -70,8 +70,10 @@ Public Class CameraKinect
         Dim metric_radius As Single ' Metric radius */
     End Structure
 
-    Public Sub initialize(fps As integer)
-        cPtr = KinectOpen()
+    Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
+        width = _width
+        height = _height
+        cPtr = KinectOpen(width, height)
         deviceName = "Kinect for Azure"
         cameraName = deviceName
         If cPtr <> 0 Then
