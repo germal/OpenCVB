@@ -65,7 +65,7 @@ Public Class Harris_Features_CPP
         gray32f.ConvertTo(dst1, cv.MatType.CV_8U)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim weight = sliders.trackbar(4).Value / 100
-        cv.Cv2.AddWeighted(dst1, weight, src, 1 - weight, 0, dst2)
+        cv.Cv2.AddWeighted(dst1, weight, ocvb.color, 1 - weight, 0, dst2)
         label2 = "RGB overlaid with Harris result. Weight = " + Format(weight, "0%")
     End Sub
     Public Sub Close()
