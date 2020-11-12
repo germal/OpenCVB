@@ -43,6 +43,8 @@ Public Class StructuredDepth_BasicsH
         inrange.Run(ocvb)
         maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
+        label1 = Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00000") + " cm width at offset = " + CStr(yCoordinate)
+
         dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
@@ -99,8 +101,9 @@ Public Class StructuredDepth_BasicsV
         inrange.maxVal = planeX + thicknessMeters
         inrange.src = top2D.split(0).Clone
         inrange.Run(ocvb)
-
         maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+
+        label1 = Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00000") + " cm width at offset = " + CStr(xCoordinate)
 
         dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
@@ -435,5 +438,21 @@ Public Class StructuredDepth_MultiSlicePolygon
                 cv.Cv2.DrawContours(dst2, contours, i, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class StructuredDepth_SliceXPlot
+    Inherits VBparent
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        ocvb.desc = "Plot the x offset of a vertical slice"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
     End Sub
 End Class

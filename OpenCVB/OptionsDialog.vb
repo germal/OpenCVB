@@ -17,7 +17,6 @@ Public Class OptionsDialog
     Public Const medRes = 1
     Public Const highRes = 2
 
-    Public resolutionResizeFactor As Single = 1
     Public resolutionName As String = "High"
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         SaveSetting("OpenCVB", "resolutionWidth", "resolutionWidth", OpenCVB.resolutionXY.Width)
@@ -58,12 +57,10 @@ Public Class OptionsDialog
             Case 640
                 mediumResolution.Checked = True
                 OpenCVB.resolutionXY = New cv.Size(640, 480)
-                resolutionResizeFactor = 0.5
                 resolutionName = "Medium"
             Case 1280
                 HighResolution.Checked = True
                 OpenCVB.resolutionXY = New cv.Size(1280, 720)
-                resolutionResizeFactor = 1
                 resolutionName = "High"
         End Select
     End Sub

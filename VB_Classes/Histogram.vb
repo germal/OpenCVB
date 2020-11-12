@@ -852,14 +852,12 @@ End Class
 Public Class Histogram_BackProjectionGrayscale
     Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
-    Public mats As Mat_4to1
     Public histIndex As Integer
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         hist = New Histogram_KalmanSmoothed(ocvb)
         Dim binSlider = findSlider("Histogram Bins")
         binSlider.Value = 10
-        mats = New Mat_4to1(ocvb)
 
         label1 = "Move mouse to backproject each histogram column"
         ocvb.desc = "Explore Backprojection of each element of a grayscale histogram."
@@ -868,40 +866,26 @@ Public Class Histogram_BackProjectionGrayscale
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
         hist.Run(ocvb)
-        mats.mat(0) = hist.dst1
+        dst1 = hist.dst1
 
-        histIndex = If(standalone, Math.Floor(hist.histogram.Rows * ocvb.mousePoint.X / src.Width), histIndex) ' provided externally when not standalone.
+        histIndex = CInt(hist.histogram.Rows * ocvb.mousePoint.X / src.Width)
+        Console.WriteLine("x = " + CStr(ocvb.mousePoint.X))
         Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
         Dim barRange = 255 / hist.sliders.trackbar(0).Value
 
         Dim mask As New cv.Mat
-        For i = 0 To 4 - 1
-            Dim index = (histIndex + i)
-            If index >= hist.histogram.Rows Then index = i - 1
-            Dim ranges() = New cv.Rangef() {New cv.Rangef(index * barRange, (index + 1) * barRange)}
-            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) '  = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            Dim mat() As cv.Mat = {gray}
-            Dim bins() = {0}
-            cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
-            gray.SetTo(255)
-            gray.SetTo(0, mask)
-            If i = 0 Then
-                dst2 = gray.Clone
-                If standalone = False Then Exit For ' minimize work when not running standalone.
-            Else
-                mats.mat(i) = gray.Clone
-            End If
-        Next
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) '  = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        Dim mat() As cv.Mat = {gray}
+        Dim bins() = {0}
+        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
+
+        gray.SetTo(0)
+        gray.SetTo(255, mask)
+        dst2 = gray.Clone
 
         label2 = "Backprojection index " + CStr(histIndex) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
-        If standalone Then
-            mats.mat(0).Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
-            Dim tmp = mats.mat(0).Clone
-            mats.mat(0) = mats.mat(1).Clone ' avoids clipping the tops of the bar chart.  
-            mats.mat(1) = tmp
-            mats.Run(ocvb)
-            dst1 = mats.dst1
-        End If
+        dst1.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
     End Sub
 End Class
 

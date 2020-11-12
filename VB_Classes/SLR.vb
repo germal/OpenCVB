@@ -48,12 +48,6 @@ Public Class SLR_Basics
             dst2.SetTo(0)
             ocvb.trueText(label1 + " yielded no results...")
         End If
-        If ocvb.frameCount = 0 Then
-            For i = 1 To resultY.Count - 1
-                Dim d = resultY(i - 1) - resultY(i)
-                Console.WriteLine(CStr(d))
-            Next
-        End If
         If standalone = False Then
             input.dataX.Clear()
             input.dataY.Clear()

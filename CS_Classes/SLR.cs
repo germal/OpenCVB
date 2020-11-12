@@ -212,7 +212,7 @@ namespace CS_Classes
             if (!LinearRegressionParameters(n_vals, sum_x, sum_y, sum_xx, sum_xy, lin_regr_out))
             {
                 //  this is a very unusual case for real data  
-                Console.WriteLine("SLR: special case error");
+                //Console.WriteLine("SLR: special case error");
                 return;
             }
 

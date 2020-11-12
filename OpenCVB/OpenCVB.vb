@@ -824,8 +824,7 @@ Public Class OpenCVB
                 mousePoint.X -= camPic(0).Width
                 mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
             End If
-            Dim resizeFactor = resolutionXY.Width / camPic(0).Width
-            mousePoint *= resizeFactor * optionsForm.resolutionResizeFactor
+            mousePoint *= resolutionXY.Width / camPic(0).Width
 
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
