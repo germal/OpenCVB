@@ -869,7 +869,6 @@ Public Class Histogram_BackProjectionGrayscale
         dst1 = hist.dst1
 
         histIndex = CInt(hist.histogram.Rows * ocvb.mousePoint.X / src.Width)
-        Console.WriteLine("x = " + CStr(ocvb.mousePoint.X))
         Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
         Dim barRange = 255 / hist.sliders.trackbar(0).Value
 
