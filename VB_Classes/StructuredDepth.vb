@@ -68,12 +68,11 @@ End Class
 Public Class StructuredDepth_BasicsV
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Dim inrange As Depth_InRange
+    Public inrange As Depth_InRange
     Dim sideStruct As StructuredDepth_BasicsH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
-    Public filterZ As Single = -1 ' filterZ is used in StructuredDepth_SliceXPlot
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         top2D = New Histogram_TopData(ocvb)
@@ -98,15 +97,6 @@ Public Class StructuredDepth_BasicsV
         Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
-
-        Dim maskZplane As New cv.Mat(top2D.split(0).Size, cv.MatType.CV_8U, 255)
-        If filterZ > 0 Then
-            inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
-            inrange.maxVal = filterZ + 0.05
-            inrange.src = top2D.split(2)
-            inrange.Run(ocvb)
-            maskZplane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        End If
 
         inrange.minVal = planeX - thicknessMeters
         inrange.maxVal = planeX + thicknessMeters
@@ -482,9 +472,23 @@ Public Class StructuredDepth_SliceXPlot
         structD.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
         dst2.Circle(New cv.Point(col, maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Dim z = (dst2.Height - maxLoc.Y) / dst2.Height * ocvb.maxZ
-        Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
-        label2 = "Peak histogram count at " + Format(z, "#0.00") + " meters +-" + Format(10 / pixelsPerMeter, "#0.00") + " m"
+        Dim filterZ = (dst2.Height - maxLoc.Y) / dst2.Height * ocvb.maxZ
 
+        Dim maskZplane As New cv.Mat(structD.top2D.split(0).Size, cv.MatType.CV_8U, 255)
+        If filterZ > 0 Then
+            structD.inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
+            structD.inrange.maxVal = filterZ + 0.05
+            structD.inrange.src = structD.top2D.split(2)
+            structD.inrange.Run(ocvb)
+            maskZplane = structD.inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        End If
+
+        If filterZ > 0 Then cv.Cv2.BitwiseAnd(structD.maskPlane, maskZplane, maskZplane)
+
+        dst1 = ocvb.color.Clone
+        dst1.SetTo(cv.Scalar.White, maskZplane)
+
+        Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
+        label2 = "Peak histogram count at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / pixelsPerMeter, "#0.00") + " m"
     End Sub
 End Class

@@ -132,6 +132,7 @@ Public Class ActiveTask : Implements IDisposable
                    "Problem likely originated with the UIindexer.")
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
+
         ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
         ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
         ' https://www.mynteye.com/pages/mynt-eye-d

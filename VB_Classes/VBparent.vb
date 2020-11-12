@@ -36,7 +36,7 @@ Public Class VBparent : Implements IDisposable
     Public label1 As String
     Public label2 As String
     Public msRNG As New System.Random
-    Dim algorithm As Object
+    Public algorithm As Object
     Public caller As String
     Public desc As String
     Dim callStack = ""
@@ -255,8 +255,8 @@ Public Class VBparent : Implements IDisposable
             proc(i).Kill()
         Next i
         If pyStream IsNot Nothing Then pyStream.Dispose()
-        Console.WriteLine("The following System.MissingMemberException indicates the algorithm has no 'Close' method (harmless notification).")
-        algorithm.Close()  ' Close any unmanaged classes...
+        Dim type As Type = algorithm.GetType()
+        If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
         sliders.Dispose()
         check.Dispose()
         radio.Dispose()
