@@ -1255,8 +1255,8 @@ Public Class Histogram_TopData
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
-
         histOutput = histOutput.Flip(cv.FlipMode.X)
+
         Static histThresholdSlider = findSlider("Histogram threshold")
         dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)

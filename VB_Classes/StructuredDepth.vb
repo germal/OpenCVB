@@ -43,7 +43,8 @@ Public Class StructuredDepth_BasicsH
         inrange.Run(ocvb)
         maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        label1 = Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00000") + " cm width at offset = " + CStr(yCoordinate)
+        label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
         dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
@@ -72,6 +73,7 @@ Public Class StructuredDepth_BasicsV
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
+    Public filterZ As Single = -1 ' filterZ is used in StructuredDepth_SliceXPlot
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         top2D = New Histogram_TopData(ocvb)
@@ -97,13 +99,23 @@ Public Class StructuredDepth_BasicsV
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
 
+        Dim maskZplane As New cv.Mat(top2D.split(0).Size, cv.MatType.CV_8U, 255)
+        If filterZ > 0 Then
+            inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
+            inrange.maxVal = filterZ + 0.05
+            inrange.src = top2D.split(2)
+            inrange.Run(ocvb)
+            maskZplane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        End If
+
         inrange.minVal = planeX - thicknessMeters
         inrange.maxVal = planeX + thicknessMeters
         inrange.src = top2D.split(0).Clone
         inrange.Run(ocvb)
         maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        label1 = Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00000") + " cm width at offset = " + CStr(xCoordinate)
+        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
         dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
@@ -448,11 +460,31 @@ End Class
 
 Public Class StructuredDepth_SliceXPlot
     Inherits VBparent
+    Dim structD As StructuredDepth_BasicsV
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+        structD = New StructuredDepth_BasicsV(ocvb)
         ocvb.desc = "Plot the x offset of a vertical slice"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        structD.Run(ocvb)
+        dst2 = structD.dst2
+
+        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        Dim cushion = cushionSlider.value
+        Static offsetSlider = findSlider("Offset for the slice")
+        Dim col = CInt(offsetSlider.value)
+
+        Dim rect = New cv.Rect(col, 0, cushion, dst2.Height - 1)
+        Dim minVal As Double, maxVal As Double
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        structD.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+
+        dst2.Circle(New cv.Point(col, maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        Dim z = (dst2.Height - maxLoc.Y) / dst2.Height * ocvb.maxZ
+        Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
+        label2 = "Peak histogram count at " + Format(z, "#0.00") + " meters +-" + Format(10 / pixelsPerMeter, "#0.00") + " m"
+
     End Sub
 End Class
