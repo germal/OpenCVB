@@ -15,6 +15,7 @@ Public Class StructuredDepth_BasicsH
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
         sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2)
+        sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
 
         histThresholdSlider = findSlider("Histogram threshold")
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -218,15 +219,13 @@ End Class
 Public Class StructuredDepth_MultiSliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
+    Public structD As StructuredDepth_BasicsH
     Dim inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         side2D = New Histogram_SideData(ocvb)
         inrange = New Depth_InRange(ocvb)
-
-        sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-        sliders.setupTrackBar(1, "Slice step size in pixels", 1, 100, 20)
+        structD = New StructuredDepth_BasicsH(ocvb)
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -241,7 +240,7 @@ Public Class StructuredDepth_MultiSliceH
         Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
 
-        Static stepSlider = findSlider("Slice step size")
+        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
         Dim maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -269,14 +268,14 @@ End Class
 Public Class StructuredDepth_MultiSliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Dim multiH As StructuredDepth_MultiSliceH
+    Public structD As StructuredDepth_BasicsH
     Dim inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
-        multiH = New StructuredDepth_MultiSliceH(ocvb)
+        structD = New StructuredDepth_BasicsH(ocvb)
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -291,7 +290,7 @@ Public Class StructuredDepth_MultiSliceV
         Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
 
-        Static stepSlider = findSlider("Slice step size")
+        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
         Dim maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -320,15 +319,16 @@ Public Class StructuredDepth_MultiSlice
     Inherits VBparent
     Public top2D As Histogram_TopData
     Public side2D As Histogram_SideData
-    Dim multiH As StructuredDepth_MultiSliceH
-    Dim inrange As Depth_InRange
+    Dim struct As StructuredDepth_BasicsV
+    Public inrange As Depth_InRange
+    Public maskPlane As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         side2D = New Histogram_SideData(ocvb)
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
-        multiH = New StructuredDepth_MultiSliceH(ocvb)
+        struct = New StructuredDepth_BasicsV(ocvb)
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -344,7 +344,7 @@ Public Class StructuredDepth_MultiSlice
         Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
 
-        Static stepSlider = findSlider("Slice step size")
+        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -355,7 +355,8 @@ Public Class StructuredDepth_MultiSlice
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = top2D.split(0).Clone
             inrange.Run(ocvb)
-            dst2.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
+            maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst2.SetTo(255, maskPlane)
         Next
 
         For yCoordinate = 0 To src.Height - 1 Step stepsize
@@ -365,7 +366,9 @@ Public Class StructuredDepth_MultiSlice
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = side2D.split(1).Clone
             inrange.Run(ocvb)
-            dst2.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
+            Dim tmp = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            cv.Cv2.BitwiseOr(tmp, maskPlane, maskPlane)
+            dst2.SetTo(255, maskPlane)
         Next
 
         dst1 = ocvb.color.Clone
@@ -450,9 +453,11 @@ End Class
 
 Public Class StructuredDepth_SliceXPlot
     Inherits VBparent
+    Dim multi As StructuredDepth_MultiSlice
     Dim structD As StructuredDepth_BasicsV
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+        multi = New StructuredDepth_MultiSlice(ocvb)
         structD = New StructuredDepth_BasicsV(ocvb)
         ocvb.desc = "Plot the x offset of a vertical slice"
     End Sub
@@ -460,6 +465,7 @@ Public Class StructuredDepth_SliceXPlot
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         structD.Run(ocvb)
         dst2 = structD.dst2
+        multi.Run(ocvb)
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.value
@@ -469,26 +475,26 @@ Public Class StructuredDepth_SliceXPlot
         Dim rect = New cv.Rect(col, 0, cushion, dst2.Height - 1)
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
-        structD.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+        multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
         dst2.Circle(New cv.Point(col, maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Dim filterZ = (dst2.Height - maxLoc.Y) / dst2.Height * ocvb.maxZ
 
-        Dim maskZplane As New cv.Mat(structD.top2D.split(0).Size, cv.MatType.CV_8U, 255)
+        Dim maskZplane As New cv.Mat(multi.top2D.split(0).Size, cv.MatType.CV_8U, 255)
         If filterZ > 0 Then
-            structD.inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
-            structD.inrange.maxVal = filterZ + 0.05
-            structD.inrange.src = structD.top2D.split(2)
-            structD.inrange.Run(ocvb)
-            maskZplane = structD.inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            multi.inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
+            multi.inrange.maxVal = filterZ + 0.05
+            multi.inrange.src = multi.top2D.split(2)
+            multi.inrange.Run(ocvb)
+            maskZplane = multi.inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
         End If
 
-        If filterZ > 0 Then cv.Cv2.BitwiseAnd(structD.maskPlane, maskZplane, maskZplane)
+        If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.maskPlane, maskZplane, maskZplane)
 
         dst1 = ocvb.color.Clone
         dst1.SetTo(cv.Scalar.White, maskZplane)
 
         Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
-        label2 = "Peak histogram count at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / pixelsPerMeter, "#0.00") + " m"
+        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / pixelsPerMeter, "#0.00") + " m"
     End Sub
 End Class
