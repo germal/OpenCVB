@@ -21,12 +21,12 @@ Public Class Coherence_Basics
 
         Dim side As Integer
         Select Case src.Height
-            Case 180
-                side = 128
-            Case 360
+            Case 360, 480
                 side = 256
             Case 720
                 side = 512
+            Case Else
+                side = 128
         End Select
         Dim xoffset = src.Width / 2 - side / 2
         Dim yoffset = src.Height / 2 - side / 2

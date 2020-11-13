@@ -1203,8 +1203,6 @@ Public Class OpenCVB
             ' bring the data into the algorithm task.
             SyncLock bufferLock
                 If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
-                camera.newImagesAvailable = False
-
                 task.ocvb.color = camera.color.Resize(resolutionXY)
                 task.ocvb.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
                 task.ocvb.leftView = camera.leftView.Resize(resolutionXY)
@@ -1227,6 +1225,7 @@ Public Class OpenCVB
                 task.ocvb.CPU_TimeStamp = camera.CPU_TimeStamp
                 task.ocvb.CPU_FrameTime = camera.CPU_FrameTime
                 task.ocvb.intermediateReview = intermediateReview
+                camera.newImagesAvailable = False
             End SyncLock
 
             Try
