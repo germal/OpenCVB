@@ -46,11 +46,12 @@ public:
 
 		OpenParams params(dev_info.index);
 		params.stream_mode = StreamMode::STREAM_2560x720;
+		if (width == 640) params.stream_mode = StreamMode::STREAM_1280x480;
+		params.framerate = 30;
 		params.ir_intensity = 4;
 		params.color_mode = ColorMode::COLOR_RECTIFIED;
 		params.color_stream_format = StreamFormat::STREAM_YUYV;
 		params.depth_mode = DepthMode::DEPTH_RAW;
-		params.framerate = 30;
 
 		cam.Open(params);
 

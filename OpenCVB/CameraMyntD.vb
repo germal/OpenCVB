@@ -95,9 +95,15 @@ Public Class CameraMyntD
         MyntDtaskIMU(cPtr)
     End Sub
     Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
-        width = _width
-        height = _height
-        cPtr = MyntDOpen(width, height, 30)
+        If frameCount = 10 Then
+            width = _width
+            height = _height
+            cPtr = MyntDOpen(width, height, fps) ' can't get it to initialize depth without starting at 1280x720
+        Else
+            width = 1280
+            height = 720
+            cPtr = MyntDOpen(1280, 720, fps) ' always open first at full resolution
+        End If
         deviceName = "MyntEyeD 1000"
         cameraName = deviceName
         If cPtr <> 0 Then
@@ -153,6 +159,7 @@ Public Class CameraMyntD
     End Sub
 
     Public Sub GetNextFrame()
+        If frameCount = 10 And width = 640 Then initialize(640, 480, 30)
         If pipelineClosed Or cPtr = 0 Then Exit Sub
         Dim imagePtr = MyntDWaitFrame(cPtr)
         Dim acc = MyntDAcceleration(cPtr)
