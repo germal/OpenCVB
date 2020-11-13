@@ -98,7 +98,7 @@ Public Class CameraMyntD
         If frameCount = 10 Then
             width = _width
             height = _height
-            cPtr = MyntDOpen(width, height, fps) ' can't get it to initialize depth without starting at 1280x720
+            cPtr = MyntDOpen(width, height, fps) ' can't get it to initialize depth without starting at 1280x720 first.  Then after a few frames, 640x480...
         Else
             width = 1280
             height = 720

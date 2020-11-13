@@ -130,7 +130,7 @@ End Class
 
 Public Class StructuredDepth_Floor
     Inherits VBparent
-    Dim structD As StructuredDepth_BasicsH
+    Public structD As StructuredDepth_BasicsH
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -139,12 +139,7 @@ Public Class StructuredDepth_Floor
 
         structD = New StructuredDepth_BasicsH(ocvb)
         structD.histThresholdSlider.Value = 10 ' some cameras can show data below ground level...
-        structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
-
-        ' this camera is less precise and needs a fatter slice of the floor.  The IMU looks to be the culprit.
-        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then structD.cushionSlider.Value = 20
-        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Then structD.cushionSlider.Value = 10
-        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then structD.cushionSlider.Value = 10
+        structD.cushionSlider.Value = 10 ' floor runs can use a thinner slice that ceilings...
 
         ocvb.desc = "Find the floor plane"
     End Sub
@@ -157,13 +152,14 @@ Public Class StructuredDepth_Floor
         Dim lastSum = dst2.Row(dst2.Height - 1).Sum()
         For yCoordinate = dst2.Height - 1 To 0 Step -1
             Dim nextSum = dst2.Row(yCoordinate).Sum()
-            If nextSum.Item(0) - lastSum.Item(0) > 3000 Then Exit For
+            If nextSum.Item(0) - lastSum.Item(0) > 1000 Then Exit For
+            lastSum = nextSum
         Next
 
-        kalman.kInput(0) = yCoordinate
+        kalman.kInput(0) = (yCoordinate + kalman.kOutput(0)) / 2
         kalman.Run(ocvb)
 
-        structD.offsetSlider.Value = If(kalman.kOutput(0) >= 0, yCoordinate, dst2.Height)
+        structD.offsetSlider.Value = If(kalman.kOutput(0) >= 0, kalman.kOutput(0), dst2.Height)
 
         dst1 = structD.dst1
         dst2 = structD.dst2
@@ -199,7 +195,8 @@ Public Class StructuredDepth_Ceiling
         Dim lastSum = dst2.Row(yCoordinate).Sum()
         For yCoordinate = 1 To dst2.Height - 1
             Dim nextSum = dst2.Row(yCoordinate).Sum()
-            If nextSum.Item(0) - lastSum.Item(0) > 3000 Then Exit For
+            If nextSum.Item(0) - lastSum.Item(0) > 1000 Then Exit For
+            lastSum = nextSum
         Next
 
         kalman.kInput(0) = yCoordinate
@@ -455,11 +452,14 @@ Public Class StructuredDepth_SliceXPlot
     Inherits VBparent
     Dim multi As StructuredDepth_MultiSlice
     Dim structD As StructuredDepth_BasicsV
+    Dim cushionSlider As Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         multi = New StructuredDepth_MultiSlice(ocvb)
         structD = New StructuredDepth_BasicsV(ocvb)
-        ocvb.desc = "Plot the x offset of a vertical slice"
+        cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        cushionSlider.Value = 25
+        ocvb.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -467,11 +467,10 @@ Public Class StructuredDepth_SliceXPlot
         dst2 = structD.dst2
         multi.Run(ocvb)
 
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        Dim cushion = cushionSlider.value
         Static offsetSlider = findSlider("Offset for the slice")
         Dim col = CInt(offsetSlider.value)
 
+        Dim cushion = cushionSlider.Value
         Dim rect = New cv.Rect(col, 0, cushion, dst2.Height - 1)
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
@@ -496,5 +495,71 @@ Public Class StructuredDepth_SliceXPlot
 
         Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
         label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / pixelsPerMeter, "#0.00") + " m"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class StructuredDepth_LinearizeFloor
+    Inherits VBparent
+    Dim floor As StructuredDepth_Floor
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        floor = New StructuredDepth_Floor(ocvb)
+        ocvb.desc = "Using the mask for the floor create a better representation of the floor plane"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        floor.Run(ocvb)
+        dst1 = floor.dst1
+        dst2 = floor.dst2
+        Dim mask = floor.structD.maskPlane
+        If mask.CountNonZero() > 0 Then
+            cv.Cv2.BitwiseNot(mask, mask)
+            Dim imuPC = floor.structD.side2D.gCloud.imuPointCloud
+            imuPC.SetTo(0, mask)
+
+            Dim split = imuPC.Split()
+            Dim minVal As Double, maxVal As Double
+            split(0).MinMaxLoc(minVal, maxVal)
+
+            Dim firstCol As Integer, lastCol As Integer
+            For firstCol = 0 To split(0).Width - 1
+                If split(0).Col(firstCol).CountNonZero() > 0 Then Exit For
+            Next
+            For lastCol = split(0).Width - 1 To 0 Step -1
+                If split(0).Col(lastCol).CountNonZero() Then Exit For
+            Next
+
+            Dim xIncr = (maxVal - minVal) / (lastCol - firstCol)
+            For i = firstCol To lastCol
+                Dim maskCol = mask.Col(i)
+                If maskCol.CountNonZero > 0 Then split(0).Col(i).SetTo(minVal + xIncr * i, maskCol)
+            Next
+
+            split(1).MinMaxLoc(minVal, maxVal)
+            Dim firstRow As Integer, lastRow As Integer
+            For firstRow = 0 To split(1).Height - 1
+                If split(1).Row(firstRow).CountNonZero() > 0 Then Exit For
+            Next
+            For lastRow = split(1).Height - 1 To 0 Step -1
+                If split(1).Row(lastRow).CountNonZero() Then Exit For
+            Next
+
+            Dim yIncr = (maxVal - minVal) / (lastRow - firstRow)
+            For i = firstRow To lastRow
+                Dim maskRow = mask.Row(i)
+                If maskRow.CountNonZero > 0 Then split(1).Row(i).SetTo(minVal + yIncr * i, maskRow)
+            Next
+
+            split(2).MinMaxLoc(minVal, maxVal)
+            split(2).SetTo((maxVal + minVal) / 2, mask)
+
+            cv.Cv2.Merge(split, imuPC)
+        End If
     End Sub
 End Class
