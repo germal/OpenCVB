@@ -51,12 +51,12 @@ Public Class StructuredDepth_BasicsH
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
 
-        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2 = dst2.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.Circle(New cv.Point(0, side2D.cameraLoc), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Dim offset = CInt(offsetSlider.Value)
-        dst2.Line(New cv.Point(0, offset), New cv.Point(dst2.Width, offset), cv.Scalar.Yellow, cushionSlider.Value)
+        Dim offset = If(offsetSlider.value < dst2.Height - cushion, CInt(offsetSlider.Value), dst2.Height - cushion - 1)
+        dst2.Line(New cv.Point(0, offset), New cv.Point(dst2.Width, offset), cv.Scalar.Yellow, cushion)
     End Sub
 End Class
 
@@ -117,7 +117,7 @@ Public Class StructuredDepth_BasicsV
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.Circle(New cv.Point(top2D.cameraLoc, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Dim offset = CInt(offsetSlider.Value)
-        dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushionSlider.Value)
+        dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
 End Class
 
@@ -507,59 +507,99 @@ End Class
 Public Class StructuredDepth_LinearizeFloor
     Inherits VBparent
     Dim floor As StructuredDepth_Floor
+    Dim kalmanCheck As Windows.Forms.CheckBox
+    Dim kalman As Kalman_Basics
+    Public imuPointCloud As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
+        kalman = New Kalman_Basics(ocvb)
         floor = New StructuredDepth_Floor(ocvb)
+        kalmanCheck = findCheckBox("Turn Kalman filtering on")
+        kalmanCheck.Checked = False ' initially it is turned off...
+
+        check.Setup(ocvb, caller, 3)
+        check.Box(0).Text = "Smooth in X-direction"
+        check.Box(1).Text = "Smooth in Y-direction" ' only the Y-direction smoothing provides more accuracy.
+        check.Box(2).Text = "Smooth in Z-direction"
+        check.Box(1).Checked = True
         ocvb.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.frameCount = 5 Then kalmanCheck.Checked = True
         floor.Run(ocvb)
         dst1 = floor.dst1
         dst2 = floor.dst2
         Dim mask = floor.structD.maskPlane
         If mask.CountNonZero() > 0 Then
-            cv.Cv2.BitwiseNot(mask, mask)
-            Dim imuPC = floor.structD.side2D.gCloud.imuPointCloud
-            imuPC.SetTo(0, mask)
+            Dim nonFloorMask As New cv.Mat
+            cv.Cv2.BitwiseNot(mask, nonFloorMask)
+            Dim imuPC = floor.structD.side2D.gCloud.imuPointCloud.Clone
+            imuPointCloud = imuPC.Clone
+            imuPC.SetTo(0, nonFloorMask)
 
             Dim split = imuPC.Split()
             Dim minVal As Double, maxVal As Double
-            split(0).MinMaxLoc(minVal, maxVal)
+            Dim minLoc As cv.Point, maxLoc As cv.Point
+            If check.Box(0).Checked Then
+                split(0).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, mask)
 
-            Dim firstCol As Integer, lastCol As Integer
-            For firstCol = 0 To split(0).Width - 1
-                If split(0).Col(firstCol).CountNonZero() > 0 Then Exit For
-            Next
-            For lastCol = split(0).Width - 1 To 0 Step -1
-                If split(0).Col(lastCol).CountNonZero() Then Exit For
-            Next
+                Dim firstCol As Integer, lastCol As Integer
+                For firstCol = 0 To mask.Width - 1
+                    If mask.Col(firstCol).CountNonZero() > 0 Then Exit For
+                Next
+                For lastCol = mask.Width - 1 To 0 Step -1
+                    If mask.Col(lastCol).CountNonZero() Then Exit For
+                Next
 
-            Dim xIncr = (maxVal - minVal) / (lastCol - firstCol)
-            For i = firstCol To lastCol
-                Dim maskCol = mask.Col(i)
-                If maskCol.CountNonZero > 0 Then split(0).Col(i).SetTo(minVal + xIncr * i, maskCol)
-            Next
+                Dim xIncr = (maxVal - minVal) / (lastCol - firstCol)
+                For i = firstCol To lastCol
+                    Dim maskCol = mask.Col(i)
+                    If maskCol.CountNonZero > 0 Then split(0).Col(i).SetTo(minVal + xIncr * i, maskCol)
+                Next
+            End If
 
-            split(1).MinMaxLoc(minVal, maxVal)
-            Dim firstRow As Integer, lastRow As Integer
-            For firstRow = 0 To split(1).Height - 1
-                If split(1).Row(firstRow).CountNonZero() > 0 Then Exit For
-            Next
-            For lastRow = split(1).Height - 1 To 0 Step -1
-                If split(1).Row(lastRow).CountNonZero() Then Exit For
-            Next
+            If check.Box(1).Checked Then
+                split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, mask)
+                kalman.kInput(0) = minVal
+                kalman.kInput(1) = maxVal
+                kalman.Run(ocvb)
+                split(1).SetTo(kalman.kOutput(0), mask)
+            End If
 
-            Dim yIncr = (maxVal - minVal) / (lastRow - firstRow)
-            For i = firstRow To lastRow
-                Dim maskRow = mask.Row(i)
-                If maskRow.CountNonZero > 0 Then split(1).Row(i).SetTo(minVal + yIncr * i, maskRow)
-            Next
+            If check.Box(2).Checked Then
+                Dim firstRow As Integer, lastRow As Integer
+                For firstRow = 0 To mask.Height - 1
+                    If mask.Row(firstRow).CountNonZero() > 20 Then Exit For
+                Next
+                For lastRow = mask.Height - 1 To 0 Step -1
+                    If mask.Row(lastRow).CountNonZero() > 20 Then Exit For
+                Next
 
-            split(2).MinMaxLoc(minVal, maxVal)
-            split(2).SetTo((maxVal + minVal) / 2, mask)
+                If lastRow >= 0 And firstRow < mask.Height Then
+                    Dim meanMin = split(2).Row(lastRow).Mean(mask.Row(lastRow))
+                    Dim meanMax = split(2).Row(firstRow).Mean(mask.Row(firstRow))
+                    Dim zIncr = (meanMax.Item(0) - meanMin.Item(0)) / Math.Abs(lastRow - firstRow)
+                    For i = firstRow To lastRow
+                        Dim maskRow = mask.Row(i)
+                        Dim mean = split(2).Row(i).Mean(maskRow)
+                        If maskRow.CountNonZero > 0 Then
+                            split(2).Row(i).SetTo(mean.Item(0))
+                            'Dim xy = New cv.Point3f(0, i, mean.Item(0))
+                            'For xy.X = 0 To split(2).Width - 1
+                            '    Dim xyz = getWorldCoordinates(ocvb, xy)
+                            '    imuPC.Set(Of cv.Point3f)(i, xy.X, xyz)
+                            'Next
+                        End If
+                    Next
+                    dst1.Line(New cv.Point(0, firstRow), New cv.Point(dst1.Width, firstRow), cv.Scalar.Yellow, 2)
+                    dst1.Line(New cv.Point(0, lastRow), New cv.Point(dst1.Width, lastRow), cv.Scalar.Yellow, 2)
+                End If
+            End If
 
             cv.Cv2.Merge(split, imuPC)
+
+            imuPC.CopyTo(imuPointCloud, mask)
         End If
     End Sub
 End Class

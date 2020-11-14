@@ -5,10 +5,15 @@ Public Class Kalman_Basics
     Dim kalman() As Kalman_Simple
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
+    Dim stable As IMU_IscameraStable
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        check.Setup(ocvb, caller, 1)
+
+        stable = New IMU_IscameraStable(ocvb)
+
+        check.Setup(ocvb, caller, 2)
         check.Box(0).Text = "Turn Kalman filtering on"
+        check.Box(1).Text = "Only use Kalman filtering when camera is stable"
         check.Box(0).Checked = True
 
         ocvb.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
@@ -33,7 +38,13 @@ Public Class Kalman_Basics
         End If
 
         Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
-        If useKalmanCheck.Checked Then
+        Dim useKalman = useKalmanCheck.checked
+        Static stableCheck = findCheckBox("Only use Kalman filtering when camera is stable")
+        If stableCheck.checked Then
+            stable.Run(ocvb)
+            If stable.cameraStable = False Then useKalman = False
+        End If
+        If useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
                 kalman(i).Run(ocvb)

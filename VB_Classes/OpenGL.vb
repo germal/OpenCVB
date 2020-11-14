@@ -430,3 +430,34 @@ Public Class OpenGL_Reduced
         ogl.Run(ocvb)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class OpenGL_FlatFloor
+    Inherits VBparent
+    Dim plane As StructuredDepth_LinearizeFloor
+    Dim ogl As OpenGL_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        ogl = New OpenGL_Basics(ocvb)
+        ogl.OpenGLTitle = "OpenGL_Callbacks"
+
+        plane = New StructuredDepth_LinearizeFloor(ocvb)
+        ocvb.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        plane.Run(ocvb)
+        dst1 = plane.dst1
+        dst2 = plane.dst2
+
+        ogl.pointCloudInput = plane.imuPointCloud
+        ogl.src = src
+        ogl.Run(ocvb)
+    End Sub
+End Class

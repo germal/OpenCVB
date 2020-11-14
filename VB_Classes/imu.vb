@@ -428,48 +428,6 @@ End Class
 
 
 
-
-Public Class IMU_IscameraLevel
-    Inherits VBparent
-    Public angleX As Single ' in radians.
-    Public angleY As Single ' in radians.
-    Public angleZ As Single ' in radians.
-    Public cameraLevel As Boolean
-    Dim flow As Font_FlowText
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        If standalone Then flow = New Font_FlowText(ocvb)
-        sliders.Setup(ocvb, caller, 1)
-        sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is a 20/10 or 2 degrees from 0...
-        ocvb.desc = "Answer the question: Is the camera level?"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim gx = ocvb.IMU_Acceleration.X
-        Dim gy = ocvb.IMU_Acceleration.Y
-        Dim gz = ocvb.IMU_Acceleration.Z
-
-        angleX = (Math.Atan2(gy, gx) + cv.Cv2.PI / 2) * 57.2958
-        angleY = (Math.Atan2(gx, gy) - cv.Cv2.PI / 2) * 57.2958
-        angleZ = (Math.Atan2(gy, gz) + cv.Cv2.PI / 2) * 57.2958
-
-        Dim degreesThreshold = sliders.trackbar(0).Value / 10 ' 0-100 --> 0-10 degrees
-        If Math.Abs(angleX) > degreesThreshold Or Math.Abs(angleZ) > degreesThreshold Then cameraLevel = False Else cameraLevel = True
-        If standalone Then
-            flow.msgs.Add(" Angle X = " + Format(angleX, "0.00") + " degrees" +
-                          " Angle Y = " + Format(angleY, "0.00") + " degrees" +
-                          " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
-                          If(cameraLevel, " - Camera is level", " - Camera is NOT level"))
-            flow.Run(ocvb)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class IMU_GVector
     Inherits VBparent
     Public kalman As Kalman_Basics
@@ -529,3 +487,89 @@ Public Class IMU_GVector
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+Public Class IMU_IscameraLevel
+    Inherits VBparent
+    Public angleX As Single ' in radians.
+    Public angleY As Single ' in radians.
+    Public angleZ As Single ' in radians.
+    Public cameraLevel As Boolean
+    Dim flow As Font_FlowText
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        If standalone Then flow = New Font_FlowText(ocvb)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is a 20/10 or 2 degrees from 0...
+        ocvb.desc = "Answer the question: Is the camera level?"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim gx = ocvb.IMU_Acceleration.X
+        Dim gy = ocvb.IMU_Acceleration.Y
+        Dim gz = ocvb.IMU_Acceleration.Z
+
+        angleX = (Math.Atan2(gy, gx) + cv.Cv2.PI / 2) * 57.2958
+        angleY = (Math.Atan2(gx, gy) - cv.Cv2.PI / 2) * 57.2958
+        angleZ = (Math.Atan2(gy, gz) + cv.Cv2.PI / 2) * 57.2958
+
+        Dim degreesThreshold = sliders.trackbar(0).Value / 10 ' 0-100 --> 0-10 degrees
+        If Math.Abs(angleX) > degreesThreshold Or Math.Abs(angleZ) > degreesThreshold Then cameraLevel = False Else cameraLevel = True
+        If standalone Then
+            flow.msgs.Add(" Angle X = " + Format(angleX, "0.00") + " degrees" +
+                          " Angle Y = " + Format(angleY, "0.00") + " degrees" +
+                          " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
+                          If(cameraLevel, " - Camera is level", " - Camera is NOT level"))
+            flow.Run(ocvb)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class IMU_IscameraStable
+    Inherits VBparent
+    Public pitch As Single ' in radians.
+    Public yaw As Single ' in radians.
+    Public roll As Single ' in radians.
+    Public cameraStable As Boolean
+    Dim flow As Font_FlowText
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        If standalone Then flow = New Font_FlowText(ocvb)
+        sliders.Setup(ocvb, caller, 1)
+        sliders.setupTrackBar(0, "Threshold in motion radian X100", 1, 100, 2) ' how much motion is reasonable?
+        ocvb.desc = "Answer the question: Is the camera stable?"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        pitch = ocvb.IMU_AngularVelocity.X
+        yaw = ocvb.IMU_AngularVelocity.Y
+        roll = ocvb.IMU_AngularVelocity.Z
+
+        Dim threshold = sliders.trackbar(0).Value / 100
+        Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
+        cameraStable = If(totalRadians > threshold, False, True)
+        If standalone Then
+            flow.msgs.Add(" Pitch = " + Format(pitch, "0.00") + " radians" +
+                          " Yaw = " + Format(yaw, "0.00") + " radians" +
+                          " Roll = " + Format(roll, "0.00") + " radians" +
+                          If(cameraStable, " - Camera is stable", " - Camera is NOT stable"))
+            flow.Run(ocvb)
+        End If
+    End Sub
+End Class

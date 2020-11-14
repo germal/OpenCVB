@@ -1016,7 +1016,7 @@ Public Class Histogram_SideView2D
         If standalone Then thresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
-        ocvb.desc = "Create a 2D histogram for depth in ZY (side view.)"
+        ocvb.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -1039,64 +1039,6 @@ Public Class Histogram_SideView2D
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = cmat.CameraLocationSide(ocvb, dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class Histogram_SideData
-    Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
-    Dim top2D As Histogram_TopData
-    Public histOutput As New cv.Mat
-    Public meterMin As Double
-    Public meterMax As Double
-    Public split() As cv.Mat
-    Public cameraLoc As Integer
-    Dim kalman As Kalman_Basics
-    Public resizeHistOutput As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-
-        top2D = New Histogram_TopData(ocvb)
-        kalman = New Kalman_Basics(ocvb)
-        gCloud = New Depth_PointCloud_IMU(ocvb)
-
-        label1 = "ZY (Side View)"
-        ocvb.desc = "Create a 2D histogram for depth in ZY side view that with precise y measurements in meters"
-    End Sub
-    Public Sub Run(ocvb As VBocvb)
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run(ocvb)
-        Dim imuPC = gCloud.imuPointCloud
-        split = imuPC.Split()
-
-        split(1).MinMaxLoc(meterMin, meterMax)
-
-        top2D.setMeterMinMax(ocvb, split(1), meterMin, meterMax)
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        Static histThresholdSlider = findSlider("Histogram threshold")
-        dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        cameraLoc = CInt(dst1.Height * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
-
-        dst1.Circle(New cv.Point(0, cameraLoc), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        label1 = "Camera dot below at " + CStr(cameraLoc) + " rows from the top"
-        label2 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00")
     End Sub
 End Class
 
@@ -1149,7 +1091,7 @@ Public Class Histogram_TopView2D
         End Select
 
         label1 = "XZ (Top View)"
-        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
+        ocvb.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -1190,8 +1132,8 @@ Public Class Histogram_TopData
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public meterMin As Double
-    Public meterMax As Double
+    Public meterMin As Single
+    Public meterMax As Single
     Public split() As cv.Mat
     Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
@@ -1200,47 +1142,16 @@ Public Class Histogram_TopData
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "X scale negative value in meters (meterMin) X100", -400, -5, -200)
+        sliders.setupTrackBar(1, "X scale positive value in meters (meterMax) X100", 5, 400, 200)
+
         kalman = New Kalman_Basics(ocvb)
         gCloud = New Depth_PointCloud_IMU(ocvb)
         If VB_Classes.ActiveTask.algParms.camNames.D455 = ocvb.parms.cameraName Then IntelBug = True
 
         label1 = "XZ (Top View)"
-        ocvb.desc = "Create a 2D histogram for depth in XZ (top view.)"
-    End Sub
-    Public Sub setMeterMinMax(ocvb As VBocvb, split As cv.Mat, ByRef meterMin As Single, ByRef meterMax As Single)
-        Const DEFAULT_METER = 2
-        If IntelBug Then
-            ' The point cloud x data contains bogus values well outside the possible range for x so here the values for meterMin/Max are just set to 2...
-            ' This problem does not occur on the D435i - just on the newer D455.  Hmmm..
-            ' It does not occur for the y values on either Intel device...
-            meterMin = -DEFAULT_METER
-            meterMax = DEFAULT_METER
-        Else
-            split.MinMaxLoc(meterMin, meterMax)
-            If meterMin = 0 Then meterMin = -DEFAULT_METER ' if the pointcloud is missing or all zeros...
-            If meterMax = 0 Then meterMax = DEFAULT_METER
-            If meterMax < meterMin Then meterMax = DEFAULT_METER
-            If meterMin < -ocvb.maxZ Then meterMin = -DEFAULT_METER
-            If meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
-
-            kalman.kInput(0) = meterMin
-            kalman.kInput(1) = meterMax
-            kalman.Run(ocvb)
-            meterMin = kalman.kOutput(0)
-            meterMax = kalman.kOutput(1)
-
-            Static lastMin As Single
-            Static lastMax As Single
-            ' no slider for the x below because it is not important - just a way to keep the scale from changing on every frame
-            If Math.Abs(lastMin - meterMin) > 0.2 Or Math.Abs(lastMax - meterMax) > 0.2 Then
-                lastMin = meterMin
-                lastMax = meterMax
-            Else
-                meterMin = lastMin
-                meterMax = lastMax
-            End If
-            If meterMax < meterMin Or meterMax > ocvb.maxZ Then meterMax = DEFAULT_METER
-        End If
+        ocvb.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
 
     Public Sub Run(ocvb As VBocvb)
@@ -1249,7 +1160,10 @@ Public Class Histogram_TopData
         Dim imuPC = gCloud.imuPointCloud
         split = imuPC.Split()
 
-        setMeterMinMax(ocvb, split(0), meterMin, meterMax)
+        Static minSlider = findSlider("X scale negative value in meters (meterMin) X100")
+        Static maxSlider = findSlider("X scale positive value in meters (meterMax) X100")
+        meterMin = minSlider.Value / 100
+        meterMax = maxSlider.value / 100
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
@@ -1267,5 +1181,65 @@ Public Class Histogram_TopData
         dst1.Line(New cv.Point(cameraLoc, dst2.Height), New cv.Point(cameraLoc, 0), cv.Scalar.Yellow, 1)
         label1 = "Camera level is " + CStr(cameraLoc) + " rows from the left (in yellow)"
         label2 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00")
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Histogram_SideData
+    Inherits VBparent
+    Public gCloud As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public meterMin As Single
+    Public meterMax As Single
+    Public split() As cv.Mat
+    Public cameraLoc As Integer
+    Dim kalman As Kalman_Basics
+    Public resizeHistOutput As Boolean = True
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        sliders.Setup(ocvb, caller)
+        sliders.setupTrackBar(0, "Y scale negative value in meters (meterMin) X100", -400, -5, -200)
+        sliders.setupTrackBar(1, "Y scale positive value in meters (meterMax) X100", 5, 400, 200)
+
+        kalman = New Kalman_Basics(ocvb)
+        gCloud = New Depth_PointCloud_IMU(ocvb)
+
+        label1 = "ZY (Side View)"
+        ocvb.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloud.Run(ocvb)
+        Dim imuPC = gCloud.imuPointCloud
+        split = imuPC.Split()
+
+        Static minSlider = findSlider("Y scale negative value in meters (meterMin) X100")
+        Static maxSlider = findSlider("Y scale positive value in meters (meterMax) X100")
+        meterMin = minSlider.value / 100
+        meterMax = maxSlider.value / 100
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        Static histThresholdSlider = findSlider("Histogram threshold")
+        dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        cameraLoc = CInt(dst1.Height * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
+
+        dst1.Circle(New cv.Point(0, cameraLoc), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        label1 = "Camera dot below at " + CStr(cameraLoc) + " rows from the top"
+        label2 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00")
     End Sub
 End Class

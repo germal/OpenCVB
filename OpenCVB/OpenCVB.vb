@@ -1066,9 +1066,6 @@ Public Class OpenCVB
         parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
         parms.IMU_RotationVector = camera.IMU_RotationVector
 
-        ' opengl algorithms are only to be run at full resolution.  All other algorithms respect the options setting...
-        If AvailableAlgorithms.Text.Contains("OpenGL") Or AvailableAlgorithms.Text.Contains("OpenCVGL") Then OptionsDialog.HighResolution.Checked = True
-
         parms.cameraName = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.camNames.D435i)
         parms.PythonExe = optionsForm.PythonExeName.Text
 
