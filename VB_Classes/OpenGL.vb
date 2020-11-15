@@ -437,7 +437,7 @@ End Class
 
 
 
-Public Class OpenGL_FlatFloor
+Public Class OpenGL_Floor
     Inherits VBparent
     Dim plane As StructuredDepth_LinearizeFloor
     Dim ogl As OpenGL_Basics

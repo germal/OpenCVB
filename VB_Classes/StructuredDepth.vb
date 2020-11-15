@@ -564,7 +564,7 @@ Public Class StructuredDepth_LinearizeFloor
                 kalman.kInput(0) = minVal
                 kalman.kInput(1) = maxVal
                 kalman.Run(ocvb)
-                split(1).SetTo(kalman.kOutput(0), mask)
+                split(1).SetTo((kalman.kOutput(0) + kalman.kOutput(1)) / 2, mask)
             End If
 
             If check.Box(2).Checked Then

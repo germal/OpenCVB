@@ -502,7 +502,7 @@ End Class
 Public Class Kalman_VB
     Inherits VBparent
     Const MAX_INPUT = 20
-    Dim matrix As New List(Of Integer)
+    Dim matrix As New List(Of Single)
     Dim oRand As Random
     Dim P(,) As Single = {{1, 0}, {0, 1}} '2x2 This is the covarience matrix
     Dim angle As Single
@@ -511,7 +511,6 @@ Public Class Kalman_VB
     Dim R_angle As Single = 0.002
     Dim Q_angle As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
     Dim Q_gyro As Single = 0.3
-    Dim dt As Single = 1 / 20
     Public input As Single
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
@@ -527,13 +526,13 @@ Public Class Kalman_VB
         sliders.setupTrackBar(4, "20 Point average difference", 0, 1000, 500)
         sliders.setupTrackBar(5, "Kalman difference", 0, 1000, 500)
         sliders.setupTrackBar(6, "Simulated Noise", 0, 100, 25)
-        sliders.setupTrackBar(7, "Simulated Bias", 0, 100, 0)
+        sliders.setupTrackBar(7, "Simulated Bias", -100, 100, 0)
         sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
         label1 = "Use first slider below to test algorithm"
         ocvb.desc = "A native VB Kalman filter"
     End Sub
-
-    Private Sub State_Update(ByVal q_m As Single)
+    Public Sub State_Update(ByVal q_m As Single)
+        Dim dt As Single = 1 / 20
         Dim q As Single = q_m - q_bias 'Unbias our gyro
         Dim Pdot() As Single = {Q_angle - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), Q_gyro}
         rate = q 'Store our unbias gyro estimate
@@ -545,10 +544,8 @@ Public Class Kalman_VB
         P(1, 0) += Pdot(2) * dt
         P(1, 1) += Pdot(3) * dt
     End Sub
-
-    Private Sub Kalman_Update(ByVal actualinput As Single)
-        Dim angle_m As Single = actualinput
-        Dim angle_err As Single = angle_m - angle
+    Public Sub Kalman_Update()
+        Dim angle_err As Single = input - angle
         Dim C_0 As Single = 1
         Dim PCt_0 = C_0 * P(0, 0) '+ C_1 * P(0, 1) 'This second part is always 0, so we don't bother
         Dim PCt_1 = C_0 * P(1, 0) '+ C_1 * P(1, 1)
@@ -580,7 +577,7 @@ Public Class Kalman_VB
         sliders.trackbar(1).Value = noisyInput
 
         matrix(ocvb.frameCount Mod MAX_INPUT) = input
-        Dim AverageOutput As Single = (New cv.Mat(MAX_INPUT, 1, cv.MatType.CV_32S, matrix.ToArray)).Mean()
+        Dim AverageOutput = (New cv.Mat(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean().Item(0)
 
         If AverageOutput < 0 Then AverageOutput = 0
         If AverageOutput > sliders.trackbar(2).Maximum Then AverageOutput = sliders.trackbar(2).Maximum
@@ -596,7 +593,7 @@ Public Class Kalman_VB
         'This is the Kalman Filter
         State_Update(noisyInput)
         'If ticks = 1 Then Kalman_Update(input) 'This updates the filter every 5 cycles
-        Kalman_Update(input) 'This updates the filter every cycle
+        Kalman_Update() 'This updates the filter every cycle
         Dim KalmanOutput As Single = angle
 
         If KalmanOutput < 0 Then KalmanOutput = 0
@@ -608,5 +605,134 @@ Public Class Kalman_VB
         sliders.trackbar(5).Value = KalmanDiff
 
         ocvb.trueText(label1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Kalman_VB_Basics
+    Inherits VBparent
+    Public kInput As Single
+    Public kOutput As Single
+    Public kAverage As Single
+    Dim P(,) As Single = {{1, 0}, {0, 1}} '2x2 This is the covarience matrix
+    Dim q_bias As Single
+    Dim outputError As Single = 0.002
+    Dim processCovar As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
+    Dim oRand As Random
+    Dim matrix As New List(Of Single)
+    Dim plot As Plot_OverTime
+    Dim basics As Kalman_Basics
+    Dim stable As IMU_IscameraStable
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+
+        stable = New IMU_IscameraStable(ocvb)
+        basics = New Kalman_Basics(ocvb)
+
+        plot = New Plot_OverTime(ocvb)
+        plot.plotCount = 3
+        plot.topBottomPad = 20
+        plot.dst1 = dst1
+
+        oRand = New Random(DateTime.Now.Millisecond)
+        sliders.Setup(ocvb, caller, 5)
+        sliders.setupTrackBar(0, "Average input count", 1, 500, 20)
+        sliders.setupTrackBar(1, "Delta Time X100", 1, 30, 5)
+        sliders.setupTrackBar(2, "Simulated Noise", 0, 100, 25)
+        sliders.setupTrackBar(3, "Simulated Bias", -100, 100, 0)
+        sliders.setupTrackBar(4, "Simulated Scale", 0, 100, 0)
+
+        label1 = "Blue = gray mean, green = kalman, red = kalman avg"
+        ocvb.desc = "Build a generic kalman filter based on Kalman_VB"
+    End Sub
+    Public Sub State_Update(ByVal q_m As Single)
+        Static deltaSlider = findSlider("Delta Time X100")
+        Dim dt As Single = deltaSlider.value / 100
+        Dim unbias As Single = q_m - q_bias 'Unbias our gyro
+        Dim Pdot() As Single = {processCovar - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), 0.3}
+        kOutput += unbias * dt
+
+        'Update the covariance matrix
+        P(0, 0) += Pdot(0) * dt
+        P(0, 1) += Pdot(1) * dt
+        P(1, 0) += Pdot(2) * dt
+        P(1, 1) += Pdot(3) * dt
+    End Sub
+    Public Sub Kalman_Update()
+        Dim kError As Single = kInput - kOutput
+        Dim C_0 As Single = 1
+        Dim PCt_0 = C_0 * P(0, 0) '+ C_1 * P(0, 1) 'This second part is always 0, so we don't bother
+        Dim PCt_1 = C_0 * P(1, 0) '+ C_1 * P(1, 1)
+        Dim err As Single = outputError + C_0 * PCt_0 'Compute the error estimate.
+        Dim K_0 As Single = PCt_0 / err 'Compute the Kalman filter gains
+        Dim K_1 As Single = PCt_1 / err
+        Dim t_0 As Single = PCt_0
+        Dim t_1 As Single = C_0 * P(0, 1)
+
+        P(0, 0) -= K_0 * t_0 'Update covariance matrix
+        P(0, 1) -= K_0 * t_1
+        P(1, 0) -= K_1 * t_0
+        P(1, 1) -= K_1 * t_1
+
+        kOutput += K_0 * kError 'Update our state estimate
+        q_bias += K_1 * kError
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then
+            Dim gray = ocvb.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            kInput = gray.Mean().Item(0)
+        End If
+
+        Static avgSlider = findSlider("Average input count")
+        Static saveAvgCount As Integer
+        If avgSlider.value <> saveAvgCount Then
+            saveAvgCount = avgSlider.value
+            matrix.Clear()
+            For i = 0 To saveAvgCount - 1
+                matrix.Add(kInput)
+            Next
+        End If
+
+        Static noiseSlider = findSlider("Simulated Noise")
+        Static biasSlider = findSlider("Simulated Bias")
+        Static scaleSlider = findSlider("Simulated Scale")
+        Dim noiselevel = noiseSlider.value
+        Dim additionalbias = biasSlider.Value
+        Dim scalefactor As Single = (scaleSlider.Value / 100) + 1 'This should be between 1 and 2
+
+        Dim iRand = oRand.Next(0, noiselevel)
+        Dim noisyInput = CInt((kInput * scalefactor) + additionalbias + iRand - (noiselevel / 2))
+        If noisyInput < 0 Then noisyInput = 0
+        If noisyInput > noiseSlider.maximum Then noisyInput = noiseSlider.maximum
+
+        matrix(ocvb.frameCount Mod saveAvgCount) = kInput
+        kAverage = (New cv.Mat(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean().Item(0)
+
+        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
+        Dim useKalman = useKalmanCheck.checked
+        Static stableCheck = findCheckBox("Only use Kalman filtering when camera is stable")
+        If stableCheck.checked Then
+            stable.Run(ocvb)
+            If stable.cameraStable = False Then useKalman = False
+        End If
+        If useKalman Then
+            'The Kalman Filter code comes from:
+            'http://www.rotomotion.com/downloads/tilt.c
+            State_Update(noisyInput)
+            Kalman_Update()
+        End If
+
+        If standalone Then
+            plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
+            plot.Run(ocvb)
+        End If
     End Sub
 End Class
