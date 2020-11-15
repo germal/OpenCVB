@@ -501,7 +501,8 @@ End Class
 ' https://www.codeproject.com/Articles/326657/KalmanDemo
 Public Class Kalman_VB
     Inherits VBparent
-    Dim matrix(20 - 1) As Integer
+    Const MAX_INPUT = 20
+    Dim matrix As New List(Of Integer)
     Dim oRand As Random
     Dim P(,) As Single = {{1, 0}, {0, 1}} '2x2 This is the covarience matrix
     Dim angle As Single
@@ -515,6 +516,9 @@ Public Class Kalman_VB
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         oRand = New Random(DateTime.Now.Millisecond)
+        For i = 0 To MAX_INPUT - 1
+            matrix.Add(0)
+        Next
         sliders.Setup(ocvb, caller, 9)
         sliders.setupTrackBar(0, "Move this to see results", 0, 1000, 500)
         sliders.setupTrackBar(1, "Input with Noise", 0, 1000, 500)
@@ -525,6 +529,7 @@ Public Class Kalman_VB
         sliders.setupTrackBar(6, "Simulated Noise", 0, 100, 25)
         sliders.setupTrackBar(7, "Simulated Bias", 0, 100, 0)
         sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
+        label1 = "Use first slider below to test algorithm"
         ocvb.desc = "A native VB Kalman filter"
     End Sub
 
@@ -568,20 +573,14 @@ Public Class Kalman_VB
         Dim additionalbias = sliders.trackbar(7).Value
         Dim scalefactor As Single = (sliders.trackbar(8).Value / 100) + 1 'This should be between 1 and 2
         Dim iRand = oRand.Next(0, noiselevel)
-        Dim NVal = CInt((input * scalefactor) + additionalbias + iRand - (noiselevel / 2))
+        Dim noisyInput = CInt((input * scalefactor) + additionalbias + iRand - (noiselevel / 2))
 
-        If NVal < 0 Then NVal = 0
-        If NVal > 1000 Then NVal = 1000
-        sliders.trackbar(1).Value = NVal
+        If noisyInput < 0 Then noisyInput = 0
+        If noisyInput > sliders.trackbar(1).Maximum Then noisyInput = sliders.trackbar(1).Maximum
+        sliders.trackbar(1).Value = noisyInput
 
-        Dim total = NVal
-        For i = 0 To matrix.Count - 2
-            matrix(i) = matrix(i + 1)
-            total += matrix(i)
-        Next
-        matrix(matrix.Count - 1) = NVal
-
-        Dim AverageOutput As Single = total / matrix.Count
+        matrix(ocvb.frameCount Mod MAX_INPUT) = input
+        Dim AverageOutput As Single = (New cv.Mat(MAX_INPUT, 1, cv.MatType.CV_32S, matrix.ToArray)).Mean()
 
         If AverageOutput < 0 Then AverageOutput = 0
         If AverageOutput > sliders.trackbar(2).Maximum Then AverageOutput = sliders.trackbar(2).Maximum
@@ -595,7 +594,7 @@ Public Class Kalman_VB
         'http://www.rotomotion.com/downloads/tilt.c
 
         'This is the Kalman Filter
-        State_Update(NVal)
+        State_Update(noisyInput)
         'If ticks = 1 Then Kalman_Update(input) 'This updates the filter every 5 cycles
         Kalman_Update(input) 'This updates the filter every cycle
         Dim KalmanOutput As Single = angle
@@ -607,5 +606,7 @@ Public Class Kalman_VB
         Dim KalmanDiff = CInt(Math.Abs(KalmanOutput - input) * 10)
         If KalmanDiff > sliders.trackbar(5).Maximum Then KalmanDiff = sliders.trackbar(5).Maximum
         sliders.trackbar(5).Value = KalmanDiff
+
+        ocvb.trueText(label1)
     End Sub
 End Class
