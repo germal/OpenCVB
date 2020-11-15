@@ -20,7 +20,7 @@ Public Class Kalman_Basics
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static saveDimension As Integer = -1
+        Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -149,7 +149,7 @@ Public Class Kalman_RotatingPoint
         Return center + New cv.Point2f(Math.Cos(angle), -Math.Sin(angle)) * R
     End Function
     Private Sub drawCross(dst1 As cv.Mat, center As cv.Point, color As cv.Scalar)
-        Dim d As Integer = 3
+        Dim d = 3
         cv.Cv2.Line(dst1, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.Line(dst1, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, cv.LineTypes.AntiAlias)
     End Sub
@@ -256,7 +256,7 @@ Public Class Kalman_CVMat
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static saveDimension As Integer = -1
+        Static saveDimension = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -492,3 +492,120 @@ Public Class Kalman_Simple : Implements IDisposable
     End Sub
 End Class
 
+
+
+
+
+
+
+' https://www.codeproject.com/Articles/326657/KalmanDemo
+Public Class Kalman_VB
+    Inherits VBparent
+    Dim matrix(20 - 1) As Integer
+    Dim oRand As Random
+    Dim P(,) As Single = {{1, 0}, {0, 1}} '2x2 This is the covarience matrix
+    Dim angle As Single
+    Dim q_bias As Single
+    Dim rate As Single
+    Dim R_angle As Single = 0.002
+    Dim Q_angle As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
+    Dim Q_gyro As Single = 0.3
+    Dim dt As Single = 1 / 20
+    Public input As Single
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        oRand = New Random(DateTime.Now.Millisecond)
+        sliders.Setup(ocvb, caller, 9)
+        sliders.setupTrackBar(0, "Move this to see results", 0, 1000, 500)
+        sliders.setupTrackBar(1, "Input with Noise", 0, 1000, 500)
+        sliders.setupTrackBar(2, "20 point average of output", 0, 1000, 500)
+        sliders.setupTrackBar(3, "Kalman Output", 0, 1000, 500)
+        sliders.setupTrackBar(4, "20 Point average difference", 0, 1000, 500)
+        sliders.setupTrackBar(5, "Kalman difference", 0, 1000, 500)
+        sliders.setupTrackBar(6, "Simulated Noise", 0, 100, 25)
+        sliders.setupTrackBar(7, "Simulated Bias", 0, 100, 0)
+        sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
+        ocvb.desc = "A native VB Kalman filter"
+    End Sub
+
+    Private Sub State_Update(ByVal q_m As Single)
+        Dim q As Single = q_m - q_bias 'Unbias our gyro
+        Dim Pdot() As Single = {Q_angle - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), Q_gyro}
+        rate = q 'Store our unbias gyro estimate
+        angle += q * dt
+
+        'Update the covariance matrix
+        P(0, 0) += Pdot(0) * dt
+        P(0, 1) += Pdot(1) * dt
+        P(1, 0) += Pdot(2) * dt
+        P(1, 1) += Pdot(3) * dt
+    End Sub
+
+    Private Sub Kalman_Update(ByVal actualinput As Single)
+        Dim angle_m As Single = actualinput
+        Dim angle_err As Single = angle_m - angle
+        Dim C_0 As Single = 1
+        Dim PCt_0 = C_0 * P(0, 0) '+ C_1 * P(0, 1) 'This second part is always 0, so we don't bother
+        Dim PCt_1 = C_0 * P(1, 0) '+ C_1 * P(1, 1)
+        Dim E As Single = R_angle + C_0 * PCt_0 'Compute the error estimate.
+        Dim K_0 As Single = PCt_0 / E 'Compute the Kalman filter gains
+        Dim K_1 As Single = PCt_1 / E
+        Dim t_0 As Single = PCt_0
+        Dim t_1 As Single = C_0 * P(0, 1)
+
+        P(0, 0) -= K_0 * t_0 'Update covariance matrix
+        P(0, 1) -= K_0 * t_1
+        P(1, 0) -= K_1 * t_0
+        P(1, 1) -= K_1 * t_1
+
+        angle += K_0 * angle_err 'Update our state estimate
+        q_bias += K_1 * angle_err
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        input = sliders.trackbar(0).Value
+        Dim noiselevel = sliders.trackbar(6).Value
+        Dim additionalbias = sliders.trackbar(7).Value
+        Dim scalefactor As Single = (sliders.trackbar(8).Value / 100) + 1 'This should be between 1 and 2
+        Dim iRand = oRand.Next(0, noiselevel)
+        Dim NVal = CInt((input * scalefactor) + additionalbias + iRand - (noiselevel / 2))
+
+        If NVal < 0 Then NVal = 0
+        If NVal > 1000 Then NVal = 1000
+        sliders.trackbar(1).Value = NVal
+
+        Dim total = NVal
+        For i = 0 To matrix.Count - 2
+            matrix(i) = matrix(i + 1)
+            total += matrix(i)
+        Next
+        matrix(matrix.Count - 1) = NVal
+
+        Dim AverageOutput As Single = total / matrix.Count
+
+        If AverageOutput < 0 Then AverageOutput = 0
+        If AverageOutput > sliders.trackbar(2).Maximum Then AverageOutput = sliders.trackbar(2).Maximum
+        sliders.trackbar(2).Value = CInt(AverageOutput)
+
+        Dim AverageDiff = CInt(Math.Abs(AverageOutput - input) * 10)
+        If AverageDiff > sliders.trackbar(4).Maximum Then AverageDiff = sliders.trackbar(4).Maximum
+        sliders.trackbar(4).Value = AverageDiff
+
+        'The Kalman Filter code comes from:
+        'http://www.rotomotion.com/downloads/tilt.c
+
+        'This is the Kalman Filter
+        State_Update(NVal)
+        'If ticks = 1 Then Kalman_Update(input) 'This updates the filter every 5 cycles
+        Kalman_Update(input) 'This updates the filter every cycle
+        Dim KalmanOutput As Single = angle
+
+        If KalmanOutput < 0 Then KalmanOutput = 0
+        If KalmanOutput > sliders.trackbar(3).Maximum Then KalmanOutput = sliders.trackbar(3).Maximum
+        sliders.trackbar(3).Value = CInt(KalmanOutput)
+
+        Dim KalmanDiff = CInt(Math.Abs(KalmanOutput - input) * 10)
+        If KalmanDiff > sliders.trackbar(5).Maximum Then KalmanDiff = sliders.trackbar(5).Maximum
+        sliders.trackbar(5).Value = KalmanDiff
+    End Sub
+End Class

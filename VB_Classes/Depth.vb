@@ -162,7 +162,7 @@ Public Class Depth_Foreground
             Next
         Next
         Dim maxBlob As Integer
-        Dim maxIndex As Integer = -1
+        Dim maxIndex = -1
         For i = 0 To blobSize.Count - 1
             If maxBlob < blobSize.Item(i) Then
                 maxBlob = blobSize.Item(i)

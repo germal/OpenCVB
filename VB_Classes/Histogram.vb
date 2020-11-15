@@ -4,9 +4,9 @@ Public Class Histogram_Basics
     Inherits VBparent
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
-    Public bins As Integer = 50
-    Public minRange As Integer = 0
-    Public maxRange As Integer = 255
+    Public bins = 50
+    Public minRange = 0
+    Public maxRange = 255
     Public backColor = cv.Scalar.Gray
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
@@ -219,7 +219,7 @@ Public Class Histogram_KalmanSmoothed
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static splitIndex As Integer = -1
+        Static splitIndex = -1
         Static colorName As String
         If standalone Then
             Dim split() = cv.Cv2.Split(src)
