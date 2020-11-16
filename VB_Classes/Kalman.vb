@@ -644,7 +644,8 @@ Public Class Kalman_VB_Basics
         sliders.Setup(ocvb, caller, 5)
         sliders.setupTrackBar(0, "Average input count", 1, 500, 20)
         sliders.setupTrackBar(1, "Delta Time X100", 1, 30, 5)
-        sliders.setupTrackBar(2, "Simulated Noise", 0, 100, 25)
+        sliders.setupTrackBar(2, "Simulated Noise", 0, 100, 0)
+        If standalone Then sliders.trackbar(2).Value = 25 ' to introduce instability into the set of sliders...
         sliders.setupTrackBar(3, "Simulated Bias", -100, 100, 0)
         sliders.setupTrackBar(4, "Simulated Scale", 0, 100, 0)
 

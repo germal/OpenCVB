@@ -509,18 +509,21 @@ Public Class StructuredDepth_LinearizeFloor
     Dim floor As StructuredDepth_Floor
     Dim kalmanCheck As Windows.Forms.CheckBox
     Dim kalman As Kalman_Basics
+    Dim kalmanVB As Kalman_VB_Basics
     Public imuPointCloud As cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
+        kalmanVB = New Kalman_VB_Basics(ocvb)
         floor = New StructuredDepth_Floor(ocvb)
         kalmanCheck = findCheckBox("Turn Kalman filtering on")
         kalmanCheck.Checked = False ' initially it is turned off...
 
-        check.Setup(ocvb, caller, 3)
+        check.Setup(ocvb, caller, 4)
         check.Box(0).Text = "Smooth in X-direction"
         check.Box(1).Text = "Smooth in Y-direction" ' only the Y-direction smoothing provides more accuracy.
         check.Box(2).Text = "Smooth in Z-direction"
+        check.Box(3).Text = "Use VB Kalman"
         check.Box(1).Checked = True
         ocvb.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
@@ -561,10 +564,17 @@ Public Class StructuredDepth_LinearizeFloor
 
             If check.Box(1).Checked Then
                 split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, mask)
-                kalman.kInput(0) = minVal
-                kalman.kInput(1) = maxVal
-                kalman.Run(ocvb)
-                split(1).SetTo((kalman.kOutput(0) + kalman.kOutput(1)) / 2, mask)
+                Static vbCheck = findCheckBox("Use VB Kalman")
+                If vbCheck.checked = False Then
+                    kalman.kInput(0) = minVal
+                    kalman.kInput(1) = maxVal
+                    kalman.Run(ocvb)
+                    split(1).SetTo((kalman.kOutput(0) + kalman.kOutput(1)) / 2, mask)
+                Else
+                    kalmanVB.kInput = (minVal + maxVal) / 2
+                    kalmanVB.Run(ocvb)
+                    split(1).SetTo(kalmanVB.kOutput, mask)
+                End If
             End If
 
             If check.Box(2).Checked Then
