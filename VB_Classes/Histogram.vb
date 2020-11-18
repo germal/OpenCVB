@@ -1,4 +1,6 @@
 Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
+
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
 Public Class Histogram_Basics
     Inherits VBparent
@@ -62,6 +64,10 @@ End Class
 
 
 Module histogram_Functions
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Histogram_3D_RGB(rgbPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer) As IntPtr
+    End Function
+
     Public Sub histogram2DPlot(histogram As cv.Mat, dst1 As cv.Mat, xBins As Integer, yBins As Integer)
         Dim maxVal As Double
         histogram.MinMaxLoc(0, maxVal)

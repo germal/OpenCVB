@@ -116,7 +116,7 @@ static int rgbBufferSize;
 static uint8_t *rgbBuffer;
 static Mat rgbMat;
 
-static double pcBufferSize;
+static int pcBufferSize;
 static float3 *pointCloudBuffer;
 
 static double fx, fy, ppx, ppy;
@@ -165,13 +165,12 @@ static int initializeNamedPipeAndMemMap(int argc, char * argv[])
 	MemMapBufferSize = std::stoi(argv[3]);
 
 	std::string pipeName(argv[4]);
-	pcBufferSize = std::stod(argv[5]);
+	pcBufferSize = (int)(std::stod(argv[5]));
 
 	// setup named pipe interface
 	std::string pipePrefix("\\\\.\\pipe\\");
 	pipeName = pipePrefix + pipeName;
 	std::wstring fullpipeName = s2ws(pipeName);
-	printf("pipeName = %s\n", pipeName.c_str());
 	pipe = CreateFile(fullpipeName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	TCHAR szName[] = TEXT("OpenCVBControl");
 	hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, MemMapBufferSize, szName);
@@ -185,6 +184,7 @@ static int initializeNamedPipeAndMemMap(int argc, char * argv[])
 	dataBufferSize = (int)sharedMem[8];
 	rgbBuffer = (unsigned char *)malloc(rgbBufferSize);
 	dataBuffer = (float3 *)malloc(dataBufferSize);
+	printf("pipeName = %s\n", pipeName.c_str());
 	if (pcBufferSize > 0) pointCloudBuffer = (float3 *)malloc((int)pcBufferSize);
 	return 0;
 } 
@@ -235,6 +235,7 @@ static void readPipeAndMemMap()
 	imageLabelBufferSize = (int)sharedMem[35];
 	pointcloudWidth = (int)sharedMem[36];
 	pointcloudHeight = (int)sharedMem[37];
+	dataBufferSize = (int)sharedMem[8];
 
 	DWORD dwRead;
 	if ((int)sharedMem[7] != rgbBufferSize)
@@ -243,9 +244,15 @@ static void readPipeAndMemMap()
 		rgbBufferSize = (int)sharedMem[7];
 		rgbBuffer = (unsigned char*)malloc(rgbBufferSize);
 	}
-	ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
+	
+	// printf("RGB size = %d, data size = %d, pointcloud size = %d w=%d h=%d\n", rgbBufferSize, dataBufferSize, pcBufferSize, imageWidth, imageHeight);
 
-	dataBufferSize = (int)sharedMem[8];
+	if (rgbBufferSize > 0)
+	{
+		ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
+		rgbMat = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
+	}
+
 	if (dataBufferSize > 0)
 	{
 		dataWidth = (int)sharedMem[16];
@@ -260,22 +267,10 @@ static void readPipeAndMemMap()
 		}
 		ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
 	}
-	else {
-		if (pcBufferSize > 0)
-		{
-			ReadFile(pipe, pointCloudBuffer, (int)pcBufferSize, &dwRead, NULL);
-		}
-	}
 
-	if (rgbBufferSize != dwRead * 4)
-	{
-		Mat tmp = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
-		imageHeight = pointcloudHeight;
-		imageWidth = pointcloudWidth;
-		resize(tmp, rgbMat, cv::Size(pointcloudWidth, pointcloudHeight)); 
-	} else {
-		rgbMat = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
-	}
+	if (pcBufferSize > 0)
+		ReadFile(pipe, pointCloudBuffer, (int)pcBufferSize, &dwRead, NULL);
+
 	ReadFile(pipe, imageLabel, imageLabelBufferSize, &dwRead, NULL);
 	imageLabel[imageLabelBufferSize] = 0;
 }

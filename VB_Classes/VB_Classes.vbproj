@@ -114,6 +114,7 @@
     <Compile Include="Sieve.vb" />
     <Compile Include="SLR.vb" />
     <Compile Include="StructuredDepth.vb" />
+    <Compile Include="Texture.vb" />
     <Compile Include="VBocvb.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="AlphaChannel.vb" />
@@ -283,7 +284,6 @@
     <Compile Include="Sound.vb" />
     <Compile Include="Stitch.vb" />
     <Compile Include="SuperPixels.vb" />
-    <Compile Include="TextureFlow.vb" />
     <Compile Include="Trace.vb" />
     <Compile Include="Tracker.vb" />
     <Compile Include="TransformationMatrix.vb" />

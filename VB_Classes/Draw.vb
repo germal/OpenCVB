@@ -51,7 +51,7 @@ Public Class Draw_rectangles
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            dst1.SetTo(cv.Scalar.White)
+            dst1.SetTo(cv.Scalar.Black)
             For i = 0 To sliders.trackbar(0).Value - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
@@ -136,7 +136,7 @@ Public Class Draw_Ellipses
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            dst1.SetTo(cv.Scalar.White)
+            dst1.SetTo(cv.Scalar.Black)
             For i = 0 To sliders.trackbar(0).Value - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
@@ -162,7 +162,7 @@ Public Class Draw_Circles
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
-            dst1.SetTo(cv.Scalar.White)
+            dst1.SetTo(cv.Scalar.Black)
             For i = 0 To sliders.trackbar(0).Value - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
@@ -187,7 +187,7 @@ Public Class Draw_Line
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
-        dst1.SetTo(cv.Scalar.White)
+        dst1.SetTo(cv.Scalar.Black)
         For i = 0 To sliders.trackbar(0).Value - 1
             Dim nPoint1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim nPoint2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -219,7 +219,7 @@ Public Class Draw_Polygon
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        dst1.SetTo(cv.Scalar.White)
+        dst1.SetTo(cv.Scalar.Black)
         dst2 = dst1.Clone()
         For i = 0 To sliders.trackbar(0).Value - 1
             Dim points = New List(Of cv.Point)
@@ -242,7 +242,7 @@ Public Class Draw_Polygon
                 points.Add(New cv.Point(hull(j).X, hull(j).Y))
             Next
             listOfPoints.Add(points)
-            dst2.SetTo(cv.Scalar.White)
+            dst2.SetTo(cv.Scalar.Black)
             If radio.check(0).Checked Then
                 cv.Cv2.DrawContours(dst2, listOfPoints, 0, polyColor, 2)
             Else
@@ -338,7 +338,7 @@ Public Class Draw_SymmetricalShapes
 
         End If
 
-        dst1.SetTo(cv.Scalar.White)
+        dst1.SetTo(cv.Scalar.Black)
         Dim numPoints = sliders.trackbar(0).Value
         Dim nGenPer = sliders.trackbar(3).Value
         If check.Box(1).Checked Then numPoints = CInt(numPoints / nGenPer) * nGenPer ' harmonize

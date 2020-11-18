@@ -188,8 +188,8 @@ Public Class DCT_Surfaces_debug
         flow = New Font_FlowText(ocvb)
 
         grid = New Thread_Grid(ocvb)
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 100
         gridHeightSlider.Value = 150
         dct = New DCT_FeatureLess(ocvb)

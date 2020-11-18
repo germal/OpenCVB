@@ -497,7 +497,7 @@ End Class
 
 
 
-
+' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 ' https://www.codeproject.com/Articles/326657/KalmanDemo
 Public Class Kalman_VB
     Inherits VBparent
@@ -624,7 +624,6 @@ Public Class Kalman_VB_Basics
     Dim q_bias As Single
     Dim outputError As Single = 0.002
     Dim processCovar As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
-    Dim oRand As Random
     Dim matrix As New List(Of Single)
     Dim plot As Plot_OverTime
     Dim basics As Kalman_Basics
@@ -640,14 +639,11 @@ Public Class Kalman_VB_Basics
         plot.topBottomPad = 20
         plot.dst1 = dst1
 
-        oRand = New Random(DateTime.Now.Millisecond)
-        sliders.Setup(ocvb, caller, 5)
+        sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Average input count", 1, 500, 20)
         sliders.setupTrackBar(1, "Delta Time X100", 1, 30, 5)
-        sliders.setupTrackBar(2, "Simulated Noise", 0, 100, 0)
-        If standalone Then sliders.trackbar(2).Value = 25 ' to introduce instability into the set of sliders...
-        sliders.setupTrackBar(3, "Simulated Bias", -100, 100, 0)
-        sliders.setupTrackBar(4, "Simulated Scale", 0, 100, 0)
+        sliders.setupTrackBar(2, "Process Covariance X10000", 0, 10000, 10)
+        sliders.setupTrackBar(3, "pDot entry X1000", 0, 1000, 300)
 
         label1 = "Blue = gray mean, green = kalman, red = kalman avg"
         ocvb.desc = "Build a generic kalman filter based on Kalman_VB"
@@ -656,7 +652,11 @@ Public Class Kalman_VB_Basics
         Static deltaSlider = findSlider("Delta Time X100")
         Dim dt As Single = deltaSlider.value / 100
         Dim unbias As Single = q_m - q_bias 'Unbias our gyro
-        Dim Pdot() As Single = {processCovar - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), 0.3}
+        Static covarSlider = findSlider("Process Covariance X10000")
+        Static pDotSlider = findSlider("pDot entry X1000")
+        Dim pdotEntry = pDotSlider.value / 1000
+        processCovar = covarSlider.value / 10000
+        Dim Pdot() As Single = {processCovar - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), pdotEntry}
         kOutput += unbias * dt
 
         'Update the covariance matrix
@@ -702,18 +702,6 @@ Public Class Kalman_VB_Basics
             Next
         End If
 
-        Static noiseSlider = findSlider("Simulated Noise")
-        Static biasSlider = findSlider("Simulated Bias")
-        Static scaleSlider = findSlider("Simulated Scale")
-        Dim noiselevel = noiseSlider.value
-        Dim additionalbias = biasSlider.Value
-        Dim scalefactor As Single = (scaleSlider.Value / 100) + 1 'This should be between 1 and 2
-
-        Dim iRand = oRand.Next(0, noiselevel)
-        Dim noisyInput = CInt((kInput * scalefactor) + additionalbias + iRand - (noiselevel / 2))
-        If noisyInput < 0 Then noisyInput = 0
-        If noisyInput > noiseSlider.maximum Then noisyInput = noiseSlider.maximum
-
         matrix(ocvb.frameCount Mod saveAvgCount) = kInput
         kAverage = (New cv.Mat(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean().Item(0)
 
@@ -727,8 +715,10 @@ Public Class Kalman_VB_Basics
         If useKalman Then
             'The Kalman Filter code comes from:
             'http://www.rotomotion.com/downloads/tilt.c
-            State_Update(noisyInput)
+            State_Update(kInput)
             Kalman_Update()
+        Else
+            kOutput = kInput
         End If
 
         If standalone Then

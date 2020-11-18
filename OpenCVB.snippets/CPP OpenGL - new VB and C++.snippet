@@ -21,23 +21,26 @@ Public Class OpenGL_MyOpenGLtest
     End Sub
     Public Sub Run(ocvb As VBocvb)
  		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ogl.rgbInput = ocvb.color
+        ogl.pointCloudInput = ocvb.PointCloud
+        ogl.src = ocvb.color
         ogl.Run(ocvb)
     End Sub
 End Class
 
 '//// Create a new project with this as the main module.  Simplest way: copy the OpenGL_Callbacks project to another directory.
-'//// Rename the directory and project and add it to the OpenCVB solution.  Don't forget to update the OpenCVB project dependencies.
+'//// Rename the directory and project and add it to the OpenCVB solution.  Don't forget to update VB_Classes dependencies.
 '//// When VB_Classes depends on your new project, your new OpenGL will recompile (if changed) with every restart of OpenCVB.
-'//
 '//#include "example.hpp"          // Include short list of convenience functions for rendering
 '//#define NOGLFW
 '//#include "../OpenGL_Basics/OpenGLcommon.h"
-'// 
+'//#include <iostream>
+'//#include <cmath>
+'//#include <cfloat>
+'//
 '//int main(int argc, char* argv[])
 '//{
 '//	GLuint gl_handle = 0;
-'//	windowTitle << "OpenGL_MyOpenGLtest";
+'//	windowTitle << "OpenGL_Callbacks";
 '//	initializeNamedPipeAndMemMap(argc, argv);
 '//
 '//	window app(windowWidth, windowHeight, windowTitle.str().c_str());
@@ -48,8 +51,8 @@ End Class
 '//	while (app)
 '//	{
 '//		readPipeAndMemMap();
-'//
-'//		tex.upload(rgbBuffer, imageWidth, imageHeight);
+'//		
+'//		tex.upload(rgbMat.data, imageWidth, imageHeight);
 '//
 '//		// OpenGL commands that prep screen for the pointcloud
 '//		glLoadIdentity();
@@ -66,7 +69,7 @@ End Class
 '//		glPushMatrix();
 '//		gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
 '//
-'//		glTranslatef(0, 0, +0.5f + MyState.offset_y * 0.05f);
+'//		glTranslatef(0, 0, +1.5f + MyState.offset_y * 0.05f);
 '//		glRotated(MyState.pitch, 1, 0, 0);
 '//		glRotated(MyState.yaw, 0, 1, 0);
 '//		glTranslatef(0, 0, -0.5f);
@@ -88,7 +91,7 @@ End Class
 '//			{
 '//				if (pcIntel[pcIndex].z > 0)
 '//				{
-'//					glVertex3fv((float*)& pcIntel[pcIndex]);
+'//					glVertex3fv((float*)&pcIntel[pcIndex]);
 '//					pt.x = (float)((x + 0.5f) / imageWidth);
 '//					pt.y = (float)((y + 0.5f) / imageHeight);
 '//					glTexCoord2fv((const GLfloat*)& pt);
@@ -96,18 +99,18 @@ End Class
 '//				pcIndex++;
 '//			}
 '//		}
-'//
 '//		glEnd();
 '//		glDisable(GL_TEXTURE_2D);
 '//
 '//		drawAxes(10, 0, 0, 1);
-'//		draw_floor(10);
+'//		draw_floor(10, 1, 0);
 '//
 '//		glPopMatrix();
 '//		glMatrixMode(GL_PROJECTION);
 '//		glPopMatrix();
 '//		glPopAttrib();
-'//
+'//		
+'//		glfwSetWindowTitle(app, imageLabel);
 '//		if (ackBuffers()) break;
 '//	}
 '//
@@ -116,8 +119,9 @@ End Class
 '//	return EXIT_SUCCESS;
 '//}
 
+
 ]]>
-            </Code>
-        </Snippet>
+    </Code>
+    </Snippet>
     </CodeSnippet>
-</CodeSnippets>
+    </CodeSnippets>
