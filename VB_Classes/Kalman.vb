@@ -612,9 +612,9 @@ End Class
 
 
 
-
-
-
+' https://towardsdatascience.com/kalman-filter-interview-bdc39f3e6cf3
+' https://towardsdatascience.com/extended-kalman-filter-43e52b16757d
+' https://towardsdatascience.com/the-unscented-kalman-filter-anything-ekf-can-do-i-can-do-it-better-ce7c773cf88d
 Public Class Kalman_VB_Basics
     Inherits VBparent
     Public kInput As Single

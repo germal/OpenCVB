@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
 		glPointSize((float)pointSize);
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-		tex.upload(rgbMat.data, imageWidth, imageHeight);
+		tex.upload(rgbBuffer, imageWidth, imageHeight);
 
 		glfwGetFramebufferSize(win, &windowWidth, &windowHeight);
 		glViewport(0, 0, windowWidth, windowHeight);

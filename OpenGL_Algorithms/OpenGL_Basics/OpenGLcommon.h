@@ -109,15 +109,17 @@ static GLFWwindow * win;
 static double *sharedMem;
 static state app_state;
 
-static float3 *dataBuffer;
-static int dataBufferSize;
+static float3* dataBuffer;
+static int dataBufferSize = 0;
 
+static uint8_t *textureBuffer;
+static int textureBufferSize = 0;
+
+static uint8_t *rgbBuffer = 0;
 static int rgbBufferSize;
-static uint8_t *rgbBuffer;
-static Mat rgbMat;
 
-static int pcBufferSize;
 static float3 *pointCloudBuffer;
+static int pcBufferSize = 0;
 
 static double fx, fy, ppx, ppy;
 static HANDLE hMapFile;
@@ -126,13 +128,17 @@ static int imageHeight;
 static double FOV;
 static double zNear;
 static double zFar;
-static int lastFrame = 0;
+static int lastFrame = -1;
+static int totalMem = 0;
+static texture_buffer rgb;
 static texture_buffer tex;
 static int pointSize;
 static int windowWidth;
 static int windowHeight;
 static int dataWidth;
 static int dataHeight;
+static int textureWidth;
+static int textureHeight;
 static std::ostringstream windowTitle;
 static float3 gyro_data;
 static float3 accel_data;
@@ -153,9 +159,9 @@ static float zTrans;
 
 static int initializeNamedPipeAndMemMap(int argc, char * argv[])
 {
-	if (argc != 6)
+	if (argc != 5)
 	{
-		MessageBox(0, L"Incorrect number of parameters.  Command should be: <program> <width> <height> <MemMapBufferSize> <pipeName> <pcBufferSize>", L"OpenCVB", MB_OK);
+		MessageBox(0, L"Incorrect number of parameters.  Command should be: <program> <width> <height> <MemMapBufferSize> <pipeName>", L"OpenCVB", MB_OK);
 		MessageBox(0, L"Use OpenCVB as the startup project in Visual Studio", L"OpenCVB", MB_OK);
 		return -1;
 	}
@@ -165,7 +171,6 @@ static int initializeNamedPipeAndMemMap(int argc, char * argv[])
 	MemMapBufferSize = std::stoi(argv[3]);
 
 	std::string pipeName(argv[4]);
-	pcBufferSize = (int)(std::stod(argv[5]));
 
 	// setup named pipe interface
 	std::string pipePrefix("\\\\.\\pipe\\");
@@ -180,12 +185,8 @@ static int initializeNamedPipeAndMemMap(int argc, char * argv[])
 	fy = sharedMem[2];
 	ppx = sharedMem[3];
 	ppy = sharedMem[4];
-	rgbBufferSize = (int)sharedMem[7];
-	dataBufferSize = (int)sharedMem[8];
-	rgbBuffer = (unsigned char *)malloc(rgbBufferSize);
-	dataBuffer = (float3 *)malloc(dataBufferSize);
+
 	printf("pipeName = %s\n", pipeName.c_str());
-	if (pcBufferSize > 0) pointCloudBuffer = (float3 *)malloc((int)pcBufferSize);
 	return 0;
 } 
 
@@ -198,9 +199,30 @@ static void readPipeAndMemMap()
 		if (++skipCount > 100) break; // process the current image again to enable getting a closeWindow request (if one comes.)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
+
 	lastFrame = (int)sharedMem[0];
 	imageWidth = (int)sharedMem[5];
 	imageHeight = (int)sharedMem[6];
+
+	if (totalMem == 0)
+	{
+		rgbBufferSize = (int)sharedMem[7];
+		dataBufferSize = (int)sharedMem[8];
+		pointcloudWidth = (int)sharedMem[36];
+		pointcloudHeight = (int)sharedMem[37];
+		textureBufferSize = (int)sharedMem[38];
+
+		pcBufferSize = pointcloudWidth * pointcloudHeight * 12;
+		totalMem = rgbBufferSize + dataBufferSize + textureBufferSize + pcBufferSize;
+
+		if (rgbBufferSize > 0) rgbBuffer = (unsigned char*)malloc(rgbBufferSize);
+		if (dataBufferSize > 0) dataBuffer = (float3*)malloc(dataBufferSize);
+		if (textureBufferSize > 0) textureBuffer = (uint8_t*)malloc(textureBufferSize);
+		if (pcBufferSize > 0) pointCloudBuffer = (float3*)malloc((int)pcBufferSize);
+
+		printf("RGB size = %d data size = %d pointcloud size = %d texture size = %d w=%d h=%d\n", 
+			   rgbBufferSize, dataBufferSize, pcBufferSize, textureBufferSize, imageWidth, imageHeight);
+	}
 	FOV = sharedMem[9];
 
 	zNear = sharedMem[13];
@@ -219,7 +241,7 @@ static void readPipeAndMemMap()
 	accel_data.z = (float)sharedMem[23];
 
 	timestamp = sharedMem[24];
-	IMU_Present = true; // (int)sharedMem[25];
+	IMU_Present = true; // always present
 
 	Eye.x = (float)sharedMem[26];
 	Eye.y = (float)sharedMem[27];
@@ -233,39 +255,26 @@ static void readPipeAndMemMap()
 	timeConversionUnits = (float)sharedMem[33];
 	imuAlphaFactor = (float)sharedMem[34];
 	imageLabelBufferSize = (int)sharedMem[35];
-	pointcloudWidth = (int)sharedMem[36];
-	pointcloudHeight = (int)sharedMem[37];
-	dataBufferSize = (int)sharedMem[8];
 
 	DWORD dwRead;
-	if ((int)sharedMem[7] != rgbBufferSize)
-	{
-		free(rgbBuffer);
-		rgbBufferSize = (int)sharedMem[7];
-		rgbBuffer = (unsigned char*)malloc(rgbBufferSize);
-	}
-	
-	// printf("RGB size = %d, data size = %d, pointcloud size = %d w=%d h=%d\n", rgbBufferSize, dataBufferSize, pcBufferSize, imageWidth, imageHeight);
 
 	if (rgbBufferSize > 0)
 	{
 		ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
-		rgbMat = Mat(imageHeight, imageWidth, CV_8UC3, rgbBuffer);
 	}
 
 	if (dataBufferSize > 0)
 	{
 		dataWidth = (int)sharedMem[16];
 		dataHeight = (int)sharedMem[17];
-
-		static int saveDataBufferSize = 0;
-		if (saveDataBufferSize != dataBufferSize)
-		{
-			saveDataBufferSize = dataBufferSize;
-			free(dataBuffer);
-			dataBuffer = (float3*)malloc(dataBufferSize);
-		}
 		ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
+	}
+
+	if (textureBufferSize > 0)
+	{
+		textureWidth = 256;
+		textureHeight = 256;
+		ReadFile(pipe, textureBuffer, textureBufferSize, &dwRead, NULL);
 	}
 
 	if (pcBufferSize > 0)

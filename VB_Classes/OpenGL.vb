@@ -14,10 +14,12 @@ Public Class OpenGL_Basics
     Dim memMapPtr As IntPtr
     Dim rgbBuffer(0) As Byte
     Dim dataBuffer(0) As Byte
+    Dim textureBuffer(0) As Byte
     Dim pointCloudBuffer(0) As Byte
-    Public memMapValues(38) As Double
+    Public memMapValues(39) As Double
     Public pointSize As integer = 2
     Public dataInput As New cv.Mat
+    Public textureInput As New cv.Mat
     Public FOV As Single = 150
     Public yaw As Single = 0
     Public pitch As Single = 0
@@ -53,10 +55,10 @@ Public Class OpenGL_Basics
                                      ocvb.IMU_Acceleration.X, ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z, ocvb.IMU_TimeStamp,
                                      1, eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
                                      scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
-                                     imageLabel.Length, pointCloudInput.Width, pointCloudInput.Height)
+                                     imageLabel.Length, pointCloudInput.Width, pointCloudInput.Height, textureInput.Total * textureInput.ElemSize)
         Next
     End Sub
-    Private Sub startOpenGLWindow(ocvb As VBocvb, pcSize As Integer)
+    Private Sub startOpenGLWindow(ocvb As VBocvb)
         ' first setup the named pipe that will be used to feed data to the OpenGL window
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         PipeTaskIndex += 1
@@ -65,7 +67,7 @@ Public Class OpenGL_Basics
         memMapbufferSize = 8 * memMapValues.Length - 1
 
         startInfo.FileName = OpenGLTitle + ".exe"
-        startInfo.Arguments = CStr(openGLWidth) + " " + CStr(openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName + " " + CStr(pcSize)
+        startInfo.Arguments = CStr(openGLWidth) + " " + CStr(openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName
         If ocvb.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
 
@@ -84,7 +86,7 @@ Public Class OpenGL_Basics
         End If
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
-        If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb, pcSize)
+        If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb)
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If ocvb.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
@@ -92,9 +94,10 @@ Public Class OpenGL_Basics
         End If
 
         Dim rgb = src.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
-        If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
-        If dataBuffer.Length <> dataInput.Total * dataInput.ElemSize Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
-        If pointCloudBuffer.Length <> pointCloudInput.Total * pointCloudInput.ElemSize Then ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
+        If rgb.Width Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
+        If dataInput.Width Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
+        If textureInput.Width Then ReDim textureBuffer(textureInput.Total * textureInput.ElemSize - 1)
+        If pointCloudInput.Width Then ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
 
         memMapUpdate(ocvb)
 
@@ -103,12 +106,14 @@ Public Class OpenGL_Basics
 
         If rgb.Width > 0 Then Marshal.Copy(rgb.Data, rgbBuffer, 0, rgbBuffer.Length)
         If dataInput.Width > 0 Then Marshal.Copy(dataInput.Data, dataBuffer, 0, dataBuffer.Length)
+        If textureInput.Width > 0 Then Marshal.Copy(textureInput.Data, textureBuffer, 0, textureBuffer.Length)
         If pointCloudInput.Width > 0 Then Marshal.Copy(pointCloudInput.Data, pointCloudBuffer, 0, pcSize)
 
         If pipe.IsConnected Then
             On Error Resume Next
             If rgb.Width > 0 Then pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
             If dataInput.Width > 0 Then pipe.Write(dataBuffer, 0, dataBuffer.Length)
+            If textureInput.Width > 0 Then pipe.Write(textureBuffer, 0, textureBuffer.Length)
             If pointCloudInput.Width > 0 Then pipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
             Dim buff = System.Text.Encoding.UTF8.GetBytes(imageLabel)
             pipe.Write(buff, 0, imageLabel.Length)
@@ -458,7 +463,7 @@ End Class
 Public Class OpenGL_FloorPlane
     Inherits VBparent
     Public ogl As OpenGL_Basics
-    Dim plane As StructuredDepth_LinearizeFloor
+    Public plane As StructuredDepth_LinearizeFloor
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         ogl = New OpenGL_Basics(ocvb)
@@ -487,3 +492,47 @@ Public Class OpenGL_FloorPlane
 End Class
 
 
+
+
+
+
+
+
+
+
+Public Class OpenGL_FloorTexture
+    Inherits VBparent
+    Dim floor As OpenGL_FloorPlane
+    Dim shuffle As Texture_Shuffle
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        floor = New OpenGL_FloorPlane(ocvb)
+        shuffle = New Texture_Shuffle(ocvb)
+        ocvb.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        floor.plane.Run(ocvb)
+        dst1 = floor.plane.dst1
+        dst2 = floor.plane.dst2
+
+        If (ocvb.frameCount Mod 300 = 0) Then
+            shuffle.src = floor.plane.maskPlane
+            shuffle.Run(ocvb)
+            floor.ogl.textureInput = shuffle.dst1(shuffle.tRect)
+            floor.ogl.textureInput = floor.ogl.textureInput.CvtColor(cv.ColorConversionCodes.BGR2RGB)
+        End If
+
+        Dim floorColor = ocvb.color.Mean(floor.plane.maskPlane)
+        Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+        data.Set(Of Single)(0, 0, floorColor.Item(0))
+        data.Set(Of Single)(1, 0, floorColor.Item(0))
+        data.Set(Of Single)(2, 0, floorColor.Item(0))
+        data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
+        floor.ogl.dataInput = data
+        floor.ogl.pointCloudInput = floor.plane.imuPointCloud
+        floor.ogl.src = src
+        floor.ogl.Run(ocvb)
+    End Sub
+End Class

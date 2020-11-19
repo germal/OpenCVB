@@ -96,7 +96,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/realsense2;$(ProjectDir)../../librealsense/src;$(ProjectDir)../../librealsense/examples;$(ProjectDir)../../librealsense/include;$(ProjectDir)../../librealsense/third-party/glfw/include;C:\_src\OpenCVB\librealsense\build;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/realsense2;$(ProjectDir)../../librealsense/src;$(ProjectDir)../../librealsense/examples;$(ProjectDir)../../librealsense/include;$(ProjectDir)../../librealsense/third-party/glfw/include;C:\_src\OpenCVB\librealsense\build;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;$(ProjectDir)/../../OpenCV//modules/highgui/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4098;4267</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -151,7 +151,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/realsense2;$(ProjectDir)../../librealsense/src;$(ProjectDir)../../librealsense/examples;$(ProjectDir)../../librealsense/include;$(ProjectDir)../../librealsense/third-party/glfw/include;C:\_src\OpenCVB\librealsense\build;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../librealsense/realsense2;$(ProjectDir)../../librealsense/src;$(ProjectDir)../../librealsense/examples;$(ProjectDir)../../librealsense/include;$(ProjectDir)../../librealsense/third-party/glfw/include;C:\_src\OpenCVB\librealsense\build;$(ProjectDir)/../../OpenCV//modules\imgproc\include;$(ProjectDir)/../../OpenCV//modules\core\include;$(ProjectDir)/../../OpenCV//Build;$(ProjectDir)/../../OpenCV/;$(ProjectDir)/../../OpenCV//modules/highgui/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4098;4267</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

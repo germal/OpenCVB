@@ -47,7 +47,7 @@ Public Class Random_Shuffle
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ocvb.RGBDepth.CopyTo(dst1)
+        src.CopyTo(dst1)
         cv.Cv2.RandShuffle(dst1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         label1 = "Random_shuffle - wave at camera"
     End Sub
@@ -247,9 +247,23 @@ Module Random_PatternGenerator_CPP_Module
     Public Sub Random_PatternGenerator_Close(Random_PatternGeneratorPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Random_PatternGenerator_Run(Random_PatternGeneratorPtr As IntPtr, rows As integer, cols As integer, channels As integer) As IntPtr
+    Public Function Random_PatternGenerator_Run(Random_PatternGeneratorPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
+    End Function
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Random_DiscreteDistribution_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Random_DiscreteDistribution_Close(rPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Random_DiscreteDistribution_Run(rPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
 End Module
+
+
+
 
 
 
@@ -266,7 +280,7 @@ Public Class Random_PatternGenerator_CPP
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols)
 
         If imagePtr <> 0 Then
             Dim dstData(src.Total - 1) As Byte
