@@ -110,6 +110,7 @@
     <Compile Include="Fibonacci.vb" />
     <Compile Include="Fuzzy.vb" />
     <Compile Include="Highlight.vb" />
+    <Compile Include="ParticleFilter.vb" />
     <Compile Include="ProCon.vb" />
     <Compile Include="Sieve.vb" />
     <Compile Include="SLR.vb" />

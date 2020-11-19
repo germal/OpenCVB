@@ -22,6 +22,7 @@
     <ClInclude Include="CvHMM.h" />
     <ClInclude Include="DepthColorizer.hpp" />
     <ClInclude Include="harrisDetector.h" />
+    <ClInclude Include="ParticleFilter.h" />
     <ClInclude Include="rbf.hpp" />
     <ClInclude Include="SemiGlobalMatching.h" />
     <ClInclude Include="videostab.h" />
@@ -43,6 +44,7 @@
     <ClCompile Include="MinTriangle.cpp" />
     <ClCompile Include="OpenCVGL.cpp" />
     <ClCompile Include="Palette.cpp" />
+    <ClCompile Include="ParticleFilter.cpp" />
     <ClCompile Include="Plot_OpenCV.cpp" />
     <ClCompile Include="PointCloud.cpp" />
     <ClCompile Include="Random_PatternGenerator.cpp" />

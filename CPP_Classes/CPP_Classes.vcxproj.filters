@@ -33,6 +33,9 @@
     <ClInclude Include="CvHMM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Corners.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Fuzzy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
