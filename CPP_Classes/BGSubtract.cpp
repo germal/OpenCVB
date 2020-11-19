@@ -10,7 +10,7 @@
 
 using namespace std;
 using namespace cv;
-using namespace cv::bgsegm;
+using namespace bgsegm;
 class BGSubtract_BGFG
 {
 private:
@@ -72,8 +72,8 @@ BGSubtract_Synthetic *BGSubtract_Synthetic_Open(int* rgbPtr, int rows, int cols,
 	BGSubtract_Synthetic* synthPtr = new BGSubtract_Synthetic();
 	Mat bg = Mat(rows, cols, CV_8UC3, rgbPtr);
 	Mat fg = imread(fgFilename, IMREAD_COLOR);
-	resize(fg, fg, cv::Size(10, 10)); // adjust the object size here...
-	synthPtr->gen = cv::bgsegm::createSyntheticSequenceGenerator(bg, fg, amplitude, magnitude, wavespeed, objectspeed);
+	resize(fg, fg, Size(10, 10)); // adjust the object size here...
+	synthPtr->gen = bgsegm::createSyntheticSequenceGenerator(bg, fg, amplitude, magnitude, wavespeed, objectspeed);
 	synthPtr->gen->getNextFrame(synthPtr->output, synthPtr->fgMask);
 	return synthPtr;
 }

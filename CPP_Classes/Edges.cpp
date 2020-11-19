@@ -9,13 +9,13 @@
 
 using namespace std;
 using namespace cv;
-using namespace cv::ximgproc;
+using namespace ximgproc;
 
 // https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
 class Edges_RandomForest
 {
 private:
-	cv::Ptr<StructuredEdgeDetection> pDollar;
+	Ptr<StructuredEdgeDetection> pDollar;
 public:
 	Mat dst32f, src32f, gray8u;
 	Edges_RandomForest(char *modelFileName) { pDollar = createStructuredEdgeDetection(modelFileName); }
@@ -60,13 +60,13 @@ public:
 	Edges_Deriche() {}
 	void Run(float alpha, float omega) {
 		Mat xdst, ydst;
-		cv::ximgproc::GradientDericheX(src, xdst, alpha, omega);
-		cv::ximgproc::GradientDericheY(src, ydst, alpha, omega);
+		ximgproc::GradientDericheX(src, xdst, alpha, omega);
+		ximgproc::GradientDericheY(src, ydst, alpha, omega);
 		Mat dx2 = xdst.mul(xdst);
 		Mat dy2 = ydst.mul(ydst);
 		Mat d2 = dx2 + dy2;
-		cv::sqrt(d2, d2);
-		cv::normalize(d2, d2, 255, cv::NormTypes::NORM_MINMAX);
+		sqrt(d2, d2);
+		normalize(d2, d2, 255, NormTypes::NORM_MINMAX);
 		d2.convertTo(dst, CV_8UC3, 255, 0);
 	}
 };

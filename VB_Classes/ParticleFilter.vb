@@ -4,15 +4,24 @@ Imports System.Runtime.InteropServices
 ' https://github.com/masaddev/OpenCVParticleFilter/tree/master/OpenCVParticleFilter
 Public Class ParticleFilter_Example
     Inherits VBparent
+    Dim pfPtr As IntPtr
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        ocvb.desc = "Particle Filter example downloaded from github - link in the code."
+        pfPtr = ParticleFilterTest_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+        ocvb.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim imagePtr = ParticleFilterTest_Run(pfPtr)
+        If imagePtr <> 0 Then
+            Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, dstData)
+        End If
     End Sub
     Public Sub Close()
-        ' ParticleFilter_Close(pfPtr)
+        ParticleFilterTest_Close(pfPtr)
     End Sub
 End Class
 
@@ -24,12 +33,12 @@ End Class
 
 Module ParticleFilter
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ParticleFilter_Open() As IntPtr
+    Public Function ParticleFilterTest_Open(matlabFileName As String, rows As Integer, cols As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ParticleFilter_Close(pfPtr As IntPtr)
+    Public Sub ParticleFilterTest_Close(pfPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function ParticleFilter_Run(pfPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    Public Function ParticleFilterTest_Run(pfPtr As IntPtr) As IntPtr
     End Function
 End Module
