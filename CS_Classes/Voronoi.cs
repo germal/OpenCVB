@@ -388,16 +388,28 @@ namespace CS_Classes
 
         public void New() { }
 
-        public List<Point> test_points = new List<Point>();
-        public void Run(ref cv.Mat src, bool bruteForce, bool randomize)
+        public void Run(ref cv.Mat src, List<cv.Point> points, bool bruteForce)
         {
-            int n_points = 10;
-            if (randomize) TestPoints.Generate(src.Width, src.Height, n_points, test_points);
+            List<Point> test_points = new List<Point>();
+            foreach (cv.Point pt in points)
+            {
+                test_points.Add(new Point(pt.X, pt.Y));
+            }
 
-            if (bruteForce == false) 
+            if (bruteForce == false)
                 src = AlgoOrderedList.TestPerformance(src.Width, src.Height, test_points);
             else
                 src = AlgoBruteForce.TestPerformance(src.Width, src.Height, test_points);
+        }
+        public void Run(ref cv.Mat src, List<cv.Point> points)
+        {
+            List<Point> test_points = new List<Point>();
+            foreach (cv.Point pt in points)
+            {
+                test_points.Add(new Point(pt.X, pt.Y));
+            }
+
+            src = AlgoOrderedList.TestPerformance(src.Width, src.Height, test_points);
         }
     }
 }

@@ -7,22 +7,25 @@ Public Class Random_Points
     Public Points2f() As cv.Point2f
     Public rangeRect As cv.Rect
     Public plotPoints As Boolean = False
+    Dim countSlider As System.Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Random Pixel Count", 1, src.Cols * src.Rows, 20)
 
-        ReDim Points(sliders.trackbar(0).Value - 1)
-        ReDim Points2f(sliders.trackbar(0).Value - 1)
+        countSlider = findSlider("Random Pixel Count")
+
+        ReDim Points(countSlider.Value - 1)
+        ReDim Points2f(countSlider.Value - 1)
 
         rangeRect = New cv.Rect(0, 0, src.Cols, src.Rows)
         ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If Points.Length <> sliders.trackbar(0).Value Then
-            ReDim Points(sliders.trackbar(0).Value - 1)
-            ReDim Points2f(sliders.trackbar(0).Value - 1)
+        If Points.Length <> countSlider.Value Then
+            ReDim Points(countSlider.Value - 1)
+            ReDim Points2f(countSlider.Value - 1)
         End If
         dst1.SetTo(0)
         For i = 0 To Points.Length - 1
