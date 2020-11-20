@@ -286,7 +286,7 @@ Public Class IMU_HostFrameTimes
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Minimum Host interrupt delay (ms)", 1, 10, 4)
-        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 25)
+        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
 
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         ocvb.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
@@ -408,7 +408,8 @@ Public Class IMU_TotalDelay
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
         plot.Run(ocvb)
 
-        Dim plotLastX = 25
+        Static countSlider = findSlider("Number of Plot Values")
+        Dim plotLastX = countSlider.value
         If plot.lastXdelta.Count > plotLastX Then
             For i = 0 To plot.plotCount - 1
                 output += "Last " + CStr(plotLastX) + Choose(i + 1, " IMU Delay ", " Host Delay", " Total Delay ms", " Smoothed Total") + vbTab

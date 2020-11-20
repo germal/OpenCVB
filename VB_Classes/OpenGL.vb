@@ -526,9 +526,9 @@ Public Class OpenGL_FloorTexture
 
         Dim floorColor = ocvb.color.Mean(floor.plane.maskPlane)
         Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
-        data.Set(Of Single)(0, 0, floorColor.Item(0))
-        data.Set(Of Single)(1, 0, floorColor.Item(0))
-        data.Set(Of Single)(2, 0, floorColor.Item(0))
+        data.Set(Of Single)(0, 0, ocvb.maxZ)
+        data.Set(Of Single)(1, 0, 0)
+        data.Set(Of Single)(2, 0, 0)
         data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
         floor.ogl.dataInput = data
         floor.ogl.pointCloudInput = floor.plane.imuPointCloud
