@@ -96,6 +96,7 @@
     <Compile Include="Sieve.cs" />
     <Compile Include="SLR.cs" />
     <Compile Include="SurfAndSift.cs" />
+    <Compile Include="Voronoi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -97,8 +97,8 @@ Mat ParticleFilter::currentPrediction()
 Mat ParticleFilter::showParticles(const Mat& inImage)
 {
 	Vec3b cVal;
-	cVal[0] = 0;
-	cVal[1] = 0;
+	cVal[0] = 255;
+	cVal[1] = 255;
 	cVal[2] = 255;
 
 	Mat pLocs = H * Xn;
@@ -203,8 +203,10 @@ void ParticleFilter::normalizeWeights()
 {
 	Mat wSum;
 	reduce(Wn, wSum, 1, CV_REDUCE_SUM);
-
-	Wn = Wn / wSum.at<float>(0, 0);
+	float sum = wSum.at<float>(0, 0);
+	//if (sum == 0) 
+	//	sum = 1;
+	Wn = Wn / sum;
 }
 
 void ParticleFilter::weightingParticles(const Mat& inZ)
@@ -356,7 +358,6 @@ public:
 		pf.predict();
 
 		currentFrame += 1;
-		if (currentFrame >= 45) currentFrame = 1;
 		resize(pImage, fullImage, fullImage.size());
  	}
 };
