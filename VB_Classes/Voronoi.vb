@@ -1,6 +1,7 @@
-﻿'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
 
+'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
 Public Class Voronoi_Basics
     Inherits VBparent
     Public vDemo As New CS_Classes.VoronoiDemo
@@ -25,10 +26,8 @@ Public Class Voronoi_Basics
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Then
-            random.Run(ocvb)
-            inputPoints = New List(Of cv.Point)(random.Points)
-        End If
+        random.Run(ocvb)
+        inputPoints = New List(Of cv.Point)(random.Points)
 
         vDemo.Run(dst1, inputPoints)
         vDisplay(ocvb, dst1, inputPoints)
@@ -40,6 +39,7 @@ End Class
 
 
 
+'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
 Public Class Voronoi_Compare
     Inherits VBparent
     Dim basics As Voronoi_Basics
@@ -63,5 +63,63 @@ Public Class Voronoi_Compare
 
         basics.vDemo.Run(dst2, points, False)
         basics.vDisplay(ocvb, dst2, points)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Module Voronoi
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function VoronoiDemo_Open(matlabFileName As String, rows As Integer, cols As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub VoronoiDemo_Close(pfPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function VoronoiDemo_Run(pfPtr As IntPtr, Input As IntPtr, pointCount As Integer, width As Integer, height As Integer) As IntPtr
+    End Function
+End Module
+
+
+
+
+
+
+'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
+Public Class Voronoi_CPP
+    Inherits VBparent
+    Dim vPtr As IntPtr
+    Dim vDemo As Voronoi_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        vDemo = New Voronoi_Basics(ocvb)
+        vPtr = VoronoiDemo_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+        ocvb.desc = "Use the C++ version of the Voronoi code"
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim countSlider = findSlider("Random Pixel Count")
+        vDemo.random.Run(ocvb)
+        Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)
+        Dim imagePtr = VoronoiDemo_Run(vPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst1.Width, dst1.Height)
+        handleSrc.Free()
+        If imagePtr <> 0 Then
+            Dim tmp As New cv.Mat(dst1.Size, cv.MatType.CV_32F)
+            Dim dstData(tmp.Total * tmp.ElemSize - 1) As Byte
+            Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
+            dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32F, dstData)
+
+            Dim inputPoints = New List(Of cv.Point)(vDemo.random.Points)
+            vDemo.vDisplay(ocvb, dst1, inputPoints)
+        End If
+    End Sub
+    Public Sub Close()
+        VoronoiDemo_Close(vPtr)
     End Sub
 End Class

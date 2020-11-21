@@ -66,9 +66,9 @@ void ParticleFilter::resampleParticles()
 		Mat outIdx = this->resampler(Wn);
 		Wn = Mat::ones(Wn.rows, Wn.cols, Wn.type());
 		this->normalizeWeights();
-		for (int i = 0; i < this->N; i++)
+		for (int i = 0; i < (int)this->N; i++)
 		{
-			Xn.col(outIdx.at<float>(0, i)).copyTo(outXn.col(i));
+			Xn.col((int)(outIdx.at<float>(0, i))).copyTo(outXn.col(i));
 		}
 
 		Xn = outXn.clone();
@@ -105,10 +105,10 @@ Mat ParticleFilter::showParticles(const Mat& inImage)
 
 	Mat retImage = inImage.clone();
 
-	for (int i = 0; i < this->N; i++)
+	for (int i = 0; i < (int)this->N; i++)
 	{
-		int xIdx = std::floor(pLocs.at<float>(0, i));
-		int yIdx = std::floor(pLocs.at<float>(1, i));
+		int xIdx = (int)std::floor(pLocs.at<float>(0, i));
+		int yIdx = (int)std::floor(pLocs.at<float>(1, i));
 
 		if (xIdx >= 0 && xIdx < retImage.cols && yIdx >= 0 && yIdx < retImage.rows)
 			retImage.at<Vec3b>(yIdx, xIdx) = cVal;
@@ -127,11 +127,11 @@ Mat ParticleFilter::showPredictedLocation(const Mat& inImage)
 	// find prediction of model
 	Mat pLocs = H * (Xn * Wn.t());
 
-	std::cout << "Tracked Location: " << pLocs << std::endl;
+	// std::cout << "Tracked Location: " << pLocs << std::endl;
 	Mat retImage = inImage.clone();
 
-	int xIdx = std::floor(pLocs.at<float>(0, 0));
-	int yIdx = std::floor(pLocs.at<float>(1, 0));
+	int xIdx = (int)std::floor(pLocs.at<float>(0, 0));
+	int yIdx = (int)std::floor(pLocs.at<float>(1, 0));
 
 	// draw a crosshair
 	int sizeIn = 3;
@@ -195,8 +195,8 @@ void ParticleFilter::selectDynamicModel(unsigned int D)
 	H.at<float>(0, 0) = 1;
 	H.at<float>(1, 3) = 1;
 
-	std::cout << "Dynamic Model A = " << A << std::endl;
-	std::cout << "Observation Model H = " << H << std::endl;
+	//std::cout << "Dynamic Model A = " << A << std::endl;
+	//std::cout << "Observation Model H = " << H << std::endl;
 }
 
 void ParticleFilter::normalizeWeights()
@@ -218,18 +218,18 @@ void ParticleFilter::weightingParticles(const Mat& inZ)
 	//std::cout << "allpZt" << allpZt << std::endl;
 	//Mat pZt;
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < (int) N; i++)
 	{
 
 		double d = distanceGaussian(inZ, allpZt.col(i).clone());
 		//std::cout << "inZ" << inZ << std::endl;
 		//std::cout << "allpZt" << allpZt.col(i) << std::endl;
 
-		Wn.at<float>(0, i) = d;
+		Wn.at<float>(0, i) = (float)d;
 
 		//std::cout << "Distance is:" << d << std::endl;
 	}
-
+	 
 	this->normalizeWeights();
 }
 
@@ -272,8 +272,7 @@ Mat ParticleFilter::resampler(const Mat& inProbs)
 			beta = beta - inProbs.at<float>(0, idx);
 			idx = (idx + 1) % inProbs.cols;
 		}
-		retIndex.at<float>(0, i) = idx; // not matlab so idx+1 is not required
-		//retIndex.at<float>(0, i) = idx + 1; //  for matlab mex
+		retIndex.at<float>(0, i) = (float)idx; // not matlab so idx+1 is not required
 	}
 	return retIndex;
 }
@@ -288,12 +287,12 @@ class ParticleFilterTest
 {
 private:
 public:
-	Mat ballLocation;
+	Mat ballLocation; 
 	Mat inR;
 	int currentFrame;
-	Mat pImage;
 	Mat fullImage;
 	std::string dataDir;
+	ParticleFilter pf;
 	ParticleFilterTest(std::string dataDirectory)
 	{
 		dataDir = dataDirectory;
@@ -319,7 +318,6 @@ public:
 
 			for (int j = 0; j < ballLocation.rows; j++)
 			{
-
 				double buff;
 				file.read((char*)&buff, sizeof(buff));
 				ballLocation.at<float>(j, i) = (float)buff;
@@ -327,9 +325,12 @@ public:
 		}
 		file.close();
 
-		std::cout << ballLocation << std::endl;
+		//std::cout << ballLocation << std::endl;
 		inR = Mat::eye(6, 6, CV_32FC1);
 		inR = inR / 2;
+		//std::cout << inR << std::endl;
+		currentFrame = 13;
+		pf = ParticleFilter(ballLocation.col(currentFrame), inR);
 	}
 	Mat loadImage(int imageNum)
 	{
@@ -340,8 +341,9 @@ public:
 		inImage = imread(filename);
 		return inImage;
 	}
-	void Run(ParticleFilter pf)
+	void Run()
 	{
+		if (currentFrame == 45) currentFrame = 13; // restart at the beginning
 		Mat inImage = loadImage(currentFrame + 1);
 		if (ballLocation.at<float>(0, currentFrame) + ballLocation.at<float>(1, currentFrame) != 0)
 		{
@@ -351,8 +353,10 @@ public:
 
 		// resample particles using importance sampling
 		pf.resampleParticles();
-		pImage = pf.showParticles(inImage);
+		Mat pImage = pf.showParticles(inImage);
 		pImage = pf.showPredictedLocation(pImage);
+		//cv::imshow("pf Out", pImage);
+		//cv::waitKey(0);
 
 		// predict next state
 		pf.predict();
@@ -367,7 +371,6 @@ ParticleFilterTest * ParticleFilterTest_Open(char* dataDirName, int rows, int co
 	std::string dataDir(dataDirName);
 	ParticleFilterTest* pfPtr = new ParticleFilterTest(dataDir);
 	pfPtr->fullImage = Mat(rows, cols, CV_8UC3);
-	pfPtr->currentFrame = 13;
 	return pfPtr;
 }
 
@@ -380,7 +383,6 @@ void ParticleFilterTest_Close(ParticleFilterTest * pfPtr)
 extern "C" __declspec(dllexport)
 int* ParticleFilterTest_Run(ParticleFilterTest *pfPtr)
 {
-	static ParticleFilter pf(pfPtr->ballLocation.col(pfPtr->currentFrame), pfPtr->inR);
-	pfPtr->Run(pf);
+	pfPtr->Run();
 	return (int*)pfPtr->fullImage.data;
 }

@@ -12,3 +12,25 @@ Public Class imShow_Basics
 End Class
 
 
+
+
+
+
+
+Public Class imShow_WaitKey
+    Inherits VBparent
+    Dim vDemo As Voronoi_Basics
+    Public Sub New(ocvb As VBocvb)
+        initParent(ocvb)
+        vDemo = New Voronoi_Basics(ocvb)
+
+        ocvb.desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
+    End Sub
+    Public Sub Run(ocvb As VBocvb)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        vDemo.Run(ocvb)
+        cv.Cv2.ImShow("Hit space bar to advance to the next frame", vDemo.dst1)
+        cv.Cv2.WaitKey()
+        dst1 = vDemo.dst1
+    End Sub
+End Class

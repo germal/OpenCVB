@@ -56,6 +56,7 @@
     <ClCompile Include="SuperPixels.cpp" />
     <ClCompile Include="Trace.cpp" />
     <ClCompile Include="videostab.cpp" />
+    <ClCompile Include="Voronoi.cpp" />
     <ClCompile Include="WarpModel.cpp" />
     <ClCompile Include="WhiteBalance.cpp" />
     <ClCompile Include="xPhoto_OilPaint.cpp" />

@@ -16,16 +16,15 @@ Public Class ParticleFilter_Example
     End Sub
     Public Sub Run(ocvb As VBocvb)
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static imageFrame = 13
-        Dim nextFile As New FileInfo(ocvb.parms.homeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
+        Static imageFrame = 12
         imageFrame += 1
-        dst2 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst1.Size)
-
-        If ocvb.frameCount Mod 13 = 0 Then
+        If imageFrame Mod 45 = 0 Then
             imageFrame = 13
             ParticleFilterTest_Close(pfPtr)
             pfPtr = ParticleFilterTest_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         End If
+        Dim nextFile As New FileInfo(ocvb.parms.homeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
+        dst2 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst1.Size)
         Dim imagePtr = ParticleFilterTest_Run(pfPtr)
         If imagePtr <> 0 Then
             Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
