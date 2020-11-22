@@ -36,13 +36,8 @@ Public Class Texture_Basics
 
         tChange = True
         If texturePop > 0 Then
-            Dim tmp As New cv.Mat(tRect.Height, tRect.Width, cv.MatType.CV_8UC3, 0)
-            ocvb.color(tRect).CopyTo(tmp, dst1(tRect))
             Dim nextCount = dst1(tRect).CountNonZero()
-            If nextCount >= texturePop * 0.95 Then
-                tChange = False
-                texturePop = nextCount
-            End If
+            If nextCount >= texturePop * 0.95 Then tChange = False
         End If
         If tChange Then
             Dim sortcounts As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)

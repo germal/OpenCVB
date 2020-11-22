@@ -49,6 +49,25 @@ int main(int argc, char* argv[])
 
 		glPointSize((float)pointSize);
 
+		// pretend there is a wall ------------------------------------------------------------------------------------------------------------
+		glMatrixMode(GL_TEXTURE);
+		glEnable(GL_TEXTURE_2D);
+		
+		float* data = (float*)dataBuffer;
+		glBegin(GL_POLYGON);
+
+		glColor3f(255, 255, 255);
+		float x = 10;
+		float y = 10;
+		float z = data[0];
+		glVertex3f(-x, -y, z);
+		glVertex3f(-x, y, z);
+		glVertex3f(x, y, z);
+		glVertex3f(x, -y, z);
+
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+
 		// draw and texture the floor --------------------------------------------------------------------------------------------------------
 		glMatrixMode(GL_TEXTURE); 
 		glEnable(GL_TEXTURE_2D);
@@ -57,11 +76,10 @@ int main(int argc, char* argv[])
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
 		glBegin(GL_POLYGON);
 
-		float* data = (float*)dataBuffer;
 		// glColor3f(data[0], data[1], data[2]);
-		float x = 10;
-		float y = data[3];
-		float z = 10;
+		x = 10;
+		y = data[3];
+		z = 10;
 		glTexCoord2f(0.0f, 100.0f); glVertex3f(-x, y, z);
 		glTexCoord2f(100.0f, 0.0f); glVertex3f(-x, y, 0);
 		glTexCoord2f(0.0f, 0.0f);  glVertex3f(x, y, 0);

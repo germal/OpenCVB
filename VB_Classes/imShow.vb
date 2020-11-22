@@ -30,7 +30,7 @@ Public Class imShow_WaitKey
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         vDemo.Run(ocvb)
         cv.Cv2.ImShow("Hit space bar to advance to the next frame", vDemo.dst1)
-        cv.Cv2.WaitKey()
+        cv.Cv2.WaitKey(1000) ' It will halt the test all run if 0 but 0 is the useful value for debugging interactively.
         dst1 = vDemo.dst1
     End Sub
 End Class
