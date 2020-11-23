@@ -111,8 +111,7 @@ Public Class OpenCVB
 
         ' Camera DLL's are built in Release mode even when configured for Debug (performance while debugging an algorithm is much better).  
         ' It is not likely camera interfaces will need debugging but to do so change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
-        Dim releaseDir = HomeDir.FullName + "\bin\Release\"
-        updatePath(releaseDir, "Release Version of camera DLL's.")
+        updatePath(HomeDir.FullName + "\bin\Release\", "Release Version of camera DLL's.")
 
         ' check to make sure there are no camera dll's in the Debug directory by mistake!
         For i = 0 To 5
@@ -669,8 +668,8 @@ Public Class OpenCVB
     End Sub
     Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
         Dim systemPath = Environment.GetEnvironmentVariable("Path")
-        Dim curDirectory = CurDir()
-        If InStr(systemPath, curDirectory) = False Then systemPath = curDirectory + ";" + systemPath
+        'Dim curDirectory = CurDir()
+        'If InStr(systemPath, curDirectory) = False Then systemPath = curDirectory + ";" + systemPath
         Dim foundDirectory As Boolean
         If Directory.Exists(neededDirectory) Then
             foundDirectory = True
@@ -678,13 +677,13 @@ Public Class OpenCVB
         End If
 
         ' maybe they didn't build the release version yet.
-        If foundDirectory = False And InStr(neededDirectory, "Release") Then
-            neededDirectory.Replace("Release", "Debug")
-            If Directory.Exists(neededDirectory) Then
-                foundDirectory = True
-                systemPath = neededDirectory + ";" + systemPath
-            End If
-        End If
+        'If foundDirectory = False And InStr(neededDirectory, "Release") Then
+        '    neededDirectory.Replace("Release", "Debug")
+        '    If Directory.Exists(neededDirectory) Then
+        '        foundDirectory = True
+        '        systemPath = neededDirectory + ";" + systemPath
+        '    End If
+        'End If
 
         If foundDirectory = False And notFoundMessage.Length > 0 Then
             MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
