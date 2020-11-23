@@ -122,6 +122,7 @@ Public Class Texture_Shuffle
     Dim floor As OpenGL_FloorPlane
     Dim texture As Texture_Basics
     Public tRect As cv.Rect
+    Public rgbaTexture As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         If standalone Then floor = New OpenGL_FloorPlane(ocvb)
@@ -148,5 +149,9 @@ Public Class Texture_Shuffle
         shuffle.Run(ocvb)
         tRect = New cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4)
         dst1(tRect) = shuffle.dst1.Repeat(4, 4)
+        Dim split = cv.Cv2.Split(dst1(tRect))
+        Dim alpha As New cv.Mat(split(0).Size, cv.MatType.CV_8U, 1)
+        Dim merged() = {split(2), split(1), split(0), alpha}
+        cv.Cv2.Merge(merged, rgbaTexture)
     End Sub
 End Class

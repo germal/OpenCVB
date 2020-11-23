@@ -25,13 +25,13 @@ int main(int argc, char* argv[])
 		readPipeAndMemMap();
 
 		rgb.upload(rgbBuffer, imageWidth, imageHeight);
-		tex.upload(textureBuffer, 256, 256);
+		tBuffer.uploadRGBA(textureBuffer, 256, 256);
 
 		// OpenGL commands that prep screen for the pointcloud
 		glLoadIdentity();
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-		// glClearColor(153.f / 255, 153.f / 255, 153.f / 255, 1);
+		//glClearColor(153.f / 255, 153.f / 255, 153.f / 255, 1);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_PROJECTION);
@@ -49,73 +49,92 @@ int main(int argc, char* argv[])
 
 		glPointSize((float)pointSize);
 
+
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
 		// pretend there is a wall ------------------------------------------------------------------------------------------------------------
-		glMatrixMode(GL_TEXTURE);
-		glEnable(GL_TEXTURE_2D);
-		
 		float* data = (float*)dataBuffer;
-		glBegin(GL_POLYGON);
-
-		glColor3f(255, 255, 255);
-		float x = 10;
-		float y = 10;
-		float z = data[0];
-		glVertex3f(-x, -y, z);
-		glVertex3f(-x, y, z);
-		glVertex3f(x, y, z);
-		glVertex3f(x, -y, z);
-
-		glEnd();
-		glDisable(GL_TEXTURE_2D);
-
-		// draw and texture the floor --------------------------------------------------------------------------------------------------------
-		glMatrixMode(GL_TEXTURE); 
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, tex.get_gl_handle());
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
-		glBegin(GL_POLYGON);
-
-		// glColor3f(data[0], data[1], data[2]);
-		x = 10;
-		y = data[3];
-		z = 10;
-		glTexCoord2f(0.0f, 100.0f); glVertex3f(-x, y, z);
-		glTexCoord2f(100.0f, 0.0f); glVertex3f(-x, y, 0);
-		glTexCoord2f(0.0f, 0.0f);  glVertex3f(x, y, 0);
-		glTexCoord2f(100.0f, 100.0f); glVertex3f(x, y, z);
-
-		glEnd();
-		glDisable(GL_TEXTURE_2D);
-
-		// draw the scene ---------------------------------------------------------------------------------------------------------------------
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, rgb.get_gl_handle());
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
-
-		glBegin(GL_POINTS);
-
-		float2 pt; int pcIndex = 0; float3* pcIntel = (float3*)pointCloudBuffer;
-		for (int y = 0; y < imageHeight; ++y)
 		{
-			for (int x = 0; x < imageWidth; ++x)
-			{
-				if (pcIntel[pcIndex].z > 0)
-				{
-					glVertex3fv((float*)&pcIntel[pcIndex]);
-					pt.x = (float)((x + 0.5f) / imageWidth);
-					pt.y = (float)((y + 0.5f) / imageHeight);
-					glTexCoord2fv((const GLfloat*)&pt);
-				}
-				pcIndex++;
-			}
+			glMatrixMode(GL_TEXTURE);
+			glEnable(GL_TEXTURE_2D);
+			//glEnable(GL_COLOR_MATERIAL);
+
+			glBegin(GL_POLYGON);
+			glColor4f(1, 1, 1, 1);
+
+			float x = 10;
+			float y = 10;
+			float z = data[0];
+			glVertex3f(-x, -y, z);
+			glVertex3f(-x, y, z);
+			glVertex3f(x, y, z);
+			glVertex3f(x, -y, z);
+
+			glEnd();
+			glDisable(GL_TEXTURE_2D);
+			//glDisable(GL_BLEND);
 		}
 
-		glEnd();
-		glDisable(GL_TEXTURE_2D);
+
+		// draw and texture the floor --------------------------------------------------------------------------------------------------------
+		{
+			//glEnable(GL_BLEND);
+			glMatrixMode(GL_TEXTURE);
+			glEnable(GL_TEXTURE_2D);
+			
+			glBindTexture(GL_TEXTURE_2D, tBuffer.get_gl_handle());
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glBegin(GL_POLYGON);
+
+			// glColor3f(data[0], data[1], data[2]);
+			float x = 10;
+			float y = data[3];
+			float z = 10;
+			glTexCoord2f(0.0f, 10.0f); glVertex3f(-x, y, z);
+			glTexCoord2f(10.0f, 0.0f); glVertex3f(-x, y, 0);
+			glTexCoord2f(0.0f, 0.0f);  glVertex3f(x, y, 0);
+			glTexCoord2f(10.0f, 10.0f); glVertex3f(x, y, z);
+
+			glEnd();
+			glDisable(GL_TEXTURE_2D);
+			//glDisable(GL_BLEND);
+		}
+
+
+		// draw the scene ---------------------------------------------------------------------------------------------------------------------
+		{
+			glEnable(GL_BLEND);
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, rgb.get_gl_handle());
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // GL_CLAMP_TO_EDGE
+
+			glBegin(GL_POINTS);
+
+			float2 pt; int pcIndex = 0; float3* pcIntel = (float3*)pointCloudBuffer;
+			for (int y = 0; y < imageHeight; ++y)
+			{
+				for (int x = 0; x < imageWidth; ++x)
+				{
+					if (pcIntel[pcIndex].z > 0)
+					{
+						glVertex3fv((float*)&pcIntel[pcIndex]);
+						pt.x = (float)((x + 0.5f) / imageWidth);
+						pt.y = (float)((y + 0.5f) / imageHeight);
+						glTexCoord2fv((const GLfloat*)&pt);
+					}
+					pcIndex++;
+				}
+			}
+
+			glEnd();
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_BLEND);
+		}
 
 		drawAxes(10, 0, 0, 1);
 

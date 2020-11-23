@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 	{
 		readPipeAndMemMap();
 		
-		tex.upload(rgbBuffer, imageWidth, imageHeight);
+		rgb.upload(rgbBuffer, imageWidth, imageHeight);
 
 		// OpenGL commands that prep screen for the pointcloud
 		glLoadIdentity();
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 		glPointSize((float)pointSize);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, tex.get_gl_handle());
+		glBindTexture(GL_TEXTURE_2D, rgb.get_gl_handle());
 		float tex_border_color[] = { 0.8f, 0.8f, 0.8f, 0.8f };
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // GL_CLAMP_TO_EDGE

@@ -506,8 +506,8 @@ Public Class OpenGL_FloorTexture
     Dim shuffle As Texture_Shuffle
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        floor = New OpenGL_FloorPlane(ocvb)
         shuffle = New Texture_Shuffle(ocvb)
+        floor = New OpenGL_FloorPlane(ocvb)
         ocvb.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
     End Sub
     Public Sub Run(ocvb As VBocvb)
@@ -517,12 +517,9 @@ Public Class OpenGL_FloorTexture
         dst1 = floor.plane.dst1
         dst2 = floor.plane.dst2
 
-        If (ocvb.frameCount Mod 300 = 0) Then
-            shuffle.src = floor.plane.maskPlane
-            shuffle.Run(ocvb)
-            floor.ogl.textureInput = shuffle.dst1(shuffle.tRect)
-            floor.ogl.textureInput = floor.ogl.textureInput.CvtColor(cv.ColorConversionCodes.BGR2RGB)
-        End If
+        shuffle.src = floor.plane.maskPlane
+        shuffle.Run(ocvb)
+        floor.ogl.textureInput = shuffle.rgbaTexture
 
         Dim floorColor = ocvb.color.Mean(floor.plane.maskPlane)
         Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)

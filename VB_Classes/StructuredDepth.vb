@@ -570,7 +570,7 @@ Public Class StructuredDepth_LinearizeFloor
                 split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, maskPlane)
                 kalman.kInput = (minVal + maxVal) / 2
                 kalman.Run(ocvb)
-                floorYPlane = kalman.kOutput
+                floorYPlane = kalman.kAverage
                 split(1).SetTo(floorYPlane, maskPlane)
             End If
 

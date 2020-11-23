@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
 		glPointSize((float)pointSize);
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-		tex.upload(rgbBuffer, imageWidth, imageHeight);
+		rgb.upload(rgbBuffer, imageWidth, imageHeight);
 
 		glfwGetFramebufferSize(win, &windowWidth, &windowHeight);
 		glViewport(0, 0, windowWidth, windowHeight);
@@ -47,7 +47,7 @@ int main(int argc, char * argv[])
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, tex.get_gl_handle());
+		glBindTexture(GL_TEXTURE_2D, rgb.get_gl_handle());
 
 		glColor3f(1, 1, 1);
 		glBegin(GL_POINTS);
