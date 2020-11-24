@@ -522,7 +522,6 @@ Public Class OpenGL_FloorTexture
         floor.ogl.textureInput = shuffle.rgbaTexture
 
 
-        Dim floorColor = ocvb.color.Mean(floor.plane.maskPlane)
         Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         data.Set(Of Single)(0, 0, ocvb.maxZ)
         data.Set(Of Single)(1, 0, 0)
