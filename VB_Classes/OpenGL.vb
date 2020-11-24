@@ -521,6 +521,7 @@ Public Class OpenGL_FloorTexture
         shuffle.Run(ocvb)
         floor.ogl.textureInput = shuffle.rgbaTexture
 
+
         Dim floorColor = ocvb.color.Mean(floor.plane.maskPlane)
         Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         data.Set(Of Single)(0, 0, ocvb.maxZ)
@@ -529,6 +530,7 @@ Public Class OpenGL_FloorTexture
         data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
         floor.ogl.dataInput = data
         floor.ogl.pointCloudInput = floor.plane.imuPointCloud
+        floor.ogl.pointCloudInput.SetTo(0, floor.plane.maskPlane)
         floor.ogl.src = src
         floor.ogl.Run(ocvb)
     End Sub

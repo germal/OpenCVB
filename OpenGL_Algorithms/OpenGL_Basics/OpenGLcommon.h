@@ -323,8 +323,9 @@ static void drawAxes(float axislen, float x, float y, float z)
 
 static void draw_floor(int tileCount, GLint y, GLint z)
 {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glLineWidth(1.0);
-	glBegin(GL_LINES);
+	glBegin(GL_POLYGON);
 	glColor4f(0.4f, 0.4f, 0.4f, 1.f);
 	int tileHalf = (int)(tileCount / 2);
 	// Render "floor" grid
@@ -336,6 +337,7 @@ static void draw_floor(int tileCount, GLint y, GLint z)
 		glVertex3i(tileHalf, y, i);
 	}
 	glEnd();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 }
 
 static void DrawWireFrame(float x, float y, float z, float dx, float dy, float dz)
