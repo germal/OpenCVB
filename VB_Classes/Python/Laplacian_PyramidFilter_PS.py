@@ -29,7 +29,7 @@ def merge_lappyr(levels):
     return np.uint8(np.clip(img, 0, 255))
 
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global leveln
     pyr = build_lappyr(imgRGB, leveln)
     for i in range(leveln):

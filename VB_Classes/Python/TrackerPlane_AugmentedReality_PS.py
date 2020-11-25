@@ -50,7 +50,7 @@ class App:
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)
 
-    def OpenCVCode(self, frame, depth_colormap):
+    def OpenCVCode(self, frame, depth_colormap, frameCount):
         playing = not self.paused and not self.rect_sel.dragging
         if playing:
             self.frame = frame.copy()

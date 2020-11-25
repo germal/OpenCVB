@@ -8,7 +8,7 @@ def set_scale(val):
     global hist_scale # force the callback to reference the global variable.
     hist_scale = val 
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global hsv_map, hist_scale, h, s
     small = cv.pyrDown(imgRGB)
     hsv = cv.cvtColor(small, cv.COLOR_BGR2HSV)

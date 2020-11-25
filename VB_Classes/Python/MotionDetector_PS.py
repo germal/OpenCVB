@@ -30,7 +30,7 @@ import numpy as np
 
 title_window = 'MotionDetector_PS.py'
 
-#cv.namedWindow(title_window)
+cv.namedWindow(title_window)
 
 # =============================================================================
 # USER-SET PARAMETERS
@@ -128,8 +128,12 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     # Convert the frame_delta to color for splicing
     frame_delta = cv.cvtColor(frame_delta, cv.COLOR_GRAY2BGR)
 
+    (h,w) = imgRGB.shape[:2] # original image size
+
+    delta = cv.resize(frame_delta, (int(w / 2), int(h / 2)))
+    img = cv.resize(imgRGB, (int(w / 2), int(h / 2)))
     # Splice the two video frames together to make one long horizontal one
-    cv.imshow("frame", np.hstack((frame_delta, imgRGB)))
+    cv.imshow(title_window,cv.hconcat([delta, img]))
     frameCount += 1
 
 movement_persistent_counter = 0

@@ -39,7 +39,7 @@ class App:
         from PyStream import PyStreamRun
         PyStreamRun(self.OpenCVCode, 'lk_track_PS.py')
 
-    def OpenCVCode(self, frame, depth_colormap):
+    def OpenCVCode(self, frame, depth_colormap, frameCount):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         vis = frame.copy()
 

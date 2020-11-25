@@ -147,7 +147,7 @@ class App:
         tracker = MOSSE(frame_gray, rect)
         self.trackers.append(tracker)
 
-    def OpenCVCode(self, vis, depth_colormap):
+    def OpenCVCode(self, vis, depth_colormap, frameCount    ):
         self.frame = vis.copy()
         if not self.paused:
             frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)

@@ -36,7 +36,7 @@ def warp_flow(img, flow):
     res = cv.remap(img, flow, None, cv.INTER_LINEAR)
     return res
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global frameCount, prev_imgRGB, prev, show_hsv, show_glitch, cur_glitch
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     if frameCount == 0:

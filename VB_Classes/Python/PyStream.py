@@ -62,7 +62,7 @@ def PyStreamRun(OpenCVCode, scriptName):
                     except:
                         print("Unable to reshape the RGB data")
                         sys.exit()
-                    OpenCVCode(imgRGB, depth_colormap)
+                    OpenCVCode(imgRGB, depth_colormap, frameCount)
                     cv.waitKey(1)
                     
     except Exception as exception:

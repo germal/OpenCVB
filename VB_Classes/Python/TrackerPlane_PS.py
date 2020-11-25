@@ -142,7 +142,7 @@ class App:
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)
 
-    def OpenCVCode(self, imgRGB, depth_colormap):
+    def OpenCVCode(self, imgRGB, depth_colormap, frameCount):
         playing = not self.paused and not self.rect_sel.dragging
         self.frame = imgRGB.copy()
 

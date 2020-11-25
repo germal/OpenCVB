@@ -18,7 +18,7 @@ def draw_rects(img, rects, color):
     for x1, y1, x2, y2 in rects:
         cv.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global cascade, nested
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     gray = cv.equalizeHist(gray)

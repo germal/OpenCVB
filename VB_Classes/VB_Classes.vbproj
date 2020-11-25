@@ -386,6 +386,7 @@
     <Content Include="Python\Logpolar.py" />
     <Content Include="Python\Make_gaussians.py" />
     <Content Include="Python\MatchTemplate.py" />
+    <Content Include="Python\MotionDetector_PS.py" />
     <Content Include="Python\MotionTemplate_PS.py" />
     <Content Include="Python\MSER_PS.py" />
     <Content Include="Python\ICP_SyntheticExample.py" />

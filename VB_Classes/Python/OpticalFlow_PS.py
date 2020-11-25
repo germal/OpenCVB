@@ -57,7 +57,7 @@ def warp_flow(img, flow):
     return res
 
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global show_hsv, show_glitch, use_spatial_propagation, use_temporal_propagation, cur_glitch, prevgray, inst, flow, initialized 
     if initialized == False:
         initialized = True

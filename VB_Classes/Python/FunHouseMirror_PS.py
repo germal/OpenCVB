@@ -13,7 +13,7 @@ def on_trackbar(val):
 	global saveMode 
 	saveMode = val 
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
 	H,W = imgRGB.shape[:2]
 	# Creating the virtual camera object
 	c1 = vcam(H=H,W=W)

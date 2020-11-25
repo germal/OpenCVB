@@ -4,7 +4,7 @@ import common
 import sys
 title_window = "SuperPixel_PS.py - use spacebar to switch views."
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, frameCount, scalarRed
     converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
     height,width,channels = converted_img.shape

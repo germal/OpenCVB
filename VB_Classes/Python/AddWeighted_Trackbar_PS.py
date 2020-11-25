@@ -13,7 +13,7 @@ trackbar_name = 'Alpha'
 cv.createTrackbar(trackbar_name, title_window , saveAlpha, alpha_slider_max, on_trackbar)
 on_trackbar(saveAlpha)
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     alpha = saveAlpha / alpha_slider_max
     beta = ( 1.0 - alpha )
     dst1 = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)

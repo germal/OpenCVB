@@ -9,7 +9,7 @@ cv.namedWindow(title_window)
 tracker = cv.MultiTracker_create()
 init_once = False
 
-def OpenCVCode(image, depth_colormap):
+def OpenCVCode(image, depth_colormap, frameCount):
     global init_once
     if not init_once:
         bbox1 = (100, 100, 100, 100) # cv.selectROI(title_window, image) # just selecting one object for now.  Others are possible.

@@ -14,7 +14,7 @@ title_window = 'SVM_Digits_PS.py'
 from common import mosaic
 from digits import *
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
 
     bin = cv.adaptiveThreshold(gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 31, 10)

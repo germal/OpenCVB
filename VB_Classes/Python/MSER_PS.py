@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import sys
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global mser
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     vis = imgRGB.copy()

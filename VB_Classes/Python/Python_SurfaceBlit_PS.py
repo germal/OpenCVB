@@ -8,7 +8,7 @@ import cv2 as cv
 import numpy as np
 title_window = 'Python_SurfaceBlit_PS.py'
 
-def OpenCVCode(imgRGB, depth_colormap):
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
     global initialized, surface, screen
     if surface == None:
         pygame.init()
