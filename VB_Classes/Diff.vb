@@ -5,14 +5,15 @@ Public Class Diff_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Diff - Color Threshold", 1, 255, 5)
+        sliders.setupTrackBar(0, "Change threshold in pixels", 1, 255, 5)
         label1 = "Stable Gray Color"
         label2 = "Unstable Color mask"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim gray = src
+        If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)

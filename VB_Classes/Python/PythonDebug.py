@@ -119,7 +119,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 
     # Print the text on the screen, and display the raw and processed video 
     # feeds
-    #cv.putText(imgRGB, str(text), (10,35), font, 0.75, (255,255,255), 2, cv.LINE_AA)
+    cv.putText(imgRGB, str(text), (10,35), font, 0.75, (255,255,255), 2, cv.LINE_AA)
     
     # For if you want to show the individual video frames
     #    cv.imshow(titleWindow, imgRGB)

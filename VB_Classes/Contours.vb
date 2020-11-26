@@ -31,14 +31,14 @@ Public Class Contours_Basics
         label2 = "FindContours output"
     End Sub
     Public Sub setOptions()
-        Static frm = findForm("Contours_Basics ContourApproximation Mode Radio Options")
+        Static frm = findForm("Contours_Basics Retrieval Mode Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
                 Exit For
             End If
         Next
-        Static frm1 = findForm("Contours_Basics Retrieval Mode Radio Options")
+        Static frm1 = findForm("Contours_Basics ContourApproximation Mode Radio Options")
         For i = 0 To frm1.check.length - 1
             If frm1.check(i).Checked Then
                 ApproximationMode = Choose(i + 1, cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
@@ -50,27 +50,29 @@ Public Class Contours_Basics
     Public Sub Run(ocvb As VBocvb)
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         setOptions()
-        Dim imageInput As New cv.Mat
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then
+            Dim imageInput As New cv.Mat
             rotatedRect.src = src
             rotatedRect.Run(ocvb)
             imageInput = rotatedRect.dst1
             If imageInput.Channels = 3 Then
-                src = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+                dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
             Else
-                src = imageInput.Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
+                dst1 = imageInput.ConvertScaleAbs(255)
             End If
+        Else
+            If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
+        cv.Cv2.ImShow("dst1", dst1.Clone)
 
         Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
             Dim img32sc1 As New cv.Mat
-            src.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
+            dst1.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
             contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
             img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         Else
-            contours0 = cv.Cv2.FindContoursAsArray(src, retrievalMode, ApproximationMode)
+            contours0 = cv.Cv2.FindContoursAsArray(dst1, retrievalMode, ApproximationMode)
         End If
 
         Dim contours()() As cv.Point = Nothing
@@ -79,7 +81,6 @@ Public Class Contours_Basics
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
         Next
 
-        dst1 = imageInput
         dst2.SetTo(0)
         If retrievalMode = cv.RetrievalModes.FloodFill Then
             cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
