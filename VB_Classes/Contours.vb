@@ -5,6 +5,8 @@ Public Class Contours_Basics
     Public rotatedRect As Draw_rotatedRectangles
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
+    Public contours As New List(Of cv.Point())
+    Public minArea As Integer = 1
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         radio.Setup(ocvb, caller, 5)
@@ -61,9 +63,8 @@ Public Class Contours_Basics
                 dst1 = imageInput.ConvertScaleAbs(255)
             End If
         Else
-            If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
         End If
-        cv.Cv2.ImShow("dst1", dst1.Clone)
 
         Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
@@ -75,17 +76,17 @@ Public Class Contours_Basics
             contours0 = cv.Cv2.FindContoursAsArray(dst1, retrievalMode, ApproximationMode)
         End If
 
-        Dim contours()() As cv.Point = Nothing
-        ReDim contours(contours0.Length - 1)
-        For j = 0 To contours0.Length - 1
-            contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
+        contours.Clear()
+        For i = 0 To contours0.Length - 1
+            If cv.Cv2.ContourArea(contours0(i)) > minArea Then contours.Add(cv.Cv2.ApproxPolyDP(contours0(i), 3, True))
         Next
 
         dst2.SetTo(0)
+        Dim cnt = contours.ToArray
         If retrievalMode = cv.RetrievalModes.FloodFill Then
-            cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.DrawContours(dst2, cnt, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Else
-            cv.Cv2.DrawContours(dst2, contours, 0, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            cv.Cv2.DrawContours(dst2, cnt, 0, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
         End If
     End Sub
 End Class
