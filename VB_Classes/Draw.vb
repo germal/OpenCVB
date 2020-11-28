@@ -512,8 +512,8 @@ Public Class Draw_OverlappingRectangles
 
         dst2.SetTo(0)
         For Each r In inputRects
-            dst1.Rectangle(r, cv.Scalar.Yellow, 4)
-            dst2.Rectangle(r, cv.Scalar.Yellow, 1)
+            dst1.Rectangle(r, cv.Scalar.Yellow, 5)
+            dst2.Rectangle(r, cv.Scalar.Yellow, 2)
         Next
 
         Dim removeRects As New List(Of cv.Rect)
@@ -543,7 +543,7 @@ Public Class Draw_OverlappingRectangles
         Next
 
         For Each r In inputRects
-            dst1.Rectangle(r, cv.Scalar.Red, 1)
+            dst1.Rectangle(r, cv.Scalar.Red, 2)
         Next
     End Sub
 End Class

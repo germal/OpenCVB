@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class Diff_Basics
     Inherits VBparent
-    Dim lastFrame As New cv.Mat
+    Public lastFrame As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         sliders.Setup(ocvb, caller)
-        sliders.setupTrackBar(0, "Change threshold in pixels", 1, 255, 5)
-        label1 = "Stable Gray Color"
+        sliders.setupTrackBar(0, "Change threshold for each pixel", 1, 255, 25)
+        label1 = "Stable Color"
         label2 = "Unstable Color mask"
         ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
