@@ -21,12 +21,12 @@ Public Class Retina_Basics_CPP
     Dim startInfo As New ProcessStartInfo
     Dim magnoData(0) As Byte
     Dim srcData(0) As Byte
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(caller, 2)
         check.Box(0).Text = "Use log sampling"
         check.Box(1).Text = "Open resulting xml file"
 
@@ -34,7 +34,7 @@ Public Class Retina_Basics_CPP
         label2 = "Retina Magno"
         ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
@@ -91,18 +91,18 @@ End Class
 Public Class Retina_Depth
     Inherits VBparent
     Dim retina As Retina_Basics_CPP
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        retina = New Retina_Basics_CPP(ocvb)
+    Public Sub New()
+        initParent()
+        retina = New Retina_Basics_CPP()
 
         ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        retina.src = ocvb.RGBDepth
-        retina.Run(ocvb)
+        retina.src = ocvb.task.RGBDepth
+        retina.Run()
         dst2 = retina.dst2
         Static lastMotion As New cv.Mat
         If lastMotion.Width = 0 Then lastMotion = retina.dst2

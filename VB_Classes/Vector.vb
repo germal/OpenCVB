@@ -2,12 +2,12 @@ Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/37492663/how-to-use-magnitude-and-absdiff-opencv-functions-to-compute-distances
 Public Class Vector_Magnitude
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Compute Euclidian and Manhattan Distance on a single vector."
         label1 = "Vector Magnitude"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim cVector() As Single = {1, 4, 4, 8}
         ocvb.trueText("Original vector = " + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ", " + CStr(cVector(2)) + ", " + CStr(cVector(3)), 10, 30)

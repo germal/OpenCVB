@@ -4,22 +4,22 @@ Public Class Fitline_Basics
     Inherits VBparent
     Public draw As Draw_Line
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        draw = New Draw_Line(ocvb)
+    Public Sub New()
+        initParent()
+        draw = New Draw_Line()
         draw.sliders.trackbar(0).Value = 2
         hideForm("Draw_Line Slider Options")
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
         sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
 
         ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
-            draw.Run(ocvb)
+            draw.Run()
             src = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
             dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst1 = dst2
@@ -53,21 +53,21 @@ End Class
 Public Class Fitline_3DBasics_MT
     Inherits VBparent
     Dim hlines As Hough_Lines_MT
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        hlines = New Hough_Lines_MT(ocvb)
+    Public Sub New()
+        initParent()
+        hlines = New Hough_Lines_MT()
         ocvb.desc = "Use visual lines to find 3D lines."
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hlines.src = src
-        hlines.Run(ocvb)
+        hlines.Run()
         dst2 = hlines.dst2
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         src.CopyTo(dst1)
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
 
         Dim lines As New List(Of cv.Line3D)
         Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
@@ -90,12 +90,11 @@ Public Class Fitline_3DBasics_MT
             Dim line = nullLine
             If points.Count = 0 Then
                 ' save the average color for this roi
-                Dim mean = ocvb.RGBDepth(roi).Mean()
+                Dim mean = ocvb.task.RGBDepth(roi).Mean()
                 mean(0) = 255 - mean(0)
                 dst2.Rectangle(roi, mean, -1, cv.LineTypes.AntiAlias)
             Else
-                Dim fitArray = points.ToArray()
-                line = cv.Cv2.FitLine(fitArray, cv.DistanceTypes.L2, 0, 0, 0.01)
+                line = cv.Cv2.FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0, 0.01)
             End If
             SyncLock lines
                 lines.Add(line)
@@ -116,14 +115,14 @@ Public Class Fitline_RawInput
     Public points As New List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Random point count", 0, 500, 100)
         sliders.setupTrackBar(1, "Line Point Count", 0, 500, 20)
         sliders.setupTrackBar(2, "Line Noise", 1, 100, 10)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(caller, 2)
         check.Box(0).Text = "Highlight Line Data"
         check.Box(1).Text = "Recompute with new random data"
         check.Box(0).Checked = True
@@ -131,8 +130,8 @@ Public Class Fitline_RawInput
 
         ocvb.desc = "Generate a noisy line in a field of random data."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If check.Box(1).Checked Or ocvb.frameCount = 0 Then
             If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
@@ -193,31 +192,31 @@ End Class
 Public Class Fitline_EigenFit
     Inherits VBparent
     Dim noisyLine As Fitline_RawInput
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        noisyLine = New Fitline_RawInput(ocvb)
+    Public Sub New()
+        initParent()
+        noisyLine = New Fitline_RawInput()
         noisyLine.sliders.trackbar(0).Value = 30
         noisyLine.sliders.trackbar(1).Value = 400
         label1 = "blue=GT, red=fitline, yellow=EigenFit"
         label2 = "Raw input (use sliders below to explore)"
         ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
         Static theta As Single
         Static len As Single
         Static m2 As Single
         If ocvb.frameCount Mod 30 = 0 Then
 
-            Static noisePointCount As integer
-            Static linePointCount As integer
-            Static lineNoise As integer
+            Static noisePointCount As Integer
+            Static linePointCount As Integer
+            Static lineNoise As Integer
             Static highlight As Boolean
             'If noisyLine.sliders.trackbar(0).Value <> noisePointCount Or noisyLine.sliders.trackbar(1).Value <> linePointCount Or
             '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
             noisyLine.check.Box(1).Checked = True
-            noisyLine.Run(ocvb)
+            noisyLine.Run()
             dst2 = noisyLine.dst1
             dst1.SetTo(0)
             noisyLine.check.Box(1).Checked = False
@@ -266,15 +265,15 @@ Public Class Fitline_EigenFit
 
             len = Math.Sqrt(Math.Pow(maxX - minX, 2) + Math.Pow(maxY - minY, 2))
 
-            p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * Len / 2, mean.Val1 - Math.Sin(theta) * Len / 2)
-            p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * Len / 2, mean.Val1 + Math.Sin(theta) * Len / 2)
+            p1 = New cv.Point2f(mean.Val0 - Math.Cos(theta) * len / 2, mean.Val1 - Math.Sin(theta) * len / 2)
+            p2 = New cv.Point2f(mean.Val0 + Math.Cos(theta) * len / 2, mean.Val1 + Math.Sin(theta) * len / 2)
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
             If Math.Abs(m2) > 1.0 Then
                 dst1.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
             Else
-                p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * Len / 2, mean.Val1 - Math.Sin(-theta) * Len / 2)
-                p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * Len / 2, mean.Val1 + Math.Sin(-theta) * Len / 2)
+                p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
+                p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
                 m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
                 dst1.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
             End If

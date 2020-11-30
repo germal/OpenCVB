@@ -6,15 +6,15 @@ Public Class Entropy_Basics
     Dim hist As Histogram_Basics
     Dim simple = New Entropy_Simple
     Public entropy As Single
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New()
+        initParent()
+        flow = New Font_FlowText()
 
-        hist = New Histogram_Basics(ocvb)
+        hist = New Histogram_Basics()
 
         ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         simple.bins = hist.sliders.trackbar(0).Value
         simple.run(src)
@@ -27,7 +27,7 @@ Public Class Entropy_Basics
         Next
         If standalone Then
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
-            flow.Run(ocvb)
+            flow.Run()
         End If
     End Sub
 End Class
@@ -43,23 +43,23 @@ Public Class Entropy_Highest_MT
     Dim hist As Histogram_Basics
     Public grid As Thread_Grid
     Public bestContrast As cv.Rect
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 80
 
-        hist = New Histogram_Basics(ocvb)
+        hist = New Histogram_Basics()
 
         label1 = "Highest entropy marked with red rectangle"
         ocvb.desc = "Find the highest entropy section of the color image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+        grid.Run()
 
         If entropies.Length <> grid.roiList.Count Then
             ReDim entropies(grid.roiList.Count - 1)
@@ -110,22 +110,22 @@ Public Class Entropy_FAST
     Inherits VBparent
     Dim fast As FAST_Basics
     Dim entropy As Entropy_Highest_MT
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fast = New FAST_Basics(ocvb)
-        entropy = New Entropy_Highest_MT(ocvb)
+    Public Sub New()
+        initParent()
+        fast = New FAST_Basics()
+        entropy = New Entropy_Highest_MT()
 
         label1 = "Output of Fast_Basics, input to entropy calculation"
         label2 = "Lighter color is higher entropy, Red marks highest"
         ocvb.desc = "Use FAST markings to add to entropy"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fast.src = src
-        fast.Run(ocvb)
+        fast.Run()
 
         entropy.src = fast.dst1
-        entropy.Run(ocvb)
+        entropy.Run()
         dst1 = entropy.dst1
         dst2 = entropy.dst2
         dst2.Rectangle(entropy.bestContrast, cv.Scalar.Red, 4)

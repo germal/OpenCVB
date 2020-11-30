@@ -6,43 +6,43 @@ Public Class Video_Basics
     Public srcVideo As String
     Public image As New cv.Mat
     Public captureVideo As New cv.VideoCapture
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        ocvb.openFileDialogRequested = True
-        ocvb.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
-        ocvb.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
-        ocvb.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
-        ocvb.openFileFilterIndex = 1
-        ocvb.openFileDialogTitle = "Select a video file for input"
-        ocvb.initialStartSetting = False
+        ocvb.task.openFileDialogRequested = True
+        ocvb.task.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
+        ocvb.task.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
+        ocvb.task.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
+        ocvb.task.openFileFilterIndex = 1
+        ocvb.task.openFileDialogTitle = "Select a video file for input"
+        ocvb.task.initialStartSetting = False
 
-        Dim fileInfo = New FileInfo(ocvb.openFileDialogName)
+        Dim fileInfo = New FileInfo(ocvb.task.openFileDialogName)
         srcVideo = fileInfo.FullName
 
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
         label1 = fileInfo.Name
         ocvb.desc = "Show a video file"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim fileInfo = New FileInfo(ocvb.openFileDialogName)
-        If srcVideo <> ocvb.openFileDialogName Then
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim fileInfo = New FileInfo(ocvb.task.openFileDialogName)
+        If srcVideo <> ocvb.task.openFileDialogName Then
             If fileInfo.Exists = False Then
                 ocvb.trueText("File not found: " + fileInfo.FullName, 10, 125)
                 Exit Sub
             End If
-            srcVideo = ocvb.openFileDialogName
-            captureVideo = New cv.VideoCapture(ocvb.openFileDialogName)
+            srcVideo = ocvb.task.openFileDialogName
+            captureVideo = New cv.VideoCapture(ocvb.task.openFileDialogName)
         End If
         captureVideo.Read(image)
         If image.Empty() Then
             captureVideo.Dispose()
-            captureVideo = New cv.VideoCapture(FileInfo.FullName)
+            captureVideo = New cv.VideoCapture(fileInfo.FullName)
             captureVideo.Read(image)
         End If
 
-        ocvb.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
+        ocvb.task.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
         If image.Empty() = False Then dst1 = image.Resize(src.Size())
     End Sub
 End Class
@@ -58,23 +58,23 @@ Public Class Video_CarCounting
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        bgSub = New BGSubtract_MOG(ocvb)
+    Public Sub New()
+        initParent()
+        bgSub = New BGSubtract_MOG()
 
-        video = New Video_Basics(ocvb)
+        video = New Video_Basics()
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText()
 
         ocvb.desc = "Count cars in a video file"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        video.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        video.Run()
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
             bgSub.src = video.image
-            bgSub.Run(ocvb)
+            bgSub.Run()
             Dim videoImage = bgSub.dst1
             dst2 = video.dst1
 
@@ -83,7 +83,7 @@ Public Class Video_CarCounting
             Dim activeHeight = 30
             Dim finishLine = bgSub.dst1.Height - activeHeight * 8
             Static activeState(5) As Boolean
-            Static carCount As integer
+            Static carCount As Integer
             For i = 1 To activeState.Length - 1
                 Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
                 Dim cellCount = videoImage(lane).CountNonZero()
@@ -101,7 +101,7 @@ Public Class Video_CarCounting
 
             Dim tmp = videoImage.Resize(src.Size())
             flow.msgs.Add("  Cars " + CStr(carCount))
-            flow.Run(ocvb)
+            flow.Run()
             cv.Cv2.BitwiseOr(dst1, tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR), dst1)
         End If
     End Sub
@@ -116,23 +116,23 @@ Public Class Video_CarCComp
     Dim cc As CComp_Basics
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        bgSub = New BGSubtract_MOG(ocvb)
-        cc = New CComp_Basics(ocvb)
-        video = New Video_Basics(ocvb)
+        bgSub = New BGSubtract_MOG()
+        cc = New CComp_Basics()
+        video = New Video_Basics()
 
         ocvb.desc = "Outline cars with a rectangle"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        video.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        video.Run()
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
-            bgSub.Run(ocvb)
+            bgSub.Run()
             cc.src = bgSub.dst1
-            cc.Run(ocvb)
+            cc.Run()
             dst1 = cc.dst1
             dst2 = cc.dst2
         End If
@@ -148,21 +148,21 @@ Public Class Video_MinRect
     Public video As Video_Basics
     Public bgSub As BGSubtract_MOG
     Public contours As cv.Point()()
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        video = New Video_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        video = New Video_Basics()
         video.srcVideo = ocvb.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
-        video.Run(ocvb)
+        video.Run()
 
-        bgSub = New BGSubtract_MOG(ocvb)
+        bgSub = New BGSubtract_MOG()
         ocvb.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        video.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        video.Run()
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
-            bgSub.Run(ocvb)
+            bgSub.Run()
 
             contours = cv.Cv2.FindContoursAsArray(bgSub.dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             dst1 = bgSub.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -184,14 +184,14 @@ End Class
 Public Class Video_MinCircle
     Inherits VBparent
     Dim video As Video_MinRect
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        video = New Video_MinRect(ocvb)
+    Public Sub New()
+        initParent()
+        video = New Video_MinRect()
         ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        video.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        video.Run()
         dst1 = video.dst1
         dst2 = video.dst2
 

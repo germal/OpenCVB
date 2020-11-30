@@ -3,22 +3,22 @@ Imports cv = OpenCvSharp
 Public Class Distance_Basics
     Inherits VBparent
     Dim foreground As kMeans_Depth_FG_BG
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 3)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 3)
         radio.check(0).Text = "C"
         radio.check(1).Text = "L1"
         radio.check(2).Text = "L2"
         radio.check(2).Checked = True
 
-        foreground = New kMeans_Depth_FG_BG(ocvb)
+        foreground = New kMeans_Depth_FG_BG()
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         ocvb.desc = "Distance algorithm basics."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        foreground.Run(ocvb)
+        foreground.Run()
         dst2 = foreground.dst1
         Dim fg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 

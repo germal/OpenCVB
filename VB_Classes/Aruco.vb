@@ -4,11 +4,11 @@ Imports OpenCvSharp.Aruco.CvAruco
 ' https://github.com/shimat/opencvsharp_samples/blob/master/SamplesCS/Samples/ArucoSample.cs
 Public Class Aruco_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Show how to use the Aruco markers and rotate the image accordingly."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/aruco_markers_photo.jpg")
         Static detectorParameters = cv.Aruco.DetectorParameters.Create()
@@ -32,13 +32,13 @@ End Class
 Public Class Aruco_CS
     Inherits VBparent
     Dim aruco As New CS_Classes.Aruco_Detect
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Original Image with marker ID's"
         label2 = "Normalized image after WarpPerspective."
         ocvb.desc = "Testing the Aruco marker detection in C#"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)

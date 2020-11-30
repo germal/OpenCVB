@@ -24,16 +24,16 @@ Public Class DFT_Basics
     Public gray As cv.Mat
     Public rows As integer
     Public cols As integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mats = New Mat_4to1(ocvb)
+    Public Sub New()
+        initParent()
+        mats = New Mat_4to1()
         mats.noLines = True
 
         ocvb.desc = "Explore the Discrete Fourier Transform."
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -69,7 +69,7 @@ Public Class DFT_Basics
             mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
             mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
             mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-            mats.Run(ocvb)
+            mats.Run()
             dst2 = mats.dst1
 
             dst1 = inverseDFT(complexImage)
@@ -85,13 +85,13 @@ End Class
 Public Class DFT_Inverse
     Inherits VBparent
     Dim mats As Mat_2to1
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mats = New Mat_2to1(ocvb)
+    Public Sub New()
+        initParent()
+        mats = New Mat_2to1()
         ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
         label1 = "Image after Inverse DFT"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
@@ -107,7 +107,7 @@ Public Class DFT_Inverse
         cv.Cv2.Absdiff(src, dst1, diff)
         mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
-        mats.Run(ocvb)
+        mats.Run()
         If mats.mat(0).countnonzero() > 0 Then
             dst2 = mats.dst1
             label2 = "Mask of difference (top) and relative diff (bot)"
@@ -127,13 +127,13 @@ End Class
 Public Class DFT_ButterworthFilter_MT
     Inherits VBparent
     Public dft As DFT_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, src.Rows, src.Rows)
         sliders.setupTrackBar(1, "DFT B Filter - Order", 1, src.Rows, 2)
 
-        radio.Setup(ocvb, caller, 6)
+        radio.Setup(caller, 6)
         radio.check(0).Text = "DFT Flags ComplexOutput"
         radio.check(1).Text = "DFT Flags Inverse"
         radio.check(2).Text = "DFT Flags None"
@@ -142,15 +142,15 @@ Public Class DFT_ButterworthFilter_MT
         radio.check(5).Text = "DFT Flags Scale"
         radio.check(0).Checked = True
 
-        dft = New DFT_Basics(ocvb)
+        dft = New DFT_Basics()
         ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dft.src = src
-        dft.Run(ocvb)
+        dft.Run()
 
         Static radius As integer
         Static order As integer
@@ -205,18 +205,18 @@ End Class
 Public Class DFT_ButterworthDepth
     Inherits VBparent
     Dim bfilter As DFT_ButterworthFilter_MT
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        bfilter = New DFT_ButterworthFilter_MT(ocvb)
+    Public Sub New()
+        initParent()
+        bfilter = New DFT_ButterworthFilter_MT()
 
         ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        'bfilter.dft.gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        bfilter.Run(ocvb)
+        'bfilter.dft.gray = ocvb.task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        bfilter.Run()
         dst1 = bfilter.dst1
         dst2 = bfilter.dst2
     End Sub

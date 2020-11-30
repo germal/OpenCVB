@@ -25,23 +25,23 @@ Public Class OpenCVGL_Image_CPP
     Dim imu As IMU_Basics
     Dim rgbData(0) As Byte
     Dim pointCloudData(0) As Byte
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        imu = New IMU_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        imu = New IMU_Basics()
 
         If ocvb.parms.testAllRunning = False Then
-            setOpenGLsliders(ocvb, caller, sliders)
+            setOpenGLsliders(caller, sliders)
             sliders.trackbar(10).Value = -10 ' eye.z
             sliders.trackbar(0).Value = 30 ' FOV
             sliders.trackbar(1).Value = 0 ' Yaw
             sliders.trackbar(2).Value = 0 ' pitch
             sliders.trackbar(3).Value = 0 ' roll
 
-            OpenCVGL_Image_Open(ocvb.pointCloud.Width, ocvb.pointCloud.Height)
+            OpenCVGL_Image_Open(ocvb.task.pointCloud.Width, ocvb.task.pointCloud.Height)
         End If
         ocvb.desc = "Use the OpenCV implementation of OpenGL to render a 3D image with depth."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.parms.testAllRunning Then
             ' It runs fine but after several cycles, it will fail with an external exception.
@@ -51,7 +51,7 @@ Public Class OpenCVGL_Image_CPP
             Exit Sub
         End If
 
-        imu.Run(ocvb)
+        imu.Run()
         Dim FOV = sliders.trackbar(0).Value
         Dim yaw = sliders.trackbar(1).Value
         Dim pitch = sliders.trackbar(2).Value
@@ -63,16 +63,16 @@ Public Class OpenCVGL_Image_CPP
         Dim zTrans = sliders.trackbar(7).Value / 100
 
         OpenCVGL_Image_Control(ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
-                               FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, ocvb.pointCloud.Width, ocvb.pointCloud.Height)
+                               FOV, zNear, zFar, eye, yaw, roll, pitch, pointSize, zTrans, ocvb.task.pointCloud.Width, ocvb.task.pointCloud.Height)
 
-        Dim pcSize = ocvb.pointCloud.Total * ocvb.pointCloud.ElemSize
+        Dim pcSize = ocvb.task.pointCloud.Total * ocvb.task.pointCloud.ElemSize
         If rgbData.Length <> src.Total * src.ElemSize Then ReDim rgbData(src.Total * src.ElemSize - 1)
         If pointCloudData.Length <> pcSize Then ReDim pointCloudData(pcSize - 1)
         Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
-        Marshal.Copy(ocvb.pointCloud.Data, pointCloudData, 0, pcSize)
+        Marshal.Copy(ocvb.task.pointCloud.Data, pointCloudData, 0, pcSize)
         Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
         Dim handlePointCloud = GCHandle.Alloc(pointCloudData, GCHandleType.Pinned)
-        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), ocvb.pointCloud.Rows, ocvb.pointCloud.Cols, src.Rows, src.Cols)
+        OpenCVGL_Image_Run(handleRGB.AddrOfPinnedObject(), handlePointCloud.AddrOfPinnedObject(), ocvb.task.pointCloud.Rows, ocvb.task.pointCloud.Cols, src.Rows, src.Cols)
         handleRGB.Free()
         handlePointCloud.Free()
     End Sub

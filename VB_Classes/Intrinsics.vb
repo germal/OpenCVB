@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class intrinsicsLeft_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Show the depth camera intrinsicsLeft."
         label2 = "ppx/ppy location"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim ttStart = 40
         Dim ttStr As String = "Width = " + CStr(src.Width) + vbTab + " height = " + CStr(src.Height) + vbCrLf

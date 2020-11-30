@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 ' https://bytefish.de/blog/eigenvalues_in_opencv/
 Public Class EigenVecVals_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
         label1 = "EigenVec (solution)"
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim a() As Double = {1.96, -6.49, -0.47, -7.2, -0.65,
                              -6.49, 3.8, -6.39, 1.5, -6.34,

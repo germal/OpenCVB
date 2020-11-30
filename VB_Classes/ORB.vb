@@ -4,14 +4,14 @@ Public Class ORB_Basics
     Inherits VBparent
     Public keypoints() As cv.KeyPoint
     Dim orb As cv.ORB
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
 
         ocvb.desc = "Find keypoints using ORB"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(sliders.trackbar(0).Value)

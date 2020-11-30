@@ -3,17 +3,17 @@ Public Class AddWeighted_Basics
     Inherits VBparent
     Public src1 As New cv.Mat
     Public src2 As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        aOptions.sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        aOptions.sliders.Setup(caller)
         aOptions.sliders.setupTrackBar(0, "Weight", 0, 100, 50)
         ocvb.desc = "Add 2 images with specified weights."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             src1 = src
-            src2 = ocvb.RGBDepth
+            src2 = ocvb.task.RGBDepth
         End If
         Static weightSlider = findSlider("Weight")
         If weightSlider IsNot Nothing Then

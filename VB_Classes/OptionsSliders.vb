@@ -1,5 +1,4 @@
-﻿Imports System.ComponentModel
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
 Imports System.Drawing
 
 Public Class OptionsSliders
@@ -8,7 +7,7 @@ Public Class OptionsSliders
     Public countLabel() As Label
     Dim defaultHeight = 260
     Dim defaultWidth = 630
-    Public Sub Setup(ocvb As VBocvb, caller As String, Optional count As Integer = 4)
+    Public Sub Setup(caller As String, Optional count As Integer = 4)
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)
@@ -39,6 +38,9 @@ Public Class OptionsSliders
             FlowLayoutPanel1.Height = defaultHeight - 30
         End If
         If lookupAlgorithm(caller) = 1 Then Me.Show() ' only the first one gets to be visible...
+        Me.Location = aOptions.nextForm
+        aOptions.nextForm.x += aOptions.offset
+        aOptions.nextForm.y += aOptions.offset
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label

@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
 Public Class PCA_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
         ocvb.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static images(7) As cv.Mat
         Static images32f(images.Length) As cv.Mat
@@ -40,15 +40,15 @@ End Class
 Public Class PCA_Depth
     Inherits VBparent
     Dim pca As PCA_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        pca = New PCA_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        pca = New PCA_Basics()
         ocvb.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        pca.src = ocvb.RGBDepth
-        pca.Run(ocvb)
+        pca.src = ocvb.task.RGBDepth
+        pca.Run()
         dst1 = pca.dst1
     End Sub
 End Class
@@ -61,9 +61,9 @@ Public Class PCA_DrawImage
     Inherits VBparent
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        pca = New PCA_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        pca = New PCA_Basics()
         image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/pca_test1.jpg")
         ocvb.desc = "Use PCA to find the principle direction of an object."
         label1 = "Original image"
@@ -82,7 +82,7 @@ Public Class PCA_DrawImage
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
         img.Line(p, q, color, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = image.Resize(dst1.Size())
         Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)

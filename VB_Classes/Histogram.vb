@@ -12,15 +12,15 @@ Public Class Histogram_Basics
     Public backColor = cv.Scalar.Gray
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 50)
         sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
 
         ocvb.desc = "Plot histograms for up to 3 channels."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static histBinSlider = findSlider("Histogram Bins")
         bins = histBinSlider.Value
@@ -139,26 +139,26 @@ End Module
 Public Class Histogram_NormalizeGray
     Inherits VBparent
     Public histogram As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
         sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
 
-        histogram = New Histogram_KalmanSmoothed(ocvb)
+        histogram = New Histogram_KalmanSmoothed()
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(caller, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
         ocvb.desc = "Create a histogram of a normalized image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         histogram.src = src
         If check.Box(0).Checked Then
             cv.Cv2.Normalize(histogram.src, histogram.src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
         End If
-        histogram.Run(ocvb)
+        histogram.Run()
         dst1 = histogram.dst1
     End Sub
 End Class
@@ -174,14 +174,14 @@ Public Class Histogram_2D_HueSaturation
     Public histogram As New cv.Mat
     Public hsv As cv.Mat
 
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         ocvb.desc = "Create a histogram for hue and saturation."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
         Dim hbins = sliders.trackbar(0).Value
@@ -210,20 +210,20 @@ Public Class Histogram_KalmanSmoothed
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        plotHist = New Plot_Histogram(ocvb)
+    Public Sub New()
+        initParent()
+        plotHist = New Plot_Histogram()
         plotHist.minRange = 0
 
-        kalman = New Kalman_Basics(ocvb)
+        kalman = New Kalman_Basics()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
 
         label2 = "Histogram - x=bins/y=count"
         ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static splitIndex = -1
         Static colorName As String
@@ -252,7 +252,7 @@ Public Class Histogram_KalmanSmoothed
         For i = 0 To plotHist.bins - 1
             kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
         Next
-        kalman.Run(ocvb)
+        kalman.Run()
         For i = 0 To plotHist.bins - 1
             histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
@@ -260,7 +260,7 @@ Public Class Histogram_KalmanSmoothed
         plotHist.hist = histogram
         If standalone Then plotHist.backColor = splitColors(splitIndex)
         plotHist.src = src
-        plotHist.Run(ocvb)
+        plotHist.Run()
         dst1 = plotHist.dst1
         label1 = colorName + " input to histogram"
     End Sub
@@ -273,20 +273,20 @@ Public Class Histogram_Depth
     Inherits VBparent
     Public inrange As Depth_InRange
     Public plotHist As Plot_Histogram
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        plotHist = New Plot_Histogram(ocvb)
+    Public Sub New()
+        initParent()
+        plotHist = New Plot_Histogram()
 
-        inrange = New Depth_InRange(ocvb)
-        sliders.Setup(ocvb, caller)
+        inrange = New Depth_InRange()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
 
         ocvb.desc = "Show depth data as a histogram."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f(ocvb)
-        inrange.Run(ocvb)
+        inrange.src = getDepth32f()
+        inrange.Run()
         plotHist.minRange = inrange.sliders.trackbar(0).Value
         plotHist.maxRange = inrange.sliders.trackbar(1).Value
         plotHist.bins = sliders.trackbar(0).Value
@@ -296,7 +296,7 @@ Public Class Histogram_Depth
         cv.Cv2.CalcHist(New cv.Mat() {inrange.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         If standalone Then
-            plotHist.Run(ocvb)
+            plotHist.Run()
             dst1 = plotHist.dst1
         End If
         label1 = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
@@ -335,24 +335,24 @@ Public Class Histogram_DepthValleys
             cv.Cv2.Rectangle(img, barRect, plotColors(i), -1)
         Next
     End Sub
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        hist = New Histogram_Depth(ocvb)
+    Public Sub New()
+        initParent()
+        hist = New Histogram_Depth()
         hist.inrange.sliders.trackbar(1).Value = 5000 ' depth to 5 meters.
         hist.sliders.trackbar(0).Value = 40 ' number of bins.
 
-        kalman = New Kalman_Basics(ocvb)
+        kalman = New Kalman_Basics()
 
         ocvb.desc = "Identify valleys in the Depth histogram."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        hist.Run(ocvb)
+        hist.Run()
         ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1
             kalman.kInput(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        kalman.Run(ocvb)
+        kalman.Run()
         For i = 0 To hist.plotHist.hist.Rows - 1
             hist.plotHist.hist.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
@@ -412,14 +412,14 @@ End Class
 Public Class Histogram_DepthClusters
     Inherits VBparent
     Public valleys As Histogram_DepthValleys
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        valleys = New Histogram_DepthValleys(ocvb)
+    Public Sub New()
+        initParent()
+        valleys = New Histogram_DepthValleys()
         ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        valleys.Run(ocvb)
+        valleys.Run()
         dst1 = valleys.dst1
 
         Dim mask As New cv.Mat
@@ -427,7 +427,7 @@ Public Class Histogram_DepthClusters
         dst2.SetTo(0)
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
-            cv.Cv2.InRange(getDepth32f(ocvb), startEndDepth.X, startEndDepth.Y, tmp)
+            cv.Cv2.InRange(getDepth32f(), startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
             dst2.SetTo(ocvb.scalarColors(i), mask)
         Next
@@ -445,14 +445,14 @@ Public Class Histogram_2D_XZ_YZ
     Inherits VBparent
     Dim inrange As Depth_InRange
     Dim xyz As Mat_ImageXYZ_MT
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        xyz = New Mat_ImageXYZ_MT(ocvb)
+    Public Sub New()
+        initParent()
+        xyz = New Mat_ImageXYZ_MT()
 
-        inrange = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange()
         inrange.sliders.trackbar(1).Value = 1500 ' up to x meters away
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram X bins", 1, src.Cols, 30)
         sliders.setupTrackBar(1, "Histogram Y bins", 1, src.Rows, 30)
         sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
@@ -460,7 +460,7 @@ Public Class Histogram_2D_XZ_YZ
         ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
@@ -473,7 +473,7 @@ Public Class Histogram_2D_XZ_YZ
         Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(minRange, maxRange)}
         Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(minRange, maxRange)}
 
-        xyz.Run(ocvb)
+        xyz.Run()
         Dim sizesX() = {xbins, zbins}
         cv.Cv2.CalcHist(New cv.Mat() {xyz.xyDepth}, New Integer() {0, 2}, New cv.Mat(), histogram, 2, sizesX, rangesX)
         histogram2DPlot(histogram, dst1, zbins, xbins)
@@ -499,20 +499,20 @@ Public Class Histogram_EqualizeColor
     Dim mats As Mat_2to1
     Public displayHist As Boolean = False
     Public channel = 2
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kalmanEq = New Histogram_KalmanSmoothed(ocvb)
+    Public Sub New()
+        initParent()
+        kalmanEq = New Histogram_KalmanSmoothed()
         kalmanEq.sliders.trackbar(0).Value = 40
 
-        kalman = New Histogram_KalmanSmoothed(ocvb)
+        kalman = New Histogram_KalmanSmoothed()
         kalman.sliders.trackbar(0).Value = 40
 
-        mats = New Mat_2to1(ocvb)
+        mats = New Mat_2to1()
 
         ocvb.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         kalman.sliders.trackbar(0).Value = kalmanEq.sliders.trackbar(0).Value
         Dim rgb(2) As cv.Mat
@@ -527,14 +527,14 @@ Public Class Histogram_EqualizeColor
             cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
             kalman.src = rgb(channel).Clone()
             kalman.plotHist.backColor = cv.Scalar.Red
-            kalman.Run(ocvb)
+            kalman.Run()
             mats.mat(0) = kalman.dst1.Clone()
 
             kalmanEq.src = rgbEq(channel).Clone()
-            kalmanEq.Run(ocvb)
+            kalmanEq.Run()
             mats.mat(1) = kalmanEq.dst1.Clone()
 
-            mats.Run(ocvb)
+            mats.Run()
             dst2 = mats.dst1
             label2 = "Before (top) and After Red Histogram"
 
@@ -553,27 +553,27 @@ Public Class Histogram_EqualizeGray
     Inherits VBparent
     Public histogramEq As Histogram_KalmanSmoothed
     Public histogram As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        histogramEq = New Histogram_KalmanSmoothed(ocvb)
+    Public Sub New()
+        initParent()
+        histogramEq = New Histogram_KalmanSmoothed()
 
-        histogram = New Histogram_KalmanSmoothed(ocvb)
+        histogram = New Histogram_KalmanSmoothed()
 
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
         ocvb.desc = "Create an equalized histogram of the grayscale image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         histogram.sliders.trackbar(0).Value = histogramEq.sliders.trackbar(0).Value
         histogram.kalman.check.Box(0).Checked = histogramEq.kalman.check.Box(0).Checked
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.src = src.Clone
-        histogram.Run(ocvb)
+        histogram.Run()
         dst1 = histogram.dst1.Clone
         cv.Cv2.EqualizeHist(histogram.src, histogramEq.src)
-        histogramEq.Run(ocvb)
+        histogramEq.Run()
         dst2 = histogramEq.dst1
     End Sub
 End Class
@@ -586,15 +586,15 @@ End Class
 Public Class Histogram_Equalize255
     Inherits VBparent
     Dim eqHist As Histogram_EqualizeColor
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        eqHist = New Histogram_EqualizeColor(ocvb)
+        eqHist = New Histogram_EqualizeColor()
         eqHist.kalmanEq.sliders.trackbar(0).Value = 255
         eqHist.kalman.sliders.trackbar(0).Value = 255
         eqHist.displayHist = True
 
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(caller, 3)
         radio.check(0).Text = "Equalize the Blue channel"
         radio.check(1).Text = "Equalize the Green channel"
         radio.check(2).Text = "Equalize the Red channel"
@@ -603,13 +603,13 @@ Public Class Histogram_Equalize255
         label2 = "Upper plot is before equalization.  Bottom is after."
         ocvb.desc = "Reproduce the results of the hist.py example with existing algorithms"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         For i = 0 To 3 - 1
             If radio.check(i).Checked Then eqHist.channel = i
         Next
         eqHist.src = src
-        eqHist.Run(ocvb)
+        eqHist.Run()
         dst1 = eqHist.dst1.Clone
         dst2 = eqHist.dst2.Clone
     End Sub
@@ -622,16 +622,16 @@ End Class
 Public Class Histogram_Simple
     Inherits VBparent
     Public plotHist As Plot_Histogram
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        plotHist = New Plot_Histogram(ocvb)
+    Public Sub New()
+        initParent()
+        plotHist = New Plot_Histogram()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, src.Cols, 50)
 
         ocvb.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         plotHist.bins = sliders.trackbar(0).Value
@@ -640,7 +640,7 @@ Public Class Histogram_Simple
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        plotHist.Run(ocvb)
+        plotHist.Run()
         dst1 = plotHist.dst1
     End Sub
 End Class
@@ -660,27 +660,27 @@ Public Class Histogram_ColorsAndGray
     Inherits VBparent
     Dim histogram As Histogram_KalmanSmoothed
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mats = New Mat_4to1(ocvb)
+    Public Sub New()
+        initParent()
+        mats = New Mat_4to1()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
         sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
 
-        histogram = New Histogram_KalmanSmoothed(ocvb)
+        histogram = New Histogram_KalmanSmoothed()
         histogram.kalman.check.Box(0).Checked = False
         histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.trackbar(0).Value = 40
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(caller, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
 
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Create a histogram of a normalized image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
@@ -693,13 +693,13 @@ Public Class Histogram_ColorsAndGray
                 histogram.src = split(i).Clone()
             End If
             histogram.plotHist.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
-            histogram.Run(ocvb)
+            histogram.Run()
             mats.mat(i) = histogram.dst1.Clone()
         Next
 
-        mats.Run(ocvb)
+        mats.Run()
         dst1 = mats.dst1
-        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -711,19 +711,19 @@ End Class
 Public Class Histogram_BackProjectionPeak
     Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        hist = New Histogram_KalmanSmoothed(ocvb)
+        hist = New Histogram_KalmanSmoothed()
         hist.kalman.check.Box(0).Checked = False
 
         ocvb.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         label2 = "Grayscale Histogram"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
-        hist.Run(ocvb)
+        hist.Run()
         dst2 = hist.dst1
 
         Dim minVal As Single, maxVal As Single
@@ -755,24 +755,24 @@ End Class
 Public Class Histogram_BackProjection2D
     Inherits VBparent
     Dim hist As Histogram_2D_HueSaturation
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        hist = New Histogram_2D_HueSaturation(ocvb)
+        hist = New Histogram_2D_HueSaturation()
 
         ocvb.desc = "Backproject from a hue and saturation histogram."
         label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
         label2 = "Backprojection of detected hue and saturation."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
-        hist.Run(ocvb)
+        hist.Run()
         dst1 = hist.dst1
         Static hueBins = hist.sliders.trackbar(0).Value
         Static satBins = hist.sliders.trackbar(1).Value
         If hueBins <> hist.sliders.trackbar(0).Value Or satBins <> hist.sliders.trackbar(1).Value Then
-            ocvb.drawRectClear = True
+            ocvb.task.drawRectClear = True
             hueBins = hist.sliders.trackbar(0).Value
             satBins = hist.sliders.trackbar(1).Value
         End If
@@ -780,15 +780,15 @@ Public Class Histogram_BackProjection2D
         Dim unitsPerHueBin = 180 / hueBins
         Dim unitsPerSatBin = 255 / satBins
         Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 255
-        If ocvb.drawRect.Width <> 0 And ocvb.drawRect.Height <> 0 Then
-            Dim intBin = Math.Floor(hueBins * ocvb.drawRect.X / dst1.Width)
+        If ocvb.task.drawRect.Width <> 0 And ocvb.task.drawRect.Height <> 0 Then
+            Dim intBin = Math.Floor(hueBins * ocvb.task.drawRect.X / dst1.Width)
             minHue = intBin * unitsPerHueBin
-            intBin = Math.Ceiling(hueBins * (ocvb.drawRect.X + ocvb.drawRect.Width) / dst1.Width)
+            intBin = Math.Ceiling(hueBins * (ocvb.task.drawRect.X + ocvb.task.drawRect.Width) / dst1.Width)
             maxHue = intBin * unitsPerHueBin
 
-            intBin = Math.Floor(satBins * ocvb.drawRect.Y / dst1.Height)
+            intBin = Math.Floor(satBins * ocvb.task.drawRect.Y / dst1.Height)
             minSat = intBin * unitsPerSatBin
-            intBin = Math.Ceiling(satBins * (ocvb.drawRect.Y + ocvb.drawRect.Height) / dst1.Height)
+            intBin = Math.Ceiling(satBins * (ocvb.task.drawRect.Y + ocvb.task.drawRect.Height) / dst1.Height)
             maxSat = intBin * unitsPerSatBin
 
             If minHue = maxHue Then maxHue = minHue + 1
@@ -818,31 +818,31 @@ Public Class Histogram_HueSaturation2DPlot
     Dim hueSat As Brightness_Hue
     Dim hist2d As Histogram_BackProjection2D
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        hueSat = New Brightness_Hue(ocvb)
-        hist2d = New Histogram_BackProjection2D(ocvb)
-        mats = New Mat_4to1(ocvb)
+        hueSat = New Brightness_Hue()
+        hist2d = New Histogram_BackProjection2D()
+        mats = New Mat_4to1()
         ocvb.quadrantIndex = QUAD3
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hueSat.src = src
-        hueSat.Run(ocvb)
+        hueSat.Run()
         mats.mat(0) = hueSat.dst1
         mats.mat(1) = hueSat.dst2
 
         hist2d.src = src
-        hist2d.Run(ocvb)
+        hist2d.Run()
         mats.mat(2) = hist2d.dst2
         mats.mat(3) = hist2d.dst1
 
-        mats.Run(ocvb)
+        mats.Run()
         dst1 = mats.dst1
-        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -859,22 +859,22 @@ Public Class Histogram_BackProjectionGrayscale
     Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
     Public histIndex As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        hist = New Histogram_KalmanSmoothed(ocvb)
+    Public Sub New()
+        initParent()
+        hist = New Histogram_KalmanSmoothed()
         Dim binSlider = findSlider("Histogram Bins")
         binSlider.Value = 10
 
         label1 = "Move mouse to backproject each histogram column"
         ocvb.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
-        hist.Run(ocvb)
+        hist.Run()
         dst1 = hist.dst1
 
-        histIndex = CInt(hist.histogram.Rows * ocvb.mousePoint.X / src.Width)
+        histIndex = CInt(hist.histogram.Rows * ocvb.task.mousePoint.X / src.Width)
         Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
         Dim barRange = 255 / hist.sliders.trackbar(0).Value
 
@@ -908,24 +908,24 @@ Public Class Histogram_Concentration
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
     Dim palette As Palette_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        palette = New Palette_Basics(ocvb)
-        sideview = New Histogram_SideView2D(ocvb)
-        topview = New Histogram_TopView2D(ocvb)
+        palette = New Palette_Basics()
+        sideview = New Histogram_SideView2D()
+        topview = New Histogram_TopView2D()
 
         Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
         minDepthSlider.Value = 1000
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
         sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
         sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
 
         ocvb.desc = "Highlight the histogram projections where concentrations are highest"
     End Sub
-    Private Function plotHighlights(ocvb As VBocvb, histOutput As cv.Mat, dst As cv.Mat) As String
+    Private Function plotHighlights( histOutput As cv.Mat, dst As cv.Mat) As String
         Static concentrationSlider = findSlider("Concentration Factor x100")
         Dim concentrationFactor = concentrationSlider.Value / 100
 
@@ -951,21 +951,21 @@ Public Class Histogram_Concentration
             dst.Circle(pt, ocvb.dotSize, cv.Scalar.All((i * 27 + 100) Mod 255), -1, cv.LineTypes.AntiAlias)
         Next
         palette.src = dst
-        palette.Run(ocvb)
+        palette.Run()
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
         Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideview.Run(ocvb)
+        sideview.Run()
         dst1 = sideview.dst1
         Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
-        label1 = "SideView " + plotHighlights(ocvb, sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst1 = palette.dst1.Clone
 
-        topview.Run(ocvb)
+        topview.Run()
         dst2 = topview.dst1
-        label2 = "TopView " + plotHighlights(ocvb, topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst2 = palette.dst1.Clone
     End Sub
 End Class
@@ -988,11 +988,11 @@ Public Class Histogram_SideView2D
     Public frustrumAdjust As Single
     Dim thresholdSlider As System.Windows.Forms.TrackBar
     Public resizeHistOutput As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        cmat = New PointCloud_Colorize(ocvb)
-        sliders.Setup(ocvb, caller)
+        cmat = New PointCloud_Colorize()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
         sliders.setupTrackBar(1, "sideCameraPoint.x adjustment", -100, 100, 0)
         frustrumSlider = findSlider("SideView Frustrum adjustment")
@@ -1017,16 +1017,16 @@ Public Class Histogram_SideView2D
                 frustrumSlider.Value = 58
                 cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
         End Select
-        gCloud = New Depth_PointCloud_IMU(ocvb)
+        gCloud = New Depth_PointCloud_IMU()
         thresholdSlider = findSlider("Histogram threshold")
         If standalone Then thresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
         ocvb.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run(ocvb)
+        gCloud.Run()
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
         ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
@@ -1044,7 +1044,7 @@ Public Class Histogram_SideView2D
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = cmat.CameraLocationSide(ocvb, dst2)
+        dst2 = cmat.CameraLocationSide(dst2)
     End Sub
 End Class
 
@@ -1064,13 +1064,13 @@ Public Class Histogram_TopView2D
     Dim cameraXSlider As Windows.Forms.TrackBar
     Dim frustrumSlider As Windows.Forms.TrackBar
     Public resizeHistOutput As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        cmat = New PointCloud_Colorize(ocvb)
-        gCloud = New Depth_PointCloud_IMU(ocvb)
+        cmat = New PointCloud_Colorize()
+        gCloud = New Depth_PointCloud_IMU()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
         sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
         frustrumSlider = findSlider("TopView Frustrum adjustment")
@@ -1099,9 +1099,9 @@ Public Class Histogram_TopView2D
         label1 = "XZ (Top View)"
         ocvb.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run(ocvb)
+        gCloud.Run()
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
         ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
@@ -1121,7 +1121,7 @@ Public Class Histogram_TopView2D
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = cmat.CameraLocationBot(ocvb, dst2)
+            dst2 = cmat.CameraLocationBot(dst2)
         End If
     End Sub
 End Class
@@ -1145,24 +1145,24 @@ Public Class Histogram_TopData
     Dim kalman As Kalman_Basics
     Dim IntelBug As Boolean
     Public resizeHistOutput As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "X scale negative value in meters (meterMin) X100", -400, -5, -200)
         sliders.setupTrackBar(1, "X scale positive value in meters (meterMax) X100", 5, 400, 200)
 
-        kalman = New Kalman_Basics(ocvb)
-        gCloud = New Depth_PointCloud_IMU(ocvb)
+        kalman = New Kalman_Basics()
+        gCloud = New Depth_PointCloud_IMU()
         If VB_Classes.ActiveTask.algParms.camNames.D455 = ocvb.parms.cameraName Then IntelBug = True
 
         label1 = "XZ (Top View)"
         ocvb.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
 
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run(ocvb)
+        gCloud.Run()
         Dim imuPC = gCloud.imuPointCloud
         split = imuPC.Split()
 
@@ -1208,22 +1208,22 @@ Public Class Histogram_SideData
     Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
     Public resizeHistOutput As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Y scale negative value in meters (meterMin) X100", -400, -5, -200)
         sliders.setupTrackBar(1, "Y scale positive value in meters (meterMax) X100", 5, 400, 200)
 
-        kalman = New Kalman_Basics(ocvb)
-        gCloud = New Depth_PointCloud_IMU(ocvb)
+        kalman = New Kalman_Basics()
+        gCloud = New Depth_PointCloud_IMU()
 
         label1 = "ZY (Side View)"
         ocvb.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run(ocvb)
+        gCloud.Run()
         Dim imuPC = gCloud.imuPointCloud
         split = imuPC.Split()
 

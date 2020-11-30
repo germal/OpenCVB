@@ -7,9 +7,9 @@ Public Class Contours_Basics
     Public ApproximationMode As cv.ContourApproximationModes
     Public contours As New List(Of cv.Point())
     Public minArea As Integer = 1
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 5)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 5)
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
         radio.check(2).Text = "FloodFill"
@@ -17,7 +17,7 @@ Public Class Contours_Basics
         radio.check(4).Text = "Tree"
         radio.check(2).Checked = True
 
-        radio1.Setup(ocvb, caller, 4)
+        radio1.Setup(caller, 4)
         radio1.check(0).Text = "ApproxNone"
         radio1.check(1).Text = "ApproxSimple"
         radio1.check(2).Text = "ApproxTC89KCOS"
@@ -27,7 +27,7 @@ Public Class Contours_Basics
         radio.Text = caller + " Retrieval Mode Radio Options"
         radio1.Text = caller + " ContourApproximation Mode Radio Options"
         radio1.Show()
-        rotatedRect = New Draw_rotatedRectangles(ocvb)
+        rotatedRect = New Draw_rotatedRectangles()
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         ocvb.desc = "Demo options on FindContours."
         label2 = "FindContours output"
@@ -49,13 +49,13 @@ Public Class Contours_Basics
             End If
         Next
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         setOptions()
         If standalone Then
             Dim imageInput As New cv.Mat
             rotatedRect.src = src
-            rotatedRect.Run(ocvb)
+            rotatedRect.Run()
             imageInput = rotatedRect.dst1
             If imageInput.Channels = 3 Then
                 dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
@@ -96,19 +96,19 @@ End Class
 Public Class Contours_FindandDraw
     Inherits VBparent
     Dim rotatedRect As Draw_rotatedRectangles
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        rotatedRect = New Draw_rotatedRectangles(ocvb)
+    Public Sub New()
+        initParent()
+        rotatedRect = New Draw_rotatedRectangles()
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
         ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         rotatedRect.src = src
-        rotatedRect.Run(ocvb)
+        rotatedRect.Run()
         dst1 = rotatedRect.dst1
         img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
 
@@ -129,16 +129,16 @@ End Class
 Public Class Contours_RGB
     Inherits VBparent
     Dim inrange As Depth_InRange
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        inrange = New Depth_InRange(ocvb)
+    Public Sub New()
+        initParent()
+        inrange = New Depth_InRange()
         ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f(ocvb)
-        inrange.Run(ocvb)
+        inrange.src = getDepth32f()
+        inrange.Run()
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, inrange.noDepthMask)
 
@@ -177,9 +177,9 @@ End Class
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
 Public Class Contours_RemoveLines
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller, 3)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller, 3)
         sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
         sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
         sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
@@ -187,7 +187,7 @@ Public Class Contours_RemoveLines
         label2 = "Original with horizontal/vertical lines removed"
         ocvb.desc = "Remove the lines from an invoice image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
@@ -226,17 +226,17 @@ Public Class Contours_Depth
     Inherits VBparent
     Public inrange As Depth_InRange
     Public contours As New List(Of cv.Point)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        inrange = New Depth_InRange(ocvb)
+    Public Sub New()
+        initParent()
+        inrange = New Depth_InRange()
         ocvb.desc = "Find and draw the contour of the depth foreground."
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f(ocvb)
-        inrange.Run(ocvb)
+        inrange.src = getDepth32f()
+        inrange.Run()
         dst1 = inrange.noDepthMask
         dst2.SetTo(0)
         Dim contours0 = cv.Cv2.FindContoursAsArray(inrange.depthMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
@@ -266,33 +266,33 @@ Public Class Contours_Prediction
     Inherits VBparent
     Dim outline As Contours_Depth
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1)
-        outline = New Contours_Depth(ocvb)
+        outline = New Contours_Depth()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)
 
         label1 = "Original contour image"
         label2 = "Image after smoothing with Kalman_Basics"
         ocvb.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        outline.Run(ocvb)
+        outline.Run()
         dst1 = outline.dst2
         dst2.SetTo(0)
         Dim stepSize = sliders.trackbar(0).Value
         Dim len = outline.contours.Count
         kalman.kInput = {outline.contours(0).X, outline.contours(0).Y}
-        kalman.Run(ocvb)
+        kalman.Run()
         Dim origin = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         For i = 0 To outline.contours.Count - 1 Step stepSize
             Dim pt1 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
             kalman.kInput = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
-            kalman.Run(ocvb)
+            kalman.Run()
             Dim pt2 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
             dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         Next

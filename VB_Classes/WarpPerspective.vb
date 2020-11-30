@@ -3,15 +3,15 @@ Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
 Public Class WarpPerspective_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Warped Width", 0, src.Cols, src.Cols - 50)
         sliders.setupTrackBar(1, "Warped Height", 0, src.Rows, src.Rows - 50)
         sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
         ocvb.desc = "Use WarpPerspective to transform input images."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(src.Width, src.Height)}
         Dim pts() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)}
@@ -35,12 +35,12 @@ End Class
 Public Class WarpPerspective_3D
     Inherits VBparent
     Dim warp As WarpPerspective_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        warp = New WarpPerspective_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        warp = New WarpPerspective_Basics()
         ocvb.desc = "Use WarpAffine on a 3D point cloud"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
     End Sub

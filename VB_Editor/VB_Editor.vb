@@ -4,7 +4,7 @@ Module VB_EditorMain
     Private Function makeChange(line As String) As String
         If line.Contains("") Then
             Console.WriteLine(line)
-            line = line.Replace("setDescription(ocvb, ", "ocvb.desc = ")
+            line = line.Replace("setDescription(", "ocvb.desc = ")
             line = Mid(line, 1, Len(line) - 1)
             Console.WriteLine("Change to: " + line)
             changeLines += 1
@@ -12,7 +12,7 @@ Module VB_EditorMain
         Return line
     End Function
     Private Function deleteLine(line As String) As Boolean
-        If line.Contains("MyBase.Finish(ocvb)") Then
+        If line.Contains("MyBase.Finish()") Then
             Console.WriteLine("Deleting line: " + line)
             changeLines += 1
             Return True
@@ -29,7 +29,7 @@ Module VB_EditorMain
             insideRunFunction = False
             Return True
         End If
-        If InStr(line, "Public Sub Run(ocvb As VBocvb)") Then
+        If InStr(line, "Public Sub Run()") Then
             insideRunFunction = True
         End If
         'Console.WriteLine(line)

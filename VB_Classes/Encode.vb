@@ -3,16 +3,16 @@ Imports cv = OpenCvSharp
 Public Class Encode_Basics
     Inherits VBparent
     Dim options As Encode_Options
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        options = New Encode_Options(ocvb)
+        options = New Encode_Options()
 
         ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         label1 = "absDiff with original"
         label2 = "Original decompressed"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim buf(src.Width * src.Height * src.ElemSize) As Byte
         Dim encodeParams() As integer = {options.getEncodeParameter(), options.qualityLevel}
@@ -38,13 +38,13 @@ End Class
 Public Class Encode_Options
     Inherits VBparent
     Public qualityLevel As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
         sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 85)
 
-        radio.Setup(ocvb, caller, 6)
+        radio.Setup(caller, 6)
         radio.check(0).Text = "JpegChromaQuality"
         radio.check(1).Text = "JpegLumaQuality"
         radio.check(2).Text = "JpegOptimize"
@@ -71,7 +71,7 @@ Public Class Encode_Options
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
         Return encodeOption
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim buf(src.Width * src.Height * src.ElemSize) As Byte
 

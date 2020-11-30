@@ -2,9 +2,9 @@ Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
         sliders.setupTrackBar(1, "Coherence Blend", 1, 10, 10)
         sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)
@@ -12,7 +12,7 @@ Public Class Coherence_Basics
         label1 = "Coherence - draw rectangle to apply"
         ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
         Dim blend = sliders.trackbar(1).Value / 10
@@ -31,7 +31,7 @@ Public Class Coherence_Basics
         Dim xoffset = src.Width / 2 - side / 2
         Dim yoffset = src.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
-        If ocvb.drawRect.Width <> 0 Then srcRect = ocvb.drawRect
+        If ocvb.task.drawRect.Width <> 0 Then srcRect = ocvb.task.drawRect
 
         dst1 = src.Clone()
         src = src(srcRect)
@@ -83,15 +83,15 @@ End Class
 Public Class Coherence_Depth
     Inherits VBparent
     Dim coherent As Coherence_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        coherent = New Coherence_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        coherent = New Coherence_Basics()
         ocvb.desc = "Find coherent lines in the depth image - Painterly"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        coherent.src = ocvb.RGBDepth
-        coherent.Run(ocvb)
+        coherent.src = ocvb.task.RGBDepth
+        coherent.Run()
         dst1 = coherent.dst1
     End Sub
 End Class

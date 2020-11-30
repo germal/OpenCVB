@@ -6,10 +6,10 @@ Public Class SVM_Options
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public points() As cv.Point2f
     Public responses() As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        sliders.Setup(ocvb, caller, 8)
+        sliders.Setup(caller, 8)
         sliders.setupTrackBar(0, "SampleCount", 5, 1000, 500)
         sliders.setupTrackBar(1, "Granularity", 1, 50, 5)
         sliders.setupTrackBar(2, "SVM Degree", 1, 200, 100)
@@ -19,7 +19,7 @@ Public Class SVM_Options
         sliders.setupTrackBar(5, "SVM Nu X100", 1, 85, 50)
         sliders.setupTrackBar(6, "SVM P X100", 0, 100, 10)
 
-        radio.Setup(ocvb, caller, 4)
+        radio.Setup(caller, 4)
         radio.check(0).Text = "kernel Type = Linear"
         radio.check(1).Text = "kernel Type = Poly (not working)"
         radio.check(1).Enabled = False
@@ -28,7 +28,7 @@ Public Class SVM_Options
         radio.check(3).Text = "kernel Type = Sigmoid (not working)"
         radio.check(3).Enabled = False
 
-        radio1.Setup(ocvb, caller, 5)
+        radio1.Setup(caller, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
         radio1.check(0).Checked = True
         radio1.check(1).Text = "SVM Type = EpsSvr"
@@ -75,7 +75,7 @@ Public Class SVM_Options
     Public Function f(x As Double) As Double
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ReDim points(sliders.trackbar(0).Value)
         ReDim responses(points.Length - 1)
@@ -103,17 +103,17 @@ End Class
 Public Class SVM_Basics
     Inherits VBparent
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        svmOptions = New SVM_Options(ocvb)
+    Public Sub New()
+        initParent()
+        svmOptions = New SVM_Options()
         ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         label1 = "SVM_Basics input data"
         label2 = "Results - white line is ground truth"
     End Sub
 
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        svmOptions.Run(ocvb) ' update any options specified in the interface.
+        svmOptions.Run() ' update any options specified in the interface.
         dst1 = svmOptions.dst1
 
         Dim dataMat = New cv.Mat(svmOptions.points.Length - 1, 2, cv.MatType.CV_32FC1, svmOptions.points)
@@ -155,26 +155,26 @@ End Class
 Public Class SVM_Random
     Inherits VBparent
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        svmOptions = New SVM_Options(ocvb)
+    Public Sub New()
+        initParent()
+        svmOptions = New SVM_Options()
         svmOptions.sliders.trackbar(1).Value = 15
 
-        ocvb.drawRect = New cv.Rect(ocvb.color.Cols / 4, ocvb.color.Rows / 4, ocvb.color.Cols / 2, ocvb.color.Rows / 2)
+        ocvb.task.drawRect = New cv.Rect(ocvb.task.color.Cols / 4, ocvb.task.color.Rows / 4, ocvb.task.color.Cols / 2, ocvb.task.color.Rows / 2)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(caller, 1)
         check.Box(0).Text = "Restrict random test to square area"
 
         label1 = "SVM Training data"
         ocvb.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        svmOptions.Run(ocvb)
+        svmOptions.Run()
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
 
-        Dim rect = ocvb.drawRect
+        Dim rect = ocvb.task.drawRect
 
         Dim dataSize = svmOptions.sliders.trackbar(0).Value ' get the sample count
         Dim trainData As New cv.Mat(dataSize, 2, cv.MatType.CV_32F)
@@ -245,23 +245,23 @@ Public Class SVM_TestCase
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
     Dim svmOptions As SVM_Options
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
         labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
 
-        svmOptions = New SVM_Options(ocvb)
+        svmOptions = New SVM_Options()
         svmOptions.sliders.trackbar(1).Value = 15
         svmOptions.radio.check(3).Enabled = False
 
         ocvb.desc = "Text book example on SVM"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(0)
-        svmOptions.Run(ocvb)
+        svmOptions.Run()
 
         Dim svmx = svmOptions.createSVM()
         svmx.Train(trainMat, cv.ML.SampleTypes.RowSample, labelsMat)

@@ -10,8 +10,8 @@ Public Class PyStream_Basics
     Dim depthBuffer(1) As Byte
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         PipeTaskIndex += 1
@@ -21,25 +21,25 @@ Public Class PyStream_Basics
             ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
         End If
 
-        memMap = New Python_MemMap(ocvb)
+        memMap = New Python_MemMap()
 
         If ocvb.parms.externalPythonInvocation Then
             pythonReady = True ' python was already running and invoked OpenCVB.
         Else
-            pythonReady = StartPython(ocvb, "--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
+            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
         End If
         If pythonReady Then pipeImages.WaitForConnection()
         ocvb.desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize,
                                                 depth32f.Total * depth32f.ElemSize, src.Rows, src.Cols)
             Next
-            memMap.Run(ocvb)
+            memMap.Run()
 
             If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
             If depthBuffer.Length <> depth32f.Total * depth32f.ElemSize Then ReDim depthBuffer(depth32f.Total * depth32f.ElemSize - 1)

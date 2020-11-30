@@ -41,18 +41,18 @@ End Module
 Public Class Hough_Circles
     Inherits VBparent
     Dim circles As Draw_Circles
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        circles = New Draw_Circles(ocvb)
+    Public Sub New()
+        initParent()
+        circles = New Draw_Circles()
         circles.sliders.trackbar(0).Value = 3
         ocvb.desc = "Find circles using HoughCircles."
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         circles.src = src
-        circles.Run(ocvb)
+        circles.Run()
         dst1 = circles.dst1
         Static Dim method As integer = 3
         cv.Cv2.CvtColor(dst1, dst2, cv.ColorConversionCodes.BGR2GRAY)
@@ -74,11 +74,11 @@ Public Class Hough_Lines
     Inherits VBparent
     Dim edges As Edges_Basics
     Public segments() As cv.LineSegmentPolar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        edges = New Edges_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        edges = New Edges_Basics()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "rho", 1, 100, 1)
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 50)
@@ -86,10 +86,10 @@ Public Class Hough_Lines
         ocvb.desc = "Use Houghlines to find lines in the image."
     End Sub
 
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         edges.src = src.Clone()
-        edges.Run(ocvb)
+        edges.Run()
 
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
@@ -121,16 +121,16 @@ Public Class Hough_Lines_MT
     Inherits VBparent
     Dim edges As Edges_Basics
     Public grid As Thread_Grid
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "rho", 1, 100, 1)
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 3)
 
-        edges = New Edges_Basics(ocvb)
+        edges = New Edges_Basics()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 16
@@ -141,12 +141,12 @@ Public Class Hough_Lines_MT
         label2 = "Hough_Lines_MT"
     End Sub
 
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+        grid.Run()
 
         edges.src = src
-        edges.Run(ocvb)
+        edges.Run()
         dst1 = edges.dst1
 
         Dim rhoIn = sliders.trackbar(0).Value
@@ -157,7 +157,7 @@ Public Class Hough_Lines_MT
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then
-                dst2(roi) = ocvb.RGBDepth(roi)
+                dst2(roi) = ocvb.task.RGBDepth(roi)
                 Exit Sub
             End If
             dst2(roi).SetTo(0)

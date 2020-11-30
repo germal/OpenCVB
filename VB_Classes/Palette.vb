@@ -7,11 +7,11 @@ Public Class Palette_Basics
     Public gradMap As Palette_BuildGradientColorMap
     Public colormap As cv.ColormapTypes
     Public colorMat As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        gradMap = New Palette_BuildGradientColorMap(ocvb)
+    Public Sub New()
+        initParent()
+        gradMap = New Palette_BuildGradientColorMap()
 
-        radio.Setup(ocvb, caller, 21)
+        radio.Setup(caller, 21)
         Static frm = findForm("Palette_Basics Radio Options")
         For i = 0 To frm.check.length - 1
             frm.check(i).Text = mapNames(i)
@@ -35,7 +35,7 @@ Public Class Palette_Basics
         Next
         Return 0
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         colormap = checkRadios()
         label1 = "ColorMap = " + mapNames(colormap)
@@ -60,7 +60,7 @@ Public Class Palette_Basics
 
         ' special case the random color map!
         If colormap = 20 Then
-            gradMap.Run(ocvb)
+            gradMap.Run()
 
             ' Uncomment this to test if the .NET interface for ApplyColorMap for custom color maps is working
             ' cv.Cv2.ApplyColorMap(src, dst2, gradMap.gradientColorMap) 
@@ -80,15 +80,15 @@ End Class
 
 Public Class Palette_Color
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
         ocvb.desc = "Define a color using sliders."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim b = sliders.trackbar(0).Value
         Dim g = sliders.trackbar(1).Value
@@ -105,15 +105,15 @@ End Class
 
 Public Class Palette_LinearPolar
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Use LinearPolar to create gradient image"
-        SetInterpolationRadioButtons(ocvb, caller, radio, "LinearPolar")
+        SetInterpolationRadioButtons(caller, radio, "LinearPolar")
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "LinearPolar radius", 0, src.Cols, src.Cols / 2)
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1.SetTo(0)
         For i = 0 To dst1.Rows - 1
@@ -188,13 +188,13 @@ End Module
 Public Class Palette_Reduction
     Inherits VBparent
     Dim reduction As Reduction_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        reduction = New Reduction_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
         ocvb.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
@@ -210,7 +210,7 @@ Public Class Palette_Reduction
             Return If(a(2) < b(2), -1, 1)
         End Function
     End Class
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         If reductionSlider.value < 32 Then
@@ -218,7 +218,7 @@ Public Class Palette_Reduction
             Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 2^^5")
         End If
         reduction.src = src
-        reduction.Run(ocvb)
+        reduction.Run()
         dst1 = reduction.dst1
 
         Dim palette As New SortedList(Of cv.Vec3b, Integer)(New CompareVec3b)
@@ -276,20 +276,20 @@ Public Class Palette_DrawTest
     Inherits VBparent
     Dim palette As Palette_Basics
     Dim draw As Draw_RngImage
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        palette = New Palette_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics()
 
-        draw = New Draw_RngImage(ocvb)
+        draw = New Draw_RngImage()
         palette.src = dst1
 
         ocvb.desc = "Experiment with palette using a drawn image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        draw.Run(ocvb)
+        draw.Run()
         palette.src = draw.dst1
-        palette.Run(ocvb)
+        palette.Run()
         dst1 = palette.dst1
     End Sub
 End Class
@@ -303,12 +303,12 @@ Public Class Palette_Gradient
     Public frameModulo As Integer = 30 ' every 30 frames try a different pair of random colors.
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label2 = "From and To colors"
         ocvb.desc = "Create gradient image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod frameModulo = 0 Then
             If standalone Then
@@ -340,15 +340,15 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits VBparent
     Public gradientColorMap As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
         label2 = "Generated colormap"
         ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -379,18 +379,18 @@ Public Class Palette_DepthColorMap
     Inherits VBparent
     Dim gradientColorMap As New cv.Mat
     Dim holes As Depth_Holes
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        holes = New Depth_Holes(ocvb)
+    Public Sub New()
+        initParent()
+        holes = New Depth_Holes()
         hideForm("Depth_Holes Slider Options")
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
 
         label2 = "Palette used to color left image"
         ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
@@ -410,10 +410,10 @@ Public Class Palette_DepthColorMap
             Next
         End If
         Static cvtScaleSlider = findSlider("Convert and Scale value X100")
-        Dim depth8u = getDepth32f(ocvb).ConvertScaleAbs(cvtScaleSlider.Value / 100)
+        Dim depth8u = getDepth32f().ConvertScaleAbs(cvtScaleSlider.Value / 100)
         dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
-        holes.Run(ocvb)
+        holes.Run()
         dst1.SetTo(0, holes.holeMask)
     End Sub
 End Class
@@ -435,23 +435,23 @@ Public Class Palette_Consistency
             Return -1 ' never returns equal because duplicates can happen.
         End Function
     End Class
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        emax = New EMax_CPP(ocvb)
+    Public Sub New()
+        initParent()
+        emax = New EMax_CPP()
         emax.basics.sliders.trackbar(1).Value = 15
 
-        hist = New Histogram_Simple(ocvb)
+        hist = New Histogram_Simple()
         hist.sliders.trackbar(0).Value = 255
         hideForm("Histogram_Simple Slider Options")
 
-        lut = New LUT_Rebuild(ocvb)
+        lut = New LUT_Rebuild()
 
         ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
-            emax.Run(ocvb)
+            emax.Run()
             src = emax.dst2
         End If
         Dim size = New cv.Size(src.Width / 4, src.Height / 4)
@@ -460,7 +460,7 @@ Public Class Palette_Consistency
         img = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         hist.src = img
-        hist.Run(ocvb)
+        hist.Run()
         If standalone Then dst2 = hist.dst1.Resize(src.Size)
 
         Dim histogram = hist.plotHist.hist
@@ -479,7 +479,7 @@ Public Class Palette_Consistency
         Next
 
         lut.src = img
-        lut.Run(ocvb)
+        lut.Run()
         dst1 = lut.dst1.Resize(src.Size())
     End Sub
 End Class
@@ -495,25 +495,25 @@ Public Class Palette_ObjectColors
     Dim inrange As Depth_InRange
     Dim palette As Palette_Basics
     Public gray As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        palette = New Palette_Basics(ocvb)
+        palette = New Palette_Basics()
         hideForm("Palette_BuildGradientColorMap Slider Options")
-        reduction = New Reduction_KNN_Color(ocvb)
-        inrange = New Depth_InRange(ocvb)
+        reduction = New Reduction_KNN_Color()
+        inrange = New Depth_InRange()
 
         label1 = "Consistent colors"
         label2 = "Original colors"
         ocvb.desc = "New class description"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
-        reduction.Run(ocvb)
+        reduction.Run()
         dst2 = reduction.dst2
 
-        inrange.Run(ocvb)
+        inrange.Run()
         Static minDepthSlider = findSlider("InRange Min Depth")
         Static maxDepthSlider = findSlider("InRange Max Depth")
         If ocvb.frameCount = 0 Then maxDepthSlider.value = maxDepthSlider.maximum
@@ -521,7 +521,7 @@ Public Class Palette_ObjectColors
         Dim maxDepth = maxDepthSlider.value
         If maxDepth - minDepth < 2 Then Exit Sub
 
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
         Dim blobList As New SortedList(Of Single, Integer)
         For i = 0 To reduction.pTrack.drawRC.viewObjects.Count - 1
             Dim vo = reduction.pTrack.drawRC.viewObjects.Values(i)
@@ -568,19 +568,19 @@ End Class
 Public Class Palette_Layout2D
     Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         Dim widthSlider = findSlider("ThreadGrid Width")
         Dim heightslider = findSlider("ThreadGrid Height")
         widthSlider.Value = 40
         heightslider.Value = 24
-        grid.Run(ocvb)
+        grid.Run()
         ocvb.desc = "Layout the available colors in a 2D grid"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+        grid.Run()
         Dim index As Integer
         For Each r In grid.roiList
             dst1(r).SetTo(ocvb.scalarColors(index Mod 255))

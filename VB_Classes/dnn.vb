@@ -7,12 +7,12 @@ Imports System.IO
 Public Class DNN_Test
     Inherits VBparent
     Dim net As Net
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim modelFile As New FileInfo(ocvb.parms.homeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
@@ -43,8 +43,8 @@ End Class
 Public Class DNN_Caffe_CS
     Inherits VBparent
     Dim caffeCS As CS_Classes.DNN
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label2 = "Input Image"
         ocvb.desc = "Download and use a Caffe database"
 
@@ -53,7 +53,7 @@ Public Class DNN_Caffe_CS
         Dim synsetWords = ocvb.parms.homeDir + "Data/synset_words.txt"
         caffeCS = New CS_Classes.DNN(protoTxt, modelFile, synsetWords)
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
@@ -78,15 +78,15 @@ Public Class DNN_Basics
     Public rect As cv.Rect
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "DNN Scale Factor", 1, 10000, 78)
         sliders.setupTrackBar(1, "DNN MeanVal", 1, 255, 127)
         sliders.setupTrackBar(2, "DNN Confidence Threshold", 1, 100, 80)
 
         For i = 0 To kalman.Count - 1
-            kalman(i) = New Kalman_Basics(ocvb)
+            kalman(i) = New Kalman_Basics()
             ReDim kalman(i).kInput(4 - 1)
             ReDim kalman(i).kOutput(4 - 1)
         Next
@@ -109,7 +109,7 @@ Public Class DNN_Basics
         ocvb.desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If dnnPrepared Then
             Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
@@ -164,7 +164,7 @@ Public Class DNN_Basics
 
                     If minIndex < kalman.Count Then
                         kalman(minIndex).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
-                        kalman(minIndex).Run(ocvb)
+                        kalman(minIndex).Run()
                         rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
                     dst2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)

@@ -8,21 +8,21 @@ Public Class Moments_Basics
     Public offsetPt As cv.Point
     Public kalman As Kalman_Basics
     Public useKalman As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        If standalone Then foreground = New kMeans_Depth_FG_BG(ocvb)
+        If standalone Then foreground = New kMeans_Depth_FG_BG()
 
-        kalman = New Kalman_Basics(ocvb)
+        kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
 
         label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the provided mask file."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
-            foreground.Run(ocvb)
+            foreground.Run()
             dst1 = foreground.dst1
             inputMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
@@ -32,7 +32,7 @@ Public Class Moments_Basics
         If kalman.check.Box(0).Checked Or useKalman Then
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run(ocvb)
+            kalman.Run()
             center = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
@@ -50,26 +50,26 @@ Public Class Moments_CentroidKalman
     Inherits VBparent
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
 
-        foreground = New kMeans_Depth_FG_BG(ocvb)
+        foreground = New kMeans_Depth_FG_BG()
 
         label1 = "Red dot = Kalman smoothed centroid"
         ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        foreground.Run(ocvb)
+        foreground.Run()
         dst1 = foreground.dst1
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(mask, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run(ocvb)
+            kalman.Run()
             dst1.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub

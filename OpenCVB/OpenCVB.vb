@@ -853,10 +853,6 @@ Public Class OpenCVB
             TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/testall.png")
         End If
     End Sub
-    'Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-    '    Dim diff = Now().Subtract(startAlgorithmTime)
-    '    If diff.TotalSeconds > 5 Then OptionsBringToFront = True
-    'End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
     End Sub
@@ -1086,7 +1082,6 @@ Public Class OpenCVB
         saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
-        'startAlgorithmTime = Now() ' black out optionsbringtofront
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
@@ -1099,16 +1094,16 @@ Public Class OpenCVB
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
             Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, myLocation, resolutionXY.Width, resolutionXY.Height)
-            textDesc = task.ocvb.desc
-            openFileInitialDirectory = task.ocvb.openFileInitialDirectory
-            openFileDialogRequested = task.ocvb.openFileDialogRequested
-            openFileinitialStartSetting = task.ocvb.initialStartSetting
-            task.ocvb.fileStarted = task.ocvb.initialStartSetting
-            openFileStarted = task.ocvb.initialStartSetting
-            openFileFilterIndex = task.ocvb.openFileFilterIndex
-            openFileFilter = task.ocvb.openFileFilter
-            openFileDialogName = task.ocvb.openFileDialogName
-            openfileDialogTitle = task.ocvb.openFileDialogTitle
+            textDesc = task.desc
+            openFileInitialDirectory = task.openFileInitialDirectory
+            openFileDialogRequested = task.openFileDialogRequested
+            openFileinitialStartSetting = task.initialStartSetting
+            task.fileStarted = task.initialStartSetting
+            openFileStarted = task.initialStartSetting
+            openFileFilterIndex = task.openFileFilterIndex
+            openFileFilter = task.openFileFilter
+            openFileDialogName = task.openFileDialogName
+            openfileDialogTitle = task.openFileDialogTitle
             intermediateReview = ""
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
@@ -1117,9 +1112,9 @@ Public Class OpenCVB
             If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-            If task.ocvb.drawRect <> New cv.Rect(0, 0, 0, 0) Then
-                drawRect = task.ocvb.drawRect
-                Dim ratio = task.ocvb.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
+            If task.drawRect <> New cv.Rect(0, 0, 0, 0) Then
+                drawRect = task.drawRect
+                Dim ratio = task.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
                 drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
             End If
 
@@ -1188,110 +1183,96 @@ Public Class OpenCVB
             ' bring the data into the algorithm task.
             SyncLock bufferLock
                 If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
-                task.ocvb.color = camera.color.Resize(resolutionXY)
-                task.ocvb.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
-                task.ocvb.leftView = camera.leftView.Resize(resolutionXY)
-                task.ocvb.rightView = camera.rightView.Resize(resolutionXY)
-                task.ocvb.pointCloud = camera.PointCloud.clone
+                task.color = camera.color.Resize(resolutionXY)
+                task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
+                task.leftView = camera.leftView.Resize(resolutionXY)
+                task.rightView = camera.rightView.Resize(resolutionXY)
+                task.pointCloud = camera.PointCloud.clone
 
-                task.ocvb.depth16 = camera.depth16.clone
-                task.ocvb.transformationMatrix = camera.transformationMatrix
-                task.ocvb.IMU_TimeStamp = camera.IMU_TimeStamp
-                task.ocvb.IMU_Barometer = camera.IMU_Barometer
-                task.ocvb.IMU_Magnetometer = camera.IMU_Magnetometer
-                task.ocvb.IMU_Temperature = camera.IMU_Temperature
-                task.ocvb.IMU_Rotation = camera.IMU_Rotation
-                task.ocvb.IMU_Translation = camera.IMU_Translation
-                task.ocvb.IMU_Acceleration = camera.IMU_Acceleration
-                task.ocvb.IMU_Velocity = camera.IMU_Velocity
-                task.ocvb.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                task.ocvb.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                task.ocvb.IMU_FrameTime = camera.IMU_FrameTime
-                task.ocvb.CPU_TimeStamp = camera.CPU_TimeStamp
-                task.ocvb.CPU_FrameTime = camera.CPU_FrameTime
-                task.ocvb.intermediateReview = intermediateReview
+                task.depth16 = camera.depth16.clone
+                task.transformationMatrix = camera.transformationMatrix
+                task.IMU_TimeStamp = camera.IMU_TimeStamp
+                task.IMU_Barometer = camera.IMU_Barometer
+                task.IMU_Magnetometer = camera.IMU_Magnetometer
+                task.IMU_Temperature = camera.IMU_Temperature
+                task.IMU_Rotation = camera.IMU_Rotation
+                task.IMU_Translation = camera.IMU_Translation
+                task.IMU_Acceleration = camera.IMU_Acceleration
+                task.IMU_Velocity = camera.IMU_Velocity
+                task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                task.IMU_FrameTime = camera.IMU_FrameTime
+                task.CPU_TimeStamp = camera.CPU_TimeStamp
+                task.CPU_FrameTime = camera.CPU_FrameTime
+                task.intermediateReview = intermediateReview
                 camera.newImagesAvailable = False
             End SyncLock
 
             Try
-                Dim ratio = task.ocvb.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
+                Dim ratio = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
                 If GrabRectangleData Then
                     GrabRectangleData = False
-                    task.ocvb.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                    If task.ocvb.drawRect.Width <= 2 Then task.ocvb.drawRect.Width = 0 ' too small?
-                    Dim w = task.ocvb.color.Width
-                    If task.ocvb.drawRect.X > w Then task.ocvb.drawRect.X -= w
-                    If task.ocvb.drawRect.X < w And task.ocvb.drawRect.X + task.ocvb.drawRect.Width > w Then
-                        task.ocvb.drawRect.Width = w - task.ocvb.drawRect.X
+                    task.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                    If task.drawRect.Width <= 2 Then task.drawRect.Width = 0 ' too small?
+                    Dim w = task.color.Width
+                    If task.drawRect.X > w Then task.drawRect.X -= w
+                    If task.drawRect.X < w And task.drawRect.X + task.drawRect.Width > w Then
+                        task.drawRect.Width = w - task.drawRect.X
                     End If
                     BothFirstAndLastReady = False
                 End If
 
-                task.ocvb.mousePoint = mousePoint
-                task.ocvb.mousePicTag = mousePicTag
-                task.ocvb.mouseClickFlag = mouseClickFlag
-                If mouseClickFlag Then task.ocvb.mouseClickPoint = mousePoint
+                task.mousePoint = mousePoint
+                task.mousePicTag = mousePicTag
+                task.mouseClickFlag = mouseClickFlag
+                If mouseClickFlag Then task.mouseClickPoint = mousePoint
                 mouseClickFlag = False
 
-                task.ocvb.fileStarted = openFileStarted ' UI may have stopped play.
+                task.fileStarted = openFileStarted ' UI may have stopped play.
 
                 task.RunAlgorithm()
 
-                If task.ocvb.drawRectClear Then
+                If task.drawRectClear Then
                     drawRect = New cv.Rect
-                    task.ocvb.drawRect = drawRect
-                    task.ocvb.drawRectClear = False
+                    task.drawRect = drawRect
+                    task.drawRectClear = False
                 End If
 
                 If openFileDialogName <> "" Then
-                    If openFileDialogName <> task.ocvb.openFileDialogName Or openFileStarted <> task.ocvb.fileStarted Then
-                        task.ocvb.fileStarted = openFileStarted
-                        task.ocvb.openFileDialogName = openFileDialogName
+                    If openFileDialogName <> task.openFileDialogName Or openFileStarted <> task.fileStarted Then
+                        task.fileStarted = openFileStarted
+                        task.openFileDialogName = openFileDialogName
                     End If
-                    openfileSliderPercent = task.ocvb.openFileSliderPercent
+                    openfileSliderPercent = task.openFileSliderPercent
                 End If
 
-                Static inputFile As String = "" ' task.ocvb.openFileDialogName
-                If inputFile <> task.ocvb.openFileDialogName Then
-                    inputFile = task.ocvb.openFileDialogName
-                    openFileInitialDirectory = task.ocvb.openFileInitialDirectory
-                    openFileDialogRequested = task.ocvb.openFileDialogRequested
+                Static inputFile As String = "" ' task.openFileDialogName
+                If inputFile <> task.openFileDialogName Then
+                    inputFile = task.openFileDialogName
+                    openFileInitialDirectory = task.openFileInitialDirectory
+                    openFileDialogRequested = task.openFileDialogRequested
                     openFileinitialStartSetting = True ' if the file playing changes while the algorithm is running, automatically start playing the new file.
-                    openFileFilterIndex = task.ocvb.openFileFilterIndex
-                    openFileFilter = task.ocvb.openFileFilter
-                    openFileDialogName = task.ocvb.openFileDialogName
-                    openfileDialogTitle = task.ocvb.openFileDialogTitle
+                    openFileFilterIndex = task.openFileFilterIndex
+                    openFileFilter = task.openFileFilter
+                    openFileDialogName = task.openFileDialogName
+                    openfileDialogTitle = task.openFileDialogTitle
                 End If
 
-                picLabels(2) = task.ocvb.label1
-                picLabels(3) = task.ocvb.label2
+                picLabels(2) = task.label1
+                picLabels(3) = task.label2
 
                 ' share the results of the algorithm task.
                 SyncLock TTtextData
                     algorithmRefresh = True
-                    imgResult = task.ocvb.result.Clone()
+                    imgResult = task.result.Clone()
                     TTtextData.Clear()
-                    If task.ocvb.TTtextData.Count Then
-                        For i = 0 To task.ocvb.TTtextData.Count - 1
-                            TTtextData.Add(task.ocvb.TTtextData(i)) ' pull over any truetype text data so paint can access it.
+                    If task.TTtextData.Count Then
+                        For i = 0 To task.TTtextData.Count - 1
+                            TTtextData.Add(task.TTtextData(i)) ' pull over any truetype text data so paint can access it.
                         Next
-                        task.ocvb.TTtextData.Clear()
+                        task.TTtextData.Clear()
                     End If
                 End SyncLock
-                'If OptionsBringToFront Then
-                '    OptionsBringToFront = False
-                '    Try
-                '        For Each frm In Application.OpenForms
-                '            If frm.name.startswith("Option") Then frm.topmost = True
-                '        Next
-                '        For Each frm In Application.OpenForms
-                '            If frm.name.startswith("Option") Then frm.topmost = False
-                '        Next
-                '    Catch ex As Exception
-                '        Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
-                '    End Try
-                '    openFileFormLocated = False
-                'End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
                 Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
@@ -1302,8 +1283,8 @@ Public Class OpenCVB
                 SyncLock callTraceLock
                     ' this allows for dynamic allocation of new algorithms.
                     callTrace.Clear()
-                    For i = 0 To task.ocvb.callTrace.Count - 1
-                        callTrace.Add(task.ocvb.callTrace(i))
+                    For i = 0 To task.callTrace.Count - 1
+                        callTrace.Add(task.callTrace(i))
                     Next
                 End SyncLock
             End If

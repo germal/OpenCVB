@@ -15,17 +15,17 @@ Public Class ProCon_Basics
     Public terminateProducer As Boolean
     Public pduration As Integer
     Public cduration As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Buffer Size", 1, 100, buffer.Length)
         sliders.setupTrackBar(1, "Producer Workload Duration (ms)", 1, 1000, 100)
         sliders.setupTrackBar(2, "Consumer Workload Duration (ms)", 1, 1000, 10)
         pduration = sliders.trackbar(1).Value
         cduration = sliders.trackbar(2).Value
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText()
 
         buffer = Enumerable.Repeat(-1, buffer.Length).ToArray
 
@@ -67,7 +67,7 @@ Public Class ProCon_Basics
             If terminateProducer Then Exit While Else Thread.Sleep(pduration)
         End While
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If sliders.trackbar(0).Value <> buffer.Length Then
             SyncLock mutex
@@ -82,7 +82,7 @@ Public Class ProCon_Basics
         pduration = sliders.trackbar(1).Value
         cduration = sliders.trackbar(2).Value
         SyncLock mutex
-            flow.Run(ocvb)
+            flow.Run()
         End SyncLock
     End Sub
     Public Sub Close()
@@ -100,14 +100,14 @@ Public Class ProCon_Variation
     Inherits VBparent
     Dim procon As ProCon_Basics
     Dim frameCount As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        procon = New ProCon_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        procon = New ProCon_Basics()
         procon.sliders.trackbar(1).Enabled = False ' no duration for the producer because algorithm task is the producer.
         procon.terminateProducer = True ' we don't want 2 producer tasks...
         ocvb.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
@@ -116,7 +116,7 @@ Public Class ProCon_Variation
                 frameCount += 1
             End If
         End SyncLock
-        procon.Run(ocvb)
+        procon.Run()
     End Sub
     Public Sub Close()
         procon.terminateConsumer = True

@@ -9,24 +9,24 @@ Public Class Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New()
+        initParent()
+        fisheye = New FishEye_Rectified()
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(caller, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        srcLeft = ocvb.leftView
-        srcRight = ocvb.rightView
+        srcLeft = ocvb.task.leftView
+        srcRight = ocvb.task.rightView
         Dim doubleSize As New cv.Mat
         CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.trackbar(0).Value, radio.check(0).Checked)
 
@@ -47,18 +47,18 @@ Public Class Surf_Basics
     Inherits VBparent
     Dim surf As Surf_Basics_CS
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New()
+        initParent()
+        fisheye = New FishEye_Rectified()
 
-        surf = New Surf_Basics_CS(ocvb)
+        surf = New Surf_Basics_CS()
 
         ocvb.desc = "Use left and right views to match points in horizontal slices."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         surf.src = src
-        surf.Run(ocvb)
+        surf.Run()
         dst1 = surf.dst1
         dst2 = surf.dst2
     End Sub
@@ -72,20 +72,20 @@ End Class
 Public Class Surf_DrawMatchManual_CS
     Inherits VBparent
     Dim surf As Surf_Basics_CS
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        surf = New Surf_Basics_CS(ocvb)
+    Public Sub New()
+        initParent()
+        surf = New Surf_Basics_CS()
         surf.CS_SurfBasics.drawPoints = False
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
 
         ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         surf.src = src
-        surf.Run(ocvb)
+        surf.Run()
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim keys1 = surf.CS_SurfBasics.keypoints1

@@ -4,9 +4,9 @@ Public Class HOG_Basics
     Inherits VBparent
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Threshold", 0, 100, 0)
         sliders.setupTrackBar(1, "Stride", 1, 100, 1)
         sliders.setupTrackBar(2, "Scale", 0, 2000, 300)
@@ -28,7 +28,7 @@ Public Class HOG_Basics
             dst1.Rectangle(r.TopLeft, r.BottomRight, cv.Scalar.Red, 3, cv.LineTypes.Link8, 0)
         Next rect
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim hog As New cv.HOGDescriptor()
         hog.SetSVMDetector(cv.HOGDescriptor.GetDefaultPeopleDetector())

@@ -6,9 +6,9 @@ Public Class MSER_Basics
     Public region()() As cv.Point = Nothing
     Dim saveParms() As integer
     Dim mser As cv.MSER
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller, 9)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller, 9)
 
         sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
         sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 60)
@@ -20,7 +20,7 @@ Public Class MSER_Basics
         sliders.setupTrackBar(7, "MSER Min Margin", 1, 100, 3)
         sliders.setupTrackBar(8, "MSER Edge Blursize", 1, 20, 5)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(caller, 2)
         check.Box(0).Text = "Pass2Only"
         check.Box(1).Text = "Use Grayscale, not color input (default)"
         check.Box(0).Checked = True
@@ -29,7 +29,7 @@ Public Class MSER_Basics
         ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
         ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim delta = sliders.trackbar(0).Value
         Dim minArea = sliders.trackbar(1).Value
@@ -69,7 +69,7 @@ Public Class MSER_Basics
                 Dim nextRegion = region(i)
                 pixels += nextRegion.Length
                 For Each pt In nextRegion
-                    dst1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
+                    dst1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.task.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 Next
             Next
             label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
@@ -97,11 +97,11 @@ Public Class MSER_Synthetic
             img.FloodFill(p0, color(i))
         Next
     End Sub
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
@@ -129,11 +129,11 @@ Public Class MSER_TestSynthetic
     Inherits VBparent
     Dim mser As MSER_Basics
     Dim synth As MSER_Synthetic
-    Private Function testSynthetic(ocvb As VBocvb, img As cv.Mat, pass2Only As Boolean, delta As integer) As String
+    Private Function testSynthetic( img As cv.Mat, pass2Only As Boolean, delta As integer) As String
         mser.check.Box(0).Checked = pass2Only
         mser.sliders.trackbar(0).Value = delta
         mser.src = img
-        mser.Run(ocvb)
+        mser.Run()
 
         Dim pixels As integer
         Dim regionCount As integer
@@ -147,9 +147,9 @@ Public Class MSER_TestSynthetic
         Next
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mser = New MSER_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        mser = New MSER_Basics()
         mser.sliders.trackbar(0).Value = 10
         mser.sliders.trackbar(1).Value = 100
         mser.sliders.trackbar(2).Value = 5000
@@ -157,18 +157,18 @@ Public Class MSER_TestSynthetic
         mser.sliders.trackbar(4).Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
-        synth = New MSER_Synthetic(ocvb)
+        synth = New MSER_Synthetic()
         label1 = "Input image to MSER"
         label1 = "Output image from MSER"
         ocvb.desc = "Test MSER with the synthetic image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        synth.Run(ocvb)
+        synth.Run()
         dst1 = synth.dst1.Clone()
         dst2 = synth.dst1
 
-        testSynthetic(ocvb, dst2, True, 100)
+        testSynthetic(dst2, True, 100)
     End Sub
 End Class
 
@@ -180,15 +180,15 @@ Public Class MSER_CPPStyle
     Inherits VBparent
     Dim gray As cv.Mat
     Dim image As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
         ocvb.desc = "Maximally Stable Extremal Regions example - still image"
         image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim mser = cv.MSER.Create()
         Dim msers()() As cv.Point = Nothing
@@ -220,16 +220,16 @@ End Class
 Public Class MSER_Contours
     Inherits VBparent
     Dim mser As MSER_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mser = New MSER_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        mser = New MSER_Basics()
         mser.sliders.trackbar(1).Value = 4000
         ocvb.desc = "Use MSER but show the contours of each region."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         mser.src = src
-        mser.Run(ocvb)
+        mser.Run()
 
         Dim pixels As integer
         dst1 = src

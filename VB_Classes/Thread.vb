@@ -23,10 +23,10 @@ Public Class Thread_Grid
             End If
         Next
     End Sub
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        src = ocvb.color
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        src = ocvb.task.color
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
         sliders.setupTrackBar(1, "ThreadGrid Height", 2, src.Height, 32)
         sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)
@@ -35,11 +35,11 @@ Public Class Thread_Grid
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
         ocvb.desc = "Create a grid for use with parallel.ForEach."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static lastWidth As integer
-        Static lastHeight As integer
-        Static lastBorder As integer
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static lastWidth As Integer
+        Static lastHeight As Integer
+        Static lastBorder As Integer
 
         Dim borderSize = sliders.trackbar(2).Value
         If lastWidth <> sliders.trackbar(0).Value Or lastHeight <> sliders.trackbar(1).Value Or lastBorder <> borderSize Then
@@ -106,9 +106,9 @@ End Class
 Public Class Thread_GridTest
     Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
@@ -116,9 +116,9 @@ Public Class Thread_GridTest
         label1 = ""
         ocvb.desc = "Validation test for thread_grid algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        grid.Run()
         Dim mean = cv.Cv2.Mean(src)
 
         Parallel.For(0, grid.roiList.Count,

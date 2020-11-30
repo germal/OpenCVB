@@ -26,16 +26,16 @@ End Module
 Public Class Hull_Basics
     Inherits VBparent
     Public hull() As cv.Point
-        Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+        Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Hull random points", 1, 20, 10)
 
         ocvb.desc = "Surround a set of random points with a convex hull"
         label1 = "Convex Hull Output"
         label2 = "Convex Hull Input"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim Count = sliders.trackbar(0).Value
         Dim points(Count - 1) As cv.Point

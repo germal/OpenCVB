@@ -8,8 +8,8 @@ Public Class FishEye_Rectified
     Dim rightViewMap1 As New cv.Mat, rightViewMap2 As New cv.Mat
     Dim t265Rect As cv.Rect
     Dim t265Original As cv.Rect
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         Dim minDisp = 0
         Dim dispOffset = 112
         Dim numDisp = dispOffset - minDisp
@@ -25,7 +25,7 @@ Public Class FishEye_Rectified
         t265Rect = New cv.Rect(42, 0, 763, 720) ' the T265 left/right views were clipped to fit in the 1280x720 image that is used throughout opencvb.
         t265Original = New cv.Rect(42, 0, 848, 800) ' the T265 left/right views were clipped to fit in the 1280x720 image that is used throughout opencvb.
 
-        'undistortSetup(ocvb, kMatRight, dMatRight, rMatRight, pMatRight, maxDisp, stereo_height_px, ocvb.parms.intrinsicsRight)
+        'undistortSetup(kMatRight, dMatRight, rMatRight, pMatRight, maxDisp, stereo_height_px, ocvb.parms.intrinsicsRight)
 
         Dim kright() As Double = {ocvb.parms.intrinsicsRight.fx, 0, ocvb.parms.intrinsicsRight.ppx, 0, ocvb.parms.intrinsicsRight.fy,
                                                           ocvb.parms.intrinsicsRight.ppy, 0, 0, 1}
@@ -49,12 +49,12 @@ Public Class FishEye_Rectified
         label1 = "Left View"
         label2 = "Right View"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         label1 = "Left View (no fisheye lens present)"
         label2 = "Right View (no fisheye lens present)"
-        leftView = ocvb.leftView
-        rightView = ocvb.rightView
+        leftView = ocvb.task.leftView
+        rightView = ocvb.task.rightView
         dst1 = leftView
         dst2 = rightView
     End Sub
@@ -66,16 +66,16 @@ End Class
 
 Public Class FishEye_Raw
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         label1 = "Left Fisheye Image"
         label2 = "Right Fisheye Image"
-        dst1 = ocvb.leftView
-        dst2 = ocvb.rightView
+        dst1 = ocvb.task.leftView
+        dst2 = ocvb.task.rightView
     End Sub
 End Class
 

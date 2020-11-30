@@ -7,18 +7,18 @@ Public Class Voxels_Basics_MT
     Public voxelMat As cv.Mat
     Public minDepth As Single
     Public maxDepth As Single
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New()
+        initParent()
+        check.Setup(caller, 1)
         check.Box(0).Text = "Display intermediate results"
         check.Box(0).Checked = True
 
-        inrange = New Depth_InRange(ocvb)
+        inrange = New Depth_InRange()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 16
@@ -27,9 +27,9 @@ Public Class Voxels_Basics_MT
         label2 = "Voxels labeled with their median distance"
         ocvb.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim split() = ocvb.pointCloud.Split()
+        Dim split() = ocvb.task.pointCloud.Split()
 
         Static minSlider = findSlider("InRange Min Depth")
         Static maxSlider = findSlider("InRange Max Depth")
@@ -39,10 +39,10 @@ Public Class Voxels_Basics_MT
         inrange.minVal = minDepth
         inrange.maxVal = maxDepth
         inrange.src = split(2) * 1000
-        inrange.Run(ocvb)
+        inrange.Run()
 
         grid.src = split(2)
-        grid.Run(ocvb)
+        grid.Run()
 
         If voxels.Length <> grid.roiList.Count Then ReDim voxels(grid.roiList.Count - 1)
 
@@ -59,7 +59,7 @@ Public Class Voxels_Basics_MT
         End Sub)
         voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_32F)
         If check.Box(0).Checked Then
-            dst1 = ocvb.RGBDepth.Clone()
+            dst1 = ocvb.task.RGBDepth.Clone()
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow
             Dim farColor = cv.Scalar.Blue

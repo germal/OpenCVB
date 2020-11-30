@@ -8,14 +8,14 @@ Public Class Stabilizer_Basics
     Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        good = New Features_GoodFeatures(ocvb)
+    Public Sub New()
+        initParent()
+        good = New Features_GoodFeatures()
 
         ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If ocvb.frameCount = 0 Then
@@ -31,7 +31,7 @@ Public Class Stabilizer_Basics
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If inputFeat Is Nothing Then
             good.src = src
-            good.Run(ocvb)
+            good.Run()
             inputFeat = good.goodFeatures
         End If
         features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
@@ -96,7 +96,7 @@ Public Class Stabilizer_Basics
             smoothedMat.Set(Of Double)(0, 2, dx)
             smoothedMat.Set(Of Double)(1, 2, dy)
 
-            Dim smoothedFrame = ocvb.color.WarpAffine(smoothedMat, src.Size())
+            Dim smoothedFrame = ocvb.task.color.WarpAffine(smoothedMat, src.Size())
             smoothedFrame = smoothedFrame(New cv.Range(vert_Border, smoothedFrame.Rows - vert_Border), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
             dst2 = smoothedFrame.Resize(src.Size())
 
@@ -118,22 +118,22 @@ Public Class Stabilizer_BriskFeatures
     Inherits VBparent
     Dim brisk As BRISK_Basics
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        stabilizer = New Stabilizer_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        stabilizer = New Stabilizer_Basics()
 
-        brisk = New BRISK_Basics(ocvb)
+        brisk = New BRISK_Basics()
         brisk.sliders.trackbar(0).Value = 10
 
         ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.CopyTo(brisk.src)
-        brisk.Run(ocvb)
+        brisk.Run()
         stabilizer.inputFeat = brisk.features ' supply the features to track with Optical Flow
         stabilizer.src = src
-        stabilizer.Run(ocvb)
+        stabilizer.Run()
         dst1 = stabilizer.dst1
         dst2 = stabilizer.dst2
     End Sub
@@ -147,21 +147,21 @@ Public Class Stabilizer_HarrisFeatures
     Inherits VBparent
     Dim harris As Harris_Detector_CPP
     Dim stabilizer As Stabilizer_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        stabilizer = New Stabilizer_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        stabilizer = New Stabilizer_Basics()
 
-        harris = New Harris_Detector_CPP(ocvb)
+        harris = New Harris_Detector_CPP()
 
         ocvb.desc = "Stabilize the video stream using Harris detector features"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         harris.src = src
-        harris.Run(ocvb)
+        harris.Run()
         stabilizer.inputFeat = harris.FeaturePoints ' supply the features to track with Optical Flow
         stabilizer.src = src
-        stabilizer.Run(ocvb)
+        stabilizer.Run()
         dst1 = stabilizer.dst1
         dst2 = stabilizer.dst2
     End Sub
@@ -189,13 +189,13 @@ Public Class Stabilizer_Basics_CPP
     Dim srcData() As Byte
     Dim handleSrc As GCHandle
     Dim sPtr As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ReDim srcData(src.Total * src.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
         ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.trueText("this algorithm is not stable.", 10, 100)
         'Marshal.Copy(src.Data, srcData, 0, srcData.Length)
@@ -224,22 +224,22 @@ Public Class Stabilizer_SideBySide
     Inherits VBparent
     Dim original As Stabilizer_Basics
     Dim basics As Stabilizer_HarrisFeatures
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        original = New Stabilizer_Basics(ocvb)
-        basics = New Stabilizer_HarrisFeatures(ocvb)
+    Public Sub New()
+        initParent()
+        original = New Stabilizer_Basics()
+        basics = New Stabilizer_HarrisFeatures()
         ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
         label1 = "Stabilizer_Basic (VB.Net)"
         label2 = "Stabilizer_HarrisFeatures"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         original.src = src
-        original.Run(ocvb)
+        original.Run()
         dst1 = original.dst1
 
         basics.src = src
-        basics.Run(ocvb)
+        basics.Run()
         dst2 = basics.dst1
     End Sub
 End Class

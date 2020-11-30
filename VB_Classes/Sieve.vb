@@ -4,9 +4,9 @@ Imports System.Numerics
 Public Class Sieve_Basics
     Inherits VBparent
     Public primes As New List(Of Integer)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Count of desired primes", 1, 10000, 400)
 
         ocvb.desc = "Implement the Sieve of Eratothenes"
@@ -23,7 +23,7 @@ Public Class Sieve_Basics
         Next
         Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, ""))
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim count = sliders.trackbar(0).Value
         Dim nextEntry As Integer = 2
@@ -52,12 +52,12 @@ Public Class Sieve_Basics_CS
     Inherits VBparent
     Dim printer As Sieve_Basics
     Dim sieve As New CS_Classes.Sieve
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        printer = New Sieve_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        printer = New Sieve_Basics()
         ocvb.desc = "Implement the Sieve of Eratothenes in C#"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static countSlider = findSlider("Count of desired primes")
         ocvb.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))

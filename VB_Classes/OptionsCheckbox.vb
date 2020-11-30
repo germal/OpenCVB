@@ -1,7 +1,7 @@
 ﻿Imports System.Windows.Forms
 Public Class OptionsCheckbox
     Public Box() As CheckBox
-    Public Sub Setup(ocvb As VBocvb, caller As String, count As Integer)
+    Public Sub Setup(caller As String, count As Integer)
         ReDim Box(count - 1)
         Me.Text = caller + " CheckBox Options"
         For i = 0 To Box.Count - 1

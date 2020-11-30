@@ -1,15 +1,15 @@
 Imports cv = OpenCvSharp
 Public Class Mat_Repeat
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Use the repeat method to replicate data."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst1 = small.Repeat(10, 10)
-        small = ocvb.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
+        small = ocvb.task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst2 = small.Repeat(10, 10)
     End Sub
 End Class
@@ -24,17 +24,17 @@ End Class
 Public Class Mat_PointToMat
     Inherits VBparent
     Dim mask As Random_Points
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mask = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        mask = New Random_Points()
         mask.plotPoints = True
         label1 = "Random_Points points (original)"
         label2 = "Random_Points points after format change"
         ocvb.desc = "Convert pointf3 into a mat of points"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        mask.Run(ocvb) ' generates a set of points
+        mask.Run() ' generates a set of points
         dst1 = mask.dst1
         Dim rows = mask.Points.Length
         Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32SC2, mask.Points)
@@ -55,13 +55,13 @@ End Class
 Public Class Mat_MatToPoint
     Inherits VBparent
     Dim mask As Random_Points
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mask = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        mask = New Random_Points()
         ocvb.desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim points(src.Total - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
@@ -87,13 +87,13 @@ End Class
 
 Public Class Mat_Transpose
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Transpose a Mat and show results."
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim trColor = src.T()
         dst1 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
@@ -110,13 +110,13 @@ End Class
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
 Public Class Mat_Tricks
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
         ocvb.desc = "Show some Mat tricks."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
@@ -136,8 +136,8 @@ Public Class Mat_4to1
     Dim mat4 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
     Public noLines As Boolean ' if they want lines or not...
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         mat1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
@@ -148,7 +148,7 @@ Public Class Mat_4to1
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Use one Mat for up to 4 images"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
@@ -157,9 +157,9 @@ Public Class Mat_4to1
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then
             mat1 = src
-            mat2 = ocvb.RGBDepth
-            mat3 = ocvb.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            mat4 = ocvb.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mat2 = ocvb.task.RGBDepth
+            mat3 = ocvb.task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mat4 = ocvb.task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
         For i = 0 To 4 - 1
@@ -189,8 +189,8 @@ Public Class Mat_2to1
     Dim mat2 As cv.Mat
     Public mat() = {mat1, mat2}
     Public noLines As Boolean ' if they want lines or not...
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         mat1 = New cv.Mat(New cv.Size(src.Rows, src.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
@@ -199,14 +199,14 @@ Public Class Mat_2to1
         label1 = ""
         ocvb.desc = "Fill a Mat with 2 images"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static nSize = New cv.Size(src.Width, src.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then
             mat1 = src
-            mat2 = ocvb.RGBDepth
+            mat2 = ocvb.task.RGBDepth
             mat = {mat1, mat2}
         End If
         dst1.SetTo(0)
@@ -233,9 +233,9 @@ Public Class Mat_ImageXYZ_MT
     Dim grid As Thread_Grid
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 32
@@ -252,10 +252,10 @@ Public Class Mat_ImageXYZ_MT
 
         ocvb.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
-        Dim depth32f = getDepth32f(ocvb)
+        grid.Run()
+        Dim depth32f = getDepth32f()
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
           Sub(roi)
               xyzPlanes(2)(roi) = depth32f(roi)
@@ -274,12 +274,12 @@ End Class
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
 Public Class Mat_RowColRange
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "BitwiseNot of RowRange and ColRange"
         ocvb.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
@@ -295,12 +295,12 @@ End Class
 
 Public Class Mat_Managed
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Color change is in the managed cv.vec3b array"
         ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static autoRand As New Random()
         Static img(src.Total) As cv.Vec3b
@@ -325,12 +325,12 @@ End Class
 Public Class Mat_MultiplyReview
     Inherits VBparent
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New()
+        initParent()
+        flow = New Font_FlowText()
         ocvb.desc = "Review matrix multiplication"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
@@ -375,7 +375,7 @@ Public Class Mat_MultiplyReview
             flow.msgs.Add(nextLine)
         Next
 
-        flow.Run(ocvb)
+        flow.Run()
     End Sub
 End Class
 
@@ -391,10 +391,10 @@ Public Class Mat_Inverse
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
     Public inverse As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        flow = New Font_FlowText(ocvb)
-        radio.Setup(ocvb, caller, 6)
+    Public Sub New()
+        initParent()
+        flow = New Font_FlowText()
+        radio.Setup(caller, 6)
         radio.check(0).Text = "Cholesky"
         radio.check(1).Text = "Eig (works but results are incorrect)"
         radio.check(2).Text = "LU"
@@ -407,7 +407,7 @@ Public Class Mat_Inverse
 
         ocvb.desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim nextline = ""
 
@@ -456,6 +456,6 @@ Public Class Mat_Inverse
             Next
         End If
 
-        flow.Run(ocvb)
+        flow.Run()
     End Sub
 End Class

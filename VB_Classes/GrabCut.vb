@@ -3,20 +3,20 @@ Imports cv = OpenCvSharp
 Public Class GrabCut_Basics
     Inherits VBparent
     Dim contours As Contours_Depth
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        contours = New Contours_Depth(ocvb)
+    Public Sub New()
+        initParent()
+        contours = New Contours_Depth()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
         sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
 
         ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         contours.src = src
-        contours.Run(ocvb)
+        contours.Run()
         dst2 = contours.dst2
         Dim iterations = sliders.trackbar(0).Value
         Dim kernelsize = sliders.trackbar(1).Value

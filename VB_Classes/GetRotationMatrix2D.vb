@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons(ocvb As VBocvb, caller As String, radio As OptionsRadioButtons, radioName As String)
-        radio.Setup(ocvb, caller, 7)
+    Public Sub SetInterpolationRadioButtons( caller As String, radio As OptionsRadioButtons, radioName As String)
+        radio.Setup(caller, 7)
         radio.check(0).Text = radioName + " with Area"
         radio.check(1).Text = radioName + " with Cubic flag"
         radio.check(2).Text = radioName + " with Lanczos4"
@@ -35,15 +35,15 @@ Public Class GetRotationMatrix2D_Basics
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public warpFlag As integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
-        SetInterpolationRadioButtons(ocvb, caller, radio, "Rotation2D")
+        SetInterpolationRadioButtons(caller, radio, "Rotation2D")
 
         ocvb.desc = "Rotate a rectangle of a specified angle"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static frm = findForm("GetRotationMatrix2D_Basics Radio Options")
         warpFlag = getInterpolationRadioButtons(radio, frm)
@@ -63,22 +63,22 @@ End Class
 Public Class GetRotationMatrix2D_Box
     Inherits VBparent
     Dim rotation As GetRotationMatrix2D_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        rotation = New GetRotationMatrix2D_Basics(ocvb)
-        ocvb.drawRect = New cv.Rect(100, 100, 100, 100)
+    Public Sub New()
+        initParent()
+        rotation = New GetRotationMatrix2D_Basics()
+        ocvb.task.drawRect = New cv.Rect(100, 100, 100, 100)
 
         label1 = "Original Rectangle in the original perspective"
         label2 = "Same Rectangle in the new warped perspective"
         ocvb.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         rotation.src = src
-        rotation.Run(ocvb)
+        rotation.Run()
         dst2 = dst1.Clone()
 
-        Dim r = ocvb.drawRect
+        Dim r = ocvb.task.drawRect
         dst1 = src.Clone()
         dst1.Rectangle(r, cv.Scalar.White, 1)
 

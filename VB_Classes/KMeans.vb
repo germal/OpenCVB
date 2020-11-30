@@ -4,14 +4,14 @@ Public Class kMeans_BasicsDepthColor
     Public kmeansK As Integer
     Public resizeRequest As Boolean = True
     Public useDepthColor As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
 
         ocvb.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim resizeVal = If(resizeRequest, 4, 1)
         Dim small = src.Resize(New cv.Size(src.Width / resizeVal, src.Height / resizeVal))
@@ -36,7 +36,7 @@ Public Class kMeans_BasicsDepthColor
         If useDepthColor Then
             For i = 0 To kmeansK - 1
                 Dim mask = labels.InRange(i, i)
-                Dim mean = ocvb.RGBDepth.Mean(mask)
+                Dim mean = ocvb.task.RGBDepth.Mean(mask)
                 dst1.SetTo(mean, mask)
             Next
         Else
@@ -53,29 +53,29 @@ Public Class kMeans_Clusters
     Inherits VBparent
     Dim Mats As Mat_4to1
     Dim km As kMeans_BasicsDepthColor
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        Mats = New Mat_4to1(ocvb)
+    Public Sub New()
+        initParent()
+        Mats = New Mat_4to1()
 
-        km = New kMeans_BasicsDepthColor(ocvb)
+        km = New kMeans_BasicsDepthColor()
 
         label1 = "kmeans - k=2,4,6,8"
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static saveRect = ocvb.drawRect
-        ocvb.drawRect = saveRect
+        Static saveRect = ocvb.task.drawRect
+        ocvb.task.drawRect = saveRect
         km.src = src
         For i = 0 To 3
             km.kmeansK = Choose(i + 1, 2, 4, 6, 8)
-            km.Run(ocvb)
+            km.Run()
             Mats.mat(i) = km.dst1.Clone
         Next
-        Mats.Run(ocvb)
+        Mats.Run()
         dst1 = Mats.dst1
-        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = Mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -89,13 +89,13 @@ Public Class kMeans_RGBFast
     Public clusterColors() As cv.Vec3b
     Public resizeFactor = 2
     Public clusterCount = 6
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         ocvb.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
         Dim columnVector As New cv.Mat
@@ -131,20 +131,20 @@ Public Class kMeans_RGB_Plus_XYDepth
     Inherits VBparent
     Dim km As kMeans_BasicsDepthColor
     Dim clusterColors() As cv.Vec6i
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        km = New kMeans_BasicsDepthColor(ocvb)
+    Public Sub New()
+        initParent()
+        km = New kMeans_BasicsDepthColor()
         label1 = "kmeans - RGB, XY, and Depth Raw"
         ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         km.src = src
-        km.Run(ocvb) ' cluster the rgb image - output is in dst2
+        km.Run() ' cluster the rgb image - output is in dst2
         Dim rgb32f As New cv.Mat
         km.dst1.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim xyDepth32f As New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC3, 0)
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
                 Dim nextVal = depth32f.Get(Of Single)(y, x)
@@ -188,21 +188,21 @@ End Class
 
 Public Class kMeans_XYDepth
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         Dim w = src.Cols / 4
         Dim h = src.Rows / 4
-        ocvb.drawRect = New cv.Rect(w, h, w * 2, h * 2)
+        ocvb.task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         label1 = "Draw rectangle anywhere..."
         label2 = "Currently selected region"
         ocvb.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim roi = ocvb.drawRect
-        Dim depth32f = getDepth32f(ocvb)
+        Dim roi = ocvb.task.drawRect
+        Dim depth32f = getDepth32f()
         Dim xyDepth32f As New cv.Mat(depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
@@ -218,7 +218,7 @@ Public Class kMeans_XYDepth
         For i = 0 To columnVector.Rows - 1
             columnVector.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Integer)(i)))
         Next
-        ocvb.RGBDepth.CopyTo(dst1)
+        ocvb.task.RGBDepth.CopyTo(dst1)
         columnVector.Reshape(3, dst1(roi).Height).ConvertTo(dst1(roi), cv.MatType.CV_8U)
     End Sub
 End Class
@@ -228,16 +228,16 @@ End Class
 
 Public Class kMeans_Depth_FG_BG
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Foreground Mask"
         label2 = "Background Mask"
         ocvb.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim columnVector As New cv.Mat
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
         columnVector = depth32f.Reshape(1, depth32f.Rows * depth32f.Cols)
         columnVector.ConvertTo(columnVector, cv.MatType.CV_32FC1)
         Dim labels = New cv.Mat()
@@ -263,19 +263,19 @@ End Class
 
 Public Class kMeans_LAB
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         label1 = "kMeans_LAB - draw to select region"
         Dim w = src.Cols / 4
         Dim h = src.Rows / 4
-        ocvb.drawRect = New cv.Rect(w, h, w * 2, h * 2)
+        ocvb.task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         ocvb.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim roi = ocvb.drawRect
+        Dim roi = ocvb.task.drawRect
         Dim labMat = src(roi).CvtColor(cv.ColorConversionCodes.RGB2Lab)
         Dim columnVector As New cv.Mat
         columnVector = labMat.Reshape(src.Channels, roi.Height * roi.Width)
@@ -293,7 +293,7 @@ Public Class kMeans_LAB
         src.CopyTo(dst1)
         lab32f.Reshape(3, roi.Height).ConvertTo(dst1(roi), cv.MatType.CV_8UC3)
         dst1(roi) = dst1(roi).CvtColor(cv.ColorConversionCodes.Lab2RGB)
-        dst1.Rectangle(ocvb.drawRect, cv.Scalar.White, 1)
+        dst1.Rectangle(ocvb.task.drawRect, cv.Scalar.White, 1)
     End Sub
 End Class
 
@@ -304,13 +304,13 @@ End Class
 
 Public Class kMeans_Color
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans cluster count (k)", 2, 32, 3)
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         Dim rgb32f As New cv.Mat
@@ -324,7 +324,7 @@ Public Class kMeans_Color
 
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.RGBDepth.Mean(mask)
+            Dim mean = ocvb.task.RGBDepth.Mean(mask)
             dst1.SetTo(mean, mask)
         Next
     End Sub
@@ -337,12 +337,12 @@ End Class
 Public Class kMeans_Color_MT
     Inherits VBparent
     Public grid As Thread_Grid
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 128
@@ -350,11 +350,11 @@ Public Class kMeans_Color_MT
 
         ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+        grid.Run()
         Dim clusterCount = sliders.trackbar(0).Value
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim zeroDepth = depth32f(roi).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
@@ -372,7 +372,7 @@ Public Class kMeans_Color_MT
             For i = 0 To clusterCount - 1
                 Dim mask = labels.InRange(i, i)
                 mask.SetTo(0, zeroDepth) ' don't include the zeros in the mean depth computation.
-                Dim mean = ocvb.RGBDepth(roi).Mean(mask)
+                Dim mean = ocvb.task.RGBDepth(roi).Mean(mask)
                 dst1(roi).SetTo(mean, mask)
             Next
         End Sub)
@@ -385,20 +385,20 @@ End Class
 
 Public Class kMeans_ColorDepth
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
         ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim srcPlanes() As cv.Mat = Nothing
         cv.Cv2.Split(rgb32f, srcPlanes)
         ReDim Preserve srcPlanes(3)
-        srcPlanes(3) = getDepth32f(ocvb)
+        srcPlanes(3) = getDepth32f()
         Dim zeroMask = srcPlanes(3).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
         Dim rgbDepth As New cv.Mat
@@ -414,7 +414,7 @@ Public Class kMeans_ColorDepth
 
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.RGBDepth.Mean(mask)
+            Dim mean = ocvb.task.RGBDepth.Mean(mask)
             dst1.SetTo(mean, mask)
         Next
         dst1.SetTo(0, zeroMask)
@@ -428,23 +428,23 @@ End Class
 Public Class kMeans_ColorDepth_MT
     Inherits VBparent
     Public grid As Thread_Grid
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         grid.sliders.trackbar(0).Value = 32
         grid.sliders.trackbar(1).Value = 32
 
         ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+        grid.Run()
 
         Dim clusterCount = sliders.trackbar(0).Value
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
        Sub(roi)
            Dim rgb32f As New cv.Mat
@@ -467,7 +467,7 @@ Public Class kMeans_ColorDepth_MT
            dst1(roi).SetTo(0)
            For i = 0 To clusterCount - 1
                Dim mask = labels.InRange(i, i)
-               Dim mean = ocvb.RGBDepth(roi).Mean(mask)
+               Dim mean = ocvb.task.RGBDepth(roi).Mean(mask)
                dst1(roi).SetTo(mean, mask)
            Next
        End Sub)
@@ -483,19 +483,19 @@ End Class
 Public Class KMeans_Subdivision
     Inherits VBparent
     Dim kmeans As kMeans_BasicsDepthColor
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kmeans = New kMeans_BasicsDepthColor(ocvb)
+    Public Sub New()
+        initParent()
+        kmeans = New kMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         ocvb.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
         kmeans.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        kmeans.Run(ocvb)
+        kmeans.Run()
         dst1 = kmeans.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim mean = dst1.Mean()
@@ -503,14 +503,14 @@ Public Class KMeans_Subdivision
         kmeans.src.SetTo(0)
         src.CopyTo(kmeans.src, maskDark)
         kmeansKslider.value = 3
-        kmeans.Run(ocvb)
+        kmeans.Run()
         dst2 = kmeans.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim maskLite = dst1.Threshold(mean.Item(0), 255, cv.ThresholdTypes.Binary)
         kmeans.src.SetTo(0)
         src.CopyTo(kmeans.src, maskLite)
         kmeansKslider.value = 3
-        kmeans.Run(ocvb)
+        kmeans.Run()
         kmeans.dst1.CopyTo(dst2, maskLite)
     End Sub
 End Class
@@ -524,34 +524,34 @@ End Class
 Public Class KMeans_Subdivision1
     Inherits VBparent
     Dim kmeans As kMeans_BasicsDepthColor
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kmeans = New kMeans_BasicsDepthColor(ocvb)
+    Public Sub New()
+        initParent()
+        kmeans = New kMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         kmeans.useDepthColor = False
         ocvb.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
         kmeans.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        kmeans.Run(ocvb)
+        kmeans.Run()
         Dim gray1 = kmeans.dst1.Clone
 
         Dim maskDark = gray1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         kmeans.src.SetTo(0)
         src.CopyTo(kmeans.src, maskDark)
         kmeansKslider.value = 3
-        kmeans.Run(ocvb)
+        kmeans.Run()
         Dim gray2 = kmeans.dst1.Clone
 
         Dim maskLite = gray1.Threshold(1, 255, cv.ThresholdTypes.Binary)
         kmeans.src.SetTo(0)
         src.CopyTo(kmeans.src, maskLite)
         kmeansKslider.value = 3
-        kmeans.Run(ocvb)
+        kmeans.Run()
         kmeans.dst1.CopyTo(gray2, maskLite)
 
         Dim centroids As New List(Of cv.Point)
@@ -577,14 +577,14 @@ Public Class kMeans_Basics
     Inherits VBparent
     Public kmeansK As Integer
     Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
 
         ocvb.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
         Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)

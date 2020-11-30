@@ -1,13 +1,13 @@
 Imports cv = OpenCvSharp
 Public Class Bitwise_Not
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Color BitwiseNot"
         label2 = "Gray BitwiseNot"
         ocvb.desc = "Gray and color bitwise_not"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         cv.Cv2.BitwiseNot(src, dst1)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

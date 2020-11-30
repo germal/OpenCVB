@@ -3,13 +3,13 @@ Imports cv = OpenCvSharp
 Public Class Fibonacci_Basics
     Inherits VBparent
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New()
+        initParent()
+        flow = New Font_FlowText()
         ocvb.desc = "Generate the fibonacci sequence using conventional code"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static a As Double = 0, b As Double = 1
         If a = 1134903170 Then
             a = 0
@@ -19,7 +19,7 @@ Public Class Fibonacci_Basics
         a = b
         b = t
         flow.msgs.Add(t.ToString)
-        flow.Run(ocvb)
+        flow.Run()
     End Sub
 End Class
 
@@ -32,9 +32,9 @@ End Class
 Public Class Fibonacci_Yield
     Inherits VBparent
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New()
+        initParent()
+        flow = New Font_FlowText()
         ocvb.desc = "Generate the fibonacci sequence using ienumerable's"
     End Sub
     Private Iterator Function nextFib() As System.Collections.Generic.IEnumerable(Of Double)
@@ -53,10 +53,10 @@ Public Class Fibonacci_Yield
             b = t
         End While
     End Function
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
         flow.msgs.Add(Format(ocvb.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(ocvb.frameCount), "###,##0"))
-        flow.Run(ocvb)
+        flow.Run()
     End Sub
 End Class

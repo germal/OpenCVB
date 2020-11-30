@@ -6,21 +6,21 @@ Public Class SLR_Basics
     Public input As SLR_Data
     Dim slr As New CS_Classes.SLR
     Dim plot As Plot_Basics_CPP
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        plot = New Plot_Basics_CPP(ocvb)
-        input = New SLR_Data(ocvb)
+    Public Sub New()
+        initParent()
+        plot = New Plot_Basics_CPP()
+        input = New SLR_Data()
         If standalone Then
-            input.Run(ocvb)
+            input.Run()
             label1 = "Sample data input"
         End If
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
         sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
         ocvb.desc = "Segmented Linear Regression example"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim resultX As New List(Of Double)
@@ -36,12 +36,12 @@ Public Class SLR_Basics
         If resultX.Count > 0 Then
             plot.srcX = input.dataX.ToArray
             plot.srcY = input.dataY.ToArray
-            plot.Run(ocvb)
+            plot.Run()
             dst1 = plot.dst1.Clone
 
             plot.srcX = resultX.ToArray
             plot.srcY = resultY.ToArray
-            plot.Run(ocvb)
+            plot.Run()
             dst2 = plot.dst1
         Else
             dst1.SetTo(0)
@@ -66,9 +66,9 @@ Public Class SLR_Data
     Dim plot As Plot_Basics_CPP
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        plot = New Plot_Basics_CPP(ocvb)
+    Public Sub New()
+        initParent()
+        plot = New Plot_Basics_CPP()
 
         Dim sr = New StreamReader(ocvb.parms.homeDir + "/Data/real_data.txt")
         Dim code As String = sr.ReadToEnd
@@ -84,11 +84,11 @@ Public Class SLR_Data
         Next
         ocvb.desc = "Plot the data used in SLR_Basics"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
-        plot.Run(ocvb)
+        plot.Run()
         dst1 = plot.dst1
     End Sub
 End Class
@@ -103,21 +103,21 @@ Public Class SLR_Image
     Inherits VBparent
     Dim slr As SLR_Basics
     Dim hist As Histogram_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        hist = New Histogram_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        hist = New Histogram_Basics()
         hist.plotRequested = True
-        slr = New SLR_Basics(ocvb)
+        slr = New SLR_Basics()
         label1 = "Original data"
         ocvb.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.src = src
         hist.plotColors(0) = cv.Scalar.White
-        hist.Run(ocvb)
+        hist.Run()
         dst1 = hist.dst1
         For i = 0 To hist.histRaw(0).Rows - 1
             For j = 0 To 3 - 1
@@ -125,7 +125,7 @@ Public Class SLR_Image
                 slr.input.dataY.Add(hist.histRaw(j).Get(Of Single)(i, 0))
             Next
         Next
-        slr.Run(ocvb)
+        slr.Run()
         dst2 = slr.dst2
     End Sub
 End Class 

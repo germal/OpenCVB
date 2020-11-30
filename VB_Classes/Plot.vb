@@ -6,22 +6,22 @@ Public Class Plot_Basics
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Basics
     Public plotCount As Integer = 3
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        hist = New Histogram_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        hist = New Histogram_Basics()
         hist.plotRequested = True
 
-        plot = New Plot_Basics_CPP(ocvb)
+        plot = New Plot_Basics_CPP()
 
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
         ocvb.desc = "Plot data provided in src Mat"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
         hist.plotColors(0) = cv.Scalar.White
-        hist.Run(ocvb)
+        hist.Run()
         dst1 = hist.dst1
 
         ReDim plot.srcX(hist.histRaw(0).Rows - 1)
@@ -30,7 +30,7 @@ Public Class Plot_Basics
             plot.srcX(i) = i
             plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
         Next
-        plot.Run(ocvb)
+        plot.Run()
         dst2 = plot.dst1
         label1 = hist.label1
     End Sub
@@ -44,11 +44,11 @@ Public Class Plot_Basics_CPP
     Inherits VBparent
     Public srcX() As Double
     Public srcY() As Double
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If standalone Then
@@ -104,19 +104,19 @@ Public Class Plot_OverTime
     Public lastXdelta As New List(Of cv.Scalar)
     Public topBottomPad As Integer
     Dim myStopWatch As Stopwatch
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New()
+        initParent()
+        check.Setup(caller, 1)
         check.Box(0).Text = "Reset the plot scale"
         check.Box(0).Checked = True
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
         sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
         ocvb.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
@@ -205,11 +205,11 @@ Public Class Plot_Histogram
     Public maxRange As integer = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public fixedMaxVal As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -286,20 +286,20 @@ Public Class Plot_Depth
     Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        hist = New Histogram_Depth(ocvb)
+    Public Sub New()
+        initParent()
+        hist = New Histogram_Depth()
         hist.sliders.trackbar(0).Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
         hist.sliders.trackbar(0).Value = 200 ' a lot more bins in a plot than a bar chart.
         hist.inrange.sliders.trackbar(1).Value = 5000 ' up to x meters.
 
-        plot = New Plot_Basics_CPP(ocvb)
+        plot = New Plot_Basics_CPP()
 
         ocvb.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        hist.Run(ocvb)
+        hist.Run()
         Dim inRangeMin = hist.inrange.sliders.trackbar(0).Value
         Dim inRangeMax = hist.inrange.sliders.trackbar(1).Value
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
@@ -308,7 +308,7 @@ Public Class Plot_Depth
             plot.srcX(i) = inRangeMin + i * (inRangeMax - inRangeMin) / plot.srcX.Length
             plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        plot.Run(ocvb)
+        plot.Run()
         dst1 = plot.dst1
 
         label1 = "histogram: " + plot.label1

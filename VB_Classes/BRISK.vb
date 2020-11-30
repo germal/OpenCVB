@@ -3,14 +3,14 @@ Public Class BRISK_Basics
     Inherits VBparent
     Public Brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
         ocvb.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.CopyTo(dst1)
         Dim keyPoints = Brisk.Detect(src)

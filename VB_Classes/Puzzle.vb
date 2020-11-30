@@ -225,28 +225,28 @@ Public Class Puzzle_Basics
     Public restartRequested As Boolean
     Dim gridWidthSlider As System.Windows.Forms.TrackBar
     Dim gridHeightSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = src.Cols / 10
         gridHeightSlider.Value = src.Rows / 8
 
-        grid.Run(ocvb)
+        grid.Run()
         ocvb.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
         Dim r As Random = New Random()
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static width As integer
         Static height As integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or ocvb.frameCount = 0 Or restartRequested Then
             restartRequested = False
-            grid.Run(ocvb)
+            grid.Run()
             width = grid.roiList(0).Width
             height = grid.roiList(0).Height
 
@@ -282,17 +282,17 @@ Public Class Puzzle_Solver
     Public roilist() As cv.Rect
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        puzzle = New Puzzle_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        puzzle = New Puzzle_Basics()
 
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(caller, 3)
         radio.check(0).Text = "256x180 tile - Easy Puzzle"
         radio.check(1).Text = "128x90  tile - Medium Puzzle"
         radio.check(2).Text = "64x90   tile - Hard Puzzle"
         radio.check(0).Checked = True
 
-        check.Setup(ocvb, caller, 3)
+        check.Setup(caller, 3)
         check.Box(0).Text = "Reshuffle pieces"
         check.Box(1).Text = "Show poor correlation coefficients"
         check.Box(2).Text = "Clean display (no grid or correlations)"
@@ -309,7 +309,7 @@ Public Class Puzzle_Solver
         Next
         Return bfit
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveWidth As Integer
         If src.Height = 180 Then ' can't support the smaller tiles are the low resolution.
@@ -370,12 +370,12 @@ Public Class Puzzle_Solver
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             End If
             puzzle.grid.src = src
-            puzzle.grid.Run(ocvb)
+            puzzle.grid.Run()
             xyOffset = puzzle.grid.sliders.trackbar(1).Value * 9 / 10
             yyOffset = puzzle.grid.sliders.trackbar(1).Value / 2
             puzzle.restartRequested = True
             puzzle.src = src
-            puzzle.Run(ocvb)
+            puzzle.Run()
             roilist = puzzle.grid.roiList.ToArray
         End If
 

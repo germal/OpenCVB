@@ -6,13 +6,13 @@ Public Class Motion_Basics
     Dim diff As Diff_Basics
     Dim dilate As DilateErode_Basics
     Dim contours As Contours_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        contours = New Contours_Basics(ocvb)
-        dilate = New DilateErode_Basics(ocvb)
-        diff = New Diff_Basics(ocvb)
-        blur = New Blur_Basics(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        contours = New Contours_Basics()
+        dilate = New DilateErode_Basics()
+        diff = New Diff_Basics()
+        blur = New Blur_Basics()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Frames to persist", 1, 100, 10)
         sliders.setupTrackBar(1, "Minimum size for motion rectangle", 1, 10000, 1000)
         sliders.setupTrackBar(2, "Milliseconds to detect no motion", 1, 1000, 100)
@@ -21,14 +21,14 @@ Public Class Motion_Basics
         iterSlider.Value = 2
         ocvb.desc = "Detect contours in the motion data"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Static rectList As New List(Of cv.Rect)
 
         If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
         blur.src = dst1
-        blur.Run(ocvb)
+        blur.Run()
         dst1 = blur.dst1
 
         Static delayCounter = 0
@@ -46,16 +46,16 @@ Public Class Motion_Basics
         If ocvb.frameCount = 0 Then threshSlider.value = 25
         diff.src = dst1
         diff.lastFrame = firstFrame
-        diff.Run(ocvb)
+        diff.Run()
         dst2 = diff.dst2
 
         dilate.src = dst2
-        dilate.Run(ocvb)
+        dilate.Run()
 
         Static minSlider = findSlider("Minimum size for motion rectangle")
         contours.minArea = minSlider.value
         contours.src = dilate.dst1
-        contours.Run(ocvb)
+        contours.Run()
 
         For Each c In contours.contours
             Dim r = cv.Cv2.BoundingRect(c)
@@ -65,7 +65,7 @@ Public Class Motion_Basics
             End If
         Next
 
-        dst1 = ocvb.color
+        dst1 = ocvb.task.color
         For i = 0 To rectList.Count - 1
             dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
         Next

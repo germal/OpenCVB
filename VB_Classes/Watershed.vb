@@ -5,17 +5,17 @@ Public Class Watershed_Basics
     Dim rects As New List(Of cv.Rect)
     Dim palette As Palette_Basics
     Public UseCorners As Boolean
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        palette = New Palette_Basics(ocvb)
-        weighted = New AddWeighted_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics()
+        weighted = New AddWeighted_Basics()
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
         ocvb.desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.drawRect.Width > 0 And ocvb.drawRect.Height > 0 Then rects.Add(ocvb.drawRect)
+        If ocvb.task.drawRect.Width > 0 And ocvb.task.drawRect.Height > 0 Then rects.Add(ocvb.task.drawRect)
 
         If (standalone Or UseCorners) And ocvb.frameCount = 0 Then
             For i = 0 To 4 - 1
@@ -43,17 +43,17 @@ Public Class Watershed_Basics
 
             markers *= Math.Truncate(255 / rects.Count)
             markers.ConvertTo(palette.src, cv.MatType.CV_8U)
-            palette.Run(ocvb)
+            palette.Run()
             dst2 = palette.dst1
 
             weighted.src1 = src
             weighted.src2 = palette.dst1
-            weighted.Run(ocvb)
+            weighted.Run()
             dst1 = weighted.dst1
         Else
             dst1 = src
         End If
-        ocvb.drawRect = New cv.Rect
+        ocvb.task.drawRect = New cv.Rect
         label1 = "There were " + CStr(rects.Count) + " regions defined as input"
     End Sub
 End Class
@@ -68,22 +68,22 @@ Public Class Watershed_DepthReduction
     Inherits VBparent
     Dim watershed As Watershed_Basics
     Dim reduction As Reduction_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        reduction = New Reduction_Basics(ocvb)
-        watershed = New Watershed_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
+        watershed = New Watershed_Basics()
         watershed.UseCorners = True
         label2 = "Reduction input to WaterShed"
         ocvb.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        reduction.src = ocvb.RGBDepth
-        reduction.Run(ocvb)
+        reduction.src = ocvb.task.RGBDepth
+        reduction.Run()
         dst2 = reduction.dst1
 
         watershed.src = reduction.dst1
-        watershed.Run(ocvb)
+        watershed.Run()
         dst1 = watershed.dst1
         label1 = watershed.label1
     End Sub
@@ -99,16 +99,16 @@ End Class
 Public Class Watershed_DepthAuto
     Inherits VBparent
     Dim watershed As Watershed_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        watershed = New Watershed_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        watershed = New Watershed_Basics()
         watershed.UseCorners = True
         ocvb.desc = "Watershed the four corners of the depth image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        watershed.src = ocvb.RGBDepth
-        watershed.Run(ocvb)
+        watershed.src = ocvb.task.RGBDepth
+        watershed.Run()
         dst1 = watershed.dst1
         label1 = watershed.label1
     End Sub

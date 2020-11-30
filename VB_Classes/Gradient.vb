@@ -6,16 +6,16 @@ Imports System.Runtime.InteropServices
 Public Class Gradient_Basics
     Inherits VBparent
     Public sobel As Edges_Sobel
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sobel = New Edges_Sobel(ocvb)
+    Public Sub New()
+        initParent()
+        sobel = New Edges_Sobel()
         ocvb.desc = "Use phase to compute gradient"
         label2 = "Phase Output"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         sobel.src = src
-        sobel.Run(ocvb)
+        sobel.Run()
         Dim angle = New cv.Mat
         Dim x32f As New cv.Mat
         Dim y32f As New cv.Mat
@@ -34,16 +34,16 @@ End Class
 Public Class Gradient_Depth
     Inherits VBparent
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sobel = New Edges_Sobel(ocvb)
+    Public Sub New()
+        initParent()
+        sobel = New Edges_Sobel()
         ocvb.desc = "Use phase to compute gradient on depth image"
         label2 = "Phase Output"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.drawRect.Width > 0 Then sobel.src = ocvb.RGBDepth(ocvb.drawRect) Else sobel.src = ocvb.RGBDepth.Clone()
-        sobel.Run(ocvb)
+        If ocvb.task.drawRect.Width > 0 Then sobel.src = ocvb.task.RGBDepth(ocvb.task.drawRect) Else sobel.src = ocvb.task.RGBDepth.Clone()
+        sobel.Run()
         Dim angle = New cv.Mat
         Dim x32f As New cv.Mat
         Dim y32f As New cv.Mat
@@ -64,21 +64,21 @@ End Class
 Public Class Gradient_Flatland
     Inherits VBparent
     Dim grade As Gradient_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grade = New Gradient_Basics(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        grade = New Gradient_Basics()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
         ocvb.desc = "Reduced grayscale shows isobars in depth."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
-        dst1 = ocvb.RGBDepth.Clone()
+        dst1 = ocvb.task.RGBDepth.Clone()
         dst1 /= reductionFactor
         dst1 *= reductionFactor
         grade.src = src
-        grade.Run(ocvb)
+        grade.Run()
         dst2 = grade.dst2
     End Sub
 End Class
@@ -95,21 +95,21 @@ Public Class Gradient_CartToPolar
     Public basics As Gradient_Basics
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        basics = New Gradient_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        basics = New Gradient_Basics()
         basics.sobel.sliders.trackbar(0).Value = 1
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
         ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
-        basics.Run(ocvb)
+        basics.Run()
 
         basics.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
         basics.sobel.grayY.ConvertTo(dst2, cv.MatType.CV_32F)
@@ -135,22 +135,22 @@ End Class
 '    Public gradient As Gradient_Basics
 '    Public magnitude As New cv.Mat
 '    Public angle As New cv.Mat
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
-'        gradient = New Gradient_Basics(ocvb)
+'    Public Sub New()
+'        initParent()
+'        gradient = New Gradient_Basics()
 '        gradient.sobel.sliders.trackbar(0).Value = 1
 
-'        sliders.Setup(ocvb, caller)
+'        sliders.Setup(caller)
 '        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
 
 '        label1 = "CartToPolar Magnitude Output Normalized"
 '        label2 = "CartToPolar Angle Output"
 '        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
-'        gradient.Run(ocvb)
+'        gradient.Run()
 
 '        If ocvb.parms.NumPyEnabled Then
 '            gradient.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)

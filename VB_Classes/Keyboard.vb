@@ -5,14 +5,14 @@ Public Class Keyboard_Basics
     Public keyInput As New List(Of String)
     Dim flow As Font_FlowText
     Public checkKeys As New OptionsKeyboardInput
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        checkKeys.Setup(ocvb, caller)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New()
+        initParent()
+        checkKeys.Setup(caller)
+        flow = New Font_FlowText()
         label1 = "Keyboard data will flow to algorithm"
         ocvb.desc = "Test the keyboard interface available to all algorithms"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
@@ -22,7 +22,7 @@ Public Class Keyboard_Basics
                 inputText += keyInput(i).ToString()
             Next
             If inputText <> "" Then flow.msgs.Add(inputText)
-            flow.Run(ocvb)
+            flow.Run()
         End If
     End Sub
 End Class

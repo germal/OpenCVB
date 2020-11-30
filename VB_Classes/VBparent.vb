@@ -40,34 +40,33 @@ Public Class VBparent : Implements IDisposable
     Public caller As String
     Public desc As String
     Dim callStack = ""
-    Public Sub initParent(ocvb As VBocvb)
-        If ocvb.callTrace.Count = 0 Then
+    Public Sub initParent()
+        If ocvb.task.callTrace.Count = 0 Then
             aOptions = New aOptionsFrm
-            aOptions.setup(ocvb)
+            aOptions.setup()
             aOptions.Show()
             aOptions.SendToBack()
 
             standalone = True
-            ocvb.callTrace.Clear()
-            ocvb.callTrace.Add(callStack)
-            ocvb.callObjects.Clear()
+            ocvb.task.callTrace.Clear()
+            ocvb.task.callTrace.Add(callStack)
         Else
             standalone = False
-            If ocvb.callTrace.Contains(callStack) = False Then ocvb.callTrace.Add(callStack)
+            If ocvb.task.callTrace.Contains(callStack) = False Then ocvb.task.callTrace.Add(callStack)
         End If
 
-        src = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(ocvb.color.Size, cv.MatType.CV_8UC3, 0)
+        src = New cv.Mat(ocvb.task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(ocvb.task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(ocvb.task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
-    Public Sub NextFrame(ocvb As VBocvb)
-        If standalone Then src = ocvb.color
+    Public Sub NextFrame()
+        If standalone Then src = ocvb.task.color
         If src.Width <> dst1.Width Or src.Width <> dst2.Width Then
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         End If
-        If ocvb.drawRect.Width <> 0 Then ocvb.drawRect = validateRect(ocvb.drawRect)
-        algorithm.Run(ocvb)
+        If ocvb.task.drawRect.Width <> 0 Then ocvb.task.drawRect = validateRect(ocvb.task.drawRect)
+        algorithm.Run()
         If standalone And src.Width > 0 Then
             If ocvb.intermediateReview <> "" And ocvb.intermediateReview <> caller Then
                 If ocvb.intermediateObject Is Nothing Then
@@ -83,11 +82,11 @@ Public Class VBparent : Implements IDisposable
             End If
             If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
             If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))
-            If ocvb.result.Width <> dst1.Width * 2 Or ocvb.result.Height <> dst1.Height Then
-                ocvb.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
+            If ocvb.task.result.Width <> dst1.Width * 2 Or ocvb.task.result.Height <> dst1.Height Then
+                ocvb.task.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
             End If
-            ocvb.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
-            ocvb.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
+            ocvb.task.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
+            ocvb.task.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
             ocvb.label1 = label1
             ocvb.label2 = label2
             ocvb.frameCount += 1
@@ -99,9 +98,9 @@ Public Class VBparent : Implements IDisposable
     Public Const QUAD2 = 2
     Public Const QUAD3 = 3
 
-    Public Sub setQuadrant(ocvb As VBocvb)
-        If ocvb.mouseClickFlag Then
-            Dim pt = ocvb.mouseClickPoint
+    Public Sub setQuadrant()
+        If ocvb.task.mouseClickFlag Then
+            Dim pt = ocvb.task.mouseClickPoint
             If pt.Y < src.Height / 2 Then
                 If pt.X < src.Width / 2 Then ocvb.quadrantIndex = QUAD0 Else ocvb.quadrantIndex = QUAD1
             Else

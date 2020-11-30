@@ -5,15 +5,15 @@ Imports System.Runtime.InteropServices
 Public Class Pixel_GetSet
     Inherits VBparent
     Dim mats As Mat_4to1
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mats = New Mat_4to1(ocvb)
+    Public Sub New()
+        initParent()
+        mats = New Mat_4to1()
 
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
         label2 = "Click any quadrant at left to view it below"
         ocvb.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim rows = src.Height
         Dim cols = src.Width
@@ -56,9 +56,9 @@ Public Class Pixel_GetSet
 
         ocvb.trueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
-        mats.Run(ocvb)
+        mats.Run()
         dst1 = mats.dst1
-        If ocvb.mouseClickFlag And ocvb.mousePicTag = RESULT1 Then setQuadrant(ocvb)
+        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class

@@ -13,8 +13,8 @@ Public Class MultiDimensionScaling_Cities
         2139, 1858, 949, 1645, 347, 2594, 2571, 0, 678, 2442,     ' San Francisco
         2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle
         543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C.
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Resulting solution using cv.Eigen"
         ocvb.desc = "Use OpenCV's Eigen function to solve a system of equations"
     End Sub
@@ -36,7 +36,7 @@ Public Class MultiDimensionScaling_Cities
     Private Function CenteringMatrix(n As integer) As cv.Mat
         Return cv.Mat.Eye(n, n, cv.MatType.CV_64F) - 1.0 / n
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim size = 10 ' we are working with 10 cities.
         Dim cityMat = New cv.Mat(size, size, cv.MatType.CV_64FC1, CityDistance)

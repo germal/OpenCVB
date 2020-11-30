@@ -3,12 +3,12 @@ Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
 Public Class FLANN_Test
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         label1 = "FLANN Basics"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ' creates data set
         Using features As New cv.Mat(10000, 2, cv.MatType.CV_32FC1)
@@ -48,17 +48,17 @@ Public Class FLANN_Basics
     Inherits VBparent
     Dim random As Random_Points
     Dim qArray() As cv.Point2f
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        random = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        random = New Random_Points()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Query count", 1, 100, 1)
         sliders.setupTrackBar(1, "Match count", 1, 100, 1)
         sliders.setupTrackBar(2, "Search check count", 1, 1000, 1)
         sliders.setupTrackBar(3, "EPS X100", 0, 100, 0)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(caller, 2)
         check.Box(0).Text = "Search params sorted"
         check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
         check.Box(1).Checked = True
@@ -66,10 +66,10 @@ Public Class FLANN_Basics
         ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         label1 = "Red is query, Nearest points blue"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reuseData = check.Box(1).Checked
-        If reuseData = False Or ocvb.frameCount = 0 Then random.Run(ocvb) ' fill result1 with random points in x and y range of the image.
+        If reuseData = False Or ocvb.frameCount = 0 Then random.Run() ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
 
         Dim matchCount = Math.Min(sliders.trackbar(1).Value, random.Points2f.Length - 1)

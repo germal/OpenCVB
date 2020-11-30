@@ -5,7 +5,7 @@ Imports System.IO.Pipes
 Imports System.IO
 
 Module VTK_Common
-    Public Sub vtkInstructions(ocvb As VBocvb)
+    Public Sub vtkInstructions()
         ocvb.trueText("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
                       "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
                       "Step 2) Build VTK for both Debug and Release" + vbCrLf +
@@ -39,13 +39,13 @@ Public Class VTK_Basics
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTK_Data"
     Public vtkPresent As Boolean
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         Dispose() ' make sure there wasn't an old VTKWindow sitting around...
         ocvb.desc = "Create VTK window and update it with images"
     End Sub
-    Private Sub memMapUpdate(ocvb As VBocvb)
+    Private Sub memMapUpdate()
         ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapSysData.Length - 1
             ' only change this if you are changing the data in the VTK C++ code at the same time...
@@ -57,7 +57,7 @@ Public Class VTK_Basics
             memMapValues(i) = memMapUserData(i - memMapSysData.Length)
         Next
     End Sub
-    Private Sub startVTKWindow(ocvb As VBocvb)
+    Private Sub startVTKWindow()
         ' first setup the named pipe that will be used to feed data to the VTK window
         pipeName = "VTKImages" + CStr(vtkTaskIndex)
         vtkTaskIndex += 1
@@ -75,13 +75,13 @@ Public Class VTK_Basics
         memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
         pipe.WaitForConnection()
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If vtkPresent = False Then
-            vtkInstructions(ocvb)
+            vtkInstructions()
             Exit Sub
         End If
-        If ocvb.frameCount = 0 Then startVTKWindow(ocvb)
+        If ocvb.frameCount = 0 Then startVTKWindow()
 
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If ocvb.frameCount <> 0 Then
@@ -93,12 +93,12 @@ Public Class VTK_Basics
 
         If usingDepthAndRGB Then
             rgbInput = src.Clone()
-            dataInput = getDepth32f(ocvb)
+            dataInput = getDepth32f()
         End If
 
         If rgbBuffer.Length <= rgbInput.Total * rgbInput.ElemSize Then MsgBox("Stopping VTK.  rgbInput Buffer > buffer limit.")
         If dataBuffer.Length <= dataInput.Total * dataInput.ElemSize Then MsgBox("Stopping VTK.  Vertices > buffer limit.")
-        memMapUpdate(ocvb)
+        memMapUpdate()
 
         Marshal.Copy(memMapValues, 0, hglobal, memMapValues.Length - 1)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
@@ -128,27 +128,27 @@ Public Class VTK_Histogram3D
     Dim vtk As VTK_Basics
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
         sliders.setupTrackBar(1, "Hist 3D bins", 1, 100, 32)
         sliders.setupTrackBar(2, "Hist 3D bin Threshold X1000000", 10, 100, 20)
 
-        mats = New Mat_4to1(ocvb)
+        mats = New Mat_4to1()
 
         label2 = "Input to VTK plot"
 
-        vtk = New VTK_Basics(ocvb)
+        vtk = New VTK_Basics()
         vtk.usingDepthAndRGB = False
 
-        random = New Random_NormalDist(ocvb)
+        random = New Random_NormalDist()
         ocvb.desc = "Create the test pattern and send it to VTK for 3D display."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If vtk.vtkPresent = False Then
-            vtkInstructions(ocvb)
+            vtkInstructions()
             Exit Sub
         End If
 
@@ -171,18 +171,18 @@ Public Class VTK_Histogram3D
                 randomSlider.Value = Choose(i + 1, 180, 180, 180, 244)
                 randomSlider.Value = sliders.trackbar(0).Value
                 random.src = src
-                random.Run(ocvb)
+                random.Run()
                 mats.mat(i) = random.dst1
             Next
             lastStdev = sliders.trackbar(0).Value
         End If
 
-        mats.Run(ocvb)
+        mats.Run()
 
         vtk.rgbInput = mats.dst1
         vtk.dataInput = New cv.Mat ' ocvb.depth
         vtk.src = src
-        vtk.Run(ocvb)
+        vtk.Run()
     End Sub
 End Class
 

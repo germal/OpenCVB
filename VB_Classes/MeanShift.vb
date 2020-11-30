@@ -6,15 +6,15 @@ Public Class MeanShift_Basics
     Public inputRect As cv.Rect
     Public trackbox As New cv.Rect
     Public usingDrawRect As Boolean
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then usingDrawRect = True
-        If usingDrawRect Then inputRect = ocvb.drawRect
+        If usingDrawRect Then inputRect = ocvb.task.drawRect
         If inputRect.X + inputRect.Width > src.Width Then inputRect.Width = src.Width - inputRect.X
         If inputRect.Y + inputRect.Height > src.Height Then inputRect.Height = src.Height - inputRect.Y
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
@@ -23,11 +23,11 @@ Public Class MeanShift_Basics
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
         Static roi_hist As New cv.Mat
         If inputRect.Width > 0 And inputRect.Height > 0 Then
-            If usingDrawRect Then trackbox = ocvb.drawRect Else trackbox = inputRect
+            If usingDrawRect Then trackbox = ocvb.task.drawRect Else trackbox = inputRect
             Dim maskROI = hsv(inputRect).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
             cv.Cv2.CalcHist(New cv.Mat() {hsv(inputRect)}, ch, maskROI, roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
-            If usingDrawRect Then ocvb.drawRectClear = True
+            If usingDrawRect Then ocvb.task.drawRectClear = True
         End If
         If trackbox.Width <> 0 Then
             Dim backProj As New cv.Mat
@@ -50,32 +50,32 @@ Public Class MeanShift_Depth
     Inherits VBparent
     Dim ms As MeanShift_Basics
     Dim blob As Depth_Foreground
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        ms = New MeanShift_Basics(ocvb)
-        blob = New Depth_Foreground(ocvb)
+    Public Sub New()
+        initParent()
+        ms = New MeanShift_Basics()
+        blob = New Depth_Foreground()
         label1 = "Draw anywhere to start mean shift tracking."
         ocvb.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.drawRect.Width > 0 Then
+        If ocvb.task.drawRect.Width > 0 Then
             ms.usingDrawRect = True
             ms.inputRect = New cv.Rect
         End If
         If ms.usingDrawRect Then
             ms.src = src
-            ms.Run(ocvb)
+            ms.Run()
             dst1 = ms.dst1
             dst2 = ms.dst2
         Else
-            blob.Run(ocvb)
+            blob.Run()
             dst1 = blob.dst1
 
             If blob.trustworthy Then
                 ms.src = src
                 ms.inputRect = blob.trustedRect
-                ms.Run(ocvb)
+                ms.Run()
                 dst2 = ms.dst2
                 dst1 = ms.dst1
             Else
@@ -90,15 +90,15 @@ End Class
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Public Class MeanShift_PyrFilter
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
         ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim spatialRadius = sliders.trackbar(0).Value
         Dim colorRadius = sliders.trackbar(1).Value
@@ -118,25 +118,25 @@ Public Class Meanshift_TopObjects
     Dim cams(4 - 1) As MeanShift_Basics
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        mats1 = New Mat_4to1(ocvb)
+    Public Sub New()
+        initParent()
+        mats1 = New Mat_4to1()
 
-        mats2 = New Mat_4to1(ocvb)
+        mats2 = New Mat_4to1()
 
-        blob = New Blob_DepthClusters(ocvb)
-        sliders.Setup(ocvb, caller)
+        blob = New Blob_DepthClusters()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
         For i = 0 To cams.Length - 1
-            cams(i) = New MeanShift_Basics(ocvb)
+            cams(i) = New MeanShift_Basics()
             cams(i).rectangleEdgeWidth = 8
         Next
         ocvb.desc = "Track - tracking algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         blob.src = src
-        blob.Run(ocvb)
+        blob.Run()
 
         Dim updateFrequency = sliders.trackbar(0).Value
         Dim trackBoxes As New List(Of cv.Rect)
@@ -148,15 +148,15 @@ Public Class Meanshift_TopObjects
                 End If
 
                 cams(i).src = src
-                cams(i).Run(ocvb)
+                cams(i).Run()
                 mats1.mat(i) = cams(i).dst1.Clone()
                 mats2.mat(i) = cams(i).dst2.Clone()
                 trackBoxes.Add(cams(i).trackbox)
             End If
         Next
-        mats1.Run(ocvb)
+        mats1.Run()
         dst1 = mats1.dst1
-        mats2.Run(ocvb)
+        mats2.Run()
         dst2 = mats2.dst1
     End Sub
 End Class

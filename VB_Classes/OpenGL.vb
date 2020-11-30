@@ -34,12 +34,12 @@ Public Class OpenGL_Basics
     Public pointCloudInput As New cv.Mat
     Dim openGLHeight = 1200
     Dim openGLWidth = 1500
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        pointCloudInput = ocvb.pointCloud
+    Public Sub New()
+        initParent()
+        pointCloudInput = ocvb.task.pointCloud
         ocvb.desc = "Create an OpenGL window and update it with images"
     End Sub
-    Private Sub memMapUpdate(ocvb As VBocvb)
+    Private Sub memMapUpdate()
         Dim timeConversionUnits As Double = 1000
         Dim imuAlphaFactor As Double = 0.98 ' theta is a mix of acceleration data and gyro data.
         If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.D435i Then
@@ -51,14 +51,14 @@ Public Class OpenGL_Basics
             memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
                                      ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, src.Width, src.Height, src.ElemSize * src.Total,
                                      dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
-                                     ocvb.IMU_AngularVelocity.X, ocvb.IMU_AngularVelocity.Y, ocvb.IMU_AngularVelocity.Z,
-                                     ocvb.IMU_Acceleration.X, ocvb.IMU_Acceleration.Y, ocvb.IMU_Acceleration.Z, ocvb.IMU_TimeStamp,
+                                     ocvb.task.IMU_AngularVelocity.X, ocvb.task.IMU_AngularVelocity.Y, ocvb.task.IMU_AngularVelocity.Z,
+                                     ocvb.task.IMU_Acceleration.X, ocvb.task.IMU_Acceleration.Y, ocvb.task.IMU_Acceleration.Z, ocvb.task.IMU_TimeStamp,
                                      1, eye.Item0 / 100, eye.Item1 / 100, eye.Item2 / 100, zTrans,
                                      scaleXYZ.Item0 / 10, scaleXYZ.Item1 / 10, scaleXYZ.Item2 / 10, timeConversionUnits, imuAlphaFactor,
                                      imageLabel.Length, pointCloudInput.Width, pointCloudInput.Height, textureInput.Total * textureInput.ElemSize)
         Next
     End Sub
-    Private Sub startOpenGLWindow(ocvb As VBocvb)
+    Private Sub startOpenGLWindow()
         ' first setup the named pipe that will be used to feed data to the OpenGL window
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         PipeTaskIndex += 1
@@ -78,15 +78,15 @@ Public Class OpenGL_Basics
         imageLabel = OpenGLTitle ' default title - can be overridden with each image.
         pipe.WaitForConnection()
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             src = src
-            pointCloudInput = ocvb.pointCloud
+            pointCloudInput = ocvb.task.pointCloud
         End If
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
-        If ocvb.frameCount = 0 Then startOpenGLWindow(ocvb)
+        If ocvb.frameCount = 0 Then startOpenGLWindow()
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If ocvb.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
@@ -99,7 +99,7 @@ Public Class OpenGL_Basics
         If textureInput.Width Then ReDim textureBuffer(textureInput.Total * textureInput.ElemSize - 1)
         If pointCloudInput.Width Then ReDim pointCloudBuffer(pointCloudInput.Total * pointCloudInput.ElemSize - 1)
 
-        memMapUpdate(ocvb)
+        memMapUpdate()
 
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
@@ -131,8 +131,8 @@ End Class
 
 
 Module OpenGL_Sliders_Module
-    Public Sub setOpenGLsliders(ocvb As VBocvb, caller As String, sliders As OptionsSliders)
-        sliders.Setup(ocvb, caller, 15)
+    Public Sub setOpenGLsliders(caller As String, sliders As OptionsSliders)
+        sliders.Setup(caller, 15)
 
         sliders.setupTrackBar(0, "OpenGL FOV", 1, 180, 150)
         If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then sliders.trackbar(0).Value = 135
@@ -161,15 +161,15 @@ End Module
 Public Class OpenGL_Options
     Inherits VBparent
     Public OpenGL As OpenGL_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        OpenGL = New OpenGL_Basics(ocvb)
-        setOpenGLsliders(ocvb, caller, sliders)
+    Public Sub New()
+        initParent()
+        OpenGL = New OpenGL_Basics()
+        setOpenGLsliders(caller, sliders)
         ocvb.desc = "Adjust point size and FOV in OpenGL"
         label1 = ""
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         OpenGL.FOV = sliders.trackbar(0).Value
         OpenGL.yaw = sliders.trackbar(1).Value
@@ -190,8 +190,8 @@ Public Class OpenGL_Options
         OpenGL.scaleXYZ.Item2 = sliders.trackbar(13).Value
 
         OpenGL.src = src
-        OpenGL.pointCloudInput = ocvb.pointCloud
-        OpenGL.Run(ocvb)
+        OpenGL.pointCloudInput = ocvb.task.pointCloud
+        OpenGL.Run()
     End Sub
 End Class
 
@@ -201,17 +201,17 @@ End Class
 Public Class OpenGL_Callbacks
     Inherits VBparent
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        ogl = New OpenGL_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ogl.src = src
-        ogl.pointCloudInput = ocvb.pointCloud
-        ogl.Run(ocvb)
+        ogl.pointCloudInput = ocvb.task.pointCloud
+        ogl.Run()
     End Sub
 End Class
 
@@ -224,23 +224,23 @@ Public Class OpenGL_IMU
     Public ogl As OpenGL_Options
     Public imu As IMU_GVector
 
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        imu = New IMU_GVector(ocvb)
+    Public Sub New()
+        initParent()
+        imu = New IMU_GVector()
 
-        ogl = New OpenGL_Options(ocvb)
+        ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.trackbar(1).Value = 0 ' pitch
         ogl.sliders.trackbar(2).Value = 0 ' yaw
         ogl.sliders.trackbar(3).Value = 0 ' roll
         ocvb.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        imu.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        imu.Run()
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
         ogl.src = src
-        ogl.Run(ocvb) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
+        ogl.Run() ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
     End Sub
 End Class
 
@@ -255,28 +255,28 @@ Public Class OpenGL_3Ddata
     Dim colors As Palette_Gradient
     Public ogl As OpenGL_Options
     Dim histInput() As Byte
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
 
-        ogl = New OpenGL_Options(ocvb)
+        ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
         ogl.sliders.trackbar(1).Value = -10
         ogl.sliders.trackbar(6).Value = 5
         ogl.sliders.trackbar(2).Value = 10
 
-        colors = New Palette_Gradient(ocvb)
+        colors = New Palette_Gradient()
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
-        colors.Run(ocvb)
+        colors.Run()
         ogl.OpenGL.src = dst1.Clone() ' only need to set this once.
 
         label1 = "Input to Histogram 3D"
         ocvb.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim bins = sliders.trackbar(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
@@ -292,7 +292,7 @@ Public Class OpenGL_3Ddata
 
         ogl.OpenGL.dataInput = histogram.Clone()
         ogl.src = src
-        ogl.Run(ocvb)
+        ogl.Run()
     End Sub
 End Class
 
@@ -303,30 +303,30 @@ Public Class OpenGL_Draw3D
     Inherits VBparent
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        circle = New Draw_Circles(ocvb)
+    Public Sub New()
+        initParent()
+        circle = New Draw_Circles()
         circle.sliders.trackbar(0).Value = 5
 
-        ogl = New OpenGL_Options(ocvb)
+        ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"
         ogl.sliders.trackbar(0).Value = 80
         ogl.sliders.trackbar(8).Value = -140
         ogl.sliders.trackbar(9).Value = -180
         ogl.sliders.trackbar(6).Value = 16
         ogl.sliders.trackbar(10).Value = -30
-        ocvb.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
+        ocvb.task.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
         ocvb.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        circle.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        circle.Run()
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
         ogl.OpenGL.src = New cv.Mat(1, ocvb.vecColors.Length - 1, cv.MatType.CV_8UC3, ocvb.vecColors.ToArray)
         ogl.src = src
-        ogl.Run(ocvb)
+        ogl.Run()
     End Sub
 End Class
 
@@ -338,18 +338,18 @@ Public Class OpenGL_Voxels
     Inherits VBparent
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        voxels = New Voxels_Basics_MT(ocvb)
+    Public Sub New()
+        initParent()
+        voxels = New Voxels_Basics_MT()
 
-        ogl = New OpenGL_Basics(ocvb)
+        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Voxels"
         ocvb.desc = "Show the voxel representation in OpenGL"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         voxels.src = src
-        voxels.Run(ocvb)
+        voxels.Run()
         Static intermediateResults = findCheckBox("Display intermediate results")
         If intermediateResults.checked Then
             dst1 = voxels.dst1
@@ -358,7 +358,7 @@ Public Class OpenGL_Voxels
 
         ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_32F, voxels.voxels)
         ogl.src = src
-        ogl.Run(ocvb)
+        ogl.Run()
     End Sub
 End Class
 
@@ -373,24 +373,24 @@ Public Class OpenGL_GravityTransform
     Inherits VBparent
     Public ogl As OpenGL_Basics
     Public gCloud As Depth_PointCloud_IMU
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        gCloud = New Depth_PointCloud_IMU(ocvb)
+        gCloud = New Depth_PointCloud_IMU()
 
-        ogl = New OpenGL_Basics(ocvb)
+        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
         ocvb.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.src = ocvb.pointCloud
-        gCloud.Run(ocvb)
+        gCloud.src = ocvb.task.pointCloud
+        gCloud.Run()
 
         ogl.pointCloudInput = gCloud.imuPointCloud
         ogl.src = src
-        ogl.Run(ocvb)
+        ogl.Run()
     End Sub
 End Class
 
@@ -403,22 +403,22 @@ Public Class OpenGL_Reduced
     Inherits VBparent
     Dim reduction As Reduction_PointCloud
     Public ogl As OpenGL_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        reduction = New Reduction_PointCloud(ocvb)
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_PointCloud()
 
-        ogl = New OpenGL_Basics(ocvb)
+        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         ocvb.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        reduction.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        reduction.Run()
         dst1 = reduction.dst1
 
-        ogl.pointCloudInput = ocvb.pointCloud
+        ogl.pointCloudInput = ocvb.task.pointCloud
         ogl.src = src
-        ogl.Run(ocvb)
+        ogl.Run()
     End Sub
 End Class
 
@@ -432,24 +432,24 @@ Public Class OpenGL_Floor
     Inherits VBparent
     Dim plane As StructuredDepth_LinearizeFloor
     Dim ogl As OpenGL_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        ogl = New OpenGL_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
-        plane = New StructuredDepth_LinearizeFloor(ocvb)
+        plane = New StructuredDepth_LinearizeFloor()
         ocvb.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        plane.Run(ocvb)
+        plane.Run()
         dst1 = plane.dst1
         dst2 = plane.dst2
 
         ogl.pointCloudInput = plane.imuPointCloud
         ogl.src = src
-        ogl.Run(ocvb)
+        ogl.Run()
     End Sub
 End Class
 
@@ -464,21 +464,21 @@ Public Class OpenGL_FloorPlane
     Inherits VBparent
     Public ogl As OpenGL_Basics
     Public plane As StructuredDepth_LinearizeFloor
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        ogl = New OpenGL_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_FloorPlane"
-        plane = New StructuredDepth_LinearizeFloor(ocvb)
+        plane = New StructuredDepth_LinearizeFloor()
         ocvb.desc = "Show the floor in the pointcloud as a plane"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        plane.Run(ocvb)
+        plane.Run()
         dst1 = plane.dst1
         dst2 = plane.dst2
 
-        Dim floorColor = ocvb.color.Mean(plane.maskPlane)
+        Dim floorColor = ocvb.task.color.Mean(plane.maskPlane)
         Dim data As New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         data.Set(Of Single)(0, 0, floorColor.Item(0))
         data.Set(Of Single)(1, 0, floorColor.Item(0))
@@ -487,7 +487,7 @@ Public Class OpenGL_FloorPlane
         ogl.dataInput = data
         ogl.pointCloudInput = plane.imuPointCloud
         ogl.src = src
-        ogl.Run(ocvb)
+        ogl.Run()
     End Sub
 End Class
 
@@ -504,21 +504,21 @@ Public Class OpenGL_FloorTexture
     Inherits VBparent
     Dim floor As OpenGL_FloorPlane
     Dim shuffle As Texture_Shuffle
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        shuffle = New Texture_Shuffle(ocvb)
-        floor = New OpenGL_FloorPlane(ocvb)
+    Public Sub New()
+        initParent()
+        shuffle = New Texture_Shuffle()
+        floor = New OpenGL_FloorPlane()
         ocvb.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        floor.plane.Run(ocvb)
+        floor.plane.Run()
         dst1 = floor.plane.dst1
         dst2 = floor.plane.dst2
 
         shuffle.src = floor.plane.maskPlane
-        shuffle.Run(ocvb)
+        shuffle.Run()
         floor.ogl.textureInput = shuffle.rgbaTexture
 
 
@@ -531,6 +531,6 @@ Public Class OpenGL_FloorTexture
         floor.ogl.pointCloudInput = floor.plane.imuPointCloud
         floor.ogl.pointCloudInput.SetTo(0, floor.plane.maskPlane)
         floor.ogl.src = src
-        floor.ogl.Run(ocvb)
+        floor.ogl.Run()
     End Sub
 End Class

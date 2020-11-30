@@ -21,16 +21,16 @@ Public Class Salience_Basics_CPP
     Dim grayData(0) As Byte
     Dim numScales As integer
     Dim salience As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         sliders = New OptionsSliders
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
 
         salience = Salience_Open()
         ocvb.desc = "Show results of Salience algorithm when using C++"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Total <> grayData.Length Then ReDim grayData(src.Total - 1)
@@ -51,14 +51,14 @@ End Class
 Public Class Salience_Basics_MT
     Inherits VBparent
     Dim salience As Salience_Basics_CPP
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        salience = New Salience_Basics_CPP(ocvb)
+    Public Sub New()
+        initParent()
+        salience = New Salience_Basics_CPP()
         salience.sliders.trackbar(1).Value = 2
 
         ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numScales = salience.sliders.trackbar(0).Value

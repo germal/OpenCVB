@@ -4,34 +4,34 @@ Public Class Featureless_Basics
     Public edges As Edges_Basics
     Public grid As Thread_Grid
     Public flood As FloodFill_8bit
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        edges = New Edges_Basics(ocvb)
+        edges = New Edges_Basics()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 10
         gridHeightSlider.Value = gridWidthSlider.Value
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
         sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
         sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, ocvb.resfactor * 500)
 
-        flood = New FloodFill_8bit(ocvb)
+        flood = New FloodFill_8bit()
 
         label1 = "Featureless regions with mask in depth color"
         ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+        grid.Run()
 
         edges.src = src
-        edges.Run(ocvb)
+        edges.Run()
 
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
@@ -47,7 +47,7 @@ Public Class Featureless_Basics
         End Sub)
 
         flood.src = mask
-        flood.Run(ocvb)
+        flood.Run()
         dst1 = flood.dst1
 
         label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count)
@@ -61,18 +61,18 @@ End Class
 Public Class Featureless_DCT_MT
     Inherits VBparent
     Dim dct As DCT_FeatureLess
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        dct = New DCT_FeatureLess(ocvb)
+    Public Sub New()
+        initParent()
+        dct = New DCT_FeatureLess()
 
         label2 = "Largest FeatureLess Region"
         ocvb.desc = "Use DCT to find featureless regions."
     End Sub
 
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dct.src = src
-        dct.Run(ocvb)
+        dct.Run()
         dst1 = dct.dst1
         dst2 = dct.dst2
 
@@ -113,19 +113,19 @@ End Class
 Public Class FeatureLess_Prediction
     Inherits VBparent
     Dim fLess As Featureless_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
 
-        fLess = New Featureless_Basics(ocvb)
+        fLess = New Featureless_Basics()
 
         ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fLess.src = src
-        fLess.Run(ocvb)
+        fLess.Run()
         dst1 = fLess.dst1
         dst2 = fLess.dst2
         Dim labels = fLess.dst2.Clone()
@@ -133,7 +133,7 @@ Public Class FeatureLess_Prediction
         Dim percent = Math.Sqrt(sliders.trackbar(0).Value / 100)
         Dim newSize = New cv.Size(src.Width * percent, src.Height * percent)
 
-        Dim rgb = src.Clone(), depth32f = getDepth32f(ocvb).Resize(newSize), mask = fLess.dst2
+        Dim rgb = src.Clone(), depth32f = getDepth32f().Resize(newSize), mask = fLess.dst2
 
         rgb = rgb.Resize(newSize)
 
@@ -163,7 +163,7 @@ Public Class FeatureLess_Prediction
         Dim learnInput As New cv.Mat
         Dim planes() = rgb32f.Split()
         ReDim Preserve planes(3)
-        planes(3) = getDepth32f(ocvb).Resize(newSize)
+        planes(3) = getDepth32f().Resize(newSize)
         cv.Cv2.Merge(planes, learnInput)
 
         Dim rtree = cv.ML.RTrees.Create()
@@ -199,24 +199,24 @@ Public Class FeatureLess_PointTracker
     Inherits VBparent
     Public fLess As Featureless_Basics
     Public pTrack As KNN_PointTracker
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        pTrack = New KNN_PointTracker(ocvb)
-        fLess = New Featureless_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        pTrack = New KNN_PointTracker()
+        fLess = New Featureless_Basics()
         label1 = "After point tracker"
         label2 = "Before point tracker"
         ocvb.desc = "Track the featureless regions with point tracker"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fLess.src = src
-        fLess.Run(ocvb)
+        fLess.Run()
         dst2 = fLess.dst1
 
         pTrack.queryPoints = fLess.flood.basics.centroids
         pTrack.queryRects = fLess.flood.basics.rects
         pTrack.queryMasks = fLess.flood.basics.masks
-        pTrack.Run(ocvb)
+        pTrack.Run()
         dst1 = pTrack.dst1
     End Sub
 End Class
@@ -231,22 +231,22 @@ Public Class FeatureLess_Highlights
     Inherits VBparent
     Public fLessP As FeatureLess_PointTracker
     Public addW As AddWeighted_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fLessP = New FeatureLess_PointTracker(ocvb)
+    Public Sub New()
+        initParent()
+        fLessP = New FeatureLess_PointTracker()
         hideForm("Palette_BuildGradientColorMap Slider Options")
         hideForm("Palette_Basics Radio Options")
-        addW = New AddWeighted_Basics(ocvb)
+        addW = New AddWeighted_Basics()
         ocvb.desc = "Highlight the featureless region in an RGB image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fLessP.src = src
-        fLessP.Run(ocvb)
+        fLessP.Run()
 
         addW.src1 = src
         addW.src2 = fLessP.dst1
-        addW.Run(ocvb)
+        addW.Run()
         dst1 = addW.dst1
     End Sub
 End Class

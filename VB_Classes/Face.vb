@@ -14,15 +14,15 @@ Public Class Face_Haar_LBP
     Inherits VBparent
     Dim haarCascade As cv.CascadeClassifier
     Dim lbpCascade As cv.CascadeClassifier
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         haarCascade = New cv.CascadeClassifier(ocvb.parms.homeDir + "Data/haarcascade_frontalface_default.xml")
         lbpCascade = New cv.CascadeClassifier(ocvb.parms.homeDir + "Data/lbpcascade_frontalface.xml")
         ocvb.desc = "Detect faces in the video stream."
         label1 = "Faces detected with Haar"
         label2 = "Faces detected with LBP"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
@@ -36,13 +36,13 @@ End Class
 Public Class Face_Haar_Alt
     Inherits VBparent
     Dim haarCascade As cv.CascadeClassifier
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         haarCascade = New cv.CascadeClassifier(ocvb.parms.homeDir + "Data/haarcascade_frontalface_alt.xml")
         ocvb.desc = "Detect faces Haar_alt database."
         label1 = "Faces detected with Haar_Alt"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)

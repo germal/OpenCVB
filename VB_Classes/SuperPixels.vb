@@ -25,9 +25,9 @@ Public Class SuperPixel_Basics_CPP
     Dim spPtr As IntPtr = 0
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Number of SuperPixels", 1, 1000, 400)
         sliders.setupTrackBar(1, "Iterations", 0, 10, 4)
         sliders.setupTrackBar(2, "Prior", 1, 10, 2)
@@ -35,7 +35,7 @@ Public Class SuperPixel_Basics_CPP
         label2 = "Superpixel label data (0-255)"
         ocvb.desc = "Sub-divide the image into super pixels."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static numSuperPixels As integer
         Static numIterations As integer
@@ -81,25 +81,25 @@ Public Class SuperPixel_BinarizedImage
     Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Dim binarize As Binarize_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        binarize = New Binarize_Basics(ocvb)
+        binarize = New Binarize_Basics()
 
-        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels = New SuperPixel_Basics_CPP()
         pixels.gridColor = cv.Scalar.Red
         Static pixelCountSlider = findSlider("Number of SuperPixels")
         pixelCountSlider.value = 20 ' find the top 20 super pixels.
 
         ocvb.desc = "Create SuperPixels from a binary image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         binarize.src = src
-        binarize.Run(ocvb)
+        binarize.Run()
 
         pixels.src = binarize.dst1
-        pixels.Run(ocvb)
+        pixels.Run()
         dst1 = pixels.dst1
         dst2 = pixels.dst2
         dst2.SetTo(cv.Scalar.White, pixels.wireGrid)
@@ -114,16 +114,16 @@ End Class
 Public Class SuperPixel_Depth
     Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        pixels = New SuperPixel_Basics_CPP(ocvb)
+    Public Sub New()
+        initParent()
+        pixels = New SuperPixel_Basics_CPP()
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        pixels.src = ocvb.RGBDepth.Clone()
-        pixels.Run(ocvb)
+        pixels.src = ocvb.task.RGBDepth.Clone()
+        pixels.Run()
         dst1 = pixels.dst1
         dst2 = pixels.dst2
     End Sub
@@ -138,21 +138,21 @@ Public Class SuperPixel_WithCanny
     Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        edges = New Edges_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        edges = New Edges_Basics()
 
-        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels = New SuperPixel_Basics_CPP()
 
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        edges.src = ocvb.color.Clone()
-        edges.Run(ocvb)
-        pixels.src = ocvb.color.Clone()
+        edges.src = ocvb.task.color.Clone()
+        edges.Run()
+        pixels.src = ocvb.task.color.Clone()
         pixels.src.SetTo(cv.Scalar.White, edges.dst1)
-        pixels.Run(ocvb)
+        pixels.Run()
         dst1 = pixels.dst1
         dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.SetTo(cv.Scalar.Red, edges.dst1)
@@ -169,22 +169,22 @@ Public Class SuperPixel_WithLineDetector
     Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As LineDetector_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        lines = New LineDetector_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        lines = New LineDetector_Basics()
 
-        pixels = New SuperPixel_Basics_CPP(ocvb)
+        pixels = New SuperPixel_Basics_CPP()
 
         label2 = "Input to superpixel basics."
         ocvb.desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         lines.src = src
-        lines.Run(ocvb)
+        lines.Run()
         dst2 = lines.dst1
         pixels.src = dst2
-        pixels.Run(ocvb)
+        pixels.Run()
         dst1 = pixels.dst1
     End Sub
 End Class

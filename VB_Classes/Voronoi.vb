@@ -7,15 +7,15 @@ Public Class Voronoi_Basics
     Public vDemo As New CS_Classes.VoronoiDemo
     Public random As Random_Points
     Public inputPoints As List(Of cv.Point)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        random = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        random = New Random_Points()
         Dim countSlider = findSlider("Random Pixel Count")
         countSlider.Maximum = 100
         label1 = "Ordered list output for Voronoi algorithm"
         ocvb.desc = "Use the ordered list method to find the Voronoi segments"
     End Sub
-    Public Sub vDisplay(ocvb As VBocvb, ByRef dst As cv.Mat, points As List(Of cv.Point))
+    Public Sub vDisplay( ByRef dst As cv.Mat, points As List(Of cv.Point))
         dst = dst.Normalize(255).ConvertScaleAbs(255)
         dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -23,14 +23,14 @@ Public Class Voronoi_Basics
             dst.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        random.Run(ocvb)
+        random.Run()
         inputPoints = New List(Of cv.Point)(random.Points)
 
         vDemo.Run(dst1, inputPoints)
-        vDisplay(ocvb, dst1, inputPoints)
+        vDisplay(dst1, inputPoints)
     End Sub
 End Class
 
@@ -44,25 +44,25 @@ Public Class Voronoi_Compare
     Inherits VBparent
     Dim basics As Voronoi_Basics
     Public random As Random_Points
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        basics = New Voronoi_Basics(ocvb)
-        random = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        basics = New Voronoi_Basics()
+        random = New Random_Points()
 
         label1 = "Brute Force method"
         label2 = "Ordered List method"
         ocvb.desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        random.Run(ocvb)
+        random.Run()
         Dim points = New List(Of cv.Point)(random.Points)
         basics.vDemo.Run(dst1, points, True)
-        basics.vDisplay(ocvb, dst1, points)
+        basics.vDisplay(dst1, points)
 
         basics.vDemo.Run(dst2, points, False)
-        basics.vDisplay(ocvb, dst2, points)
+        basics.vDisplay(dst2, points)
     End Sub
 End Class
 
@@ -95,17 +95,17 @@ Public Class Voronoi_CPP
     Inherits VBparent
     Dim vPtr As IntPtr
     Dim vDemo As Voronoi_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        vDemo = New Voronoi_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        vDemo = New Voronoi_Basics()
         vPtr = VoronoiDemo_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         ocvb.desc = "Use the C++ version of the Voronoi code"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim countSlider = findSlider("Random Pixel Count")
-        vDemo.random.Run(ocvb)
+        vDemo.random.Run()
         Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)
         Dim imagePtr = VoronoiDemo_Run(vPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst1.Width, dst1.Height)
         handleSrc.Free()
@@ -116,7 +116,7 @@ Public Class Voronoi_CPP
             dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32F, dstData)
 
             Dim inputPoints = New List(Of cv.Point)(vDemo.random.Points)
-            vDemo.vDisplay(ocvb, dst1, inputPoints)
+            vDemo.vDisplay(dst1, inputPoints)
         End If
     End Sub
     Public Sub Close()

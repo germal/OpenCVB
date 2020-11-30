@@ -3,11 +3,11 @@ Imports cv = OpenCvSharp
 Public Class BlockMatching_Basics
     Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        colorizer = New Depth_Colorizer_CPP(ocvb)
+    Public Sub New()
+        initParent()
+        colorizer = New Depth_Colorizer_CPP()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)
         sliders.setupTrackBar(1, "Blockmatch block size", 5, 255, 15)
         sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
@@ -15,7 +15,7 @@ Public Class BlockMatching_Basics
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             ocvb.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
@@ -28,8 +28,8 @@ Public Class BlockMatching_Basics
         Static blockMatch = cv.StereoBM.Create()
         blockMatch.BlockSize = blockSize
         blockMatch.MinDisparity = 0
-        blockMatch.ROI1 = New cv.Rect(0, 0, ocvb.leftView.Width, ocvb.leftView.Height)
-        blockMatch.ROI2 = New cv.Rect(0, 0, ocvb.leftView.Width, ocvb.leftView.Height)
+        blockMatch.ROI1 = New cv.Rect(0, 0, ocvb.task.leftView.Width, ocvb.task.leftView.Height)
+        blockMatch.ROI2 = New cv.Rect(0, 0, ocvb.task.leftView.Width, ocvb.task.leftView.Height)
         blockMatch.PreFilterCap = 31
         blockMatch.NumDisparities = numDisparity
         blockMatch.TextureThreshold = 10
@@ -39,7 +39,7 @@ Public Class BlockMatching_Basics
         blockMatch.Disp12MaxDiff = 1
 
         Dim disparity As New cv.Mat
-        blockMatch.compute(ocvb.leftView, ocvb.rightView, disparity)
+        blockMatch.compute(ocvb.task.leftView, ocvb.task.rightView, disparity)
         disparity.ConvertTo(colorizer.src, cv.MatType.CV_32F, 1 / 16)
         colorizer.src = colorizer.src.Threshold(0, 0, cv.ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8
@@ -48,9 +48,9 @@ Public Class BlockMatching_Basics
         Dim distance = sliders.trackbar(2).Value * 1000
         cv.Cv2.Divide(distance, colorizer.src(rect), colorizer.src(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
         colorizer.src(rect) = colorizer.src(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
-        colorizer.Run(ocvb)
+        colorizer.Run()
         dst1(rect) = colorizer.dst1(rect)
-        dst2 = ocvb.rightView.Resize(src.Size())
+        dst2 = ocvb.task.rightView.Resize(src.Size())
     End Sub
 End Class
 

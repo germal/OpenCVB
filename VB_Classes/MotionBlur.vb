@@ -3,14 +3,14 @@ Public Class MotionBlur_Basics
     Inherits VBparent
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
         sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
         ocvb.desc = "Use Filter2D to create a motion blur"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         if standalone Then
             If sliders.trackbar(1).Value < sliders.trackbar(1).Maximum Then
@@ -115,15 +115,15 @@ Public Class MotionBlur_Deblur
         planes = complexIH.Split()
         Return planes(0)
     End Function
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New()
+        initParent()
+        check.Setup(caller, 1)
         check.Box(0).Text = "Redo motion blurred image"
         check.Box(0).Checked = True
 
-        mblur = New MotionBlur_Basics(ocvb)
+        mblur = New MotionBlur_Basics()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Deblur Restore Vector", 1, mblur.sliders.trackbar(0).Maximum, 10)
         sliders.setupTrackBar(1, "Deblur Angle of Restore Vector", mblur.sliders.trackbar(1).Minimum, mblur.sliders.trackbar(1).Maximum, 0)
         sliders.setupTrackBar(2, "Deblur Signal to Noise Ratio", 1, 1000, 700)
@@ -133,17 +133,17 @@ Public Class MotionBlur_Deblur
         label1 = "Blurred Image Input"
         label2 = "Deblurred Image Output"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         mblur.src = src
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             mblur.sliders.trackbar(0).Value = msRNG.Next(mblur.sliders.trackbar(0).Minimum, mblur.sliders.trackbar(0).Maximum)
             mblur.sliders.trackbar(1).Value = msRNG.Next(mblur.sliders.trackbar(1).Minimum, mblur.sliders.trackbar(1).Maximum)
-            mblur.Run(ocvb)
+            mblur.Run()
             mblur.showDirection = False
         Else
-            mblur.Run(ocvb) ' the motion blurred image is in result1
+            mblur.Run() ' the motion blurred image is in result1
         End If
         dst1 = mblur.dst1
 

@@ -8,9 +8,9 @@ Public Class Random_Points
     Public rangeRect As cv.Rect
     Public plotPoints As Boolean = False
     Dim countSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Random Pixel Count", 1, src.Cols * src.Rows, 20)
 
         countSlider = findSlider("Random Pixel Count")
@@ -21,7 +21,7 @@ Public Class Random_Points
         rangeRect = New cv.Rect(0, 0, src.Cols, src.Rows)
         ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If Points.Length <> countSlider.Value Then
             ReDim Points(countSlider.Value - 1)
@@ -44,11 +44,11 @@ End Class
 Public Class Random_Shuffle
     Inherits VBparent
     Dim myRNG As New cv.RNG
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Use randomShuffle to reorder an image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.CopyTo(dst1)
         cv.Cv2.RandShuffle(dst1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
@@ -62,22 +62,22 @@ Public Class Random_LUTMask
     Inherits VBparent
     Dim random As Random_Points
     Dim km As kMeans_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        km = New kMeans_Basics(ocvb)
-        random = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        km = New kMeans_Basics()
+        random = New Random_Points()
         ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static lutMat As cv.Mat
         If lutMat Is Nothing Or ocvb.frameCount Mod 10 = 0 Then
-            random.Run(ocvb)
+            random.Run()
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
             km.src = src
-            km.Run(ocvb)
+            km.Run()
             dst1 = km.dst1
             For i = 0 To random.Points.Length - 1
                 Dim x = random.Points(i).X
@@ -96,11 +96,11 @@ End Class
 
 Public Class Random_UniformDist
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Create a uniform distribution."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(dst1, 0, 255)
@@ -111,16 +111,16 @@ End Class
 
 Public Class Random_NormalDist
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 25)
         sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
         sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
         ocvb.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
     End Sub
@@ -132,23 +132,23 @@ Public Class Random_CheckUniformSmoothed
     Inherits VBparent
     Dim histogram As Histogram_KalmanSmoothed
     Dim rUniform As Random_UniformDist
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        histogram = New Histogram_KalmanSmoothed(ocvb)
+    Public Sub New()
+        initParent()
+        histogram = New Histogram_KalmanSmoothed()
         histogram.sliders.trackbar(0).Value = 255
 
-        rUniform = New Random_UniformDist(ocvb)
+        rUniform = New Random_UniformDist()
 
         ocvb.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         rUniform.src = src
-        rUniform.Run(ocvb)
+        rUniform.Run()
         dst1 = rUniform.dst1
         histogram.src = dst1
         histogram.plotHist.maxRange = 255
-        histogram.Run(ocvb)
+        histogram.Run()
         dst2 = histogram.dst1
     End Sub
 End Class
@@ -162,23 +162,23 @@ Public Class Random_CheckUniformDist
     Inherits VBparent
     Dim histogram As Histogram_Basics
     Dim rUniform As Random_UniformDist
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        histogram = New Histogram_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        histogram = New Histogram_Basics()
         histogram.sliders.trackbar(0).Value = 255
 
-        rUniform = New Random_UniformDist(ocvb)
+        rUniform = New Random_UniformDist()
 
         ocvb.desc = "Display the histogram for a uniform distribution."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         rUniform.src = src
-        rUniform.Run(ocvb)
+        rUniform.Run()
         dst1 = rUniform.dst1
         histogram.src = dst1
         histogram.plotRequested = True
-        histogram.Run(ocvb)
+        histogram.Run()
         dst2 = histogram.dst1
     End Sub
 End Class
@@ -192,21 +192,21 @@ Public Class Random_CheckNormalDist
     Inherits VBparent
     Dim histogram As Histogram_Basics
     Dim normalDist As Random_NormalDist
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        histogram = New Histogram_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        histogram = New Histogram_Basics()
         histogram.sliders.trackbar(0).Value = 255
-        normalDist = New Random_NormalDist(ocvb)
+        normalDist = New Random_NormalDist()
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         normalDist.src = src
-        normalDist.Run(ocvb)
+        normalDist.Run()
         dst1 = normalDist.dst1
         histogram.src = dst1
         histogram.plotRequested = True
-        histogram.Run(ocvb)
+        histogram.Run()
         dst2 = histogram.dst1
     End Sub
 End Class
@@ -219,21 +219,21 @@ Public Class Random_CheckNormalDistSmoothed
     Inherits VBparent
     Dim histogram As Histogram_KalmanSmoothed
     Dim normalDist As Random_NormalDist
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        histogram = New Histogram_KalmanSmoothed(ocvb)
+    Public Sub New()
+        initParent()
+        histogram = New Histogram_KalmanSmoothed()
         histogram.sliders.trackbar(0).Value = 255
         histogram.plotHist.minRange = 1
-        normalDist = New Random_NormalDist(ocvb)
+        normalDist = New Random_NormalDist()
         ocvb.desc = "Display the histogram for a Normal distribution."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         normalDist.src = src
-        normalDist.Run(ocvb)
+        normalDist.Run()
         dst1 = normalDist.dst1
         histogram.src = dst1
-        histogram.Run(ocvb)
+        histogram.Run()
         dst2 = histogram.dst1
     End Sub
 End Class
@@ -274,12 +274,12 @@ End Module
 Public Class Random_PatternGenerator_CPP
     Inherits VBparent
     Dim Random_PatternGenerator As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         Random_PatternGenerator = Random_PatternGenerator_Open()
         ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
@@ -309,16 +309,16 @@ Public Class Random_CustomDistribution
     Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cv.Mat
     Public plotHist As Plot_Histogram
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
         inputCDF = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
 
-        If standalone Then plotHist = New Plot_Histogram(ocvb)
+        If standalone Then plotHist = New Plot_Histogram()
 
         ocvb.desc = "Create a custom random number distribution from any histogram"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
         If Not (lastValue > 0.99 And lastValue <= 1.0) Then ' convert the input histogram to a cdf.
@@ -342,7 +342,7 @@ Public Class Random_CustomDistribution
 
         If standalone Then
             plotHist.hist = outputHistogram
-            plotHist.Run(ocvb)
+            plotHist.Run()
             dst1 = plotHist.dst1
         End If
     End Sub
@@ -358,16 +358,16 @@ Public Class Random_MonteCarlo
     Inherits VBparent
     Public plotHist As Plot_Histogram
     Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        plotHist = New Plot_Histogram(ocvb)
+    Public Sub New()
+        initParent()
+        plotHist = New Plot_Histogram()
         plotHist.fixedMaxVal = 100
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
         ocvb.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim dimension = sliders.trackbar(0).Value
         Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
@@ -386,7 +386,7 @@ Public Class Random_MonteCarlo
 
         If standalone Then
             plotHist.hist = histogram
-            plotHist.Run(ocvb)
+            plotHist.Run()
             dst1 = plotHist.dst1
         End If
     End Sub
@@ -402,13 +402,13 @@ Public Class Random_CustomHistogram
     Public random As Random_CustomDistribution
     Public hist As Histogram_Simple
     Public saveHist As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        random = New Random_CustomDistribution(ocvb)
+        random = New Random_CustomDistribution()
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
-        hist = New Histogram_Simple(ocvb)
+        hist = New Histogram_Simple()
         hist.sliders.trackbar(0).Value = 255
 
         label1 = "Histogram of the grayscale image"
@@ -416,7 +416,7 @@ Public Class Random_CustomHistogram
 
         ocvb.desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -425,18 +425,18 @@ Public Class Random_CustomHistogram
             saveBins = hist.sliders.trackbar(0).Value
             hist.src = src
             hist.plotHist.fixedMaxVal = 0 ' we are sharing the plothist with the code below...
-            hist.Run(ocvb)
+            hist.Run()
             dst1 = hist.dst1.Clone()
             saveHist = hist.plotHist.hist.Clone()
         End If
 
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
-        random.Run(ocvb)
+        random.Run()
 
         If standalone Then
             hist.plotHist.fixedMaxVal = 100
             hist.plotHist.hist = random.outputHistogram
-            hist.plotHist.Run(ocvb)
+            hist.plotHist.Run()
             dst2 = hist.plotHist.dst1
         End If
     End Sub

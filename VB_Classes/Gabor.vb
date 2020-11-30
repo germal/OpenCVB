@@ -11,10 +11,10 @@ Public Class Gabor_Basics
     Public lambda As Double
     Public gamma As Double
     Public phaseOffset As Double
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        sliders.Setup(ocvb, caller, 6)
+        sliders.Setup(caller, 6)
         sliders.setupTrackBar(0, "Gabor Kernel Size", 0, 50, 15)
         sliders.setupTrackBar(1, "Gabor Sigma", 0, 100, 4)
         sliders.setupTrackBar(2, "Gabor Theta (degrees)", 0, 180, 90)
@@ -24,7 +24,7 @@ Public Class Gabor_Basics
 
         ocvb.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             ksize = sliders.trackbar(0).Value * 2 + 1
@@ -49,26 +49,26 @@ Public Class Gabor_Basics_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Dim gabor(31) As Gabor_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         label2 = "The 32 kernels used"
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = src.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         gridHeightSlider.Value = src.Height / 4
 
-        grid.Run(ocvb) ' we only run this one time!  It needs to be 32 Gabor filters only.
+        grid.Run() ' we only run this one time!  It needs to be 32 Gabor filters only.
 
         For i = 0 To gabor.Length - 1
-            gabor(i) = New Gabor_Basics(ocvb)
+            gabor(i) = New Gabor_Basics()
             gabor(i).sliders.trackbar(2).Value = i * 180 / gabor.Length
         Next
 
         gabor(0).sliders.Visible = True
         ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         For i = 0 To gabor.Count - 1
             gabor(i).ksize = gabor(0).sliders.trackbar(0).Value * 2 + 1
@@ -85,7 +85,7 @@ Public Class Gabor_Basics_MT
         Sub(i)
             Dim roi = grid.roiList(i)
             gabor(i).src = src
-            gabor(i).Run(ocvb)
+            gabor(i).Run()
             SyncLock accum
                 cv.Cv2.Max(accum, gabor(i).dst1, accum)
                 dst32f(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))

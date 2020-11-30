@@ -4,15 +4,15 @@ Imports OpenCvSharp.XFeatures2D
 Public Class FREAK_Basics
     Inherits VBparent
     Dim orb As ORB_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        orb = New ORB_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        orb = New ORB_Basics()
         ocvb.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         orb.src = src
-        orb.Run(ocvb)
+        orb.Run()
 
         Dim freak = cv.XFeatures2D.FREAK.Create()
         Dim fdesc = New cv.Mat

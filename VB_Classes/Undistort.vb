@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Module undistort_Mats
-    Public Sub undistortSetup(ocvb As VBocvb, ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
+    Public Sub undistortSetup( ByRef kMatLeft As cv.Mat, ByRef dMatLeft As cv.Mat, ByRef rMatLeft As cv.Mat, ByRef pMatLeft As cv.Mat,
                        maxDisp As integer, stereo_height_px As integer, intrinsics As ActiveTask.intrinsics_VB)
         Dim kLeft(8) As Double
         Dim rLeft(8) As Double
@@ -64,28 +64,28 @@ Public Class Undistort_Basics
     Dim maxDisp As integer
     Dim stereo_cx As integer
     Dim stereo_cy As integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
 
         sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
         sliders.setupTrackBar(2, "undistort stereo height", 1, src.Rows, src.Rows)
         sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(caller, 1)
         check.Box(0).Text = "Restore Original matrices"
         check.Box(0).Checked = True
 
         label1 = "Left Image with sliders applied"
         ocvb.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat
         Static kMat As cv.Mat, dMat As cv.Mat
-        Dim rawWidth = ocvb.leftView.Width
-        Dim rawHeight = ocvb.leftView.Height
+        Dim rawWidth = ocvb.task.leftView.Width
+        Dim rawHeight = ocvb.task.leftView.Height
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
 
@@ -94,7 +94,7 @@ Public Class Undistort_Basics
 
             maxDisp = sliders.trackbar(3).Value
             Dim stereo_height_px = sliders.trackbar(2).Value
-            undistortSetup(ocvb, kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
+            undistortSetup(kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
 
             ' the intrinsic coeff's on the Intel RS2 series are always zero.  Here we just make up some numbers so we can show the impact.
             If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then
@@ -125,7 +125,7 @@ Public Class Undistort_Basics
 
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMatLeft, pMatLeft, New cv.Size(rawWidth, rawHeight),
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
-        dst1 = ocvb.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
+        dst1 = ocvb.task.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
         dst2 = src.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
     End Sub
 End Class

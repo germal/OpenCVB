@@ -9,12 +9,12 @@ Imports System.IO
 Public Class ParticleFilter_Example
     Inherits VBparent
     Dim pfPtr As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         pfPtr = ParticleFilterTest_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         ocvb.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static imageFrame = 12
         imageFrame += 1

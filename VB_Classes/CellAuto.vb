@@ -5,8 +5,8 @@ Public Class CellAuto_Basics
     Public i18 As New List(Of String)
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         i18.Add("00011110 Rule 30 (chaotic)")
         i18.Add("00110110 Rule 54")
         i18.Add("00111100 Rule 60")
@@ -28,9 +28,9 @@ Public Class CellAuto_Basics
         i18.Add("11111010 Rule 250")
 
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
-        combo.Setup(ocvb, caller, label + vbCrLf + "output below:", i18)
+        combo.Setup(caller, label + vbCrLf + "output below:", i18)
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(caller, 1)
         check.Box(0).Text = "Rotate through the different rules"
         check.Box(0).Checked = True
 
@@ -58,7 +58,7 @@ Public Class CellAuto_Basics
         Next
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             src = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
@@ -110,23 +110,23 @@ Public Class CellAuto_Life
         End If
         Return CountNeighbors
     End Function
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         grid = New cv.Mat(src.Height / factor, src.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
-        random = New Random_Points(ocvb)
+        random = New Random_Points()
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         ocvb.desc = "Use OpenCV to implement the Game of Life"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static savePointCount As Integer
         Static randomSlider = findSlider("Random Pixel Count")
         If randomSlider.Value <> savePointCount Or generation = 0 Then
-            random.Run(ocvb)
+            random.Run()
             generation = 0
             savePointCount = randomSlider.Value
             For i = 0 To random.Points.Count - 1
@@ -186,18 +186,18 @@ End Class
 Public Class CellAuto_LifeColor
     Inherits VBparent
     Dim game As CellAuto_Life
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        game = New CellAuto_Life(ocvb)
+    Public Sub New()
+        initParent()
+        game = New CellAuto_Life()
         game.backColor = cv.Scalar.White
         game.nodeColor = cv.Scalar.Black
 
         label1 = "Births are blue, deaths are red"
         ocvb.desc = "Game of Life but with color added"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        game.Run(ocvb)
+        game.Run()
         dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst1.Clone
 
@@ -223,24 +223,24 @@ Public Class CellAuto_LifePopulation
     Inherits VBparent
     Dim plot As Plot_OverTime
     Dim game As CellAuto_Life
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        game = New CellAuto_Life(ocvb)
+    Public Sub New()
+        initParent()
+        game = New CellAuto_Life()
 
-        plot = New Plot_OverTime(ocvb)
+        plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 2000
         plot.plotCount = 1
 
         ocvb.desc = "Show Game of Life display with plot of population"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        game.Run(ocvb)
+        game.Run()
         dst1 = game.dst1
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
-        plot.Run(ocvb)
+        plot.Run()
         dst2 = plot.dst1
     End Sub
 End Class
@@ -256,15 +256,15 @@ Public Class CellAuto_Basics_MP
     Dim cell As CellAuto_Basics
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        cell = New CellAuto_Basics(ocvb)
+        cell = New CellAuto_Basics()
         i18 = cell.i18
 
         ocvb.desc = "Multi-threaded version of CellAuto_Basics"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
@@ -299,12 +299,12 @@ End Class
 Public Class CellAuto_All256
     Inherits VBparent
     Dim cell As CellAuto_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        cell = New CellAuto_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        cell = New CellAuto_Basics()
         cell.combo.Visible = False ' won't need this...
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
         ocvb.desc = "Run through all 256 combinations of outcomes"
     End Sub
@@ -316,7 +316,7 @@ Public Class CellAuto_All256
         Next
         Return outstr
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
@@ -348,22 +348,22 @@ End Class
 Public Class CellAuto_MultiPoint
     Inherits VBparent
     Dim cell As CellAuto_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        cell = New CellAuto_Basics(ocvb)
+        cell = New CellAuto_Basics()
         cell.combo.Box.SelectedIndex = 4 ' this one is nice...
         cell.check.Box(0).Checked = False ' just the one pattern.
         ocvb.desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
         Static pt1 = 0
         Static pt2 = cell.src.Width / 2
         cell.src.Set(0, pt1, 1)
         cell.src.Set(0, pt2, 1)
-        cell.Run(ocvb)
+        cell.Run()
 
         dst1 = cell.dst1
         pt1 += 1

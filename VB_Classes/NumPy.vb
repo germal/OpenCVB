@@ -9,11 +9,11 @@
 '' https://github.com/SciSharp/Numpy.NET
 'Public Class NumPy_FFT
 '    Inherits VBparent
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
+'    Public Sub New()
+'        initParent()
 '        ocvb.desc = "Test Numpy interface for FFT"
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            Dim test = np.random.randn(64, 1000)
@@ -37,11 +37,11 @@
 'Public Class NumPy_EmbeddedTest_CS
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_EmbeddedTest
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
+'    Public Sub New()
+'        initParent()
 '        ocvb.desc = "Run an embedded Python script"
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            embed.Run()
@@ -61,11 +61,11 @@
 'Public Class NumPy_EmbeddedMat_CS
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_EmbeddedMat
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
+'    Public Sub New()
+'        initParent()
 '        ocvb.desc = "Run an embedded Python script to display an image"
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            'Dim cmd = "import ctypes # An included library with Python install." + vbCrLf + "import sys" + vbCrLf + "def Mbox(title, text, style):" + vbCrLf + vbTab +
@@ -88,11 +88,11 @@
 'Public Class NumPy_CmdLine
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_Cmds
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
+'    Public Sub New()
+'        initParent()
 '        ocvb.desc = "Run an embedded Python string of commands"
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            embed.Run()
@@ -112,11 +112,11 @@
 'Public Class NumPy_EmbeddedCmd
 '    Inherits VBparent
 '    Dim embed = New CS_Classes.NumPy_EmbeddedCmd
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
+'    Public Sub New()
+'        initParent()
 '        ocvb.desc = "Install a package on the embedded Python with Pip"
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            embed.Run("from code import InteractiveConsole" + vbCrLf + "class Console(InteractiveConsole):" + vbCrLf + vbTab +

@@ -62,7 +62,7 @@ Module UI_GeneratorMain
                                     If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
                                     If LCase(line2) = "inherits vbparent" Then className = split(2) ' public class <classname>
                                 End If
-                                If LCase(line).StartsWith("public sub new(ocvb as vbocvb") Then
+                                If LCase(line).StartsWith("public sub new(") Then
                                     sortedNames.Add(className, sIndex)
                                     sIndex += 1
                                 End If
@@ -100,7 +100,7 @@ Module UI_GeneratorMain
         sw.WriteLine("end module")
         sw.WriteLine("Public Class algorithmList")
 
-        sw.WriteLine("Public Function createAlgorithm(ocvb As VBocvb, algorithmName as string) As Object")
+        sw.WriteLine("Public Function createAlgorithm( algorithmName as string) As Object")
         sw.WriteLine(vbTab + "redim callerSliderCounts(" + CStr(cleanNames.Count - 1) + ")")
         sw.WriteLine(vbTab + "redim callerCheckboxCounts(" + CStr(cleanNames.Count - 1) + ")")
         sw.WriteLine(vbTab + "redim callerRadioCounts(" + CStr(cleanNames.Count - 1) + ")")
@@ -110,9 +110,9 @@ Module UI_GeneratorMain
             sw.WriteLine(vbTab + "case """ + UCase(nextName) + """")
             If nextName.EndsWith(".py") Then
                 sw.WriteLine(vbTab + vbTab + "ocvb.PythonFileName = """ + pythonAppDir.FullName + nextName + """")
-                sw.WriteLine(vbTab + vbTab + "return new Python_Run(ocvb)")
+                sw.WriteLine(vbTab + vbTab + "return new Python_Run()")
             Else
-                sw.WriteLine(vbTab + vbTab + "return new " + nextName + "(ocvb)")
+                sw.WriteLine(vbTab + vbTab + "return new " + nextName + "()")
             End If
         Next
         sw.WriteLine("End Select")

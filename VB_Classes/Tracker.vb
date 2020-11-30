@@ -5,13 +5,13 @@ Public Class Tracker_Basics
     Public bbox As cv.Rect2d
     Public boxObject() As cv.Rect2d
     Public trackerIndex As integer = 5 ' trackerMIL by default...
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New()
+        initParent()
+        check.Setup(caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
         ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.trueText("Draw a rectangle around object to be tracked.", 10, 140)
         If check.Box(0).Checked Then
@@ -19,11 +19,11 @@ Public Class Tracker_Basics
             If tracker IsNot Nothing Then tracker.Dispose()
             tracker = Nothing
         End If
-        If ocvb.drawRect.Width <> 0 Then
+        If ocvb.task.drawRect.Width <> 0 Then
             tracker = cv.Tracking.MultiTracker.Create()
-            Dim r = ocvb.drawRect
+            Dim r = ocvb.task.drawRect
             bbox = New cv.Rect2d(r.X, r.Y, r.Width, r.Height) ' silly that this isn't the same as rect.
-            ocvb.drawRectClear = True
+            ocvb.task.drawRectClear = True
             Select Case trackerIndex
                 Case 0
                     tracker.Add(cv.Tracking.TrackerBoosting.Create(), src, bbox)
@@ -62,17 +62,17 @@ End Class
 Public Class Tracker_MultiObject
     Inherits VBparent
     Dim trackers As New List(Of Tracker_Basics)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Track any number of objects simultaneously - tracker algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.drawRect.Width <> 0 Then
-            Dim tr = New Tracker_Basics(ocvb)
+        If ocvb.task.drawRect.Width <> 0 Then
+            Dim tr = New Tracker_Basics()
             tr.src = src
-            tr.Run(ocvb)
-            ocvb.drawRect = New cv.Rect
+            tr.Run()
+            ocvb.task.drawRect = New cv.Rect
             trackers.Add(tr)
         End If
         dst1 = src.Clone()
@@ -80,7 +80,7 @@ Public Class Tracker_MultiObject
             Dim closeIt As Boolean
             If tr.check.Box(0).Checked Then closeIt = True
             tr.src = src
-            tr.Run(ocvb)
+            tr.Run()
             If closeIt Then tr.check.Dispose()
             If tr.tracker IsNot Nothing Then
                 Dim p1 = New cv.Point(tr.boxObject(0).X, tr.boxObject(0).Y)
@@ -99,11 +99,11 @@ End Class
 Public Class Tracker_Methods
     Inherits VBparent
     Dim tracker As Tracker_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        tracker = New Tracker_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        tracker = New Tracker_Basics()
 
-        radio.Setup(ocvb, caller, 8)
+        radio.Setup(caller, 8)
         radio.check(0).Text = "TrackerBoosting"
         radio.check(1).Text = "TrackerCSRT"
         radio.check(2).Text = "TrackerGOTURN - disabled (not working)"
@@ -117,7 +117,7 @@ Public Class Tracker_Methods
 
         ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveMethod As Integer
 
@@ -133,7 +133,7 @@ Public Class Tracker_Methods
             tracker.check.Box(0).Checked = True
         Else
             tracker.src = src
-            tracker.Run(ocvb)
+            tracker.Run()
             dst1 = tracker.dst1
         End If
         saveMethod = tracker.trackerIndex

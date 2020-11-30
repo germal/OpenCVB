@@ -5,22 +5,22 @@ Public Class Clone_Basics
     Public colorChangeValues As cv.Vec3f
     Public illuminationChangeValues As cv.Vec2f
     Public textureFlatteningValues As cv.Vec2f
-    Public cloneSpec As integer ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public cloneSpec As Integer ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
+    Public Sub New()
+        initParent()
 
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
         ocvb.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-        ocvb.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
+        ocvb.task.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-        If ocvb.drawRect = New cv.Rect Then
+        If ocvb.task.drawRect = New cv.Rect Then
             mask.SetTo(255)
         Else
-            cv.Cv2.Rectangle(mask, ocvb.drawRect, cv.Scalar.White, -1)
+            cv.Cv2.Rectangle(mask, ocvb.task.drawRect, cv.Scalar.White, -1)
         End If
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -42,11 +42,11 @@ End Class
 Public Class Clone_ColorChange
     Inherits VBparent
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        clone = New Clone_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        clone = New Clone_Basics()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Color Change - Red", 5, 25, 15)
         sliders.setupTrackBar(1, "Color Change - Green", 5, 25, 5)
         sliders.setupTrackBar(2, "Color Change - Blue", 5, 25, 5)
@@ -55,11 +55,11 @@ Public Class Clone_ColorChange
         label2 = "Mask used for clone"
         ocvb.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
-        clone.Run(ocvb)
+        clone.Run()
         dst1 = clone.dst1
         dst2 = clone.dst2
     End Sub
@@ -71,11 +71,11 @@ End Class
 Public Class Clone_IlluminationChange
     Inherits VBparent
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        clone = New Clone_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        clone = New Clone_Basics()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
         sliders.setupTrackBar(1, "Beta", 0, 20, 2)
 
@@ -83,11 +83,11 @@ Public Class Clone_IlluminationChange
         label2 = "Mask used for clone"
         ocvb.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
-        clone.Run(ocvb)
+        clone.Run()
         dst1 = clone.dst1
         dst2 = clone.dst2
     End Sub
@@ -100,11 +100,11 @@ End Class
 Public Class Clone_TextureFlattening
     Inherits VBparent
     Dim clone As Clone_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        clone = New Clone_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        clone = New Clone_Basics()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)
         sliders.setupTrackBar(1, "High Threshold", 0, 100, 50)
 
@@ -112,11 +112,11 @@ Public Class Clone_TextureFlattening
         label2 = "mask used for clone"
         ocvb.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
-        clone.Run(ocvb)
+        clone.Run()
         dst1 = clone.dst1
         dst2 = clone.dst2
     End Sub
@@ -137,9 +137,9 @@ Public Class Clone_Eagle
     Dim srcROI As cv.Rect
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 3)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 3)
         radio.check(0).Text = "Seamless - Mixed Clone"
         radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
         radio.check(2).Text = "Seamless - Normal Clone"
@@ -162,11 +162,11 @@ Public Class Clone_Eagle
         label2 = "Source image and source mask."
         ocvb.desc = "Clone an eagle into the video stream."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.Clone()
-        If ocvb.mouseClickFlag Then
-            pt = ocvb.mouseClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
+        If ocvb.task.mouseClickFlag Then
+            pt = ocvb.task.mouseClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
             If pt.X + srcROI.Width / 2 >= src.Width Then pt.X = src.Width - srcROI.Width / 2
             If pt.X - srcROI.Width / 2 < 0 Then pt.X = srcROI.Width / 2
             If pt.Y + srcROI.Height >= src.Height Then pt.Y = src.Height - srcROI.Height / 2
@@ -191,9 +191,9 @@ End Class
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
 Public Class Clone_Seamless
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 3)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 3)
         radio.check(0).Text = "Seamless Normal Clone"
         radio.check(1).Text = "Seamless Mono Clone"
         radio.check(2).Text = "Seamless Mixed Clone"
@@ -202,15 +202,15 @@ Public Class Clone_Seamless
         label2 = "Mask for Clone"
         ocvb.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
-        If ocvb.drawRect = New cv.Rect Then
+        If ocvb.task.drawRect = New cv.Rect Then
             dst2.SetTo(0)
             dst2.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
         Else
-            cv.Cv2.Rectangle(dst2, ocvb.drawRect, cv.Scalar.White, -1)
+            cv.Cv2.Rectangle(dst2, ocvb.task.drawRect, cv.Scalar.White, -1)
         End If
 
         Dim style = cv.SeamlessCloneMethods.NormalClone
@@ -222,7 +222,7 @@ Public Class Clone_Seamless
             End If
         Next
         dst1 = src.Clone()
-        cv.Cv2.SeamlessClone(ocvb.RGBDepth, src, dst2, center, dst1, style)
+        cv.Cv2.SeamlessClone(ocvb.task.RGBDepth, src, dst2, center, dst1, style)
         dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

@@ -25,12 +25,12 @@ Module Plane_Exports
         Return New cv.Point3f(product.X / magnitude, product.Y / magnitude, product.Z / magnitude)
     End Function
 
-    Public Function getWorldCoordinates(ocvb As VBocvb, p As cv.Point3f) As cv.Point3f
+    Public Function getWorldCoordinates( p As cv.Point3f) As cv.Point3f
         Dim x = (p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx
         Dim y = (p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
-    Public Function getWorldCoordinatesD6(ocvb As VBocvb, p As cv.Point3f) As cv.Vec6f
+    Public Function getWorldCoordinatesD6( p As cv.Point3f) As cv.Vec6f
         Dim x = CSng((p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx)
         Dim y = CSng((p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
@@ -95,9 +95,9 @@ End Module
 Public Class Plane_Detect
     Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
@@ -106,13 +106,13 @@ Public Class Plane_Detect
         ocvb.desc = "Identify planes in each segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = getDepth32f(ocvb)
-        grid.Run(ocvb)
+        Dim depth32f = getDepth32f()
+        grid.Run()
 
         dst2.SetTo(0)
-        ocvb.RGBDepth.CopyTo(dst1)
+        ocvb.task.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -145,8 +145,8 @@ Public Class Plane_Detect
             For j = 0 To lastj * stepj Step stepj
                 Dim p1 = contours(maxIndex)(j)
                 Dim p2 = contours(maxIndex)(k + stepj)
-                worldDepth.Add(getWorldCoordinates(ocvb, New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
-                worldDepth.Add(getWorldCoordinates(ocvb, New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
+                worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
+                worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
                 dst1(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
             Next
 
@@ -169,9 +169,9 @@ End Class
 Public Class Plane_DetectDebug
     Inherits VBparent
     Dim grid As Thread_Grid
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 32
@@ -180,13 +180,13 @@ Public Class Plane_DetectDebug
         ocvb.desc = "Debug code to identify planes in just one segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = getDepth32f(ocvb)
-        grid.Run(ocvb)
+        Dim depth32f = getDepth32f()
+        grid.Run()
 
         dst2.SetTo(0)
-        ocvb.RGBDepth.CopyTo(dst1)
+        ocvb.task.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -219,8 +219,8 @@ Public Class Plane_DetectDebug
             For j = 0 To lastj * stepj Step stepj
                 Dim p1 = contours(maxIndex)(j)
                 Dim p2 = contours(maxIndex)(k + stepj)
-                worldDepth.Add(getWorldCoordinates(ocvb, New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
-                worldDepth.Add(getWorldCoordinates(ocvb, New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
+                worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
+                worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
                 dst1(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
             Next
 

@@ -9,11 +9,11 @@ Imports cv = OpenCvSharp
 
 'Public Class Emgu_Basics
 '    Inherits ocvbClass
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
+'    Public Sub New()
+'        initParent()
 '        ocvb.desc = "Test a sample EMGU usage."
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 '		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        Dim data(src.Rows * src.Cols * src.ElemSize) As Byte
 '        If ocvb.parms.testAllRunning  Then
@@ -32,11 +32,11 @@ Imports cv = OpenCvSharp
 
 'Public Class Emgu_Facedetection
 '    Inherits ocvbClass
-'    Public Sub New(ocvb As VBocvb)
-'        initParent(ocvb)
+'    Public Sub New()
+'        initParent()
 '        ocvb.desc = "Use the simplest possible face detector in Emgu examples."
 '    End Sub
-'    Public Sub Run(ocvb As VBocvb)
+'    Public Sub Run()
 '		 If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.testAllRunning  Then
 '            ocvb.trueText("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +

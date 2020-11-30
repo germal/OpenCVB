@@ -5,13 +5,13 @@ Imports System.Windows.Forms
 
 Public Class xPhoto_Bm3dDenoise
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Denoise image with block matching and filtering."
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(src, src)
@@ -30,14 +30,14 @@ End Class
 
 Public Class xPhoto_Bm3dDenoiseDepthImage
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Denoise the depth image with block matching and filtering."
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = ocvb.task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
         cv.Cv2.Subtract(dst1, gray, dst2)
@@ -70,13 +70,13 @@ End Module
 Public Class xPhoto_OilPaint_CPP
     Inherits VBparent
     Dim xPhoto_OilPaint As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
         sliders.setupTrackBar(1, "xPhoto Block Size", 1, 100, 3)
 
-        radio.Setup(ocvb, caller, 5)
+        radio.Setup(caller, 5)
         radio.check(0).Text = "BGR2GRAY"
         radio.check(1).Text = "BGR2HSV"
         radio.check(2).Text = "BGR2YUV  "
@@ -88,7 +88,7 @@ Public Class xPhoto_OilPaint_CPP
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim colorCode As integer = cv.ColorConversionCodes.BGR2GRAY
         Static frm = findForm("xPhoto_OilPaint_CPP Radio Options")

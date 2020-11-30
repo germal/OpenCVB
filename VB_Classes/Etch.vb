@@ -7,27 +7,27 @@ Public Class Etch_ASketch
     Dim black As New cv.Vec3b(0, 0, 0)
     Dim cursor As cv.Point
     Dim ms_rng As New System.Random
-    Private Function randomCursor(ocvb As VBocvb)
+    Private Function randomCursor()
         Return New cv.Point(ms_rng.Next(0, src.Width), ms_rng.Next(0, src.Height))
     End Function
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(caller, 2)
         check.Box(0).Text = "Etch_ASketch clean slate"
         check.Box(1).Text = "Demo mode"
         check.Box(1).Checked = True
         If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
 
-        keys = New Keyboard_Basics(ocvb)
+        keys = New Keyboard_Basics()
 
-        cursor = randomCursor(ocvb)
+        cursor = randomCursor()
         dst1.SetTo(slateColor)
         ocvb.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        keys.Run(ocvb)
+        keys.Run()
         Dim Input = New List(Of String)(keys.keyInput)
 
         If check.Box(1).Checked Then
@@ -42,7 +42,7 @@ Public Class Etch_ASketch
         End If
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
-            cursor = randomCursor(ocvb)
+            cursor = randomCursor()
             dst1.SetTo(slateColor)
         End If
 
@@ -65,7 +65,7 @@ Public Class Etch_ASketch
         Next
         If check.Box(1).Checked Then
             Static lastCursor = cursor
-            If lastCursor = cursor And ocvb.frameCount <> 0 Then cursor = randomCursor(ocvb)
+            If lastCursor = cursor And ocvb.frameCount <> 0 Then cursor = randomCursor()
             lastCursor = cursor
         End If
     End Sub

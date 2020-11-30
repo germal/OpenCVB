@@ -6,26 +6,26 @@ Public Class OilPaint_Pointilism
     Inherits VBparent
     Dim randomMask As cv.Mat
     Dim myRNG As New cv.RNG
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
         sliders.setupTrackBar(1, "Smoothing Radius", 0, 100, 32)
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(caller, 2)
         radio.check(0).Text = "Use Elliptical stroke"
         radio.check(1).Text = "Use Circular stroke"
         radio.check(1).Checked = True
 
-        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        ocvb.task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
         ocvb.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src
-        Dim img = src(ocvb.drawRect)
+        Dim img = src(ocvb.task.drawRect)
         Static saveDrawRect As New cv.Rect
-        If saveDrawRect <> ocvb.drawRect Then
-            saveDrawRect = ocvb.drawRect
+        If saveDrawRect <> ocvb.task.drawRect Then
+            saveDrawRect = ocvb.task.drawRect
             ' only need to create the mask to order the brush strokes once.
             randomMask = New cv.Mat(img.Size(), cv.MatType.CV_32SC2)
             Dim nPt As New cv.Point
@@ -84,17 +84,17 @@ Public Class OilPaint_ColorProbability
     Inherits VBparent
     Public color_probability() As Single
     Public km As kMeans_RGBFast
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        km = New kMeans_RGBFast(ocvb)
+    Public Sub New()
+        initParent()
+        km = New kMeans_RGBFast()
         km.sliders.trackbar(0).Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.trackbar(0).Value - 1)
         ocvb.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         km.src = src
-        km.Run(ocvb)
+        km.Run()
         dst1 = km.dst1
         Dim c() = km.clusterColors
         If c Is Nothing Then Exit Sub
@@ -122,21 +122,21 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Manual
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
         sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         ocvb.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
-        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        ocvb.task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
 
         If filtersize Mod 2 = 0 Then filtersize += 1 ' must be odd
-        Dim roi = ocvb.drawRect
+        Dim roi = ocvb.task.drawRect
         src.CopyTo(dst1)
         Dim color = src(roi)
         Dim result1 = color.Clone()
@@ -181,22 +181,22 @@ End Class
 Public Class OilPaint_Manual_CS
     Inherits VBparent
     Dim oilPaint As New CS_Classes.OilPaintManual
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
         sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
         sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         ocvb.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
-        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        ocvb.task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        Dim roi = ocvb.drawRect
+        Dim roi = ocvb.task.drawRect
         src.CopyTo(dst1)
         oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.trackbar(1).Value)
         dst2 = src.EmptyClone.SetTo(0)
@@ -214,26 +214,26 @@ Public Class OilPaint_Cartoon
     Inherits VBparent
     Dim oil As OilPaint_Manual_CS
     Dim laplacian As Edges_Laplacian
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        laplacian = New Edges_Laplacian(ocvb)
+    Public Sub New()
+        initParent()
+        laplacian = New Edges_Laplacian()
 
-        oil = New OilPaint_Manual_CS(ocvb)
-        ocvb.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        oil = New OilPaint_Manual_CS()
+        ocvb.task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
 
         ocvb.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim roi = ocvb.drawRect
+        Dim roi = ocvb.task.drawRect
         laplacian.src = src
-        laplacian.Run(ocvb)
+        laplacian.Run()
         dst2 = laplacian.dst1
 
         oil.src = src
-        oil.Run(ocvb)
+        oil.Run()
         dst1 = oil.dst1
 
         Dim threshold = oil.sliders.trackbar(2).Value

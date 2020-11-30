@@ -4,12 +4,12 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
 Public Class InPaint_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(caller, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
@@ -17,7 +17,7 @@ Public Class InPaint_Basics
         ocvb.desc = "Create a flaw in an image and then use inPaint to mask it."
         label2 = "Repaired Image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
@@ -39,11 +39,11 @@ End Class
 Public Class InPaint_Noise
     Inherits VBparent
     Dim noise As Draw_Noise
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        noise = New Draw_Noise(ocvb)
+    Public Sub New()
+        initParent()
+        noise = New Draw_Noise()
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(caller, 2)
         radio.check(0).Text = "TELEA"
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
@@ -51,11 +51,11 @@ Public Class InPaint_Noise
         ocvb.desc = "Create noise in an image and then use inPaint to remove it."
         label2 = "Repaired Image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.src = src
-        noise.Run(ocvb) ' create some noise in the result1 image.
+        noise.Run() ' create some noise in the result1 image.
         dst1 = noise.dst1
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
         cv.Cv2.Inpaint(dst1, noise.noiseMask, dst2, noise.maxNoiseWidth, inPaintFlag)

@@ -42,13 +42,13 @@ Public Class Draw_rectangles
     Inherits VBparent
     Public updateFrequency = 30
     Public drawRotatedRectangles As Boolean
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of rotated rectangles."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
@@ -78,14 +78,14 @@ Public Class Draw_Noise
     Public maxNoiseWidth As Integer = 3
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
         ocvb.desc = "Add Noise to the color image"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         maxNoiseWidth = sliders.trackbar(1).Value
         src.CopyTo(dst1)
@@ -108,16 +108,16 @@ End Class
 Public Class Draw_rotatedRectangles
     Inherits VBparent
     Public rect As Draw_rectangles
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        rect = New Draw_rectangles(ocvb)
+    Public Sub New()
+        initParent()
+        rect = New Draw_rectangles()
         rect.drawRotatedRectangles = True
         ocvb.desc = "Draw the requested number of rectangles."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         rect.src = src
-        rect.Run(ocvb)
+        rect.Run()
         dst1 = rect.dst1
     End Sub
 End Class
@@ -127,13 +127,13 @@ End Class
 Public Class Draw_Ellipses
     Inherits VBparent
     Public updateFrequency = 30
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of ellipses."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
@@ -153,13 +153,13 @@ End Class
 Public Class Draw_Circles
     Inherits VBparent
     Public updateFrequency = 30
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
         ocvb.desc = "Draw the requested number of circles."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
@@ -178,13 +178,13 @@ End Class
 Public Class Draw_Line
     Inherits VBparent
     Public updateFrequency = 30
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
         ocvb.desc = "Draw the requested number of Lines."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.Black)
@@ -202,19 +202,19 @@ End Class
 
 Public Class Draw_Polygon
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
         ocvb.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
 
-        radio.Setup(ocvb, caller, 2) ' ask for 2 radio buttons
+        radio.Setup(caller, 2) ' ask for 2 radio buttons
         radio.check(0).Text = "Polygon Outline"
         radio.check(1).Text = "Polygon Filled"
         radio.check(0).Checked = True
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim height = src.Height / 8
         Dim width = src.Width / 8
@@ -259,11 +259,11 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class Draw_RngImage
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
@@ -301,15 +301,15 @@ End Class
 
 Public Class Draw_SymmetricalShapes
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
         sliders.setupTrackBar(1, "Radius 1", 1, src.Rows / 2, src.Rows / 4)
         sliders.setupTrackBar(2, "Radius 2", 1, src.Rows / 2, src.Rows / 8)
         sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
 
-        check.Setup(ocvb, caller, 5)
+        check.Setup(caller, 5)
         check.Box(0).Text = "Symmetric Ripple"
         check.Box(1).Text = "Only Regular Shapes"
         check.Box(2).Text = "Filled Shapes"
@@ -318,7 +318,7 @@ Public Class Draw_SymmetricalShapes
         check.Box(4).Checked = True
         ocvb.desc = "Generate shapes programmatically"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static rotateAngle As Single = 0
         Static fillColor = cv.Scalar.Red
@@ -387,7 +387,7 @@ Public Class Draw_Arc
 
     Dim colorIndex As Integer
     Dim thickness As Integer
-    Private Sub setup(ocvb As VBocvb)
+    Private Sub setup()
         saveMargin = sliders.trackbar(0).Value ' work in the middle of the image.
 
         rect = initRandomRect(dst1.Width, dst1.Height, saveMargin)
@@ -399,29 +399,29 @@ Public Class Draw_Arc
 
         kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        kalman = New Kalman_Basics(ocvb)
+        kalman = New Kalman_Basics()
         ReDim kalman.kInput(7 - 1)
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, src.Width / 8, src.Width / 16)
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(caller, 3)
         radio.check(0).Text = "Draw Full Ellipse"
         radio.check(1).Text = "Draw Filled Arc"
         radio.check(2).Text = "Draw Arc"
         radio.check(1).Checked = True
 
-        setup(ocvb)
+        setup()
 
         ocvb.desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If kalman.check.Box(0).Checked Then
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-            kalman.Run(ocvb)
+            kalman.Run()
         Else
             kalman.kOutput = kalman.kInput ' do nothing...
         End If
@@ -443,7 +443,7 @@ Public Class Draw_Arc
             dst1.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
                          angle, startAngle, endAngle, color, thickness, cv.LineTypes.AntiAlias)
         End If
-        If r = rect Or sliders.trackbar(0).Value <> saveMargin Then setup(ocvb)
+        If r = rect Or sliders.trackbar(0).Value <> saveMargin Then setup()
     End Sub
 End Class
 
@@ -458,10 +458,10 @@ Public Class Draw_OverlappingRectangles
     Public inputMasks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        If standalone Then flood = New FloodFill_Basics(ocvb)
+        If standalone Then flood = New FloodFill_Basics()
 
         label1 = "(First 5) Overlapping rectangles are red, original in yellow"
         label2 = "Original list of rectangles"
@@ -495,11 +495,11 @@ Public Class Draw_OverlappingRectangles
         overlapping.Add(r)
         Return overlapping
     End Function
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             flood.src = src
-            flood.Run(ocvb)
+            flood.Run()
             dst1 = flood.dst2
             inputRects.Clear()
             inputMasks.Clear()
@@ -557,17 +557,17 @@ Public Class Draw_ViewObjects
     Inherits VBparent
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public palette As Palette_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        palette = New Palette_Basics(ocvb)
-        check.Setup(ocvb, caller, 1)
+        palette = New Palette_Basics()
+        check.Setup(caller, 1)
         check.Box(0).Text = "Draw rectangle and centroid for each mask"
         check.Box(0).Checked = True
 
         ocvb.desc = "Draw rectangles and centroids"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             ocvb.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
@@ -584,7 +584,7 @@ Public Class Draw_ViewObjects
             Next
 
             palette.src = dst1 * cv.Scalar.All(incr) ' spread the colors 
-            palette.Run(ocvb)
+            palette.Run()
             dst1 = palette.dst1
 
             Static drawRectangleCheck = findCheckBox("Draw rectangle and centroid for each mask")
@@ -609,24 +609,24 @@ End Class
 Public Class Draw_Frustrum
     Inherits VBparent
     Public xyzDepth As Depth_WorldXYZ_MT
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        xyzDepth = New Depth_WorldXYZ_MT(ocvb)
+    Public Sub New()
+        initParent()
+        xyzDepth = New Depth_WorldXYZ_MT()
         xyzDepth.depthUnitsMeters = True
 
         If standalone = False Then ocvb.useIMU = True
         ocvb.desc = "Draw a frustrum for a camera viewport"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst1 = New cv.Mat(ocvb.pointCloud.Height, ocvb.pointCloud.Height, cv.MatType.CV_32F, 0)
-        Dim mid = ocvb.pointCloud.Height / 2
+        dst1 = New cv.Mat(ocvb.task.pointCloud.Height, ocvb.task.pointCloud.Height, cv.MatType.CV_32F, 0)
+        Dim mid = ocvb.task.pointCloud.Height / 2
         Dim zIncr = ocvb.maxZ / mid
-        For i = 0 To ocvb.pointCloud.Height / 2
+        For i = 0 To ocvb.task.pointCloud.Height / 2
             dst1.Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
         Next
-        xyzDepth.src = dst1.Resize(ocvb.pointCloud.Size)
-        xyzDepth.Run(ocvb)
+        xyzDepth.src = dst1.Resize(ocvb.task.pointCloud.Size)
+        xyzDepth.Run()
     End Sub
 End Class
 
@@ -650,21 +650,21 @@ Public Class Draw_ClipLine
         rect = initRandomRect(dst2.Width, dst2.Height, 25)
         If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText()
 
-        kalman = New Kalman_Basics(ocvb)
+        kalman = New Kalman_Basics()
         setup()
 
         ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst2 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-        kalman.Run(ocvb)
+        kalman.Run()
         Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
         Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
 
@@ -685,7 +685,7 @@ Public Class Draw_ClipLine
         ocvb.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      CInt(src.Width / 2), 200)
         If r = rect Then setup()
-        flow.Run(ocvb)
+        flow.Run()
     End Sub
 End Class
 
@@ -703,11 +703,11 @@ Public Class Draw_Intersection
     Public p4 As cv.Point2f
     Public intersect As Boolean
     Public intersectionPoint As cv.Point2f
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         ocvb.desc = "Determine if 2 lines intersect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If standalone Then If ocvb.frameCount Mod 100 <> 0 Then Exit Sub
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then

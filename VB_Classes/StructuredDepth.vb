@@ -8,12 +8,12 @@ Public Class StructuredDepth_SliceH
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
     Public yPlaneOffset As Integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        side2D = New Histogram_SideData(ocvb)
-        inrange = New Depth_InRange(ocvb)
+    Public Sub New()
+        initParent()
+        side2D = New Histogram_SideData()
+        inrange = New Depth_InRange()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
         sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2 - 20)
         sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
@@ -25,9 +25,9 @@ Public Class StructuredDepth_SliceH
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         ocvb.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        side2D.Run(ocvb)
+        side2D.Run()
         dst2 = side2D.dst2
 
         Static offsetSlider = findSlider("Offset for the slice")
@@ -42,13 +42,13 @@ Public Class StructuredDepth_SliceH
         inrange.minVal = planeY - thicknessMeters
         inrange.maxVal = planeY + thicknessMeters
         inrange.src = side2D.split(1).Clone
-        inrange.Run(ocvb)
+        inrange.Run()
         maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
-        dst1 = ocvb.color.Clone
+        dst1 = ocvb.task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
 
@@ -75,11 +75,11 @@ Public Class StructuredDepth_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        top2D = New Histogram_TopData(ocvb)
-        inrange = New Depth_InRange(ocvb)
-        sideStruct = New StructuredDepth_SliceH(ocvb)
+    Public Sub New()
+        initParent()
+        top2D = New Histogram_TopData()
+        inrange = New Depth_InRange()
+        sideStruct = New StructuredDepth_SliceH()
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
@@ -87,10 +87,10 @@ Public Class StructuredDepth_SliceV
 
         ocvb.desc = "Find and isolate planes using the top view histogram data"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
-        top2D.Run(ocvb)
+        top2D.Run()
         dst2 = top2D.dst2
 
         Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
@@ -103,13 +103,13 @@ Public Class StructuredDepth_SliceV
         inrange.minVal = planeX - thicknessMeters
         inrange.maxVal = planeX + thicknessMeters
         inrange.src = top2D.split(0).Clone
-        inrange.Run(ocvb)
+        inrange.Run()
         maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
-        dst1 = ocvb.color.Clone
+        dst1 = ocvb.task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
 
@@ -134,20 +134,20 @@ Public Class StructuredDepth_Floor
     Public structD As StructuredDepth_SliceH
     Dim kalman As Kalman_VB_Basics
     Public floorYplane As Single
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kalman = New Kalman_VB_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        kalman = New Kalman_VB_Basics()
 
-        structD = New StructuredDepth_SliceH(ocvb)
+        structD = New StructuredDepth_SliceH()
         structD.histThresholdSlider.Value = 10 ' some cameras can show data below ground level...
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
         ocvb.desc = "Find the floor plane"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        structD.Run(ocvb)
+        structD.Run()
 
         Dim yCoordinate = dst2.Height
         Dim lastSum = dst2.Row(dst2.Height - 1).Sum()
@@ -158,7 +158,7 @@ Public Class StructuredDepth_Floor
         Next
 
         kalman.kInput = yCoordinate
-        kalman.Run(ocvb)
+        kalman.Run()
 
         ' it settles down quicker...
         If ocvb.frameCount > 30 Then yCoordinate = kalman.kAverage
@@ -183,19 +183,19 @@ Public Class StructuredDepth_Ceiling
     Inherits VBparent
     Public structD As StructuredDepth_SliceH
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        kalman = New Kalman_Basics()
         ReDim kalman.kInput(0)
 
-        structD = New StructuredDepth_SliceH(ocvb)
+        structD = New StructuredDepth_SliceH()
         structD.cushionSlider.Value = 10
         ocvb.desc = "Find the ceiling plane"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        structD.Run(ocvb)
+        structD.Run()
 
         Dim yCoordinate As Integer
         Dim lastSum = dst2.Row(yCoordinate).Sum()
@@ -206,7 +206,7 @@ Public Class StructuredDepth_Ceiling
         Next
 
         kalman.kInput(0) = yCoordinate
-        kalman.Run(ocvb)
+        kalman.Run()
         structD.offsetSlider.Value = If(kalman.kOutput(0) >= 0, kalman.kOutput(0), 0)
 
         dst1 = structD.dst1
@@ -224,17 +224,17 @@ Public Class StructuredDepth_MultiSliceH
     Public side2D As Histogram_SideData
     Public structD As StructuredDepth_SliceH
     Dim inrange As Depth_InRange
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        side2D = New Histogram_SideData(ocvb)
-        inrange = New Depth_InRange(ocvb)
-        structD = New StructuredDepth_SliceH(ocvb)
+    Public Sub New()
+        initParent()
+        side2D = New Histogram_SideData()
+        inrange = New Depth_InRange()
+        structD = New StructuredDepth_SliceH()
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        side2D.Run(ocvb)
+        side2D.Run()
         dst2 = side2D.dst2
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -253,11 +253,11 @@ Public Class StructuredDepth_MultiSliceH
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = side2D.split(1).Clone
-            inrange.Run(ocvb)
+            inrange.Run()
             maskPlane.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
         Next
 
-        dst1 = ocvb.color.Clone
+        dst1 = ocvb.task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
     End Sub
@@ -273,18 +273,18 @@ Public Class StructuredDepth_MultiSliceV
     Public top2D As Histogram_TopData
     Public structD As StructuredDepth_SliceH
     Dim inrange As Depth_InRange
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        top2D = New Histogram_TopData(ocvb)
-        inrange = New Depth_InRange(ocvb)
-        structD = New StructuredDepth_SliceH(ocvb)
+        top2D = New Histogram_TopData()
+        inrange = New Depth_InRange()
+        structD = New StructuredDepth_SliceH()
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        top2D.Run(ocvb)
+        top2D.Run()
         dst2 = top2D.dst2
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -303,11 +303,11 @@ Public Class StructuredDepth_MultiSliceV
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = top2D.split(0).Clone
-            inrange.Run(ocvb)
+            inrange.Run()
             maskPlane.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
         Next
 
-        dst1 = ocvb.color.Clone
+        dst1 = ocvb.task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
     End Sub
@@ -325,20 +325,20 @@ Public Class StructuredDepth_MultiSlice
     Dim struct As StructuredDepth_SliceV
     Public inrange As Depth_InRange
     Public maskPlane As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        side2D = New Histogram_SideData(ocvb)
-        top2D = New Histogram_TopData(ocvb)
-        inrange = New Depth_InRange(ocvb)
-        struct = New StructuredDepth_SliceV(ocvb)
+        side2D = New Histogram_SideData()
+        top2D = New Histogram_TopData()
+        inrange = New Depth_InRange()
+        struct = New StructuredDepth_SliceV()
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        top2D.Run(ocvb)
-        side2D.Run(ocvb)
+        top2D.Run()
+        side2D.Run()
         ' dst2 = top2D.dst2
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -357,7 +357,7 @@ Public Class StructuredDepth_MultiSlice
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = top2D.split(0).Clone
-            inrange.Run(ocvb)
+            inrange.Run()
             maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst2.SetTo(255, maskPlane)
         Next
@@ -368,13 +368,13 @@ Public Class StructuredDepth_MultiSlice
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = side2D.split(1).Clone
-            inrange.Run(ocvb)
+            inrange.Run()
             Dim tmp = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
             cv.Cv2.BitwiseOr(tmp, maskPlane, maskPlane)
             dst2.SetTo(255, maskPlane)
         Next
 
-        dst1 = ocvb.color.Clone
+        dst1 = ocvb.task.color.Clone
         dst1.SetTo(cv.Scalar.White, dst2)
     End Sub
 End Class
@@ -389,20 +389,20 @@ Public Class StructuredDepth_MultiSliceLines
     Inherits VBparent
     Dim multi As StructuredDepth_MultiSlice
     Public ldetect As LineDetector_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        ldetect = New LineDetector_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        ldetect = New LineDetector_Basics()
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
-        multi = New StructuredDepth_MultiSlice(ocvb)
+        multi = New StructuredDepth_MultiSlice()
         ocvb.desc = "Detect lines in the multiSlice output"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        multi.Run(ocvb)
+        multi.Run()
         cv.Cv2.BitwiseNot(multi.dst2, dst2)
         ldetect.src = multi.dst2
-        ldetect.Run(ocvb)
+        ldetect.Run()
         dst1 = ldetect.dst1
     End Sub
 End Class
@@ -416,19 +416,19 @@ End Class
 Public Class StructuredDepth_MultiSlicePolygon
     Inherits VBparent
     Dim multi As StructuredDepth_MultiSlice
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        multi = New StructuredDepth_MultiSlice(ocvb)
+    Public Sub New()
+        initParent()
+        multi = New StructuredDepth_MultiSlice()
         label1 = "Input to FindContours"
         label2 = "ApproxPolyDP 4-corner object from FindContours input"
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
         ocvb.desc = "Detect polygons in the multiSlice output"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        multi.Run(ocvb)
+        multi.Run()
         cv.Cv2.BitwiseNot(multi.dst2, dst1)
 
         Dim rawContours = cv.Cv2.FindContoursAsArray(dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
@@ -459,19 +459,19 @@ Public Class StructuredDepth_SliceXPlot
     Dim multi As StructuredDepth_MultiSlice
     Dim structD As StructuredDepth_SliceV
     Dim cushionSlider As Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        multi = New StructuredDepth_MultiSlice(ocvb)
-        structD = New StructuredDepth_SliceV(ocvb)
+    Public Sub New()
+        initParent()
+        multi = New StructuredDepth_MultiSlice()
+        structD = New StructuredDepth_SliceV()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         cushionSlider.Value = 25
         ocvb.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        structD.Run(ocvb)
+        structD.Run()
         dst2 = structD.dst2
-        multi.Run(ocvb)
+        multi.Run()
 
         Static offsetSlider = findSlider("Offset for the slice")
         Dim col = CInt(offsetSlider.value)
@@ -490,13 +490,13 @@ Public Class StructuredDepth_SliceXPlot
             multi.inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
             multi.inrange.maxVal = filterZ + 0.05
             multi.inrange.src = multi.top2D.split(2)
-            multi.inrange.Run(ocvb)
+            multi.inrange.Run()
             maskZplane = multi.inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
         End If
 
         If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.maskPlane, maskZplane, maskZplane)
 
-        dst1 = ocvb.color.Clone
+        dst1 = ocvb.task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskZplane)
 
         Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
@@ -517,24 +517,24 @@ Public Class StructuredDepth_LinearizeFloor
     Public imuPointCloud As cv.Mat
     Public maskPlane As cv.Mat
     Public floorYPlane As Single
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kalman = New Kalman_VB_Basics(ocvb)
-        floor = New StructuredDepth_Floor(ocvb)
+    Public Sub New()
+        initParent()
+        kalman = New Kalman_VB_Basics()
+        floor = New StructuredDepth_Floor()
 
-        check.Setup(ocvb, caller, 3)
+        check.Setup(caller, 3)
         check.Box(0).Text = "Smooth in X-direction"
         check.Box(1).Text = "Smooth in Y-direction"
         check.Box(2).Text = "Smooth in Z-direction"
         check.Box(1).Checked = True
         ocvb.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
-        floor.Run(ocvb)
+        floor.Run()
         dst1 = floor.dst1
         dst2 = floor.dst2
         maskPlane = floor.structD.maskPlane
@@ -569,7 +569,7 @@ Public Class StructuredDepth_LinearizeFloor
             If yCheck.Checked Then
                 split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, maskPlane)
                 kalman.kInput = (minVal + maxVal) / 2
-                kalman.Run(ocvb)
+                kalman.Run()
                 floorYPlane = kalman.kAverage
                 split(1).SetTo(floorYPlane, maskPlane)
             End If
@@ -595,7 +595,7 @@ Public Class StructuredDepth_LinearizeFloor
                             split(2).Row(i).SetTo(mean.Item(0))
                             'Dim xy = New cv.Point3f(0, i, mean.Item(0))
                             'For xy.X = 0 To split(2).Width - 1
-                            '    Dim xyz = getWorldCoordinates(ocvb, xy)
+                            '    Dim xyz = getWorldCoordinates(xy)
                             '    imuPC.Set(Of cv.Point3f)(i, xy.X, xyz)
                             'Next
                         End If

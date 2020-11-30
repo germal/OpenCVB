@@ -72,9 +72,9 @@ Public Class OpticalFlow_DenseOptions
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As integer
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 5)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 5)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"
@@ -82,7 +82,7 @@ Public Class OpticalFlow_DenseOptions
         radio.check(4).Text = "PyrBReady"
         radio.check(0).Checked = True
 
-        sliders.Setup(ocvb, caller, 6)
+        sliders.Setup(caller, 6)
         sliders.setupTrackBar(0, "Optical Flow pyrScale", 1, 100, 35)
         sliders.setupTrackBar(1, "Optical Flow Levels", 1, 10, 1)
         sliders.setupTrackBar(2, "Optical Flow winSize", 1, 9, 1)
@@ -93,7 +93,7 @@ Public Class OpticalFlow_DenseOptions
         label1 = "No output - just option settings..."
         ocvb.desc = "Use dense optical flow algorithm options"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
         levels = sliders.trackbar(1).Value
@@ -123,18 +123,18 @@ End Class
 Public Class OpticalFlow_DenseBasics
     Inherits VBparent
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        flow = New OpticalFlow_DenseOptions(ocvb)
+    Public Sub New()
+        initParent()
+        flow = New OpticalFlow_DenseOptions()
         ocvb.desc = "Use dense optical flow algorithm  "
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If ocvb.frameCount > 0 Then
-            flow.Run(ocvb)
+            flow.Run()
 
             Dim hsv = opticalFlow_Dense(oldGray, src, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
 
@@ -155,9 +155,9 @@ Public Class OpticalFlow_DenseBasics_MT
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         Static gridBorderSlider = findSlider("ThreadGrid Border")
@@ -165,21 +165,21 @@ Public Class OpticalFlow_DenseBasics_MT
         gridHeightSlider.Value = src.Rows / 4
         gridHeightSlider.Value = 5
 
-        flow = New OpticalFlow_DenseOptions(ocvb)
+        flow = New OpticalFlow_DenseOptions()
         flow.sliders.trackbar(0).Value = 75
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
 
         ocvb.desc = "MultiThread dense optical flow algorithm  "
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static oldGray As New cv.Mat
 
         If ocvb.frameCount > 0 Then
-            grid.Run(ocvb)
-            flow.Run(ocvb)
+            grid.Run()
+            flow.Run()
 
             Dim CCthreshold = CSng(sliders.trackbar(0).Value / sliders.trackbar(0).Maximum)
             Parallel.For(0, grid.borderList.Count,
@@ -223,15 +223,15 @@ Public Class OpticalFlow_Sparse
     Dim lastFrame As cv.Mat
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        good = New Features_GoodFeatures(ocvb)
+    Public Sub New()
+        initParent()
+        good = New Features_GoodFeatures()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "OpticalFlow window", 1, 20, 3)
         sliders.setupTrackBar(1, "OpticalFlow Max Pixels Distance", 1, 100, 30)
 
-        radio.Setup(ocvb, caller, 6)
+        radio.Setup(caller, 6)
         radio.check(0).Text = "FarnebackGaussian"
         radio.check(1).Text = "LkGetMinEigenvals"
         radio.check(2).Text = "None"
@@ -254,7 +254,7 @@ Public Class OpticalFlow_Sparse
             errScale.Set(Of Double)(i, 0, (1 - gainScale) * f1err.Get(Of Double)(i, 0))
         Next
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.Clone()
         dst2 = src.Clone()
@@ -279,7 +279,7 @@ Public Class OpticalFlow_Sparse
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         good.src = src
-        good.Run(ocvb)
+        good.Run()
         features = good.goodFeatures
         Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat

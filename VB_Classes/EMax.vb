@@ -10,23 +10,23 @@ Public Class EMax_Basics
     Public regionCount As Integer
     Public gridWidthSlider As System.Windows.Forms.TrackBar
     Public gridHeightSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        check.Setup(ocvb, caller, 1)
+    Public Sub New()
+        initParent()
+        check.Setup(caller, 1)
         check.Box(0).Text = "Show EMax input in output"
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "EMax Number of Samples", 1, 200, 100)
         sliders.setupTrackBar(1, "EMax Prediction Step Size", 1, 20, 5)
         sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = src.Width / 2
         gridHeightSlider.Value = src.Height / 2
 
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(caller, 3)
         radio.check(0).Text = "EMax matrix type Spherical"
         radio.check(1).Text = "EMax matrix type Diagonal"
         radio.check(2).Text = "EMax matrix type Generic"
@@ -34,7 +34,7 @@ Public Class EMax_Basics
 
         ocvb.desc = "OpenCV expectation maximization example."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             ocvb.trueText("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
@@ -42,7 +42,7 @@ Public Class EMax_Basics
             Exit Sub
         End If
 
-        grid.Run(ocvb)
+        grid.Run()
         regionCount = grid.roiList.Count - 1
 
         samples = New cv.Mat(sliders.trackbar(0).Value, 2, cv.MatType.CV_32FC1, 0)
@@ -126,18 +126,18 @@ Public Class EMax_CPP
     Public basics As EMax_Basics
     Dim inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        basics = New EMax_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        basics = New EMax_Basics()
 
         EMax_Basics = EMax_Basics_Open()
 
         label2 = "Emax regions around clusters"
         ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        basics.Run(ocvb)
+        basics.Run()
         dst1 = basics.dst1
         Dim srcCount = basics.sliders.trackbar(0).Value
         label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
@@ -188,26 +188,26 @@ Public Class EMax_Centroids
     Inherits VBparent
     Public emaxCPP As EMax_CPP
     Public flood As FloodFill_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        flood = New FloodFill_Basics(ocvb)
+        flood = New FloodFill_Basics()
         Dim lowDiffslider = findSlider("FloodFill LoDiff")
         Dim highDiffslider = findSlider("FloodFill HiDiff")
         lowDiffslider.Value = 1
         highDiffslider.Value = 1
-        emaxCPP = New EMax_CPP(ocvb)
+        emaxCPP = New EMax_CPP()
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         gridWidthSlider.Value = src.Width * 170 / 640
 
         ocvb.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        emaxCPP.Run(ocvb)
+        emaxCPP.Run()
 
         flood.src = emaxCPP.dst2.Clone
-        flood.Run(ocvb)
+        flood.Run()
         dst1 = flood.dst2
 
         Static lastCentroids As New List(Of cv.Point2f)
@@ -229,12 +229,12 @@ Public Class EMax_PointTracker
     Inherits VBparent
     Dim pTrack As KNN_PointTracker
     Dim emax As EMax_Centroids
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        emax = New EMax_Centroids(ocvb)
+        emax = New EMax_Centroids()
 
-        pTrack = New KNN_PointTracker(ocvb)
+        pTrack = New KNN_PointTracker()
         Dim rectCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         rectCheckbox.Checked = False
         Dim floodMinSlider = findSlider("FloodFill Minimum Size")
@@ -243,15 +243,15 @@ Public Class EMax_PointTracker
         label1 = "Original before KNN/Kalman tracking (red=previous)"
         ocvb.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        emax.Run(ocvb)
+        emax.Run()
         dst1 = emax.dst1
 
         pTrack.queryPoints = emax.flood.centroids
         pTrack.queryMasks = emax.flood.masks
         pTrack.queryRects = emax.flood.rects
-        pTrack.Run(ocvb)
+        pTrack.Run()
         dst2 = pTrack.dst1
 
         ' this is to verify that the colors are remaining largely consistent (they may change if more centroids appear.)

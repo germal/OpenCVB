@@ -82,12 +82,12 @@ End Module
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
 Public Class Dither_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
 
-        radio.Setup(ocvb, caller, 24)
+        radio.Setup(caller, 24)
         Static frm = findForm("Dither_Basics Radio Options")
         For i = 0 To frm.check.length - 1
             frm.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
@@ -101,7 +101,7 @@ Public Class Dither_Basics
         label2 = "Dither applied to the Depth image"
         ocvb.desc = "Explore all the varieties of dithering"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim radioIndex As Integer
         Static frm = findForm("Dither_Basics Radio Options")
@@ -121,7 +121,7 @@ Public Class Dither_Basics
         Dim pixels(dst1.Total * dst1.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1
-            Dim copySrc = Choose(i + 1, src, ocvb.RGBDepth)
+            Dim copySrc = Choose(i + 1, src, ocvb.task.RGBDepth)
             Marshal.Copy(copySrc.Data, pixels, 0, pixels.Length)
             Select Case radioIndex
                 Case 0

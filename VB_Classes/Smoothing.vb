@@ -41,25 +41,25 @@ Public Class Smoothing_Exterior
 		spline.Add(spoints(spoints.Count - 2))
 		Return spline
 	End Function
-	Public Sub New(ocvb As VBocvb)
-		initParent(ocvb)
-		hull = New Hull_Basics(ocvb)
+	Public Sub New()
+		initParent()
+		hull = New Hull_Basics()
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 
-		sliders.Setup(ocvb, caller)
+		sliders.Setup(caller)
 		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 10)
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		ocvb.desc = "Smoothing the line connecting a series of points."
 	End Sub
-	Public Sub Run(ocvb As VBocvb)
+	Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 		If standalone Then
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
 			hull.src = src
-			hull.Run(ocvb)
+			hull.Run()
 			Dim nextHull = hull.hull
 
 			dst1.SetTo(0)
@@ -119,13 +119,13 @@ Public Class Smoothing_Interior
 		Return nl
 	End Function
 
-	Public Sub New(ocvb As VBocvb)
-		initParent(ocvb)
-		hull = New Hull_Basics(ocvb)
+	Public Sub New()
+		initParent()
+		hull = New Hull_Basics()
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.sliders.trackbar(0).Value = 16
 
-		sliders.Setup(ocvb, caller)
+		sliders.Setup(caller)
 		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 1)
 		sliders.setupTrackBar(1, "Smoothing tension X100", 1, 100, 50)
 
@@ -133,13 +133,13 @@ Public Class Smoothing_Interior
 		label2 = ""
 		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
-	Public Sub Run(ocvb As VBocvb)
+	Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 		If standalone Then
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
 			hull.src = src
-			hull.Run(ocvb)
+			hull.Run()
 			Dim nextHull = hull.hull
 
 			dst1.SetTo(0)
@@ -164,27 +164,27 @@ Public Class Smoothing_Contours
 	Dim outline As Contours_Depth
 	Dim smoothE As Smoothing_Exterior
 	Dim smoothI As Smoothing_Interior
-	Public Sub New(ocvb As VBocvb)
-		initParent(ocvb)
-		outline = New Contours_Depth(ocvb)
-		smoothE = New Smoothing_Exterior(ocvb)
-		smoothI = New Smoothing_Interior(ocvb)
+	Public Sub New()
+		initParent()
+		outline = New Contours_Depth()
+		smoothE = New Smoothing_Exterior()
+		smoothI = New Smoothing_Interior()
 		smoothE.plotColor = cv.Scalar.Blue
 		smoothI.plotColor = cv.Scalar.Blue
 
-		sliders.Setup(ocvb, caller)
+		sliders.Setup(caller)
 		sliders.setupTrackBar(0, "Step size when adding points (1 is identity)", 1, 500, 30)
 
-		radio.Setup(ocvb, caller, 2)
+		radio.Setup(caller, 2)
 		radio.check(0).Text = "Interior smoothing"
 		radio.check(1).Text = "Exterior smoothing"
 		radio.check(1).Checked = True
 
 		ocvb.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 	End Sub
-	Public Sub Run(ocvb As VBocvb)
+	Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-		outline.Run(ocvb)
+		outline.Run()
 
 		Dim stepsize = sliders.trackbar(0).Value
 		Dim smooth As Object
@@ -194,7 +194,7 @@ Public Class Smoothing_Contours
 			smooth.inputPoints.Add(New cv.Point2f(outline.contours(i).X, outline.contours(i).Y))
 		Next
 		smooth.dst1 = outline.dst2
-		smooth.Run(ocvb)
+		smooth.Run()
 		dst1 = smooth.dst1
 		label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
 	End Sub

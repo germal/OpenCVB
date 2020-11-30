@@ -1,12 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class DCT_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
         sliders.setupTrackBar(1, "Run Length Minimum", 1, 100, 15)
-        radio.Setup(ocvb, caller, 3)
+        radio.Setup(caller, 3)
         radio.check(0).Text = "DCT Flags None"
         radio.check(1).Text = "DCT Flags Row"
         radio.check(2).Text = "DCT Flags Inverse"
@@ -15,7 +15,7 @@ Public Class DCT_Basics
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         label2 = "Difference from original"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
@@ -47,16 +47,16 @@ End Class
 Public Class DCT_RGB
     Inherits VBparent
     Public dct As DCT_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        dct = New DCT_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        dct = New DCT_Basics()
         dct.sliders.trackbar(0).Value = 1
 
         label1 = "Reconstituted RGB image"
         label2 = "Difference from original"
         ocvb.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim srcPlanes() As cv.Mat = Nothing
         cv.Cv2.Split(src, srcPlanes)
@@ -95,16 +95,16 @@ End Class
 Public Class DCT_Depth
     Inherits VBparent
     Public dct As DCT_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        dct = New DCT_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        dct = New DCT_Basics()
         dct.sliders.trackbar(0).Value = 1
         label2 = "Subtract DCT inverse from Grayscale depth"
         ocvb.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim gray = ocvb.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = ocvb.task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
@@ -128,18 +128,18 @@ End Class
 Public Class DCT_FeatureLess
     Inherits VBparent
     Public dct As DCT_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        dct = New DCT_Basics(ocvb)
+        dct = New DCT_Basics()
         dct.sliders.trackbar(0).Value = 1
         ocvb.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         label2 = "FeatureLess RGB regions"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dct.src = src
-        dct.Run(ocvb)
+        dct.Run()
         Dim runLenMin = dct.sliders.trackbar(1).Value
         dst1 = dct.dst1
         dst2 = dct.dst2
@@ -183,39 +183,39 @@ Public Class DCT_Surfaces_debug
     Dim grid As Thread_Grid
     Dim dct As DCT_FeatureLess
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        flow = New Font_FlowText(ocvb)
+    Public Sub New()
+        initParent()
+        flow = New Font_FlowText()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 100
         gridHeightSlider.Value = 150
-        dct = New DCT_FeatureLess(ocvb)
+        dct = New DCT_FeatureLess()
         dct.dct.sliders.trackbar(0).Value = 1
-        Mats = New Mat_4to1(ocvb)
+        Mats = New Mat_4to1()
 
         label1 = "Largest flat surface segment stats"
         label2 = "Lower right image identifies potential flat surface"
         ocvb.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        grid.Run(ocvb)
+        grid.Run()
 
         Mats.mat(0) = src.Clone
         Mats.mat(0).SetTo(cv.Scalar.White, grid.gridMask)
 
         dct.src = src
-        dct.Run(ocvb)
+        dct.Run()
         Mats.mat(1) = dct.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
         Mats.mat(2) = dct.dst2.Clone()
 
         Dim mask = dct.dst1.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, notMask)
-        Dim depth32f = getDepth32f(ocvb)
+        Dim depth32f = getDepth32f()
         depth32f.SetTo(0, notMask) ' remove non-featureless surface depth data.
 
         ' find the most featureless roi
@@ -228,7 +228,7 @@ Public Class DCT_Surfaces_debug
 
         Mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
         src(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
-        Mats.Run(ocvb)
+        Mats.Run()
         dst2 = Mats.dst1
 
         Dim world As New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
@@ -244,7 +244,7 @@ Public Class DCT_Surfaces_debug
                             If minDepth > nextD Then minDepth = nextD
                             If maxDepth < nextD Then maxDepth = nextD
                             Dim wpt = New cv.Point3f(roi.X + i, roi.Y + j, nextD)
-                            worldPoints.Add(getWorldCoordinates(ocvb, wpt))
+                            worldPoints.Add(getWorldCoordinates(wpt))
                         End If
                     Next
                 Next
@@ -256,7 +256,7 @@ Public Class DCT_Surfaces_debug
                 End If
             End If
         End If
-        flow.Run(ocvb)
+        flow.Run()
     End Sub
 End Class
 
@@ -267,22 +267,22 @@ Public Class DCT_CComponents
     Inherits VBparent
     Dim dct As DCT_FeatureLess
     Dim cc As CComp_ColorDepth
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        dct = New DCT_FeatureLess(ocvb)
-        cc = New CComp_ColorDepth(ocvb)
+    Public Sub New()
+        initParent()
+        dct = New DCT_FeatureLess()
+        cc = New CComp_ColorDepth()
 
         label1 = "DCT masks colorized with average depth."
         label2 = "DCT mask"
         ocvb.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dct.src = src
-        dct.Run(ocvb)
+        dct.Run()
 
         cc.src = dct.dst1.Clone()
-        cc.Run(ocvb)
+        cc.Run()
         dst1 = cc.dst1
         dst2 = cc.dst2
     End Sub

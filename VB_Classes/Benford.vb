@@ -19,16 +19,16 @@ Public Class Benford_Basics
     Dim benford As Benford_NormalizedImage
     Dim weight As AddWeighted_Basics
     Dim use99 As Boolean
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        plot = New Plot_Histogram(ocvb)
-        If standalone Then benford = New Benford_NormalizedImage(ocvb)
+    Public Sub New()
+        initParent()
+        plot = New Plot_Histogram()
+        If standalone Then benford = New Benford_NormalizedImage()
 
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
 
-        weight = New AddWeighted_Basics(ocvb)
+        weight = New AddWeighted_Basics()
 
         ocvb.desc = "Build the capability to perform a Benford analysis."
     End Sub
@@ -40,11 +40,11 @@ Public Class Benford_Basics
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             benford.src = src
-            benford.Run(ocvb)
+            benford.Run()
             dst1 = benford.dst1
             dst2 = benford.dst2
             label2 = benford.label2
@@ -83,7 +83,7 @@ Public Class Benford_Basics
         End If
 
         plot.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plot.Run(ocvb)
+        plot.Run()
         weight.src1 = plot.dst1.Clone
 
         For i = 0 To counts.Count - 1
@@ -91,11 +91,11 @@ Public Class Benford_Basics
         Next
 
         plot.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plot.Run(ocvb)
+        plot.Run()
 
         cv.Cv2.BitwiseNot(plot.dst1, weight.src2)
         ' weight.src2 = plot.dst1
-        weight.Run(ocvb)
+        weight.Run()
         dst1 = weight.dst1
 
         label2 = "AddWeighted: " + CStr(weightSlider.Value) + "% actual vs. " + CStr(100 - weightSlider.Value) + "% Benford distribution"
@@ -111,21 +111,21 @@ End Class
 Public Class Benford_NormalizedImage
     Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        benford = New Benford_Basics(ocvb)
+        benford = New Benford_Basics()
 
         ocvb.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.src = gray32f.Normalize(1)
-        benford.Run(ocvb)
+        benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
     End Sub
@@ -140,22 +140,22 @@ End Class
 Public Class Benford_NormalizedImage99
     Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        benford = New Benford_Basics(ocvb)
+        benford = New Benford_Basics()
         benford.setup99()
 
         ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.src = gray32f.Normalize(1)
-        benford.Run(ocvb)
+        benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
     End Sub
@@ -170,22 +170,22 @@ End Class
 Public Class Benford_JPEG
     Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        benford = New Benford_Basics(ocvb)
+        benford = New Benford_Basics()
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
         ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
-        benford.Run(ocvb)
+        benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
     End Sub
@@ -200,24 +200,24 @@ End Class
 Public Class Benford_JPEG99
     Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        benford = New Benford_Basics(ocvb)
+        benford = New Benford_Basics()
         benford.setup99()
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
         ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
-        benford.Run(ocvb)
+        benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
     End Sub
@@ -233,23 +233,23 @@ End Class
 Public Class Benford_PNG
     Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        benford = New Benford_Basics(ocvb)
+        benford = New Benford_Basics()
 
-        sliders.Setup(ocvb, caller, 1)
+        sliders.Setup(caller, 1)
         sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
 
         ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         benford.src = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
         dst1 = cv.Cv2.ImDecode(png, cv.ImreadModes.Color)
-        benford.Run(ocvb)
+        benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
     End Sub
@@ -263,15 +263,15 @@ End Class
 Public Class Benford_Depth
     Inherits VBparent
     Public benford As Benford_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        benford = New Benford_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        benford = New Benford_Basics()
         ocvb.desc = "Apply Benford to the depth data"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        benford.src = getDepth32f(ocvb)
-        benford.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        benford.src = getDepth32f()
+        benford.Run()
         dst1 = benford.dst1
         label1 = benford.label2
     End Sub
@@ -285,15 +285,15 @@ End Class
 Public Class Benford_DepthRGB
     Inherits VBparent
     Public benford As Benford_JPEG
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        benford = New Benford_JPEG(ocvb)
+    Public Sub New()
+        initParent()
+        benford = New Benford_JPEG()
         ocvb.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        benford.src = ocvb.RGBDepth
-        benford.Run(ocvb)
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        benford.src = ocvb.task.RGBDepth
+        benford.Run()
         dst1 = benford.dst2
         label1 = benford.label2
     End Sub
@@ -310,22 +310,22 @@ Public Class Benford_Primes
     Inherits VBparent
     Dim sieve As Sieve_Basics
     Dim benford As Benford_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        benford = New Benford_Basics(ocvb)
-        sieve = New Sieve_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        benford = New Benford_Basics()
+        sieve = New Sieve_Basics()
         Dim countSlider = findSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
         ocvb.desc = "Apply Benford to a list of primes"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount = 0 Then sieve.Run(ocvb) ' only need to compute this once...
+        If ocvb.frameCount = 0 Then sieve.Run() ' only need to compute this once...
         ocvb.trueText(CStr(sieve.primes.Count) + " primes were found")
 
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(benford.src, cv.MatType.CV_32F)
-        benford.Run(ocvb)
+        benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
     End Sub

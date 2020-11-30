@@ -6,7 +6,8 @@ Public Class aOptionsFrm
     Public radio As New OptionsRadioButtons
     Public radio1 As New OptionsRadioButtons
     Public sliders As New OptionsSliders
-
+    Public nextForm = New Drawing.Point
+    Public offset = 30
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim defaultLeft = GetSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
         Dim defaultTop = GetSetting("OpenCVB", "OpenCVBTop", "OpenCVBTop", Me.Top)
@@ -16,7 +17,7 @@ Public Class aOptionsFrm
         'Me.Width = GetSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", defaultLeft - 30)
         'Me.Height = GetSetting("OpenCVB", "aOptionsTop", "aOptionsTop", defaultTop - 30)
     End Sub
-    Public Sub setup(ocvb As VBocvb)
+    Public Sub setup()
         Me.Width = ocvb.mainLocation.Width
         Me.Height = ocvb.mainLocation.Height
         combo.MdiParent = Me

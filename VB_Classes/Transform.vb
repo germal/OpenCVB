@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Transform_Resize
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
         ocvb.desc = "Resize an image based on the slider value."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim resizeFactor = sliders.trackbar(0).Value / 100
         Dim w = CInt(resizeFactor * src.Width)
@@ -31,16 +31,16 @@ End Class
 Public Class Transform_Rotate
     Inherits VBparent
     Public imageCenter As cv.Point2f
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Angle", -180, 180, 30)
         sliders.setupTrackBar(1, "Scale Factor% (100% means no scaling)", 1, 100, 100)
         sliders.setupTrackBar(2, "Rotation center X", 1, src.Width, src.Width / 2)
         sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
         ocvb.desc = "Rotate and scale and image based on the slider values."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
@@ -54,9 +54,9 @@ End Class
 
 Public Class Transform_Sort
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 4)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 4)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
@@ -64,7 +64,7 @@ Public Class Transform_Sort
         radio.check(3).Text = "EveryRow"
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
@@ -82,15 +82,15 @@ End Class
 
 Public Class Transform_SortReshape
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 2)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 2)
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
         ocvb.desc = "Sort the pixels of a grayscale image."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
@@ -107,14 +107,14 @@ End Class
 
 Public Class Transform_Affine3D
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        check.Setup(ocvb, caller, 2)
+    Public Sub New()
+        initParent()
+        check.Setup(caller, 2)
         check.Box(0).Text = "Check to snap the first point cloud"
         check.Box(1).Text = "Check to snap the second point cloud"
         ocvb.desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
         Static pc1 As cv.Mat
@@ -127,14 +127,14 @@ Public Class Transform_Affine3D
         End If
 
         If check.Box(0).Checked Then
-            pc1 = ocvb.pointCloud.Clone()
+            pc1 = ocvb.task.pointCloud.Clone()
             check.Box(0).Checked = False
             output += "First point cloud captured" + vbCrLf
             affineTransform = Nothing
         End If
 
         If check.Box(1).Checked Then
-            pc2 = ocvb.pointCloud.Clone()
+            pc2 = ocvb.task.pointCloud.Clone()
             check.Box(1).Checked = False
             output += "Second point cloud captured" + vbCrLf
             affineTransform = Nothing

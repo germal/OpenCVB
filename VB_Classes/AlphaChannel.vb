@@ -6,19 +6,19 @@ Public Class AlphaChannel_Basics
     Inherits VBparent
     Dim fg As Depth_InRange
     Dim alpha As New OptionsAlphaBlend
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        fg = New Depth_InRange(ocvb)
+        fg = New Depth_InRange()
 
         alpha.Show()
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
 
         ocvb.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        fg.Run(ocvb)
+        fg.Run()
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
         Dim split() = cv.Cv2.Split(src)
@@ -36,19 +36,19 @@ End Class
 Public Class AlphaChannel_Blend
     Inherits VBparent
     Dim fg As Depth_InRange
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        fg = New Depth_InRange(ocvb)
+        fg = New Depth_InRange()
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)
 
         ocvb.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        fg.Run(ocvb)
+        fg.Run()
         dst2.SetTo(0)
         src.CopyTo(dst2, fg.noDepthMask)
 

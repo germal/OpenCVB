@@ -14,10 +14,10 @@ End Module
 
 Public Class Quaterion_Basics
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        sliders.Setup(ocvb, caller, 8)
+        sliders.Setup(caller, 8)
         sliders.setupTrackBar(0, "quaternion A.x X100", -100, 100, -50)
         sliders.setupTrackBar(1, "quaternion A.y X100", -100, 100, 10)
         sliders.setupTrackBar(2, "quaternion A.z X100", -100, 100, 20)
@@ -30,7 +30,7 @@ Public Class Quaterion_Basics
 
         ocvb.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
                                     CSng(sliders.trackbar(2).Value / 100), CSng(sliders.trackbar(3).Value / 100))
@@ -49,56 +49,56 @@ End Class
 Public Class Quaterion_IMUPrediction
     Inherits VBparent
     Dim host As IMU_HostFrameTimes
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        host = New IMU_HostFrameTimes(ocvb)
+    Public Sub New()
+        initParent()
+        host = New IMU_HostFrameTimes()
 
         label1 = "Quaternion_IMUPrediction"
         label2 = ""
         ocvb.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
 
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        host.Run(ocvb)
+        host.Run()
 
         Dim dt = host.HostInterruptDelayEstimate
 
-        Dim t = ocvb.IMU_Translation
-        Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * ocvb.IMU_Acceleration.X + ocvb.IMU_Velocity.X) + t.X,
-                                                  dt * (dt / 2 * ocvb.IMU_Acceleration.Y + ocvb.IMU_Velocity.Y) + t.Y,
-                                                  dt * (dt / 2 * ocvb.IMU_Acceleration.Z + ocvb.IMU_Velocity.Z) + t.Z)
+        Dim t = ocvb.task.IMU_Translation
+        Dim predictedTranslation = New cv.Point3f(dt * (dt / 2 * ocvb.task.IMU_Acceleration.X + ocvb.task.IMU_Velocity.X) + t.X,
+                                                  dt * (dt / 2 * ocvb.task.IMU_Acceleration.Y + ocvb.task.IMU_Velocity.Y) + t.Y,
+                                                  dt * (dt / 2 * ocvb.task.IMU_Acceleration.Z + ocvb.task.IMU_Velocity.Z) + t.Z)
 
-        Dim predictedW = New cv.Point3f(dt * (dt / 2 * ocvb.IMU_AngularAcceleration.X + ocvb.IMU_AngularVelocity.X),
-                                        dt * (dt / 2 * ocvb.IMU_AngularAcceleration.Y + ocvb.IMU_AngularVelocity.Y),
-                                        dt * (dt / 2 * ocvb.IMU_AngularAcceleration.Z + ocvb.IMU_AngularVelocity.Z))
+        Dim predictedW = New cv.Point3f(dt * (dt / 2 * ocvb.task.IMU_AngularAcceleration.X + ocvb.task.IMU_AngularVelocity.X),
+                                        dt * (dt / 2 * ocvb.task.IMU_AngularAcceleration.Y + ocvb.task.IMU_AngularVelocity.Y),
+                                        dt * (dt / 2 * ocvb.task.IMU_AngularAcceleration.Z + ocvb.task.IMU_AngularVelocity.Z))
 
         Dim predictedRotation As New Quaternion
-        predictedRotation = Quaternion.Multiply(quaternion_exp(predictedW), ocvb.IMU_Rotation)
+        predictedRotation = Quaternion.Multiply(quaternion_exp(predictedW), ocvb.task.IMU_Rotation)
 
-        Dim diffq = Quaternion.Subtract(ocvb.IMU_Rotation, predictedRotation)
+        Dim diffq = Quaternion.Subtract(ocvb.task.IMU_Rotation, predictedRotation)
 
         ocvb.trueText("IMU_Acceleration = " + vbTab +
-                                 Format(ocvb.IMU_Acceleration.X, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_Acceleration.Y, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_Acceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +
+                                 Format(ocvb.task.IMU_Acceleration.X, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_Acceleration.Y, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_Acceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +
                                  "IMU_Velocity = " + vbTab + vbTab +
-                                 Format(ocvb.IMU_Velocity.X, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_Velocity.Y, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_Velocity.Z, "0.0000") + ", " + vbTab + vbCrLf +
+                                 Format(ocvb.task.IMU_Velocity.X, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_Velocity.Y, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_Velocity.Z, "0.0000") + ", " + vbTab + vbCrLf +
                                  "IMU_AngularAccel. = " + vbTab +
-                                 Format(ocvb.IMU_AngularAcceleration.X, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_AngularAcceleration.Y, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_AngularAcceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +
+                                 Format(ocvb.task.IMU_AngularAcceleration.X, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_AngularAcceleration.Y, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_AngularAcceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +
                                  "IMU_AngularVelocity = " + vbTab +
-                                 Format(ocvb.IMU_AngularVelocity.X, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_AngularVelocity.Y, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_AngularVelocity.Z, "0.0000") + ", " + vbTab + vbCrLf +
+                                 Format(ocvb.task.IMU_AngularVelocity.X, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_AngularVelocity.Y, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_AngularVelocity.Z, "0.0000") + ", " + vbTab + vbCrLf +
                                  "dt = " + dt.ToString() + vbCrLf +
                                  "Pose quaternion = " + vbTab +
-                                 Format(ocvb.IMU_Rotation.X, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_Rotation.Y, "0.0000") + ", " + vbTab +
-                                 Format(ocvb.IMU_Rotation.Z, "0.0000") + ", " + vbTab + vbCrLf +
+                                 Format(ocvb.task.IMU_Rotation.X, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_Rotation.Y, "0.0000") + ", " + vbTab +
+                                 Format(ocvb.task.IMU_Rotation.Z, "0.0000") + ", " + vbTab + vbCrLf +
                                  "Prediction Rotation = " + vbTab +
                                  Format(predictedRotation.X, "0.0000") + ", " + vbTab +
                                  Format(predictedRotation.Y, "0.0000") + ", " + vbTab +

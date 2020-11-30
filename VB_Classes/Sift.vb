@@ -6,25 +6,25 @@ Public Class Sift_Basics_CS
     Inherits VBparent
     Dim siftCS As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New()
+        initParent()
+        fisheye = New FishEye_Rectified()
 
-        radio.Setup(ocvb, caller, 2)
+        radio.Setup(caller, 2)
         radio.check(0).Text = "Use BF Matcher"
         radio.check(1).Text = "Use Flann Matcher"
         radio.check(0).Checked = True
 
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim doubleSize As New cv.Mat(ocvb.leftView.Rows, ocvb.leftView.Cols * 2, cv.MatType.CV_8UC3)
+        Dim doubleSize As New cv.Mat(ocvb.task.leftView.Rows, ocvb.task.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
-        siftCS.Run(ocvb.leftView, ocvb.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
+        siftCS.Run(ocvb.task.leftView, ocvb.task.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
 
         doubleSize(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
         doubleSize(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
@@ -43,33 +43,33 @@ Public Class Sift_Basics_CS_MT
     Dim siftBasics As Sift_Basics_CS
     Dim fisheye As FishEye_Rectified
     Dim numPointSlider As System.Windows.Forms.TrackBar
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        fisheye = New FishEye_Rectified(ocvb)
+    Public Sub New()
+        initParent()
+        fisheye = New FishEye_Rectified()
 
-        grid = New Thread_Grid(ocvb)
+        grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Maximum = ocvb.color.Cols * 2
-        gridWidthSlider.Value = ocvb.color.Cols * 2 ' we are just taking horizontal slices of the image.
+        gridWidthSlider.Maximum = ocvb.task.color.Cols * 2
+        gridWidthSlider.Value = ocvb.task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
 
-        grid.Run(ocvb)
+        grid.Run()
 
-        siftBasics = New Sift_Basics_CS(ocvb)
+        siftBasics = New Sift_Basics_CS()
         numPointSlider = findSlider("Points to Match")
         numPointSlider.Value = 1
 
         ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim leftView As cv.Mat
         Dim rightView As cv.Mat
 
-        leftView = ocvb.leftView
-        rightView = ocvb.rightView
-        grid.Run(ocvb)
+        leftView = ocvb.task.leftView
+        rightView = ocvb.task.rightView
+        grid.Run()
 
         Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
 

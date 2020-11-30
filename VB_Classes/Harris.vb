@@ -31,10 +31,10 @@ Public Class Harris_Features_CPP
     Inherits VBparent
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 
-        sliders.Setup(ocvb, caller, 5)
+        sliders.Setup(caller, 5)
         sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
         sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
         sliders.setupTrackBar(2, "Harris aperture", 1, 31, 21)
@@ -46,7 +46,7 @@ Public Class Harris_Features_CPP
         ReDim srcData(src.Total - 1)
         Harris_Features = Harris_Features_Open()
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
@@ -65,7 +65,7 @@ Public Class Harris_Features_CPP
         gray32f.ConvertTo(dst1, cv.MatType.CV_8U)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim weight = sliders.trackbar(4).Value / 100
-        cv.Cv2.AddWeighted(dst1, weight, ocvb.color, 1 - weight, 0, dst2)
+        cv.Cv2.AddWeighted(dst1, weight, ocvb.task.color, 1 - weight, 0, dst2)
         label2 = "RGB overlaid with Harris result. Weight = " + Format(weight, "0%")
     End Sub
     Public Sub Close()
@@ -83,9 +83,9 @@ Public Class Harris_Detector_CPP
     Dim ptCount(1) As integer
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
 
         ocvb.desc = "Use Harris detector to identify interesting points."
@@ -93,7 +93,7 @@ Public Class Harris_Detector_CPP
         ReDim srcData(src.Total - 1)
         Harris_Detector = Harris_Detector_Open()
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)

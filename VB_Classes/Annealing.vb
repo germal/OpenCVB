@@ -30,7 +30,7 @@ Public Class Annealing_Basics_CPP
     Public closed As Boolean
     Public circularPattern As Boolean = True
     Dim saPtr As IntPtr
-    Public Sub drawMap(ocvb As VBocvb)
+    Public Sub drawMap()
         dst1.SetTo(0)
         For i = 0 To cityOrder.Length - 1
             dst1.Circle(cityPositions(i), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
@@ -39,7 +39,7 @@ Public Class Annealing_Basics_CPP
         cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), cv.HersheyFonts.HersheyComplex, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), cv.HersheyFonts.HersheyComplex, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub setup(ocvb As VBocvb)
+    Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)
 
         Dim radius = src.Rows * 0.45
@@ -66,17 +66,17 @@ Public Class Annealing_Basics_CPP
         hCityPosition.Free()
         closed = False
     End Sub
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        setup(ocvb)
+    Public Sub New()
+        initParent()
+        setup()
         ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If closed = True Then Exit Sub
         If standalone Then
             If ocvb.frameCount = 0 Then
-                setup(ocvb)
+                setup()
                 Open()
             End If
         End If
@@ -88,13 +88,13 @@ Public Class Annealing_Basics_CPP
         Dim split As String() = Regex.Split(msg, "\W+")
         energy = CSng(split(split.Length - 2) + "." + split(split.Length - 1))
 
-        drawMap(ocvb)
+        drawMap()
 
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then
             Annealing_Basics_Close(saPtr)
             restartComputation = False
             If standalone Then
-                setup(ocvb)
+                setup()
                 Open()
             End If
             closed = True
@@ -122,19 +122,19 @@ Public Class Annealing_CPP_MT
             Return 1
         End Function
     End Class
-    Private Sub setup(ocvb As VBocvb)
+    Private Sub setup()
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = sliders.trackbar(0).Value
-        random.Run(ocvb) ' get the city positions (may or may not be used below.)
+        random.Run() ' get the city positions (may or may not be used below.)
 
         Dim numberofCities = sliders.trackbar(0).Value
         Dim circles = check.Box(2).Checked
         For i = 0 To anneal.Length - 1
-            anneal(i) = New Annealing_Basics_CPP(ocvb)
+            anneal(i) = New Annealing_Basics_CPP()
             anneal(i).numberOfCities = numberofCities
             anneal(i).cityPositions = random.Points2f.Clone()
             anneal(i).circularPattern = circles
-            anneal(i).setup(ocvb)
+            anneal(i).setup()
             anneal(i).cityPositions = anneal(0).cityPositions.Clone() ' duplicate for all threads - working on the same set of points.
             anneal(i).Open() ' this will initialize the C++ copy of the city positions.
         Next
@@ -144,43 +144,43 @@ Public Class Annealing_CPP_MT
         startTime = Now
     End Sub
 
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        random = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        random = New Random_Points()
         hideForm("Random_Points Slider Options")
 
-        mats = New Mat_4to1(ocvb)
+        mats = New Mat_4to1()
 
         ReDim anneal(Environment.ProcessorCount - 1)
-        sliders.Setup(ocvb, caller)
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Anneal Number of Cities", 5, 500, 25)
         sliders.setupTrackBar(1, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
 
-        check.Setup(ocvb, caller, 3)
+        check.Setup(caller, 3)
         check.Box(0).Text = "Restart TravelingSalesman"
         check.Box(1).Text = "Copy Best Intermediate solutions (top half) to Bottom Half"
         check.Box(1).Checked = True
         check.Box(2).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(2).Checked = True
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText()
 
         label1 = "Log of Annealing progress"
         label2 = "Top 2 are best solutions, bottom 2 are worst."
 
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If anneal(0) Is Nothing Then setup(ocvb) ' setup here rather than in algorithm so all threads work on the same problem.
+        If anneal(0) Is Nothing Then setup() ' setup here rather than in algorithm so all threads work on the same problem.
         Static CityCountSlider = findSlider("Anneal Number of Cities")
-        If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup(ocvb)
+        If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup()
         check.Box(0).Checked = False
         Dim allClosed As Boolean = True
         Parallel.For(0, anneal.Length,
             Sub(i)
                 If anneal(i).closed = False Then
-                    anneal(i).Run(ocvb)
+                    anneal(i).Run()
                     allClosed = False
                 End If
             End Sub)
@@ -194,7 +194,7 @@ Public Class Annealing_CPP_MT
             bestList.Add(anneal(i).energy, i)
             flow.msgs.Add("CPU=" + Format(i, "00") + " " + anneal(i).msg)
         Next
-        flow.Run(ocvb)
+        flow.Run()
 
         ' if the top 4 are all the same energy, then we are done.
         If bestList.Count > 1 Then
@@ -219,7 +219,7 @@ Public Class Annealing_CPP_MT
             mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst1
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst1
         End If
-        mats.Run(ocvb)
+        mats.Run()
         dst2 = mats.dst1
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
@@ -229,7 +229,7 @@ Public Class Annealing_CPP_MT
             Next
         End If
 
-        If allClosed Then setup(ocvb)
+        If allClosed Then setup()
     End Sub
 End Class
 
@@ -241,32 +241,32 @@ Public Class Annealing_Options
     Dim random As Random_Points
     Public anneal As Annealing_Basics_CPP
     Dim flow As Font_FlowText
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        random = New Random_Points(ocvb)
+    Public Sub New()
+        initParent()
+        random = New Random_Points()
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = 25 ' change the default number of cities here.
-        random.Run(ocvb) ' get the city positions (may or may not be used below.)
+        random.Run() ' get the city positions (may or may not be used below.)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(caller, 2)
         check.Box(0).Text = "Restart TravelingSalesman"
         check.Box(1).Text = "Circular pattern of cities (allows you to visually check if successful.)"
         check.Box(1).Checked = True
 
-        flow = New Font_FlowText(ocvb)
+        flow = New Font_FlowText()
 
         label1 = "Log of Annealing progress"
 
 
-        anneal = New Annealing_Basics_CPP(ocvb)
+        anneal = New Annealing_Basics_CPP()
         anneal.numberOfCities = randomSlider.Value
         anneal.circularPattern = check.Box(1).Checked
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
-        anneal.setup(ocvb)
+        anneal.setup()
         anneal.Open()
         ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static randomSlider = findSlider("Random Pixel Count")
         Dim numberOfCities = randomSlider.Value
@@ -280,14 +280,14 @@ Public Class Annealing_Options
             check.Box(0).Checked = False
         End If
 
-        anneal.Run(ocvb)
+        anneal.Run()
         dst2 = anneal.dst1
 
         If anneal.restartComputation Then
             anneal.restartComputation = False
-            random.Run(ocvb) ' get the city positions (may or may not be used below.)
+            random.Run() ' get the city positions (may or may not be used below.)
             If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
-            anneal.setup(ocvb)
+            anneal.setup()
             anneal.Open()
             Static startTime As DateTime
             Dim timeSpent = Now.Subtract(startTime)
@@ -296,7 +296,7 @@ Public Class Annealing_Options
         End If
 
         flow.msgs.Add(anneal.msg)
-        flow.Run(ocvb)
+        flow.Run()
 
     End Sub
 End Class

@@ -8,9 +8,9 @@ Public Class WarpModel_Input
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        radio.Setup(ocvb, caller, 12)
+    Public Sub New()
+        initParent()
+        radio.Setup(caller, 12)
         radio.check(0).Text = "building.jpg"
         radio.check(1).Text = "church.jpg"
         radio.check(2).Text = "emir.jpg"
@@ -25,13 +25,13 @@ Public Class WarpModel_Input
         radio.check(11).Text = "Valley.jpg"
         radio.check(9).Checked = True
 
-        check.Setup(ocvb, caller, 1)
+        check.Setup(caller, 1)
         check.Box(0).Text = "Use Gradient in WarpInput"
 
-        sobel = New Edges_Sobel(ocvb)
+        sobel = New Edges_Sobel()
         ocvb.desc = "Import the misaligned input."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img As New cv.Mat
         Static frm = findForm("WarpModel_Input Radio Options")
@@ -50,7 +50,7 @@ Public Class WarpModel_Input
         For i = 0 To r.Count - 1
             If check.Box(0).Checked Then
                 sobel.src = img(r(i))
-                sobel.Run(ocvb)
+                sobel.Run()
                 gradient(i) = sobel.dst1.Clone()
             End If
             rgb(i) = img(r(i))
@@ -103,25 +103,25 @@ Public Class WarpModel_FindTransformECC_CPP
     Public rgb2 As New cv.Mat
     Public warpMode As Integer
     Public aligned As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
         cPtr = WarpModel_Open()
 
-        radio.Setup(ocvb, caller,4)
+        radio.Setup(caller,4)
         radio.check(0).Text = "Motion_Translation (fastest)"
         radio.check(1).Text = "Motion_Euclidean"
         radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
         radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
         radio.check(0).Checked = True
 
-        warp = New WarpModel_Input(ocvb)
+        warp = New WarpModel_Input()
 
         ocvb.desc = "Use FindTransformECC to align 2 images"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         warp.src = src
-        warp.Run(ocvb)
+        warp.Run()
         dst1 = warp.dst1
 
         Static frm = findForm("WarpModel_FindTransformECC_CPP Radio Options")
@@ -196,13 +196,13 @@ End Class
 Public Class WarpModel_AlignImages
     Inherits VBparent
     Dim ecc As WarpModel_FindTransformECC_CPP
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        ecc = New WarpModel_FindTransformECC_CPP(ocvb)
+    Public Sub New()
+        initParent()
+        ecc = New WarpModel_FindTransformECC_CPP()
 
         ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
@@ -214,7 +214,7 @@ Public Class WarpModel_AlignImages
                 ecc.src2 = Choose(i + 1, ecc.warp.rgb(1), ecc.warp.rgb(2))
             End If
             ecc.src = src
-            ecc.Run(ocvb)
+            ecc.Run()
             aligned(i) = ecc.aligned.Clone()
         Next
 

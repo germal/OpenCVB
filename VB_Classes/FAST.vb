@@ -3,17 +3,17 @@ Imports cv = OpenCvSharp
 Public Class FAST_Basics
     Inherits VBparent
     Public keypoints() As cv.KeyPoint
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Threshold", 0, 200, 15)
-        check.Setup(ocvb, caller, 1)
+        check.Setup(caller, 1)
         check.Box(0).Text = "Use Non-Max = True"
         check.Box(0).Checked = True
 
         ocvb.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.CopyTo(dst1)
@@ -34,18 +34,18 @@ Public Class FAST_Centroid
     Inherits VBparent
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        kalman = New Kalman_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        kalman = New Kalman_Basics()
         ReDim kalman.kInput(1) ' 2 elements - cv.point
 
-        fast = New FAST_Basics(ocvb)
+        fast = New FAST_Basics()
         ocvb.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         fast.src = src
-        fast.Run(ocvb)
+        fast.Run()
         dst1 = fast.dst1
         dst2.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
@@ -56,7 +56,7 @@ Public Class FAST_Centroid
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run(ocvb)
+            kalman.Run()
             dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
     End Sub

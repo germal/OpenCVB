@@ -8,24 +8,24 @@ Public Class Texture_Basics
     Public tRect As cv.Rect
     Dim texturePop As Integer
     Public tChange As Boolean ' if the texture hasn't changed this will be false.
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        grid = New Thread_Grid(ocvb)
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid()
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 64
-        grid.Run(ocvb)
+        grid.Run()
 
-        ellipse = New Draw_Ellipses(ocvb)
+        ellipse = New Draw_Ellipses()
         If standalone = False Then hideForm("Draw_Ellipses Slider Options")
         ocvb.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If standalone Or src.Channels <> 1 Then
-            ellipse.Run(ocvb)
+            ellipse.Run()
             dst1 = ellipse.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1 = dst1.ConvertScaleAbs(255)
             dst2 = ellipse.dst1.Clone
@@ -46,7 +46,7 @@ Public Class Texture_Basics
             Next
             If standalone Then dst2.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
             tRect = sortcounts.ElementAt(0).Value
-            texture = ocvb.color(tRect)
+            texture = ocvb.task.color(tRect)
             texturePop = dst1(tRect).CountNonZero()
         End If
         If standalone Then dst2.Rectangle(tRect, cv.Scalar.White, 2)
@@ -60,16 +60,16 @@ End Class
 
 Public Class Texture_Flow
     Inherits VBparent
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
         sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
 
         ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim TFdelta = sliders.trackbar(0).Value
         Dim TFblockSize = sliders.trackbar(1).Value * 2 + 1
@@ -97,15 +97,15 @@ End Class
 Public Class Texture_Flow_Depth
     Inherits VBparent
     Dim texture As Texture_Flow
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        texture = New Texture_Flow(ocvb)
+    Public Sub New()
+        initParent()
+        texture = New Texture_Flow()
         ocvb.desc = "Display texture flow in the depth data"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        texture.src = ocvb.RGBDepth
-        texture.Run(ocvb)
+        texture.src = ocvb.task.RGBDepth
+        texture.Run()
         dst1 = texture.dst1
     End Sub
 End Class
@@ -123,17 +123,17 @@ Public Class Texture_Shuffle
     Dim texture As Texture_Basics
     Public tRect As cv.Rect
     Public rgbaTexture As New cv.Mat
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        If standalone Then floor = New OpenGL_FloorPlane(ocvb)
-        texture = New Texture_Basics(ocvb)
-        shuffle = New Random_Shuffle(ocvb)
+    Public Sub New()
+        initParent()
+        If standalone Then floor = New OpenGL_FloorPlane()
+        texture = New Texture_Basics()
+        shuffle = New Random_Shuffle()
         ocvb.desc = "Use random shuffling to homogenize a texture sample"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
-            floor.plane.Run(ocvb)
+            floor.plane.Run()
             dst2.SetTo(0)
             src.CopyTo(dst2, floor.plane.maskPlane)
             dst1 = floor.plane.dst1
@@ -142,11 +142,11 @@ Public Class Texture_Shuffle
             texture.src = src
         End If
 
-        texture.Run(ocvb)
+        texture.Run()
         dst1 = texture.dst2
         dst2.Rectangle(texture.tRect, cv.Scalar.White, 2)
         shuffle.src = texture.texture
-        shuffle.Run(ocvb)
+        shuffle.Run()
         tRect = New cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4)
         dst1(tRect) = shuffle.dst1.Repeat(4, 4)
         Dim split = cv.Cv2.Split(dst1(tRect))

@@ -7,24 +7,24 @@ Public Class Highlight_Basics
     Dim preKalmanRect As New cv.Rect
     Dim highlightMask As New cv.Mat
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        If standalone Then reduction = New Reduction_KNN_Color(ocvb)
+    Public Sub New()
+        initParent()
+        If standalone Then reduction = New Reduction_KNN_Color()
         ocvb.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+    Public Sub Run()
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             reduction.src = src
-            reduction.Run(ocvb)
+            reduction.Run()
             viewObjects = reduction.pTrack.drawRC.viewObjects
             src = reduction.dst1
         End If
 
         dst1 = src
-        If ocvb.mouseClickFlag Then
-            highlightPoint = ocvb.mouseClickPoint
-            ocvb.mouseClickFlag = False ' absorb the mouse click here only
+        If ocvb.task.mouseClickFlag Then
+            highlightPoint = ocvb.task.mouseClickPoint
+            ocvb.task.mouseClickFlag = False ' absorb the mouse click here only
         End If
         If highlightPoint <> New cv.Point And viewObjects.Count > 0 Then
             Dim index = findNearestPoint(highlightPoint, viewObjects)
@@ -37,7 +37,7 @@ Public Class Highlight_Basics
             dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             dst1.Rectangle(highlightRect, cv.Scalar.Red, 2)
             Dim rect = New cv.Rect(0, 0, highlightMask.Width, highlightMask.Height)
-            ocvb.color.CopyTo(dst2)
+            ocvb.task.color.CopyTo(dst2)
             dst2(preKalmanRect).SetTo(cv.Scalar.Yellow, highlightMask)
             label2 = "Highlighting the selected region."
         End If

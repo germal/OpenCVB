@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Windows.Forms
 Module Algorithm_Module
-    Public ocvbx As VBocvb
+    Public ocvb As VBocvb
     Public aOptions As aOptionsFrm
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
@@ -23,9 +23,59 @@ Module Algorithm_Module
     End Sub
 End Module
 Public Class ActiveTask : Implements IDisposable
-    Public ocvb As VBocvb
     Dim algoList As New algorithmList
     Dim algorithmObject As Object
+
+    Public color As cv.Mat
+    Public RGBDepth As cv.Mat
+    Public result As New cv.Mat
+    Public pointCloud As cv.Mat
+    Public depth16 As cv.Mat
+    Public leftView As cv.Mat
+    Public rightView As cv.Mat
+
+    Public mouseClickFlag As Boolean
+    Public mouseClickPoint As cv.Point
+    Public mousePicTag As Integer ' which image was the mouse in?
+    Public mousePoint As cv.Point ' trace any mouse movements using this.
+
+    Public IMU_Barometer As Single
+    Public IMU_Magnetometer As cv.Point3f
+    Public IMU_Temperature As Single
+    Public IMU_TimeStamp As Double
+    Public IMU_Rotation As System.Numerics.Quaternion
+    Public IMU_Translation As cv.Point3f
+    Public IMU_Acceleration As cv.Point3f
+    Public IMU_Velocity As cv.Point3f
+    Public IMU_AngularAcceleration As cv.Point3f
+    Public IMU_AngularVelocity As cv.Point3f
+    Public IMU_FrameTime As Double
+    Public CPU_TimeStamp As Double
+    Public CPU_FrameTime As Double
+
+    Public openFileDialogRequested As Boolean
+    Public openFileInitialDirectory As String
+    Public openFileFilter As String
+    Public openFileFilterIndex As Integer
+    Public openFileDialogName As String
+    Public openFileDialogTitle As String
+    Public openFileSliderPercent As Single
+    Public fileStarted As Boolean
+    Public initialStartSetting As Boolean
+
+    Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
+    Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
+
+    Public label1 As String
+    Public label2 As String
+    Public desc As String
+    Public intermediateReview As String
+
+    Public transformationMatrix() As Single
+
+    Public TTtextData As New List(Of TTtext)
+    Public callTrace As New List(Of String)
+
     Public Structure Extrinsics_VB
         Public rotation As Single()
         Public translation As Single()
@@ -39,8 +89,6 @@ Public Class ActiveTask : Implements IDisposable
         Public FOV As Single()
     End Structure
     Public Structure algParms
-        ' these are parameters needed early in the task initialization, either by the algorithm constructor or the VBparent initialization or
-        ' one-time only constants needed by the algorithms.
         Public cameraName As camNames
         Enum camNames
             Kinect4AzureCam
@@ -64,7 +112,7 @@ Public Class ActiveTask : Implements IDisposable
         Public intrinsicsRight As intrinsics_VB
         Public extrinsics As Extrinsics_VB
     End Structure
-    Private Sub buildColors(ocvb As VBocvb)
+    Private Sub buildColors()
         Dim vec As cv.Scalar, r As Integer = 120, b As Integer = 255, g As Integer = 0
         Dim scalarList As New List(Of cv.Scalar)
         For i = 0 To ocvb.fixedColors.Length - 1
@@ -91,48 +139,20 @@ Public Class ActiveTask : Implements IDisposable
             ocvb.scalarColors(i) = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
         Next
     End Sub
-    Private Sub layoutOptions(mainLocation As cv.Rect)
-        Dim sliderOffset As New cv.Point(mainLocation.Left, mainLocation.Top + mainLocation.Height)
-        Dim otherOffset As New cv.Point(mainLocation.Left + mainLocation.Width / 2, mainLocation.Top + mainLocation.Height)
-        Try
-            Dim indexS As Integer = 0
-            Dim indexO As Integer = 0
-            For Each frm In Application.OpenForms
-                If frm.name.startswith("OptionsSliders") Or frm.name.startswith("OptionsKeyboardInput") Or frm.name.startswith("OptionsAlphaBlend") Then
-                    If frm.visible Then
-                        Try
-                            frm.SetDesktopLocation(sliderOffset.X + indexS * ocvb.optionsOffset, sliderOffset.Y + indexS * ocvb.optionsOffset)
-                        Catch ex As Exception
-
-                        End Try
-                        indexS += 1
-                    End If
-                End If
-                If frm.name.startswith("OptionsRadioButtons") Or frm.name.startswith("OptionsCheckbox") Or frm.name.startswith("OptionsCombo") Then
-                    If frm.visible Then
-                        frm.SetDesktopLocation(otherOffset.X + indexO * ocvb.optionsOffset, otherOffset.Y + indexO * ocvb.optionsOffset)
-                        indexO += 1
-                    End If
-                End If
-            Next
-        Catch ex As Exception
-            Console.WriteLine("Error in layoutOptions: " + ex.Message)
-        End Try
-    End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, location As cv.Rect, camWidth As Integer, camHeight As Integer)
         Randomize() ' just in case anyone uses VB.Net's Rnd
-        ocvb = New VBocvb(resolution, parms, location, camWidth, camHeight)
+        ocvb = New VBocvb(resolution, location, camWidth, camHeight, Me)
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
         ocvb.mainLocation = location
         ocvb.optionsOffset = 30
         ocvb.parms = parms
-        buildColors(ocvb)
-        algorithmObject = algoList.createAlgorithm(ocvb, algName)
+        buildColors()
+        algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Problem likely originated with the UIindexer.")
         End If
-        If parms.useRecordedData Then recordedData = New Replay_Play(ocvb)
+        If parms.useRecordedData Then recordedData = New Replay_Play()
 
         ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
         ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
@@ -147,20 +167,23 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 
-        ocvbx = ocvb
-        layoutOptions(location)
+        ocvb = ocvb
     End Sub
     Public Sub RunAlgorithm()
         Try
             If ocvb.parms.useRecordedData Then
-                Dim recordingFilename = New FileInfo(ocvb.openFileDialogName)
+                Dim recordingFilename = New FileInfo(ocvb.task.openFileDialogName)
                 If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
                     ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
                     Exit Sub
                 End If
-                recordedData.Run(ocvb)
+                recordedData.Run()
             End If
-            algorithmObject.NextFrame(ocvb)
+            algorithmObject.NextFrame()
+            label1 = ocvb.label1
+            label2 = ocvb.label2
+            desc = ocvb.desc
+            intermediateReview = ocvb.intermediateReview
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

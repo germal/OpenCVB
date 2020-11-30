@@ -7,21 +7,21 @@ Public Class KLT_Basics
     Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        sliders.Setup(ocvb, caller)
+    Public Sub New()
+        initParent()
+        sliders.Setup(caller)
         sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
         sliders.setupTrackBar(1, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
         sliders.setupTrackBar(2, "KLT - minDistance", 1, 100, 7)
         sliders.setupTrackBar(3, "KLT - BlockSize", 1, 100, 7)
 
-        check.Setup(ocvb, caller, 2)
+        check.Setup(caller, 2)
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
         ocvb.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static prevGray As New cv.Mat
 
@@ -88,15 +88,15 @@ Public Class KLT_OpticalFlow
     Inherits VBparent
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
-        klt = New KLT_Basics(ocvb)
+    Public Sub New()
+        initParent()
+        klt = New KLT_Basics()
         ocvb.desc = "KLT optical flow - needs more work"
     End Sub
-    Public Sub Run(ocvb As VBocvb)
+    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         klt.src = src
-        klt.Run(ocvb)
+        klt.Run()
         If ocvb.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             dst1 = klt.dst1
             src.CopyTo(dst2)
