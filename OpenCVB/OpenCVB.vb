@@ -668,22 +668,11 @@ Public Class OpenCVB
     End Sub
     Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
         Dim systemPath = Environment.GetEnvironmentVariable("Path")
-        'Dim curDirectory = CurDir()
-        'If InStr(systemPath, curDirectory) = False Then systemPath = curDirectory + ";" + systemPath
         Dim foundDirectory As Boolean
         If Directory.Exists(neededDirectory) Then
             foundDirectory = True
             systemPath = neededDirectory + ";" + systemPath
         End If
-
-        ' maybe they didn't build the release version yet.
-        'If foundDirectory = False And InStr(neededDirectory, "Release") Then
-        '    neededDirectory.Replace("Release", "Debug")
-        '    If Directory.Exists(neededDirectory) Then
-        '        foundDirectory = True
-        '        systemPath = neededDirectory + ";" + systemPath
-        '    End If
-        'End If
 
         If foundDirectory = False And notFoundMessage.Length > 0 Then
             MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
