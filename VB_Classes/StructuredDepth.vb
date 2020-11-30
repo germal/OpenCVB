@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class StructuredDepth_BasicsH
+Public Class StructuredDepth_SliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
     Dim inrange As Depth_InRange
@@ -15,7 +15,7 @@ Public Class StructuredDepth_BasicsH
 
         sliders.Setup(ocvb, caller)
         sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-        sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2)
+        sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2 - 20)
         sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
 
         histThresholdSlider = findSlider("Histogram threshold")
@@ -67,11 +67,11 @@ End Class
 
 
 
-Public Class StructuredDepth_BasicsV
+Public Class StructuredDepth_SliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
     Public inrange As Depth_InRange
-    Dim sideStruct As StructuredDepth_BasicsH
+    Dim sideStruct As StructuredDepth_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
@@ -79,7 +79,7 @@ Public Class StructuredDepth_BasicsV
         initParent(ocvb)
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
-        sideStruct = New StructuredDepth_BasicsH(ocvb)
+        sideStruct = New StructuredDepth_SliceH(ocvb)
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
@@ -131,14 +131,14 @@ End Class
 
 Public Class StructuredDepth_Floor
     Inherits VBparent
-    Public structD As StructuredDepth_BasicsH
+    Public structD As StructuredDepth_SliceH
     Dim kalman As Kalman_VB_Basics
     Public floorYplane As Single
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_VB_Basics(ocvb)
 
-        structD = New StructuredDepth_BasicsH(ocvb)
+        structD = New StructuredDepth_SliceH(ocvb)
         structD.histThresholdSlider.Value = 10 ' some cameras can show data below ground level...
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
@@ -181,14 +181,14 @@ End Class
 
 Public Class StructuredDepth_Ceiling
     Inherits VBparent
-    Public structD As StructuredDepth_BasicsH
+    Public structD As StructuredDepth_SliceH
     Dim kalman As Kalman_Basics
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         kalman = New Kalman_Basics(ocvb)
         ReDim kalman.kInput(0)
 
-        structD = New StructuredDepth_BasicsH(ocvb)
+        structD = New StructuredDepth_SliceH(ocvb)
         structD.cushionSlider.Value = 10
         ocvb.desc = "Find the ceiling plane"
     End Sub
@@ -222,13 +222,13 @@ End Class
 Public Class StructuredDepth_MultiSliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
-    Public structD As StructuredDepth_BasicsH
+    Public structD As StructuredDepth_SliceH
     Dim inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         side2D = New Histogram_SideData(ocvb)
         inrange = New Depth_InRange(ocvb)
-        structD = New StructuredDepth_BasicsH(ocvb)
+        structD = New StructuredDepth_SliceH(ocvb)
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -271,14 +271,14 @@ End Class
 Public Class StructuredDepth_MultiSliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Public structD As StructuredDepth_BasicsH
+    Public structD As StructuredDepth_SliceH
     Dim inrange As Depth_InRange
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
 
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
-        structD = New StructuredDepth_BasicsH(ocvb)
+        structD = New StructuredDepth_SliceH(ocvb)
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -322,7 +322,7 @@ Public Class StructuredDepth_MultiSlice
     Inherits VBparent
     Public top2D As Histogram_TopData
     Public side2D As Histogram_SideData
-    Dim struct As StructuredDepth_BasicsV
+    Dim struct As StructuredDepth_SliceV
     Public inrange As Depth_InRange
     Public maskPlane As cv.Mat
     Public Sub New(ocvb As VBocvb)
@@ -331,7 +331,7 @@ Public Class StructuredDepth_MultiSlice
         side2D = New Histogram_SideData(ocvb)
         top2D = New Histogram_TopData(ocvb)
         inrange = New Depth_InRange(ocvb)
-        struct = New StructuredDepth_BasicsV(ocvb)
+        struct = New StructuredDepth_SliceV(ocvb)
 
         ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -457,12 +457,12 @@ End Class
 Public Class StructuredDepth_SliceXPlot
     Inherits VBparent
     Dim multi As StructuredDepth_MultiSlice
-    Dim structD As StructuredDepth_BasicsV
+    Dim structD As StructuredDepth_SliceV
     Dim cushionSlider As Windows.Forms.TrackBar
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
         multi = New StructuredDepth_MultiSlice(ocvb)
-        structD = New StructuredDepth_BasicsV(ocvb)
+        structD = New StructuredDepth_SliceV(ocvb)
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         cushionSlider.Value = 25
         ocvb.desc = "Find any plane around a peak value in the top-down histogram"
