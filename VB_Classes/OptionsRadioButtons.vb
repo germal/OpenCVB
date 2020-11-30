@@ -25,7 +25,4 @@ Public Class OptionsRadioButtons
             Return True
         End Get
     End Property
-    Private Sub OptionsRadioButtons_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SetDesktopLocation(optionLocation.X, optionLocation.Y)
-    End Sub
 End Class

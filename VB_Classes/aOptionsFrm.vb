@@ -1,6 +1,6 @@
 ﻿Imports System.ComponentModel
 
-Public Class Options
+Public Class aOptionsFrm
     Public check As New OptionsCheckbox
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
@@ -30,5 +30,11 @@ Public Class Options
         'SaveSetting("OpenCVB", "aOptionsTop", "aOptionsTop", Me.Top)
         'SaveSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", Me.Width)
         'SaveSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", Me.Height)
+
+        sliders.Dispose()
+        check.Dispose()
+        radio.Dispose()
+        radio1.Dispose()
+        combo.Dispose()
     End Sub
 End Class

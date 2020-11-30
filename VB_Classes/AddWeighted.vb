@@ -5,8 +5,8 @@ Public Class AddWeighted_Basics
     Public src2 As New cv.Mat
     Public Sub New(ocvb As VBocvb)
         initParent(ocvb)
-        ocvb.aOptions.sliders.Setup(ocvb, caller)
-        ocvb.aOptions.sliders.setupTrackBar(0, "Weight", 0, 100, 50)
+        aOptions.sliders.Setup(ocvb, caller)
+        aOptions.sliders.setupTrackBar(0, "Weight", 0, 100, 50)
         ocvb.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run(ocvb As VBocvb)

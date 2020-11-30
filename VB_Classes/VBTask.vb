@@ -2,9 +2,10 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Windows.Forms
 Module Algorithm_Module
+    Public ocvbx As VBocvb
+    Public aOptions As aOptionsFrm
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
-    Public optionLocation As cv.Point
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
     Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
@@ -119,7 +120,6 @@ Public Class ActiveTask : Implements IDisposable
         End Try
     End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, location As cv.Rect, camWidth As Integer, camHeight As Integer)
-        optionLocation = New cv.Point(location.X, location.Y + location.Height)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New VBocvb(resolution, parms, location, camWidth, camHeight)
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
@@ -147,6 +147,7 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 
+        ocvbx = ocvb
         layoutOptions(location)
     End Sub
     Public Sub RunAlgorithm()

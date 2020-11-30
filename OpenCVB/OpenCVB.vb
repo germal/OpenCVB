@@ -54,7 +54,7 @@ Public Class OpenCVB
     Dim myBrush = New SolidBrush(System.Drawing.Color.White)
     Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
     Dim openCVKeywords As New List(Of String)
-    Dim OptionsBringToFront As Boolean
+    'Dim OptionsBringToFront As Boolean
     Dim treeViewBringToFront As Boolean
     Dim optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
@@ -82,7 +82,7 @@ Public Class OpenCVB
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
-    Dim startAlgorithmTime As DateTime
+    'Dim startAlgorithmTime As DateTime
     Const MAX_RECENT = 25
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
@@ -853,10 +853,10 @@ Public Class OpenCVB
             TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/testall.png")
         End If
     End Sub
-    Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        Dim diff = Now().Subtract(startAlgorithmTime)
-        If diff.TotalSeconds > 5 Then OptionsBringToFront = True
-    End Sub
+    'Private Sub OpenCVB_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+    '    Dim diff = Now().Subtract(startAlgorithmTime)
+    '    If diff.TotalSeconds > 5 Then OptionsBringToFront = True
+    'End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
     End Sub
@@ -1086,7 +1086,7 @@ Public Class OpenCVB
         saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
-        startAlgorithmTime = Now() ' black out optionsbringtofront
+        'startAlgorithmTime = Now() ' black out optionsbringtofront
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
@@ -1141,17 +1141,17 @@ Public Class OpenCVB
 
             ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
             ' This deletes the options forms for the current thread so they can be created (if needed) with the next algorithm thread.
-            Try
-                Dim frmlist As New List(Of Form)
-                For Each frm In Application.OpenForms
-                    If frm.name.startswith("Option") Then frmlist.Add(frm)
-                Next
-                For Each frm In frmlist
-                    frm.Close()
-                Next
-            Catch ex As Exception
-                Console.WriteLine("Error removing an Options form: " + ex.Message)
-            End Try
+            'Try
+            '    Dim frmlist As New List(Of Form)
+            '    For Each frm In Application.OpenForms
+            '        If frm.name.startswith("Option") Then frmlist.Add(frm)
+            '    Next
+            '    For Each frm In frmlist
+            '        frm.Close()
+            '    Next
+            'Catch ex As Exception
+            '    Console.WriteLine("Error removing an Options form: " + ex.Message)
+            'End Try
 
             task.Dispose()
             frameCount = 0
@@ -1278,20 +1278,20 @@ Public Class OpenCVB
                         task.ocvb.TTtextData.Clear()
                     End If
                 End SyncLock
-                If OptionsBringToFront Then
-                    OptionsBringToFront = False
-                    Try
-                        For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") Then frm.topmost = True
-                        Next
-                        For Each frm In Application.OpenForms
-                            If frm.name.startswith("Option") Then frm.topmost = False
-                        Next
-                    Catch ex As Exception
-                        Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
-                    End Try
-                    openFileFormLocated = False
-                End If
+                'If OptionsBringToFront Then
+                '    OptionsBringToFront = False
+                '    Try
+                '        For Each frm In Application.OpenForms
+                '            If frm.name.startswith("Option") Then frm.topmost = True
+                '        Next
+                '        For Each frm In Application.OpenForms
+                '            If frm.name.startswith("Option") Then frm.topmost = False
+                '        Next
+                '    Catch ex As Exception
+                '        Console.WriteLine("Error in OptionsBringToFront: " + ex.Message)
+                '    End Try
+                '    openFileFormLocated = False
+                'End If
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
                 Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
