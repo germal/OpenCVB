@@ -85,6 +85,9 @@ Public Class VBocvb
     Public imuZAxis As Boolean
     Public intermediateReview As String
     Public intermediateObject As VBparent
+    Public aOptions As Options
+    Public mainLocation As cv.Rect
+    Public optionsOffset As Integer
     Public Sub New(resolution As cv.Size, parms As ActiveTask.algParms, location As cv.Rect, pointcloudWidth As Integer, pointcloudHeight As Integer)
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

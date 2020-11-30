@@ -42,6 +42,11 @@ Public Class VBparent : Implements IDisposable
     Dim callStack = ""
     Public Sub initParent(ocvb As VBocvb)
         If ocvb.callTrace.Count = 0 Then
+            ocvb.aOptions = New Options
+            ocvb.aOptions.setup(ocvb)
+            ocvb.aOptions.Show()
+            ocvb.aOptions.SendToBack()
+
             standalone = True
             ocvb.callTrace.Clear()
             ocvb.callTrace.Add(callStack)

@@ -83,7 +83,7 @@ Public Class StructuredDepth_SliceV
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
-        offsetSlider.Value = src.Width / 2
+        offsetSlider.Value = src.Width / 2 - 20
 
         ocvb.desc = "Find and isolate planes using the top view histogram data"
     End Sub

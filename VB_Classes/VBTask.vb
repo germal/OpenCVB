@@ -93,7 +93,6 @@ Public Class ActiveTask : Implements IDisposable
     Private Sub layoutOptions(mainLocation As cv.Rect)
         Dim sliderOffset As New cv.Point(mainLocation.Left, mainLocation.Top + mainLocation.Height)
         Dim otherOffset As New cv.Point(mainLocation.Left + mainLocation.Width / 2, mainLocation.Top + mainLocation.Height)
-        Dim offset = 30
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
@@ -101,7 +100,7 @@ Public Class ActiveTask : Implements IDisposable
                 If frm.name.startswith("OptionsSliders") Or frm.name.startswith("OptionsKeyboardInput") Or frm.name.startswith("OptionsAlphaBlend") Then
                     If frm.visible Then
                         Try
-                            frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                            frm.SetDesktopLocation(sliderOffset.X + indexS * ocvb.optionsOffset, sliderOffset.Y + indexS * ocvb.optionsOffset)
                         Catch ex As Exception
 
                         End Try
@@ -110,7 +109,7 @@ Public Class ActiveTask : Implements IDisposable
                 End If
                 If frm.name.startswith("OptionsRadioButtons") Or frm.name.startswith("OptionsCheckbox") Or frm.name.startswith("OptionsCombo") Then
                     If frm.visible Then
-                        frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
+                        frm.SetDesktopLocation(otherOffset.X + indexO * ocvb.optionsOffset, otherOffset.Y + indexO * ocvb.optionsOffset)
                         indexO += 1
                     End If
                 End If
@@ -124,6 +123,8 @@ Public Class ActiveTask : Implements IDisposable
         Randomize() ' just in case anyone uses VB.Net's Rnd
         ocvb = New VBocvb(resolution, parms, location, camWidth, camHeight)
         If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
+        ocvb.mainLocation = location
+        ocvb.optionsOffset = 30
         ocvb.parms = parms
         buildColors(ocvb)
         algorithmObject = algoList.createAlgorithm(ocvb, algName)
