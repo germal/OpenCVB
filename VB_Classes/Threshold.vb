@@ -12,7 +12,7 @@ Public Class Threshold_LaplacianFilter
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "dist Threshold", 1, 100, 40)
         label1 = "Foreground Input"
-        ocvb.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
+        task.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

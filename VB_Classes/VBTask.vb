@@ -3,6 +3,7 @@ Imports System.IO
 Imports System.Windows.Forms
 Module Algorithm_Module
     Public ocvb As VBocvb
+    Public task As ActiveTask
     Public aOptions As aOptionsFrm
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
@@ -141,12 +142,20 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, location As cv.Rect, camWidth As Integer, camHeight As Integer)
         Randomize() ' just in case anyone uses VB.Net's Rnd
-        ocvb = New VBocvb(resolution, location, camWidth, camHeight, Me)
-        If LCase(algName).EndsWith(".py") Then ocvb.PythonFileName = algName
+        color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        pointCloud = New cv.Mat(camHeight, camWidth, cv.MatType.CV_32FC3, cv.Scalar.All(0))
+        result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+
+        ocvb = New VBocvb(Me)
+
+        task = Me
         ocvb.mainLocation = location
         ocvb.optionsOffset = 30
         ocvb.parms = parms
+
         buildColors()
+        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
@@ -163,16 +172,15 @@ Public Class ActiveTask : Implements IDisposable
         ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455
         Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86} ' all values from the specification.
         Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57} ' all values from the specification.
-
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 
-        ocvb = ocvb
+        aOptions.layoutOptions(location)
     End Sub
     Public Sub RunAlgorithm()
         Try
             If ocvb.parms.useRecordedData Then
-                Dim recordingFilename = New FileInfo(ocvb.task.openFileDialogName)
+                Dim recordingFilename = New FileInfo(task.openFileDialogName)
                 If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
                     ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
                     Exit Sub
@@ -182,7 +190,6 @@ Public Class ActiveTask : Implements IDisposable
             algorithmObject.NextFrame()
             label1 = ocvb.label1
             label2 = ocvb.label2
-            desc = ocvb.desc
             intermediateReview = ocvb.intermediateReview
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)

@@ -2,6 +2,7 @@
 Public Class OptionsCheckbox
     Public Box() As CheckBox
     Public Sub Setup(caller As String, count As Integer)
+        Me.MdiParent = aOptions
         ReDim Box(count - 1)
         Me.Text = caller + " CheckBox Options"
         For i = 0 To Box.Count - 1

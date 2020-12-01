@@ -9,7 +9,7 @@ Public Class Polylines_IEnumerableExample
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
         sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
-        ocvb.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
+        task.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -38,7 +38,7 @@ Public Class Polylines_Random
     Public Sub New()
         initParent()
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
-        ocvb.desc = "Create a random procedural image - Painterly Effect"
+        task.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -62,8 +62,8 @@ Public Class Polylines_Random
 
         Dim width As Double = dst1.Width / zoomFactor
         Dim height As Double = dst1.Height / zoomFactor
-        Dim x = Math.Min(ocvb.task.mousePoint.X, dst1.Width - width)
-        Dim y = Math.Min(ocvb.task.mousePoint.Y, dst1.Height - height)
+        Dim x = Math.Min(task.mousePoint.X, dst1.Width - width)
+        Dim y = Math.Min(task.mousePoint.Y, dst1.Height - height)
         dst2 = dst1.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst2.Size)
     End Sub
 End Class

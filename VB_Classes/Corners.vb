@@ -9,7 +9,7 @@ Public Class Corners_Harris
         sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
         sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
-        ocvb.desc = "Find corners using Eigen values and vectors"
+        task.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run()
@@ -66,7 +66,7 @@ Public Class Corners_SubPix
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)
         label1 = "Output of GoodFeatures"
-        ocvb.desc = "Use PreCornerDetect to find features in the image."
+        task.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -99,7 +99,7 @@ Public Class Corners_PreCornerDetect
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
 
-        ocvb.desc = "Use PreCornerDetect to find features in the image."
+        task.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -139,7 +139,7 @@ Public Class Corners_ShiTomasi_CPP
         sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
         sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
         sliders.setupTrackBar(3, "Corner normalize alpha", 1, 255, 127)
-        ocvb.desc = "Find corners using Eigen values and vectors"
+        task.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run()

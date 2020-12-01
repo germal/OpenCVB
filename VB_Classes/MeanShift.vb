@@ -9,12 +9,12 @@ Public Class MeanShift_Basics
     Public Sub New()
         initParent()
         label1 = "Draw anywhere to start mean shift tracking."
-        ocvb.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
+        task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then usingDrawRect = True
-        If usingDrawRect Then inputRect = ocvb.task.drawRect
+        If usingDrawRect Then inputRect = task.drawRect
         If inputRect.X + inputRect.Width > src.Width Then inputRect.Width = src.Width - inputRect.X
         If inputRect.Y + inputRect.Height > src.Height Then inputRect.Height = src.Height - inputRect.Y
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
@@ -23,11 +23,11 @@ Public Class MeanShift_Basics
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
         Static roi_hist As New cv.Mat
         If inputRect.Width > 0 And inputRect.Height > 0 Then
-            If usingDrawRect Then trackbox = ocvb.task.drawRect Else trackbox = inputRect
+            If usingDrawRect Then trackbox = task.drawRect Else trackbox = inputRect
             Dim maskROI = hsv(inputRect).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
             cv.Cv2.CalcHist(New cv.Mat() {hsv(inputRect)}, ch, maskROI, roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
-            If usingDrawRect Then ocvb.task.drawRectClear = True
+            If usingDrawRect Then task.drawRectClear = True
         End If
         If trackbox.Width <> 0 Then
             Dim backProj As New cv.Mat
@@ -55,11 +55,11 @@ Public Class MeanShift_Depth
         ms = New MeanShift_Basics()
         blob = New Depth_Foreground()
         label1 = "Draw anywhere to start mean shift tracking."
-        ocvb.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
+        task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.task.drawRect.Width > 0 Then
+        If task.drawRect.Width > 0 Then
             ms.usingDrawRect = True
             ms.inputRect = New cv.Rect
         End If
@@ -96,7 +96,7 @@ Public Class MeanShift_PyrFilter
         sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
         sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
         sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
-        ocvb.desc = "Use PyrMeanShiftFiltering to segment an image."
+        task.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -131,7 +131,7 @@ Public Class Meanshift_TopObjects
             cams(i) = New MeanShift_Basics()
             cams(i).rectangleEdgeWidth = 8
         Next
-        ocvb.desc = "Track - tracking algorithm"
+        task.desc = "Track - tracking algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

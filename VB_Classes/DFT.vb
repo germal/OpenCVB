@@ -29,7 +29,7 @@ Public Class DFT_Basics
         mats = New Mat_4to1()
         mats.noLines = True
 
-        ocvb.desc = "Explore the Discrete Fourier Transform."
+        task.desc = "Explore the Discrete Fourier Transform."
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
@@ -88,7 +88,7 @@ Public Class DFT_Inverse
     Public Sub New()
         initParent()
         mats = New Mat_2to1()
-        ocvb.desc = "Take the inverse of the Discrete Fourier Transform."
+        task.desc = "Take the inverse of the Discrete Fourier Transform."
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run()
@@ -143,7 +143,7 @@ Public Class DFT_ButterworthFilter_MT
         radio.check(0).Checked = True
 
         dft = New DFT_Basics()
-        ocvb.desc = "Use the Butterworth filter on a DFT image - color image input."
+        task.desc = "Use the Butterworth filter on a DFT image - color image input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
@@ -209,13 +209,13 @@ Public Class DFT_ButterworthDepth
         initParent()
         bfilter = New DFT_ButterworthFilter_MT()
 
-        ocvb.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
+        task.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        'bfilter.dft.gray = ocvb.task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        'bfilter.dft.gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run()
         dst1 = bfilter.dst1
         dst2 = bfilter.dst2

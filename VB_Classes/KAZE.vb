@@ -6,7 +6,7 @@ Public Class KAZE_KeypointsKAZE_CS
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
     Public Sub New()
         initParent()
-        ocvb.desc = "Find keypoints using KAZE algorithm."
+        task.desc = "Find keypoints using KAZE algorithm."
         label1 = "KAZE key points"
     End Sub
     Public Sub Run()
@@ -27,7 +27,7 @@ Public Class KAZE_KeypointsAKAZE_CS
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
     Public Sub New()
         initParent()
-        ocvb.desc = "Find keypoints using AKAZE algorithm."
+        task.desc = "Find keypoints using AKAZE algorithm."
         label1 = "AKAZE key points"
     End Sub
     Public Sub Run()
@@ -51,7 +51,7 @@ Public Class KAZE_Sample_CS
         initParent()
         box = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
-        ocvb.desc = "Match keypoints in 2 photos."
+        task.desc = "Match keypoints in 2 photos."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -70,7 +70,7 @@ Public Class KAZE_Match_CS
         initParent()
         red = New LeftRightView_Basics()
         red.sliders.trackbar(0).Value = 45
-        ocvb.desc = "Match keypoints in the left and right images."
+        task.desc = "Match keypoints in the left and right images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -96,15 +96,15 @@ Public Class KAZE_LeftAligned_CS
         sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
         sliders.setupTrackBar(1, "When matching, max possible distance", 1, 200, 100)
 
-        ocvb.desc = "Match keypoints in the left and right images but display it as movement in the right image."
+        task.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        CS_KazeLeft.GetKeypoints(ocvb.task.leftView)
-        CS_KazeRight.GetKeypoints(ocvb.task.rightView)
+        CS_KazeLeft.GetKeypoints(task.leftView)
+        CS_KazeRight.GetKeypoints(task.rightView)
 
-        dst1 = ocvb.task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = ocvb.task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim topDistance = sliders.trackbar(1).Value
         Dim maxPoints = sliders.trackbar(0).Value

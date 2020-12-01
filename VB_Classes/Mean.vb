@@ -6,7 +6,7 @@ Public Class Mean_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Mean - number of input images", 1, 100, 10)
-        ocvb.desc = "Create an image that is the mean of x number of previous images."
+        task.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

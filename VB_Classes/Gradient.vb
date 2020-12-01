@@ -9,7 +9,7 @@ Public Class Gradient_Basics
     Public Sub New()
         initParent()
         sobel = New Edges_Sobel()
-        ocvb.desc = "Use phase to compute gradient"
+        task.desc = "Use phase to compute gradient"
         label2 = "Phase Output"
     End Sub
     Public Sub Run()
@@ -37,12 +37,12 @@ Public Class Gradient_Depth
     Public Sub New()
         initParent()
         sobel = New Edges_Sobel()
-        ocvb.desc = "Use phase to compute gradient on depth image"
+        task.desc = "Use phase to compute gradient on depth image"
         label2 = "Phase Output"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.task.drawRect.Width > 0 Then sobel.src = ocvb.task.RGBDepth(ocvb.task.drawRect) Else sobel.src = ocvb.task.RGBDepth.Clone()
+        If task.drawRect.Width > 0 Then sobel.src = task.RGBDepth(task.drawRect) Else sobel.src = task.RGBDepth.Clone()
         sobel.Run()
         Dim angle = New cv.Mat
         Dim x32f As New cv.Mat
@@ -69,12 +69,12 @@ Public Class Gradient_Flatland
         grade = New Gradient_Basics()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
-        ocvb.desc = "Reduced grayscale shows isobars in depth."
+        task.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
-        dst1 = ocvb.task.RGBDepth.Clone()
+        dst1 = task.RGBDepth.Clone()
         dst1 /= reductionFactor
         dst1 *= reductionFactor
         grade.src = src
@@ -104,7 +104,7 @@ Public Class Gradient_CartToPolar
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
-        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+        task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -145,7 +145,7 @@ End Class
 
 '        label1 = "CartToPolar Magnitude Output Normalized"
 '        label2 = "CartToPolar Angle Output"
-'        ocvb.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+'        task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
 '    End Sub
 '    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

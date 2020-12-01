@@ -11,12 +11,12 @@ Public Class Edges_Basics
         sliders.setupTrackBar(1, "Canny threshold2", 1, 255, 50)
         sliders.setupTrackBar(2, "Canny Aperture", 3, 7, 3)
 
-        ocvb.desc = "Show canny edge detection with varying thresholds"
+        task.desc = "Show canny edge detection with varying thresholds"
         label1 = "Canny using L1 Norm"
         label2 = "Canny using L2 Norm"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim threshold1 As Integer = sliders.trackbar(0).Value
         Dim threshold2 As Integer = sliders.trackbar(1).Value
         Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
@@ -44,12 +44,12 @@ Public Class Edges_DepthAndColor
 
         shadow = New Depth_Holes()
 
-        ocvb.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
+        task.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         label1 = "Edges in color and depth after dilate"
         label2 = "Edges in color and depth no dilate"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         canny.src = src
         canny.Run()
         shadow.Run()
@@ -77,10 +77,10 @@ Public Class Edges_Laplacian
         sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
         sliders.setupTrackBar(1, "Laplacian Kernel", 1, 32, 5)
         label2 = "Laplacian of Depth Image"
-        ocvb.desc = "Show Laplacian edge detection with varying kernel sizes"
+        task.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
 
@@ -88,7 +88,7 @@ Public Class Edges_Laplacian
         dst1 = dst1.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
         dst1 = dst1.ConvertScaleAbs()
 
-        dst2 = ocvb.task.RGBDepth.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
+        dst2 = task.RGBDepth.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
         dst2 = dst2.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
         dst2 = dst2.ConvertScaleAbs()
     End Sub
@@ -104,10 +104,10 @@ Public Class Edges_Scharr
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
         label2 = "x field + y field in CV_32F format"
-        ocvb.desc = "Scharr is most accurate with 3x3 kernel."
+        task.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
@@ -133,10 +133,10 @@ Public Class Edges_Preserving
         sliders.setupTrackBar(1, "Edge Sigma_r", 1, 100, 40)
 
         label2 = "Edge preserving blur for RGB depth image above"
-        ocvb.desc = "OpenCV's edge preserving filter."
+        task.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
@@ -145,9 +145,9 @@ Public Class Edges_Preserving
             cv.Cv2.EdgePreservingFilter(src, dst1, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
         If radio.check(0).Checked Then
-            cv.Cv2.EdgePreservingFilter(ocvb.task.RGBDepth, dst2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(task.RGBDepth, dst2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(ocvb.task.RGBDepth, dst2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(task.RGBDepth, dst2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
     End Sub
 End Class
@@ -162,7 +162,7 @@ Module Edges_Exports
     Public Sub Edges_RandomForest_Close(Edges_RandomForestPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edges_RandomForest_Run(Edges_RandomForestPtr As IntPtr, inputPtr As IntPtr, rows As integer, cols As integer) As IntPtr
+    Public Function Edges_RandomForest_Run(Edges_RandomForestPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
 End Module
 
@@ -178,12 +178,12 @@ Public Class Edges_RandomForest_CPP
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
 
-        ocvb.desc = "Detect edges using structured forests - Opencv Contrib"
+        task.desc = "Detect edges using structured forests - Opencv Contrib"
         ReDim rgbData(src.Total * src.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount < 100 Then ocvb.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
@@ -220,12 +220,12 @@ Public Class Edges_LeftView
         sobel = New Edges_Sobel()
         sobel.sliders.trackbar(0).Value = 5
 
-        ocvb.desc = "Find the edges in the LeftViewimages."
+        task.desc = "Find the edges in the LeftViewimages."
         label1 = "Edges in Left Image"
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         red.Run()
         Dim leftView = red.dst1
         sobel.src = red.dst2
@@ -249,12 +249,12 @@ Public Class Edges_ResizeAdd
         sliders.setupTrackBar(1, "Border Horizontal in Pixels", 1, 20, 5)
         sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
 
-        ocvb.desc = "Find edges using a resize, subtract, and threshold."
+        task.desc = "Find edges using a resize, subtract, and threshold."
         label1 = "Edges found with just resizing"
         label2 = "Found edges added to grayscale image source."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
                             New cv.Range(sliders.trackbar(1).Value, gray.Cols - sliders.trackbar(1).Value))
@@ -277,11 +277,11 @@ Public Class Edges_DCTfrequency
         sliders.setupTrackBar(1, "Threshold after Removal", 1, 255, 20)
 
         label2 = "Mask for the isolated frequencies"
-        ocvb.desc = "Find edges by removing all the highest frequencies."
+        task.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim gray = ocvb.task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
         gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
@@ -310,7 +310,7 @@ Module Edges_Deriche_CPP_Module
     Public Sub Edges_Deriche_Close(Edges_DerichePtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edges_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, alpha As Single, omega As Single) As IntPtr
+    Public Function Edges_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer, alpha As Single, omega As Single) As IntPtr
     End Function
 End Module
 
@@ -328,10 +328,10 @@ Public Class Edges_Deriche_CPP
         sliders.setupTrackBar(1, "Deriche Omega", 1, 1000, 100)
         Edges_Deriche = Edges_Deriche_Open()
         label2 = "Image enhanced with Deriche results"
-        ocvb.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
+        task.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -367,7 +367,7 @@ Public Class Edges_Sobel
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
-        ocvb.desc = "Show Sobel edge detection with varying kernel sizes"
+        task.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

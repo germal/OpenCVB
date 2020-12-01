@@ -23,7 +23,7 @@ Public Class Trace_OpenCV_CPP
     Public Sub New()
         initParent()
         Trace_OpenCV = Trace_OpenCV_Open()
-        ocvb.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
+        task.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

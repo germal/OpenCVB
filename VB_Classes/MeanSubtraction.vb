@@ -6,7 +6,7 @@ Public Class MeanSubtraction_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
-        ocvb.desc = "Subtract the mean from the image with a scaling factor"
+        task.desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

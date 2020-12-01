@@ -16,7 +16,7 @@ Public Class LineDetector_Basics
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
-        ocvb.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
+        task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -246,7 +246,7 @@ Public Class lineDetector_FLD_CPP
         check.Box(1).Text = "FLD - Draw lines on input image"
         check.Box(1).Checked = True
 
-        ocvb.desc = "Basics for a Fast Line Detector"
+        task.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -289,7 +289,7 @@ Public Class LineDetector_3D_LongestLine
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
-        ocvb.desc = "Identify planes using the lines present in the rgb image."
+        task.desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
     End Sub
     Public Sub Run()
@@ -324,7 +324,7 @@ Public Class LineDetector_3D_FLD_MT
         sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
         sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
 
-        ocvb.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
+        task.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
     Public Sub Run()
@@ -367,7 +367,7 @@ Public Class LineDetector_3D_FitLineZ
         check.Box(1).Text = "Display only the longest line"
         check.Box(1).Checked = True
 
-        ocvb.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
+        task.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
         label2 = ""
     End Sub
     Public Sub Run()
@@ -475,7 +475,7 @@ Public Class lineDetector_FLD
         check.Setup(caller, 1)
         check.Box(0).Text = "FLD - incremental merge"
         check.Box(0).Checked = True
-        ocvb.desc = "A Fast Line Detector"
+        task.desc = "A Fast Line Detector"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -533,7 +533,7 @@ Public Class LineDetector_LongLines
         lDetect = New LineDetector_Basics()
 
         label1 = "Longest lines in pixels (yellow)"
-        ocvb.desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
+        task.desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -579,7 +579,7 @@ Public Class LineDetector_Reduction
 
         label1 = "Output of line detection using reduced input"
         label2 = "Output of reduction_basics"
-        ocvb.desc = "Use the reduced rgb image as input to the line detector"
+        task.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -610,11 +610,11 @@ Public Class LineDetector_Depth
         topView = New Histogram_TopView2D()
         longline = New LineDetector_LongLines()
 
-        ocvb.desc = "Detect the lines in the depth data before trying to model the line in 3D space"
+        task.desc = "Detect the lines in the depth data before trying to model the line in 3D space"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        longline.src = ocvb.task.RGBDepth
+        longline.src = task.RGBDepth
         longline.Run()
         dst1 = longline.dst1
 
@@ -641,7 +641,7 @@ Public Class LineDetector_Depth
                 height = Math.Min(src.Height - topleft.Y, pixelRadius * 2)
             End If
             Dim rect = New cv.Rect(topleft.X, topleft.Y, width, height)
-            If rect.Width > 0 And rect.Height > 0 Then ocvb.task.pointCloud(rect).CopyTo(sideView.src(rect))
+            If rect.Width > 0 And rect.Height > 0 Then task.pointCloud(rect).CopyTo(sideView.src(rect))
         Next
         sideView.Run()
         topView.Run()

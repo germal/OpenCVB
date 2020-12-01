@@ -18,7 +18,7 @@ Public Class Palette_Basics
         Next
         Dim hsvRadio = findRadio("Hot")
         hsvRadio.Checked = True
-        ocvb.desc = "Apply the different color maps in OpenCV - Painterly Effect"
+        task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
         Static frm = findForm("Palette_Basics Radio Options")
@@ -86,7 +86,7 @@ Public Class Palette_Color
         sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
         sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
-        ocvb.desc = "Define a color using sliders."
+        task.desc = "Define a color using sliders."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -107,7 +107,7 @@ Public Class Palette_LinearPolar
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Use LinearPolar to create gradient image"
+        task.desc = "Use LinearPolar to create gradient image"
         SetInterpolationRadioButtons(caller, radio, "LinearPolar")
 
         sliders.Setup(caller)
@@ -196,7 +196,7 @@ Public Class Palette_Reduction
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
-        ocvb.desc = "Map colors to different palette - Painterly Effect."
+        task.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
     Private Class CompareVec3b : Implements IComparer(Of cv.Vec3b)
@@ -283,7 +283,7 @@ Public Class Palette_DrawTest
         draw = New Draw_RngImage()
         palette.src = dst1
 
-        ocvb.desc = "Experiment with palette using a drawn image"
+        task.desc = "Experiment with palette using a drawn image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -306,7 +306,7 @@ Public Class Palette_Gradient
     Public Sub New()
         initParent()
         label2 = "From and To colors"
-        ocvb.desc = "Create gradient image"
+        task.desc = "Create gradient image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -346,7 +346,7 @@ Public Class Palette_BuildGradientColorMap
         sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
 
         label2 = "Generated colormap"
-        ocvb.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
+        task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -388,7 +388,7 @@ Public Class Palette_DepthColorMap
         sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
 
         label2 = "Palette used to color left image"
-        ocvb.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
+        task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -446,7 +446,7 @@ Public Class Palette_Consistency
 
         lut = New LUT_Rebuild()
 
-        ocvb.desc = "Using a histogram, assign the same colors to the same areas across frames"
+        task.desc = "Using a histogram, assign the same colors to the same areas across frames"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -505,7 +505,7 @@ Public Class Palette_ObjectColors
 
         label1 = "Consistent colors"
         label2 = "Original colors"
-        ocvb.desc = "New class description"
+        task.desc = "New class description"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -576,7 +576,7 @@ Public Class Palette_Layout2D
         widthSlider.Value = 40
         heightslider.Value = 24
         grid.Run()
-        ocvb.desc = "Layout the available colors in a 2D grid"
+        task.desc = "Layout the available colors in a 2D grid"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

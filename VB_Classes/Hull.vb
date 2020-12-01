@@ -31,7 +31,7 @@ Public Class Hull_Basics
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Hull random points", 1, 20, 10)
 
-        ocvb.desc = "Surround a set of random points with a convex hull"
+        task.desc = "Surround a set of random points with a convex hull"
         label1 = "Convex Hull Output"
         label2 = "Convex Hull Input"
     End Sub

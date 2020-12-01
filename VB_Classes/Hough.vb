@@ -45,7 +45,7 @@ Public Class Hough_Circles
         initParent()
         circles = New Draw_Circles()
         circles.sliders.trackbar(0).Value = 3
-        ocvb.desc = "Find circles using HoughCircles."
+        task.desc = "Find circles using HoughCircles."
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
     End Sub
@@ -83,7 +83,7 @@ Public Class Hough_Lines
         sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
         sliders.setupTrackBar(2, "threshold", 1, 100, 50)
         sliders.setupTrackBar(3, "Lines to Plot", 1, 1000, 25)
-        ocvb.desc = "Use Houghlines to find lines in the image."
+        task.desc = "Use Houghlines to find lines in the image."
     End Sub
 
     Public Sub Run()
@@ -136,7 +136,7 @@ Public Class Hough_Lines_MT
         gridWidthSlider.Value = 16
         gridHeightSlider.Value = 16
 
-        ocvb.desc = "Multithread Houghlines to find lines in image fragments."
+        task.desc = "Multithread Houghlines to find lines in image fragments."
         label1 = "Hough_Lines_MT"
         label2 = "Hough_Lines_MT"
     End Sub
@@ -157,7 +157,7 @@ Public Class Hough_Lines_MT
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then
-                dst2(roi) = ocvb.task.RGBDepth(roi)
+                dst2(roi) = task.RGBDepth(roi)
                 Exit Sub
             End If
             dst2(roi).SetTo(0)

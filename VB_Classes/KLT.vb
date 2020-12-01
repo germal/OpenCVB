@@ -19,7 +19,7 @@ Public Class KLT_Basics
         check.Box(0).Text = "KLT - Night Mode"
         check.Box(1).Text = "KLT - delete all Points"
 
-        ocvb.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
+        task.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -91,7 +91,7 @@ Public Class KLT_OpticalFlow
     Public Sub New()
         initParent()
         klt = New KLT_Basics()
-        ocvb.desc = "KLT optical flow - needs more work"
+        task.desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

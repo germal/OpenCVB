@@ -16,7 +16,7 @@ Public Class Binarize_Basics
         initParent()
         blur = New Blur_Basics()
 
-        ocvb.desc = "Binarize an image using Threshold with OTSU."
+        task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -59,7 +59,7 @@ Public Class Binarize_OTSU
 
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         label2 = "Histograms correspond to images on the left"
-        ocvb.desc = "Binarize an image using Threshold with OTSU."
+        task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -102,7 +102,7 @@ Public Class Binarize_Niblack_Sauvola
         sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
         sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
 
-        ocvb.desc = "Binarize an image using Niblack and Sauvola"
+        task.desc = "Binarize an image using Niblack and Sauvola"
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
@@ -132,7 +132,7 @@ Public Class Binarize_Niblack_Nick
         sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
         sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
 
-        ocvb.desc = "Binarize an image using Niblack and Nick"
+        task.desc = "Binarize an image using Niblack and Nick"
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
@@ -164,8 +164,8 @@ Public Class Binarize_Bernson
 
         label1 = "Binarize Bernson (Draw Enabled)"
 
-        ocvb.task.drawRect = New cv.Rect(100, 100, 100, 100)
-        ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+        task.drawRect = New cv.Rect(100, 100, 100, 100)
+        task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -174,10 +174,10 @@ Public Class Binarize_Bernson
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayBin = gray.Clone()
-        If ocvb.task.drawRect = New cv.Rect() Then
+        If task.drawRect = New cv.Rect() Then
             cv.Extensions.Binarizer.Bernsen(gray, grayBin, kernelSize, sliders.trackbar(1).Value, sliders.trackbar(2).Value)
         Else
-            cv.Extensions.Binarizer.Bernsen(gray(ocvb.task.drawRect), grayBin(ocvb.task.drawRect), kernelSize, sliders.trackbar(1).Value, sliders.trackbar(2).Value)
+            cv.Extensions.Binarizer.Bernsen(gray(task.drawRect), grayBin(task.drawRect), kernelSize, sliders.trackbar(1).Value, sliders.trackbar(2).Value)
         End If
         dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
@@ -202,7 +202,7 @@ Public Class Binarize_Bernson_MT
         sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
         sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
 
-        ocvb.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+        task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run()

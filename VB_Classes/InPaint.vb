@@ -14,7 +14,7 @@ Public Class InPaint_Basics
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
 
-        ocvb.desc = "Create a flaw in an image and then use inPaint to mask it."
+        task.desc = "Create a flaw in an image and then use inPaint to mask it."
         label2 = "Repaired Image"
     End Sub
     Public Sub Run()
@@ -48,7 +48,7 @@ Public Class InPaint_Noise
         radio.check(1).Text = "Navier-Stokes"
         radio.check(0).Checked = True
 
-        ocvb.desc = "Create noise in an image and then use inPaint to remove it."
+        task.desc = "Create noise in an image and then use inPaint to remove it."
         label2 = "Repaired Image"
     End Sub
     Public Sub Run()

@@ -11,7 +11,7 @@ Public Class Rodrigues_ValidateKinect
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
+        task.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -40,7 +40,7 @@ Public Class Rodrigues_ValidateVector
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
+        task.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -81,7 +81,7 @@ Public Class Rodrigues_RotationMatrix
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Display the contents of the IMU Rotation Matrix"
+        task.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -113,7 +113,7 @@ Public Class Rodrigues_Extrinsics
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
+        task.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

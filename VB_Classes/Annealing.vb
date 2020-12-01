@@ -69,7 +69,7 @@ Public Class Annealing_Basics_CPP
     Public Sub New()
         initParent()
         setup()
-        ocvb.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
+        task.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -123,8 +123,8 @@ Public Class Annealing_CPP_MT
         End Function
     End Class
     Private Sub setup()
-        Static randomSlider = findSlider("Random Pixel Count")
-        randomSlider.Value = sliders.trackbar(0).Value
+        Static citySlider = findSlider("Anneal Number of Cities")
+        random.countSlider.Value = citySlider.value
         random.Run() ' get the city positions (may or may not be used below.)
 
         Dim numberofCities = sliders.trackbar(0).Value
@@ -168,7 +168,7 @@ Public Class Annealing_CPP_MT
         label1 = "Log of Annealing progress"
         label2 = "Top 2 are best solutions, bottom 2 are worst."
 
-        ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
+        task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -264,7 +264,7 @@ Public Class Annealing_Options
         If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
         anneal.setup()
         anneal.Open()
-        ocvb.desc = "Setup and control finding the optimal route for a traveling salesman"
+        task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

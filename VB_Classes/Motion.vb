@@ -19,7 +19,7 @@ Public Class Motion_Basics
 
         Dim iterSlider = findSlider("Dilate/Erode Kernel Size")
         iterSlider.Value = 2
-        ocvb.desc = "Detect contours in the motion data"
+        task.desc = "Detect contours in the motion data"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -65,7 +65,7 @@ Public Class Motion_Basics
             End If
         Next
 
-        dst1 = ocvb.task.color
+        dst1 = task.color
         For i = 0 To rectList.Count - 1
             dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
         Next

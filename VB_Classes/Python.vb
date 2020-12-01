@@ -27,7 +27,7 @@ Module Python_Module
 
     Public Function StartPython( arguments As String) As Boolean
         If checkPythonPackage("numpy") = False Or checkPythonPackage("cv2") = False Then Return False
-        Dim pythonApp = New FileInfo(ocvb.PythonFileName)
+        Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
         ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it
         If ocvb.parms.testAllRunning Then
@@ -44,7 +44,7 @@ Module Python_Module
         End If
         If pythonApp.Exists Then
             Dim p As New Process
-            p.StartInfo.FileName = ocvb.parms.pythonExe
+            p.StartInfo.FileName = ocvb.parms.PythonExe
             p.StartInfo.WorkingDirectory = pythonApp.DirectoryName
             If arguments = "" Then
                 p.StartInfo.Arguments = """" + pythonApp.Name + """"
@@ -67,23 +67,23 @@ End Module
 
 Public Class Python_Run
     Inherits VBparent
-    Dim tryCount As integer
+    Dim tryCount As Integer
     Public Sub New()
         initParent()
-        If ocvb.PythonFileName = "" Then ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/PythonPackages.py"
-        Dim pythonApp = New FileInfo(ocvb.PythonFileName)
+        If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python/PythonPackages.py"
+        Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
             pyStream = New PyStream_Basics()
         Else
             StartPython("")
         End If
-        ocvb.desc = "Run Python app: " + pythonApp.Name
+        task.desc = "Run Python app: " + pythonApp.Name
         label1 = ""
         label2 = ""
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If pyStream IsNot Nothing Then
             pyStream.src = src
             pyStream.Run()
@@ -107,13 +107,9 @@ Public Class Python_MemMap
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
     Public memMapValues(49) As Double ' more than we need - buffer for growth
-    Public memMapbufferSize As integer
+    Public memMapbufferSize As Integer
     Public Sub New()
         initParent()
-        If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/Python_MemMap.py"
-        End If
-
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length
         memMapPtr = Marshal.AllocHGlobal(memMapbufferSize)
         memMapFile = MemoryMappedFile.CreateOrOpen("Python_MemMap", memMapbufferSize)
@@ -125,13 +121,13 @@ Public Class Python_MemMap
             If ocvb.parms.externalPythonInvocation = False Then
                 StartPython("--MemMapLength=" + CStr(memMapbufferSize))
             End If
-            Dim pythonApp = New FileInfo(ocvb.PythonFileName)
+            Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
             label1 = "No output for Python_MemMap - see Python console"
-            ocvb.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
+            task.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then memMapValues(0) = ocvb.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
@@ -160,8 +156,7 @@ Public Class Python_SurfaceBlit
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
         PipeTaskIndex += 1
 
-        ' this Python script assumes that fast processing is off - the pointcloud is being used and cannot be resized.
-        ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
+        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
         memMap = New Python_MemMap()
 
         If ocvb.parms.externalPythonInvocation Then
@@ -170,7 +165,7 @@ Public Class Python_SurfaceBlit
             PythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
         End If
         If PythonReady Then pipe.WaitForConnection()
-        ocvb.desc = "Stream data to Python_SurfaceBlit Python script."
+        task.desc = "Stream data to Python_SurfaceBlit Python script."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -29,7 +29,7 @@ Public Class Blob_Input
 
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Test simple Blob Detector."
+        task.desc = "Test simple Blob Detector."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -50,7 +50,7 @@ Public Class Blob_Input
         Mats.mat(3) = poly.dst2
         Mats.Run()
         Mats.dst1.CopyTo(dst1)
-        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = Mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -119,7 +119,7 @@ Public Class Blob_RenderBlobs
         blob = New Blob_Input()
         blob.updateFrequency = 1
 
-        ocvb.desc = "Use connected components to find blobs."
+        task.desc = "Use connected components to find blobs."
         label1 = "Input blobs"
         label2 = "Showing only the largest blob in test data"
     End Sub
@@ -172,7 +172,7 @@ Public Class Blob_DepthClusters
         flood.fBasics.sliders.trackbar(2).Value = 1 ' pixels are exact.
 
         label2 = "Backprojection of identified histogram depth clusters."
-        ocvb.desc = "Highlight the distinct histogram blobs found with depth clustering."
+        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -208,7 +208,7 @@ Public Class Blob_Rectangles
     Public Sub New()
         initParent()
         blobs = New Blob_Largest()
-        ocvb.desc = "Get the blobs and their masks and outline them with a rectangle."
+        task.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -261,7 +261,7 @@ Public Class Blob_Largest
         ReDim kalman.kInput(4 - 1)
 
         blobs = New Blob_DepthClusters()
-        ocvb.desc = "Gather all the blob data and display the largest."
+        task.desc = "Gather all the blob data and display the largest."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -295,7 +295,7 @@ Public Class Blob_LargestDepthCluster
         initParent()
         blobs = New Blob_DepthClusters()
 
-        ocvb.desc = "Display only the largest depth cluster (might not be contiguous.)"
+        task.desc = "Display only the largest depth cluster (might not be contiguous.)"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

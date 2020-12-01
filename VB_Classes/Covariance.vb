@@ -6,7 +6,7 @@ Public Class Covariance_Basics
     Public Sub New()
         initParent()
         random = New Random_Points()
-        ocvb.desc = "Calculate the covariance of random depth data points."
+        task.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -51,7 +51,7 @@ Public Class Covariance_Test
         initParent()
 
         covar = New Covariance_Basics()
-        ocvb.desc = "Test the covariance basics algorithm."
+        task.desc = "Test the covariance basics algorithm."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -99,7 +99,7 @@ Public Class Dither_Basics
 
         label1 = "Dither applied to the RGB image"
         label2 = "Dither applied to the Depth image"
-        ocvb.desc = "Explore all the varieties of dithering"
+        task.desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -121,7 +121,7 @@ Public Class Dither_Basics
         Dim pixels(dst1.Total * dst1.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1
-            Dim copySrc = Choose(i + 1, src, ocvb.task.RGBDepth)
+            Dim copySrc = Choose(i + 1, src, task.RGBDepth)
             Marshal.Copy(copySrc.Data, pixels, 0, pixels.Length)
             Select Case radioIndex
                 Case 0

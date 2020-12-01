@@ -3,7 +3,7 @@ Public Class imShow_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
+        task.desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -24,7 +24,7 @@ Public Class imShow_WaitKey
         initParent()
         vDemo = New Voronoi_Basics()
 
-        ocvb.desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
+        task.desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -10,7 +10,7 @@ Public Class Coherence_Basics
         sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)
         sliders.setupTrackBar(3, "Coherence eigen kernel", 1, 31, 1)
         label1 = "Coherence - draw rectangle to apply"
-        ocvb.desc = "Find lines that are artistically coherent in the image - Painterly"
+        task.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -31,7 +31,7 @@ Public Class Coherence_Basics
         Dim xoffset = src.Width / 2 - side / 2
         Dim yoffset = src.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
-        If ocvb.task.drawRect.Width <> 0 Then srcRect = ocvb.task.drawRect
+        If task.drawRect.Width <> 0 Then srcRect = task.drawRect
 
         dst1 = src.Clone()
         src = src(srcRect)
@@ -86,11 +86,11 @@ Public Class Coherence_Depth
     Public Sub New()
         initParent()
         coherent = New Coherence_Basics()
-        ocvb.desc = "Find coherent lines in the depth image - Painterly"
+        task.desc = "Find coherent lines in the depth image - Painterly"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        coherent.src = ocvb.task.RGBDepth
+        coherent.src = task.RGBDepth
         coherent.Run()
         dst1 = coherent.dst1
     End Sub

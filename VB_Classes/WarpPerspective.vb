@@ -9,7 +9,7 @@ Public Class WarpPerspective_Basics
         sliders.setupTrackBar(0, "Warped Width", 0, src.Cols, src.Cols - 50)
         sliders.setupTrackBar(1, "Warped Height", 0, src.Rows, src.Rows - 50)
         sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
-        ocvb.desc = "Use WarpPerspective to transform input images."
+        task.desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -38,7 +38,7 @@ Public Class WarpPerspective_3D
     Public Sub New()
         initParent()
         warp = New WarpPerspective_Basics()
-        ocvb.desc = "Use WarpAffine on a 3D point cloud"
+        task.desc = "Use WarpAffine on a 3D point cloud"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

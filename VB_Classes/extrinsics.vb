@@ -3,7 +3,7 @@ Public Class Extrinsics_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Show the depth camera extrinsics."
+        task.desc = "Show the depth camera extrinsics."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

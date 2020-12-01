@@ -5,7 +5,7 @@ Public Class LeftRightView_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "brightness", 0, 255, 100)
-        ocvb.desc = "Show the left and right views from the 3D Camera"
+        task.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
                 label1 = "Infrared Image"
@@ -18,8 +18,8 @@ Public Class LeftRightView_Basics
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst1 = ocvb.task.leftView
-        dst2 = ocvb.task.rightView
+        dst1 = task.leftView
+        dst2 = task.rightView
 
         dst1 += sliders.trackbar(0).Value
         dst2 += sliders.trackbar(0).Value
@@ -48,7 +48,7 @@ Public Class LeftRightView_CompareUndistorted
                 label1 = "Left Image"
                 label2 = "Right Image"
         End Select
-        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
+        task.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -56,8 +56,8 @@ Public Class LeftRightView_CompareUndistorted
         Dim slideHeight = sliders.trackbar(2).Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
 
-        leftInput = ocvb.task.leftView
-        rightInput = ocvb.task.rightView
+        leftInput = task.leftView
+        rightInput = task.rightView
 
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
         dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
@@ -96,7 +96,7 @@ Public Class LeftRightView_CompareRaw
         End Select
         lrView = New LeftRightView_Basics()
         lrView.sliders.Hide()
-        ocvb.desc = "Show slices of the left and right view next to each other for visual comparison"
+        task.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -130,7 +130,7 @@ Public Class LeftRightView_Features
 
         lrView = New LeftRightView_Basics()
 
-        ocvb.desc = "Find GoodFeatures in the left and right depalettized infrared images"
+        task.desc = "Find GoodFeatures in the left and right depalettized infrared images"
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -166,7 +166,7 @@ Public Class LeftRightView_Palettized
         lrView = New LeftRightView_Basics()
         palette = New Palette_Basics()
 
-        ocvb.desc = "Add color to the 8-bit infrared images."
+        task.desc = "Add color to the 8-bit infrared images."
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -193,7 +193,7 @@ Public Class LeftRightView_BRISK
     Dim brisk As BRISK_Basics
     Public Sub New()
         initParent()
-        ocvb.desc = "Add color to the 8-bit infrared images."
+        task.desc = "Add color to the 8-bit infrared images."
         label1 = "Infrared Left Image"
         label2 = "Infrared Right Image"
 

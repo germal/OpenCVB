@@ -6,7 +6,7 @@ Public Class Pyramid_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
-        ocvb.desc = "Use pyrup and pyrdown to zoom in and out of an image."
+        task.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -39,7 +39,7 @@ Public Class Pyramid_Filter
         initParent()
         laplace = New Laplacian_PyramidFilter()
 
-        ocvb.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
+        task.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

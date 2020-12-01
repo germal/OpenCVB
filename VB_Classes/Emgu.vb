@@ -11,7 +11,7 @@ Imports cv = OpenCvSharp
 '    Inherits ocvbClass
 '    Public Sub New()
 '        initParent()
-'        ocvb.desc = "Test a sample EMGU usage."
+'        task.desc = "Test a sample EMGU usage."
 '    End Sub
 '    Public Sub Run()
 '		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -34,7 +34,7 @@ Imports cv = OpenCvSharp
 '    Inherits ocvbClass
 '    Public Sub New()
 '        initParent()
-'        ocvb.desc = "Use the simplest possible face detector in Emgu examples."
+'        task.desc = "Use the simplest possible face detector in Emgu examples."
 '    End Sub
 '    Public Sub Run()
 '		 If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

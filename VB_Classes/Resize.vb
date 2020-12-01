@@ -9,7 +9,7 @@ Public Class Resize_Basics
         radio.check(5).Enabled = False
         radio.check(6).Enabled = False
 
-        ocvb.desc = "Resize with different options and compare them"
+        task.desc = "Resize with different options and compare them"
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
@@ -19,7 +19,7 @@ Public Class Resize_Basics
         Dim resizeFlag = getInterpolationRadioButtons(radio, frm)
         If standalone Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
-            If ocvb.task.drawRect.Width <> 0 Then roi = ocvb.task.drawRect
+            If task.drawRect.Width <> 0 Then roi = task.drawRect
 
             dst1 = src(roi).Resize(dst1.Size(), 0, 0, resizeFlag)
             dst2 = (src(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) - dst1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -46,7 +46,7 @@ Public Class Resize_Percentage
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
 
-        ocvb.desc = "Resize by a percentage of the image."
+        task.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

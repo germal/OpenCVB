@@ -23,7 +23,7 @@ Public Class CComp_Basics
         check.Box(1).Text = "Input to CComp is above CComp threshold"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Draw bounding boxes around RGB binarized connected Components"
+        task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
     Private Function renderBlobs( minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
         Dim count As Integer = 0
@@ -116,7 +116,7 @@ Public Class CComp_Basics_FullImage
         mats = New Mat_4to1()
         basics = New CComp_Basics()
 
-        ocvb.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
+        task.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
         label2 = "Masks binary+otsu used to compute mean depth"
     End Sub
     Private Function colorWithDepth( matIndex As Integer) As Integer
@@ -137,7 +137,7 @@ Public Class CComp_Basics_FullImage
         For Each blob In cc.Blobs
             If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
             count += 1
-            Dim avg = ocvb.task.RGBDepth(blob.Rect).Mean(mats.mat(matIndex)(blob.Rect))
+            Dim avg = task.RGBDepth(blob.Rect).Mean(mats.mat(matIndex)(blob.Rect))
             dst1(blob.Rect).SetTo(avg, mats.mat(matIndex)(blob.Rect))
         Next
         Return count
@@ -173,7 +173,7 @@ Public Class CComp_PointTracker
         pTrack = New KNN_PointTracker()
         basics = New CComp_Basics()
 
-        ocvb.desc = "Track connected componenent centroids and use it to match coloring"
+        task.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -224,7 +224,7 @@ Public Class CComp_MaxBlobs
         check.Setup(caller, 1)
         check.Box(0).Text = "Reassess the best CComp threshold"
 
-        ocvb.desc = "Find the best CComp threshold to maximize the number of blobs"
+        task.desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -277,7 +277,7 @@ Public Class CComp_MaxPixels
         initParent()
         maxBlob = New CComp_MaxBlobs()
         maxBlob.incr = 5
-        ocvb.desc = "Find the best CComp threshold to maximize pixels"
+        task.desc = "Find the best CComp threshold to maximize pixels"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -329,7 +329,7 @@ Public Class CComp_DepthEdges
         check.Box(0).Text = "Use edge mask in connected components"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Use depth edges to isolate connected components in depth"
+        task.desc = "Use depth edges to isolate connected components in depth"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -359,7 +359,7 @@ Public Class CComp_EdgeMask
 
         ccomp = New CComp_ColorDepth()
 
-        ocvb.desc = "Isolate Color connected components after applying the Edge Mask"
+        task.desc = "Isolate Color connected components after applying the Edge Mask"
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
@@ -386,7 +386,7 @@ Public Class CComp_ColorDepth
 
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
-        ocvb.desc = "Color connected components based on their depth"
+        task.desc = "Color connected components based on their depth"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -397,7 +397,7 @@ Public Class CComp_ColorDepth
 
         For Each blob In cc.Blobs.Skip(1)
             Dim roi = blob.Rect
-            Dim avg = ocvb.task.RGBDepth(roi).Mean(dst2(roi))
+            Dim avg = task.RGBDepth(roi).Mean(dst2(roi))
             dst1(roi).SetTo(avg, dst2(roi))
         Next
 
@@ -423,7 +423,7 @@ Public Class CComp_InRange_MT
         sliders.setupTrackBar(1, "InRange Max Depth", 150, 10000, 3000)
         sliders.setupTrackBar(2, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
-        ocvb.desc = "Connected components in specific ranges"
+        task.desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run()
@@ -456,7 +456,7 @@ Public Class CComp_InRange_MT
                 Dim depth = depth32f(roiList(j))
                 Dim meanDepth = depth.Mean(mask(roiList(j)))
                 If meanDepth.Item(0) < maxDepth Then
-                    Dim avg = ocvb.task.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
+                    Dim avg = task.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
                     dst1(roiList(j)).SetTo(avg, bin)
                     dst2(roiList(j)).SetTo(avg)
                 End If
@@ -477,7 +477,7 @@ Public Class CComp_InRange
         sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
         sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
-        ocvb.desc = "Connect components in specific ranges"
+        task.desc = "Connect components in specific ranges"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -500,7 +500,7 @@ Public Class CComp_InRange
         Next
         roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
         For i = 0 To roiList.Count - 1
-            Dim avg = ocvb.task.RGBDepth(roiList(i)).Mean(mask(roiList(i)))
+            Dim avg = task.RGBDepth(roiList(i)).Mean(mask(roiList(i)))
             dst1(roiList(i)).SetTo(avg)
         Next
 
@@ -523,7 +523,7 @@ Public Class CComp_Shapes
         shapes = New cv.Mat(ocvb.parms.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
-        ocvb.desc = "Use connected components to isolate objects in image."
+        task.desc = "Use connected components to isolate objects in image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -572,7 +572,7 @@ Public Class CComp_OverlappingRectangles
 
         label1 = "Input Image with all ccomp rectangles"
         label2 = "Unique rectangles (largest to smallest) colored by size"
-        ocvb.desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
+        task.desc = "Define unique regions in the RGB image by eliminating overlapping rectangles."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

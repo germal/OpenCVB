@@ -84,7 +84,7 @@ Public Class Delaunay_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Use Delaunay to subdivide an image into triangles."
+        task.desc = "Use Delaunay to subdivide an image into triangles."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -114,7 +114,7 @@ Public Class Delaunay_GoodFeatures
         initParent()
         features = New Features_GoodFeatures()
         label2 = "Voronoi facets of delauney good features"
-        ocvb.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
+        task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -145,7 +145,7 @@ Public Class Delauney_Subdiv2D
     Public Sub New()
         initParent()
         label2 = "Voronoi facets for the same subdiv2D"
-        ocvb.desc = "Generate random points and divide the image around those points."
+        task.desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -203,7 +203,7 @@ Public Class Delauney_Coverage
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
         label1 = "Coverage of space"
-        ocvb.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
+        task.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

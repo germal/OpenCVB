@@ -91,7 +91,7 @@ Public Class OpticalFlow_DenseOptions
         sliders.setupTrackBar(5, "Optical Flow Scaling Output", 1, 100, 50)
 
         label1 = "No output - just option settings..."
-        ocvb.desc = "Use dense optical flow algorithm options"
+        task.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -126,7 +126,7 @@ Public Class OpticalFlow_DenseBasics
     Public Sub New()
         initParent()
         flow = New OpticalFlow_DenseOptions()
-        ocvb.desc = "Use dense optical flow algorithm  "
+        task.desc = "Use dense optical flow algorithm  "
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -171,7 +171,7 @@ Public Class OpticalFlow_DenseBasics_MT
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
 
-        ocvb.desc = "MultiThread dense optical flow algorithm  "
+        task.desc = "MultiThread dense optical flow algorithm  "
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -241,7 +241,7 @@ Public Class OpticalFlow_Sparse
         radio.check(5).Enabled = False
         radio.check(0).Checked = True
 
-        ocvb.desc = "Show the optical flow of a sparse matrix."
+        task.desc = "Show the optical flow of a sparse matrix."
         label1 = ""
         label2 = ""
     End Sub

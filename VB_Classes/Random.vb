@@ -7,7 +7,7 @@ Public Class Random_Points
     Public Points2f() As cv.Point2f
     Public rangeRect As cv.Rect
     Public plotPoints As Boolean = False
-    Dim countSlider As System.Windows.Forms.TrackBar
+    Public countSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         sliders.Setup(caller)
@@ -19,7 +19,7 @@ Public Class Random_Points
         ReDim Points2f(countSlider.Value - 1)
 
         rangeRect = New cv.Rect(0, 0, src.Cols, src.Rows)
-        ocvb.desc = "Create a uniform random mask with a specificied number of pixels."
+        task.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -46,7 +46,7 @@ Public Class Random_Shuffle
     Dim myRNG As New cv.RNG
     Public Sub New()
         initParent()
-        ocvb.desc = "Use randomShuffle to reorder an image."
+        task.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -66,7 +66,7 @@ Public Class Random_LUTMask
         initParent()
         km = New kMeans_Basics()
         random = New Random_Points()
-        ocvb.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
+        task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
     Public Sub Run()
@@ -98,7 +98,7 @@ Public Class Random_UniformDist
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Create a uniform distribution."
+        task.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -118,7 +118,7 @@ Public Class Random_NormalDist
         sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
         sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
         sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
-        ocvb.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
+        task.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -139,7 +139,7 @@ Public Class Random_CheckUniformSmoothed
 
         rUniform = New Random_UniformDist()
 
-        ocvb.desc = "Display the smoothed histogram for a uniform distribution."
+        task.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -169,7 +169,7 @@ Public Class Random_CheckUniformDist
 
         rUniform = New Random_UniformDist()
 
-        ocvb.desc = "Display the histogram for a uniform distribution."
+        task.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -197,7 +197,7 @@ Public Class Random_CheckNormalDist
         histogram = New Histogram_Basics()
         histogram.sliders.trackbar(0).Value = 255
         normalDist = New Random_NormalDist()
-        ocvb.desc = "Display the histogram for a Normal distribution."
+        task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -225,7 +225,7 @@ Public Class Random_CheckNormalDistSmoothed
         histogram.sliders.trackbar(0).Value = 255
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist()
-        ocvb.desc = "Display the histogram for a Normal distribution."
+        task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -277,7 +277,7 @@ Public Class Random_PatternGenerator_CPP
     Public Sub New()
         initParent()
         Random_PatternGenerator = Random_PatternGenerator_Open()
-        ocvb.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
+        task.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -316,7 +316,7 @@ Public Class Random_CustomDistribution
 
         If standalone Then plotHist = New Plot_Histogram()
 
-        ocvb.desc = "Create a custom random number distribution from any histogram"
+        task.desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -365,7 +365,7 @@ Public Class Random_MonteCarlo
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
-        ocvb.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
+        task.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -414,7 +414,7 @@ Public Class Random_CustomHistogram
         label1 = "Histogram of the grayscale image"
         label2 = "Histogram of the resulting random numbers"
 
-        ocvb.desc = "Create a random number distribution that reflects histogram of a grayscale image"
+        task.desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

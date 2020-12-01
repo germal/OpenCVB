@@ -19,7 +19,7 @@ Public Class Texture_Basics
 
         ellipse = New Draw_Ellipses()
         If standalone = False Then hideForm("Draw_Ellipses Slider Options")
-        ocvb.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
+        task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -46,7 +46,7 @@ Public Class Texture_Basics
             Next
             If standalone Then dst2.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
             tRect = sortcounts.ElementAt(0).Value
-            texture = ocvb.task.color(tRect)
+            texture = task.color(tRect)
             texturePop = dst1(tRect).CountNonZero()
         End If
         If standalone Then dst2.Rectangle(tRect, cv.Scalar.White, 2)
@@ -67,7 +67,7 @@ Public Class Texture_Flow
         sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
         sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
 
-        ocvb.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
+        task.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -100,11 +100,11 @@ Public Class Texture_Flow_Depth
     Public Sub New()
         initParent()
         texture = New Texture_Flow()
-        ocvb.desc = "Display texture flow in the depth data"
+        task.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        texture.src = ocvb.task.RGBDepth
+        texture.src = task.RGBDepth
         texture.Run()
         dst1 = texture.dst1
     End Sub
@@ -128,7 +128,7 @@ Public Class Texture_Shuffle
         If standalone Then floor = New OpenGL_FloorPlane()
         texture = New Texture_Basics()
         shuffle = New Random_Shuffle()
-        ocvb.desc = "Use random shuffling to homogenize a texture sample"
+        task.desc = "Use random shuffling to homogenize a texture sample"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

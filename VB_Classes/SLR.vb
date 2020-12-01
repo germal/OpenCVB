@@ -18,7 +18,7 @@ Public Class SLR_Basics
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
         sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
-        ocvb.desc = "Segmented Linear Regression example"
+        task.desc = "Segmented Linear Regression example"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -82,7 +82,7 @@ Public Class SLR_Data
                 dataY.Add(CDbl(split(1)))
             End If
         Next
-        ocvb.desc = "Plot the data used in SLR_Basics"
+        task.desc = "Plot the data used in SLR_Basics"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -109,7 +109,7 @@ Public Class SLR_Image
         hist.plotRequested = True
         slr = New SLR_Basics()
         label1 = "Original data"
-        ocvb.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
+        task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

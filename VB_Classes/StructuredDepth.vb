@@ -23,7 +23,7 @@ Public Class StructuredDepth_SliceH
         offsetSlider = findSlider("Offset for the slice")
 
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
-        ocvb.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
+        task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -48,7 +48,7 @@ Public Class StructuredDepth_SliceH
         label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
-        dst1 = ocvb.task.color.Clone
+        dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
 
@@ -85,7 +85,7 @@ Public Class StructuredDepth_SliceV
         offsetSlider = findSlider("Offset for the slice")
         offsetSlider.Value = src.Width / 2 - 20
 
-        ocvb.desc = "Find and isolate planes using the top view histogram data"
+        task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -109,7 +109,7 @@ Public Class StructuredDepth_SliceV
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
-        dst1 = ocvb.task.color.Clone
+        dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
 
@@ -142,7 +142,7 @@ Public Class StructuredDepth_Floor
         structD.histThresholdSlider.Value = 10 ' some cameras can show data below ground level...
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
-        ocvb.desc = "Find the floor plane"
+        task.desc = "Find the floor plane"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -190,7 +190,7 @@ Public Class StructuredDepth_Ceiling
 
         structD = New StructuredDepth_SliceH()
         structD.cushionSlider.Value = 10
-        ocvb.desc = "Find the ceiling plane"
+        task.desc = "Find the ceiling plane"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -230,7 +230,7 @@ Public Class StructuredDepth_MultiSliceH
         inrange = New Depth_InRange()
         structD = New StructuredDepth_SliceH()
 
-        ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+        task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -257,7 +257,7 @@ Public Class StructuredDepth_MultiSliceH
             maskPlane.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
         Next
 
-        dst1 = ocvb.task.color.Clone
+        dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
     End Sub
@@ -280,7 +280,7 @@ Public Class StructuredDepth_MultiSliceV
         inrange = New Depth_InRange()
         structD = New StructuredDepth_SliceH()
 
-        ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+        task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -307,7 +307,7 @@ Public Class StructuredDepth_MultiSliceV
             maskPlane.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
         Next
 
-        dst1 = ocvb.task.color.Clone
+        dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
     End Sub
@@ -333,7 +333,7 @@ Public Class StructuredDepth_MultiSlice
         inrange = New Depth_InRange()
         struct = New StructuredDepth_SliceV()
 
-        ocvb.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+        task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -374,7 +374,7 @@ Public Class StructuredDepth_MultiSlice
             dst2.SetTo(255, maskPlane)
         Next
 
-        dst1 = ocvb.task.color.Clone
+        dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, dst2)
     End Sub
 End Class
@@ -395,7 +395,7 @@ Public Class StructuredDepth_MultiSliceLines
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
         multi = New StructuredDepth_MultiSlice()
-        ocvb.desc = "Detect lines in the multiSlice output"
+        task.desc = "Detect lines in the multiSlice output"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -424,7 +424,7 @@ Public Class StructuredDepth_MultiSlicePolygon
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
-        ocvb.desc = "Detect polygons in the multiSlice output"
+        task.desc = "Detect polygons in the multiSlice output"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -465,7 +465,7 @@ Public Class StructuredDepth_SliceXPlot
         structD = New StructuredDepth_SliceV()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         cushionSlider.Value = 25
-        ocvb.desc = "Find any plane around a peak value in the top-down histogram"
+        task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -496,7 +496,7 @@ Public Class StructuredDepth_SliceXPlot
 
         If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.maskPlane, maskZplane, maskZplane)
 
-        dst1 = ocvb.task.color.Clone
+        dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskZplane)
 
         Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
@@ -527,7 +527,7 @@ Public Class StructuredDepth_LinearizeFloor
         check.Box(1).Text = "Smooth in Y-direction"
         check.Box(2).Text = "Smooth in Z-direction"
         check.Box(1).Checked = True
-        ocvb.desc = "Using the mask for the floor create a better representation of the floor plane"
+        task.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

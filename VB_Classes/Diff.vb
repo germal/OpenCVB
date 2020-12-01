@@ -8,7 +8,7 @@ Public Class Diff_Basics
         sliders.setupTrackBar(0, "Change threshold for each pixel", 1, 255, 25)
         label1 = "Stable Color"
         label2 = "Unstable Color mask"
-        ocvb.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
+        task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -40,14 +40,14 @@ Public Class Diff_UnstableDepthAndColor
         depth = New Depth_Stable()
 
         label1 = "Stable depth and color"
-        ocvb.desc = "Build a mask for any pixels that have either unstable depth or color"
+        task.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         diff.src = src
         diff.Run()
         Dim unstableColor = diff.dst2.Clone()
-        depth.src = ocvb.task.RGBDepth
+        depth.src = task.RGBDepth
         depth.Run()
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat

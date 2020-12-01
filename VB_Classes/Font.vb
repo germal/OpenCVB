@@ -3,7 +3,7 @@ Public Class Font_OpenCV
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Display different font options available in OpenCV"
+        task.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -33,7 +33,7 @@ Public Class Font_TrueType
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Display different TrueType fonts"
+        task.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -54,7 +54,7 @@ Public Class Font_FlowText
     Public dst As Integer = RESULT1 ' set to result2 to appear in dst2
     Public Sub New()
         initParent()
-        ocvb.desc = "Show TrueType text flowing through an image."
+        task.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

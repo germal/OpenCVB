@@ -11,11 +11,11 @@ Public Class Watershed_Basics
         weighted = New AddWeighted_Basics()
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
-        ocvb.desc = "Watershed API experiment.  Draw on the image to test."
+        task.desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.task.drawRect.Width > 0 And ocvb.task.drawRect.Height > 0 Then rects.Add(ocvb.task.drawRect)
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
         If (standalone Or UseCorners) And ocvb.frameCount = 0 Then
             For i = 0 To 4 - 1
@@ -53,7 +53,7 @@ Public Class Watershed_Basics
         Else
             dst1 = src
         End If
-        ocvb.task.drawRect = New cv.Rect
+        task.drawRect = New cv.Rect
         label1 = "There were " + CStr(rects.Count) + " regions defined as input"
     End Sub
 End Class
@@ -74,11 +74,11 @@ Public Class Watershed_DepthReduction
         watershed = New Watershed_Basics()
         watershed.UseCorners = True
         label2 = "Reduction input to WaterShed"
-        ocvb.desc = "Watershed the depth image using shadow, close, and far points."
+        task.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        reduction.src = ocvb.task.RGBDepth
+        reduction.src = task.RGBDepth
         reduction.Run()
         dst2 = reduction.dst1
 
@@ -103,11 +103,11 @@ Public Class Watershed_DepthAuto
         initParent()
         watershed = New Watershed_Basics()
         watershed.UseCorners = True
-        ocvb.desc = "Watershed the four corners of the depth image."
+        task.desc = "Watershed the four corners of the depth image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        watershed.src = ocvb.task.RGBDepth
+        watershed.src = task.RGBDepth
         watershed.Run()
         dst1 = watershed.dst1
         label1 = watershed.label1

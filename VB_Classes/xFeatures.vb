@@ -4,7 +4,7 @@ Public Class XFeatures2D_StarDetector
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
+        task.desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

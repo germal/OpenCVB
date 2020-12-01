@@ -51,7 +51,7 @@ Public Class Smoothing_Exterior
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
-		ocvb.desc = "Smoothing the line connecting a series of points."
+		task.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -131,7 +131,7 @@ Public Class Smoothing_Interior
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
-		ocvb.desc = "Smoothing the line connecting a series of points staying inside the outline."
+		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -180,7 +180,7 @@ Public Class Smoothing_Contours
 		radio.check(1).Text = "Exterior smoothing"
 		radio.check(1).Checked = True
 
-		ocvb.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
+		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 	End Sub
 	Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

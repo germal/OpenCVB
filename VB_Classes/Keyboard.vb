@@ -10,7 +10,7 @@ Public Class Keyboard_Basics
         checkKeys.Setup(caller)
         flow = New Font_FlowText()
         label1 = "Keyboard data will flow to algorithm"
-        ocvb.desc = "Test the keyboard interface available to all algorithms"
+        task.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

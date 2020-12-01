@@ -16,7 +16,7 @@ Public Class BGSubtract_Basics_CPP
         radio.check(5).Text = "GSOC"
         radio.check(6).Text = "LSBP"
         radio.check(4).Checked = True ' mog2 appears to be the best...
-        ocvb.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
+        task.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -67,7 +67,7 @@ Public Class BGSubtract_MotionDetect_MT
         radio.check(0).Text = "1 thread"
         radio.check(5).Checked = True
         label2 = "Only Motion Added"
-        ocvb.desc = "Detect Motion for use with background subtraction"
+        task.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -85,7 +85,7 @@ Public Class BGSubtract_MotionDetect_MT
         Dim threadCount = threadData(0)
         width = threadData(1)
         height = threadData(2)
-        Dim taskArray(threadCount - 1) As Task
+        Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
         Static correlationSlider = findSlider("Correlation Threshold")
@@ -93,7 +93,7 @@ Public Class BGSubtract_MotionDetect_MT
         dst1.SetTo(0)
         For i = 0 To threadCount - 1
             Dim section = i
-            taskArray(i) = Task.Factory.StartNew(
+            taskArray(i) = System.Threading.Tasks.Task.Factory.StartNew(
                 Sub()
                     Dim roi = New cv.Rect((section Mod xfactor) * width, height * Math.Floor(section / yfactor), width, height)
                     Dim correlation As New cv.Mat
@@ -104,7 +104,7 @@ Public Class BGSubtract_MotionDetect_MT
                     End If
                 End Sub)
         Next
-        Task.WaitAll(taskArray)
+        System.Threading.Tasks.Task.WaitAll(taskArray)
     End Sub
 End Class
 
@@ -122,7 +122,7 @@ Public Class BGSubtract_Basics_MT
         sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
 
         label2 = "Only Motion Added"
-        ocvb.desc = "Detect Motion in the color image"
+        task.desc = "Detect Motion in the color image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -153,14 +153,14 @@ Public Class BGSubtract_Depth_MT
         initParent()
         bgsub = New BGSubtract_Basics_MT()
         shadow = New Depth_Holes()
-        ocvb.desc = "Detect Motion in the depth image - needs more work"
+        task.desc = "Detect Motion in the depth image - needs more work"
         label1 = "Depth data input"
         label2 = "Accumulated depth image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run() ' get where depth is zero
-        bgsub.src = ocvb.task.RGBDepth
+        bgsub.src = task.RGBDepth
         bgsub.Run()
         dst1 = bgsub.src
         dst2 = bgsub.dst2
@@ -180,7 +180,7 @@ Public Class BGSubtract_MOG
         sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
 
         MOG = cv.BackgroundSubtractorMOG.Create()
-        ocvb.desc = "Subtract background using a mixture of Gaussians"
+        task.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -207,7 +207,7 @@ Public Class BGSubtract_MOG2
         sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
 
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
-        ocvb.desc = "Subtract background using a mixture of Gaussians"
+        task.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -230,7 +230,7 @@ Public Class BGSubtract_GMG_KNN
 
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
-        ocvb.desc = "GMG and KNN API's to subtract background"
+        task.desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -265,11 +265,11 @@ Public Class BGSubtract_MOG_RGBDepth
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
         label1 = "Unstable depth"
         label1 = "Unstable color"
-        ocvb.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
+        task.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gray = ocvb.task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("Learn Rate")
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -295,11 +295,11 @@ Public Class BGSubtract_MOG_Retina
 
         label1 = "MOG results of depth motion"
         label2 = "Difference from retina depth motion."
-        ocvb.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
+        task.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        retina.src = ocvb.task.RGBDepth
+        retina.src = task.RGBDepth
         retina.Run()
         bgSub.src = retina.dst2.Clone()
         bgSub.Run()
@@ -317,7 +317,7 @@ Public Class BGSubtract_DepthOrColorMotion
     Public Sub New()
         initParent()
         motion = New Diff_UnstableDepthAndColor()
-        ocvb.desc = "Detect motion with both depth and color changes"
+        task.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -363,7 +363,7 @@ Public Class BGSubtract_Video
 
         video = New Video_Basics()
         video.srcVideo = ocvb.parms.homeDir + "Data/vtest.avi"
-        ocvb.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
+        task.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -409,7 +409,7 @@ Public Class BGSubtract_Synthetic_CPP
         sliders.setupTrackBar(2, "Synthetic Wavespeed x100", 1, 400, 20)
         sliders.setupTrackBar(3, "Synthetic ObjectSpeed", 1, 20, 15)
         label1 = "Synthetic background/foreground image."
-        ocvb.desc = "Generate a synthetic input to background subtraction method - Painterly"
+        task.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -455,7 +455,7 @@ Public Class BGSubtract_Synthetic
         bgfg = New BGSubtract_Basics_CPP()
 
         synth = New BGSubtract_Synthetic_CPP()
-        ocvb.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
+        task.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

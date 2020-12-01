@@ -16,7 +16,7 @@ Public Class MultiDimensionScaling_Cities
     Public Sub New()
         initParent()
         label1 = "Resulting solution using cv.Eigen"
-        ocvb.desc = "Use OpenCV's Eigen function to solve a system of equations"
+        task.desc = "Use OpenCV's Eigen function to solve a system of equations"
     End Sub
     Private Function Torgerson(src As cv.Mat) As Double
         Dim rows = src.Rows

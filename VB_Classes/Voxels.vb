@@ -25,11 +25,11 @@ Public Class Voxels_Basics_MT
         gridHeightSlider.Value = 16
 
         label2 = "Voxels labeled with their median distance"
-        ocvb.desc = "Use multi-threading to get median depth values as voxels."
+        task.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim split() = ocvb.task.pointCloud.Split()
+        Dim split() = task.pointCloud.Split()
 
         Static minSlider = findSlider("InRange Min Depth")
         Static maxSlider = findSlider("InRange Max Depth")
@@ -59,7 +59,7 @@ Public Class Voxels_Basics_MT
         End Sub)
         voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_32F)
         If check.Box(0).Checked Then
-            dst1 = ocvb.task.RGBDepth.Clone()
+            dst1 = task.RGBDepth.Clone()
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow
             Dim farColor = cv.Scalar.Blue

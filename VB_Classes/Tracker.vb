@@ -9,7 +9,7 @@ Public Class Tracker_Basics
         initParent()
         check.Setup(caller, 1)
         check.Box(0).Text = "Stop tracking selected object"
-        ocvb.desc = "Track an object using cv.Tracking API - tracker algorithm"
+        task.desc = "Track an object using cv.Tracking API - tracker algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -19,11 +19,11 @@ Public Class Tracker_Basics
             If tracker IsNot Nothing Then tracker.Dispose()
             tracker = Nothing
         End If
-        If ocvb.task.drawRect.Width <> 0 Then
+        If task.drawRect.Width <> 0 Then
             tracker = cv.Tracking.MultiTracker.Create()
-            Dim r = ocvb.task.drawRect
+            Dim r = task.drawRect
             bbox = New cv.Rect2d(r.X, r.Y, r.Width, r.Height) ' silly that this isn't the same as rect.
-            ocvb.task.drawRectClear = True
+            task.drawRectClear = True
             Select Case trackerIndex
                 Case 0
                     tracker.Add(cv.Tracking.TrackerBoosting.Create(), src, bbox)
@@ -64,15 +64,15 @@ Public Class Tracker_MultiObject
     Dim trackers As New List(Of Tracker_Basics)
     Public Sub New()
         initParent()
-        ocvb.desc = "Track any number of objects simultaneously - tracker algorithm"
+        task.desc = "Track any number of objects simultaneously - tracker algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.task.drawRect.Width <> 0 Then
+        If task.drawRect.Width <> 0 Then
             Dim tr = New Tracker_Basics()
             tr.src = src
             tr.Run()
-            ocvb.task.drawRect = New cv.Rect
+            task.drawRect = New cv.Rect
             trackers.Add(tr)
         End If
         dst1 = src.Clone()
@@ -115,7 +115,7 @@ Public Class Tracker_Methods
         radio.check(7).Text = "TrackerTLD"
         radio.check(5).Checked = True ' TrackerMIL is the default
 
-        ocvb.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
+        task.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

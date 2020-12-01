@@ -7,7 +7,7 @@ Public Class Contrast_POW
         sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         label1 = "Original Image"
         label2 = "Contrast reduced"
-        ocvb.desc = "Reduce contrast with POW function"
+        task.desc = "Reduce contrast with POW function"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -32,7 +32,7 @@ Public Class Contrast_Basics
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Brightness", 1, 100, 50)
         sliders.setupTrackBar(1, "Contrast", 1, 100, 50)
-        ocvb.desc = "Show image with varying contrast and brightness."
+        task.desc = "Show image with varying contrast and brightness."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

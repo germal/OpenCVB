@@ -24,7 +24,7 @@ Public Class RecursiveBilateralFilter_CPP
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)
         rbf = RecursiveBilateralFilter_Open()
-        ocvb.desc = "Apply the recursive bilateral filter"
+        task.desc = "Apply the recursive bilateral filter"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

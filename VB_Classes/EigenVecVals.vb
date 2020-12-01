@@ -4,7 +4,7 @@ Public Class EigenVecVals_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Solve system of equations using OpenCV's EigenVV"
+        task.desc = "Solve system of equations using OpenCV's EigenVV"
         label1 = "EigenVec (solution)"
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub

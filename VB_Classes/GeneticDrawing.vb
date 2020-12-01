@@ -54,7 +54,7 @@ Public Class GeneticDrawing_Basics
 
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"
-        ocvb.desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
+        task.desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
         Dim nextImage = imgGeneration.Clone()
@@ -133,7 +133,7 @@ Public Class GeneticDrawing_Basics
         gradientMagContrast = gradient.sliders.trackbar(0).Value
         sobelKernel = gradient.basics.sobel.sliders.trackbar(0).Value
         Static r = New cv.Rect(0, 0, src.Width, src.Height)
-        If ocvb.task.drawRect.Width > 0 Then r = ocvb.task.drawRect
+        If task.drawRect.Width > 0 Then r = task.drawRect
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             stageTotal = sliders.trackbar(1).Value
@@ -214,7 +214,7 @@ Public Class GeneticDrawing_Basics
         mats.Run()
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
-        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -237,7 +237,7 @@ Public Class GeneticDrawing_Color
         gDraw(2) = New GeneticDrawing_Basics() ' options for the red channel are visible and will be sync below with the other channels if changed.
 
         label1 = "Intermediate results - original+2 partial+Mag"
-        ocvb.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
+        task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -284,23 +284,23 @@ Public Class GeneticDrawing_Photo
     Public Sub New()
         initParent()
 
-        ocvb.task.openFileDialogRequested = True
-        ocvb.task.openFileInitialDirectory = ocvb.parms.homeDir + "Data/"
-        ocvb.task.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg")
-        ocvb.task.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
-        ocvb.task.openFileFilterIndex = 1
-        ocvb.task.openFileDialogTitle = "Select an image file to create a paint version"
-        ocvb.task.initialStartSetting = True
-        ocvb.task.openFileSliderPercent = -1
+        task.openFileDialogRequested = True
+        task.openFileInitialDirectory = ocvb.parms.homeDir + "Data/"
+        task.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg")
+        task.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
+        task.openFileFilterIndex = 1
+        task.openFileDialogTitle = "Select an image file to create a paint version"
+        task.initialStartSetting = True
+        task.openFileSliderPercent = -1
         gDraw = New GeneticDrawing_Color()
 
-        ocvb.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
+        task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If inputFileName <> ocvb.task.openFileDialogName Or ocvb.frameCount = 0 Then
-            Dim fileinfo = New FileInfo(ocvb.task.openFileDialogName)
+        If inputFileName <> task.openFileDialogName Or ocvb.frameCount = 0 Then
+            Dim fileinfo = New FileInfo(task.openFileDialogName)
             If fileinfo.Exists = False Then
                 label1 = "No input file.  Use dialogbox below..."
                 Exit Sub
@@ -311,7 +311,7 @@ Public Class GeneticDrawing_Photo
                 label1 = "Input file must be RGB 3-channel image!"
                 Exit Sub
             End If
-            inputFileName = ocvb.task.openFileDialogName
+            inputFileName = task.openFileDialogName
 
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color()

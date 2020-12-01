@@ -41,7 +41,7 @@ Public Class Harris_Features_CPP
         sliders.setupTrackBar(3, "Harris Parameter", 1, 100, 1)
         sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
 
-        ocvb.desc = "Use Harris feature detectors to identify interesting points."
+        task.desc = "Use Harris feature detectors to identify interesting points."
 
         ReDim srcData(src.Total - 1)
         Harris_Features = Harris_Features_Open()
@@ -65,7 +65,7 @@ Public Class Harris_Features_CPP
         gray32f.ConvertTo(dst1, cv.MatType.CV_8U)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim weight = sliders.trackbar(4).Value / 100
-        cv.Cv2.AddWeighted(dst1, weight, ocvb.task.color, 1 - weight, 0, dst2)
+        cv.Cv2.AddWeighted(dst1, weight, task.color, 1 - weight, 0, dst2)
         label2 = "RGB overlaid with Harris result. Weight = " + Format(weight, "0%")
     End Sub
     Public Sub Close()
@@ -88,7 +88,7 @@ Public Class Harris_Detector_CPP
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
 
-        ocvb.desc = "Use Harris detector to identify interesting points."
+        task.desc = "Use Harris detector to identify interesting points."
 
         ReDim srcData(src.Total - 1)
         Harris_Detector = Harris_Detector_Open()

@@ -5,7 +5,7 @@ Public Class FLANN_Test
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
+        task.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
         label1 = "FLANN Basics"
     End Sub
     Public Sub Run()
@@ -63,7 +63,7 @@ Public Class FLANN_Basics
         check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
         check.Box(1).Checked = True
 
-        ocvb.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
+        task.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         label1 = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run()

@@ -11,7 +11,7 @@ Public Class Features_GoodFeatures
         sliders.setupTrackBar(1, "Quality Level", 1, 100, 1)
         sliders.setupTrackBar(2, "Distance", 1, 100, 30)
 
-        ocvb.desc = "Find good features to track in an RGB image."
+        task.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -48,7 +48,7 @@ Public Class Features_PointTracker
 
         label1 = "Good features without Kalman"
         label2 = "Good features with Kalman"
-        ocvb.desc = "Find good features and track them"
+        task.desc = "Find good features and track them"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -11,7 +11,7 @@ Public Class BlockMatching_Basics
         sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)
         sliders.setupTrackBar(1, "Blockmatch block size", 5, 255, 15)
         sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
-        ocvb.desc = "Use OpenCV's block matching on left and right views"
+        task.desc = "Use OpenCV's block matching on left and right views"
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
     End Sub
@@ -28,8 +28,8 @@ Public Class BlockMatching_Basics
         Static blockMatch = cv.StereoBM.Create()
         blockMatch.BlockSize = blockSize
         blockMatch.MinDisparity = 0
-        blockMatch.ROI1 = New cv.Rect(0, 0, ocvb.task.leftView.Width, ocvb.task.leftView.Height)
-        blockMatch.ROI2 = New cv.Rect(0, 0, ocvb.task.leftView.Width, ocvb.task.leftView.Height)
+        blockMatch.ROI1 = New cv.Rect(0, 0, task.leftView.Width, task.leftView.Height)
+        blockMatch.ROI2 = New cv.Rect(0, 0, task.leftView.Width, task.leftView.Height)
         blockMatch.PreFilterCap = 31
         blockMatch.NumDisparities = numDisparity
         blockMatch.TextureThreshold = 10
@@ -39,7 +39,7 @@ Public Class BlockMatching_Basics
         blockMatch.Disp12MaxDiff = 1
 
         Dim disparity As New cv.Mat
-        blockMatch.compute(ocvb.task.leftView, ocvb.task.rightView, disparity)
+        blockMatch.compute(task.leftView, task.rightView, disparity)
         disparity.ConvertTo(colorizer.src, cv.MatType.CV_32F, 1 / 16)
         colorizer.src = colorizer.src.Threshold(0, 0, cv.ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8
@@ -50,7 +50,7 @@ Public Class BlockMatching_Basics
         colorizer.src(rect) = colorizer.src(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
         colorizer.Run()
         dst1(rect) = colorizer.dst1(rect)
-        dst2 = ocvb.task.rightView.Resize(src.Size())
+        dst2 = task.rightView.Resize(src.Size())
     End Sub
 End Class
 

@@ -6,7 +6,7 @@ Public Class Fibonacci_Basics
     Public Sub New()
         initParent()
         flow = New Font_FlowText()
-        ocvb.desc = "Generate the fibonacci sequence using conventional code"
+        task.desc = "Generate the fibonacci sequence using conventional code"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -35,7 +35,7 @@ Public Class Fibonacci_Yield
     Public Sub New()
         initParent()
         flow = New Font_FlowText()
-        ocvb.desc = "Generate the fibonacci sequence using ienumerable's"
+        task.desc = "Generate the fibonacci sequence using ienumerable's"
     End Sub
     Private Iterator Function nextFib() As System.Collections.Generic.IEnumerable(Of Double)
         Dim a As Double = 0

@@ -3,13 +3,13 @@ Public Class Mat_Repeat
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Use the repeat method to replicate data."
+        task.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst1 = small.Repeat(10, 10)
-        small = ocvb.task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
+        small = task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst2 = small.Repeat(10, 10)
     End Sub
 End Class
@@ -30,7 +30,7 @@ Public Class Mat_PointToMat
         mask.plotPoints = True
         label1 = "Random_Points points (original)"
         label2 = "Random_Points points after format change"
-        ocvb.desc = "Convert pointf3 into a mat of points"
+        task.desc = "Convert pointf3 into a mat of points"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -58,7 +58,7 @@ Public Class Mat_MatToPoint
     Public Sub New()
         initParent()
         mask = New Random_Points()
-        ocvb.desc = "Convert a mat into a vector of points."
+        task.desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
     Public Sub Run()
@@ -89,7 +89,7 @@ Public Class Mat_Transpose
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Transpose a Mat and show results."
+        task.desc = "Transpose a Mat and show results."
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
@@ -114,7 +114,7 @@ Public Class Mat_Tricks
         initParent()
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
-        ocvb.desc = "Show some Mat tricks."
+        task.desc = "Show some Mat tricks."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -146,7 +146,7 @@ Public Class Mat_4to1
 
         label1 = "Combining 4 images into one"
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Use one Mat for up to 4 images"
+        task.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -157,9 +157,9 @@ Public Class Mat_4to1
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then
             mat1 = src
-            mat2 = ocvb.task.RGBDepth
-            mat3 = ocvb.task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            mat4 = ocvb.task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mat2 = task.RGBDepth
+            mat3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mat4 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             mat = {mat1, mat2, mat3, mat4}
         End If
         For i = 0 To 4 - 1
@@ -197,7 +197,7 @@ Public Class Mat_2to1
         dst1 = dst2
 
         label1 = ""
-        ocvb.desc = "Fill a Mat with 2 images"
+        task.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -206,7 +206,7 @@ Public Class Mat_2to1
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then
             mat1 = src
-            mat2 = ocvb.task.RGBDepth
+            mat2 = task.RGBDepth
             mat = {mat1, mat2}
         End If
         dst1.SetTo(0)
@@ -250,7 +250,7 @@ Public Class Mat_ImageXYZ_MT
         Next
         cv.Cv2.Split(xyDepth, xyzPlanes)
 
-        ocvb.desc = "Create a cv.Point3f vector with x, y, and z."
+        task.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -277,7 +277,7 @@ Public Class Mat_RowColRange
     Public Sub New()
         initParent()
         label1 = "BitwiseNot of RowRange and ColRange"
-        ocvb.desc = "Perform operation on a range of cols and/or Rows."
+        task.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -298,7 +298,7 @@ Public Class Mat_Managed
     Public Sub New()
         initParent()
         label1 = "Color change is in the managed cv.vec3b array"
-        ocvb.desc = "There is a limited ability to use Mat data in Managed code directly."
+        task.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -328,7 +328,7 @@ Public Class Mat_MultiplyReview
     Public Sub New()
         initParent()
         flow = New Font_FlowText()
-        ocvb.desc = "Review matrix multiplication"
+        task.desc = "Review matrix multiplication"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -405,7 +405,7 @@ Public Class Mat_Inverse
         radio.check(3).Enabled = False ' not accepted!
         radio.check(4).Enabled = False ' not accepted!
 
-        ocvb.desc = "Given a 3x3 matrix, invert it and present results."
+        task.desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

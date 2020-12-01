@@ -4,7 +4,7 @@ Module VB_EditorMain
     Private Function makeChange(line As String) As String
         If line.Contains("") Then
             Console.WriteLine(line)
-            line = line.Replace("setDescription(", "ocvb.desc = ")
+            line = line.Replace("setDescription(", "task.desc = ")
             line = Mid(line, 1, Len(line) - 1)
             Console.WriteLine("Change to: " + line)
             changeLines += 1

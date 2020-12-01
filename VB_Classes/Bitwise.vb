@@ -5,7 +5,7 @@ Public Class Bitwise_Not
         initParent()
         label1 = "Color BitwiseNot"
         label2 = "Gray BitwiseNot"
-        ocvb.desc = "Gray and color bitwise_not"
+        task.desc = "Gray and color bitwise_not"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

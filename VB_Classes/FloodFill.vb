@@ -27,7 +27,7 @@ Public Class FloodFill_Basics
         sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
 
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
+        task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -105,7 +105,7 @@ Public Class FloodFill_8bit
         palette.Run()
 
         basics = New FloodFill_Basics()
-        ocvb.desc = "Create a floodfill image that is only 8-bit for use with a palette"
+        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -147,7 +147,7 @@ Public Class FloodFill_Top16_MT
         sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
         sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
 
-        ocvb.desc = "Use floodfill to build image segments with a grayscale image."
+        task.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -187,7 +187,7 @@ Public Class FloodFill_Color_MT
         grid = New Thread_Grid()
         flood = New FloodFill_Top16_MT()
 
-        ocvb.desc = "Use floodfill to build image segments in an RGB image."
+        task.desc = "Use floodfill to build image segments in an RGB image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -231,7 +231,7 @@ Public Class FloodFill_DCT
         flood = New FloodFill_Color_MT()
 
         dct = New DCT_FeatureLess()
-        ocvb.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
+        task.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -262,7 +262,7 @@ Public Class FloodFill_CComp
         range = New FloodFill_RelativeRange()
 
         label1 = "Input to Floodfill "
-        ocvb.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
+        task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -298,7 +298,7 @@ Public Class FloodFill_RelativeRange
         check.Box(2).Text = "Use 'Mask Only'"
         label1 = "Input to floodfill basics"
         label2 = "Output of floodfill basics"
-        ocvb.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
+        task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -330,7 +330,7 @@ Public Class FloodFill_Top16
         flood = New FloodFill_Basics()
 
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill to build image segments in a grayscale image."
+        task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -382,7 +382,7 @@ Public Class Floodfill_Objects
         basics = New FloodFill_Basics()
         basics.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
 
-        ocvb.desc = "Use floodfill to identify the desired number of objects"
+        task.desc = "Use floodfill to identify the desired number of objects"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -425,7 +425,7 @@ Public Class FloodFill_WithDepth
 
         label1 = "Floodfill results after removing unknown depth"
         label2 = "Mask showing where depth data is missing"
-        ocvb.desc = "Floodfill only the areas where there is depth"
+        task.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -456,7 +456,7 @@ Public Class Floodfill_Identifiers
         initParent()
         basics = New FloodFill_Basics()
         label1 = "Input image to floodfill"
-        ocvb.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
+        task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -515,7 +515,7 @@ Public Class Floodfill_ColorObjects
         initParent()
         pFlood = New Floodfill_Identifiers()
 
-        ocvb.desc = "Use floodfill to identify each of the region candidates using only color."
+        task.desc = "Use floodfill to identify each of the region candidates using only color."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -550,7 +550,7 @@ Public Class FloodFill_PointTracker
         flood = New FloodFill_8bit()
 
         label1 = "Point tracker output"
-        ocvb.desc = "Test the FloodFill output as input into the point tracker"
+        task.desc = "Test the FloodFill output as input into the point tracker"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

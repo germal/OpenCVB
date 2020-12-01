@@ -4,7 +4,7 @@ Public Class Remap_Basics
     Public direction = 3 ' default to remap horizontally and vertically
     Public Sub New()
         initParent()
-        ocvb.desc = "Use remap to reflect an image in 4 directions."
+        task.desc = "Use remap to reflect an image in 4 directions."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -48,7 +48,7 @@ Public Class Remap_Flip
     Public direction = 0
     Public Sub New()
         initParent()
-        ocvb.desc = "Use flip to remap an image."
+        task.desc = "Use flip to remap an image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

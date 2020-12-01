@@ -9,31 +9,31 @@ Public Class Video_Basics
     Public Sub New()
         initParent()
 
-        ocvb.task.openFileDialogRequested = True
-        ocvb.task.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
-        ocvb.task.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
-        ocvb.task.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
-        ocvb.task.openFileFilterIndex = 1
-        ocvb.task.openFileDialogTitle = "Select a video file for input"
-        ocvb.task.initialStartSetting = False
+        task.openFileDialogRequested = True
+        task.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
+        task.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
+        task.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
+        task.openFileFilterIndex = 1
+        task.openFileDialogTitle = "Select a video file for input"
+        task.initialStartSetting = False
 
-        Dim fileInfo = New FileInfo(ocvb.task.openFileDialogName)
+        Dim fileInfo = New FileInfo(task.openFileDialogName)
         srcVideo = fileInfo.FullName
 
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
         label1 = fileInfo.Name
-        ocvb.desc = "Show a video file"
+        task.desc = "Show a video file"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim fileInfo = New FileInfo(ocvb.task.openFileDialogName)
-        If srcVideo <> ocvb.task.openFileDialogName Then
+        Dim fileInfo = New FileInfo(task.openFileDialogName)
+        If srcVideo <> task.openFileDialogName Then
             If fileInfo.Exists = False Then
                 ocvb.trueText("File not found: " + fileInfo.FullName, 10, 125)
                 Exit Sub
             End If
-            srcVideo = ocvb.task.openFileDialogName
-            captureVideo = New cv.VideoCapture(ocvb.task.openFileDialogName)
+            srcVideo = task.openFileDialogName
+            captureVideo = New cv.VideoCapture(task.openFileDialogName)
         End If
         captureVideo.Read(image)
         If image.Empty() Then
@@ -42,7 +42,7 @@ Public Class Video_Basics
             captureVideo.Read(image)
         End If
 
-        ocvb.task.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
+        task.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
         If image.Empty() = False Then dst1 = image.Resize(src.Size())
     End Sub
 End Class
@@ -66,7 +66,7 @@ Public Class Video_CarCounting
 
         flow = New Font_FlowText()
 
-        ocvb.desc = "Count cars in a video file"
+        task.desc = "Count cars in a video file"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -123,7 +123,7 @@ Public Class Video_CarCComp
         cc = New CComp_Basics()
         video = New Video_Basics()
 
-        ocvb.desc = "Outline cars with a rectangle"
+        task.desc = "Outline cars with a rectangle"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -155,7 +155,7 @@ Public Class Video_MinRect
         video.Run()
 
         bgSub = New BGSubtract_MOG()
-        ocvb.desc = "Find area of car outline - example of using minAreaRect"
+        task.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -187,7 +187,7 @@ Public Class Video_MinCircle
     Public Sub New()
         initParent()
         video = New Video_MinRect()
-        ocvb.desc = "Find area of car outline - example of using MinEnclosingCircle"
+        task.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

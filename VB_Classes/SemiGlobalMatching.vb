@@ -25,7 +25,7 @@ Public Class SemiGlobalMatching_CPP
     Dim cPtr As IntPtr
     Public Sub New()
         initParent()
-        ocvb.desc = "Find depth using the semi-global matching algorithm."
+        task.desc = "Find depth using the semi-global matching algorithm."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -41,17 +41,17 @@ Public Class SemiGlobalMatching_CPP
         '    cPtr = SemiGlobalMatching_Open(src.Rows, src.Cols, 3)
         'End If
 
-        'Marshal.Copy(ocvb.task.leftView.Data, leftData, 0, leftData.Length)
-        'Marshal.Copy(ocvb.task.rightView.Data, rightData, 0, rightData.Length)
+        'Marshal.Copy(task.leftView.Data, leftData, 0, leftData.Length)
+        'Marshal.Copy(task.rightView.Data, rightData, 0, rightData.Length)
 
         'Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
         'Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
         'Dim imagePtr = SemiGlobalMatching_Run(cPtr, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(),
-        '                                      ocvb.task.leftView.Rows, ocvb.task.leftView.Cols)
+        '                                      task.leftView.Rows, task.leftView.Cols)
         'handleLeft.Free()
         'handleRight.Free()
 
-        'Dim dst1 = New cv.Mat(ocvb.task.leftView.Rows, ocvb.task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
+        'Dim dst1 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
         ocvb.trueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported." + vbCrLf +
                       "Needs work but investing further is not needed - we have disparity from the device.", 10, 40, 3)
     End Sub

@@ -28,7 +28,7 @@ Public Class Salience_Basics_CPP
         sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
 
         salience = Salience_Open()
-        ocvb.desc = "Show results of Salience algorithm when using C++"
+        task.desc = "Show results of Salience algorithm when using C++"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -56,7 +56,7 @@ Public Class Salience_Basics_MT
         salience = New Salience_Basics_CPP()
         salience.sliders.trackbar(1).Value = 2
 
-        ocvb.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
+        task.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

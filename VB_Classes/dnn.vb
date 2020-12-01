@@ -10,7 +10,7 @@ Public Class DNN_Test
     Public Sub New()
         initParent()
         label2 = "Input Image"
-        ocvb.desc = "Download and use a Caffe database"
+        task.desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -46,7 +46,7 @@ Public Class DNN_Caffe_CS
     Public Sub New()
         initParent()
         label2 = "Input Image"
-        ocvb.desc = "Download and use a Caffe database"
+        task.desc = "Download and use a Caffe database"
 
         Dim protoTxt = ocvb.parms.homeDir + "Data/bvlc_googlenet.prototxt"
         Dim modelFile = ocvb.parms.homeDir + "Data/bvlc_googlenet.caffemodel"
@@ -106,7 +106,7 @@ Public Class DNN_Basics
         If dnnPrepared = False Then
             ocvb.trueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
         End If
-        ocvb.desc = "Use OpenCV's dnn from Caffe file."
+        task.desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run()

@@ -25,7 +25,7 @@ Public Class Area_MinTriangle_CPP
         sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
         sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         setup()
-        ocvb.desc = "Find minimum containing triangle for a set of points."
+        task.desc = "Find minimum containing triangle for a set of points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -79,7 +79,7 @@ Public Class Area_MinRect
 
         setup(sliders.trackbar(0).Value)
 
-        ocvb.desc = "Find minimum containing rectangle for a set of points."
+        task.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -112,7 +112,7 @@ Public Class Area_MinMotionRect
         bgSub = New BGSubtract_MOG()
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
         bgSubLearnRate.Value = 100 ' low threshold to maximize motion
-        ocvb.desc = "Use minRectArea to encompass detected motion"
+        task.desc = "Use minRectArea to encompass detected motion"
         label1 = "MinRectArea of MOG motion"
     End Sub
 
@@ -150,7 +150,7 @@ Public Class Area_FindNonZero
         initParent()
         label1 = "Coordinates of non-zero points"
         label2 = "Non-zero original points"
-        ocvb.desc = "Use FindNonZero API to get coordinates of non-zero points."
+        task.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

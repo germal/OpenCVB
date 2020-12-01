@@ -34,7 +34,7 @@ Public Class MatrixInverse_Basics_CS
     Public Sub New()
         initParent()
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-        ocvb.desc = "Manually invert a matrix"
+        task.desc = "Manually invert a matrix"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -64,7 +64,7 @@ Public Class MatrixInverse_OpenCV
     Public Sub New()
         initParent()
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
-        ocvb.desc = "Use OpenCV to invert a matrix"
+        task.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -103,7 +103,7 @@ Public Class Plane_Detect
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 64
 
-        ocvb.desc = "Identify planes in each segment."
+        task.desc = "Identify planes in each segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
@@ -112,7 +112,7 @@ Public Class Plane_Detect
         grid.Run()
 
         dst2.SetTo(0)
-        ocvb.task.RGBDepth.CopyTo(dst1)
+        task.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
@@ -177,7 +177,7 @@ Public Class Plane_DetectDebug
         gridWidthSlider.Value = 32
         gridHeightSlider.Value = 32
 
-        ocvb.desc = "Debug code to identify planes in just one segment."
+        task.desc = "Debug code to identify planes in just one segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
@@ -186,7 +186,7 @@ Public Class Plane_DetectDebug
         grid.Run()
 
         dst2.SetTo(0)
-        ocvb.task.RGBDepth.CopyTo(dst1)
+        task.RGBDepth.CopyTo(dst1)
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)

@@ -46,7 +46,7 @@ Module UI_GeneratorMain
                 sIndex += 1
                 fileName = fileinfo.FullName
             Else
-                If fileName.EndsWith("VBparent.vb") = False Then
+                If fileName.EndsWith("VBparent.vb") = False And fileName.EndsWith("VBocvb.vb") = False Then
                     Dim nextFile As New System.IO.StreamReader(fileName)
                     While nextFile.Peek() <> -1
                         Dim line = Trim(nextFile.ReadLine())
@@ -62,7 +62,10 @@ Module UI_GeneratorMain
                                     If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
                                     If LCase(line2) = "inherits vbparent" Then className = split(2) ' public class <classname>
                                 End If
-                                If LCase(line).StartsWith("public sub new(") Then
+
+                                If className = "Kalman_Single" Then Dim k = 0
+
+                                If LCase(line).StartsWith("public sub new(") And sortedNames.ContainsKey(className) = False Then
                                     sortedNames.Add(className, sIndex)
                                     sIndex += 1
                                 End If
@@ -109,7 +112,6 @@ Module UI_GeneratorMain
             Dim nextName = cleanNames.Item(i)
             sw.WriteLine(vbTab + "case """ + UCase(nextName) + """")
             If nextName.EndsWith(".py") Then
-                sw.WriteLine(vbTab + vbTab + "ocvb.PythonFileName = """ + pythonAppDir.FullName + nextName + """")
                 sw.WriteLine(vbTab + vbTab + "return new Python_Run()")
             Else
                 sw.WriteLine(vbTab + vbTab + "return new " + nextName + "()")

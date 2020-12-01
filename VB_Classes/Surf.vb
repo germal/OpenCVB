@@ -21,12 +21,12 @@ Public Class Surf_Basics_CS
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
 
-        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
+        task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        srcLeft = ocvb.task.leftView
-        srcRight = ocvb.task.rightView
+        srcLeft = task.leftView
+        srcRight = task.rightView
         Dim doubleSize As New cv.Mat
         CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.trackbar(0).Value, radio.check(0).Checked)
 
@@ -53,7 +53,7 @@ Public Class Surf_Basics
 
         surf = New Surf_Basics_CS()
 
-        ocvb.desc = "Use left and right views to match points in horizontal slices."
+        task.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -80,7 +80,7 @@ Public Class Surf_DrawMatchManual_CS
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
 
-        ocvb.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
+        task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

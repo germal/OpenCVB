@@ -6,7 +6,7 @@ Public Class Blur_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
-        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
+        task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -14,7 +14,7 @@ Public Class Blur_Basics
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             cv.Cv2.GaussianBlur(src, dst1, New cv.Size(kernelSize, kernelSize), 0, 0)
-            If standalone Then cv.Cv2.GaussianBlur(ocvb.task.RGBDepth, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
+            If standalone Then cv.Cv2.GaussianBlur(task.RGBDepth, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
         Else
             dst1 = src
         End If
@@ -33,7 +33,7 @@ Public Class Blur_Gaussian_CS
     Public Sub New()
         initParent()
         blur = New Blur_Basics()
-        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
+        task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -42,7 +42,7 @@ Public Class Blur_Gaussian_CS
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             CS_BlurGaussian.Run(src, dst1, kernelSize)
-            If standalone Then CS_BlurGaussian.Run(ocvb.task.RGBDepth, dst2, kernelSize)
+            If standalone Then CS_BlurGaussian.Run(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
         End If
@@ -61,7 +61,7 @@ Public Class Blur_Median_CS
     Public Sub New()
         initParent()
         blur = New Blur_Basics()
-        ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
+        task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -70,7 +70,7 @@ Public Class Blur_Median_CS
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             CS_BlurMedian.Run(src, dst1, kernelSize)
-            If standalone Then CS_BlurMedian.Run(ocvb.task.RGBDepth, dst2, kernelSize)
+            If standalone Then CS_BlurMedian.Run(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
         End If
@@ -88,7 +88,7 @@ Public Class Blur_Homogeneous
     Public Sub New()
         initParent()
         blur = New Blur_Basics()
-        ocvb.desc = "Smooth each pixel with a kernel of 1's of different sizes."
+        task.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -97,10 +97,10 @@ Public Class Blur_Homogeneous
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             dst1 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
-            If standalone Then dst2 = ocvb.task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+            If standalone Then dst2 = task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         Else
             dst1 = src
-            dst2 = ocvb.task.RGBDepth
+            dst2 = task.RGBDepth
         End If
     End Sub
 End Class
@@ -117,7 +117,7 @@ Public Class Blur_Median
     Public Sub New()
         initParent()
         blur = New Blur_Basics()
-        ocvb.desc = "Replace each pixel with the median of neighborhood of varying sizes."
+        task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -126,10 +126,10 @@ Public Class Blur_Median
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             cv.Cv2.MedianBlur(src, dst1, kernelSize)
-            If standalone Then cv.Cv2.MedianBlur(ocvb.task.RGBDepth, dst2, kernelSize)
+            If standalone Then cv.Cv2.MedianBlur(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
-            dst2 = ocvb.task.RGBDepth
+            dst2 = task.RGBDepth
         End If
     End Sub
 End Class
@@ -146,7 +146,7 @@ Public Class Blur_Bilateral
     Public Sub New()
         initParent()
         blur = New Blur_Basics()
-        ocvb.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
+        task.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -180,7 +180,7 @@ Public Class Blur_PlusHistogram
 
         label1 = "Use Blur slider to see impact on histograms"
         label2 = "Top is before equalize, Bottom is after Equalize"
-        ocvb.desc = "Compound algorithms Blur and Histogram"
+        task.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -221,7 +221,7 @@ Public Class Blur_TopoMap
         sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)
 
         label1 = "Image Gradient"
-        ocvb.desc = "Create a topo map from the blurred image"
+        task.desc = "Create a topo map from the blurred image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -14,7 +14,7 @@ Public Class Fitline_Basics
         sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
         sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
 
-        ocvb.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
+        task.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -56,7 +56,7 @@ Public Class Fitline_3DBasics_MT
     Public Sub New()
         initParent()
         hlines = New Hough_Lines_MT()
-        ocvb.desc = "Use visual lines to find 3D lines."
+        task.desc = "Use visual lines to find 3D lines."
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run()
@@ -90,7 +90,7 @@ Public Class Fitline_3DBasics_MT
             Dim line = nullLine
             If points.Count = 0 Then
                 ' save the average color for this roi
-                Dim mean = ocvb.task.RGBDepth(roi).Mean()
+                Dim mean = task.RGBDepth(roi).Mean()
                 mean(0) = 255 - mean(0)
                 dst2.Rectangle(roi, mean, -1, cv.LineTypes.AntiAlias)
             Else
@@ -128,7 +128,7 @@ Public Class Fitline_RawInput
         check.Box(0).Checked = True
         check.Box(1).Checked = True
 
-        ocvb.desc = "Generate a noisy line in a field of random data."
+        task.desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -199,7 +199,7 @@ Public Class Fitline_EigenFit
         noisyLine.sliders.trackbar(1).Value = 400
         label1 = "blue=GT, red=fitline, yellow=EigenFit"
         label2 = "Raw input (use sliders below to explore)"
-        ocvb.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
+        task.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

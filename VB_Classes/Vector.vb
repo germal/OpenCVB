@@ -4,7 +4,7 @@ Public Class Vector_Magnitude
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Compute Euclidian and Manhattan Distance on a single vector."
+        task.desc = "Compute Euclidian and Manhattan Distance on a single vector."
         label1 = "Vector Magnitude"
     End Sub
     Public Sub Run()

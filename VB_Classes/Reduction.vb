@@ -12,7 +12,7 @@ Public Class Reduction_Basics
         radio.check(2).Text = "No reduction"
         radio.check(1).Checked = True
 
-        ocvb.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
+        task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -57,7 +57,7 @@ Public Class Reduction_Edges
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
 
-        ocvb.desc = "Get the edges after reducing the image."
+        task.desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -86,7 +86,7 @@ Public Class Reduction_Floodfill
         initParent()
         flood = New FloodFill_Basics()
         reduction = New Reduction_Basics()
-        ocvb.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
+        task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -119,7 +119,7 @@ Public Class Reduction_KNN_Color
         If standalone Then highlight = New Highlight_Basics()
 
         label2 = "Original floodfill color selections"
-        ocvb.desc = "Use KNN with color reduction to consistently identify regions and color them."
+        task.desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -161,7 +161,7 @@ Public Class Reduction_KNN_ColorAndDepth
         reduction = New Reduction_KNN_Color()
         label1 = "Detecting objects using only color coherence"
         label2 = "Detecting objects with color and depth coherence"
-        ocvb.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
+        task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -189,7 +189,7 @@ Public Class Reduction_Depth
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()
-        ocvb.desc = "Use reduction to smooth depth data"
+        task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -219,18 +219,18 @@ Public Class Reduction_PointCloud
         initParent()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
-        ocvb.desc = "Use reduction to smooth depth data"
+        task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim split() = ocvb.task.pointCloud.Split()
+        Dim split() = task.pointCloud.Split()
         split(2) *= 1000 ' convert to mm's
         split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
         reduction.dst1.ConvertTo(dst2, cv.MatType.CV_32F)
-        dst1 = dst2.Resize(ocvb.task.pointCloud.Size)
+        dst1 = dst2.Resize(task.pointCloud.Size)
         split(2) = dst1 / 1000
-        cv.Cv2.Merge(split, ocvb.task.pointCloud)
+        cv.Cv2.Merge(split, task.pointCloud)
         dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
     End Sub
 End Class
@@ -262,7 +262,7 @@ Public Class Reduction_Lines
 
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"
-        ocvb.desc = "Present both the top and side view to minimize pixel counts."
+        task.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

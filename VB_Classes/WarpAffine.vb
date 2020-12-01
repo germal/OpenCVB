@@ -8,7 +8,7 @@ Public Class WarpAffine_Captcha
     Dim rng As New System.Random
     Public Sub New()
         initParent()
-        ocvb.desc = "Use OpenCV to build a captcha Turing test."
+        task.desc = "Use OpenCV to build a captcha Turing test."
     End Sub
     Private Sub addNoise(image As cv.Mat)
         For n = 0 To 100
@@ -97,7 +97,7 @@ Public Class WarpAffine_Basics
 
         SetInterpolationRadioButtons(caller, radio, "WarpAffine")
 
-        ocvb.desc = "Use WarpAffine to transform input images."
+        task.desc = "Use WarpAffine to transform input images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -130,7 +130,7 @@ Public Class WarpAffine_3Points
         triangle.sliders.trackbar(0).Value = 20
         triangle.sliders.trackbar(1).Value = 150
 
-        ocvb.desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
+        task.desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
         label1 = "Triangles define the affine transform"
         label2 = "Image with affine transform applied"
     End Sub
@@ -204,7 +204,7 @@ Public Class WarpAffine_4Points
         initParent()
         rect = New Area_MinRect()
 
-        ocvb.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
+        task.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         label1 = "Color image with perspective transform applied"
     End Sub
     Public Sub Run()

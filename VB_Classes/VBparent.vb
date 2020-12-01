@@ -1,4 +1,4 @@
-﻿#if USE_NUMPY Then
+﻿#If USE_NUMPY Then
 Imports Numpy
 #End If
 Imports System.Windows.Forms
@@ -41,31 +41,29 @@ Public Class VBparent : Implements IDisposable
     Public desc As String
     Dim callStack = ""
     Public Sub initParent()
-        If ocvb.task.callTrace.Count = 0 Then
+        If task.callTrace.Count = 0 Then
             aOptions = New aOptionsFrm
-            aOptions.setup()
             aOptions.Show()
-            aOptions.SendToBack()
 
             standalone = True
-            ocvb.task.callTrace.Clear()
-            ocvb.task.callTrace.Add(callStack)
+            task.callTrace.Clear()
+            task.callTrace.Add(callStack)
         Else
             standalone = False
-            If ocvb.task.callTrace.Contains(callStack) = False Then ocvb.task.callTrace.Add(callStack)
+            If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
         End If
 
-        src = New cv.Mat(ocvb.task.color.Size, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(ocvb.task.color.Size, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(ocvb.task.color.Size, cv.MatType.CV_8UC3, 0)
+        src = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame()
-        If standalone Then src = ocvb.task.color
+        If standalone Then src = task.color
         If src.Width <> dst1.Width Or src.Width <> dst2.Width Then
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         End If
-        If ocvb.task.drawRect.Width <> 0 Then ocvb.task.drawRect = validateRect(ocvb.task.drawRect)
+        If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run()
         If standalone And src.Width > 0 Then
             If ocvb.intermediateReview <> "" And ocvb.intermediateReview <> caller Then
@@ -82,11 +80,11 @@ Public Class VBparent : Implements IDisposable
             End If
             If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
             If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))
-            If ocvb.task.result.Width <> dst1.Width * 2 Or ocvb.task.result.Height <> dst1.Height Then
-                ocvb.task.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
+            If task.result.Width <> dst1.Width * 2 Or task.result.Height <> dst1.Height Then
+                task.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
             End If
-            ocvb.task.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
-            ocvb.task.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
+            task.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
+            task.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
             ocvb.label1 = label1
             ocvb.label2 = label2
             ocvb.frameCount += 1
@@ -99,8 +97,8 @@ Public Class VBparent : Implements IDisposable
     Public Const QUAD3 = 3
 
     Public Sub setQuadrant()
-        If ocvb.task.mouseClickFlag Then
-            Dim pt = ocvb.task.mouseClickPoint
+        If task.mouseClickFlag Then
+            Dim pt = task.mouseClickPoint
             If pt.Y < src.Height / 2 Then
                 If pt.X < src.Width / 2 Then ocvb.quadrantIndex = QUAD0 Else ocvb.quadrantIndex = QUAD1
             Else
@@ -261,6 +259,11 @@ Public Class VBparent : Implements IDisposable
         If pyStream IsNot Nothing Then pyStream.Dispose()
         Dim type As Type = algorithm.GetType()
         If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
-        aOptions.Dispose()
+        aOptions.Close()
+        sliders.Dispose()
+        check.Dispose()
+        radio.Dispose()
+        radio1.Dispose()
+        combo.Dispose()
     End Sub
 End Class

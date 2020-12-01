@@ -27,7 +27,7 @@ Public Class Fuzzy_Basics
 
         label1 = "Solid regions"
         label2 = "Fuzzy pixels - not solid"
-        ocvb.desc = "That which is not solid is fuzzy"
+        task.desc = "That which is not solid is fuzzy"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -116,11 +116,11 @@ Public Class Fuzzy_ContoursDepth
         initParent()
         fuzzyD = New Fuzzy_Basics()
 
-        ocvb.desc = "Use contours to outline solids in the depth data"
+        task.desc = "Use contours to outline solids in the depth data"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        fuzzyD.src = ocvb.task.RGBDepth
+        fuzzyD.src = task.RGBDepth
         fuzzyD.Run()
         dst1 = fuzzyD.dst1
     End Sub
@@ -139,7 +139,7 @@ Public Class Fuzzy_NeighborProof
     Public Sub New()
         initParent()
         fuzzy = New Fuzzy_Basics()
-        ocvb.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
+        task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -196,11 +196,11 @@ Public Class Fuzzy_TrackerDepth
         check.Box(0).Text = "Display centroid and rectangle for each region"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
+        task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        fuzzy.src = ocvb.task.RGBDepth
+        fuzzy.src = task.RGBDepth
         fuzzy.Run()
         dst1 = fuzzy.dst1
 
@@ -255,7 +255,7 @@ Public Class Fuzzy_TrackerDepthClick
     Public Sub New()
         initParent()
         tracker = New Fuzzy_TrackerDepth()
-        ocvb.desc = "Create centroids and rect's for solid regions and track them - tracker"
+        task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -266,10 +266,10 @@ Public Class Fuzzy_TrackerDepthClick
         If standalone And highlightRegion < 0 Then ocvb.trueText("Click any color region to get more details and track it", 10, 50, 3)
 
         Dim gray = tracker.fuzzy.gray
-        If ocvb.task.mouseClickFlag Then
-            highlightPoint = ocvb.task.mouseClickPoint
+        If task.mouseClickFlag Then
+            highlightPoint = task.mouseClickPoint
             highlightRegion = gray.Get(Of Byte)(highlightPoint.Y, highlightPoint.X)
-            ocvb.task.mouseClickFlag = False
+            task.mouseClickFlag = False
         End If
         If highlightRegion >= 0 Then
             dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -299,7 +299,7 @@ Public Class Fuzzy_PointTracker
         pTrack = New KNN_PointTracker()
         fuzzy.sliders.Visible = False
 
-        ocvb.desc = "FloodFill the regions defined as solid"
+        task.desc = "FloodFill the regions defined as solid"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

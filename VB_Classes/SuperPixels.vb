@@ -33,7 +33,7 @@ Public Class SuperPixel_Basics_CPP
         sliders.setupTrackBar(2, "Prior", 1, 10, 2)
 
         label2 = "Superpixel label data (0-255)"
-        ocvb.desc = "Sub-divide the image into super pixels."
+        task.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -91,7 +91,7 @@ Public Class SuperPixel_BinarizedImage
         Static pixelCountSlider = findSlider("Number of SuperPixels")
         pixelCountSlider.value = 20 ' find the top 20 super pixels.
 
-        ocvb.desc = "Create SuperPixels from a binary image."
+        task.desc = "Create SuperPixels from a binary image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -118,11 +118,11 @@ Public Class SuperPixel_Depth
         initParent()
         pixels = New SuperPixel_Basics_CPP()
 
-        ocvb.desc = "Create SuperPixels using RGBDepth image."
+        task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        pixels.src = ocvb.task.RGBDepth.Clone()
+        pixels.src = task.RGBDepth.Clone()
         pixels.Run()
         dst1 = pixels.dst1
         dst2 = pixels.dst2
@@ -144,13 +144,13 @@ Public Class SuperPixel_WithCanny
 
         pixels = New SuperPixel_Basics_CPP()
 
-        ocvb.desc = "Create SuperPixels using RGBDepth image."
+        task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        edges.src = ocvb.task.color.Clone()
+        edges.src = task.color.Clone()
         edges.Run()
-        pixels.src = ocvb.task.color.Clone()
+        pixels.src = task.color.Clone()
         pixels.src.SetTo(cv.Scalar.White, edges.dst1)
         pixels.Run()
         dst1 = pixels.dst1
@@ -176,7 +176,7 @@ Public Class SuperPixel_WithLineDetector
         pixels = New SuperPixel_Basics_CPP()
 
         label2 = "Input to superpixel basics."
-        ocvb.desc = "Create SuperPixels using RGBDepth image."
+        task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

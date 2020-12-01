@@ -11,7 +11,7 @@
 '    Inherits VBparent
 '    Public Sub New()
 '        initParent()
-'        ocvb.desc = "Test Numpy interface for FFT"
+'        task.desc = "Test Numpy interface for FFT"
 '    End Sub
 '    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -39,7 +39,7 @@
 '    Dim embed = New CS_Classes.NumPy_EmbeddedTest
 '    Public Sub New()
 '        initParent()
-'        ocvb.desc = "Run an embedded Python script"
+'        task.desc = "Run an embedded Python script"
 '    End Sub
 '    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -63,7 +63,7 @@
 '    Dim embed = New CS_Classes.NumPy_EmbeddedMat
 '    Public Sub New()
 '        initParent()
-'        ocvb.desc = "Run an embedded Python script to display an image"
+'        task.desc = "Run an embedded Python script to display an image"
 '    End Sub
 '    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -90,7 +90,7 @@
 '    Dim embed = New CS_Classes.NumPy_Cmds
 '    Public Sub New()
 '        initParent()
-'        ocvb.desc = "Run an embedded Python string of commands"
+'        task.desc = "Run an embedded Python string of commands"
 '    End Sub
 '    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -114,7 +114,7 @@
 '    Dim embed = New CS_Classes.NumPy_EmbeddedCmd
 '    Public Sub New()
 '        initParent()
-'        ocvb.desc = "Install a package on the embedded Python with Pip"
+'        task.desc = "Install a package on the embedded Python with Pip"
 '    End Sub
 '    Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -12,7 +12,7 @@ Public Class Entropy_Basics
 
         hist = New Histogram_Basics()
 
-        ocvb.desc = "Compute the entropy in an image - a measure of contrast(iness)"
+        task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -55,7 +55,7 @@ Public Class Entropy_Highest_MT
         hist = New Histogram_Basics()
 
         label1 = "Highest entropy marked with red rectangle"
-        ocvb.desc = "Find the highest entropy section of the color image."
+        task.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -117,7 +117,7 @@ Public Class Entropy_FAST
 
         label1 = "Output of Fast_Basics, input to entropy calculation"
         label2 = "Lighter color is higher entropy, Red marks highest"
-        ocvb.desc = "Use FAST markings to add to entropy"
+        task.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

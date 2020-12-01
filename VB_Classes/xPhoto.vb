@@ -7,7 +7,7 @@ Public Class xPhoto_Bm3dDenoise
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Denoise image with block matching and filtering."
+        task.desc = "Denoise image with block matching and filtering."
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
@@ -32,12 +32,12 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Denoise the depth image with block matching and filtering."
+        task.desc = "Denoise the depth image with block matching and filtering."
         label2 = "Difference from Input"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim gray = ocvb.task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
         cv.Cv2.Subtract(dst1, gray, dst2)
@@ -86,7 +86,7 @@ Public Class xPhoto_OilPaint_CPP
 
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
-        ocvb.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
+        task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

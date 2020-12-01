@@ -16,7 +16,7 @@ Public Class Kalman_Basics
         check.Box(1).Text = "Only use Kalman filtering when camera is stable"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
+        task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -93,7 +93,7 @@ Public Class Kalman_Compare
 
         label1 = "Kalman input: mean values for RGB"
         label2 = "Kalman output: smoothed mean values for RGB"
-        ocvb.desc = "Use this kalman filter to predict the next value."
+        task.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -167,7 +167,7 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Randn(kf.StatePost, New cv.Scalar(0), cv.Scalar.All(1))
         radius = src.Rows / 2.4 ' so we see the entire circle...
         center = New cv.Point2f(src.Cols / 2, src.Rows / 2)
-        ocvb.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
+        task.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -217,20 +217,20 @@ Public Class Kalman_MousePredict
 
         lineWidth = src.Width / 300
         label1 = "Red is real mouse, white is prediction"
-        ocvb.desc = "Use kalman filter to predict the next mouse location."
+        task.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
-        Static lastRealMouse = ocvb.task.mousePoint
-        kalman.kInput(0) = ocvb.task.mousePoint.X
-        kalman.kInput(1) = ocvb.task.mousePoint.Y
+        Static lastRealMouse = task.mousePoint
+        kalman.kInput(0) = task.mousePoint.X
+        kalman.kInput(1) = task.mousePoint.Y
         Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         kalman.Run()
         cv.Cv2.Line(dst1, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, cv.LineTypes.AntiAlias)
-        cv.Cv2.Line(dst1, ocvb.task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, cv.LineTypes.AntiAlias)
-        lastRealMouse = ocvb.task.mousePoint
+        cv.Cv2.Line(dst1, task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, cv.LineTypes.AntiAlias)
+        lastRealMouse = task.mousePoint
     End Sub
 End Class
 
@@ -252,7 +252,7 @@ Public Class Kalman_CVMat
         ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
-        ocvb.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
+        task.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -324,7 +324,7 @@ Public Class Kalman_ImageSmall
 
         label1 = "The small image is processed by the Kalman filter"
         label2 = "Mask of the smoothed image minus original"
-        ocvb.desc = "Resize the image to allow the Kalman filter to process the whole image."
+        task.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -360,11 +360,11 @@ Public Class Kalman_DepthSmall
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Mask of the smoothed image minus original"
-        ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
+        task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        kalman.src = ocvb.task.RGBDepth
+        kalman.src = task.RGBDepth
         kalman.Run()
         dst1 = kalman.dst1
         dst2 = kalman.dst2
@@ -390,7 +390,7 @@ Public Class Kalman_Depth32f
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Difference from original depth"
-        ocvb.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
+        task.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -436,7 +436,7 @@ Public Class Kalman_Single
         kf.ErrorCovPost.SetIdentity(1)
         plot = New Plot_OverTime()
         plot.plotCount = 2 ' 2 items to plot
-        ocvb.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
+        task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -529,7 +529,7 @@ Public Class Kalman_VB
         sliders.setupTrackBar(7, "Simulated Bias", -100, 100, 0)
         sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
         label1 = "Use first slider below to test algorithm"
-        ocvb.desc = "A native VB Kalman filter"
+        task.desc = "A native VB Kalman filter"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
         Dim dt As Single = 1 / 20
@@ -646,7 +646,7 @@ Public Class Kalman_VB_Basics
         sliders.setupTrackBar(3, "pDot entry X1000", 0, 1000, 300)
 
         label1 = "Blue = gray mean, green = kalman, red = kalman avg"
-        ocvb.desc = "Build a generic kalman filter based on Kalman_VB"
+        task.desc = "Build a generic kalman filter based on Kalman_VB"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
         Static deltaSlider = findSlider("Delta Time X100")
@@ -688,7 +688,7 @@ Public Class Kalman_VB_Basics
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If standalone Then
-            Dim gray = ocvb.task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             kInput = gray.Mean().Item(0)
         End If
 

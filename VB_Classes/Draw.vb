@@ -46,7 +46,7 @@ Public Class Draw_rectangles
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
-        ocvb.desc = "Draw the requested number of rotated rectangles."
+        task.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -83,7 +83,7 @@ Public Class Draw_Noise
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
         sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
-        ocvb.desc = "Add Noise to the color image"
+        task.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -112,7 +112,7 @@ Public Class Draw_rotatedRectangles
         initParent()
         rect = New Draw_rectangles()
         rect.drawRotatedRectangles = True
-        ocvb.desc = "Draw the requested number of rectangles."
+        task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -131,7 +131,7 @@ Public Class Draw_Ellipses
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
-        ocvb.desc = "Draw the requested number of ellipses."
+        task.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -157,7 +157,7 @@ Public Class Draw_Circles
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
-        ocvb.desc = "Draw the requested number of circles."
+        task.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -182,7 +182,7 @@ Public Class Draw_Line
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
-        ocvb.desc = "Draw the requested number of Lines."
+        task.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -206,7 +206,7 @@ Public Class Draw_Polygon
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
-        ocvb.desc = "Draw Polygon figures"
+        task.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
 
         radio.Setup(caller, 2) ' ask for 2 radio buttons
@@ -261,7 +261,7 @@ Public Class Draw_RngImage
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Use RNG to draw the same set of shapes every time"
+        task.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -316,7 +316,7 @@ Public Class Draw_SymmetricalShapes
         check.Box(3).Text = "Reverse In/Out"
         check.Box(4).Text = "Use demo mode"
         check.Box(4).Checked = True
-        ocvb.desc = "Generate shapes programmatically"
+        task.desc = "Generate shapes programmatically"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -415,7 +415,7 @@ Public Class Draw_Arc
 
         setup()
 
-        ocvb.desc = "Use OpenCV's ellipse function to draw an arc"
+        task.desc = "Use OpenCV's ellipse function to draw an arc"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -465,7 +465,7 @@ Public Class Draw_OverlappingRectangles
 
         label1 = "(First 5) Overlapping rectangles are red, original in yellow"
         label2 = "Original list of rectangles"
-        ocvb.desc = "Find first 5 rectangles that are overlapping."
+        task.desc = "Find first 5 rectangles that are overlapping."
     End Sub
     Private Class CompareMasks : Implements IComparer(Of cv.Rect)
         Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
@@ -565,7 +565,7 @@ Public Class Draw_ViewObjects
         check.Box(0).Text = "Draw rectangle and centroid for each mask"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Draw rectangles and centroids"
+        task.desc = "Draw rectangles and centroids"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -615,17 +615,17 @@ Public Class Draw_Frustrum
         xyzDepth.depthUnitsMeters = True
 
         If standalone = False Then ocvb.useIMU = True
-        ocvb.desc = "Draw a frustrum for a camera viewport"
+        task.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst1 = New cv.Mat(ocvb.task.pointCloud.Height, ocvb.task.pointCloud.Height, cv.MatType.CV_32F, 0)
-        Dim mid = ocvb.task.pointCloud.Height / 2
+        dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Height, cv.MatType.CV_32F, 0)
+        Dim mid = task.pointCloud.Height / 2
         Dim zIncr = ocvb.maxZ / mid
-        For i = 0 To ocvb.task.pointCloud.Height / 2
+        For i = 0 To task.pointCloud.Height / 2
             dst1.Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
         Next
-        xyzDepth.src = dst1.Resize(ocvb.task.pointCloud.Size)
+        xyzDepth.src = dst1.Resize(task.pointCloud.Size)
         xyzDepth.Run()
     End Sub
 End Class
@@ -658,7 +658,7 @@ Public Class Draw_ClipLine
         kalman = New Kalman_Basics()
         setup()
 
-        ocvb.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
+        task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -705,7 +705,7 @@ Public Class Draw_Intersection
     Public intersectionPoint As cv.Point2f
     Public Sub New()
         initParent()
-        ocvb.desc = "Determine if 2 lines intersect"
+        task.desc = "Determine if 2 lines intersect"
     End Sub
     Public Sub Run()
         If standalone Then If ocvb.frameCount Mod 100 <> 0 Then Exit Sub

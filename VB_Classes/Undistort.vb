@@ -78,14 +78,14 @@ Public Class Undistort_Basics
         check.Box(0).Checked = True
 
         label1 = "Left Image with sliders applied"
-        ocvb.desc = "Use sliders to control the undistort OpenCV API - Painterly"
+        task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static kMatLeft As cv.Mat, dMatLeft As cv.Mat, rMatLeft As cv.Mat, pMatLeft As cv.Mat
         Static kMat As cv.Mat, dMat As cv.Mat
-        Dim rawWidth = ocvb.task.leftView.Width
-        Dim rawHeight = ocvb.task.leftView.Height
+        Dim rawWidth = task.leftView.Width
+        Dim rawHeight = task.leftView.Height
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
 
@@ -125,7 +125,7 @@ Public Class Undistort_Basics
 
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMatLeft, pMatLeft, New cv.Size(rawWidth, rawHeight),
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
-        dst1 = ocvb.task.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
+        dst1 = task.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
         dst2 = src.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
     End Sub
 End Class

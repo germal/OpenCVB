@@ -9,7 +9,7 @@ Public Class kMeans_BasicsDepthColor
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
 
-        ocvb.desc = "Cluster the rgb image pixels using kMeans."
+        task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -36,7 +36,7 @@ Public Class kMeans_BasicsDepthColor
         If useDepthColor Then
             For i = 0 To kmeansK - 1
                 Dim mask = labels.InRange(i, i)
-                Dim mean = ocvb.task.RGBDepth.Mean(mask)
+                Dim mean = task.RGBDepth.Mean(mask)
                 dst1.SetTo(mean, mask)
             Next
         Else
@@ -61,12 +61,12 @@ Public Class kMeans_Clusters
 
         label1 = "kmeans - k=2,4,6,8"
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
+        task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static saveRect = ocvb.task.drawRect
-        ocvb.task.drawRect = saveRect
+        Static saveRect = task.drawRect
+        task.drawRect = saveRect
         km.src = src
         For i = 0 To 3
             km.kmeansK = Choose(i + 1, 2, 4, 6, 8)
@@ -75,7 +75,7 @@ Public Class kMeans_Clusters
         Next
         Mats.Run()
         dst1 = Mats.dst1
-        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = Mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -93,7 +93,7 @@ Public Class kMeans_RGBFast
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
-        ocvb.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
+        task.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -135,7 +135,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         initParent()
         km = New kMeans_BasicsDepthColor()
         label1 = "kmeans - RGB, XY, and Depth Raw"
-        ocvb.desc = "Cluster with kMeans RGB, x, y, and depth."
+        task.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -194,14 +194,14 @@ Public Class kMeans_XYDepth
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         Dim w = src.Cols / 4
         Dim h = src.Rows / 4
-        ocvb.task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
+        task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         label1 = "Draw rectangle anywhere..."
         label2 = "Currently selected region"
-        ocvb.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
+        task.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim roi = ocvb.task.drawRect
+        Dim roi = task.drawRect
         Dim depth32f = getDepth32f()
         Dim xyDepth32f As New cv.Mat(depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To xyDepth32f.Rows - 1
@@ -218,7 +218,7 @@ Public Class kMeans_XYDepth
         For i = 0 To columnVector.Rows - 1
             columnVector.Set(Of cv.Vec3f)(i, 0, colors.Get(Of cv.Vec3f)(labels.Get(Of Integer)(i)))
         Next
-        ocvb.task.RGBDepth.CopyTo(dst1)
+        task.RGBDepth.CopyTo(dst1)
         columnVector.Reshape(3, dst1(roi).Height).ConvertTo(dst1(roi), cv.MatType.CV_8U)
     End Sub
 End Class
@@ -232,7 +232,7 @@ Public Class kMeans_Depth_FG_BG
         initParent()
         label1 = "Foreground Mask"
         label2 = "Background Mask"
-        ocvb.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
+        task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -270,12 +270,12 @@ Public Class kMeans_LAB
         label1 = "kMeans_LAB - draw to select region"
         Dim w = src.Cols / 4
         Dim h = src.Rows / 4
-        ocvb.task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
-        ocvb.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
+        task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
+        task.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim roi = ocvb.task.drawRect
+        Dim roi = task.drawRect
         Dim labMat = src(roi).CvtColor(cv.ColorConversionCodes.RGB2Lab)
         Dim columnVector As New cv.Mat
         columnVector = labMat.Reshape(src.Channels, roi.Height * roi.Width)
@@ -293,7 +293,7 @@ Public Class kMeans_LAB
         src.CopyTo(dst1)
         lab32f.Reshape(3, roi.Height).ConvertTo(dst1(roi), cv.MatType.CV_8UC3)
         dst1(roi) = dst1(roi).CvtColor(cv.ColorConversionCodes.Lab2RGB)
-        dst1.Rectangle(ocvb.task.drawRect, cv.Scalar.White, 1)
+        dst1.Rectangle(task.drawRect, cv.Scalar.White, 1)
     End Sub
 End Class
 
@@ -308,7 +308,7 @@ Public Class kMeans_Color
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans cluster count (k)", 2, 32, 3)
-        ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
+        task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -324,7 +324,7 @@ Public Class kMeans_Color
 
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.task.RGBDepth.Mean(mask)
+            Dim mean = task.RGBDepth.Mean(mask)
             dst1.SetTo(mean, mask)
         Next
     End Sub
@@ -348,7 +348,7 @@ Public Class kMeans_Color_MT
         gridWidthSlider.Value = 128
         gridHeightSlider.Value = 160
 
-        ocvb.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
+        task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -372,7 +372,7 @@ Public Class kMeans_Color_MT
             For i = 0 To clusterCount - 1
                 Dim mask = labels.InRange(i, i)
                 mask.SetTo(0, zeroDepth) ' don't include the zeros in the mean depth computation.
-                Dim mean = ocvb.task.RGBDepth(roi).Mean(mask)
+                Dim mean = task.RGBDepth(roi).Mean(mask)
                 dst1(roi).SetTo(mean, mask)
             Next
         End Sub)
@@ -389,7 +389,7 @@ Public Class kMeans_ColorDepth
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
-        ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
+        task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -414,7 +414,7 @@ Public Class kMeans_ColorDepth
 
         For i = 0 To clusterCount - 1
             Dim mask = labels.InRange(i, i)
-            Dim mean = ocvb.task.RGBDepth.Mean(mask)
+            Dim mean = task.RGBDepth.Mean(mask)
             dst1.SetTo(mean, mask)
         Next
         dst1.SetTo(0, zeroMask)
@@ -437,7 +437,7 @@ Public Class kMeans_ColorDepth_MT
         grid.sliders.trackbar(0).Value = 32
         grid.sliders.trackbar(1).Value = 32
 
-        ocvb.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
+        task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -467,7 +467,7 @@ Public Class kMeans_ColorDepth_MT
            dst1(roi).SetTo(0)
            For i = 0 To clusterCount - 1
                Dim mask = labels.InRange(i, i)
-               Dim mean = ocvb.task.RGBDepth(roi).Mean(mask)
+               Dim mean = task.RGBDepth(roi).Mean(mask)
                dst1(roi).SetTo(mean, mask)
            Next
        End Sub)
@@ -487,7 +487,7 @@ Public Class KMeans_Subdivision
         initParent()
         kmeans = New kMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
-        ocvb.desc = "Use KMeans to subdivide an image and then subdivide it again."
+        task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -529,7 +529,7 @@ Public Class KMeans_Subdivision1
         kmeans = New kMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         kmeans.useDepthColor = False
-        ocvb.desc = "Use KMeans to subdivide an image and then subdivide it again."
+        task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -582,7 +582,7 @@ Public Class kMeans_Basics
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
 
-        ocvb.desc = "Cluster the rgb image pixels using kMeans."
+        task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

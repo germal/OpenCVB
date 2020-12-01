@@ -7,7 +7,7 @@ Public Class Math_Subtract
         sliders.setupTrackBar(0, "Red", 0, 255, 255)
         sliders.setupTrackBar(1, "Green", 0, 255, 255)
         sliders.setupTrackBar(2, "Blue", 0, 255, 255)
-        ocvb.desc = "Invert the image colors using subtract"
+        task.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -53,7 +53,7 @@ Public Class Math_Median_CDF
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
-        ocvb.desc = "Compute the src image median"
+        task.desc = "Compute the src image median"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -88,7 +88,7 @@ Public Class Math_DepthMeanStdev
     Public Sub New()
         initParent()
         minMax = New Depth_Stable()
-        ocvb.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
+        task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -97,12 +97,12 @@ Public Class Math_DepthMeanStdev
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask = minMax.dst2 ' the mask for stable depth.
         dst2.SetTo(0)
-        ocvb.task.RGBDepth.CopyTo(dst2, mask)
+        task.RGBDepth.CopyTo(dst2, mask)
         Dim depth32f = getDepth32f()
         cv.Cv2.MeanStdDev(depth32f, mean, stdev, mask)
         label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
 
-        dst1 = ocvb.task.RGBDepth
+        dst1 = task.RGBDepth
         cv.Cv2.MeanStdDev(depth32f, mean, stdev)
         label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
@@ -121,7 +121,7 @@ Public Class Math_RGBCorrelation
         flow = New Font_FlowText()
 
         corr = New MatchTemplate_Basics()
-        ocvb.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
+        task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

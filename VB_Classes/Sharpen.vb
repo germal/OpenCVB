@@ -7,7 +7,7 @@ Public Class Sharpen_UnsharpMask
         sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
         sliders.setupTrackBar(1, "threshold", 0, 255, 5)
         sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
-        ocvb.desc = "Sharpen an image - Painterly Effect"
+        task.desc = "Sharpen an image - Painterly Effect"
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run()
@@ -36,7 +36,7 @@ Public Class Sharpen_DetailEnhance
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "DetailEnhance Sigma_r", 1, 100, 7)
-        ocvb.desc = "Enhance detail on an image - Painterly Effect"
+        task.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -57,7 +57,7 @@ Public Class Sharpen_Stylize
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
         sliders.setupTrackBar(1, "Stylize Sigma_r", 1, 100, 7)
-        ocvb.desc = "Stylize an image - Painterly Effect"
+        task.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

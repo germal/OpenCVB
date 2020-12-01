@@ -22,7 +22,7 @@ Public Class Gabor_Basics
         sliders.setupTrackBar(4, "Gabor gamma X10", 0, 10, 5)
         sliders.setupTrackBar(5, "Gabor Phase offset X100", 0, 100, 0)
 
-        ocvb.desc = "Explore Gabor kernel - Painterly Effect"
+        task.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -66,7 +66,7 @@ Public Class Gabor_Basics_MT
         Next
 
         gabor(0).sliders.Visible = True
-        ocvb.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
+        task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -16,7 +16,6 @@ Module Anyname_CPP_Module
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Anyname_Close(cPtr As IntPtr)
- 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Anyname_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, channels As Int32) As IntPtr
@@ -68,13 +67,14 @@ End Module
 Public Class AnyName_CPP
     Inherits VBparent
     Dim anyname As IntPtr
-    Public Sub New(ocvb As VBocvb)
-        initParent(ocvb)
+    Public Sub New()
+        initParent()
 		    anyname = Anyname_Open()
-        ocvb.desc = "New class description"
+        ocvb.task.desc = "New class description"
 	  End Sub
-    Public Sub Run(ocvb As VBocvb)
-        Dim src = ocvb.color
+    Public Sub Run()
+        If ocvb.task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim src = ocvb.task.color
         Dim srcData(src.Total * src.ElemSize) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)

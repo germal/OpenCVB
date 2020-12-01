@@ -29,7 +29,7 @@ Public Class WarpModel_Input
         check.Box(0).Text = "Use Gradient in WarpInput"
 
         sobel = New Edges_Sobel()
-        ocvb.desc = "Import the misaligned input."
+        task.desc = "Import the misaligned input."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -116,7 +116,7 @@ Public Class WarpModel_FindTransformECC_CPP
 
         warp = New WarpModel_Input()
 
-        ocvb.desc = "Use FindTransformECC to align 2 images"
+        task.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -200,7 +200,7 @@ Public Class WarpModel_AlignImages
         initParent()
         ecc = New WarpModel_FindTransformECC_CPP()
 
-        ocvb.desc = "Align the RGB inputs raw images from the Prokudin examples."
+        task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

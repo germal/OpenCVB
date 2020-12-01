@@ -41,7 +41,7 @@ Public Class GetRotationMatrix2D_Basics
         sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
         SetInterpolationRadioButtons(caller, radio, "Rotation2D")
 
-        ocvb.desc = "Rotate a rectangle of a specified angle"
+        task.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -66,11 +66,11 @@ Public Class GetRotationMatrix2D_Box
     Public Sub New()
         initParent()
         rotation = New GetRotationMatrix2D_Basics()
-        ocvb.task.drawRect = New cv.Rect(100, 100, 100, 100)
+        task.drawRect = New cv.Rect(100, 100, 100, 100)
 
         label1 = "Original Rectangle in the original perspective"
         label2 = "Same Rectangle in the new warped perspective"
-        ocvb.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
+        task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -78,7 +78,7 @@ Public Class GetRotationMatrix2D_Box
         rotation.Run()
         dst2 = dst1.Clone()
 
-        Dim r = ocvb.task.drawRect
+        Dim r = task.drawRect
         dst1 = src.Clone()
         dst1.Rectangle(r, cv.Scalar.White, 1)
 

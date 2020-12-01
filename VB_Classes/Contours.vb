@@ -29,7 +29,7 @@ Public Class Contours_Basics
         radio1.Show()
         rotatedRect = New Draw_rotatedRectangles()
         rotatedRect.rect.sliders.trackbar(0).Value = 5
-        ocvb.desc = "Demo options on FindContours."
+        task.desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub
     Public Sub setOptions()
@@ -102,7 +102,7 @@ Public Class Contours_FindandDraw
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
-        ocvb.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
+        task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -132,7 +132,7 @@ Public Class Contours_RGB
     Public Sub New()
         initParent()
         inrange = New Depth_InRange()
-        ocvb.desc = "Find and draw the contour of the largest foreground RGB contour."
+        task.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
     Public Sub Run()
@@ -185,7 +185,7 @@ Public Class Contours_RemoveLines
         sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
         label1 = "Original image"
         label2 = "Original with horizontal/vertical lines removed"
-        ocvb.desc = "Remove the lines from an invoice image"
+        task.desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -229,7 +229,7 @@ Public Class Contours_Depth
     Public Sub New()
         initParent()
         inrange = New Depth_InRange()
-        ocvb.desc = "Find and draw the contour of the depth foreground."
+        task.desc = "Find and draw the contour of the depth foreground."
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
@@ -277,7 +277,7 @@ Public Class Contours_Prediction
 
         label1 = "Original contour image"
         label2 = "Image after smoothing with Kalman_Basics"
-        ocvb.desc = "Predict the next contour point with Kalman to smooth the outline"
+        task.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

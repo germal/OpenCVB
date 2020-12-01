@@ -40,7 +40,7 @@ Public Class SVM_Options
         radio1.Text = caller + " SVM Type Options"
         radio1.Show()
         label1 = "SVM_Options - only options, no output"
-        ocvb.desc = "SVM has many options - enough to make a class for it."
+        task.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
         Static frm = findForm("SVM_Options Kernel Options")
@@ -106,7 +106,7 @@ Public Class SVM_Basics
     Public Sub New()
         initParent()
         svmOptions = New SVM_Options()
-        ocvb.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
+        task.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         label1 = "SVM_Basics input data"
         label2 = "Results - white line is ground truth"
     End Sub
@@ -160,13 +160,13 @@ Public Class SVM_Random
         svmOptions = New SVM_Options()
         svmOptions.sliders.trackbar(1).Value = 15
 
-        ocvb.task.drawRect = New cv.Rect(ocvb.task.color.Cols / 4, ocvb.task.color.Rows / 4, ocvb.task.color.Cols / 2, ocvb.task.color.Rows / 2)
+        task.drawRect = New cv.Rect(task.color.Cols / 4, task.color.Rows / 4, task.color.Cols / 2, task.color.Rows / 2)
 
         check.Setup(caller, 1)
         check.Box(0).Text = "Restrict random test to square area"
 
         label1 = "SVM Training data"
-        ocvb.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
+        task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -174,7 +174,7 @@ Public Class SVM_Random
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
 
-        Dim rect = ocvb.task.drawRect
+        Dim rect = task.drawRect
 
         Dim dataSize = svmOptions.sliders.trackbar(0).Value ' get the sample count
         Dim trainData As New cv.Mat(dataSize, 2, cv.MatType.CV_32F)
@@ -255,7 +255,7 @@ Public Class SVM_TestCase
         svmOptions.sliders.trackbar(1).Value = 15
         svmOptions.radio.check(3).Enabled = False
 
-        ocvb.desc = "Text book example on SVM"
+        task.desc = "Text book example on SVM"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

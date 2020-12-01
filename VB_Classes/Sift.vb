@@ -18,13 +18,13 @@ Public Class Sift_Basics_CS
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
 
-        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images."
+        task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim doubleSize As New cv.Mat(ocvb.task.leftView.Rows, ocvb.task.leftView.Cols * 2, cv.MatType.CV_8UC3)
+        Dim doubleSize As New cv.Mat(task.leftView.Rows, task.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
-        siftCS.Run(ocvb.task.leftView, ocvb.task.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
+        siftCS.Run(task.leftView, task.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
 
         doubleSize(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
         doubleSize(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
@@ -50,8 +50,8 @@ Public Class Sift_Basics_CS_MT
         grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Maximum = ocvb.task.color.Cols * 2
-        gridWidthSlider.Value = ocvb.task.color.Cols * 2 ' we are just taking horizontal slices of the image.
+        gridWidthSlider.Maximum = task.color.Cols * 2
+        gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
 
         grid.Run()
@@ -60,15 +60,15 @@ Public Class Sift_Basics_CS_MT
         numPointSlider = findSlider("Points to Match")
         numPointSlider.Value = 1
 
-        ocvb.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
+        task.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim leftView As cv.Mat
         Dim rightView As cv.Mat
 
-        leftView = ocvb.task.leftView
-        rightView = ocvb.task.rightView
+        leftView = task.leftView
+        rightView = task.rightView
         grid.Run()
 
         Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)

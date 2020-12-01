@@ -13,7 +13,7 @@ Public Class KNN_Basics
 
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
-        ocvb.desc = "Test knn with random points in the image.  Find the nearest n points."
+        task.desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -80,7 +80,7 @@ Public Class KNN_QueryTrain
 
         label1 = "Random training points"
         label2 = "Random query points"
-        ocvb.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
+        task.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -132,7 +132,7 @@ Public Class KNN_1_to_1
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
-        ocvb.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
+        task.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -226,7 +226,7 @@ Public Class KNN_Emax
 
         label1 = "Output from Emax"
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
-        ocvb.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
+        task.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -271,7 +271,7 @@ Public Class KNN_Test
         check.Setup(caller, 1)
         check.Box(0).Text = "Show grid mask"
 
-        ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
+        task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -315,7 +315,7 @@ Public Class KNN_Test_1_to_1
         check.Setup(caller, 1)
         check.Box(0).Text = "Show grid mask"
 
-        ocvb.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
+        task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -353,7 +353,7 @@ Public Class KNN_Point3d
         sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
         sliders.setupTrackBar(1, "knn k nearest points", 0, 500, 1)
 
-        ocvb.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
+        task.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
@@ -435,7 +435,7 @@ Public Class KNN_DepthClusters
 
         label1 = "Output of Blob_DepthClusters"
         label2 = "Same output after KNN_PointTracker"
-        ocvb.desc = "Use KNN to track and color the Blob results from clustering the depth data"
+        task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -469,7 +469,7 @@ Public Class KNN_PointPresent
         flow.dst = RESULT2
         knn = New KNN_DepthClusters()
 
-        ocvb.desc = "Determine if a point is present or not on the basis of the previous x frames"
+        task.desc = "Determine if a point is present or not on the basis of the previous x frames"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -507,7 +507,7 @@ Public Class KNN_SmoothAverage
 
         label1 = "AddWeight result of current and previous frame"
         label2 = "Mask for difference between current and last frame"
-        ocvb.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
+        task.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -548,7 +548,7 @@ Public Class KNN_StabilizeRegions
 
         label1 = "Output of KNN_DepthClusters"
         label2 = "KNN_DepthClusters output plus unstable regions"
-        ocvb.desc = "Identify major regions that are unstable - appearing and disappearing"
+        task.desc = "Identify major regions that are unstable - appearing and disappearing"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -581,7 +581,7 @@ Public Class KNN_Contours
         initParent()
         outline = New Contours_Depth()
         knn = New KNN_Basics()
-        ocvb.desc = "Use KNN to streamline the outline of a contour"
+        task.desc = "Use KNN to streamline the outline of a contour"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -640,7 +640,7 @@ Public Class KNN_Cluster2DCities
         check.Box(0).Checked = True
 
         label1 = ""
-        ocvb.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
+        task.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
     End Sub
     Public Sub cluster( result As cv.Mat)
         Dim alreadyTaken As New List(Of Integer)
@@ -731,7 +731,7 @@ Public Class KNN_Point2d
         knn = New KNN_Basics()
         If standalone Then knn.knnQT.useRandomData = True
 
-        ocvb.desc = "Use KNN to find n matching points for each query."
+        task.desc = "Use KNN to find n matching points for each query."
         label1 = "Yellow=Queries, Blue=Best Responses"
     End Sub
     Public Sub prepareImage(dst As cv.Mat, dotSize As Integer)
@@ -807,7 +807,7 @@ Public Class KNN_PointTracker
         allocateKalman(16) ' allocate some kalman objects
 
         hideForm("Thread_Grid Slider Options")
-        ocvb.desc = "Use KNN to track points and Kalman to smooth the results"
+        task.desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
     Private Sub allocateKalman( count As Integer)
         For i = kalman.Count To count - 1
@@ -824,7 +824,7 @@ Public Class KNN_PointTracker
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
-            topView.src = ocvb.task.pointCloud
+            topView.src = task.pointCloud
             topView.Run()
             dst1 = topView.dst1
             Exit Sub

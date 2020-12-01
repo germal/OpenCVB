@@ -11,7 +11,7 @@ Public Class Pixel_GetSet
 
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
+        task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -58,7 +58,7 @@ Public Class Pixel_GetSet
 
         mats.Run()
         dst1 = mats.dst1
-        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class

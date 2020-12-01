@@ -40,22 +40,22 @@ Public Class Sound_ToPCM
     Public Sub New()
         initParent()
 
-        ocvb.task.openFileDialogRequested = True
-        ocvb.task.openFileInitialDirectory = ocvb.parms.homeDir + "Data\"
-        ocvb.task.openFileDialogName = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", "")
-        ocvb.task.openFileFilter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
-        ocvb.task.openFileFilterIndex = 1
-        ocvb.task.openFileDialogTitle = "Select an audio file to analyze"
-        ocvb.task.initialStartSetting = True
+        task.openFileDialogRequested = True
+        task.openFileInitialDirectory = ocvb.parms.homeDir + "Data\"
+        task.openFileDialogName = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", "")
+        task.openFileFilter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
+        task.openFileFilterIndex = 1
+        task.openFileDialogTitle = "Select an audio file to analyze"
+        task.initialStartSetting = True
 
-        ocvb.desc = "Load an audio file, play it, and convert to PCM"
+        task.desc = "Load an audio file, play it, and convert to PCM"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If inputFileName <> ocvb.task.openFileDialogName Then
-            inputFileName = ocvb.task.openFileDialogName
+        If inputFileName <> task.openFileDialogName Then
+            inputFileName = task.openFileDialogName
             Dim fileinfo = New FileInfo(inputFileName)
-            If fileinfo.Exists And ocvb.task.fileStarted Then
+            If fileinfo.Exists And task.fileStarted Then
                 Close()
 
                 reader = New MediaFoundationReader(fileinfo.FullName)
@@ -83,8 +83,8 @@ Public Class Sound_ToPCM
                 startTime = Now
             End If
         End If
-        If ocvb.task.fileStarted Then
-            ocvb.task.openFileSliderPercent = (Now - startTime).TotalSeconds / pcmDuration
+        If task.fileStarted Then
+            task.openFileSliderPercent = (Now - startTime).TotalSeconds / pcmDuration
         Else
             inputFileName = ""
             player?.Stop()
@@ -138,12 +138,12 @@ Public Class Sound_SignalGenerator
         player = New WaveOut
         player.Init(wGen)
 
-        ocvb.desc = "Generate sound with a sine waveform."
+        task.desc = "Generate sound with a sine waveform."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static radioIndex As Integer
-        If ocvb.task.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
+        If task.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
             radio.check(radioIndex).Checked = False Then
             If pcmDuration <> sliders.trackbar(4).Value Then
                 pcmDuration = sliders.trackbar(4).Value
@@ -177,8 +177,8 @@ Public Class Sound_SignalGenerator
         End If
         If standalone Then ocvb.trueText("Requested sound data is in the pcm32f cv.Mat")
 
-        ocvb.task.openFileSliderPercent = ((Now - startTime).TotalSeconds Mod pcmDuration) / pcmDuration
-        If ocvb.task.openFileSliderPercent >= 0.99 Then ocvb.task.openFileSliderPercent = 0
+        task.openFileSliderPercent = ((Now - startTime).TotalSeconds Mod pcmDuration) / pcmDuration
+        If task.openFileSliderPercent >= 0.99 Then task.openFileSliderPercent = 0
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -211,7 +211,7 @@ Public Class Sound_Display
         check.Box(0).Checked = True
 
         label2 = "Black shows approximately what is currently playing"
-        ocvb.desc = "Display a sound buffer in several styles"
+        task.desc = "Display a sound buffer in several styles"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -229,7 +229,7 @@ Public Class Sound_Display
             starttime = Now
         End If
 
-        If check.Box(0).Checked Or ocvb.task.fileStarted Then
+        If check.Box(0).Checked Or task.fileStarted Then
             sound.Run()
 
             Dim halfHeight As Integer = dst1.Height / 2
@@ -301,14 +301,14 @@ Public Class Sound_Display
             End Select
         End If
         If check.Box(0).Checked = False Then
-            ocvb.task.openFileSliderPercent = If(ocvb.task.fileStarted, (Now - starttime).TotalSeconds / sound.pcmduration, 0)
+            task.openFileSliderPercent = If(task.fileStarted, (Now - starttime).TotalSeconds / sound.pcmduration, 0)
             ' when playing back an audio file, restart at the beginning when it is over...
-            If ocvb.task.openFileSliderPercent > 0.99 Or ocvb.task.fileStarted = False Then
+            If task.openFileSliderPercent > 0.99 Or task.fileStarted = False Then
                 sound.close()
                 sound = Nothing ' this will restart the audio
             End If
         End If
-        Dim x = dst1.Width * ocvb.task.openFileSliderPercent
+        Dim x = dst1.Width * task.openFileSliderPercent
         dst1.Line(New cv.Point(x, 0), New cv.Point(x, dst1.Height), cv.Scalar.Black, 2)
     End Sub
 End Class

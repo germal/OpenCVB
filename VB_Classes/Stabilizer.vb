@@ -12,7 +12,7 @@ Public Class Stabilizer_Basics
         initParent()
         good = New Features_GoodFeatures()
 
-        ocvb.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
+        task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run()
@@ -96,7 +96,7 @@ Public Class Stabilizer_Basics
             smoothedMat.Set(Of Double)(0, 2, dx)
             smoothedMat.Set(Of Double)(1, 2, dy)
 
-            Dim smoothedFrame = ocvb.task.color.WarpAffine(smoothedMat, src.Size())
+            Dim smoothedFrame = task.color.WarpAffine(smoothedMat, src.Size())
             smoothedFrame = smoothedFrame(New cv.Range(vert_Border, smoothedFrame.Rows - vert_Border), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
             dst2 = smoothedFrame.Resize(src.Size())
 
@@ -125,7 +125,7 @@ Public Class Stabilizer_BriskFeatures
         brisk = New BRISK_Basics()
         brisk.sliders.trackbar(0).Value = 10
 
-        ocvb.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
+        task.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -153,7 +153,7 @@ Public Class Stabilizer_HarrisFeatures
 
         harris = New Harris_Detector_CPP()
 
-        ocvb.desc = "Stabilize the video stream using Harris detector features"
+        task.desc = "Stabilize the video stream using Harris detector features"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -193,7 +193,7 @@ Public Class Stabilizer_Basics_CPP
         initParent()
         ReDim srcData(src.Total * src.ElemSize - 1)
         sPtr = Stabilizer_Basics_Open()
-        ocvb.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
+        task.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -228,7 +228,7 @@ Public Class Stabilizer_SideBySide
         initParent()
         original = New Stabilizer_Basics()
         basics = New Stabilizer_HarrisFeatures()
-        ocvb.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
+        task.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
         label1 = "Stabilizer_Basic (VB.Net)"
         label2 = "Stabilizer_HarrisFeatures"
     End Sub

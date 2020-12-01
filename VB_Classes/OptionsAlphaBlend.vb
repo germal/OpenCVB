@@ -4,4 +4,8 @@
             Return True
         End Get
     End Property
+
+    Private Sub OptionsAlphaBlend_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.MdiParent = aOptions
+    End Sub
 End Class

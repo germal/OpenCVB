@@ -6,9 +6,9 @@ Public Class Stitch_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)
-        sliders.setupTrackBar(1, "Rectangle width", ocvb.task.color.Width / 4, ocvb.task.color.Width - 1, ocvb.task.color.Width / 2)
-        sliders.setupTrackBar(2, "Rectangle height", ocvb.task.color.Height / 4, ocvb.task.color.Height - 1, ocvb.task.color.Height / 2)
-        ocvb.desc = "Stitch together random parts of a color image."
+        sliders.setupTrackBar(1, "Rectangle width", task.color.Width / 4, task.color.Width - 1, task.color.Width / 2)
+        sliders.setupTrackBar(2, "Rectangle height", task.color.Height / 4, task.color.Height - 1, task.color.Height / 2)
+        task.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -5,8 +5,6 @@ Public Class VBocvb
     Public quadrantIndex As Integer = 0
     Public parms As ActiveTask.algParms
 
-    Public PythonFileName As String
-
     Public algorithmIndex As Integer
     Public parentRoot As String
     Public parentAlgorithm As String
@@ -42,29 +40,22 @@ Public Class VBocvb
 
     Public mainLocation As cv.Rect
     Public optionsOffset As Integer
-    Public task As ActiveTask
 
     Public label1 As String
     Public label2 As String
-    Public desc As String
     Public intermediateReview As String
 
-    Public Sub New(resolution As cv.Size, location As cv.Rect, pointcloudWidth As Integer, pointcloudHeight As Integer, _task As ActiveTask)
-        task = _task
-        task.color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        task.RGBDepth = New cv.Mat(task.color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-        task.pointCloud = New cv.Mat(pointcloudHeight, pointcloudWidth, cv.MatType.CV_32FC3, cv.Scalar.All(0))
-        task.result = New cv.Mat(task.color.Height, task.color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-
-        Select Case task.color.Width
+    Public pythonTaskName As String
+    Public Sub New(_task As ActiveTask)
+        Select Case _task.color.Width
             Case 320
-                fontSize = task.color.Width / task.pointCloud.Width
+                fontSize = _task.color.Width / _task.pointCloud.Width
                 dotSize = 3
                 lineSize = 1
                 resfactor = 0.1
                 resolutionIndex = 1
             Case 640
-                fontSize = task.color.Width / task.pointCloud.Width
+                fontSize = _task.color.Width / _task.pointCloud.Width
                 dotSize = 7
                 lineSize = 2
                 resfactor = 0.3

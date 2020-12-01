@@ -9,7 +9,7 @@ Public Class Sieve_Basics
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Count of desired primes", 1, 10000, 400)
 
-        ocvb.desc = "Implement the Sieve of Eratothenes"
+        task.desc = "Implement the Sieve of Eratothenes"
     End Sub
     Public Function shareResults(sieveList As List(Of Integer)) As String
         Dim completeList As String = ""
@@ -55,7 +55,7 @@ Public Class Sieve_Basics_CS
     Public Sub New()
         initParent()
         printer = New Sieve_Basics()
-        ocvb.desc = "Implement the Sieve of Eratothenes in C#"
+        task.desc = "Implement the Sieve of Eratothenes in C#"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -36,7 +36,7 @@ Public Class ProCon_Basics
         c.Name = "Consumer"
         c.Start()
 
-        ocvb.desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced."
+        task.desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced."
     End Sub
     Public Function success(index As Integer) As Integer
         Return (index + 1) Mod buffer.Length
@@ -105,7 +105,7 @@ Public Class ProCon_Variation
         procon = New ProCon_Basics()
         procon.sliders.trackbar(1).Enabled = False ' no duration for the producer because algorithm task is the producer.
         procon.terminateProducer = True ' we don't want 2 producer tasks...
-        ocvb.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
+        task.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

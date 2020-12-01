@@ -11,7 +11,7 @@ Public Class Object_Basics
 
         label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"
-        ocvb.desc = "Identify objects in the foreground."
+        task.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

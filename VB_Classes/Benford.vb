@@ -30,7 +30,7 @@ Public Class Benford_Basics
 
         weight = New AddWeighted_Basics()
 
-        ocvb.desc = "Build the capability to perform a Benford analysis."
+        task.desc = "Build the capability to perform a Benford analysis."
     End Sub
     Public Sub setup99()
         ReDim expectedDistribution(100 - 1)
@@ -116,7 +116,7 @@ Public Class Benford_NormalizedImage
 
         benford = New Benford_Basics()
 
-        ocvb.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
+        task.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -146,7 +146,7 @@ Public Class Benford_NormalizedImage99
         benford = New Benford_Basics()
         benford.setup99()
 
-        ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
+        task.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -178,7 +178,7 @@ Public Class Benford_JPEG
         sliders.Setup(caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
-        ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
+        task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -209,7 +209,7 @@ Public Class Benford_JPEG99
         sliders.Setup(caller, 1)
         sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
 
-        ocvb.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
+        task.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -241,7 +241,7 @@ Public Class Benford_PNG
         sliders.Setup(caller, 1)
         sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
 
-        ocvb.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
+        task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -266,7 +266,7 @@ Public Class Benford_Depth
     Public Sub New()
         initParent()
         benford = New Benford_Basics()
-        ocvb.desc = "Apply Benford to the depth data"
+        task.desc = "Apply Benford to the depth data"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -288,11 +288,11 @@ Public Class Benford_DepthRGB
     Public Sub New()
         initParent()
         benford = New Benford_JPEG()
-        ocvb.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
+        task.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        benford.src = ocvb.task.RGBDepth
+        benford.src = task.RGBDepth
         benford.Run()
         dst1 = benford.dst2
         label1 = benford.label2
@@ -316,7 +316,7 @@ Public Class Benford_Primes
         sieve = New Sieve_Basics()
         Dim countSlider = findSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
-        ocvb.desc = "Apply Benford to a list of primes"
+        task.desc = "Apply Benford to a list of primes"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

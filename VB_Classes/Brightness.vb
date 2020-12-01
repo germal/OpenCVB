@@ -7,7 +7,7 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
         sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
-        ocvb.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
+        task.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -30,7 +30,7 @@ Public Class Brightness_Hue
     Public hsv_planes(2) As cv.Mat
     Public Sub New()
         initParent()
-        ocvb.desc = "Show hue (Result1) and Saturation (Result2)."
+        task.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -51,7 +51,7 @@ Public Class Brightness_AlphaBeta
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Use alpha and beta with ConvertScaleAbs."
+        task.desc = "Use alpha and beta with ConvertScaleAbs."
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
         sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
@@ -70,7 +70,7 @@ Public Class Brightness_Gamma
     Dim lookupTable(255) As Byte
     Public Sub New()
         initParent()
-        ocvb.desc = "Use gamma with ConvertScaleAbs."
+        task.desc = "Use gamma with ConvertScaleAbs."
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
     End Sub
@@ -118,7 +118,7 @@ Public Class Brightness_WhiteBalance_CPP
         wPtr = WhiteBalance_Open()
         label1 = "Image with auto white balance"
         label2 = "White pixels were altered from the original"
-        ocvb.desc = "Automate getting the right white balance"
+        task.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -160,7 +160,7 @@ Public Class Brightness_WhiteBalance
         whiteCPP = New Brightness_WhiteBalance_CPP()
 
         label1 = "Image with auto white balance"
-        ocvb.desc = "Automate getting the right white balance"
+        task.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -219,7 +219,7 @@ Public Class Brightness_ChangeMask
         white = New Brightness_WhiteBalance()
         whiteCPP = New Brightness_WhiteBalance_CPP()
 
-        ocvb.desc = "Create a mask for the changed pixels after white balance"
+        task.desc = "Create a mask for the changed pixels after white balance"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -269,7 +269,7 @@ Public Class Brightness_PlotHist
         hideForm("Histogram_KalmanSmoothed Slider Options")
         mat2to1 = New Mat_2to1()
 
-        ocvb.desc = "Plot the histogram of the before and after white balancing"
+        task.desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

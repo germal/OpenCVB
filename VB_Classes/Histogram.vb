@@ -18,7 +18,7 @@ Public Class Histogram_Basics
         sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 50)
         sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
 
-        ocvb.desc = "Plot histograms for up to 3 channels."
+        task.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -150,7 +150,7 @@ Public Class Histogram_NormalizeGray
         check.Setup(caller, 1)
         check.Box(0).Text = "Normalize Before Histogram"
         check.Box(0).Checked = True
-        ocvb.desc = "Create a histogram of a normalized image"
+        task.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -179,7 +179,7 @@ Public Class Histogram_2D_HueSaturation
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
         sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
-        ocvb.desc = "Create a histogram for hue and saturation."
+        task.desc = "Create a histogram for hue and saturation."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -221,7 +221,7 @@ Public Class Histogram_KalmanSmoothed
         sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
 
         label2 = "Histogram - x=bins/y=count"
-        ocvb.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
+        task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -281,7 +281,7 @@ Public Class Histogram_Depth
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
 
-        ocvb.desc = "Show depth data as a histogram."
+        task.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -343,7 +343,7 @@ Public Class Histogram_DepthValleys
 
         kalman = New Kalman_Basics()
 
-        ocvb.desc = "Identify valleys in the Depth histogram."
+        task.desc = "Identify valleys in the Depth histogram."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -415,7 +415,7 @@ Public Class Histogram_DepthClusters
     Public Sub New()
         initParent()
         valleys = New Histogram_DepthValleys()
-        ocvb.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
+        task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -457,7 +457,7 @@ Public Class Histogram_2D_XZ_YZ
         sliders.setupTrackBar(1, "Histogram Y bins", 1, src.Rows, 30)
         sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
 
-        ocvb.desc = "Create a 2D histogram for depth in XZ and YZ."
+        task.desc = "Create a 2D histogram for depth in XZ and YZ."
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run()
@@ -509,7 +509,7 @@ Public Class Histogram_EqualizeColor
 
         mats = New Mat_2to1()
 
-        ocvb.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
+        task.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run()
@@ -561,7 +561,7 @@ Public Class Histogram_EqualizeGray
 
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
-        ocvb.desc = "Create an equalized histogram of the grayscale image."
+        task.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -601,7 +601,7 @@ Public Class Histogram_Equalize255
         radio.check(2).Checked = True
         label1 = "Resulting equalized image"
         label2 = "Upper plot is before equalization.  Bottom is after."
-        ocvb.desc = "Reproduce the results of the hist.py example with existing algorithms"
+        task.desc = "Reproduce the results of the hist.py example with existing algorithms"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -629,7 +629,7 @@ Public Class Histogram_Simple
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Histogram Bins", 2, src.Cols, 50)
 
-        ocvb.desc = "Build a simple and reusable histogram for grayscale images."
+        task.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -678,7 +678,7 @@ Public Class Histogram_ColorsAndGray
         check.Box(0).Checked = True
 
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Create a histogram of a normalized image"
+        task.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -699,7 +699,7 @@ Public Class Histogram_ColorsAndGray
 
         mats.Run()
         dst1 = mats.dst1
-        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -717,7 +717,7 @@ Public Class Histogram_BackProjectionPeak
         hist = New Histogram_KalmanSmoothed()
         hist.kalman.check.Box(0).Checked = False
 
-        ocvb.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
+        task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         label2 = "Grayscale Histogram"
     End Sub
     Public Sub Run()
@@ -760,7 +760,7 @@ Public Class Histogram_BackProjection2D
 
         hist = New Histogram_2D_HueSaturation()
 
-        ocvb.desc = "Backproject from a hue and saturation histogram."
+        task.desc = "Backproject from a hue and saturation histogram."
         label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
         label2 = "Backprojection of detected hue and saturation."
     End Sub
@@ -772,7 +772,7 @@ Public Class Histogram_BackProjection2D
         Static hueBins = hist.sliders.trackbar(0).Value
         Static satBins = hist.sliders.trackbar(1).Value
         If hueBins <> hist.sliders.trackbar(0).Value Or satBins <> hist.sliders.trackbar(1).Value Then
-            ocvb.task.drawRectClear = True
+            task.drawRectClear = True
             hueBins = hist.sliders.trackbar(0).Value
             satBins = hist.sliders.trackbar(1).Value
         End If
@@ -780,15 +780,15 @@ Public Class Histogram_BackProjection2D
         Dim unitsPerHueBin = 180 / hueBins
         Dim unitsPerSatBin = 255 / satBins
         Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 255
-        If ocvb.task.drawRect.Width <> 0 And ocvb.task.drawRect.Height <> 0 Then
-            Dim intBin = Math.Floor(hueBins * ocvb.task.drawRect.X / dst1.Width)
+        If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then
+            Dim intBin = Math.Floor(hueBins * task.drawRect.X / dst1.Width)
             minHue = intBin * unitsPerHueBin
-            intBin = Math.Ceiling(hueBins * (ocvb.task.drawRect.X + ocvb.task.drawRect.Width) / dst1.Width)
+            intBin = Math.Ceiling(hueBins * (task.drawRect.X + task.drawRect.Width) / dst1.Width)
             maxHue = intBin * unitsPerHueBin
 
-            intBin = Math.Floor(satBins * ocvb.task.drawRect.Y / dst1.Height)
+            intBin = Math.Floor(satBins * task.drawRect.Y / dst1.Height)
             minSat = intBin * unitsPerSatBin
-            intBin = Math.Ceiling(satBins * (ocvb.task.drawRect.Y + ocvb.task.drawRect.Height) / dst1.Height)
+            intBin = Math.Ceiling(satBins * (task.drawRect.Y + task.drawRect.Height) / dst1.Height)
             maxSat = intBin * unitsPerSatBin
 
             If minHue = maxHue Then maxHue = minHue + 1
@@ -826,7 +826,7 @@ Public Class Histogram_HueSaturation2DPlot
         mats = New Mat_4to1()
         ocvb.quadrantIndex = QUAD3
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
+        task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -842,7 +842,7 @@ Public Class Histogram_HueSaturation2DPlot
 
         mats.Run()
         dst1 = mats.dst1
-        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -866,7 +866,7 @@ Public Class Histogram_BackProjectionGrayscale
         binSlider.Value = 10
 
         label1 = "Move mouse to backproject each histogram column"
-        ocvb.desc = "Explore Backprojection of each element of a grayscale histogram."
+        task.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -874,7 +874,7 @@ Public Class Histogram_BackProjectionGrayscale
         hist.Run()
         dst1 = hist.dst1
 
-        histIndex = CInt(hist.histogram.Rows * ocvb.task.mousePoint.X / src.Width)
+        histIndex = CInt(hist.histogram.Rows * task.mousePoint.X / src.Width)
         Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
         Dim barRange = 255 / hist.sliders.trackbar(0).Value
 
@@ -923,7 +923,7 @@ Public Class Histogram_Concentration
         sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
         sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
 
-        ocvb.desc = "Highlight the histogram projections where concentrations are highest"
+        task.desc = "Highlight the histogram projections where concentrations are highest"
     End Sub
     Private Function plotHighlights( histOutput As cv.Mat, dst As cv.Mat) As String
         Static concentrationSlider = findSlider("Concentration Factor x100")
@@ -1022,7 +1022,7 @@ Public Class Histogram_SideView2D
         If standalone Then thresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
-        ocvb.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
+        task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -1097,7 +1097,7 @@ Public Class Histogram_TopView2D
         End Select
 
         label1 = "XZ (Top View)"
-        ocvb.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
+        task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -1157,7 +1157,7 @@ Public Class Histogram_TopData
         If VB_Classes.ActiveTask.algParms.camNames.D455 = ocvb.parms.cameraName Then IntelBug = True
 
         label1 = "XZ (Top View)"
-        ocvb.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
+        task.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
 
     Public Sub Run()
@@ -1219,7 +1219,7 @@ Public Class Histogram_SideData
         gCloud = New Depth_PointCloud_IMU()
 
         label1 = "ZY (Side View)"
-        ocvb.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
+        task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

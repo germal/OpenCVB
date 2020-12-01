@@ -7,7 +7,7 @@ Public Class BRISK_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
-        ocvb.desc = "Detect features with BRISK"
+        task.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub
     Public Sub Run()

@@ -14,7 +14,7 @@ Public Class Distance_Basics
         foreground = New kMeans_Depth_FG_BG()
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
-        ocvb.desc = "Distance algorithm basics."
+        task.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

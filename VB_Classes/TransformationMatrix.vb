@@ -10,12 +10,12 @@ Public Class TransformationMatrix_Basics
 
         label1 = "View from above the camera"
         label2 = "View from side of the camera"
-        ocvb.desc = "Show the contents of the transformation matrix"
+        task.desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.task.transformationMatrix IsNot Nothing Then
-            Dim t = ocvb.task.transformationMatrix
+        If task.transformationMatrix IsNot Nothing Then
+            Dim t = task.transformationMatrix
             Dim mul = sliders.trackbar(0).Value
             topLocations.Add(New cv.Point3d(-t(12) * mul + dst1.Width / 2,
                                             -t(13) * mul + dst1.Height / 2,

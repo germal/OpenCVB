@@ -11,7 +11,7 @@ Public Class GrabCut_Basics
         sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
         sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
 
-        ocvb.desc = "Use grabcut to isolate what is in the foreground and background.  "
+        task.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

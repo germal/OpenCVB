@@ -8,7 +8,7 @@ Public Class Encode_Basics
 
         options = New Encode_Options()
 
-        ocvb.desc = "Error Level Analysis - to verify a jpg image has not been modified."
+        task.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         label1 = "absDiff with original"
         label2 = "Original decompressed"
     End Sub
@@ -53,7 +53,7 @@ Public Class Encode_Options
         radio.check(5).Text = "WebPQuality"
         radio.check(1).Checked = True
 
-        ocvb.desc = "Encode options that affect quality."
+        task.desc = "Encode options that affect quality."
         label1 = "absDiff with original image"
     End Sub
     Public Function getEncodeParameter() As Integer

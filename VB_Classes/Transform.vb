@@ -6,7 +6,7 @@ Public Class Transform_Resize
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
-        ocvb.desc = "Resize an image based on the slider value."
+        task.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -38,7 +38,7 @@ Public Class Transform_Rotate
         sliders.setupTrackBar(1, "Scale Factor% (100% means no scaling)", 1, 100, 100)
         sliders.setupTrackBar(2, "Rotation center X", 1, src.Width, src.Width / 2)
         sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
-        ocvb.desc = "Rotate and scale and image based on the slider values."
+        task.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -62,7 +62,7 @@ Public Class Transform_Sort
         radio.check(1).Text = "Descending"
         radio.check(2).Text = "EveryColumn"
         radio.check(3).Text = "EveryRow"
-        ocvb.desc = "Sort the pixels of a grayscale image."
+        task.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -88,7 +88,7 @@ Public Class Transform_SortReshape
         radio.check(0).Text = "Ascending"
         radio.check(0).Checked = True
         radio.check(1).Text = "Descending"
-        ocvb.desc = "Sort the pixels of a grayscale image."
+        task.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -112,7 +112,7 @@ Public Class Transform_Affine3D
         check.Setup(caller, 2)
         check.Box(0).Text = "Check to snap the first point cloud"
         check.Box(1).Text = "Check to snap the second point cloud"
-        ocvb.desc = "Using 2 point clouds compute the 3D affine transform between them"
+        task.desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -127,14 +127,14 @@ Public Class Transform_Affine3D
         End If
 
         If check.Box(0).Checked Then
-            pc1 = ocvb.task.pointCloud.Clone()
+            pc1 = task.pointCloud.Clone()
             check.Box(0).Checked = False
             output += "First point cloud captured" + vbCrLf
             affineTransform = Nothing
         End If
 
         If check.Box(1).Checked Then
-            pc2 = ocvb.task.pointCloud.Clone()
+            pc2 = task.pointCloud.Clone()
             check.Box(1).Checked = False
             output += "Second point cloud captured" + vbCrLf
             affineTransform = Nothing

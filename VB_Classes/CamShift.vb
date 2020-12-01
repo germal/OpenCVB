@@ -22,7 +22,7 @@ Public Class CamShift_Basics
 
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
-        ocvb.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
+        task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -43,16 +43,16 @@ Public Class CamShift_Basics
         cv.Cv2.MixChannels({hsv}, {hue}, {0, 0})
         Dim mask = hsv.InRange(sbins, New cv.Scalar(180, 255, max))
 
-        If ocvb.task.drawRect.Width > 0 And ocvb.task.drawRect.Height > 0 Then
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
             vMinLast = min
             vMaxLast = max
             sBinsLast = sbins
-            If ocvb.task.drawRect.X + ocvb.task.drawRect.Width > src.Width Then ocvb.task.drawRect.Width = src.Width - ocvb.task.drawRect.X - 1
-            If ocvb.task.drawRect.Y + ocvb.task.drawRect.Height > src.Height Then ocvb.task.drawRect.Height = src.Height - ocvb.task.drawRect.Y - 1
-            cv.Cv2.CalcHist(New cv.Mat() {hue(ocvb.task.drawRect)}, {0, 0}, mask(ocvb.task.drawRect), roi_hist, 1, hsize, ranges)
+            If task.drawRect.X + task.drawRect.Width > src.Width Then task.drawRect.Width = src.Width - task.drawRect.X - 1
+            If task.drawRect.Y + task.drawRect.Height > src.Height Then task.drawRect.Height = src.Height - task.drawRect.Y - 1
+            cv.Cv2.CalcHist(New cv.Mat() {hue(task.drawRect)}, {0, 0}, mask(task.drawRect), roi_hist, 1, hsize, ranges)
             roi_hist = roi_hist.Normalize(0, 255, cv.NormTypes.MinMax)
-            roi = ocvb.task.drawRect
-            ocvb.task.drawRectClear = True
+            roi = task.drawRect
+            task.drawRectClear = True
         End If
         If roi_hist.Rows <> 0 Then
             Dim backproj As New cv.Mat
@@ -84,7 +84,7 @@ Public Class CamShift_Foreground
         camshift = New CamShift_Basics()
         fore = New Depth_Foreground()
         label1 = "Automatically finding the head - top of nearest object"
-        ocvb.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
+        task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -125,7 +125,7 @@ Public Class Camshift_Object
 
         label1 = "Largest blob with hue tracked.  Draw enabled."
         label2 = "Backprojection of depth clusters masked with hue"
-        ocvb.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
+        task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -136,9 +136,9 @@ Public Class Camshift_Object
         If blob.flood.fBasics.masks.Count > 0 Then
             Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
-                ocvb.task.drawRect = blob.flood.fBasics.rects(largestMask)
+                task.drawRect = blob.flood.fBasics.rects(largestMask)
             End If
-            If camshift.trackBox.Size.Width < 50 Then ocvb.task.drawRect = blob.flood.fBasics.rects(largestMask)
+            If camshift.trackBox.Size.Width < 50 Then task.drawRect = blob.flood.fBasics.rects(largestMask)
             camshift.src = src
             camshift.Run()
             dst1 = camshift.dst1
@@ -170,7 +170,7 @@ Public Class Camshift_TopObjects
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
-        ocvb.desc = "Track - Tracker Algorithm"
+        task.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -184,7 +184,7 @@ Public Class Camshift_TopObjects
             If blob.flood.fBasics.maskSizes.Count > i Then
                 Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
                 If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
-                    ocvb.task.drawRect = blob.flood.fBasics.rects(camIndex)
+                    task.drawRect = blob.flood.fBasics.rects(camIndex)
                 End If
 
                 cams(i).src = src

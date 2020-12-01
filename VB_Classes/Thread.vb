@@ -25,7 +25,7 @@ Public Class Thread_Grid
     End Sub
     Public Sub New()
         initParent()
-        src = ocvb.task.color
+        src = task.color
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
         sliders.setupTrackBar(1, "ThreadGrid Height", 2, src.Height, 32)
@@ -33,7 +33,7 @@ Public Class Thread_Grid
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
-        ocvb.desc = "Create a grid for use with parallel.ForEach."
+        task.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -114,7 +114,7 @@ Public Class Thread_GridTest
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 40
         label1 = ""
-        ocvb.desc = "Validation test for thread_grid algorithm"
+        task.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run()
         If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -4,7 +4,7 @@ Public Class Solve_ByMat
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Solve a set of equations with OpenCV's Solve API."
+        task.desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -30,7 +30,7 @@ Public Class Solve_ByArray
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
+        task.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

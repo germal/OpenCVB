@@ -7,7 +7,10 @@ Public Class OptionsSliders
     Public countLabel() As Label
     Dim defaultHeight = 260
     Dim defaultWidth = 630
+    Dim algoIndex As Integer
     Public Sub Setup(caller As String, Optional count As Integer = 4)
+        Me.MdiParent = aOptions
+
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)
@@ -41,6 +44,7 @@ Public Class OptionsSliders
         Me.Location = aOptions.nextForm
         aOptions.nextForm.x += aOptions.offset
         aOptions.nextForm.y += aOptions.offset
+        Me.Show()
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label

@@ -73,7 +73,7 @@ Public Class ML_FillRGBDepth_MT
         shadow = New Depth_Holes()
         label1 = "ML filled shadow"
         label2 = ""
-        ocvb.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
+        task.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -109,13 +109,13 @@ Public Class ML_FillRGBDepth
         shadow.sliders.trackbar(0).Value = 3
 
         label2 = "ML filled shadow"
-        ocvb.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
+        task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run()
         Dim minLearnCount = sliders.trackbar(0).Value
-        ocvb.task.RGBDepth.CopyTo(dst1)
+        task.RGBDepth.CopyTo(dst1)
         Dim depth32f = getDepth32f()
         depth32f = detectAndFillShadow(shadow.holeMask, shadow.borderMask, depth32f, src, minLearnCount)
         colorizer.src = depth32f
@@ -148,7 +148,7 @@ Public Class ML_DepthFromColor_MT
 
         label1 = "Predicted Depth"
         label2 = "Mask of color and depth input"
-        ocvb.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
+        task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -216,7 +216,7 @@ Public Class ML_DepthFromColor
         resized.sliders.trackbar(0).Value = 2 ' 2% of the image.
 
         label2 = "Click any quadrant at left to view it below"
-        ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
+        task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -269,7 +269,7 @@ Public Class ML_DepthFromColor
         mats.Run()
         dst1 = mats.dst1
         label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
-        If ocvb.task.mouseClickFlag And ocvb.task.mousePicTag = RESULT1 Then setQuadrant()
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
         dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
@@ -297,7 +297,7 @@ Public Class ML_DepthFromXYColor
         resized.sliders.trackbar(0).Value = 2
 
         label1 = "Predicted Depth"
-        ocvb.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
+        task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -396,7 +396,7 @@ Public Class ML_EdgeDepth_MT
 
         label1 = "Depth Shadow (inverse of color and depth)"
         label2 = "Predicted Depth"
-        ocvb.desc = "Use RGB to predict depth near edges."
+        task.desc = "Use RGB to predict depth near edges."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -465,7 +465,7 @@ End Class
 
 '        label1 = ""
 '        label2 = ""
-'        ocvb.desc = "Simplest form for using RandomForest in OpenCV"
+'        task.desc = "Simplest form for using RandomForest in OpenCV"
 '    End Sub
 '    Private Function convertScalarToVec3b(s As cv.Scalar) As cv.Vec3b
 '        Dim vec As New cv.Mat

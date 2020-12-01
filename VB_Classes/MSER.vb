@@ -27,7 +27,7 @@ Public Class MSER_Basics
         check.Box(1).Checked = True
 
         ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
-        ocvb.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
+        task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -69,7 +69,7 @@ Public Class MSER_Basics
                 Dim nextRegion = region(i)
                 pixels += nextRegion.Length
                 For Each pt In nextRegion
-                    dst1.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.task.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
+                    dst1.Set(Of cv.Vec3b)(pt.Y, pt.X, task.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 Next
             Next
             label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
@@ -99,7 +99,7 @@ Public Class MSER_Synthetic
     End Sub
     Public Sub New()
         initParent()
-        ocvb.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
+        task.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -160,7 +160,7 @@ Public Class MSER_TestSynthetic
         synth = New MSER_Synthetic()
         label1 = "Input image to MSER"
         label1 = "Output image from MSER"
-        ocvb.desc = "Test MSER with the synthetic image."
+        task.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -184,7 +184,7 @@ Public Class MSER_CPPStyle
         initParent()
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
-        ocvb.desc = "Maximally Stable Extremal Regions example - still image"
+        task.desc = "Maximally Stable Extremal Regions example - still image"
         image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
@@ -224,7 +224,7 @@ Public Class MSER_Contours
         initParent()
         mser = New MSER_Basics()
         mser.sliders.trackbar(1).Value = 4000
-        ocvb.desc = "Use MSER but show the contours of each region."
+        task.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

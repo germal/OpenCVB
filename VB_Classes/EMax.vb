@@ -32,7 +32,7 @@ Public Class EMax_Basics
         radio.check(2).Text = "EMax matrix type Generic"
         radio.check(0).Checked = True
 
-        ocvb.desc = "OpenCV expectation maximization example."
+        task.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -133,7 +133,7 @@ Public Class EMax_CPP
         EMax_Basics = EMax_Basics_Open()
 
         label2 = "Emax regions around clusters"
-        ocvb.desc = "Use EMax - Expectation Maximization - to classify a series of points"
+        task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -200,7 +200,7 @@ Public Class EMax_Centroids
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         gridWidthSlider.Value = src.Width * 170 / 640
 
-        ocvb.desc = "Get the Emax cluster centroids using floodfill "
+        task.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -241,7 +241,7 @@ Public Class EMax_PointTracker
         floodMinSlider.Value = 100
 
         label1 = "Original before KNN/Kalman tracking (red=previous)"
-        ocvb.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
+        task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

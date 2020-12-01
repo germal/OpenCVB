@@ -4,7 +4,7 @@ Public Class Filter_Laplacian
     Inherits VBparent
     Public Sub New()
         initParent()
-        ocvb.desc = "Use a filter to approximate the Laplacian derivative."
+        task.desc = "Use a filter to approximate the Laplacian derivative."
         label1 = "Sharpened image using Filter2D output"
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
@@ -34,7 +34,7 @@ Public Class Filter_NormalizedKernel
         radio.check(3).Text = "MinMax"
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
-        ocvb.desc = "Create a normalized kernel and use it."
+        task.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -69,7 +69,7 @@ Public Class Filter_Normalized2D
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Filter_Normalized2D kernel size", 1, 21, 3)
-        ocvb.desc = "Create and apply a normalized kernel."
+        task.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -97,7 +97,7 @@ Public Class Filter_SepFilter2D
         sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
         sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)
         label1 = "Gaussian Blur result"
-        ocvb.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
+        task.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

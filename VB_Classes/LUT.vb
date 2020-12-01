@@ -10,7 +10,7 @@ Public Class LUT_Gray
         sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
         sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
         sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
-        ocvb.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
+        task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -43,7 +43,7 @@ Public Class LUT_Basics
         initParent()
         reduction = New Reduction_Basics()
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors)
-        ocvb.desc = "Build and use a custom color palette - Painterly Effect"
+        task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -69,7 +69,7 @@ Public Class LUT_Color
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors) ' Create a new color palette here.
-        ocvb.desc = "Build and use a custom color palette - Painterly Effect"
+        task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -96,7 +96,7 @@ Public Class LUT_Rebuild
         For i = 0 To paletteMap.Count - 1
             paletteMap(i) = i
         Next
-        ocvb.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
+        task.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

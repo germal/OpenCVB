@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsCombo
     Public Sub Setup(caller As String, label As String, comboList As List(Of String))
+        Me.MdiParent = aOptions
         Me.Text = caller + " ComboBox Options"
         Me.Show()
         Label1.Text = label

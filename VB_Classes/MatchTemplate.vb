@@ -22,7 +22,7 @@ Public Class MatchTemplate_Basics
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
-        ocvb.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
+        task.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -69,7 +69,7 @@ Public Class MatchTemplate_RowCorrelation
         corr = New MatchTemplate_Basics()
         hideForm("MatchTemplate_Basics Slider Options")
 
-        ocvb.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
+        task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -115,20 +115,20 @@ Public Class MatchTemplate_DrawRect
             frm.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
         radio.check(5).Checked = True
-        If standalone Then ocvb.task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
+        If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
         label1 = "Probabilities (draw rectangle to test again)"
         label2 = "White is input, Red circle centers highest probability"
-        ocvb.desc = "Find the requested template in an image.  Tracker Algorithm"
+        task.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.task.drawRect.Width > 0 And ocvb.task.drawRect.Height > 0 Then
-            If ocvb.task.drawRect.X + ocvb.task.drawRect.Width >= src.Width Then ocvb.task.drawRect.Width = src.Width - ocvb.task.drawRect.X
-            If ocvb.task.drawRect.Y + ocvb.task.drawRect.Height >= src.Height Then ocvb.task.drawRect.Height = src.Height - ocvb.task.drawRect.Y
-            saveRect = ocvb.task.drawRect
-            saveTemplate = src(ocvb.task.drawRect).Clone()
-            ocvb.task.drawRectClear = True
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+            If task.drawRect.X + task.drawRect.Width >= src.Width Then task.drawRect.Width = src.Width - task.drawRect.X
+            If task.drawRect.Y + task.drawRect.Height >= src.Height Then task.drawRect.Height = src.Height - task.drawRect.Y
+            saveRect = task.drawRect
+            saveTemplate = src(task.drawRect).Clone()
+            task.drawRectClear = True
         End If
         Dim matchMethod As cv.TemplateMatchModes
         Static frm = findForm("MatchTemplate_DrawRect Radio Options")
@@ -165,14 +165,14 @@ Public Class MatchTemplate_BestEntropy_MT
 
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
-        ocvb.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
+        task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 30 = 0 Then
             entropy.src = src
             entropy.Run()
-            ocvb.task.drawRect = entropy.bestContrast
+            task.drawRect = entropy.bestContrast
         End If
 
         match.src = src

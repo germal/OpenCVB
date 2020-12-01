@@ -23,7 +23,7 @@ Public Class Etch_ASketch
 
         cursor = randomCursor()
         dst1.SetTo(slateColor)
-        ocvb.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
+        task.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

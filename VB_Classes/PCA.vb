@@ -6,7 +6,7 @@ Public Class PCA_Basics
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
-        ocvb.desc = "Reconstruct a video stream as a composite of X images."
+        task.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -43,11 +43,11 @@ Public Class PCA_Depth
     Public Sub New()
         initParent()
         pca = New PCA_Basics()
-        ocvb.desc = "Reconstruct a depth stream as a composite of X images."
+        task.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        pca.src = ocvb.task.RGBDepth
+        pca.src = task.RGBDepth
         pca.Run()
         dst1 = pca.dst1
     End Sub
@@ -65,7 +65,7 @@ Public Class PCA_DrawImage
         initParent()
         pca = New PCA_Basics()
         image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/pca_test1.jpg")
-        ocvb.desc = "Use PCA to find the principle direction of an object."
+        task.desc = "Use PCA to find the principle direction of an object."
         label1 = "Original image"
         label2 = "PCA Output"
     End Sub

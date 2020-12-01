@@ -7,7 +7,7 @@ Public Class FREAK_Basics
     Public Sub New()
         initParent()
         orb = New ORB_Basics()
-        ocvb.desc = "Find keypoints using ORB and FREAK algorithm"
+        task.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

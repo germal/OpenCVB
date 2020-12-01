@@ -32,7 +32,7 @@ Public Class Retina_Basics_CPP
 
         label1 = "Retina Parvo"
         label2 = "Retina Magno"
-        ocvb.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
+        task.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -95,13 +95,13 @@ Public Class Retina_Depth
         initParent()
         retina = New Retina_Basics_CPP()
 
-        ocvb.desc = "Use the bio-inspired retina algorithm with the depth data."
+        task.desc = "Use the bio-inspired retina algorithm with the depth data."
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        retina.src = ocvb.task.RGBDepth
+        retina.src = task.RGBDepth
         retina.Run()
         dst2 = retina.dst2
         Static lastMotion As New cv.Mat

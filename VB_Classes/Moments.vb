@@ -17,7 +17,7 @@ Public Class Moments_Basics
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
 
         label1 = "Red dot = Kalman smoothed centroid"
-        ocvb.desc = "Compute the centroid of the provided mask file."
+        task.desc = "Compute the centroid of the provided mask file."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -58,7 +58,7 @@ Public Class Moments_CentroidKalman
         foreground = New kMeans_Depth_FG_BG()
 
         label1 = "Red dot = Kalman smoothed centroid"
-        ocvb.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
+        task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

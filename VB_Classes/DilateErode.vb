@@ -7,7 +7,7 @@ Public Class DilateErode_Basics
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 5)
         sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
-        ocvb.desc = "Dilate and Erode the RGB and Depth image."
+        task.desc = "Dilate and Erode the RGB and Depth image."
 
         radio.Setup(caller, 4)
         radio.check(0).Text = "Dilate/Erode shape: Cross"
@@ -39,11 +39,11 @@ Public Class DilateErode_Basics
 
         If standalone Then
             If iterations >= 0 Then
-                dst2 = ocvb.task.RGBDepth.Dilate(element, Nothing, iterations)
+                dst2 = task.RGBDepth.Dilate(element, Nothing, iterations)
                 label1 = "Dilate RGB " + CStr(iterations) + " times"
                 label2 = "Dilate Depth " + CStr(iterations) + " times"
             Else
-                dst2 = ocvb.task.RGBDepth.Erode(element, Nothing, -iterations)
+                dst2 = task.RGBDepth.Erode(element, Nothing, -iterations)
                 label1 = "Erode RGB " + CStr(-iterations) + " times"
                 label2 = "Erode Depth " + CStr(-iterations) + " times"
             End If
@@ -65,7 +65,7 @@ Public Class DilateErode_DepthSeed
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "DepthSeed flat depth", 1, 200, 100)
         sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
-        ocvb.desc = "Erode depth to build a depth mask for inrange data."
+        task.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -88,7 +88,7 @@ Public Class DilateErode_DepthSeed
         validImg.SetTo(0, depth32f.GreaterThan(sliders.trackbar(1).Value)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
         dst1.SetTo(0)
-        ocvb.task.RGBDepth.CopyTo(dst1, seeds)
+        task.RGBDepth.CopyTo(dst1, seeds)
     End Sub
 End Class
 
@@ -106,7 +106,7 @@ Public Class DilateErode_OpenClose
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
-        ocvb.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
+        task.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -119,10 +119,10 @@ Public Class DilateErode_OpenClose
 
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(an * 2 + 1, an * 2 + 1), New cv.Point(an, an))
         If n < 0 Then
-            cv.Cv2.MorphologyEx(ocvb.task.RGBDepth, dst2, cv.MorphTypes.Open, element)
+            cv.Cv2.MorphologyEx(task.RGBDepth, dst2, cv.MorphTypes.Open, element)
             cv.Cv2.MorphologyEx(src, dst1, cv.MorphTypes.Open, element)
         Else
-            cv.Cv2.MorphologyEx(ocvb.task.RGBDepth, dst2, cv.MorphTypes.Close, element)
+            cv.Cv2.MorphologyEx(task.RGBDepth, dst2, cv.MorphTypes.Close, element)
             cv.Cv2.MorphologyEx(src, dst1, cv.MorphTypes.Close, element)
         End If
     End Sub

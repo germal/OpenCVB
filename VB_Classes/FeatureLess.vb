@@ -24,7 +24,7 @@ Public Class Featureless_Basics
         flood = New FloodFill_8bit()
 
         label1 = "Featureless regions with mask in depth color"
-        ocvb.desc = "Multithread Houghlines to find featureless regions in an image."
+        task.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -66,7 +66,7 @@ Public Class Featureless_DCT_MT
         dct = New DCT_FeatureLess()
 
         label2 = "Largest FeatureLess Region"
-        ocvb.desc = "Use DCT to find featureless regions."
+        task.desc = "Use DCT to find featureless regions."
     End Sub
 
     Public Sub Run()
@@ -120,7 +120,7 @@ Public Class FeatureLess_Prediction
 
         fLess = New Featureless_Basics()
 
-        ocvb.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
+        task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -205,7 +205,7 @@ Public Class FeatureLess_PointTracker
         fLess = New Featureless_Basics()
         label1 = "After point tracker"
         label2 = "Before point tracker"
-        ocvb.desc = "Track the featureless regions with point tracker"
+        task.desc = "Track the featureless regions with point tracker"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -237,7 +237,7 @@ Public Class FeatureLess_Highlights
         hideForm("Palette_BuildGradientColorMap Slider Options")
         hideForm("Palette_Basics Radio Options")
         addW = New AddWeighted_Basics()
-        ocvb.desc = "Highlight the featureless region in an RGB image"
+        task.desc = "Highlight the featureless region in an RGB image"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

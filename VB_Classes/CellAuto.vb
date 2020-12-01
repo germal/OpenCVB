@@ -34,7 +34,7 @@ Public Class CellAuto_Basics
         check.Box(0).Text = "Rotate through the different rules"
         check.Box(0).Checked = True
 
-        ocvb.desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
+        task.desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
     End Sub
     Public Function createCells(outStr As String) As cv.Mat
         Dim outcomes(8 - 1) As Byte
@@ -119,7 +119,7 @@ Public Class CellAuto_Life
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
-        ocvb.desc = "Use OpenCV to implement the Game of Life"
+        task.desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -193,7 +193,7 @@ Public Class CellAuto_LifeColor
         game.nodeColor = cv.Scalar.Black
 
         label1 = "Births are blue, deaths are red"
-        ocvb.desc = "Game of Life but with color added"
+        task.desc = "Game of Life but with color added"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -232,7 +232,7 @@ Public Class CellAuto_LifePopulation
         plot.maxScale = 2000
         plot.plotCount = 1
 
-        ocvb.desc = "Show Game of Life display with plot of population"
+        task.desc = "Show Game of Life display with plot of population"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -262,7 +262,7 @@ Public Class CellAuto_Basics_MP
         cell = New CellAuto_Basics()
         i18 = cell.i18
 
-        ocvb.desc = "Multi-threaded version of CellAuto_Basics"
+        task.desc = "Multi-threaded version of CellAuto_Basics"
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -306,7 +306,7 @@ Public Class CellAuto_All256
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
-        ocvb.desc = "Run through all 256 combinations of outcomes"
+        task.desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String
         Dim outstr As String = ""
@@ -354,7 +354,7 @@ Public Class CellAuto_MultiPoint
         cell = New CellAuto_Basics()
         cell.combo.Box.SelectedIndex = 4 ' this one is nice...
         cell.check.Box(0).Checked = False ' just the one pattern.
-        ocvb.desc = "All256 above starts with just one point.  Here we start with multiple points."
+        task.desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me

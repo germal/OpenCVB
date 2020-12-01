@@ -17,8 +17,8 @@ Public Class PyStream_Basics
         PipeTaskIndex += 1
 
         ' Was this class invoked directly?  Then just run something that works with RGB and depth...
-        If ocvb.PythonFileName Is Nothing Then
-            ocvb.PythonFileName = ocvb.parms.homeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
+        If ocvb.pythonTaskName Is Nothing Then
+            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
         End If
 
         memMap = New Python_MemMap()
@@ -29,7 +29,7 @@ Public Class PyStream_Basics
             pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
         End If
         If pythonReady Then pipeImages.WaitForConnection()
-        ocvb.desc = "General purpose class to pipe RGB and Depth to Python scripts."
+        task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
