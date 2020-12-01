@@ -22,7 +22,10 @@ Public Class Benford_Basics
     Public Sub New()
         initParent()
         plot = New Plot_Histogram()
-        If standalone Then benford = New Benford_NormalizedImage()
+        If standalone Then
+            benford = New Benford_NormalizedImage()
+            hideForm("AddWeighted_Basics Slider Options")
+        End If
 
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
@@ -92,7 +95,6 @@ Public Class Benford_Basics
         plot.Run()
 
         cv.Cv2.BitwiseNot(plot.dst1, weight.src2)
-        ' weight.src2 = plot.dst1
         weight.Run()
         dst1 = weight.dst1
 
