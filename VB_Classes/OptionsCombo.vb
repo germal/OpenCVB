@@ -3,13 +3,19 @@ Public Class OptionsCombo
     Public Sub Setup(caller As String, label As String, comboList As List(Of String))
         Me.MdiParent = aOptions
         Me.Text = caller + " ComboBox Options"
-        Me.Show()
         Label1.Text = label
         For i = 0 To comboList.Count - 1
             Box.Items.Add(comboList.ElementAt(i))
         Next
         Box.SelectedIndex = 0
+        Me.Location = New System.Drawing.Point(0, 0)
         Me.Show()
+        If aOptions.optionsFormTitle.Contains(Me.Text) = False Then
+            aOptions.optionsFormTitle.Add(Me.Text)
+            aOptions.optionsForms.Add(Me)
+        Else
+            If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
+        End If
     End Sub
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get

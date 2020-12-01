@@ -42,7 +42,6 @@ Public Class OpenCVB
     Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
-    Dim activateMe As Boolean
 
     Dim LastX As Integer
     Dim LastY As Integer
@@ -865,10 +864,7 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        If activateMe Then
-            activateMe = False
-            Me.Activate()
-        End If
+        If camera.frameCount < 30 Then Me.Activate() ' after all the algorithm options forms have appeared, set focus on the main form.
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
@@ -1087,7 +1083,7 @@ Public Class OpenCVB
         saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
-        activateMe = True
+        camera.frameCount = 0
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
@@ -1099,7 +1095,7 @@ Public Class OpenCVB
             If algName = "" Then Exit Sub
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, myLocation, resolutionXY.Width, resolutionXY.Height)
+            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, resolutionXY.Width, resolutionXY.Height)
             textDesc = task.desc
             openFileInitialDirectory = task.openFileInitialDirectory
             openFileDialogRequested = task.openFileDialogRequested
@@ -1139,21 +1135,6 @@ Public Class OpenCVB
 #Else
             Run(task, algName)
 #End If
-
-            ' remove all options forms.  They can only be made topmost (see OptionsBringToFront above) when created on the same thread.
-            ' This deletes the options forms for the current thread so they can be created (if needed) with the next algorithm thread.
-            'Try
-            '    Dim frmlist As New List(Of Form)
-            '    For Each frm In Application.OpenForms
-            '        If frm.name.startswith("Option") Then frmlist.Add(frm)
-            '    Next
-            '    For Each frm In frmlist
-            '        frm.Close()
-            '    Next
-            'Catch ex As Exception
-            '    Console.WriteLine("Error removing an Options form: " + ex.Message)
-            'End Try
-
             task.Dispose()
             frameCount = 0
             If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)

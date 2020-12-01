@@ -5,8 +5,15 @@ Public Class OptionsKeyboardInput
     Dim keyboardLastInput As String
     Public Sub Setup(caller As String)
         Me.MdiParent = aOptions
-        Me.Text = caller + " CheckBox Options"
-        Me.Show() ' only the first one   gets to be visible...
+        Me.Text = caller + " Keyboard Options"
+        Me.Location = New System.Drawing.Point(0, 0)
+        Me.Show()
+        If aOptions.optionsFormTitle.Contains(Me.Text) = False Then
+            aOptions.optionsFormTitle.Add(Me.Text)
+            aOptions.optionsForms.Add(Me)
+        Else
+            If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
+        End If
     End Sub
     Private Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyUp
         HoldKeyTimer.Enabled = False

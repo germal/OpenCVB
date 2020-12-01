@@ -43,7 +43,6 @@ Public Class VBparent : Implements IDisposable
     Public Sub initParent()
         If task.callTrace.Count = 0 Then
             aOptions = New aOptionsFrm
-            aOptions.Show()
 
             standalone = True
             task.callTrace.Clear()
@@ -109,10 +108,11 @@ Public Class VBparent : Implements IDisposable
     Public Function findCheckBox(opt As String) As CheckBox
         While 1
             Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" CheckBox Options") Then
-                        For i = 0 To frm.Box.length - 1
-                            If frm.box(i).text.contains(opt) Then Return frm.box(i)
+                For i = 0 To aOptions.optionsFormTitle.Count - 1
+                    If aOptions.optionsFormTitle(i).EndsWith(" CheckBox Options") Then
+                        Dim frm = findForm(aOptions.optionsFormTitle(i))
+                        For j = 0 To frm.Box.Length - 1
+                            If frm.Box(j).Text.Contains(opt) Then Return frm.Box(j)
                         Next
                     End If
                 Next
@@ -132,10 +132,11 @@ Public Class VBparent : Implements IDisposable
     Public Function findRadio(opt As String) As RadioButton
         While 1
             Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" Radio Options") Then
-                        For i = 0 To frm.check.length - 1
-                            If frm.check(i).text.contains(opt) Then Return frm.check(i)
+                For i = 0 To aOptions.optionsFormTitle.Count - 1
+                    If aOptions.optionsFormTitle(i).EndsWith(" Radio Options") Then
+                        Dim frm = findForm(aOptions.optionsFormTitle(i))
+                        For j = 0 To frm.check.Length - 1
+                            If frm.check(j).Text.Contains(opt) Then Return frm.check(j)
                         Next
                     End If
                 Next
@@ -153,26 +154,27 @@ Public Class VBparent : Implements IDisposable
         Return Nothing
     End Function
     Public Sub hideForm(title As String)
-        For Each frm In Application.OpenForms
-            If frm.text = title Then
-                frm.hide
-                Exit Sub
-            End If
-        Next
+        If aOptions.optionsHidden.Contains(title) = False Then aOptions.optionsHidden.Add(title)
     End Sub
     Public Function findForm(title As String) As Object
-        For Each frm In Application.OpenForms
-            If frm.text = title Then Return frm
+        'For Each frm In Application.OpenForms
+        '    If frm.text = title Then Return frm
+        'Next
+        'Return Nothing
+
+        For i = 0 To aOptions.optionsFormTitle.Count - 1
+            If aOptions.optionsFormTitle(i) = title Then Return aOptions.optionsForms(i)
         Next
         Return Nothing
     End Function
     Public Function findSlider(opt As String) As TrackBar
         While 1
             Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" Slider Options") Then
-                        For i = 0 To frm.trackbar.length - 1
-                            If frm.sLabels(i).text.contains(opt) Then Return frm.trackbar(i)
+                For i = 0 To aOptions.optionsFormTitle.Count - 1
+                    If aOptions.optionsFormTitle(i).EndsWith(" Slider Options") Then
+                        Dim frm = findForm(aOptions.optionsFormTitle(i))
+                        For j = 0 To frm.trackbar.length - 1
+                            If frm.sLabels(j).text.contains(opt) Then Return frm.trackbar(j)
                         Next
                     End If
                 Next

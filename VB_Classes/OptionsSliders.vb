@@ -40,11 +40,14 @@ Public Class OptionsSliders
             defaultHeight = count * 58 ' add space for the additional unexpected trackbars.
             FlowLayoutPanel1.Height = defaultHeight - 30
         End If
-        If lookupAlgorithm(caller) = 1 Then Me.Show() ' only the first one gets to be visible...
-        Me.Location = aOptions.nextForm
-        aOptions.nextForm.x += aOptions.offset
-        aOptions.nextForm.y += aOptions.offset
+        Me.Location = New Point(0, 0)
         Me.Show()
+        If aOptions.optionsFormTitle.Contains(Me.Text) = False Then
+            aOptions.optionsFormTitle.Add(Me.Text)
+            aOptions.optionsForms.Add(Me)
+        Else
+            If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
+        End If
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label
@@ -59,15 +62,6 @@ Public Class OptionsSliders
     Private Sub TrackBar_ValueChanged(sender As Object, e As EventArgs)
         countLabel(sender.tag).Text = CStr(trackbar(sender.tag).Value)
     End Sub
-    Private Function lookupAlgorithm(caller As String) As Integer
-        For i = 0 To callerNames.Length - 1
-            If callerNames(i) = caller Then
-                callerSliderCounts(i) += 1
-                Return callerSliderCounts(i)
-            End If
-        Next
-        Return 0
-    End Function
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get
             Return True

@@ -38,9 +38,6 @@ Public Class VBocvb
 
     Public intermediateObject As VBparent
 
-    Public mainLocation As cv.Rect
-    Public optionsOffset As Integer
-
     Public label1 As String
     Public label2 As String
     Public intermediateReview As String

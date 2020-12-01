@@ -140,7 +140,7 @@ Public Class ActiveTask : Implements IDisposable
             ocvb.scalarColors(i) = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
         Next
     End Sub
-    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, location As cv.Rect, camWidth As Integer, camHeight As Integer)
+    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, camWidth As Integer, camHeight As Integer)
         Randomize() ' just in case anyone uses VB.Net's Rnd
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
@@ -148,10 +148,7 @@ Public Class ActiveTask : Implements IDisposable
         result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
 
         ocvb = New VBocvb(Me)
-
         task = Me
-        ocvb.mainLocation = location
-        ocvb.optionsOffset = 30
         ocvb.parms = parms
 
         buildColors()
@@ -175,7 +172,7 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 
-        aOptions.layoutOptions(location)
+        aOptions.layoutOptions()
     End Sub
     Public Sub RunAlgorithm()
         Try

@@ -10,17 +10,15 @@ Public Class OptionsRadioButtons
             check(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
-        If lookupAlgorithm(caller) = 1 Then Me.Show() ' only the first one gets to be visible...
+        Me.Location = New System.Drawing.Point(0, 0)
+        Me.Show()
+        If aOptions.optionsFormTitle.Contains(Me.Text) = False Then
+            aOptions.optionsFormTitle.Add(Me.Text)
+            aOptions.optionsForms.Add(Me)
+        Else
+            If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
+        End If
     End Sub
-    Private Function lookupAlgorithm(caller As String) As Integer
-        For i = 0 To callerNames.Length - 1
-            If callerNames(i) = caller Then
-                callerRadioCounts(i) += 1
-                Return callerRadioCounts(i)
-            End If
-        Next
-        Return 0
-    End Function
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get
             Return True

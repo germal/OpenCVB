@@ -2,7 +2,9 @@
 Imports System.ComponentModel
 Imports System.Windows.Forms
 Public Class aOptionsFrm
-    Public nextForm = New Drawing.Point
+    Public optionsFormTitle As New List(Of String)
+    Public optionsForms As New List(Of System.Windows.Forms.Form)
+    Public optionsHidden As New List(Of String)
     Public offset = 30
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim defaultLeft = GetSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -21,28 +23,39 @@ Public Class aOptionsFrm
         SaveSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", Me.Width)
         SaveSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", Me.Height)
     End Sub
-    Public Sub layoutOptions(mainLocation As cv.Rect)
+    Public Function findRealForm(title As String) As Windows.Forms.Form
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
+        Next
+        Return Nothing
+    End Function
+    Public Sub layoutOptions()
+        Me.Show()
+        Application.DoEvents()
         Dim sliderOffset As New cv.Point(0, 0)
-        Dim otherOffset As New cv.Point(mainLocation.Width / 2, 0)
+        Dim otherOffset As New cv.Point(Me.Width / 2, 0)
+        For Each title In optionsHidden
+            Dim frm = findRealForm(title)
+            While frm IsNot Nothing
+                frm.Hide()
+                frm = findRealForm(title)
+            End While
+        Next
+
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
-            For Each frm In Application.OpenForms
-                If frm.name.startswith("OptionsSliders") Or frm.name.startswith("OptionsKeyboardInput") Or frm.name.startswith("OptionsAlphaBlend") Then
-                    If frm.visible Then
-                        Try
-                            frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
-                        Catch ex As Exception
-
-                        End Try
-                        indexS += 1
-                    End If
+            For Each title In optionsFormTitle
+                If aOptions.optionsHidden.Contains(title) Then Continue For
+                If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
+                    Dim frm = findRealForm(title)
+                    frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                    indexS += 1
                 End If
-                If frm.name.startswith("OptionsRadioButtons") Or frm.name.startswith("OptionsCheckbox") Or frm.name.startswith("OptionsCombo") Then
-                    If frm.visible Then
-                        frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
-                        indexO += 1
-                    End If
+                If title.EndsWith(" Radio Options") Or title.EndsWith(" CheckBox Options") Then
+                    Dim frm = findRealForm(title)
+                    frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
+                    indexO += 1
                 End If
             Next
         Catch ex As Exception
