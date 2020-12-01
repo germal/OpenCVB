@@ -51,10 +51,8 @@ Public Class Benford_Basics
             Exit Sub
         End If
 
-        Dim weightSlider = findSlider("Weight")
-        If ocvb.frameCount = 0 Then
-            If weightSlider IsNot Nothing Then weightSlider.Value = 75
-        End If
+        Static weightSlider = findSlider("Weight")
+        If ocvb.frameCount = 0 Then weightSlider.Value = 75
 
         src = src.Reshape(1, src.Width * src.Height)
         Dim indexer = src.GetGenericIndexer(Of Single)()

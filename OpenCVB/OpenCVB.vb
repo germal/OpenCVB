@@ -42,6 +42,7 @@ Public Class OpenCVB
     Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
     Dim HomeDir As DirectoryInfo
+    Dim activateMe As Boolean
 
     Dim LastX As Integer
     Dim LastY As Integer
@@ -864,6 +865,10 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
+        If activateMe Then
+            activateMe = False
+            Me.Activate()
+        End If
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
@@ -1082,6 +1087,7 @@ Public Class OpenCVB
         saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
+        activateMe = True
         fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
