@@ -9,7 +9,7 @@ Public Class Contours_Basics
     Public minArea As Integer = 1
     Public Sub New()
         initParent()
-        radio.Setup(caller, 5)
+        radio.Setup(caller + " Retrieval Mode", 5)
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
         radio.check(2).Text = "FloodFill"
@@ -17,16 +17,13 @@ Public Class Contours_Basics
         radio.check(4).Text = "Tree"
         radio.check(2).Checked = True
 
-        radio1.Setup(caller, 4)
+        radio1.Setup(caller + " ContourApproximation Mode", 4)
         radio1.check(0).Text = "ApproxNone"
         radio1.check(1).Text = "ApproxSimple"
         radio1.check(2).Text = "ApproxTC89KCOS"
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
 
-        radio.Text = caller + " Retrieval Mode Radio Options"
-        radio1.Text = caller + " ContourApproximation Mode Radio Options"
-        radio1.Show()
         rotatedRect = New Draw_rotatedRectangles()
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         task.desc = "Demo options on FindContours."
@@ -106,13 +103,13 @@ Public Class Contours_FindandDraw
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim img As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         rotatedRect.src = src
         rotatedRect.Run()
         dst1 = rotatedRect.dst1
-        img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(254, 255, cv.ThresholdTypes.BinaryInv)
-
-        Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim tmp As New cv.Mat
+        img.ConvertTo(tmp, cv.MatType.CV_32SC1)
+        Dim contours0 = cv.Cv2.FindContoursAsArray(tmp, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
         Dim contours(contours0.Length - 1)() As cv.Point
         For j = 0 To contours0.Length - 1
             contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)

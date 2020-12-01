@@ -108,9 +108,9 @@ Public Class VBparent : Implements IDisposable
     Public Function findCheckBox(opt As String) As CheckBox
         While 1
             Try
-                For i = 0 To aOptions.optionsFormTitle.Count - 1
-                    If aOptions.optionsFormTitle(i).EndsWith(" CheckBox Options") Then
-                        Dim frm = findForm(aOptions.optionsFormTitle(i))
+                For i = 0 To aOptions.optionsTitle.Count - 1
+                    If aOptions.optionsTitle(i).EndsWith(" CheckBox Options") Then
+                        Dim frm = findForm(aOptions.optionsTitle(i))
                         For j = 0 To frm.Box.Length - 1
                             If frm.Box(j).Text.Contains(opt) Then Return frm.Box(j)
                         Next
@@ -132,9 +132,9 @@ Public Class VBparent : Implements IDisposable
     Public Function findRadio(opt As String) As RadioButton
         While 1
             Try
-                For i = 0 To aOptions.optionsFormTitle.Count - 1
-                    If aOptions.optionsFormTitle(i).EndsWith(" Radio Options") Then
-                        Dim frm = findForm(aOptions.optionsFormTitle(i))
+                For i = 0 To aOptions.optionsTitle.Count - 1
+                    If aOptions.optionsTitle(i).EndsWith(" Radio Options") Then
+                        Dim frm = findForm(aOptions.optionsTitle(i))
                         For j = 0 To frm.check.Length - 1
                             If frm.check(j).Text.Contains(opt) Then Return frm.check(j)
                         Next
@@ -157,22 +157,17 @@ Public Class VBparent : Implements IDisposable
         If aOptions.optionsHidden.Contains(title) = False Then aOptions.optionsHidden.Add(title)
     End Sub
     Public Function findForm(title As String) As Object
-        'For Each frm In Application.OpenForms
-        '    If frm.text = title Then Return frm
-        'Next
-        'Return Nothing
-
-        For i = 0 To aOptions.optionsFormTitle.Count - 1
-            If aOptions.optionsFormTitle(i) = title Then Return aOptions.optionsForms(i)
+        For i = 0 To aOptions.optionsTitle.Count - 1
+            If aOptions.optionsTitle(i) = title Then Return aOptions.optionsForms(i)
         Next
         Return Nothing
     End Function
     Public Function findSlider(opt As String) As TrackBar
         While 1
             Try
-                For i = 0 To aOptions.optionsFormTitle.Count - 1
-                    If aOptions.optionsFormTitle(i).EndsWith(" Slider Options") Then
-                        Dim frm = findForm(aOptions.optionsFormTitle(i))
+                For i = 0 To aOptions.optionsTitle.Count - 1
+                    If aOptions.optionsTitle(i).EndsWith(" Slider Options") Then
+                        Dim frm = findForm(aOptions.optionsTitle(i))
                         For j = 0 To frm.trackbar.length - 1
                             If frm.sLabels(j).text.contains(opt) Then Return frm.trackbar(j)
                         Next

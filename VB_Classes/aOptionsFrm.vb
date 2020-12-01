@@ -2,7 +2,7 @@
 Imports System.ComponentModel
 Imports System.Windows.Forms
 Public Class aOptionsFrm
-    Public optionsFormTitle As New List(Of String)
+    Public optionsTitle As New List(Of String)
     Public optionsForms As New List(Of System.Windows.Forms.Form)
     Public optionsHidden As New List(Of String)
     Public offset = 30
@@ -45,7 +45,7 @@ Public Class aOptionsFrm
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
-            For Each title In optionsFormTitle
+            For Each title In optionsTitle
                 If aOptions.optionsHidden.Contains(title) Then Continue For
                 If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                     Dim frm = findRealForm(title)

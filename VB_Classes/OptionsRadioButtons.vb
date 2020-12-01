@@ -12,8 +12,8 @@ Public Class OptionsRadioButtons
         Next
         Me.Location = New System.Drawing.Point(0, 0)
         Me.Show()
-        If aOptions.optionsFormTitle.Contains(Me.Text) = False Then
-            aOptions.optionsFormTitle.Add(Me.Text)
+        If aOptions.optionsTitle.Contains(Me.Text) = False Then
+            aOptions.optionsTitle.Add(Me.Text)
             aOptions.optionsForms.Add(Me)
         Else
             If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
