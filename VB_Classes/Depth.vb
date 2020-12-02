@@ -861,9 +861,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
 
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(grid.roiList.Count * 4 - 1)
-
-        kalman = New Kalman_Basics()
-        ReDim kalman.kInput(4 - 1)
+        hideForm("Thread_Grid Slider Options") ' it doesn't work to change the thread count.  
 
         label1 = "Red is min distance, blue is max distance"
         task.desc = "Find minimum depth in each segment."
@@ -1106,15 +1104,15 @@ Public Class Depth_SmoothingMat
         inrange.src = src(rect)
         inrange.Run()
         Static lastDepth = inrange.dst2 ' the far depth needs to be smoothed
-        If lastDepth.Size <> inrange.dst2.Size Then lastDepth = inrange.dst2
+        If lastDepth.Size <> inrange.dst1.Size Then lastDepth = inrange.dst1
 
-        cv.Cv2.Subtract(lastDepth, inrange.dst2, dst1)
+        cv.Cv2.Subtract(lastDepth, inrange.dst1, dst1)
 
         Static thresholdSlider = findSlider("Threshold in millimeters")
         Dim mmThreshold = CSng(thresholdSlider.Value)
         dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv).Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
-        cv.Cv2.Add(inrange.dst2, dst1, dst2)
-        lastDepth = inrange.dst2
+        cv.Cv2.Add(inrange.dst1, dst1, dst2)
+        lastDepth = inrange.dst1
 
         Static inrangeMinSlider = findSlider("InRange Min Depth")
         Static inrangeMaxSlider = findSlider("InRange Max Depth")
@@ -1570,10 +1568,9 @@ Public Class Depth_InRange
         If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f()
         cv.Cv2.InRange(depth32f, cv.Scalar.All(min), cv.Scalar.All(max), depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
-        ' task.pointCloud.SetTo(0, noDepthMask.Resize(task.pointCloud.Size))
-        depth32f.SetTo(0, noDepthMask)
-        dst1 = depth32f.Clone.SetTo(0, noDepthMask)
-        If standalone Or depth32fAfterMasking Then dst2 = depth32f.Clone.SetTo(0, depthMask)
+        Dim tmp = depth32f.Clone
+        dst1 = tmp.SetTo(0, noDepthMask)
+        If standalone Or depth32fAfterMasking Then dst2 = depth32f.SetTo(0, depthMask)
     End Sub
 End Class
 

@@ -507,7 +507,7 @@ Public Class IMU_IscameraLevel
         initParent()
         If standalone Then flow = New Font_FlowText()
         sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is a 20/10 or 2 degrees from 0...
+        sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is 20 which is 2 degrees from 0...
         task.desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run()
