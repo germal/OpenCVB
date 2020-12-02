@@ -29,6 +29,15 @@ Public Class aOptionsFrm
         Next
         Return Nothing
     End Function
+    Public Sub addTitle(frm As Object)
+        frm.show()
+        If optionsTitle.Contains(frm.Text) = False Then
+            optionsTitle.Add(frm.Text)
+            optionsForms.Add(frm)
+        Else
+            If optionsHidden.Contains(frm.Text) = False Then optionsHidden.Add(frm.Text)
+        End If
+    End Sub
     Public Sub layoutOptions()
         Me.Show()
         Application.DoEvents()
@@ -46,7 +55,7 @@ Public Class aOptionsFrm
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
             For Each title In optionsTitle
-                If aOptions.optionsHidden.Contains(title) Then Continue For
+                If optionsHidden.Contains(title) Then Continue For
                 If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                     Dim frm = findRealForm(title)
                     frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)

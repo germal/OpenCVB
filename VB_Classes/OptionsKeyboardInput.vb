@@ -6,14 +6,7 @@ Public Class OptionsKeyboardInput
     Public Sub Setup(caller As String)
         Me.MdiParent = aOptions
         Me.Text = caller + " Keyboard Options"
-        Me.Location = New System.Drawing.Point(0, 0)
-        Me.Show()
-        If aOptions.optionsTitle.Contains(Me.Text) = False Then
-            aOptions.optionsTitle.Add(Me.Text)
-            aOptions.optionsForms.Add(Me)
-        Else
-            If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
-        End If
+        aOptions.addTitle(Me)
     End Sub
     Private Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyUp
         HoldKeyTimer.Enabled = False

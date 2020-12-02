@@ -115,7 +115,7 @@ Public Class FLANN_Basics
         output += "The query (in red) is often not picking the nearest blue point." + vbCrLf
         output += "To test further, set the match count to a higher value and observe it will often switch blue dots." + vbCrLf
         output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf + vbCrLf
-        output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4."
+        output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4." + vbCrLf
         output += "Perhaps FLANN is only good enough to find a group of neighbors.  Use with caution."
         ocvb.trueText(output, 10, 50, 3)
     End Sub

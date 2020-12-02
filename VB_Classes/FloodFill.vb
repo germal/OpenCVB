@@ -31,10 +31,10 @@ Public Class FloodFill_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        Static loDiffSlider = findSlider("FloodFill LoDiff")
-        Static hiDiffSlider = findSlider("FloodFill HiDiff")
-        Static stepSlider = findSlider("Step Size")
+        Static minSizeSlider = sliders.trackbar(0)
+        Static loDiffSlider = sliders.trackbar(1)
+        Static hiDiffSlider = sliders.trackbar(2)
+        Static stepSlider = sliders.trackbar(3)
         minFloodSize = minSizeSlider.Value
         Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
         Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
@@ -253,26 +253,21 @@ Public Class FloodFill_CComp
     Inherits VBparent
     Dim ccomp As CComp_Basics
     Dim range As FloodFill_RelativeRange
-    Dim shadow As Depth_Holes
     Public Sub New()
         initParent()
 
-        shadow = New Depth_Holes()
         ccomp = New CComp_Basics()
         range = New FloodFill_RelativeRange()
-
         label1 = "Input to Floodfill "
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ' shadow.Run()
 
         ccomp.src = src
         ccomp.Run()
 
         range.src = ccomp.dst1
-        ' range.fBasics.initialMask = shadow.holeMask
         range.Run()
         dst1 = range.dst1
         dst2 = range.dst2
@@ -293,9 +288,11 @@ Public Class FloodFill_RelativeRange
         fBasics = New FloodFill_Basics()
         check.Setup(caller, 3)
         check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
+        check.Box(0).Checked = True
         check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
         check.Box(1).Checked = True ' link4 produces better results.
         check.Box(2).Text = "Use 'Mask Only'"
+
         label1 = "Input to floodfill basics"
         label2 = "Output of floodfill basics"
         task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."

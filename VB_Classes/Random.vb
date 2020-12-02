@@ -7,13 +7,13 @@ Public Class Random_Points
     Public Points2f() As cv.Point2f
     Public rangeRect As cv.Rect
     Public plotPoints As Boolean = False
-    Public countSlider As System.Windows.Forms.TrackBar
+    Public countSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Random Pixel Count", 1, src.Cols * src.Rows, 20)
 
-        countSlider = findSlider("Random Pixel Count")
+        countSlider = sliders.trackbar(0)
 
         ReDim Points(countSlider.Value - 1)
         ReDim Points2f(countSlider.Value - 1)

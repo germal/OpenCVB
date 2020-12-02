@@ -40,14 +40,7 @@ Public Class OptionsSliders
             defaultHeight = count * 58 ' add space for the additional unexpected trackbars.
             FlowLayoutPanel1.Height = defaultHeight - 30
         End If
-        Me.Location = New Point(0, 0)
-        Me.Show()
-        If aOptions.optionsTitle.Contains(Me.Text) = False Then
-            aOptions.optionsTitle.Add(Me.Text)
-            aOptions.optionsForms.Add(Me)
-        Else
-            If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
-        End If
+        aOptions.addTitle(Me)
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label

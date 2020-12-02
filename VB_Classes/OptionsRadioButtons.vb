@@ -10,14 +10,7 @@ Public Class OptionsRadioButtons
             check(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
-        Me.Location = New System.Drawing.Point(0, 0)
-        Me.Show()
-        If aOptions.optionsTitle.Contains(Me.Text) = False Then
-            aOptions.optionsTitle.Add(Me.Text)
-            aOptions.optionsForms.Add(Me)
-        Else
-            If aOptions.optionsHidden.Contains(Me.Text) = False Then aOptions.optionsHidden.Add(Me.Text)
-        End If
+        aOptions.addTitle(Me)
     End Sub
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get
