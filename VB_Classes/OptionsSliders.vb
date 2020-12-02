@@ -9,12 +9,11 @@ Public Class OptionsSliders
     Dim defaultWidth = 630
     Dim algoIndex As Integer
     Public Sub Setup(caller As String, Optional count As Integer = 4)
-        Me.MdiParent = aOptions
-
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)
         Me.Text = caller + " Slider Options"
+        aOptions.setParent(Me)
         Dim yIncr = 100
         For i = 0 To trackbar.Count - 1
             FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight

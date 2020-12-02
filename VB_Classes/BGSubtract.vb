@@ -20,7 +20,7 @@ Public Class BGSubtract_Basics_CPP
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static frm = findForm("BGSubtract_Basics_CPP Radio Options")
+        Static frm = findfrm("BGSubtract_Basics_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 If currMethod = i Then
@@ -74,7 +74,7 @@ Public Class BGSubtract_MotionDetect_MT
         If ocvb.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
-        Static frm = findForm("BGSubtract_MotionDetect_MT Radio Options")
+        Static frm = findfrm("BGSubtract_MotionDetect_MT Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 threadData = Choose(i + 1, New cv.Vec3i(1, width, height), New cv.Vec3i(2, width / 2, height), New cv.Vec3i(4, width / 2, height / 2),

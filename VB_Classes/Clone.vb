@@ -174,7 +174,7 @@ Public Class Clone_Eagle
         End If
 
         Dim cloneFlag As New cv.SeamlessCloneMethods
-        Static frm = findForm("Clone_Eagle Radio Options")
+        Static frm = findfrm("Clone_Eagle Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 cloneFlag = Choose(i + 1, cv.SeamlessCloneMethods.MixedClone, cv.SeamlessCloneMethods.MonochromeTransfer, cv.SeamlessCloneMethods.NormalClone)
@@ -214,7 +214,7 @@ Public Class Clone_Seamless
         End If
 
         Dim style = cv.SeamlessCloneMethods.NormalClone
-        Static frm = findForm("Clone_Seamless Radio Options")
+        Static frm = findfrm("Clone_Seamless Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 style = Choose(i + 1, cv.SeamlessCloneMethods.NormalClone, cv.SeamlessCloneMethods.MonochromeTransfer, cv.SeamlessCloneMethods.MixedClone)

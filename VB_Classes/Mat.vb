@@ -412,7 +412,7 @@ Public Class Mat_Inverse
         Dim nextline = ""
 
         Dim decompType = cv.DecompTypes.Cholesky
-        Static frm = findForm("Mat_Inverse Radio Options")
+        Static frm = findfrm("Mat_Inverse Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 decompType = Choose(i + 1, cv.DecompTypes.Cholesky, cv.DecompTypes.Eig, cv.DecompTypes.LU, cv.DecompTypes.Normal,

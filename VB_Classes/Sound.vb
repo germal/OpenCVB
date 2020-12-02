@@ -125,7 +125,7 @@ Public Class Sound_SignalGenerator
         sliders.setupTrackBar(4, "Retain Data for x seconds", 1, 100, 2)
 
         radio.Setup(caller, 7)
-        Static frm = findForm("Sound_SignalGenerator Radio Options")
+        Static frm = findfrm("Sound_SignalGenerator Radio Options")
         For i = 0 To frm.check.length - 1
             frm.check(i).Text = Choose(i + 1, "Pink", "White", "Sweep", "Sin", "Square", "Triangle", "SawTooth")
         Next
@@ -151,7 +151,7 @@ Public Class Sound_SignalGenerator
                 startTime = Now
             End If
 
-            Static frm = findForm("Sound_SignalGenerator Radio Options")
+            Static frm = findfrm("Sound_SignalGenerator Radio Options")
             For i = 0 To frm.check.length - 1
                 If frm.check(i).Checked Then
                     wGen.Type = Choose(i + 1, Pink, White, Sweep, Sin, Square, Triangle, SawTooth)
@@ -239,7 +239,7 @@ Public Class Sound_Display
             Dim totalSamples = sound.pcm32f.Rows
             Dim samplesPerLine = If(sound.stereo, totalSamples / 2 / dst1.Width, totalSamples / dst1.Width)
             Dim formatIndex As Integer
-            Static frm = findForm("Sound_Display Radio Options")
+            Static frm = findfrm("Sound_Display Radio Options")
             For i = 0 To frm.check.length - 1
                 If frm.check(i).Checked Then formatIndex = i
             Next

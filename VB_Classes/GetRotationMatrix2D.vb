@@ -45,7 +45,7 @@ Public Class GetRotationMatrix2D_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static frm = findForm("GetRotationMatrix2D_Basics Radio Options")
+        Static frm = findfrm("GetRotationMatrix2D_Basics Radio Options")
         warpFlag = getInterpolationRadioButtons(radio, frm)
 
         Dim angle = sliders.trackbar(0).Value

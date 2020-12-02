@@ -50,7 +50,9 @@ Public Class Fuzzy_Basics
         End If
 
         dst2 = gray.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        contours = cv.Cv2.FindContoursAsArray(dst2, options.retrievalMode, options.ApproximationMode)
+        Dim tmp As New cv.Mat
+        dst2.ConvertTo(tmp, cv.MatType.CV_32S)
+        contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
 
         sortContours.Clear()
         For i = 0 To contours.Length - 1
@@ -168,7 +170,7 @@ Public Class Fuzzy_NeighborProof
                 Next
             Next
         Next
-        ocvb.trueText("Mask ID's for all contour point in each region identified only one region.", 10, 50, 3)
+        ocvb.trueText("Mask ID's for all contour points in each region identified only one region.", 10, 50, 3)
     End Sub
 End Class
 

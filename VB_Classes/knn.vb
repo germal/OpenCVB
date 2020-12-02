@@ -73,7 +73,7 @@ Public Class KNN_QueryTrain
         check.Setup(caller, 1)
         check.Box(0).Text = "Reuse the training and query data"
         If standalone = False Then
-            aOptions.optionsHidden.Add(check.Text)
+            aOptions.hiddenOptions.Add(check.Text)
             check.Visible = False
         End If
 

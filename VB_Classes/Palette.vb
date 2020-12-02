@@ -117,7 +117,7 @@ Public Class Palette_LinearPolar
             Dim c = i * 255 / dst1.Rows
             dst1.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
-        Static frm = findForm("Palette_LinearPolar Radio Options")
+        Static frm = findfrm("Palette_LinearPolar Radio Options")
         Dim iFlag = getInterpolationRadioButtons(radio, frm)
         Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
         Dim radius = sliders.trackbar(0).Value ' msRNG.next(0, dst1.Cols)

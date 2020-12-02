@@ -179,7 +179,7 @@ Public Class DFT_ButterworthFilter_MT
         End If
 
         Dim dftFlag As cv.DctFlags
-        Static frm = findForm("DFT_ButterworthFilter_MT Radio Options")
+        Static frm = findfrm("DFT_ButterworthFilter_MT Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 dftFlag = Choose(i + 1, cv.DftFlags.ComplexOutput, cv.DftFlags.Inverse, cv.DftFlags.None,

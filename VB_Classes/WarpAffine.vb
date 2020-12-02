@@ -101,7 +101,7 @@ Public Class WarpAffine_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static frm = findForm("WarpAffine_Basics Radio Options")
+        Static frm = findfrm("WarpAffine_Basics Radio Options")
         Dim warpFlag = getInterpolationRadioButtons(radio, frm)
 
         Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)

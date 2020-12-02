@@ -15,7 +15,7 @@ Public Class Resize_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static frm = findForm("Resize_Basics Radio Options")
+        Static frm = findfrm("Resize_Basics Radio Options")
         Dim resizeFlag = getInterpolationRadioButtons(radio, frm)
         If standalone Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)

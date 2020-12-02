@@ -34,7 +34,7 @@ Public Class WarpModel_Input
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img As New cv.Mat
-        Static frm = findForm("WarpModel_Input Radio Options")
+        Static frm = findfrm("WarpModel_Input Radio Options")
         For i = 0 To frm.check.length - 1
             Dim nextRadio = frm.check(i)
             If nextRadio.Checked Then
@@ -124,7 +124,7 @@ Public Class WarpModel_FindTransformECC_CPP
         warp.Run()
         dst1 = warp.dst1
 
-        Static frm = findForm("WarpModel_FindTransformECC_CPP Radio Options")
+        Static frm = findfrm("WarpModel_FindTransformECC_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then warpMode = i
         Next

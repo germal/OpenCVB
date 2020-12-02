@@ -43,7 +43,7 @@ Public Class SVM_Options
         task.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
-        Static frm = findForm("SVM_Options Kernel Options")
+        Static frm = findfrm("SVM_Options Kernel Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 kernelType = Choose(i + 1, cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid)
@@ -51,7 +51,7 @@ Public Class SVM_Options
             End If
         Next
 
-        Static frm1 = findForm("SVM_Options SVM Type Options")
+        Static frm1 = findfrm("SVM_Options SVM Type Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 SVMType = Choose(i + 1, cv.ML.SVM.Types.CSvc, cv.ML.SVM.Types.EpsSvr, cv.ML.SVM.Types.NuSvc, cv.ML.SVM.Types.NuSvr, cv.ML.SVM.Types.OneClass)

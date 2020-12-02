@@ -59,7 +59,7 @@ Public Class Encode_Options
     Public Function getEncodeParameter() As Integer
         Dim encodeOption As Integer
         qualityLevel = sliders.trackbar(0).Value
-        Static frm = findForm("Encode_Options Radio Options")
+        Static frm = findfrm("Encode_Options Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 encodeOption = Choose(i + 1, cv.ImwriteFlags.JpegChromaQuality, cv.ImwriteFlags.JpegLumaQuality, cv.ImwriteFlags.JpegOptimize, cv.ImwriteFlags.JpegProgressive,

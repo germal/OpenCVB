@@ -64,7 +64,7 @@ Public Class EMax_Basics
         If standalone Then
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = regionCount
-            Static frm = findForm("EMax_Basics Radio Options")
+            Static frm = findfrm("EMax_Basics Radio Options")
             For i = 0 To frm.check.length - 1
                 If frm.check(i).Checked Then
                     em_model.CovarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)

@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.ComponentModel
-Imports System.Windows.Forms
 Public Class aOptionsFrm
     Public optionsTitle As New List(Of String)
     Public optionsForms As New List(Of System.Windows.Forms.Form)
-    Public optionsHidden As New List(Of String)
+    Public hiddenOptions As New List(Of String)
+    Public hiddenForms As New List(Of System.Windows.Forms.Form)
     Public offset = 30
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim defaultLeft = GetSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
@@ -24,38 +24,46 @@ Public Class aOptionsFrm
         SaveSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", Me.Height)
     End Sub
     Public Function findRealForm(title As String) As Windows.Forms.Form
-        For Each frm In Application.OpenForms
-            If frm.text = title Then Return frm
+        For i = 0 To optionsTitle.Count - 1
+            If optionsTitle(i) = title Then Return optionsForms(i)
         Next
         Return Nothing
     End Function
+    Public Function findFormByTitle(title As String) As Object
+        For i = 0 To aOptions.optionsTitle.Count - 1
+            If optionsTitle(i) = title Then Return optionsForms(i)
+        Next
+        Return Nothing
+    End Function
+    Public Sub setParent(frm As Object)
+        If findFormByTitle(frm.text) Is Nothing Then frm.MdiParent = aOptions
+    End Sub
+
     Public Sub addTitle(frm As Object)
         frm.show()
         If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
             optionsForms.Add(frm)
         Else
-            If optionsHidden.Contains(frm.Text) = False Then optionsHidden.Add(frm.Text)
+            ' If optionsHidden.Contains(frm.Text) = False Then optionsHidden.Add(frm.Text)
+            hiddenOptions.Add(frm.Text)
+            hiddenForms.Add(frm)
         End If
     End Sub
     Public Sub layoutOptions()
         Me.Show()
-        Application.DoEvents()
+        System.Windows.Forms.Application.DoEvents()
         Dim sliderOffset As New cv.Point(0, 0)
         Dim otherOffset As New cv.Point(Me.Width / 2, 0)
-        For Each title In optionsHidden
-            Dim frm = findRealForm(title)
-            While frm IsNot Nothing
-                frm.Hide()
-                frm = findRealForm(title)
-            End While
+        For Each frm In hiddenForms
+            frm.Hide()
         Next
 
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
             For Each title In optionsTitle
-                If optionsHidden.Contains(title) Then Continue For
+                If hiddenOptions.Contains(title) Then Continue For
                 If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                     Dim frm = findRealForm(title)
                     frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)

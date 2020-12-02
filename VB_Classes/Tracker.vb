@@ -121,7 +121,7 @@ Public Class Tracker_Methods
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveMethod As Integer
 
-        Static frm = findForm("Tracker_Methods Radio Options")
+        Static frm = findfrm("Tracker_Methods Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked = True Then
                 tracker.trackerIndex = i

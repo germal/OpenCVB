@@ -30,14 +30,14 @@ Public Class Contours_Basics
         label2 = "FindContours output"
     End Sub
     Public Sub setOptions()
-        Static frm = findForm("Contours_Basics Retrieval Mode Radio Options")
+        Static frm = findfrm("Contours_Basics Retrieval Mode Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
                 Exit For
             End If
         Next
-        Static frm1 = findForm("Contours_Basics ContourApproximation Mode Radio Options")
+        Static frm1 = findfrm("Contours_Basics ContourApproximation Mode Radio Options")
         For i = 0 To frm1.check.length - 1
             If frm1.check(i).Checked Then
                 ApproximationMode = Choose(i + 1, cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,

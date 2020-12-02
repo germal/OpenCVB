@@ -322,7 +322,7 @@ Public Class Puzzle_Solver
             saveWidth = src.Width
         End If
         Dim radioIndex As Integer
-        Static frm = findForm("Puzzle_Solver Radio Options")
+        Static frm = findfrm("Puzzle_Solver Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 radioIndex = i

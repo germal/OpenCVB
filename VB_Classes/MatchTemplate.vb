@@ -34,7 +34,7 @@ Public Class MatchTemplate_Basics
         End If
 
         matchOption = cv.TemplateMatchModes.CCoeffNormed
-        Static frm = findForm("MatchTemplate_Basics Radio Options")
+        Static frm = findfrm("MatchTemplate_Basics Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 matchOption = Choose(i + 1, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed, cv.TemplateMatchModes.CCorr,
@@ -110,7 +110,7 @@ Public Class MatchTemplate_DrawRect
     Public Sub New()
         initParent()
         radio.Setup(caller, 6)
-        Static frm = findForm("MatchTemplate_DrawRect Radio Options")
+        Static frm = findfrm("MatchTemplate_DrawRect Radio Options")
         For i = 0 To frm.check.length - 1
             frm.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
         Next
@@ -131,7 +131,7 @@ Public Class MatchTemplate_DrawRect
             task.drawRectClear = True
         End If
         Dim matchMethod As cv.TemplateMatchModes
-        Static frm = findForm("MatchTemplate_DrawRect Radio Options")
+        Static frm = findfrm("MatchTemplate_DrawRect Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 matchMethod = Choose(i + 1, cv.TemplateMatchModes.SqDiff, cv.TemplateMatchModes.SqDiffNormed, cv.TemplateMatchModes.CCorr,

@@ -105,7 +105,7 @@ Public Class OpticalFlow_DenseOptions
         polySigma = 1.5
         If polyN <= 5 Then polySigma = 1.1
 
-        Static frm = findForm("OpticalFlow_DenseOptions Radio Options")
+        Static frm = findfrm("OpticalFlow_DenseOptions Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 OpticalFlowFlags = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
@@ -260,7 +260,7 @@ Public Class OpticalFlow_Sparse
         dst2 = src.Clone()
 
         Dim OpticalFlowFlag As cv.OpticalFlowFlags
-        Static frm = findForm("OpticalFlow_Sparse Radio Options")
+        Static frm = findfrm("OpticalFlow_Sparse Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 OpticalFlowFlag = Choose(i + 1, cv.OpticalFlowFlags.FarnebackGaussian, cv.OpticalFlowFlags.LkGetMinEigenvals, cv.OpticalFlowFlags.None,
