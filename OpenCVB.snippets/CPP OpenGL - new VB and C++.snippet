@@ -17,12 +17,12 @@ Public Class OpenGL_MyOpenGLtest
         initParent()
 		ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_MyOpenGLtest"
-        ocvb.desc = "New class description"
+        task.desc = "New class description"
     End Sub
     Public Sub Run()
- 		If ocvb.task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ogl.pointCloudInput = ocvb.task.PointCloud
-        ogl.src = ocvb.task.color
+ 		If task.task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        ogl.pointCloudInput = task.PointCloud
+        ogl.src = task.color
         ogl.Run()
     End Sub
 End Class

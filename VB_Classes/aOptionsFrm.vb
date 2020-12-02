@@ -1,21 +1,18 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.ComponentModel
+Imports System.Windows.Forms
 Public Class aOptionsFrm
     Public optionsTitle As New List(Of String)
     Public optionsForms As New List(Of System.Windows.Forms.Form)
     Public hiddenOptions As New List(Of String)
     Public hiddenForms As New List(Of System.Windows.Forms.Form)
     Public offset = 30
+    Public layoutOptionsRequested As Boolean
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim defaultLeft = GetSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
-        Dim defaultTop = GetSetting("OpenCVB", "OpenCVBTop", "OpenCVBTop", Me.Top)
-        Dim defaultWidth = GetSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
-        Dim defaultHeight = GetSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
-
-        Me.Left = GetSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", defaultLeft - offset)
-        Me.Top = GetSetting("OpenCVB", "aOptionsTop", "aOptionsTop", defaultTop - offset)
-        Me.Width = GetSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", defaultWidth)
-        Me.Height = GetSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", defaultHeight)
+        Me.Left = GetSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", ocvb.defaultRect.X - offset)
+        Me.Top = GetSetting("OpenCVB", "aOptionsTop", "aOptionsTop", ocvb.defaultRect.Y - offset)
+        Me.Width = GetSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", ocvb.defaultRect.Width)
+        Me.Height = GetSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", ocvb.defaultRect.Height)
     End Sub
     Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         SaveSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", Me.Left)
@@ -24,8 +21,8 @@ Public Class aOptionsFrm
         SaveSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", Me.Height)
     End Sub
     Public Function findRealForm(title As String) As Windows.Forms.Form
-        For i = 0 To optionsTitle.Count - 1
-            If optionsTitle(i) = title Then Return optionsForms(i)
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
         Next
         Return Nothing
     End Function
@@ -36,22 +33,24 @@ Public Class aOptionsFrm
         Return Nothing
     End Function
     Public Sub addTitle(frm As Object)
-        If findFormByTitle(frm.text) Is Nothing Then frm.MdiParent = aOptions
-        frm.show()
         If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
             optionsForms.Add(frm)
         Else
-            ' If optionsHidden.Contains(frm.Text) = False Then optionsHidden.Add(frm.Text)
             hiddenOptions.Add(frm.Text)
             hiddenForms.Add(frm)
         End If
+
+        frm.show
+        layoutOptionsRequested = True
     End Sub
     Public Sub layoutOptions()
+        layoutOptionsRequested = False
         Me.Show()
-        System.Windows.Forms.Application.DoEvents()
+        Application.DoEvents()
         Dim sliderOffset As New cv.Point(0, 0)
-        Dim otherOffset As New cv.Point(Me.Width / 2, 0)
+        Dim w = GetSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", ocvb.defaultRect.Width)
+        Dim otherOffset As New cv.Point(w / 2, 0)
         For Each frm In hiddenForms
             frm.Hide()
         Next
@@ -65,7 +64,6 @@ Public Class aOptionsFrm
                     Dim frm = findRealForm(title)
                     If frm.Visible = False Then Continue For
                     frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
-                    Console.WriteLine("title = " + title + " at location " + CStr(indexS))
                     indexS += 1
                 End If
                 If title.EndsWith(" Radio Options") Or title.EndsWith(" CheckBox Options") Then

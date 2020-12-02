@@ -70,11 +70,11 @@ Public Class AnyName_CPP
     Public Sub New()
         initParent()
 		    anyname = Anyname_Open()
-        ocvb.task.desc = "New class description"
+        task.desc = "New class description"
 	  End Sub
     Public Sub Run()
-        If ocvb.task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim src = ocvb.task.color
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim src = task.color
         Dim srcData(src.Total * src.ElemSize) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)

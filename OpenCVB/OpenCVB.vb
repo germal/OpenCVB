@@ -1095,7 +1095,7 @@ Public Class OpenCVB
             If algName = "" Then Exit Sub
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, resolutionXY.Width, resolutionXY.Height)
+            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, resolutionXY.Width, resolutionXY.Height, myLocation)
             textDesc = task.desc
             openFileInitialDirectory = task.openFileInitialDirectory
             openFileDialogRequested = task.openFileDialogRequested

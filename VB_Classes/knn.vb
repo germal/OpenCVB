@@ -72,13 +72,9 @@ Public Class KNN_QueryTrain
 
         check.Setup(caller, 1)
         check.Box(0).Text = "Reuse the training and query data"
-        If standalone = False Then
-            aOptions.hiddenOptions.Add(check.Text)
-            check.Visible = False
-        End If
+        If standalone = False Then aOptions.hiddenOptions.Add(check.Text)
 
         randomTrain = New Random_Points()
-        hideForm("Random_Points Slider Options")
         randomQuery = New Random_Points()
 
         label1 = "Random training points"

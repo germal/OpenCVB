@@ -1,5 +1,36 @@
 Imports cv = OpenCvSharp
 Imports System.IO
+
+
+
+
+Public Class GeneticDrawing_Options
+    Inherits VBparent
+    Public stageTotal = 100
+    Public Sub New()
+        initParent()
+        check.Setup(caller, 2)
+        check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
+        check.Box(1).Text = "Restart the algorithm with the current settings"
+        check.Box(1).Checked = True
+
+        sliders.Setup(caller)
+        sliders.setupTrackBar(0, "Number of Generations", 1, 200, 20)
+        sliders.setupTrackBar(1, "Number of Stages", 1, 2000, stageTotal)
+        sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 20, 10)
+        sliders.setupTrackBar(3, "Brush size Percentage", 5, 100, 100)
+
+        task.desc = "Display all the options available to genetic drawing algorithms."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        ocvb.trueText("There is no output for this algorithm - just controls showing the genetic drawing options")
+    End Sub
+End Class
+
+
+
+
 Public Structure DNAentry
     Dim color As Byte
     Dim pt As cv.Point
@@ -10,7 +41,6 @@ End Structure
 ' https://github.com/anopara/genetic-drawing
 Public Class GeneticDrawing_Basics
     Inherits VBparent
-    Public gradient As Gradient_CartToPolar
     Public minBrushRange = New cv.Rangef(0.1, 0.3)
     Public maxBrushRange = New cv.Rangef(0.3, 0.7)
     Dim minSize As Single
@@ -20,36 +50,26 @@ Public Class GeneticDrawing_Basics
     Dim totalError As Single
     Dim stage As Integer
     Public generation As Integer
-    Dim generationTotal As Integer
-    Dim gradientMagContrast As Integer
-    Dim sobelKernel As Integer
-    Dim stageTotal As Integer
     Dim imgGeneration As cv.Mat
     Dim imgStage As cv.Mat
     Public mats As Mat_4to1
     Dim brushPercent As Integer
+    Dim options As GeneticDrawing_Options
+    Dim stageTotal = 100
+    Public gradient As Gradient_CartToPolar
+    Public restartRequested As Boolean
     Public Sub New()
         initParent()
 
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
-        check.Box(1).Text = "Restart the algorithm with the current settings"
-        check.Box(1).Checked = True
+        If standalone Then options = New GeneticDrawing_Options()
 
         gradient = New Gradient_CartToPolar()
-
         For i = 0 To brushes.Count - 1
             brushes(i) = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Next
 
         mats = New Mat_4to1()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of Generations", 1, 200, 20)
-        sliders.setupTrackBar(1, "Number of Stages", 1, 2000, 100)
-        sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 20, 10)
-        sliders.setupTrackBar(3, "Brush size Percentage", 5, 100, 100)
-        stageTotal = sliders.trackbar(1).Value
         ocvb.quadrantIndex = QUAD3
 
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
@@ -103,7 +123,8 @@ Public Class GeneticDrawing_Basics
         Return diff1.Sum()
     End Function
     Private Sub startNewStage(r As cv.Rect)
-        Dim brushstrokeCount = sliders.trackbar(2).Value
+        Static strokeSlider = findSlider("Brushstroke count per generation")
+        Dim brushstrokeCount = strokeSlider.Value
 
         ReDim DNAseq(brushstrokeCount - 1)
         minSize = calcBrushSize(minBrushRange)
@@ -127,29 +148,30 @@ Public Class GeneticDrawing_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        brushPercent = sliders.trackbar(3).Value
-        stageTotal = sliders.trackbar(1).Value
-        generationTotal = sliders.trackbar(0).Value
-        gradientMagContrast = gradient.sliders.trackbar(0).Value
-        sobelKernel = gradient.basics.sobel.sliders.trackbar(0).Value
+
+        Static genSlider = findSlider("Number of Generations")
+        Static stageSlider = findSlider("Number of Stages")
+        Static brushSlider = findSlider("Brush size Percentage")
+        Static gradientMagSlider = findSlider("Contrast exponent to use X100")
+        Static sobelSlider = findSlider("Sobel kernel Size")
+        Static snapCheck = findCheckBox("Snapshot Video input to initialize genetic drawing")
+
+        brushPercent = brushSlider.Value
+        stageTotal = stageSlider.Value
+        Dim sobelKernel = sobelSlider.Value
         Static r = New cv.Rect(0, 0, src.Width, src.Height)
         If task.drawRect.Width > 0 Then r = task.drawRect
-        If check.Box(1).Checked Then
-            check.Box(1).Checked = False
-            stageTotal = sliders.trackbar(1).Value
+        If restartRequested Then
+            restartRequested = False
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
             imgStage = dst2.Clone
-            generationTotal = sliders.trackbar(0).Value
-            stageTotal = sliders.trackbar(1).Value
-            gradientMagContrast = gradient.sliders.trackbar(0).Value
-            sobelKernel = gradient.basics.sobel.sliders.trackbar(0).Value
             generation = 0
             stage = 0
 
             If standalone Then
-                src = If(check.Box(0).Checked, src.Clone, cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                src = If(snapCheck.Checked, src.Clone, cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
-            check.Box(0).Checked = False
+            snapCheck.Checked = False
 
             src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
             mats.mat(0) = src
@@ -203,7 +225,7 @@ Public Class GeneticDrawing_Basics
         End If
 
         generation += 1
-        If generation = generationTotal Then
+        If generation = genSlider.Value Then
             imgStage = mats.mat(3)
             mats.mat(1) = imgStage
             generation = 0
@@ -234,7 +256,7 @@ Public Class GeneticDrawing_Color
 
         gDraw(0) = New GeneticDrawing_Basics()
         gDraw(1) = New GeneticDrawing_Basics()
-        gDraw(2) = New GeneticDrawing_Basics() ' options for the red channel are visible and will be sync below with the other channels if changed.
+        gDraw(2) = New GeneticDrawing_Basics()
 
         label1 = "Intermediate results - original+2 partial+Mag"
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
@@ -244,19 +266,11 @@ Public Class GeneticDrawing_Color
         Dim split() As cv.Mat
         split = cv.Cv2.Split(src)
 
+        Static restartCheck = findCheckBox("Restart the algorithm with the current settings")
+        Dim restartRequested = restartCheck.checked
+        restartCheck.checked = False
         For i = 0 To split.Count - 1
-            For j = 0 To gDraw(2).sliders.trackbar.Count - 1
-                gDraw(i).sliders.trackbar(j).Value = gDraw(2).sliders.trackbar(j).Value
-            Next
-            For j = 0 To gDraw(2).gradient.sliders.trackbar.Count - 1
-                gDraw(i).gradient.sliders.trackbar(j).Value = gDraw(2).gradient.sliders.trackbar(j).Value
-            Next
-
-            gDraw(i).check.Box(0).Checked = gDraw(2).check.Box(0).Checked
-            gDraw(i).check.Box(1).Checked = gDraw(2).check.Box(1).Checked
-        Next
-
-        For i = 0 To split.Count - 1
+            gDraw(i).restartRequested = restartRequested
             gDraw(i).src = split(i)
             gDraw(i).Run()
             split(i) = gDraw(i).dst2
@@ -281,8 +295,10 @@ Public Class GeneticDrawing_Photo
     Inherits VBparent
     Dim gDraw As GeneticDrawing_Color
     Dim inputFileName As String
+    Dim options As GeneticDrawing_Options
     Public Sub New()
         initParent()
+        options = New GeneticDrawing_Options()
 
         task.openFileDialogRequested = True
         task.openFileInitialDirectory = ocvb.parms.homeDir + "Data/"
@@ -292,7 +308,6 @@ Public Class GeneticDrawing_Photo
         task.openFileDialogTitle = "Select an image file to create a paint version"
         task.initialStartSetting = True
         task.openFileSliderPercent = -1
-        gDraw = New GeneticDrawing_Color()
 
         task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
@@ -315,6 +330,7 @@ Public Class GeneticDrawing_Photo
 
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color()
+
             If fullsizeImage.Width <> dst1.Width Or fullsizeImage.Height <> dst1.Height Then
                 Dim newSize = New cv.Size(dst1.Height * fullsizeImage.Width / fullsizeImage.Height, dst1.Height)
                 If newSize.Width > dst1.Width Then

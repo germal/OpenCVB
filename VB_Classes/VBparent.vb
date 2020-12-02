@@ -154,7 +154,6 @@ Public Class VBparent : Implements IDisposable
         Return Nothing
     End Function
     Public Sub hideForm(title As String)
-        ' If aOptions.hiddenOptions.Contains(title) = False Then aOptions.optionsHidden.Add(title)
         aOptions.hiddenOptions.Add(title)
     End Sub
     Public Function findfrm(title As String) As Object
