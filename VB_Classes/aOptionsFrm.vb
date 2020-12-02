@@ -5,7 +5,6 @@ Public Class aOptionsFrm
     Public optionsTitle As New List(Of String)
     Public optionsForms As New List(Of System.Windows.Forms.Form)
     Public hiddenOptions As New List(Of String)
-    Public hiddenForms As New List(Of System.Windows.Forms.Form)
     Public offset = 30
     Public layoutOptionsRequested As Boolean
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -38,7 +37,6 @@ Public Class aOptionsFrm
             optionsForms.Add(frm)
         Else
             hiddenOptions.Add(frm.Text)
-            hiddenForms.Add(frm)
         End If
 
         frm.show
@@ -51,8 +49,14 @@ Public Class aOptionsFrm
         Dim sliderOffset As New cv.Point(0, 0)
         Dim w = GetSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", ocvb.defaultRect.Width)
         Dim otherOffset As New cv.Point(w / 2, 0)
-        For Each frm In hiddenForms
-            frm.Hide()
+        For Each title In hiddenOptions
+            Dim hideList As New List(Of Form)
+            For Each frm In Application.OpenForms
+                If frm.text = title Then hideList.Add(frm)
+            Next
+            For Each frm In hideList
+                frm.Hide()
+            Next
         Next
 
         Try

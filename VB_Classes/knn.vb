@@ -70,12 +70,14 @@ Public Class KNN_QueryTrain
         sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
         sliders.setupTrackBar(2, "KNN k nearest points", 1, 5, 1)
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Reuse the training and query data"
-        If standalone = False Then aOptions.hiddenOptions.Add(check.Text)
+        If standalone Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Reuse the training and query data"
+        End If
 
         randomTrain = New Random_Points()
         randomQuery = New Random_Points()
+        hideForm("Random_Points Slider Options")
 
         label1 = "Random training points"
         label2 = "Random query points"
@@ -83,7 +85,11 @@ Public Class KNN_QueryTrain
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If check.Box(0).Checked = False Or useRandomData Then
+        If standalone Then
+            If check.Box(0).Checked = False Then useRandomData = True
+        End If
+
+        If useRandomData Then
             Static trainSlider = findSlider("KNN Train count")
             randomTrain.sliders.trackbar(0).Value = trainSlider.Value
             randomTrain.Run()

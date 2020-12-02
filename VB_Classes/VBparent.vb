@@ -154,11 +154,24 @@ Public Class VBparent : Implements IDisposable
         Return Nothing
     End Function
     Public Sub hideForm(title As String)
+        If aOptions.optionsTitle.Contains(title) Then
+            For i = 0 To aOptions.optionsTitle.Count - 1
+                If aOptions.optionsTitle(i) = title Then
+                    aOptions.optionsTitle.RemoveAt(i)
+                    aOptions.optionsForms.RemoveAt(i)
+                    Exit For
+                End If
+            Next
+        End If
         aOptions.hiddenOptions.Add(title)
     End Sub
     Public Function findfrm(title As String) As Object
-        For i = 0 To aOptions.optionsTitle.Count - 1
-            If aOptions.optionsTitle(i) = title Then Return aOptions.optionsForms(i)
+        'For i = 0 To aOptions.optionsTitle.Count - 1
+        '    If aOptions.optionsTitle(i) = title Then Return aOptions.optionsForms(i)
+        'Next
+        'Return Nothing
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
         Next
         Return Nothing
     End Function
