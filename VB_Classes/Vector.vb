@@ -8,7 +8,7 @@ Public Class Vector_Magnitude
         label1 = "Vector Magnitude"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim cVector() As Single = {1, 4, 4, 8}
         ocvb.trueText("Original vector = " + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ", " + CStr(cVector(2)) + ", " + CStr(cVector(3)), 10, 30)
         Dim coordinates As New cv.Mat(1, 4, cv.MatType.CV_32F, cVector)

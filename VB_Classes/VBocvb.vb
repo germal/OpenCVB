@@ -40,7 +40,6 @@ Public Class VBocvb
 
     Public label1 As String
     Public label2 As String
-    Public intermediateReview As String
 
     Public pythonTaskName As String
     Public Sub New(_task As ActiveTask)

@@ -14,7 +14,7 @@ Public Class Pixel_GetSet
         task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""

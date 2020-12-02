@@ -17,7 +17,7 @@ Public Class DilateErode_Basics
         radio.check(0).Checked = True
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim iterations = sliders.trackbar(1).Value
         Dim kernelsize = sliders.trackbar(0).Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
@@ -68,7 +68,7 @@ Public Class DilateErode_DepthSeed
         task.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim iterations = dilate.sliders.trackbar(1).Value
         Dim kernelsize = If(dilate.sliders.trackbar(0).Value Mod 2, dilate.sliders.trackbar(0).Value, dilate.sliders.trackbar(0).Value + 1)
         Dim morphShape = cv.MorphShapes.Cross
@@ -109,7 +109,7 @@ Public Class DilateErode_OpenClose
         task.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim n = sliders.trackbar(0).Value
         Dim an As integer = If(n > 0, n, -n)
         Dim morphShape = cv.MorphShapes.Rect

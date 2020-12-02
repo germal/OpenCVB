@@ -102,7 +102,7 @@ Public Class Dither_Basics
         task.desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim radioIndex As Integer
         Static frm = findForm("Dither_Basics Radio Options")
         For i = 0 To frm.check.length - 1

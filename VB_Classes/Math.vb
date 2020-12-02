@@ -10,7 +10,7 @@ Public Class Math_Subtract
         task.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         tmp.SetTo(New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value))
         cv.Cv2.Subtract(tmp, src, dst1)
@@ -56,7 +56,7 @@ Public Class Math_Median_CDF
         task.desc = "Compute the src image median"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone Then bins = sliders.trackbar(0).Value
 
@@ -91,7 +91,7 @@ Public Class Math_DepthMeanStdev
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         minMax.src = src
         minMax.Run()
         Dim mean As Single = 0, stdev As Single = 0
@@ -124,7 +124,7 @@ Public Class Math_RGBCorrelation
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split = src.Split()
         corr.sample1 = split(0)
         corr.sample2 = split(1)

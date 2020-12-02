@@ -9,7 +9,7 @@ Public Class PCA_Basics
         task.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static images(7) As cv.Mat
         Static images32f(images.Length) As cv.Mat
         Dim index = ocvb.frameCount Mod images.Length
@@ -46,7 +46,7 @@ Public Class PCA_Depth
         task.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         pca.src = task.RGBDepth
         pca.Run()
         dst1 = pca.dst1
@@ -83,7 +83,7 @@ Public Class PCA_DrawImage
         img.Line(p, q, color, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = image.Resize(dst1.Size())
         Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex = Nothing

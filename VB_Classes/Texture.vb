@@ -22,7 +22,7 @@ Public Class Texture_Basics
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If standalone Or src.Channels <> 1 Then
             ellipse.Run()
@@ -70,7 +70,7 @@ Public Class Texture_Flow
         task.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim TFdelta = sliders.trackbar(0).Value
         Dim TFblockSize = sliders.trackbar(1).Value * 2 + 1
         Dim TFksize = sliders.trackbar(2).Value * 2 + 1
@@ -103,7 +103,7 @@ Public Class Texture_Flow_Depth
         task.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         texture.src = task.RGBDepth
         texture.Run()
         dst1 = texture.dst1
@@ -131,7 +131,7 @@ Public Class Texture_Shuffle
         task.desc = "Use random shuffling to homogenize a texture sample"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             floor.plane.Run()
             dst2.SetTo(0)

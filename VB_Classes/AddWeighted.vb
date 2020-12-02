@@ -10,7 +10,7 @@ Public Class AddWeighted_Basics
         task.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             src1 = src
             src2 = task.RGBDepth

@@ -14,7 +14,7 @@ Public Class GrabCut_Basics
         task.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         contours.src = src
         contours.Run()
         dst2 = contours.dst2

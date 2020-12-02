@@ -26,7 +26,7 @@ Public Class StructuredDepth_SliceH
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
         dst2 = side2D.dst2
 
@@ -88,7 +88,7 @@ Public Class StructuredDepth_SliceV
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
         dst2 = top2D.dst2
@@ -145,7 +145,7 @@ Public Class StructuredDepth_Floor
         task.desc = "Find the floor plane"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         structD.Run()
 
@@ -193,7 +193,7 @@ Public Class StructuredDepth_Ceiling
         task.desc = "Find the ceiling plane"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         structD.Run()
 
@@ -233,7 +233,7 @@ Public Class StructuredDepth_MultiSliceH
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
         dst2 = side2D.dst2
 
@@ -283,7 +283,7 @@ Public Class StructuredDepth_MultiSliceV
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         top2D.Run()
         dst2 = top2D.dst2
 
@@ -336,7 +336,7 @@ Public Class StructuredDepth_MultiSlice
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         top2D.Run()
         side2D.Run()
         ' dst2 = top2D.dst2
@@ -398,7 +398,7 @@ Public Class StructuredDepth_MultiSliceLines
         task.desc = "Detect lines in the multiSlice output"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         multi.Run()
         cv.Cv2.BitwiseNot(multi.dst2, dst2)
         ldetect.src = multi.dst2
@@ -427,7 +427,7 @@ Public Class StructuredDepth_MultiSlicePolygon
         task.desc = "Detect polygons in the multiSlice output"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         multi.Run()
         cv.Cv2.BitwiseNot(multi.dst2, dst1)
 
@@ -468,7 +468,7 @@ Public Class StructuredDepth_SliceXPlot
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         structD.Run()
         dst2 = structD.dst2
         multi.Run()
@@ -530,7 +530,7 @@ Public Class StructuredDepth_LinearizeFloor
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat

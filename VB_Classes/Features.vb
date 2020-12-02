@@ -14,7 +14,7 @@ Public Class Features_GoodFeatures
         task.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.trackbar(0).Value
         Dim quality = sliders.trackbar(1).Value / 100
@@ -45,13 +45,14 @@ Public Class Features_PointTracker
         pTrack = New KNN_PointTracker()
         Dim drawRectCheck = findCheckBox("Draw rectangle and centroid for each mask")
         drawRectCheck.Checked = False
+        hideForm("Draw_ViewObjects CheckBox Options")
 
         label1 = "Good features without Kalman"
         label2 = "Good features with Kalman"
         task.desc = "Find good features and track them"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         features.src = src
         features.Run()

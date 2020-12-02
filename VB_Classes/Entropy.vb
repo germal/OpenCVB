@@ -15,7 +15,7 @@ Public Class Entropy_Basics
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         simple.bins = hist.sliders.trackbar(0).Value
         simple.run(src)
         entropy = 0
@@ -58,7 +58,7 @@ Public Class Entropy_Highest_MT
         task.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
         If entropies.Length <> grid.roiList.Count Then
@@ -120,7 +120,7 @@ Public Class Entropy_FAST
         task.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         fast.src = src
         fast.Run()
 

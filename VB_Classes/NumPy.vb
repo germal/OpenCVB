@@ -14,7 +14,7 @@
 '        task.desc = "Test Numpy interface for FFT"
 '    End Sub
 '    Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            Dim test = np.random.randn(64, 1000)
 '            Dim x = np.array(Of Double)({1.0, 2.0, 1.0, -1.0, 1.5})
@@ -42,7 +42,7 @@
 '        task.desc = "Run an embedded Python script"
 '    End Sub
 '    Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            embed.Run()
 '        Else
@@ -66,7 +66,7 @@
 '        task.desc = "Run an embedded Python script to display an image"
 '    End Sub
 '    Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            'Dim cmd = "import ctypes # An included library with Python install." + vbCrLf + "import sys" + vbCrLf + "def Mbox(title, text, style):" + vbCrLf + vbTab +
 '            '          "return ctypes.windll.user32.MessageBoxW(0, text, title, style)" + vbCrLf + "Mbox('NumPy_Embedded testing', 'test', 1)"
@@ -93,7 +93,7 @@
 '        task.desc = "Run an embedded Python string of commands"
 '    End Sub
 '    Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            embed.Run()
 '        Else
@@ -117,7 +117,7 @@
 '        task.desc = "Install a package on the embedded Python with Pip"
 '    End Sub
 '    Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        If ocvb.parms.NumPyEnabled Then
 '            embed.Run("from code import InteractiveConsole" + vbCrLf + "class Console(InteractiveConsole):" + vbCrLf + vbTab +
 '                      "def __init__(*args): InteractiveConsole.__init__(*args)" + vbCrLf + "a = 0" + vbCrLf + "code = 'a = 1; print(a)'" + vbCrLf +

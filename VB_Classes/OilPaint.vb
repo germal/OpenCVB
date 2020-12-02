@@ -20,7 +20,7 @@ Public Class OilPaint_Pointilism
         task.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src
         Dim img = src(task.drawRect)
         Static saveDrawRect As New cv.Rect
@@ -92,7 +92,7 @@ Public Class OilPaint_ColorProbability
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         km.src = src
         km.Run()
         dst1 = km.dst1
@@ -131,7 +131,7 @@ Public Class OilPaint_Manual
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
 
@@ -193,7 +193,7 @@ Public Class OilPaint_Manual_CS
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = task.drawRect
@@ -226,7 +226,7 @@ Public Class OilPaint_Cartoon
         label2 = "Laplacian Edges"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim roi = task.drawRect
         laplacian.src = src
         laplacian.Run()

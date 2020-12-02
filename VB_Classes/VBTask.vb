@@ -187,7 +187,7 @@ Public Class ActiveTask : Implements IDisposable
             algorithmObject.NextFrame()
             label1 = ocvb.label1
             label2 = ocvb.label2
-            intermediateReview = ocvb.intermediateReview
+            intermediateReview = task.intermediateReview
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

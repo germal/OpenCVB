@@ -7,7 +7,7 @@ Public Class Mouse_Basics
         task.desc = "Test the mousePoint interface"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static lastPoint = New cv.Point
         ' only display mouse movement in the lower left image (pic.tag = 2)
         If lastPoint = task.mousePoint Or task.mousePicTag <> 2 Then Exit Sub
@@ -32,7 +32,7 @@ Public Class Mouse_LeftClick
         task.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.trueText("Left-click and drag to select a region in any of the images." + vbCrLf +
                                  "The selected area is presented to ocvbClass in task.drawRect." + vbCrLf +
                                  "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +
@@ -53,7 +53,7 @@ Public Class Mouse_RightClick
         task.desc = "Demonstrate what the right-click enables"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         ocvb.trueText("Right-click and drag to select a region in one of the images." + vbCrLf +
                                  "The selected image data will be opened in a spreadsheet.  Give it a try!" + vbCrLf +
                                  "Double-click an image to remove the selected region.")

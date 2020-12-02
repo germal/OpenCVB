@@ -13,7 +13,7 @@ Public Class Gradient_Basics
         label2 = "Phase Output"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sobel.src = src
         sobel.Run()
         Dim angle = New cv.Mat
@@ -41,7 +41,7 @@ Public Class Gradient_Depth
         label2 = "Phase Output"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If task.drawRect.Width > 0 Then sobel.src = task.RGBDepth(task.drawRect) Else sobel.src = task.RGBDepth.Clone()
         sobel.Run()
         Dim angle = New cv.Mat
@@ -72,7 +72,7 @@ Public Class Gradient_Flatland
         task.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
         dst1 = task.RGBDepth.Clone()
         dst1 /= reductionFactor
@@ -107,7 +107,7 @@ Public Class Gradient_CartToPolar
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run()
 
@@ -148,7 +148,7 @@ End Class
 '        task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
 '    End Sub
 '    Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        src.ConvertTo(gradient.src, cv.MatType.CV_32FC3, 1 / 255)
 '        gradient.Run()
 

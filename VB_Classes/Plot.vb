@@ -18,7 +18,7 @@ Public Class Plot_Basics
         task.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
         hist.plotColors(0) = cv.Scalar.White
         hist.Run()
@@ -49,7 +49,7 @@ Public Class Plot_Basics_CPP
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If standalone Then
             ReDim srcX(50 - 1)
@@ -117,7 +117,7 @@ Public Class Plot_OverTime
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
         Dim pixelHeight = CInt(sliders.trackbar(0).Value)
@@ -210,7 +210,7 @@ Public Class Plot_Histogram
         task.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {bins}
@@ -298,7 +298,7 @@ Public Class Plot_Depth
         task.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.Run()
         Dim inRangeMin = hist.inrange.sliders.trackbar(0).Value
         Dim inRangeMax = hist.inrange.sliders.trackbar(1).Value

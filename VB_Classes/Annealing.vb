@@ -72,7 +72,7 @@ Public Class Annealing_Basics_CPP
         task.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If closed = True Then Exit Sub
         If standalone Then
             If ocvb.frameCount = 0 Then
@@ -171,7 +171,7 @@ Public Class Annealing_CPP_MT
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If anneal(0) Is Nothing Then setup() ' setup here rather than in algorithm so all threads work on the same problem.
         Static CityCountSlider = findSlider("Anneal Number of Cities")
         If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup()
@@ -187,8 +187,8 @@ Public Class Annealing_CPP_MT
 
         ' find the best result and start all the others with it.
         Dim minEnergy As Single = Single.MaxValue
-        Dim minIndex As integer = 0
-        Dim bestList As New SortedList(Of Single, integer)(New CompareEnergy)
+        Dim minIndex As Integer = 0
+        Dim bestList As New SortedList(Of Single, Integer)(New CompareEnergy)
         flow.msgs.Clear()
         For i = 0 To anneal.Length - 1
             bestList.Add(anneal(i).energy, i)
@@ -198,7 +198,7 @@ Public Class Annealing_CPP_MT
 
         ' if the top 4 are all the same energy, then we are done.
         If bestList.Count > 1 Then
-            Dim sameEnergy As integer = 1
+            Dim sameEnergy As Integer = 1
             Dim successCounter = sliders.trackbar(1).Value
             For i = 1 To successCounter - 1
                 If anneal(CInt(bestList.ElementAt(i).Value)).energy = anneal(CInt(bestList.ElementAt(0).Value)).energy Then sameEnergy += 1
@@ -267,7 +267,7 @@ Public Class Annealing_Options
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static randomSlider = findSlider("Random Pixel Count")
         Dim numberOfCities = randomSlider.Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?

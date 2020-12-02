@@ -32,7 +32,7 @@ Public Class WarpModel_Input
         task.desc = "Import the misaligned input."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img As New cv.Mat
         Static frm = findForm("WarpModel_Input Radio Options")
         For i = 0 To frm.check.length - 1
@@ -119,7 +119,7 @@ Public Class WarpModel_FindTransformECC_CPP
         task.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         warp.src = src
         warp.Run()
         dst1 = warp.dst1
@@ -203,7 +203,7 @@ Public Class WarpModel_AlignImages
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
             If ecc.warp.check.Box(0).Checked Then

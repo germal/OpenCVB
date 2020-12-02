@@ -11,7 +11,7 @@ Public Class Pencil_Basics
         task.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         Dim shadowFactor = sliders.trackbar(2).Value / 1000
@@ -32,7 +32,7 @@ Public Class Pencil_Manual
         task.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         cv.Cv2.BitwiseNot(src, grayinv)

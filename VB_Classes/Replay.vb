@@ -88,7 +88,7 @@ Public Class Replay_Record
         task.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(task.openFileDialogName)
         If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
@@ -177,7 +177,7 @@ Public Class Replay_Play
         task.desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(task.openFileDialogName)
         If recordingFilename.Exists = False Then ocvb.trueText("File not found: " + recordingFilename.FullName, 10, 125)
@@ -256,7 +256,7 @@ Public Class Replay_OpenGL
         task.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         replay.Run()
         ogl.src = task.color
         ogl.Run()

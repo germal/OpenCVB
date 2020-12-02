@@ -126,7 +126,7 @@ Public Class GeneticDrawing_Basics
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         brushPercent = sliders.trackbar(3).Value
         stageTotal = sliders.trackbar(1).Value
         generationTotal = sliders.trackbar(0).Value
@@ -240,7 +240,7 @@ Public Class GeneticDrawing_Color
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split() As cv.Mat
         split = cv.Cv2.Split(src)
 
@@ -297,7 +297,7 @@ Public Class GeneticDrawing_Photo
         task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If inputFileName <> task.openFileDialogName Or ocvb.frameCount = 0 Then
             Dim fileinfo = New FileInfo(task.openFileDialogName)

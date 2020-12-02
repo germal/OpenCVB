@@ -11,7 +11,7 @@ Public Class BRISK_Basics
         Brisk = cv.BRISK.Create()
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.CopyTo(dst1)
         Dim keyPoints = Brisk.Detect(src)
 

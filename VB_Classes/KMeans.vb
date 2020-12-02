@@ -12,7 +12,7 @@ Public Class kMeans_BasicsDepthColor
         task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim resizeVal = If(resizeRequest, 4, 1)
         Dim small = src.Resize(New cv.Size(src.Width / resizeVal, src.Height / resizeVal))
         Dim rectMat = small.Clone
@@ -64,7 +64,7 @@ Public Class kMeans_Clusters
         task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveRect = task.drawRect
         task.drawRect = saveRect
         km.src = src
@@ -96,7 +96,7 @@ Public Class kMeans_RGBFast
         task.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
         Dim columnVector As New cv.Mat
         columnVector = small8uC3.Reshape(small8uC3.Channels, small8uC3.Rows * small8uC3.Cols)
@@ -138,7 +138,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         task.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         km.src = src
         km.Run() ' cluster the rgb image - output is in dst2
         Dim rgb32f As New cv.Mat
@@ -200,7 +200,7 @@ Public Class kMeans_XYDepth
         task.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim roi = task.drawRect
         Dim depth32f = getDepth32f()
         Dim xyDepth32f As New cv.Mat(depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
@@ -235,7 +235,7 @@ Public Class kMeans_Depth_FG_BG
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim columnVector As New cv.Mat
         Dim depth32f = getDepth32f()
         columnVector = depth32f.Reshape(1, depth32f.Rows * depth32f.Cols)
@@ -274,7 +274,7 @@ Public Class kMeans_LAB
         task.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim roi = task.drawRect
         Dim labMat = src(roi).CvtColor(cv.ColorConversionCodes.RGB2Lab)
         Dim columnVector As New cv.Mat
@@ -311,7 +311,7 @@ Public Class kMeans_Color
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -351,7 +351,7 @@ Public Class kMeans_Color_MT
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
         Dim clusterCount = sliders.trackbar(0).Value
         Dim depth32f = getDepth32f()
@@ -392,7 +392,7 @@ Public Class kMeans_ColorDepth
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim srcPlanes() As cv.Mat = Nothing
@@ -440,7 +440,7 @@ Public Class kMeans_ColorDepth_MT
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
         Dim clusterCount = sliders.trackbar(0).Value
@@ -490,7 +490,7 @@ Public Class KMeans_Subdivision
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
@@ -532,7 +532,7 @@ Public Class KMeans_Subdivision1
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
@@ -585,7 +585,7 @@ Public Class kMeans_Basics
         task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
         Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
         Dim src32f As New cv.Mat

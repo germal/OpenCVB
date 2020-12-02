@@ -36,7 +36,7 @@ Public Class Thread_Grid
         task.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static lastWidth As Integer
         Static lastHeight As Integer
         Static lastBorder As Integer
@@ -82,14 +82,14 @@ Public Class Thread_Grid
                 borderList.Add(broi)
             Next
 
-            If standalone Or ocvb.intermediateReview = caller Then drawGrid(borderList)
+            If standalone Or task.intermediateReview = caller Then drawGrid(borderList)
 
             lastWidth = sliders.trackbar(0).Value
             lastHeight = sliders.trackbar(1).Value
             lastBorder = borderSize
         End If
 
-        If standalone Or ocvb.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.All(255), gridMask)
             label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
@@ -117,7 +117,7 @@ Public Class Thread_GridTest
         task.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
         Dim mean = cv.Cv2.Mean(src)
 

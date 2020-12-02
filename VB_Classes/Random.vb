@@ -22,7 +22,7 @@ Public Class Random_Points
         task.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If Points.Length <> countSlider.Value Then
             ReDim Points(countSlider.Value - 1)
             ReDim Points2f(countSlider.Value - 1)
@@ -49,7 +49,7 @@ Public Class Random_Shuffle
         task.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         src.CopyTo(dst1)
         cv.Cv2.RandShuffle(dst1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         label1 = "Random_shuffle - wave at camera"
@@ -70,7 +70,7 @@ Public Class Random_LUTMask
         label2 = "kmeans run To Get colors"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static lutMat As cv.Mat
         If lutMat Is Nothing Or ocvb.frameCount Mod 10 = 0 Then
             random.Run()
@@ -101,7 +101,7 @@ Public Class Random_UniformDist
         task.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(dst1, 0, 255)
     End Sub
@@ -121,7 +121,7 @@ Public Class Random_NormalDist
         task.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
     End Sub
 End Class
@@ -142,7 +142,7 @@ Public Class Random_CheckUniformSmoothed
         task.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         rUniform.src = src
         rUniform.Run()
         dst1 = rUniform.dst1
@@ -172,7 +172,7 @@ Public Class Random_CheckUniformDist
         task.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         rUniform.src = src
         rUniform.Run()
         dst1 = rUniform.dst1
@@ -200,7 +200,7 @@ Public Class Random_CheckNormalDist
         task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         normalDist.src = src
         normalDist.Run()
         dst1 = normalDist.dst1
@@ -228,7 +228,7 @@ Public Class Random_CheckNormalDistSmoothed
         task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         normalDist.src = src
         normalDist.Run()
         dst1 = normalDist.dst1
@@ -280,7 +280,7 @@ Public Class Random_PatternGenerator_CPP
         task.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols)
@@ -319,7 +319,7 @@ Public Class Random_CustomDistribution
         task.desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
         If Not (lastValue > 0.99 And lastValue <= 1.0) Then ' convert the input histogram to a cdf.
             inputCDF *= 1 / (inputCDF.Sum().Item(0))
@@ -368,7 +368,7 @@ Public Class Random_MonteCarlo
         task.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim dimension = sliders.trackbar(0).Value
         Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
         For i = 0 To outputRandom.rows - 1
@@ -417,7 +417,7 @@ Public Class Random_CustomHistogram
         task.desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static saveBins As Integer

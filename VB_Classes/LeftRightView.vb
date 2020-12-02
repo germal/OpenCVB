@@ -17,7 +17,7 @@ Public Class LeftRightView_Basics
         End Select
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = task.leftView
         dst2 = task.rightView
 
@@ -51,7 +51,7 @@ Public Class LeftRightView_CompareUndistorted
         task.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim sliceY = sliders.trackbar(1).Value
         Dim slideHeight = sliders.trackbar(2).Value
         Dim leftInput As cv.Mat, rightInput As cv.Mat
@@ -99,7 +99,7 @@ Public Class LeftRightView_CompareRaw
         task.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         lrView.Run()
 
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
@@ -135,7 +135,7 @@ Public Class LeftRightView_Features
         label2 = "Right Image"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         lrView.Run()
 
         features.src = lrView.dst2
@@ -171,7 +171,7 @@ Public Class LeftRightView_Palettized
         label2 = "Right Image"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         lrView.Run()
 
         palette.src = lrView.dst1
@@ -203,7 +203,7 @@ Public Class LeftRightView_BRISK
         lrView = New LeftRightView_Basics()
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         lrView.Run()
         brisk.src = lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         brisk.Run()

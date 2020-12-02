@@ -79,7 +79,7 @@ Public Class OpenGL_Basics
         pipe.WaitForConnection()
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             src = src
             pointCloudInput = task.pointCloud
@@ -169,7 +169,7 @@ Public Class OpenGL_Options
         label1 = ""
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         OpenGL.FOV = sliders.trackbar(0).Value
         OpenGL.yaw = sliders.trackbar(1).Value
@@ -208,7 +208,7 @@ Public Class OpenGL_Callbacks
         task.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         ogl.src = src
         ogl.pointCloudInput = task.pointCloud
         ogl.Run()
@@ -236,7 +236,7 @@ Public Class OpenGL_IMU
         task.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         imu.Run()
         ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
         ogl.src = src
@@ -276,7 +276,7 @@ Public Class OpenGL_3Ddata
         task.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim bins = sliders.trackbar(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
@@ -320,7 +320,7 @@ Public Class OpenGL_Draw3D
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         circle.Run()
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
@@ -347,7 +347,7 @@ Public Class OpenGL_Voxels
         task.desc = "Show the voxel representation in OpenGL"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         voxels.src = src
         voxels.Run()
         Static intermediateResults = findCheckBox("Display intermediate results")
@@ -384,7 +384,7 @@ Public Class OpenGL_GravityTransform
         task.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloud.src = task.pointCloud
         gCloud.Run()
 
@@ -412,7 +412,7 @@ Public Class OpenGL_Reduced
         task.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.Run()
         dst1 = reduction.dst1
 
@@ -441,7 +441,7 @@ Public Class OpenGL_Floor
         task.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         plane.Run()
         dst1 = plane.dst1
@@ -472,7 +472,7 @@ Public Class OpenGL_FloorPlane
         task.desc = "Show the floor in the pointcloud as a plane"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         plane.Run()
         dst1 = plane.dst1
@@ -511,7 +511,7 @@ Public Class OpenGL_FloorTexture
         task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         floor.plane.Run()
         dst1 = floor.plane.dst1

@@ -24,7 +24,7 @@ Public Class Voronoi_Basics
         Next
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         random.Run()
         inputPoints = New List(Of cv.Point)(random.Points)
@@ -54,7 +54,7 @@ Public Class Voronoi_Compare
         task.desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         random.Run()
         Dim points = New List(Of cv.Point)(random.Points)
@@ -102,7 +102,7 @@ Public Class Voronoi_CPP
         task.desc = "Use the C++ version of the Voronoi code"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim countSlider = findSlider("Random Pixel Count")
         vDemo.random.Run()

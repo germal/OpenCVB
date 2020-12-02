@@ -34,7 +34,7 @@ Public Class DFT_Basics
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -93,7 +93,7 @@ Public Class DFT_Inverse
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -149,12 +149,12 @@ Public Class DFT_ButterworthFilter_MT
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dft.src = src
         dft.Run()
 
-        Static radius As integer
-        Static order As integer
+        Static radius As Integer
+        Static order As Integer
         Static butterworthFilter(1) As cv.Mat
         ' only create the filter if radius or order has changed.
         If radius <> sliders.trackbar(0).Value Or order <> sliders.trackbar(1).Value Then
@@ -215,7 +215,7 @@ Public Class DFT_ButterworthDepth
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         bfilter.src = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run()
         dst1 = bfilter.dst1

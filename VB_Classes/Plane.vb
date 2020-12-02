@@ -107,7 +107,7 @@ Public Class Plane_Detect
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = getDepth32f()
         grid.Run()
 
@@ -181,7 +181,7 @@ Public Class Plane_DetectDebug
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = getDepth32f()
         grid.Run()
 

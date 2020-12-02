@@ -19,7 +19,7 @@ Public Class Kalman_Basics
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -75,6 +75,71 @@ End Class
 
 
 
+
+
+Public Class Kalman_Stripped
+    Inherits VBparent
+    Dim kalman() As Kalman_Simple
+    Public kInput(4 - 1) As Single
+    Public kOutput(4 - 1) As Single
+    Public Sub New()
+        initParent()
+
+        task.desc = "High volume usage only.  Same as Kalman_basics but no stability check or kalman checkbox."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static saveDimension = -1
+        If saveDimension <> kInput.Length Then
+            If kalman IsNot Nothing Then
+                If kalman.Count > 0 Then
+                    For i = 0 To kalman.Count - 1
+                        kalman(i).Dispose()
+                    Next
+                End If
+            End If
+            saveDimension = kInput.Length
+            ReDim kalman(kInput.Length - 1)
+            For i = 0 To kInput.Length - 1
+                kalman(i) = New Kalman_Simple()
+            Next
+            ReDim kOutput(kInput.Count - 1)
+        End If
+
+        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
+        Dim useKalman = useKalmanCheck.checked
+        If useKalman Then
+            For i = 0 To kalman.Length - 1
+                kalman(i).inputReal = kInput(i)
+                kalman(i).Run()
+                If Double.IsNaN(kalman(i).stateResult) Then kalman(i).stateResult = kalman(i).inputReal ' kalman failure...
+                kOutput(i) = kalman(i).stateResult
+            Next
+        Else
+            kOutput = kInput ' do nothing to the input.
+        End If
+
+        If standalone Then
+            dst1 = src.Clone()
+            Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
+            rect = validateRect(rect)
+            Static lastRect = rect
+            If rect = lastRect Then
+                Dim r = initRandomRect(src.Width, src.Height, 50)
+                kInput = New Single() {r.X, r.Y, r.Width, r.Height}
+            End If
+            lastRect = rect
+            dst1.Rectangle(rect, cv.Scalar.White, 6)
+            dst1.Rectangle(rect, cv.Scalar.Red, 1)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_Compare
     Inherits VBparent
@@ -96,7 +161,7 @@ Public Class Kalman_Compare
         task.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount = 0 Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -170,7 +235,7 @@ Public Class Kalman_RotatingPoint
         task.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim stateAngle = kState.Get(Of Single)(0)
 
         Dim prediction = kf.Predict()
@@ -220,7 +285,7 @@ Public Class Kalman_MousePredict
         task.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = task.mousePoint
@@ -255,7 +320,7 @@ Public Class Kalman_CVMat
         task.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
@@ -327,7 +392,7 @@ Public Class Kalman_ImageSmall
         task.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         resize.src = src
         resize.Run()
@@ -363,7 +428,7 @@ Public Class Kalman_DepthSmall
         task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         kalman.src = task.RGBDepth
         kalman.Run()
         dst1 = kalman.dst1
@@ -393,7 +458,7 @@ Public Class Kalman_Depth32f
         task.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = getDepth32f()
         resize.src = depth32f
         resize.Run()
@@ -439,7 +504,7 @@ Public Class Kalman_Single
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
@@ -564,7 +629,7 @@ Public Class Kalman_VB
         q_bias += K_1 * angle_err
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         input = sliders.trackbar(0).Value
         Dim noiselevel = sliders.trackbar(6).Value
         Dim additionalbias = sliders.trackbar(7).Value
@@ -685,7 +750,7 @@ Public Class Kalman_VB_Basics
         q_bias += K_1 * kError
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If standalone Then
             Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

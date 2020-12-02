@@ -14,7 +14,7 @@ Public Class FAST_Basics
         task.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.CopyTo(dst1)
         keypoints = cv.Cv2.FAST(src, sliders.trackbar(0).Value, If(check.Box(0).Checked, True, False))
@@ -43,7 +43,7 @@ Public Class FAST_Centroid
         task.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         fast.src = src
         fast.Run()
         dst1 = fast.dst1

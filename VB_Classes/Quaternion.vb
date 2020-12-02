@@ -31,7 +31,7 @@ Public Class Quaterion_Basics
         task.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
                                     CSng(sliders.trackbar(2).Value / 100), CSng(sliders.trackbar(3).Value / 100))
         Dim q2 = New Quaternion(CSng(sliders.trackbar(4).Value / 100), CSng(sliders.trackbar(5).Value / 100),
@@ -59,7 +59,7 @@ Public Class Quaterion_IMUPrediction
     End Sub
 
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         host.Run()
 
         Dim dt = host.HostInterruptDelayEstimate

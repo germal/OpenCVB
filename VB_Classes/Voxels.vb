@@ -28,7 +28,7 @@ Public Class Voxels_Basics_MT
         task.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split() = task.pointCloud.Split()
 
         Static minSlider = findSlider("InRange Min Depth")

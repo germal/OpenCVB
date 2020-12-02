@@ -28,7 +28,7 @@ Public Class SemiGlobalMatching_CPP
         task.desc = "Find depth using the semi-global matching algorithm."
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         'If ocvb.frameCount < 10 Then Exit Sub
         'If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
         '    ocvb.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera.")

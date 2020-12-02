@@ -9,7 +9,7 @@ Public Class Mean_Basics
         task.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveImageCount = sliders.trackbar(0).Value
         If sliders.trackbar(0).Value <> saveImageCount Then
             saveImageCount = sliders.trackbar(0).Value

@@ -14,7 +14,7 @@ Public Class Object_Basics
         task.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         inrange.src = getDepth32f()
         inrange.Run()
         If standalone Then

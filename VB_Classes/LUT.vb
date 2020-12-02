@@ -13,7 +13,7 @@ Public Class LUT_Gray
         task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
         sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
         sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
@@ -46,7 +46,7 @@ Public Class LUT_Basics
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run()
         dst1 = reduction.dst1.LUT(colorMat)
@@ -72,7 +72,7 @@ Public Class LUT_Color
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reduction = sliders.trackbar(0).Value
         If standalone Then
             src /= reduction
@@ -99,7 +99,7 @@ Public Class LUT_Rebuild
         task.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
         dst1 = src.LUT(lut)
         If standalone Then dst2 = lut.Resize(src.Size())

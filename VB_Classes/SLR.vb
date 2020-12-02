@@ -21,7 +21,7 @@ Public Class SLR_Basics
         task.desc = "Segmented Linear Regression example"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim resultX As New List(Of Double)
         Dim resultY As New List(Of Double)
@@ -85,7 +85,7 @@ Public Class SLR_Data
         task.desc = "Plot the data used in SLR_Basics"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
         plot.Run()
@@ -112,7 +112,7 @@ Public Class SLR_Image
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
     Public Sub Run()
-        If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.src = src

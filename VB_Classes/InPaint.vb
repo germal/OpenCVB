@@ -18,7 +18,7 @@ Public Class InPaint_Basics
         label2 = "Repaired Image"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
         If ocvb.frameCount Mod 100 Then Exit Sub
@@ -52,7 +52,7 @@ Public Class InPaint_Noise
         label2 = "Repaired Image"
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.src = src
         noise.Run() ' create some noise in the result1 image.

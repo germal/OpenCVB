@@ -11,7 +11,7 @@ Public Class Stitch_Basics
         task.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run()
-		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim mats As New List(Of cv.Mat)
         Dim imageCount = sliders.trackbar(0).Value
         Dim width = sliders.trackbar(1).Value
