@@ -1369,7 +1369,7 @@ Public Class Depth_TooCloseCentroids
         dst2 = depth.noiseMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst1 = depth.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In depth.flood.basics.rejectedCentroids
-            dst1.Circle(pt, 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            If pt <> New cv.Point Then dst1.Circle(pt, 25, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
 
         Static maxPixelSlider = findSlider("Size of rejected rects that are likely too close")
@@ -1383,7 +1383,7 @@ Public Class Depth_TooCloseCentroids
                 ' if the rect is surrounded by largely zero depth, then it is likely noise from being too close
                 Dim percentZero = holes(r).CountNonZero() / (r.Width * r.Height)
                 If percentZero > percentThreshold Then
-                    dst2.Rectangle(r, cv.Scalar.Yellow, -1)
+                    dst2.Rectangle(r, cv.Scalar.Red, -1)
                     tooClosePoints.Add(New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2))
                 End If
             End If
@@ -1418,9 +1418,9 @@ Public Class Depth_TooCloseCluster
         If ocvb.frameCount Mod 10 = 0 Then dst2.SetTo(0)
         For i = 0 To knn2d.knn.knnQT.queryPoints.Count - 1
             Dim qPoint = knn2d.knn.knnQT.queryPoints.ElementAt(i)
-            cv.Cv2.Circle(dst2, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            cv.Cv2.Circle(dst2, qPoint, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
             Dim pt = knn2d.knn.knnQT.trainingPoints.ElementAt(knn2d.knn.neighbors.Get(Of Single)(i, 0))
-            cv.Cv2.Circle(dst2, pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+            cv.Cv2.Circle(dst2, pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
             Dim distance = Math.Sqrt((pt.X - qPoint.X) * (pt.X - qPoint.X) + (pt.Y - qPoint.Y) * (pt.Y - qPoint.Y))
             If distance < src.Width / 10 Then dst2.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
         Next

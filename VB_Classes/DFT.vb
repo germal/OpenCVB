@@ -35,7 +35,8 @@ Public Class DFT_Basics
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        gray = src
+        If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         rows = cv.Cv2.GetOptimalDFTSize(gray.Rows)
         cols = cv.Cv2.GetOptimalDFTSize(gray.Cols)
@@ -215,7 +216,7 @@ Public Class DFT_ButterworthDepth
     End Sub
     Public Sub Run()
 		If ocvb.intermediateReview = caller Then ocvb.intermediateObject = Me
-        'bfilter.dft.gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        bfilter.src = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run()
         dst1 = bfilter.dst1
         dst2 = bfilter.dst2
