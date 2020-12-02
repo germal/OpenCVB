@@ -797,7 +797,7 @@ Public Class KNN_PointTracker
     Dim newCentroids As New List(Of cv.Point2f)
     Dim topView As PointCloud_Kalman_TopView
     Public kalman As New List(Of Kalman_Stripped)
-    Public kalmanOptions As New Kalman_Basics
+    Public kalmanOptions As Kalman_Basics
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)

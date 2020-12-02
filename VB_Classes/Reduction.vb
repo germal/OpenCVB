@@ -60,7 +60,7 @@ Public Class Reduction_Edges
         task.desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run()
         dst1 = reduction.dst1.Clone
@@ -89,7 +89,7 @@ Public Class Reduction_Floodfill
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run()
 
@@ -122,7 +122,7 @@ Public Class Reduction_KNN_Color
         task.desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run()
         dst2 = reduction.dst1
@@ -164,7 +164,7 @@ Public Class Reduction_KNN_ColorAndDepth
         task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run()
         dst1 = reduction.dst1
@@ -192,7 +192,7 @@ Public Class Reduction_Depth
         task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Type = cv.MatType.CV_32S Then
             reduction.src = src
         Else
@@ -222,7 +222,7 @@ Public Class Reduction_PointCloud
         task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split() = task.pointCloud.Split()
         split(2) *= 1000 ' convert to mm's
         split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)

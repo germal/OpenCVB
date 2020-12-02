@@ -108,14 +108,22 @@ Public Class VBparent : Implements IDisposable
     Public Function findCheckBox(opt As String) As CheckBox
         While 1
             Try
-                For i = 0 To aOptions.optionsTitle.Count - 1
-                    If aOptions.optionsTitle(i).EndsWith(" CheckBox Options") Then
-                        Dim frm = findfrm(aOptions.optionsTitle(i))
-                        For j = 0 To frm.Box.Length - 1
-                            If frm.Box(j).Text.Contains(opt) Then Return frm.Box(j)
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" CheckBox Options") Then
+                        For j = 0 To frm.Box.length - 1
+                            If frm.Box(j).text.contains(opt) Then Return frm.Box(j)
                         Next
                     End If
                 Next
+
+                'For i = 0 To aOptions.optionsTitle.Count - 1
+                '    If aOptions.optionsTitle(i).EndsWith(" CheckBox Options") Then
+                '        Dim frm = findfrm(aOptions.optionsTitle(i))
+                '        For j = 0 To frm.Box.Length - 1
+                '            If frm.Box(j).Text.Contains(opt) Then Return frm.Box(j)
+                '        Next
+                '    End If
+                'Next
             Catch ex As Exception
                 Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
@@ -132,14 +140,21 @@ Public Class VBparent : Implements IDisposable
     Public Function findRadio(opt As String) As RadioButton
         While 1
             Try
-                For i = 0 To aOptions.optionsTitle.Count - 1
-                    If aOptions.optionsTitle(i).EndsWith(" Radio Options") Then
-                        Dim frm = findfrm(aOptions.optionsTitle(i))
-                        For j = 0 To frm.check.Length - 1
-                            If frm.check(j).Text.Contains(opt) Then Return frm.check(j)
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" Radio Options") Then
+                        For j = 0 To frm.check.length - 1
+                            If frm.check(j).text.contains(opt) Then Return frm.check(j)
                         Next
                     End If
                 Next
+                'For i = 0 To aOptions.optionsTitle.Count - 1
+                '    If aOptions.optionsTitle(i).EndsWith(" Radio Options") Then
+                '        Dim frm = findfrm(aOptions.optionsTitle(i))
+                '        For j = 0 To frm.check.Length - 1
+                '            If frm.check(j).Text.Contains(opt) Then Return frm.check(j)
+                '        Next
+                '    End If
+                'Next
             Catch ex As Exception
                 Console.WriteLine("findRadio failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
@@ -178,9 +193,8 @@ Public Class VBparent : Implements IDisposable
     Public Function findSlider(opt As String) As TrackBar
         While 1
             Try
-                For i = 0 To aOptions.optionsTitle.Count - 1
-                    If aOptions.optionsTitle(i).EndsWith(" Slider Options") Then
-                        Dim frm = findfrm(aOptions.optionsTitle(i))
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" Slider Options") Then
                         For j = 0 To frm.trackbar.length - 1
                             If frm.sLabels(j).text.contains(opt) Then Return frm.trackbar(j)
                         Next
