@@ -13,7 +13,6 @@ Public Class OptionsSliders
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)
         Me.Text = caller + " Slider Options"
-        aOptions.setParent(Me)
         Dim yIncr = 100
         For i = 0 To trackbar.Count - 1
             FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight

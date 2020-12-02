@@ -4,7 +4,6 @@ Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
     Public Sub Setup(caller As String)
-        Me.MdiParent = aOptions
         Me.Text = caller + " Keyboard Options"
         aOptions.addTitle(Me)
     End Sub

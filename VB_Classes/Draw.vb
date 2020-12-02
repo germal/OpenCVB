@@ -37,15 +37,39 @@ End Module
 
 
 
+Public Class Draw_rotatedRectangles
+    Inherits VBparent
+    Public rect As Draw_rectangles
+    Public Sub New()
+        initParent()
+        rect = New Draw_rectangles()
+        Dim rotatedCheck = findCheckBox("Draw Rotated Rectangles")
+        rotatedCheck.Checked = True
+        task.desc = "Draw the requested number of rectangles."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        rect.src = src
+        rect.Run()
+        dst1 = rect.dst1
+    End Sub
+End Class
+
+
+
+
 
 Public Class Draw_rectangles
     Inherits VBparent
     Public updateFrequency = 30
-    Public drawRotatedRectangles As Boolean
     Public Sub New()
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
+
+        check.Setup(caller, 1)
+        check.Box(0).Text = "Draw Rotated Rectangles"
+
         task.desc = "Draw the requested number of rotated rectangles."
     End Sub
     Public Sub Run()
@@ -61,7 +85,7 @@ Public Class Draw_rectangles
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
 
                 Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
-                If drawRotatedRectangles Then
+                If check.Box(0).Checked Then
                     drawRotatedRectangle(rotatedRect, dst1, nextColor)
                 Else
                     cv.Cv2.Rectangle(dst1, New cv.Rect(nPoint.X, nPoint.Y, width, height), nextColor, -1)
@@ -70,6 +94,8 @@ Public Class Draw_rectangles
         End If
     End Sub
 End Class
+
+
 
 
 
@@ -105,22 +131,6 @@ End Class
 
 
 
-Public Class Draw_rotatedRectangles
-    Inherits VBparent
-    Public rect As Draw_rectangles
-    Public Sub New()
-        initParent()
-        rect = New Draw_rectangles()
-        rect.drawRotatedRectangles = True
-        task.desc = "Draw the requested number of rectangles."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        rect.src = src
-        rect.Run()
-        dst1 = rect.dst1
-    End Sub
-End Class
 
 
 
@@ -708,9 +718,9 @@ Public Class Draw_Intersection
         task.desc = "Determine if 2 lines intersect"
     End Sub
     Public Sub Run()
-        If standalone Then If ocvb.frameCount Mod 100 <> 0 Then Exit Sub
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
+            If ocvb.frameCount Mod 100 <> 0 Then Exit Sub
             p1 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
             p2 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
             p3 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)

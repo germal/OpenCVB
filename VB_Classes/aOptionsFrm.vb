@@ -35,11 +35,8 @@ Public Class aOptionsFrm
         Next
         Return Nothing
     End Function
-    Public Sub setParent(frm As Object)
-        If findFormByTitle(frm.text) Is Nothing Then frm.MdiParent = aOptions
-    End Sub
-
     Public Sub addTitle(frm As Object)
+        If findFormByTitle(frm.text) Is Nothing Then frm.MdiParent = aOptions
         frm.show()
         If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
@@ -67,6 +64,7 @@ Public Class aOptionsFrm
                 If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                     Dim frm = findRealForm(title)
                     frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                    Console.WriteLine("title = " + title + " at location " + CStr(indexS))
                     indexS += 1
                 End If
                 If title.EndsWith(" Radio Options") Or title.EndsWith(" CheckBox Options") Then

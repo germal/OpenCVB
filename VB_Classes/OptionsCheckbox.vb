@@ -4,7 +4,6 @@ Public Class OptionsCheckbox
     Public Sub Setup(caller As String, count As Integer)
         ReDim Box(count - 1)
         Me.Text = caller + " CheckBox Options"
-        aOptions.setParent(Me)
         For i = 0 To Box.Count - 1
             Box(i) = New CheckBox
             Box(i).AutoSize = True
