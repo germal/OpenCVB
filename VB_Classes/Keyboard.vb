@@ -9,7 +9,7 @@ Public Class Keyboard_Basics
         initParent()
         checkKeys.Setup(caller)
         flow = New Font_FlowText()
-        label1 = "Keyboard data will flow to algorithm"
+        label1 = "Use the Options form to send in keystrokes"
         task.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run()

@@ -5,7 +5,6 @@ Public Class allOptionsFrm
     Public optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public offset = 30
-    Public layoutOptionsRequested As Boolean
     Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Left = GetSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", ocvb.defaultRect.X - offset)
         Me.Top = GetSetting("OpenCVB", "aOptionsTop", "aOptionsTop", ocvb.defaultRect.Y - offset)
@@ -32,10 +31,8 @@ Public Class allOptionsFrm
         End If
 
         frm.show
-        layoutOptionsRequested = True
     End Sub
     Public Sub layoutOptions()
-        layoutOptionsRequested = False
         Me.Show()
         Application.DoEvents()
         Dim sliderOffset As New cv.Point(0, 0)

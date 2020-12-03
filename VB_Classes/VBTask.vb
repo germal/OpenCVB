@@ -187,7 +187,6 @@ Public Class ActiveTask : Implements IDisposable
                 recordedData.Run()
             End If
             algorithmObject.NextFrame()
-            'If aOptions.layoutOptionsRequested Then aOptions.layoutOptions()
             label1 = ocvb.label1
             label2 = ocvb.label2
             intermediateReview = task.intermediateReview

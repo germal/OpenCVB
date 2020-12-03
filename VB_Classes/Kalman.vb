@@ -105,8 +105,11 @@ Public Class Kalman_Stripped
             ReDim kOutput(kInput.Count - 1)
         End If
 
-        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
-        Dim useKalman = useKalmanCheck.checked
+        Dim useKalman = True
+        If standalone = False Then
+            Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
+            useKalman = useKalmanCheck.checked
+        End If
         If useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
