@@ -169,26 +169,19 @@ Public Class VBparent : Implements IDisposable
         Return Nothing
     End Function
     Public Function findSlider(opt As String) As TrackBar
-        While 1
-            Try
-                For Each frm In Application.OpenForms
-                    If frm.text.endswith(" Slider Options") Then
-                        For j = 0 To frm.trackbar.length - 1
-                            If frm.sLabels(j).text.contains(opt) Then Return frm.trackbar(j)
-                        Next
-                    End If
-                Next
-            Catch ex As Exception
-                Console.WriteLine("findSlider failed.  The application list of forms changed while iterating.  Not critical.")
-            End Try
-            Application.DoEvents()
-            Static retryCount As Integer
-            retryCount += 1
-            If retryCount >= 5 Then
-                MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
-                Exit While
-            End If
-        End While
+        Console.WriteLine("test'")
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" Slider Options") Then
+                    For j = 0 To frm.trackbar.length - 1
+                        If frm.sLabels(j).text.contains(opt) Then Return frm.trackbar(j)
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+            Console.WriteLine("findSlider failed.  The application list of forms changed while iterating.  Not critical.")
+        End Try
+        MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request in '" + vbCrLf + vbCrLf + "'" + caller + "'")
 
         Return Nothing
     End Function

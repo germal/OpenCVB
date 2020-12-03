@@ -985,7 +985,6 @@ Public Class Histogram_SideView2D
     Dim frustrumSlider As Windows.Forms.TrackBar
     Dim cmat As PointCloud_Colorize
     Public frustrumAdjust As Single
-    Dim thresholdSlider As System.Windows.Forms.TrackBar
     Public resizeHistOutput As Boolean = True
     Public Sub New()
         initParent()
@@ -1037,7 +1036,7 @@ Public Class Histogram_SideView2D
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
-        If standalone And ocvb.frameCount = 0 Then thresholdSlider.Value = 1
+        If standalone And ocvb.frameCount = 0 Then histThresholdSlider.Value = 1
         Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
