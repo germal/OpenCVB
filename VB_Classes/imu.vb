@@ -298,8 +298,10 @@ Public Class IMU_HostFrameTimes
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static CPUanchor As Integer = task.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
+
         ' there can be some errant times at startup.
-        If task.CPU_FrameTime > plot.maxScale Or task.CPU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
+        If task.CPU_FrameTime > plot.maxScale Then task.CPU_FrameTime = plot.maxScale
+        If task.CPU_FrameTime < 0 Then task.CPU_FrameTime = 0
 
         Dim maxval = Integer.MinValue
         For i = 0 To hist.Count - 1

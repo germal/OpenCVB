@@ -57,13 +57,13 @@ Public Class aOptionsFrm
             For Each title In optionsTitle
                 If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                     Dim frm = findRealForm(title)
-                    If frm.Visible = False Then Continue For
+                    If frm Is Nothing Then Continue For
                     frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
                     indexS += 1
                 End If
                 If title.EndsWith(" Radio Options") Or title.EndsWith(" CheckBox Options") Then
                     Dim frm = findRealForm(title)
-                    If frm.Visible = False Then Continue For
+                    If frm Is Nothing Then Continue For
                     frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
                     indexO += 1
                 End If
