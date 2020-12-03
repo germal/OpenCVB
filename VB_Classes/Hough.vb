@@ -131,10 +131,6 @@ Public Class Hough_Lines_MT
         edges = New Edges_Basics()
 
         grid = New Thread_Grid()
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 16
-        gridHeightSlider.Value = 16
 
         task.desc = "Multithread Houghlines to find lines in image fragments."
         label1 = "Hough_Lines_MT"
@@ -142,7 +138,14 @@ Public Class Hough_Lines_MT
     End Sub
 
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If ocvb.frameCount = 0 Then
+            Static gridWidthSlider = findSlider("ThreadGrid Width")
+            Static gridHeightSlider = findSlider("ThreadGrid Height")
+            gridWidthSlider.Value = 16
+            gridHeightSlider.Value = 16
+        End If
         grid.Run()
 
         edges.src = src

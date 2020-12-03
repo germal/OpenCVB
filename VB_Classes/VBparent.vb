@@ -169,7 +169,6 @@ Public Class VBparent : Implements IDisposable
         Return Nothing
     End Function
     Public Function findSlider(opt As String) As TrackBar
-        Console.WriteLine("test'")
         Try
             For Each frm In Application.OpenForms
                 If frm.text.endswith(" Slider Options") Then

@@ -10,8 +10,6 @@ Public Class Voronoi_Basics
     Public Sub New()
         initParent()
         random = New Random_Points()
-        Dim countSlider = findSlider("Random Pixel Count")
-        countSlider.Maximum = 100
         label1 = "Ordered list output for Voronoi algorithm"
         task.desc = "Use the ordered list method to find the Voronoi segments"
     End Sub
@@ -26,6 +24,10 @@ Public Class Voronoi_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
+        If ocvb.frameCount = 0 Then
+            Dim countSlider = findSlider("Random Pixel Count")
+            countSlider.Maximum = 100
+        End If
         random.Run()
         inputPoints = New List(Of cv.Point)(random.Points)
 

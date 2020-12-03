@@ -200,8 +200,11 @@ Public Class IMU_FrameTime
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static IMUanchor As Integer = task.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
+
         ' there can be some errant times at startup.
-        If task.IMU_FrameTime > plot.maxScale Or task.IMU_FrameTime < 0 Then Exit Sub ' skip the crazy values.
+        If task.IMU_FrameTime > plot.maxScale Then task.IMU_FrameTime = plot.maxScale
+        If task.IMU_FrameTime < 0 Then task.IMU_FrameTime = 0
+
         Static imuTotalTime As Double
         imuTotalTime += task.IMU_FrameTime
         If imuTotalTime = 0 Then
