@@ -84,8 +84,7 @@ Public Class Kalman_Stripped
     Public kOutput(4 - 1) As Single
     Public Sub New()
         initParent()
-
-        task.desc = "High volume usage only.  Same as Kalman_basics but no stability check or kalman checkbox."
+        task.desc = "High volume usage only.  Same as Kalman_basics but no check boxes."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -499,8 +498,10 @@ Public Class Kalman_Single
         kf.ProcessNoiseCov.SetIdentity(0.00001)
         kf.MeasurementNoiseCov.SetIdentity(0.1)
         kf.ErrorCovPost.SetIdentity(1)
-        plot = New Plot_OverTime()
-        plot.plotCount = 2 ' 2 items to plot
+        If standalone Then
+            plot = New Plot_OverTime()
+            plot.plotCount = 2 ' 2 items to plot
+        End If
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run()

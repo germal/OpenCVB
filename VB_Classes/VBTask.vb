@@ -4,7 +4,7 @@ Imports System.Windows.Forms
 Module Algorithm_Module
     Public ocvb As VBocvb
     Public task As ActiveTask
-    Public aOptions As aOptionsFrm
+    Public aOptions As allOptionsFrm
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public PipeTaskIndex As Integer
@@ -187,7 +187,7 @@ Public Class ActiveTask : Implements IDisposable
                 recordedData.Run()
             End If
             algorithmObject.NextFrame()
-            If aOptions.layoutOptionsRequested Then aOptions.layoutOptions()
+            'If aOptions.layoutOptionsRequested Then aOptions.layoutOptions()
             label1 = ocvb.label1
             label2 = ocvb.label2
             intermediateReview = task.intermediateReview
