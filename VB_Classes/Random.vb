@@ -3,8 +3,8 @@ Imports System.Runtime.InteropServices
 
 Public Class Random_Points
     Inherits VBparent
-    Public Points() As cv.Point
-    Public Points2f() As cv.Point2f
+    Public Points(0) As cv.Point
+    Public Points2f(0) As cv.Point2f
     Public rangeRect As cv.Rect
     Public plotPoints As Boolean = False
     Public countSlider As Windows.Forms.TrackBar
@@ -13,11 +13,10 @@ Public Class Random_Points
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Random Pixel Count", 1, src.Cols * src.Rows, 20)
+            countSlider = sliders.trackbar(0)
+        Else
+            countSlider = findSlider("Random Pixel Count")
         End If
-        countSlider = findSlider("Random Pixel Count")
-
-        ReDim Points(countSlider.Value - 1)
-        ReDim Points2f(countSlider.Value - 1)
 
         rangeRect = New cv.Rect(0, 0, src.Cols, src.Rows)
         task.desc = "Create a uniform random mask with a specificied number of pixels."
