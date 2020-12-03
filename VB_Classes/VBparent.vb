@@ -115,15 +115,6 @@ Public Class VBparent : Implements IDisposable
                         Next
                     End If
                 Next
-
-                'For i = 0 To aOptions.optionsTitle.Count - 1
-                '    If aOptions.optionsTitle(i).EndsWith(" CheckBox Options") Then
-                '        Dim frm = findfrm(aOptions.optionsTitle(i))
-                '        For j = 0 To frm.Box.Length - 1
-                '            If frm.Box(j).Text.Contains(opt) Then Return frm.Box(j)
-                '        Next
-                '    End If
-                'Next
             Catch ex As Exception
                 Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
@@ -147,14 +138,6 @@ Public Class VBparent : Implements IDisposable
                         Next
                     End If
                 Next
-                'For i = 0 To aOptions.optionsTitle.Count - 1
-                '    If aOptions.optionsTitle(i).EndsWith(" Radio Options") Then
-                '        Dim frm = findfrm(aOptions.optionsTitle(i))
-                '        For j = 0 To frm.check.Length - 1
-                '            If frm.check(j).Text.Contains(opt) Then Return frm.check(j)
-                '        Next
-                '    End If
-                'Next
             Catch ex As Exception
                 Console.WriteLine("findRadio failed.  The application list of forms changed while iterating.  Not critical.")
             End Try
@@ -173,7 +156,6 @@ Public Class VBparent : Implements IDisposable
             For i = 0 To aOptions.optionsTitle.Count - 1
                 If aOptions.optionsTitle(i) = title Then
                     aOptions.optionsTitle.RemoveAt(i)
-                    aOptions.optionsForms.RemoveAt(i)
                     Exit For
                 End If
             Next
@@ -181,10 +163,6 @@ Public Class VBparent : Implements IDisposable
         aOptions.hiddenOptions.Add(title)
     End Sub
     Public Function findfrm(title As String) As Object
-        'For i = 0 To aOptions.optionsTitle.Count - 1
-        '    If aOptions.optionsTitle(i) = title Then Return aOptions.optionsForms(i)
-        'Next
-        'Return Nothing
         For Each frm In Application.OpenForms
             If frm.text = title Then Return frm
         Next

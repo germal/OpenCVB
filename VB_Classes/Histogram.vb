@@ -914,9 +914,8 @@ Public Class Histogram_Concentration
         palette = New Palette_Basics()
         sideview = New Histogram_SideView2D()
         topview = New Histogram_TopView2D()
-
-        Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
-        minDepthSlider.Value = 1000
+        'Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
+        'minDepthSlider.Value = 1000
 
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
@@ -995,8 +994,8 @@ Public Class Histogram_SideView2D
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
         sliders.setupTrackBar(1, "sideCameraPoint.x adjustment", -100, 100, 0)
-        frustrumSlider = findSlider("SideView Frustrum adjustment")
-        cameraYSlider = findSlider("sideCameraPoint.x adjustment")
+        frustrumSlider = sliders.trackbar(0)
+        cameraYSlider = sliders.trackbar(1)
 
         ' The specification for each camera spells out the vertical FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
@@ -1018,8 +1017,6 @@ Public Class Histogram_SideView2D
                 cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
         End Select
         gCloud = New Depth_PointCloud_IMU()
-        thresholdSlider = findSlider("Histogram threshold")
-        If standalone Then thresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
@@ -1040,6 +1037,7 @@ Public Class Histogram_SideView2D
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Histogram threshold")
+        If standalone And ocvb.frameCount = 0 Then thresholdSlider.Value = 1
         Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
@@ -1073,8 +1071,8 @@ Public Class Histogram_TopView2D
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
         sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
-        frustrumSlider = findSlider("TopView Frustrum adjustment")
-        cameraXSlider = findSlider("TopCameraPoint.x adjustment")
+        frustrumSlider = sliders.trackbar(0)
+        cameraXSlider = sliders.trackbar(1)
 
         ' The specification for each camera spells out the vertical FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.

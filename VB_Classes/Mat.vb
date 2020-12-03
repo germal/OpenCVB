@@ -236,8 +236,8 @@ Public Class Mat_ImageXYZ_MT
     Public Sub New()
         initParent()
         grid = New Thread_Grid()
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 32
         gridHeightSlider.Value = 32
 
@@ -253,7 +253,7 @@ Public Class Mat_ImageXYZ_MT
         task.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
         Dim depth32f = getDepth32f()
         Parallel.ForEach(Of cv.Rect)(grid.roiList,

@@ -3,7 +3,6 @@ Imports System.ComponentModel
 Imports System.Windows.Forms
 Public Class aOptionsFrm
     Public optionsTitle As New List(Of String)
-    Public optionsForms As New List(Of System.Windows.Forms.Form)
     Public hiddenOptions As New List(Of String)
     Public offset = 30
     Public layoutOptionsRequested As Boolean
@@ -25,16 +24,9 @@ Public Class aOptionsFrm
         Next
         Return Nothing
     End Function
-    Public Function findFormByTitle(title As String) As Object
-        For i = 0 To aOptions.optionsTitle.Count - 1
-            If optionsTitle(i) = title Then Return optionsForms(i)
-        Next
-        Return Nothing
-    End Function
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
-            optionsForms.Add(frm)
         Else
             hiddenOptions.Add(frm.Text)
         End If
@@ -52,10 +44,10 @@ Public Class aOptionsFrm
         For Each title In hiddenOptions
             Dim hideList As New List(Of Form)
             For Each frm In Application.OpenForms
-                If frm.text = title Then hideList.Add(frm)
-            Next
-            For Each frm In hideList
-                frm.Hide()
+                If frm.text = title Then
+                    frm.hide
+                    Exit For
+                End If
             Next
         Next
 
@@ -63,7 +55,6 @@ Public Class aOptionsFrm
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
             For Each title In optionsTitle
-                If hiddenOptions.Contains(title) Then Continue For
                 If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                     Dim frm = findRealForm(title)
                     If frm.Visible = False Then Continue For
