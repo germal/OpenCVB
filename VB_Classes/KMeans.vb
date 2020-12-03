@@ -343,15 +343,17 @@ Public Class kMeans_Color_MT
         sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
 
         grid = New Thread_Grid()
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 128
-        gridHeightSlider.Value = 160
 
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.frameCount = 0 Then
+            Static gridWidthSlider = findSlider("ThreadGrid Width")
+            Static gridHeightSlider = findSlider("ThreadGrid Height")
+            gridWidthSlider.Value = 128
+            gridHeightSlider.Value = 160
+        End If
         grid.Run()
         Dim clusterCount = sliders.trackbar(0).Value
         Dim depth32f = getDepth32f()

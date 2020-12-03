@@ -10,6 +10,7 @@ Public Class KNN_Basics
         initParent()
 
         knnQT = New KNN_QueryTrain()
+        If standalone Then knnQT.useRandomData = True
 
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
@@ -77,7 +78,6 @@ Public Class KNN_QueryTrain
 
         randomTrain = New Random_Points()
         randomQuery = New Random_Points()
-        hideForm("Random_Points Slider Options")
 
         label1 = "Random training points"
         label2 = "Random query points"
