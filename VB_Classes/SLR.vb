@@ -15,9 +15,11 @@ Public Class SLR_Basics
             label1 = "Sample data input"
         End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
-        sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
+            sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
+        End If
         task.desc = "Segmented Linear Regression example"
     End Sub
     Public Sub Run()

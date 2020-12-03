@@ -5,10 +5,12 @@ Public Class WarpPerspective_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Warped Width", 0, src.Cols, src.Cols - 50)
-        sliders.setupTrackBar(1, "Warped Height", 0, src.Rows, src.Rows - 50)
-        sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Warped Width", 0, src.Cols, src.Cols - 50)
+            sliders.setupTrackBar(1, "Warped Height", 0, src.Rows, src.Rows - 50)
+            sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
+        End If
         task.desc = "Use WarpPerspective to transform input images."
     End Sub
     Public Sub Run()

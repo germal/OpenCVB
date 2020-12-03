@@ -6,11 +6,12 @@ Public Class Features_GoodFeatures
     Public goodFeatures As New List(Of cv.Point2f)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of Points", 10, 1000, 200)
-        sliders.setupTrackBar(1, "Quality Level", 1, 100, 1)
-        sliders.setupTrackBar(2, "Distance", 1, 100, 30)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of Points", 10, 1000, 200)
+            sliders.setupTrackBar(1, "Quality Level", 1, 100, 1)
+            sliders.setupTrackBar(2, "Distance", 1, 100, 30)
+        End If
         task.desc = "Find good features to track in an RGB image."
     End Sub
     Public Sub Run()

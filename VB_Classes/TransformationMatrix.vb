@@ -4,8 +4,10 @@ Public Class TransformationMatrix_Basics
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
+        End If
         If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then sliders.trackbar(0).Value = 1 ' need a smaller multiplier...
 
         label1 = "View from above the camera"

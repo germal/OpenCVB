@@ -9,16 +9,19 @@ Public Class KLT_Basics
     Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
-        sliders.setupTrackBar(1, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
-        sliders.setupTrackBar(2, "KLT - minDistance", 1, 100, 7)
-        sliders.setupTrackBar(3, "KLT - BlockSize", 1, 100, 7)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
+            sliders.setupTrackBar(1, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
+            sliders.setupTrackBar(2, "KLT - minDistance", 1, 100, 7)
+            sliders.setupTrackBar(3, "KLT - BlockSize", 1, 100, 7)
+        End If
 
-        check.Setup(caller, 2)
-        check.Box(0).Text = "KLT - Night Mode"
-        check.Box(1).Text = "KLT - delete all Points"
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "KLT - Night Mode"
+            check.Box(1).Text = "KLT - delete all Points"
+        End If
         task.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub Run()

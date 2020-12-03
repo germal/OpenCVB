@@ -3,12 +3,17 @@ Public Class Polylines_IEnumerableExample
     Inherits VBparent
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Polyline closed if checked"
-        check.Box(0).Checked = True
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
-        sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Polyline closed if checked"
+            check.Box(0).Checked = True
+        End If
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
+            sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
+        End If
         task.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
     Public Sub Run()

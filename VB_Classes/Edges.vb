@@ -6,10 +6,12 @@ Public Class Edges_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Canny threshold1", 1, 255, 50)
-        sliders.setupTrackBar(1, "Canny threshold2", 1, 255, 50)
-        sliders.setupTrackBar(2, "Canny Aperture", 3, 7, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Canny threshold1", 1, 255, 50)
+            sliders.setupTrackBar(1, "Canny threshold2", 1, 255, 50)
+            sliders.setupTrackBar(2, "Canny Aperture", 3, 7, 3)
+        End If
 
         task.desc = "Show canny edge detection with varying thresholds"
         label1 = "Canny using L1 Norm"
@@ -73,9 +75,11 @@ Public Class Edges_Laplacian
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
-        sliders.setupTrackBar(1, "Laplacian Kernel", 1, 32, 5)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
+            sliders.setupTrackBar(1, "Laplacian Kernel", 1, 32, 5)
+        End If
         label2 = "Laplacian of Depth Image"
         task.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
@@ -101,8 +105,10 @@ Public Class Edges_Scharr
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
+        End If
         label2 = "x field + y field in CV_32F format"
         task.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
@@ -123,15 +129,18 @@ Public Class Edges_Preserving
     Inherits VBparent
     Public Sub New()
         initParent()
-        radio.Setup(caller, 2)
-        radio.check(0).Text = "Edge RecurseFilter"
-        radio.check(1).Text = "Edge NormconvFilter"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Edge RecurseFilter"
+            radio.check(1).Text = "Edge NormconvFilter"
+            radio.check(0).Checked = True
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Edge Sigma_s", 0, 200, 10)
-        sliders.setupTrackBar(1, "Edge Sigma_r", 1, 100, 40)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Edge Sigma_s", 0, 200, 10)
+            sliders.setupTrackBar(1, "Edge Sigma_r", 1, 100, 40)
+        End If
         label2 = "Edge preserving blur for RGB depth image above"
         task.desc = "OpenCV's edge preserving filter."
     End Sub
@@ -175,8 +184,10 @@ Public Class Edges_RandomForest_CPP
     Dim EdgesPtr As IntPtr
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
+        End If
 
         task.desc = "Detect edges using structured forests - Opencv Contrib"
         ReDim rgbData(src.Total * src.ElemSize - 1)
@@ -244,11 +255,12 @@ Public Class Edges_ResizeAdd
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Border Vertical in Pixels", 1, 20, 5)
-        sliders.setupTrackBar(1, "Border Horizontal in Pixels", 1, 20, 5)
-        sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Border Vertical in Pixels", 1, 20, 5)
+            sliders.setupTrackBar(1, "Border Horizontal in Pixels", 1, 20, 5)
+            sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
+        End If
         task.desc = "Find edges using a resize, subtract, and threshold."
         label1 = "Edges found with just resizing"
         label2 = "Found edges added to grayscale image source."
@@ -272,9 +284,11 @@ Public Class Edges_DCTfrequency
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 32)
-        sliders.setupTrackBar(1, "Threshold after Removal", 1, 255, 20)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 32)
+            sliders.setupTrackBar(1, "Threshold after Removal", 1, 255, 20)
+        End If
 
         label2 = "Mask for the isolated frequencies"
         task.desc = "Find edges by removing all the highest frequencies."
@@ -323,9 +337,11 @@ Public Class Edges_Deriche_CPP
     Dim Edges_Deriche As IntPtr
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Deriche Alpha", 1, 400, 100)
-        sliders.setupTrackBar(1, "Deriche Omega", 1, 1000, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Deriche Alpha", 1, 400, 100)
+            sliders.setupTrackBar(1, "Deriche Omega", 1, 1000, 100)
+        End If
         Edges_Deriche = Edges_Deriche_Open()
         label2 = "Image enhanced with Deriche results"
         task.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
@@ -365,8 +381,10 @@ Public Class Edges_Sobel
     Public grayY As cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
+        End If
         task.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run()

@@ -382,8 +382,10 @@ Public Class PointCloud_Objects
         ocvb.imuZAxis = False
 
         If standalone Then
-            sliders.Setup(caller, 1)
-            sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
+            If findfrm(caller + " Slider Options") Is Nothing Then
+                sliders.Setup(caller, 1)
+                sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
+            End If
         End If
         task.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
@@ -1200,10 +1202,12 @@ Public Class PointCloud_GVectorPlane
         inrange = New Depth_InRange()
         gLine = New PointCloud_GVectorLine()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Cushion when estimating the floor or ceiling plane (mm)", 1, 1000, 100)
-        sliders.setupTrackBar(1, "Y-coordinate consistency check count", 1, 100, 5)
-        sliders.setupTrackBar(2, "Y-coordinate up/down adjustment (mm)", -4000, 4000, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Cushion when estimating the floor or ceiling plane (mm)", 1, 1000, 100)
+            sliders.setupTrackBar(1, "Y-coordinate consistency check count", 1, 100, 5)
+            sliders.setupTrackBar(2, "Y-coordinate up/down adjustment (mm)", -4000, 4000, 0)
+        End If
 
         label1 = "Plane equation input"
         label2 = "Side view rotated with gravity vector"
@@ -1285,9 +1289,11 @@ Public Class PointCloud_GVectorLine
 
         kalman = New Kalman_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 40)
-        sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 20)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 40)
+            sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 20)
+        End If
 
         task.desc = "Find the floor in a side view squared up with gravity"
     End Sub

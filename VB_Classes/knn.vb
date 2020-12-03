@@ -66,14 +66,18 @@ Public Class KNN_QueryTrain
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
-        sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
-        sliders.setupTrackBar(2, "KNN k nearest points", 1, 5, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
+            sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
+            sliders.setupTrackBar(2, "KNN k nearest points", 1, 5, 1)
+        End If
 
         If standalone Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Reuse the training and query data"
+            If findfrm(caller + " CheckBox Options") Is Nothing Then
+                check.Setup(caller, 1)
+                check.Box(0).Text = "Reuse the training and query data"
+            End If
         End If
 
         randomTrain = New Random_Points()
@@ -218,13 +222,15 @@ Public Class KNN_Emax
             emax.Run() ' set the first generation of points.
         End If
 
-        check.Setup(caller, 3)
-        check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
-        check.Box(1).Text = "Display queries"
-        check.Box(2).Text = "Display training input and connecting line"
-        check.Box(0).Checked = True
-        check.Box(1).Checked = True
-        check.Box(2).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
+            check.Box(1).Text = "Display queries"
+            check.Box(2).Text = "Display training input and connecting line"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+            check.Box(2).Checked = True
+        End If
 
         knn = New KNN_1_to_1()
         knn.basics.knnQT.useRandomData = False
@@ -273,8 +279,10 @@ Public Class KNN_Test
         knn = New KNN_Basics()
         knn.testMode = True
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Show grid mask"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show grid mask"
+        End If
 
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
@@ -317,9 +325,10 @@ Public Class KNN_Test_1_to_1
 
         knn = New KNN_1_to_1()
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Show grid mask"
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show grid mask"
+        End If
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run()
@@ -354,10 +363,11 @@ Public Class KNN_Point3d
     Public findXnearest As Integer
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
-        sliders.setupTrackBar(1, "knn k nearest points", 0, 500, 1)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
+            sliders.setupTrackBar(1, "knn k nearest points", 0, 500, 1)
+        End If
         task.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
@@ -507,8 +517,10 @@ Public Class KNN_SmoothAverage
         Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         drawCheckbox.Checked = False
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Weight X100", 0, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Weight X100", 0, 100, 50)
+        End If
 
         label1 = "AddWeight result of current and previous frame"
         label2 = "Mask for difference between current and last frame"
@@ -638,11 +650,15 @@ Public Class KNN_Cluster2DCities
         initParent()
         knn = New KNN_Point2d()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "KNN - number of points", 10, 1000, 100)
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Demo Mode (continuous update)"
-        check.Box(0).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "KNN - number of points", 10, 1000, 100)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Demo Mode (continuous update)"
+            check.Box(0).Checked = True
+        End If
 
         label1 = ""
         task.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."

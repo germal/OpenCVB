@@ -23,12 +23,16 @@ Public Class Retina_Basics_CPP
     Dim srcData(0) As Byte
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
+        End If
 
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Use log sampling"
-        check.Box(1).Text = "Open resulting xml file"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Use log sampling"
+            check.Box(1).Text = "Open resulting xml file"
+        End If
 
         label1 = "Retina Parvo"
         label2 = "Retina Magno"

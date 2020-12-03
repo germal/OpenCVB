@@ -13,13 +13,17 @@ Public Class Surf_Basics_CS
         initParent()
         fisheye = New FishEye_Rectified()
 
-        radio.Setup(caller, 2)
-        radio.check(0).Text = "Use BF Matcher"
-        radio.check(1).Text = "Use Flann Matcher"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Use BF Matcher"
+            radio.check(1).Text = "Use Flann Matcher"
+            radio.check(0).Checked = True
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
+        End If
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
@@ -77,9 +81,10 @@ Public Class Surf_DrawMatchManual_CS
         surf = New Surf_Basics_CS()
         surf.CS_SurfBasics.drawPoints = False
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
+        End If
         task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run()

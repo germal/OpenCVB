@@ -6,9 +6,10 @@ Public Class ORB_Basics
     Dim orb As cv.ORB
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
+        End If
         task.desc = "Find keypoints using ORB"
     End Sub
     Public Sub Run()

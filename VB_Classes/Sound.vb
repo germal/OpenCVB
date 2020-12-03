@@ -117,24 +117,29 @@ Public Class Sound_SignalGenerator
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 5)
-        sliders.setupTrackBar(0, "Sine Wave Frequency", 10, 4000, 1000)
-        sliders.setupTrackBar(1, "Decibels", -100, 0, -20)
-        sliders.setupTrackBar(2, "Sweep Only - End Frequency", 20, 4000, 1000)
-        sliders.setupTrackBar(3, "Sweep Only - duration secs", 0, 10, 1)
-        sliders.setupTrackBar(4, "Retain Data for x seconds", 1, 100, 2)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 5)
+            sliders.setupTrackBar(0, "Sine Wave Frequency", 10, 4000, 1000)
+            sliders.setupTrackBar(1, "Decibels", -100, 0, -20)
+            sliders.setupTrackBar(2, "Sweep Only - End Frequency", 20, 4000, 1000)
+            sliders.setupTrackBar(3, "Sweep Only - duration secs", 0, 10, 1)
+            sliders.setupTrackBar(4, "Retain Data for x seconds", 1, 100, 2)
+        End If
 
-        radio.Setup(caller, 7)
-        Static frm = findfrm("Sound_SignalGenerator Radio Options")
-        For i = 0 To frm.check.length - 1
-            frm.check(i).Text = Choose(i + 1, "Pink", "White", "Sweep", "Sin", "Square", "Triangle", "SawTooth")
-        Next
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 7)
+            Static frm = findfrm("Sound_SignalGenerator Radio Options")
+            For i = 0 To frm.check.length - 1
+                frm.check(i).Text = Choose(i + 1, "Pink", "White", "Sweep", "Sin", "Square", "Triangle", "SawTooth")
+            Next
+            radio.check(0).Checked = True
+        End If
 
-        check.Setup(caller, 2)
-        check.Box(0).Text = "PhaseReverse Left"
-        check.Box(1).Text = "PhaseReverse Right"
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "PhaseReverse Left"
+            check.Box(1).Text = "PhaseReverse Right"
+        End If
         player = New WaveOut
         player.Init(wGen)
 
@@ -199,16 +204,20 @@ Public Class Sound_Display
     Public Sub New()
         initParent()
 
-        radio.Setup(caller, 4)
-        radio.check(0).Text = "Max Absolute Value"
-        radio.check(1).Text = "Max RMS Value"
-        radio.check(2).Text = "Sampled Peaks"
-        radio.check(3).Text = "Scaled Average"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "Max Absolute Value"
+            radio.check(1).Text = "Max RMS Value"
+            radio.check(2).Text = "Sampled Peaks"
+            radio.check(3).Text = "Scaled Average"
+            radio.check(0).Checked = True
+        End If
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Use generated sound (unchecked will use latest audio file)"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Use generated sound (unchecked will use latest audio file)"
+            check.Box(0).Checked = True
+        End If
 
         label2 = "Black shows approximately what is currently playing"
         task.desc = "Display a sound buffer in several styles"

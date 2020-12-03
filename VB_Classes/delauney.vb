@@ -200,8 +200,10 @@ Public Class Delauney_Coverage
         initParent()
         delauney = New Delauney_Subdiv2D()
         delauney.updateFrequency = 1
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
+        End If
         label1 = "Coverage of space"
         task.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub

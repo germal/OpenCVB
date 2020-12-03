@@ -5,10 +5,12 @@ Public Class Corners_Harris
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
+            sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
+            sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
+        End If
         task.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
@@ -63,8 +65,10 @@ Public Class Corners_SubPix
     Public Sub New()
         initParent()
         good = New Features_GoodFeatures()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)
+        End If
         label1 = "Output of GoodFeatures"
         task.desc = "Use PreCornerDetect to find features in the image."
     End Sub
@@ -96,9 +100,10 @@ Public Class Corners_PreCornerDetect
     Public Sub New()
         initParent()
         median = New Math_Median_CDF()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
+        End If
         task.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run()
@@ -134,11 +139,13 @@ Public Class Corners_ShiTomasi_CPP
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
-        sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
-        sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
-        sliders.setupTrackBar(3, "Corner normalize alpha", 1, 255, 127)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
+            sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
+            sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
+            sliders.setupTrackBar(3, "Corner normalize alpha", 1, 255, 127)
+        End If
         task.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub

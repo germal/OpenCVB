@@ -28,8 +28,10 @@ Public Class Hull_Basics
     Public hull() As cv.Point
         Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Hull random points", 1, 20, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Hull random points", 1, 20, 10)
+        End If
 
         task.desc = "Surround a set of random points with a convex hull"
         label1 = "Convex Hull Output"

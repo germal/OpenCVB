@@ -52,16 +52,19 @@ Public Class FLANN_Basics
         initParent()
         random = New Random_Points()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Query count", 1, 100, 1)
-        sliders.setupTrackBar(1, "Match count", 1, 100, 1)
-        sliders.setupTrackBar(2, "Search check count", 1, 1000, 1)
-        sliders.setupTrackBar(3, "EPS X100", 0, 100, 0)
-
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Search params sorted"
-        check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
-        check.Box(1).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Query count", 1, 100, 1)
+            sliders.setupTrackBar(1, "Match count", 1, 100, 1)
+            sliders.setupTrackBar(2, "Search check count", 1, 1000, 1)
+            sliders.setupTrackBar(3, "EPS X100", 0, 100, 0)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Search params sorted"
+            check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
+            check.Box(1).Checked = True
+        End If
 
         task.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
         label1 = "Red is query, Nearest points blue"

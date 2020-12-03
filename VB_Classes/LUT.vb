@@ -5,11 +5,14 @@ Public Class LUT_Gray
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
-        sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
-        sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
-        sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
+            sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
+            sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
+            sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
+        End If
+
         task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run()
@@ -66,8 +69,10 @@ Public Class LUT_Color
     Dim colorMat As cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
+        End If
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors) ' Create a new color palette here.
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub

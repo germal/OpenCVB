@@ -4,8 +4,11 @@ Public Class PCA_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
+        End If
+
         task.desc = "Reconstruct a video stream as a composite of X images."
     End Sub
     Public Sub Run()

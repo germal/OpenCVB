@@ -80,11 +80,12 @@ Public Class DNN_Basics
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "DNN Scale Factor", 1, 10000, 78)
-        sliders.setupTrackBar(1, "DNN MeanVal", 1, 255, 127)
-        sliders.setupTrackBar(2, "DNN Confidence Threshold", 1, 100, 80)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "DNN Scale Factor", 1, 10000, 78)
+            sliders.setupTrackBar(1, "DNN MeanVal", 1, 255, 127)
+            sliders.setupTrackBar(2, "DNN Confidence Threshold", 1, 100, 80)
+        End If
         For i = 0 To kalman.Count - 1
             kalman(i) = New Kalman_Basics()
             ReDim kalman(i).kInput(4 - 1)

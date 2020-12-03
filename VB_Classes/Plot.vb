@@ -106,13 +106,17 @@ Public Class Plot_OverTime
     Dim myStopWatch As Stopwatch
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Reset the plot scale"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Reset the plot scale"
+            check.Box(0).Checked = True
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
-        sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
+            sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
+        End If
         task.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub

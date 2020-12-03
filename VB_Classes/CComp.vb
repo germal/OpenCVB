@@ -13,15 +13,18 @@ Public Class CComp_Basics
     Public Sub New()
         initParent()
         mats = New Mat_4to1()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-        sliders.setupTrackBar(1, "CComp Max Area", 0, src.Width * src.Height / 2, src.Width * src.Height / 4)
-        sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
-
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Use OTSU to binarize the image"
-        check.Box(1).Text = "Input to CComp is above CComp threshold"
-        check.Box(0).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
+            sliders.setupTrackBar(1, "CComp Max Area", 0, src.Width * src.Height / 2, src.Width * src.Height / 4)
+            sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Use OTSU to binarize the image"
+            check.Box(1).Text = "Input to CComp is above CComp threshold"
+            check.Box(0).Checked = True
+        End If
 
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
@@ -221,8 +224,10 @@ Public Class CComp_MaxBlobs
         Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
         checkOTSU.Checked = False ' turn off OTSU so the slider works...
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Reassess the best CComp threshold"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Reassess the best CComp threshold"
+        End If
 
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
@@ -325,9 +330,11 @@ Public Class CComp_DepthEdges
         ccomp = New CComp_PointTracker()
         depth = New Depth_Edges()
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Use edge mask in connected components"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Use edge mask in connected components"
+            check.Box(0).Checked = True
+        End If
 
         task.desc = "Use depth edges to isolate connected components in depth"
     End Sub
@@ -381,9 +388,10 @@ Public Class CComp_ColorDepth
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 1)
+            sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
+        End If
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
         task.desc = "Color connected components based on their depth"
@@ -473,10 +481,11 @@ Public Class CComp_InRange
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
-        sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
+            sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
+        End If
         task.desc = "Connect components in specific ranges"
     End Sub
     Public Sub Run()

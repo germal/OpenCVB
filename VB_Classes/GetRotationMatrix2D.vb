@@ -1,15 +1,18 @@
 Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons( caller As String, radio As OptionsRadioButtons, radioName As String)
-        radio.Setup(caller, 7)
-        radio.check(0).Text = radioName + " with Area"
-        radio.check(1).Text = radioName + " with Cubic flag"
-        radio.check(2).Text = radioName + " with Lanczos4"
-        radio.check(3).Text = radioName + " with Linear"
-        radio.check(4).Text = radioName + " with Nearest"
-        radio.check(5).Text = radioName + " with WarpFillOutliers"
-        radio.check(6).Text = radioName + " with WarpInverseMap"
-        radio.check(3).Checked = True
+    Public Sub SetInterpolationRadioButtons(caller As String, radio As OptionsRadioButtons, radioName As String)
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 7)
+            radio.check(0).Text = radioName + " with Area"
+            radio.check(1).Text = radioName + " with Cubic flag"
+            radio.check(2).Text = radioName + " with Lanczos4"
+            radio.check(3).Text = radioName + " with Linear"
+            radio.check(4).Text = radioName + " with Nearest"
+            radio.check(5).Text = radioName + " with WarpFillOutliers"
+            radio.check(6).Text = radioName + " with WarpInverseMap"
+            radio.check(3).Checked = True
+        End If
     End Sub
     Public Function getInterpolationRadioButtons(radio As OptionsRadioButtons, frm As Object) As cv.InterpolationFlags
         Dim warpFlag As cv.InterpolationFlags
@@ -21,6 +24,12 @@ Module GetRotationMatrix
             End If
         Next
         Return warpFlag
+    End Function
+    Public Function findfrm(title As String) As Object
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
+        Next
+        Return Nothing
     End Function
 End Module
 
@@ -37,8 +46,10 @@ Public Class GetRotationMatrix2D_Basics
     Public warpFlag As integer
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
+        End If
         SetInterpolationRadioButtons(caller, radio, "Rotation2D")
 
         task.desc = "Rotate a rectangle of a specified angle"

@@ -43,8 +43,10 @@ Public Class Resize_Percentage
         initParent()
         resizeOptions = New Resize_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
+        End If
 
         task.desc = "Resize by a percentage of the image."
     End Sub

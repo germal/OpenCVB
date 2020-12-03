@@ -9,17 +9,20 @@ Public Class GeneticDrawing_Options
     Public stageTotal = 100
     Public Sub New()
         initParent()
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
-        check.Box(1).Text = "Restart the algorithm with the current settings"
-        check.Box(1).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
+            check.Box(1).Text = "Restart the algorithm with the current settings"
+            check.Box(1).Checked = True
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of Generations", 1, 200, 20)
-        sliders.setupTrackBar(1, "Number of Stages", 1, 2000, stageTotal)
-        sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 20, 10)
-        sliders.setupTrackBar(3, "Brush size Percentage", 5, 100, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of Generations", 1, 200, 20)
+            sliders.setupTrackBar(1, "Number of Stages", 1, 2000, stageTotal)
+            sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 20, 10)
+            sliders.setupTrackBar(3, "Brush size Percentage", 5, 100, 100)
+        End If
         task.desc = "Display all the options available to genetic drawing algorithms."
     End Sub
     Public Sub Run()

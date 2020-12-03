@@ -10,10 +10,11 @@ Public Class Fitline_Basics
         draw.sliders.trackbar(0).Value = 2
         hideForm("Draw_Line Slider Options")
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
-        sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
+            sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
+        End If
         task.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run()
@@ -118,17 +119,19 @@ Public Class Fitline_RawInput
     Public bb As Single
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Random point count", 0, 500, 100)
-        sliders.setupTrackBar(1, "Line Point Count", 0, 500, 20)
-        sliders.setupTrackBar(2, "Line Noise", 1, 100, 10)
-
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Highlight Line Data"
-        check.Box(1).Text = "Recompute with new random data"
-        check.Box(0).Checked = True
-        check.Box(1).Checked = True
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Random point count", 0, 500, 100)
+            sliders.setupTrackBar(1, "Line Point Count", 0, 500, 20)
+            sliders.setupTrackBar(2, "Line Noise", 1, 100, 10)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Highlight Line Data"
+            check.Box(1).Text = "Recompute with new random data"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
         task.desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Sub Run()

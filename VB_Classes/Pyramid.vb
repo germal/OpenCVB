@@ -4,8 +4,10 @@ Public Class Pyramid_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
+        End If
         task.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run()

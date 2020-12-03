@@ -26,10 +26,12 @@ Public Class Thread_Grid
     Public Sub New()
         initParent()
         src = task.color
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
-        sliders.setupTrackBar(1, "ThreadGrid Height", 2, src.Height, 32)
-        sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
+            sliders.setupTrackBar(1, "ThreadGrid Height", 2, src.Height, 32)
+            sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)
+        End If
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)

@@ -130,18 +130,21 @@ Public Class DFT_ButterworthFilter_MT
     Public dft As DFT_Basics
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, src.Rows, src.Rows)
-        sliders.setupTrackBar(1, "DFT B Filter - Order", 1, src.Rows, 2)
-
-        radio.Setup(caller, 6)
-        radio.check(0).Text = "DFT Flags ComplexOutput"
-        radio.check(1).Text = "DFT Flags Inverse"
-        radio.check(2).Text = "DFT Flags None"
-        radio.check(3).Text = "DFT Flags RealOutput"
-        radio.check(4).Text = "DFT Flags Rows"
-        radio.check(5).Text = "DFT Flags Scale"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, src.Rows, src.Rows)
+            sliders.setupTrackBar(1, "DFT B Filter - Order", 1, src.Rows, 2)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 6)
+            radio.check(0).Text = "DFT Flags ComplexOutput"
+            radio.check(1).Text = "DFT Flags Inverse"
+            radio.check(2).Text = "DFT Flags None"
+            radio.check(3).Text = "DFT Flags RealOutput"
+            radio.check(4).Text = "DFT Flags Rows"
+            radio.check(5).Text = "DFT Flags Scale"
+            radio.check(0).Checked = True
+        End If
 
         dft = New DFT_Basics()
         task.desc = "Use the Butterworth filter on a DFT image - color image input."

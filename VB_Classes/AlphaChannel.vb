@@ -41,8 +41,10 @@ Public Class AlphaChannel_Blend
 
         fg = New Depth_InRange()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)
+        End If
 
         task.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub

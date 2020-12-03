@@ -7,10 +7,11 @@ Public Class GrabCut_Basics
         initParent()
         contours = New Contours_Depth()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
-        sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
+            sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
+        End If
         task.desc = "Use grabcut to isolate what is in the foreground and background.  "
     End Sub
     Public Sub Run()

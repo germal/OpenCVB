@@ -3,8 +3,10 @@ Public Class LeftRightView_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "brightness", 0, 255, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "brightness", 0, 255, 100)
+        End If
         task.desc = "Show the left and right views from the 3D Camera"
         Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
@@ -38,10 +40,12 @@ Public Class LeftRightView_CompareUndistorted
         initParent()
         fisheye = New FishEye_Rectified()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "brightness", 0, 255, 0)
-        sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "brightness", 0, 255, 0)
+            sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
+            sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
+        End If
 
         Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.D435i, VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
@@ -81,10 +85,13 @@ Public Class LeftRightView_CompareRaw
     Dim lrView As LeftRightView_Basics
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "brightness", 0, 255, 100)
-        sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
-        sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "brightness", 0, 255, 100)
+            sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
+            sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
+        End If
+
         Select Case ocvb.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.D435i, VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2,
                 label1 = "Left Image"

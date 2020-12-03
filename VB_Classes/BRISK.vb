@@ -5,8 +5,10 @@ Public Class BRISK_Basics
     Public features As New List(Of cv.Point2f)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
+        End If
         task.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub

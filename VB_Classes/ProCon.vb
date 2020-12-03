@@ -18,10 +18,12 @@ Public Class ProCon_Basics
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Buffer Size", 1, 100, buffer.Length)
-        sliders.setupTrackBar(1, "Producer Workload Duration (ms)", 1, 1000, 100)
-        sliders.setupTrackBar(2, "Consumer Workload Duration (ms)", 1, 1000, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Buffer Size", 1, 100, buffer.Length)
+            sliders.setupTrackBar(1, "Producer Workload Duration (ms)", 1, 1000, 100)
+            sliders.setupTrackBar(2, "Consumer Workload Duration (ms)", 1, 1000, 10)
+        End If
         pduration = sliders.trackbar(1).Value
         cduration = sliders.trackbar(2).Value
 

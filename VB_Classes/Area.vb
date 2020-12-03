@@ -21,9 +21,11 @@ Public Class Area_MinTriangle_CPP
     End Sub
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
-        sliders.setupTrackBar(1, "Area size", 10, 300, 200)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
+            sliders.setupTrackBar(1, "Area size", 10, 300, 200)
+        End If
         setup()
         task.desc = "Find minimum containing triangle for a set of points."
     End Sub
@@ -73,9 +75,11 @@ Public Class Area_MinRect
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
-        sliders.setupTrackBar(1, "Area size", 10, 300, 200)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
+            sliders.setupTrackBar(1, "Area size", 10, 300, 200)
+        End If
 
         setup(sliders.trackbar(0).Value)
 

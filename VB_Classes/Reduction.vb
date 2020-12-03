@@ -3,14 +3,18 @@ Public Class Reduction_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Reduction factor", 0, 4000, 64)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Reduction factor", 0, 4000, 64)
+        End If
 
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "Use bitwise reduction"
-        radio.check(1).Text = "Use simple reduction"
-        radio.check(2).Text = "No reduction"
-        radio.check(1).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Use bitwise reduction"
+            radio.check(1).Text = "Use simple reduction"
+            radio.check(2).Text = "No reduction"
+            radio.check(1).Checked = True
+        End If
 
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub

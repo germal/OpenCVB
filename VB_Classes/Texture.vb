@@ -62,10 +62,12 @@ Public Class Texture_Flow
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
-        sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
-        sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
+            sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
+            sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
+        End If
 
         task.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
     End Sub

@@ -46,11 +46,12 @@ Public Class Clone_ColorChange
         initParent()
         clone = New Clone_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Color Change - Red", 5, 25, 15)
-        sliders.setupTrackBar(1, "Color Change - Green", 5, 25, 5)
-        sliders.setupTrackBar(2, "Color Change - Blue", 5, 25, 5)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Color Change - Red", 5, 25, 15)
+            sliders.setupTrackBar(1, "Color Change - Green", 5, 25, 5)
+            sliders.setupTrackBar(2, "Color Change - Blue", 5, 25, 5)
+        End If
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
@@ -75,10 +76,11 @@ Public Class Clone_IlluminationChange
         initParent()
         clone = New Clone_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
-        sliders.setupTrackBar(1, "Beta", 0, 20, 2)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
+            sliders.setupTrackBar(1, "Beta", 0, 20, 2)
+        End If
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
@@ -104,10 +106,11 @@ Public Class Clone_TextureFlattening
         initParent()
         clone = New Clone_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)
-        sliders.setupTrackBar(1, "High Threshold", 0, 100, 50)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)
+            sliders.setupTrackBar(1, "High Threshold", 0, 100, 50)
+        End If
         label1 = "Draw anywhere to select different clone region"
         label2 = "mask used for clone"
         task.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
@@ -139,12 +142,13 @@ Public Class Clone_Eagle
     Dim pt As cv.Point
     Public Sub New()
         initParent()
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "Seamless - Mixed Clone"
-        radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
-        radio.check(2).Text = "Seamless - Normal Clone"
-        radio.check(2).Checked = True
-
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Seamless - Mixed Clone"
+            radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
+            radio.check(2).Text = "Seamless - Normal Clone"
+            radio.check(2).Checked = True
+        End If
         sourceImage = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/CloneSource.png")
         sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * src.Width / 1280, sourceImage.Height * src.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
@@ -193,11 +197,14 @@ Public Class Clone_Seamless
     Inherits VBparent
     Public Sub New()
         initParent()
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "Seamless Normal Clone"
-        radio.check(1).Text = "Seamless Mono Clone"
-        radio.check(2).Text = "Seamless Mixed Clone"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Seamless Normal Clone"
+            radio.check(1).Text = "Seamless Mono Clone"
+            radio.check(2).Text = "Seamless Mixed Clone"
+            radio.check(0).Checked = True
+        End If
+
         label1 = "Results for SeamlessClone"
         label2 = "Mask for Clone"
         task.desc = "Use the seamlessclone API to merge color and depth..."

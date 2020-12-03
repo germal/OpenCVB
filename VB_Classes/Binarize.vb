@@ -96,12 +96,13 @@ Public Class Binarize_Niblack_Sauvola
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
-        sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+            sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
+            sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
+            sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
+        End If
         task.desc = "Binarize an image using Niblack and Sauvola"
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
@@ -127,11 +128,12 @@ Public Class Binarize_Niblack_Nick
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
-        sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+            sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
+            sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
+        End If
         task.desc = "Binarize an image using Niblack and Nick"
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
@@ -157,11 +159,12 @@ Public Class Binarize_Bernson
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
-        sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+            sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
+            sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
+        End If
         label1 = "Binarize Bernson (Draw Enabled)"
 
         task.drawRect = New cv.Rect(100, 100, 100, 100)
@@ -197,11 +200,12 @@ Public Class Binarize_Bernson_MT
         gridWidthSlider.Value = 32
         gridHeightSlider.Value = 32
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
-        sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
-        sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
+            sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
+            sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
+        End If
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub

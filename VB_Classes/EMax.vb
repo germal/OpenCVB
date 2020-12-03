@@ -12,13 +12,17 @@ Public Class EMax_Basics
     Public gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Show EMax input in output"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show EMax input in output"
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "EMax Number of Samples", 1, 200, 100)
-        sliders.setupTrackBar(1, "EMax Prediction Step Size", 1, 20, 5)
-        sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "EMax Number of Samples", 1, 200, 100)
+            sliders.setupTrackBar(1, "EMax Prediction Step Size", 1, 20, 5)
+            sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
+        End If
 
         grid = New Thread_Grid()
         gridWidthSlider = findSlider("ThreadGrid Width")
@@ -26,11 +30,13 @@ Public Class EMax_Basics
         gridWidthSlider.Value = src.Width / 2
         gridHeightSlider.Value = src.Height / 2
 
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "EMax matrix type Spherical"
-        radio.check(1).Text = "EMax matrix type Diagonal"
-        radio.check(2).Text = "EMax matrix type Generic"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "EMax matrix type Spherical"
+            radio.check(1).Text = "EMax matrix type Diagonal"
+            radio.check(2).Text = "EMax matrix type Generic"
+            radio.check(0).Checked = True
+        End If
 
         task.desc = "OpenCV expectation maximization example."
     End Sub

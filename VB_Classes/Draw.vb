@@ -64,11 +64,14 @@ Public Class Draw_rectangles
     Public updateFrequency = 30
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
-
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Draw Rotated Rectangles"
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Draw Rotated Rectangles"
+        End If
 
         task.desc = "Draw the requested number of rotated rectangles."
     End Sub
@@ -106,9 +109,11 @@ Public Class Draw_Noise
     Public noiseMask As cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
-        sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
+            sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
+        End If
         task.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run()
@@ -139,8 +144,10 @@ Public Class Draw_Ellipses
     Public updateFrequency = 30
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
+        End If
         task.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run()
@@ -165,8 +172,10 @@ Public Class Draw_Circles
     Public updateFrequency = 30
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
+        End If
         task.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run()
@@ -190,8 +199,10 @@ Public Class Draw_Line
     Public updateFrequency = 30
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
+        End If
         task.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run()
@@ -214,15 +225,19 @@ Public Class Draw_Polygon
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
+        End If
         task.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
 
-        radio.Setup(caller, 2) ' ask for 2 radio buttons
-        radio.check(0).Text = "Polygon Outline"
-        radio.check(1).Text = "Polygon Filled"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Polygon Outline"
+            radio.check(1).Text = "Polygon Filled"
+            radio.check(0).Checked = True
+        End If
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -313,19 +328,22 @@ Public Class Draw_SymmetricalShapes
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
-        sliders.setupTrackBar(1, "Radius 1", 1, src.Rows / 2, src.Rows / 4)
-        sliders.setupTrackBar(2, "Radius 2", 1, src.Rows / 2, src.Rows / 8)
-        sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
-
-        check.Setup(caller, 5)
-        check.Box(0).Text = "Symmetric Ripple"
-        check.Box(1).Text = "Only Regular Shapes"
-        check.Box(2).Text = "Filled Shapes"
-        check.Box(3).Text = "Reverse In/Out"
-        check.Box(4).Text = "Use demo mode"
-        check.Box(4).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
+            sliders.setupTrackBar(1, "Radius 1", 1, src.Rows / 2, src.Rows / 4)
+            sliders.setupTrackBar(2, "Radius 2", 1, src.Rows / 2, src.Rows / 8)
+            sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 5)
+            check.Box(0).Text = "Symmetric Ripple"
+            check.Box(1).Text = "Only Regular Shapes"
+            check.Box(2).Text = "Filled Shapes"
+            check.Box(3).Text = "Reverse In/Out"
+            check.Box(4).Text = "Use demo mode"
+            check.Box(4).Checked = True
+        End If
         task.desc = "Generate shapes programmatically"
     End Sub
     Public Sub Run()
@@ -415,13 +433,17 @@ Public Class Draw_Arc
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(7 - 1)
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, src.Width / 8, src.Width / 16)
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "Draw Full Ellipse"
-        radio.check(1).Text = "Draw Filled Arc"
-        radio.check(2).Text = "Draw Arc"
-        radio.check(1).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, src.Width / 8, src.Width / 16)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Draw Full Ellipse"
+            radio.check(1).Text = "Draw Filled Arc"
+            radio.check(2).Text = "Draw Arc"
+            radio.check(1).Checked = True
+        End If
 
         setup()
 
@@ -571,10 +593,11 @@ Public Class Draw_ViewObjects
         initParent()
 
         palette = New Palette_Basics()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Draw rectangle and centroid for each mask"
-        check.Box(0).Checked = True
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Draw rectangle and centroid for each mask"
+            check.Box(0).Checked = True
+        End If
         task.desc = "Draw rectangles and centroids"
     End Sub
     Public Sub Run()

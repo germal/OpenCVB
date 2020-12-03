@@ -3,10 +3,12 @@ Public Class Sharpen_UnsharpMask
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
-        sliders.setupTrackBar(1, "threshold", 0, 255, 5)
-        sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
+            sliders.setupTrackBar(1, "threshold", 0, 255, 5)
+            sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
+        End If
         task.desc = "Sharpen an image - Painterly Effect"
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
@@ -33,9 +35,11 @@ Public Class Sharpen_DetailEnhance
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar(1, "DetailEnhance Sigma_r", 1, 100, 7)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
+            sliders.setupTrackBar(1, "DetailEnhance Sigma_r", 1, 100, 7)
+        End If
         task.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
     Public Sub Run()
@@ -54,9 +58,11 @@ Public Class Sharpen_Stylize
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar(1, "Stylize Sigma_r", 1, 100, 7)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
+            sliders.setupTrackBar(1, "Stylize Sigma_r", 1, 100, 7)
+        End If
         task.desc = "Stylize an image - Painterly Effect"
     End Sub
     Public Sub Run()

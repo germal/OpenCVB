@@ -4,8 +4,10 @@ Public Class Blur_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
+        End If
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run()
@@ -215,11 +217,12 @@ Public Class Blur_TopoMap
 
         gradient = New Gradient_CartToPolar()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Percent of Blurring", 0, 100, 20)
-        sliders.setupTrackBar(1, "Reduction Factor", 2, 64, 20)
-        sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Percent of Blurring", 0, 100, 20)
+            sliders.setupTrackBar(1, "Reduction Factor", 2, 64, 20)
+            sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)
+        End If
         label1 = "Image Gradient"
         task.desc = "Create a topo map from the blurred image"
     End Sub

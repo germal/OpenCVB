@@ -27,10 +27,12 @@ Public Class SuperPixel_Basics_CPP
     Public gridColor = cv.Scalar.White
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of SuperPixels", 1, 1000, 400)
-        sliders.setupTrackBar(1, "Iterations", 0, 10, 4)
-        sliders.setupTrackBar(2, "Prior", 1, 10, 2)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of SuperPixels", 1, 1000, 400)
+            sliders.setupTrackBar(1, "Iterations", 0, 10, 4)
+            sliders.setupTrackBar(2, "Prior", 1, 10, 2)
+        End If
 
         label2 = "Superpixel label data (0-255)"
         task.desc = "Sub-divide the image into super pixels."

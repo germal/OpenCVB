@@ -9,15 +9,18 @@ Public Class Voxels_Basics_MT
     Public maxDepth As Single
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Display intermediate results"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Display intermediate results"
+            check.Box(0).Checked = True
+        End If
 
         inrange = New Depth_InRange()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
+        End If
         grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")

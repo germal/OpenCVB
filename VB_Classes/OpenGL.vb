@@ -133,7 +133,6 @@ End Class
 Module OpenGL_Sliders_Module
     Public Sub setOpenGLsliders(caller As String, sliders As OptionsSliders)
         sliders.Setup(caller, 15)
-
         sliders.setupTrackBar(0, "OpenGL FOV", 1, 180, 150)
         If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then sliders.trackbar(0).Value = 135
         sliders.setupTrackBar(1, "OpenGL yaw (degrees)", -180, 180, -3)
@@ -257,8 +256,10 @@ Public Class OpenGL_3Ddata
     Dim histInput() As Byte
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
+        End If
 
         ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"

@@ -4,11 +4,13 @@ Public Class Coherence_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
-        sliders.setupTrackBar(1, "Coherence Blend", 1, 10, 10)
-        sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)
-        sliders.setupTrackBar(3, "Coherence eigen kernel", 1, 31, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
+            sliders.setupTrackBar(1, "Coherence Blend", 1, 10, 10)
+            sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)
+            sliders.setupTrackBar(3, "Coherence eigen kernel", 1, 31, 1)
+        End If
         label1 = "Coherence - draw rectangle to apply"
         task.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub

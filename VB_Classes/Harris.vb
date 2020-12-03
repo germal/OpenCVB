@@ -34,13 +34,14 @@ Public Class Harris_Features_CPP
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 5)
-        sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
-        sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
-        sliders.setupTrackBar(2, "Harris aperture", 1, 31, 21)
-        sliders.setupTrackBar(3, "Harris Parameter", 1, 100, 1)
-        sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 5)
+            sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
+            sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
+            sliders.setupTrackBar(2, "Harris aperture", 1, 31, 21)
+            sliders.setupTrackBar(3, "Harris Parameter", 1, 100, 1)
+            sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
+        End If
         task.desc = "Use Harris feature detectors to identify interesting points."
 
         ReDim srcData(src.Total - 1)
@@ -85,9 +86,10 @@ Public Class Harris_Detector_CPP
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
+        End If
         task.desc = "Use Harris detector to identify interesting points."
 
         ReDim srcData(src.Total - 1)

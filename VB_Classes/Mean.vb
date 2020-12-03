@@ -4,8 +4,10 @@ Public Class Mean_Basics
     Dim images As New List(Of cv.Mat)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Mean - number of input images", 1, 100, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Mean - number of input images", 1, 100, 10)
+        End If
         task.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run()

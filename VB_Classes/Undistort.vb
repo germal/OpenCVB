@@ -66,17 +66,19 @@ Public Class Undistort_Basics
     Dim stereo_cy As integer
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
+        End If
         sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
         sliders.setupTrackBar(2, "undistort stereo height", 1, src.Rows, src.Rows)
         sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Restore Original matrices"
-        check.Box(0).Checked = True
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Restore Original matrices"
+            check.Box(0).Checked = True
+        End If
         label1 = "Left Image with sliders applied"
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub

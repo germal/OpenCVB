@@ -67,8 +67,10 @@ Public Class Gradient_Flatland
     Public Sub New()
         initParent()
         grade = New Gradient_Basics()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
+        End If
         task.desc = "Reduced grayscale shows isobars in depth."
     End Sub
     Public Sub Run()
@@ -100,8 +102,10 @@ Public Class Gradient_CartToPolar
         basics = New Gradient_Basics()
         basics.sobel.sliders.trackbar(0).Value = 1
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
+        End If
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
@@ -139,10 +143,10 @@ End Class
 '        initParent()
 '        gradient = New Gradient_Basics()
 '        gradient.sobel.sliders.trackbar(0).Value = 1
-
-'        sliders.Setup(caller)
-'        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
-
+'        If findfrm(caller + " Slider Options") Is Nothing Then
+'            sliders.Setup(caller)
+'            sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
+'        endif
 '        label1 = "CartToPolar Magnitude Output Normalized"
 '        label2 = "CartToPolar Angle Output"
 '        task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"

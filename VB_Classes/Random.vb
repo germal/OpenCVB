@@ -10,10 +10,11 @@ Public Class Random_Points
     Public countSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Random Pixel Count", 1, src.Cols * src.Rows, 20)
-
-        countSlider = sliders.trackbar(0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Random Pixel Count", 1, src.Cols * src.Rows, 20)
+        End If
+        countSlider = findSlider("Random Pixel Count")
 
         ReDim Points(countSlider.Value - 1)
         ReDim Points2f(countSlider.Value - 1)
@@ -113,11 +114,13 @@ Public Class Random_NormalDist
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 25)
-        sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
-        sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
-        sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 25)
+            sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
+            sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
+            sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
+        End If
         task.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run()
@@ -363,8 +366,10 @@ Public Class Random_MonteCarlo
         plotHist = New Plot_Histogram()
         plotHist.fixedMaxVal = 100
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
+        End If
         task.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
     Public Sub Run()

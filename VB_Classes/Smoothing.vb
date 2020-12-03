@@ -46,9 +46,10 @@ Public Class Smoothing_Exterior
 		hull = New Hull_Basics()
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 
-		sliders.Setup(caller)
-		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 10)
-
+		If findfrm(caller + " Slider Options") Is Nothing Then
+			sliders.Setup(caller)
+			sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 10)
+		End If
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points."
@@ -125,10 +126,11 @@ Public Class Smoothing_Interior
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 		hull.sliders.trackbar(0).Value = 16
 
-		sliders.Setup(caller)
-		sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 1)
-		sliders.setupTrackBar(1, "Smoothing tension X100", 1, 100, 50)
-
+		If findfrm(caller + " Slider Options") Is Nothing Then
+			sliders.Setup(caller)
+			sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 1)
+			sliders.setupTrackBar(1, "Smoothing tension X100", 1, 100, 50)
+		End If
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
@@ -172,13 +174,16 @@ Public Class Smoothing_Contours
 		smoothE.plotColor = cv.Scalar.Blue
 		smoothI.plotColor = cv.Scalar.Blue
 
-		sliders.Setup(caller)
-		sliders.setupTrackBar(0, "Step size when adding points (1 is identity)", 1, 500, 30)
-
-		radio.Setup(caller, 2)
-		radio.check(0).Text = "Interior smoothing"
-		radio.check(1).Text = "Exterior smoothing"
-		radio.check(1).Checked = True
+		If findfrm(caller + " Slider Options") Is Nothing Then
+			sliders.Setup(caller)
+			sliders.setupTrackBar(0, "Step size when adding points (1 is identity)", 1, 500, 30)
+		End If
+		If findfrm(caller + " Radio Options") Is Nothing Then
+			radio.Setup(caller, 2)
+			radio.check(0).Text = "Interior smoothing"
+			radio.check(1).Text = "Exterior smoothing"
+			radio.check(1).Checked = True
+		End If
 
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 	End Sub

@@ -8,24 +8,26 @@ Public Class MSER_Basics
     Dim mser As cv.MSER
     Public Sub New()
         initParent()
-        sliders.Setup(caller, 9)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 9)
+            sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
+            sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 60)
+            sliders.setupTrackBar(2, "MSER Max Area", 1000, 100000, 100000)
+            sliders.setupTrackBar(3, "MSER Max Variation", 1, 100, 25)
+            sliders.setupTrackBar(4, "Min Diversity", 0, 100, 20)
+            sliders.setupTrackBar(5, "MSER Max Evolution", 1, 1000, 200)
+            sliders.setupTrackBar(6, "MSER Area Threshold", 1, 101, 101)
+            sliders.setupTrackBar(7, "MSER Min Margin", 1, 100, 3)
+            sliders.setupTrackBar(8, "MSER Edge Blursize", 1, 20, 5)
+        End If
 
-        sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
-        sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 60)
-        sliders.setupTrackBar(2, "MSER Max Area", 1000, 100000, 100000)
-        sliders.setupTrackBar(3, "MSER Max Variation", 1, 100, 25)
-        sliders.setupTrackBar(4, "Min Diversity", 0, 100, 20)
-        sliders.setupTrackBar(5, "MSER Max Evolution", 1, 1000, 200)
-        sliders.setupTrackBar(6, "MSER Area Threshold", 1, 101, 101)
-        sliders.setupTrackBar(7, "MSER Min Margin", 1, 100, 3)
-        sliders.setupTrackBar(8, "MSER Edge Blursize", 1, 20, 5)
-
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Pass2Only"
-        check.Box(1).Text = "Use Grayscale, not color input (default)"
-        check.Box(0).Checked = True
-        check.Box(1).Checked = True
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Pass2Only"
+            check.Box(1).Text = "Use Grayscale, not color input (default)"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
         ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
         task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub

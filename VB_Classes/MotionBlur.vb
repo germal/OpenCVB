@@ -5,9 +5,11 @@ Public Class MotionBlur_Basics
     Public showDirection As Boolean = True
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
-        sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
+            sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
+        End If
         task.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run()
@@ -117,17 +119,21 @@ Public Class MotionBlur_Deblur
     End Function
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Redo motion blurred image"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Redo motion blurred image"
+            check.Box(0).Checked = True
+        End If
 
         mblur = New MotionBlur_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Deblur Restore Vector", 1, mblur.sliders.trackbar(0).Maximum, 10)
-        sliders.setupTrackBar(1, "Deblur Angle of Restore Vector", mblur.sliders.trackbar(1).Minimum, mblur.sliders.trackbar(1).Maximum, 0)
-        sliders.setupTrackBar(2, "Deblur Signal to Noise Ratio", 1, 1000, 700)
-        sliders.setupTrackBar(3, "Deblur Gamma", 1, 100, 5)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Deblur Restore Vector", 1, mblur.sliders.trackbar(0).Maximum, 10)
+            sliders.setupTrackBar(1, "Deblur Angle of Restore Vector", mblur.sliders.trackbar(1).Minimum, mblur.sliders.trackbar(1).Maximum, 0)
+            sliders.setupTrackBar(2, "Deblur Signal to Noise Ratio", 1, 1000, 700)
+            sliders.setupTrackBar(3, "Deblur Gamma", 1, 100, 5)
+        End If
 
         task.desc = "Deblur a motion blurred image"
         label1 = "Blurred Image Input"

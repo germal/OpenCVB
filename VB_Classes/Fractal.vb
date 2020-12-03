@@ -12,8 +12,10 @@ Public Class Fractal_Mandelbrot
     Public incrY As Single
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
+        End If
         task.desc = "Run the classic Mandalbrot algorithm"
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         saveIterations = 0
@@ -80,8 +82,10 @@ Public Class Fractal_MandelbrotZoom
     Public Sub New()
         initParent()
         mandel = New Fractal_Mandelbrot()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Reset to original Mandelbrot"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Reset to original Mandelbrot"
+        End If
         task.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
     Public Sub Run()

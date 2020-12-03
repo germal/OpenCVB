@@ -12,10 +12,12 @@ Public Class Motion_Basics
         dilate = New DilateErode_Basics()
         diff = New Diff_Basics()
         blur = New Blur_Basics()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Frames to persist", 1, 100, 10)
-        sliders.setupTrackBar(1, "Minimum size for motion rectangle", 1, 10000, 1000)
-        sliders.setupTrackBar(2, "Milliseconds to detect no motion", 1, 1000, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Frames to persist", 1, 100, 10)
+            sliders.setupTrackBar(1, "Minimum size for motion rectangle", 1, 10000, 1000)
+            sliders.setupTrackBar(2, "Milliseconds to detect no motion", 1, 1000, 100)
+        End If
 
         Dim iterSlider = findSlider("Dilate/Erode Kernel Size")
         iterSlider.Value = 2

@@ -74,22 +74,25 @@ Public Class OpticalFlow_DenseOptions
     Public outputScaling As integer
     Public Sub New()
         initParent()
-        radio.Setup(caller, 5)
-        radio.check(0).Text = "FarnebackGaussian"
-        radio.check(1).Text = "LkGetMinEigenvals"
-        radio.check(2).Text = "None"
-        radio.check(3).Text = "PyrAReady"
-        radio.check(4).Text = "PyrBReady"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 5)
+            radio.check(0).Text = "FarnebackGaussian"
+            radio.check(1).Text = "LkGetMinEigenvals"
+            radio.check(2).Text = "None"
+            radio.check(3).Text = "PyrAReady"
+            radio.check(4).Text = "PyrBReady"
+            radio.check(0).Checked = True
+        End If
 
-        sliders.Setup(caller, 6)
-        sliders.setupTrackBar(0, "Optical Flow pyrScale", 1, 100, 35)
-        sliders.setupTrackBar(1, "Optical Flow Levels", 1, 10, 1)
-        sliders.setupTrackBar(2, "Optical Flow winSize", 1, 9, 1)
-        sliders.setupTrackBar(3, "Optical Flow Iterations", 1, 10, 1)
-        sliders.setupTrackBar(4, "Optical Flow PolyN", 1, 15, 5)
-        sliders.setupTrackBar(5, "Optical Flow Scaling Output", 1, 100, 50)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 6)
+            sliders.setupTrackBar(0, "Optical Flow pyrScale", 1, 100, 35)
+            sliders.setupTrackBar(1, "Optical Flow Levels", 1, 10, 1)
+            sliders.setupTrackBar(2, "Optical Flow winSize", 1, 9, 1)
+            sliders.setupTrackBar(3, "Optical Flow Iterations", 1, 10, 1)
+            sliders.setupTrackBar(4, "Optical Flow PolyN", 1, 15, 5)
+            sliders.setupTrackBar(5, "Optical Flow Scaling Output", 1, 100, 50)
+        End If
         label1 = "No output - just option settings..."
         task.desc = "Use dense optical flow algorithm options"
     End Sub
@@ -168,8 +171,10 @@ Public Class OpticalFlow_DenseBasics_MT
         flow = New OpticalFlow_DenseOptions()
         flow.sliders.trackbar(0).Value = 75
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
+        End If
 
         task.desc = "MultiThread dense optical flow algorithm  "
     End Sub
@@ -227,19 +232,23 @@ Public Class OpticalFlow_Sparse
         initParent()
         good = New Features_GoodFeatures()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "OpticalFlow window", 1, 20, 3)
-        sliders.setupTrackBar(1, "OpticalFlow Max Pixels Distance", 1, 100, 30)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "OpticalFlow window", 1, 20, 3)
+            sliders.setupTrackBar(1, "OpticalFlow Max Pixels Distance", 1, 100, 30)
+        End If
 
-        radio.Setup(caller, 6)
-        radio.check(0).Text = "FarnebackGaussian"
-        radio.check(1).Text = "LkGetMinEigenvals"
-        radio.check(2).Text = "None"
-        radio.check(3).Text = "PyrAReady"
-        radio.check(4).Text = "PyrBReady"
-        radio.check(5).Text = "UseInitialFlow"
-        radio.check(5).Enabled = False
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 6)
+            radio.check(0).Text = "FarnebackGaussian"
+            radio.check(1).Text = "LkGetMinEigenvals"
+            radio.check(2).Text = "None"
+            radio.check(3).Text = "PyrAReady"
+            radio.check(4).Text = "PyrBReady"
+            radio.check(5).Text = "UseInitialFlow"
+            radio.check(5).Enabled = False
+            radio.check(0).Checked = True
+        End If
 
         task.desc = "Show the optical flow of a sparse matrix."
         label1 = ""

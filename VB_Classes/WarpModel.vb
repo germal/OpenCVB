@@ -10,23 +10,27 @@ Public Class WarpModel_Input
     Dim sobel As Edges_Sobel
     Public Sub New()
         initParent()
-        radio.Setup(caller, 12)
-        radio.check(0).Text = "building.jpg"
-        radio.check(1).Text = "church.jpg"
-        radio.check(2).Text = "emir.jpg"
-        radio.check(3).Text = "Painting.jpg"
-        radio.check(4).Text = "railroad.jpg"
-        radio.check(5).Text = "river.jpg"
-        radio.check(6).Text = "Cliff.jpg"
-        radio.check(7).Text = "Column.jpg"
-        radio.check(8).Text = "General.jpg"
-        radio.check(9).Text = "Girls.jpg"
-        radio.check(10).Text = "Tablet.jpg"
-        radio.check(11).Text = "Valley.jpg"
-        radio.check(9).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 12)
+            radio.check(0).Text = "building.jpg"
+            radio.check(1).Text = "church.jpg"
+            radio.check(2).Text = "emir.jpg"
+            radio.check(3).Text = "Painting.jpg"
+            radio.check(4).Text = "railroad.jpg"
+            radio.check(5).Text = "river.jpg"
+            radio.check(6).Text = "Cliff.jpg"
+            radio.check(7).Text = "Column.jpg"
+            radio.check(8).Text = "General.jpg"
+            radio.check(9).Text = "Girls.jpg"
+            radio.check(10).Text = "Tablet.jpg"
+            radio.check(11).Text = "Valley.jpg"
+            radio.check(9).Checked = True
+        End If
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Use Gradient in WarpInput"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Use Gradient in WarpInput"
+        End If
 
         sobel = New Edges_Sobel()
         task.desc = "Import the misaligned input."
@@ -107,12 +111,14 @@ Public Class WarpModel_FindTransformECC_CPP
         initParent()
         cPtr = WarpModel_Open()
 
-        radio.Setup(caller,4)
-        radio.check(0).Text = "Motion_Translation (fastest)"
-        radio.check(1).Text = "Motion_Euclidean"
-        radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
-        radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "Motion_Translation (fastest)"
+            radio.check(1).Text = "Motion_Euclidean"
+            radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
+            radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
+            radio.check(0).Checked = True
+        End If
 
         warp = New WarpModel_Input()
 

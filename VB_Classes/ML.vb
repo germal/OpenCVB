@@ -102,8 +102,10 @@ Public Class ML_FillRGBDepth
         initParent()
         colorizer = New Depth_Colorizer_CPP()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "ML Min Learn Count", 2, 100, 5)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "ML Min Learn Count", 2, 100, 5)
+        End If
 
         shadow = New Depth_Holes()
         shadow.sliders.trackbar(0).Value = 3
@@ -137,9 +139,10 @@ Public Class ML_DepthFromColor_MT
         dilate = New DilateErode_Basics()
         dilate.sliders.trackbar(1).Value = 2
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
+        End If
         grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -209,9 +212,10 @@ Public Class ML_DepthFromColor
 
         shadow = New Depth_Holes()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
+        End If
         resized = New Resize_Percentage()
         resized.sliders.trackbar(0).Value = 2 ' 2% of the image.
 
@@ -290,9 +294,10 @@ Public Class ML_DepthFromXYColor
 
         shadow = New Depth_Holes()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
+        End If
         resized = New Resize_Percentage()
         resized.sliders.trackbar(0).Value = 2
 
@@ -385,9 +390,10 @@ Public Class ML_EdgeDepth_MT
         dilate = New DilateErode_Basics()
         dilate.sliders.trackbar(1).Value = 5
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
+        End If
         grid = New Thread_Grid()
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")

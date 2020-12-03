@@ -8,9 +8,10 @@ Public Class IMU_Basics
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
+        End If
         flow = New Font_FlowText()
 
         task.desc = "Read and display the IMU coordinates"
@@ -189,10 +190,11 @@ Public Class IMU_FrameTime
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Minimum IMU to Capture time (ms)", 1, 10, 2)
-        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Minimum IMU to Capture time (ms)", 1, 10, 2)
+            sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
+        End If
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
@@ -287,10 +289,11 @@ Public Class IMU_HostFrameTimes
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Minimum Host interrupt delay (ms)", 1, 10, 4)
-        sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Minimum Host interrupt delay (ms)", 1, 10, 4)
+            sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
+        End If
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
@@ -455,7 +458,8 @@ Public Class IMU_GVector
 
         kalman.kInput = {gx, gy, gz, ocvb.angleX, ocvb.angleY, ocvb.angleZ}
 
-        If kalman.check.Box(0).Checked Then
+        Static kalmanCheck = findCheckBox("Turn Kalman filtering on")
+        If kalmanCheck.Checked Then
             kalman.Run()
             gx = kalman.kOutput(0)
             gy = kalman.kOutput(1)
@@ -511,8 +515,10 @@ Public Class IMU_IscameraLevel
     Public Sub New()
         initParent()
         If standalone Then flow = New Font_FlowText()
-        sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is 20 which is 2 degrees from 0...
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 1)
+            sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is 20 which is 2 degrees from 0...
+        End If
         task.desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run()
@@ -556,8 +562,10 @@ Public Class IMU_IscameraStable
     Public Sub New()
         initParent()
         If standalone Then flow = New Font_FlowText()
-        sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "Threshold in motion radian X100", 1, 100, 2) ' how much motion is reasonable?
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 1)
+            sliders.setupTrackBar(0, "Threshold in motion radian X100", 1, 100, 2) ' how much motion is reasonable?
+        End If
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
     Public Sub Run()

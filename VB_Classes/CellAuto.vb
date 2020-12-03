@@ -30,9 +30,11 @@ Public Class CellAuto_Basics
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
         combo.Setup(caller, label + vbCrLf + "output below:", i18)
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Rotate through the different rules"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Rotate through the different rules"
+            check.Box(0).Checked = True
+        End If
 
         task.desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
     End Sub
@@ -304,8 +306,10 @@ Public Class CellAuto_All256
         cell = New CellAuto_Basics()
         cell.combo.Visible = False ' won't need this...
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
+        End If
         task.desc = "Run through all 256 combinations of outcomes"
     End Sub
     Private Function createOutcome(val As Integer) As String

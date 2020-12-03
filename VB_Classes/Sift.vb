@@ -10,14 +10,17 @@ Public Class Sift_Basics_CS
         initParent()
         fisheye = New FishEye_Rectified()
 
-        radio.Setup(caller, 2)
-        radio.check(0).Text = "Use BF Matcher"
-        radio.check(1).Text = "Use Flann Matcher"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Use BF Matcher"
+            radio.check(1).Text = "Use Flann Matcher"
+            radio.check(0).Checked = True
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
+        End If
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run()

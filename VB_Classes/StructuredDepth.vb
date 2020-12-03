@@ -13,10 +13,12 @@ Public Class StructuredDepth_SliceH
         side2D = New Histogram_SideData()
         inrange = New Depth_InRange()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-        sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2 - 20)
-        sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
+            sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2 - 20)
+            sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
+        End If
 
         histThresholdSlider = findSlider("Histogram threshold")
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -30,7 +32,6 @@ Public Class StructuredDepth_SliceH
         side2D.Run()
         dst2 = side2D.dst2
 
-        Static offsetSlider = findSlider("Offset for the slice")
         Dim yCoordinate = CInt(offsetSlider.Value)
 
         Dim planeY = side2D.meterMin * (side2D.cameraLoc - yCoordinate) / side2D.cameraLoc
@@ -43,7 +44,7 @@ Public Class StructuredDepth_SliceH
         inrange.maxVal = planeY + thicknessMeters
         inrange.src = side2D.split(1).Clone
         inrange.Run()
-        maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        maskPlane = inrange.depthMask
 
         label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
@@ -104,7 +105,7 @@ Public Class StructuredDepth_SliceV
         inrange.maxVal = planeX + thicknessMeters
         inrange.src = top2D.split(0).Clone
         inrange.Run()
-        maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        maskPlane = inrange.depthMask
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
@@ -254,7 +255,7 @@ Public Class StructuredDepth_MultiSliceH
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = side2D.split(1).Clone
             inrange.Run()
-            maskPlane.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
+            maskPlane.SetTo(255, inrange.depthMask)
         Next
 
         dst1 = task.color.Clone
@@ -304,7 +305,7 @@ Public Class StructuredDepth_MultiSliceV
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = top2D.split(0).Clone
             inrange.Run()
-            maskPlane.SetTo(255, inrange.depth32f.Resize(dst1.Size).ConvertScaleAbs(255))
+            maskPlane.SetTo(255, inrange.depthMask)
         Next
 
         dst1 = task.color.Clone
@@ -358,7 +359,7 @@ Public Class StructuredDepth_MultiSlice
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = top2D.split(0).Clone
             inrange.Run()
-            maskPlane = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            maskPlane = inrange.depthMask
             dst2.SetTo(255, maskPlane)
         Next
 
@@ -369,7 +370,7 @@ Public Class StructuredDepth_MultiSlice
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = side2D.split(1).Clone
             inrange.Run()
-            Dim tmp = inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            Dim tmp = inrange.depthMask
             cv.Cv2.BitwiseOr(tmp, maskPlane, maskPlane)
             dst2.SetTo(255, maskPlane)
         Next
@@ -422,8 +423,10 @@ Public Class StructuredDepth_MultiSlicePolygon
         label1 = "Input to FindContours"
         label2 = "ApproxPolyDP 4-corner object from FindContours input"
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
+        End If
         task.desc = "Detect polygons in the multiSlice output"
     End Sub
     Public Sub Run()
@@ -491,7 +494,7 @@ Public Class StructuredDepth_SliceXPlot
             multi.inrange.maxVal = filterZ + 0.05
             multi.inrange.src = multi.top2D.split(2)
             multi.inrange.Run()
-            maskZplane = multi.inrange.depth32f.Resize(src.Size).ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            maskZplane = multi.inrange.depthMask
         End If
 
         If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.maskPlane, maskZplane, maskZplane)
@@ -522,11 +525,13 @@ Public Class StructuredDepth_LinearizeFloor
         kalman = New Kalman_VB_Basics()
         floor = New StructuredDepth_Floor()
 
-        check.Setup(caller, 3)
-        check.Box(0).Text = "Smooth in X-direction"
-        check.Box(1).Text = "Smooth in Y-direction"
-        check.Box(2).Text = "Smooth in Z-direction"
-        check.Box(1).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Smooth in X-direction"
+            check.Box(1).Text = "Smooth in Y-direction"
+            check.Box(2).Text = "Smooth in Z-direction"
+            check.Box(1).Checked = True
+        End If
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub Run()

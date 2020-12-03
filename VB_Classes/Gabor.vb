@@ -14,14 +14,15 @@ Public Class Gabor_Basics
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 6)
-        sliders.setupTrackBar(0, "Gabor Kernel Size", 0, 50, 15)
-        sliders.setupTrackBar(1, "Gabor Sigma", 0, 100, 4)
-        sliders.setupTrackBar(2, "Gabor Theta (degrees)", 0, 180, 90)
-        sliders.setupTrackBar(3, "Gabor lambda", 0, 100, 10)
-        sliders.setupTrackBar(4, "Gabor gamma X10", 0, 10, 5)
-        sliders.setupTrackBar(5, "Gabor Phase offset X100", 0, 100, 0)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 6)
+            sliders.setupTrackBar(0, "Gabor Kernel Size", 0, 50, 15)
+            sliders.setupTrackBar(1, "Gabor Sigma", 0, 100, 4)
+            sliders.setupTrackBar(2, "Gabor Theta (degrees)", 0, 180, 90)
+            sliders.setupTrackBar(3, "Gabor lambda", 0, 100, 10)
+            sliders.setupTrackBar(4, "Gabor gamma X10", 0, 10, 5)
+            sliders.setupTrackBar(5, "Gabor Phase offset X100", 0, 100, 0)
+        End If
         task.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run()

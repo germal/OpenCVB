@@ -4,17 +4,21 @@ Public Class DilateErode_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 5)
-        sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 5)
+            sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
+        End If
         task.desc = "Dilate and Erode the RGB and Depth image."
 
-        radio.Setup(caller, 4)
-        radio.check(0).Text = "Dilate/Erode shape: Cross"
-        radio.check(1).Text = "Dilate/Erode shape: Ellipse"
-        radio.check(2).Text = "Dilate/Erode shape: Rect"
-        radio.check(3).Text = "Dilate/Erode shape: None"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "Dilate/Erode shape: Cross"
+            radio.check(1).Text = "Dilate/Erode shape: Ellipse"
+            radio.check(2).Text = "Dilate/Erode shape: Rect"
+            radio.check(3).Text = "Dilate/Erode shape: None"
+            radio.check(0).Checked = True
+        End If
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -62,9 +66,11 @@ Public Class DilateErode_DepthSeed
         initParent()
         dilate = New DilateErode_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "DepthSeed flat depth", 1, 200, 100)
-        sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "DepthSeed flat depth", 1, 200, 100)
+            sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
+        End If
         task.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
     Public Sub Run()
@@ -98,14 +104,17 @@ Public Class DilateErode_OpenClose
     Inherits VBparent
     Public Sub New()
         initParent()
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "Open/Close shape: Cross"
-        radio.check(1).Text = "Open/Close shape: Ellipse"
-        radio.check(2).Text = "Open/Close shape: Rect"
-        radio.check(2).Checked = True
-
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Open/Close shape: Cross"
+            radio.check(1).Text = "Open/Close shape: Ellipse"
+            radio.check(2).Text = "Open/Close shape: Rect"
+            radio.check(2).Checked = True
+        End If
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
+        End If
         task.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
     Public Sub Run()

@@ -21,8 +21,10 @@ Public Class RecursiveBilateralFilter_CPP
     Dim rbf As IntPtr
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)
+        End If
         rbf = RecursiveBilateralFilter_Open()
         task.desc = "Apply the recursive bilateral filter"
     End Sub

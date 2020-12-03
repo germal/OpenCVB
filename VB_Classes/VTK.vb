@@ -130,10 +130,12 @@ Public Class VTK_Histogram3D
     Dim random As Random_NormalDist
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
-        sliders.setupTrackBar(1, "Hist 3D bins", 1, 100, 32)
-        sliders.setupTrackBar(2, "Hist 3D bin Threshold X1000000", 10, 100, 20)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
+            sliders.setupTrackBar(1, "Hist 3D bins", 1, 100, 32)
+            sliders.setupTrackBar(2, "Hist 3D bin Threshold X1000000", 10, 100, 20)
+        End If
 
         mats = New Mat_4to1()
 

@@ -6,10 +6,12 @@ Public Class HOG_Basics
     Dim staticImageProcessed As Boolean
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Threshold", 0, 100, 0)
-        sliders.setupTrackBar(1, "Stride", 1, 100, 1)
-        sliders.setupTrackBar(2, "Scale", 0, 2000, 300)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold", 0, 100, 0)
+            sliders.setupTrackBar(1, "Stride", 1, 100, 1)
+            sliders.setupTrackBar(2, "Scale", 0, 2000, 300)
+        End If
         task.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         dst2 = staticImage.Resize(dst2.Size)

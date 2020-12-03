@@ -15,12 +15,13 @@ Public Class Featureless_Basics
         gridWidthSlider.Value = 10
         gridHeightSlider.Value = gridWidthSlider.Value
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
-        sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
-        sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, ocvb.resfactor * 500)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
+            sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
+            sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
+            sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, ocvb.resfactor * 500)
+        End If
         flood = New FloodFill_8bit()
 
         label1 = "Featureless regions with mask in depth color"
@@ -115,9 +116,10 @@ Public Class FeatureLess_Prediction
     Dim fLess As Featureless_Basics
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
+        End If
         fLess = New Featureless_Basics()
 
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"

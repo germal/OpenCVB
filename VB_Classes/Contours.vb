@@ -176,10 +176,12 @@ Public Class Contours_RemoveLines
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller, 3)
-        sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
-        sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
-        sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 3)
+            sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
+            sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
+            sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
+        End If
         label1 = "Original image"
         label2 = "Original with horizontal/vertical lines removed"
         task.desc = "Remove the lines from an invoice image"
@@ -269,9 +271,10 @@ Public Class Contours_Prediction
         ReDim kalman.kInput(2 - 1)
         outline = New Contours_Depth()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)
+        End If
         label1 = "Original contour image"
         label2 = "Image after smoothing with Kalman_Basics"
         task.desc = "Predict the next contour point with Kalman to smooth the outline"

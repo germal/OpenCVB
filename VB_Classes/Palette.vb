@@ -11,16 +11,19 @@ Public Class Palette_Basics
         initParent()
         gradMap = New Palette_BuildGradientColorMap()
 
-        radio.Setup(caller, 21)
-        For i = 0 To radio.check.Length - 1
-            radio.check(i).Text = mapNames(i)
-            If mapNames(i) = "Hot" Then radio.check(i).Checked = True
-        Next
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 21)
+            For i = 0 To radio.check.Length - 1
+                radio.check(i).Text = mapNames(i)
+                If mapNames(i) = "Hot" Then radio.check(i).Checked = True
+            Next
+        End If
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
-        For i = 0 To radio.check.Length - 1
-            If radio.check(i).Checked Then
+        Static radioFrm = findfrm(caller + " Radio Options")
+        For i = 0 To radioFrm.check.Length - 1
+            If radioFrm.check(i).Checked Then
                 Dim scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
                                            cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
                                            cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
@@ -79,10 +82,12 @@ Public Class Palette_Color
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
-        sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
+            sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
+            sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
+        End If
         task.desc = "Define a color using sliders."
     End Sub
     Public Sub Run()
@@ -107,8 +112,10 @@ Public Class Palette_LinearPolar
         task.desc = "Use LinearPolar to create gradient image"
         SetInterpolationRadioButtons(caller, radio, "LinearPolar")
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "LinearPolar radius", 0, src.Cols, src.Cols / 2)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "LinearPolar radius", 0, src.Cols, src.Cols / 2)
+        End If
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -191,8 +198,10 @@ Public Class Palette_Reduction
         reduction.radio.check(0).Checked = True
         reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
+        End If
         task.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
@@ -339,8 +348,10 @@ Public Class Palette_BuildGradientColorMap
     Public gradientColorMap As New cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
+        End If
 
         label2 = "Generated colormap"
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
@@ -381,8 +392,10 @@ Public Class Palette_DepthColorMap
         holes = New Depth_Holes()
         hideForm("Depth_Holes Slider Options")
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
+        End If
 
         label2 = "Palette used to color left image"
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."

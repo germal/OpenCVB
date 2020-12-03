@@ -11,17 +11,21 @@ Public Class MatchTemplate_Basics
         initParent()
         flow = New Font_FlowText()
 
-        radio.Setup(caller, 6)
-        radio.check(0).Text = "CCoeff"
-        radio.check(1).Text = "CCoeffNormed"
-        radio.check(2).Text = "CCorr"
-        radio.check(3).Text = "CCorrNormed"
-        radio.check(4).Text = "SqDiff"
-        radio.check(5).Text = "SqDiffNormed"
-        radio.check(1).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 6)
+            radio.check(0).Text = "CCoeff"
+            radio.check(1).Text = "CCoeffNormed"
+            radio.check(2).Text = "CCorr"
+            radio.check(3).Text = "CCorrNormed"
+            radio.check(4).Text = "SqDiff"
+            radio.check(5).Text = "SqDiffNormed"
+            radio.check(1).Checked = True
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
+        End If
         task.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
     Public Sub Run()

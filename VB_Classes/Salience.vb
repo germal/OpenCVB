@@ -23,9 +23,11 @@ Public Class Salience_Basics_CPP
     Dim salience As IntPtr
     Public Sub New()
         initParent()
-        sliders = New OptionsSliders
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders = New OptionsSliders
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
+        End If
 
         salience = Salience_Open()
         task.desc = "Show results of Salience algorithm when using C++"

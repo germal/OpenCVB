@@ -11,10 +11,12 @@ Public Class Kalman_Basics
 
         stable = New IMU_IscameraStable()
 
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Turn Kalman filtering on"
-        check.Box(1).Text = "Only use Kalman filtering when camera is stable"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Turn Kalman filtering on"
+            check.Box(1).Text = "Only use Kalman filtering when camera is stable"
+            check.Box(0).Checked = True
+        End If
 
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
@@ -587,16 +589,18 @@ Public Class Kalman_VB
         For i = 0 To MAX_INPUT - 1
             matrix.Add(0)
         Next
-        sliders.Setup(caller, 9)
-        sliders.setupTrackBar(0, "Move this to see results", 0, 1000, 500)
-        sliders.setupTrackBar(1, "Input with Noise", 0, 1000, 500)
-        sliders.setupTrackBar(2, "20 point average of output", 0, 1000, 500)
-        sliders.setupTrackBar(3, "Kalman Output", 0, 1000, 500)
-        sliders.setupTrackBar(4, "20 Point average difference", 0, 1000, 500)
-        sliders.setupTrackBar(5, "Kalman difference", 0, 1000, 500)
-        sliders.setupTrackBar(6, "Simulated Noise", 0, 100, 25)
-        sliders.setupTrackBar(7, "Simulated Bias", -100, 100, 0)
-        sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 9)
+            sliders.setupTrackBar(0, "Move this to see results", 0, 1000, 500)
+            sliders.setupTrackBar(1, "Input with Noise", 0, 1000, 500)
+            sliders.setupTrackBar(2, "20 point average of output", 0, 1000, 500)
+            sliders.setupTrackBar(3, "Kalman Output", 0, 1000, 500)
+            sliders.setupTrackBar(4, "20 Point average difference", 0, 1000, 500)
+            sliders.setupTrackBar(5, "Kalman difference", 0, 1000, 500)
+            sliders.setupTrackBar(6, "Simulated Noise", 0, 100, 25)
+            sliders.setupTrackBar(7, "Simulated Bias", -100, 100, 0)
+            sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
+        End If
         label1 = "Use first slider below to test algorithm"
         task.desc = "A native VB Kalman filter"
     End Sub
@@ -708,12 +712,13 @@ Public Class Kalman_VB_Basics
         plot.topBottomPad = 20
         plot.dst1 = dst1
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Average input count", 1, 500, 20)
-        sliders.setupTrackBar(1, "Delta Time X100", 1, 30, 5)
-        sliders.setupTrackBar(2, "Process Covariance X10000", 0, 10000, 10)
-        sliders.setupTrackBar(3, "pDot entry X1000", 0, 1000, 300)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Average input count", 1, 500, 20)
+            sliders.setupTrackBar(1, "Delta Time X100", 1, 30, 5)
+            sliders.setupTrackBar(2, "Process Covariance X10000", 0, 10000, 10)
+            sliders.setupTrackBar(3, "pDot entry X1000", 0, 1000, 300)
+        End If
         label1 = "Blue = gray mean, green = kalman, red = kalman avg"
         task.desc = "Build a generic kalman filter based on Kalman_VB"
     End Sub

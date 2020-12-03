@@ -3,8 +3,10 @@ Public Class Contrast_POW
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
+        End If
         label1 = "Original Image"
         label2 = "Contrast reduced"
         task.desc = "Reduce contrast with POW function"
@@ -29,9 +31,11 @@ Public Class Contrast_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Brightness", 1, 100, 50)
-        sliders.setupTrackBar(1, "Contrast", 1, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Brightness", 1, 100, 50)
+            sliders.setupTrackBar(1, "Contrast", 1, 100, 50)
+        End If
         task.desc = "Show image with varying contrast and brightness."
     End Sub
     Public Sub Run()

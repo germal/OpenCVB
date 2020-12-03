@@ -84,18 +84,21 @@ Public Class Dither_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
-
-        radio.Setup(caller, 24)
-        Static frm = findfrm("Dither_Basics Radio Options")
-        For i = 0 To frm.check.length - 1
-            frm.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
-                                       "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
-                                       "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
-                                       "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra")
-        Next
-        radio.check(4).Checked = True ' this one was interesting...
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 24)
+            Static frm = findfrm("Dither_Basics Radio Options")
+            For i = 0 To frm.check.length - 1
+                frm.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
+                                           "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
+                                           "FSRgb3bpp", "FSRgb6bpp", "FSRgb9bpp", "FSRgb12bpp", "FSRgb15bpp", "FSRgb18bpp",
+                                           "SierraLiteRgbNbpp", "SierraLite", "SierraRgbNbpp", "Sierra")
+            Next
+            radio.check(4).Checked = True ' this one was interesting...
+        End If
 
         label1 = "Dither applied to the RGB image"
         label2 = "Dither applied to the Depth image"

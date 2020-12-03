@@ -4,10 +4,13 @@ Public Class Pencil_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
-        sliders.setupTrackBar(1, "Pencil Sigma_r", 1, 100, 7)
-        sliders.setupTrackBar(2, "Pencil Shade Factor", 1, 200, 40)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
+            sliders.setupTrackBar(1, "Pencil Sigma_r", 1, 100, 7)
+            sliders.setupTrackBar(2, "Pencil Shade Factor", 1, 200, 40)
+        End If
+
         task.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
     Public Sub Run()
@@ -27,8 +30,10 @@ Public Class Pencil_Manual
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
+        End If
         task.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
     Public Sub Run()

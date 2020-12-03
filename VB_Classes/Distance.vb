@@ -4,12 +4,13 @@ Public Class Distance_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "C"
-        radio.check(1).Text = "L1"
-        radio.check(2).Text = "L2"
-        radio.check(1).Checked = True
-
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "C"
+            radio.check(1).Text = "L1"
+            radio.check(2).Text = "L2"
+            radio.check(1).Checked = True
+        End If
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
@@ -42,12 +43,13 @@ Public Class Distance_Foreground
     Dim foreground As kMeans_Depth_FG_BG
     Public Sub New()
         initParent()
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "C"
-        radio.check(1).Text = "L1"
-        radio.check(2).Text = "L2"
-        radio.check(2).Checked = True
-
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "C"
+            radio.check(1).Text = "L1"
+            radio.check(2).Text = "L2"
+            radio.check(2).Checked = True
+        End If
         foreground = New kMeans_Depth_FG_BG()
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"

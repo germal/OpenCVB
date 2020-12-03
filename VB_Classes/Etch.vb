@@ -13,11 +13,13 @@ Public Class Etch_ASketch
     Public Sub New()
         initParent()
 
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Etch_ASketch clean slate"
-        check.Box(1).Text = "Demo mode"
-        check.Box(1).Checked = True
-        If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Etch_ASketch clean slate"
+            check.Box(1).Text = "Demo mode"
+            check.Box(1).Checked = True
+            If ocvb.parms.testAllRunning Then check.Box(1).Checked = True
+        End If
 
         keys = New Keyboard_Basics()
 

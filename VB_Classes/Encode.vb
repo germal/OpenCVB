@@ -40,18 +40,21 @@ Public Class Encode_Options
     Public qualityLevel As Integer
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
-        sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 85)
-
-        radio.Setup(caller, 6)
-        radio.check(0).Text = "JpegChromaQuality"
-        radio.check(1).Text = "JpegLumaQuality"
-        radio.check(2).Text = "JpegOptimize"
-        radio.check(3).Text = "JpegProgressive"
-        radio.check(4).Text = "JpegQuality"
-        radio.check(5).Text = "WebPQuality"
-        radio.check(1).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
+            sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 85)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 6)
+            radio.check(0).Text = "JpegChromaQuality"
+            radio.check(1).Text = "JpegLumaQuality"
+            radio.check(2).Text = "JpegOptimize"
+            radio.check(3).Text = "JpegProgressive"
+            radio.check(4).Text = "JpegQuality"
+            radio.check(5).Text = "WebPQuality"
+            radio.check(1).Checked = True
+        End If
 
         task.desc = "Encode options that affect quality."
         label1 = "absDiff with original image"

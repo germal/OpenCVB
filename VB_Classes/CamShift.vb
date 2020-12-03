@@ -14,12 +14,13 @@ Public Class CamShift_Basics
         initParent()
         plotHist = New Plot_Histogram()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "CamShift vMin", 0, 255, 32)
-        sliders.setupTrackBar(1, "CamShift vMax", 0, 255, 255)
-        sliders.setupTrackBar(2, "CamShift Smin", 0, 255, 60)
-        sliders.setupTrackBar(3, "CamShift Histogram bins", 16, 255, 32)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "CamShift vMin", 0, 255, 32)
+            sliders.setupTrackBar(1, "CamShift vMax", 0, 255, 255)
+            sliders.setupTrackBar(2, "CamShift Smin", 0, 255, 60)
+            sliders.setupTrackBar(3, "CamShift Histogram bins", 16, 255, 32)
+        End If
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
         task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
@@ -168,8 +169,10 @@ Public Class Camshift_TopObjects
             cams(i) = New CamShift_Basics()
         Next
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
+        End If
         task.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run()

@@ -6,13 +6,16 @@ Public Class InPaint_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
-
-        radio.Setup(caller, 2)
-        radio.check(0).Text = "TELEA"
-        radio.check(1).Text = "Navier-Stokes"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "TELEA"
+            radio.check(1).Text = "Navier-Stokes"
+            radio.check(0).Checked = True
+        End If
 
         task.desc = "Create a flaw in an image and then use inPaint to mask it."
         label2 = "Repaired Image"
@@ -43,10 +46,12 @@ Public Class InPaint_Noise
         initParent()
         noise = New Draw_Noise()
 
-        radio.Setup(caller, 2)
-        radio.check(0).Text = "TELEA"
-        radio.check(1).Text = "Navier-Stokes"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "TELEA"
+            radio.check(1).Text = "Navier-Stokes"
+            radio.check(0).Checked = True
+        End If
 
         task.desc = "Create noise in an image and then use inPaint to remove it."
         label2 = "Repaired Image"

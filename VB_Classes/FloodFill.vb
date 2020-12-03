@@ -20,12 +20,13 @@ Public Class FloodFill_Basics
     End Class
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
-        sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
-        sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
-        sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
+            sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
+            sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
+            sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
+        End If
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
@@ -142,11 +143,12 @@ Public Class FloodFill_Top16_MT
     Public Sub New()
         initParent()
         grid = New Thread_Grid()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2000)
-        sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
-        sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2000)
+            sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
+            sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
+        End If
         task.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run()
@@ -286,13 +288,14 @@ Public Class FloodFill_RelativeRange
     Public Sub New()
         initParent()
         fBasics = New FloodFill_Basics()
-        check.Setup(caller, 3)
-        check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
-        check.Box(0).Checked = True
-        check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
-        check.Box(1).Checked = True ' link4 produces better results.
-        check.Box(2).Text = "Use 'Mask Only'"
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
+            check.Box(0).Checked = True
+            check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
+            check.Box(1).Checked = True ' link4 produces better results.
+            check.Box(2).Text = "Use 'Mask Only'"
+        End If
         label1 = "Input to floodfill basics"
         label2 = "Output of floodfill basics"
         task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
@@ -321,8 +324,10 @@ Public Class FloodFill_Top16
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
+        End If
 
         flood = New FloodFill_Basics()
 
@@ -373,9 +378,10 @@ Public Class Floodfill_Objects
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 1)
+            sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
+        End If
         basics = New FloodFill_Basics()
         basics.sliders.trackbar(0).Value = (src.Width Mod 100) * 25
 

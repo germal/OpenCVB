@@ -78,11 +78,13 @@ Public Class Hough_Lines
         initParent()
         edges = New Edges_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "rho", 1, 100, 1)
-        sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar(2, "threshold", 1, 100, 50)
-        sliders.setupTrackBar(3, "Lines to Plot", 1, 1000, 25)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "rho", 1, 100, 1)
+            sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
+            sliders.setupTrackBar(2, "threshold", 1, 100, 50)
+            sliders.setupTrackBar(3, "Lines to Plot", 1, 1000, 25)
+        End If
         task.desc = "Use Houghlines to find lines in the image."
     End Sub
 
@@ -123,11 +125,12 @@ Public Class Hough_Lines_MT
     Public grid As Thread_Grid
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "rho", 1, 100, 1)
-        sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
-        sliders.setupTrackBar(2, "threshold", 1, 100, 3)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "rho", 1, 100, 1)
+            sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
+            sliders.setupTrackBar(2, "threshold", 1, 100, 3)
+        End If
         edges = New Edges_Basics()
 
         grid = New Thread_Grid()

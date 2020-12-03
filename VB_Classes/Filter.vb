@@ -26,14 +26,18 @@ Public Class Filter_NormalizedKernel
     Inherits VBparent
     Public Sub New()
         initParent()
-        radio.Setup(caller, 4)
-        radio.check(0).Text = "INF"
-        radio.check(1).Text = "L1"
-        radio.check(1).Checked = True
-        radio.check(2).Text = "L2"
-        radio.check(3).Text = "MinMax"
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "INF"
+            radio.check(1).Text = "L1"
+            radio.check(1).Checked = True
+            radio.check(2).Text = "L2"
+            radio.check(3).Text = "MinMax"
+        End If
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
+        End If
         task.desc = "Create a normalized kernel and use it."
     End Sub
     Public Sub Run()
@@ -67,8 +71,10 @@ Public Class Filter_Normalized2D
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Filter_Normalized2D kernel size", 1, 21, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Filter_Normalized2D kernel size", 1, 21, 3)
+        End If
         task.desc = "Create and apply a normalized kernel."
     End Sub
     Public Sub Run()
@@ -88,14 +94,18 @@ Public Class Filter_SepFilter2D
     Inherits VBparent
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
+            check.Box(0).Checked = True
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Kernel X size", 1, 21, 5)
-        sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
-        sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Kernel X size", 1, 21, 5)
+            sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
+            sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)
+        End If
         label1 = "Gaussian Blur result"
         task.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub

@@ -4,11 +4,13 @@ Public Class CartoonifyImage_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Cartoon Median Blur kernel", 1, 21, 7)
-        sliders.setupTrackBar(1, "Cartoon Median Blur kernel 2", 1, 21, 3)
-        sliders.setupTrackBar(2, "Cartoon threshold", 1, 255, 80)
-        sliders.setupTrackBar(3, "Cartoon Laplacian kernel", 1, 21, 5)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Cartoon Median Blur kernel", 1, 21, 7)
+            sliders.setupTrackBar(1, "Cartoon Median Blur kernel 2", 1, 21, 3)
+            sliders.setupTrackBar(2, "Cartoon threshold", 1, 255, 80)
+            sliders.setupTrackBar(3, "Cartoon Laplacian kernel", 1, 21, 5)
+        End If
         label1 = "Mask for Cartoon"
         label2 = "Cartoonify Result"
         task.desc = "Create a cartoon from a color image - Painterly Effect"

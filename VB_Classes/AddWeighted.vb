@@ -5,8 +5,10 @@ Public Class AddWeighted_Basics
     Public src2 As New cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Weight", 0, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Weight", 0, 100, 50)
+        End If
         task.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run()

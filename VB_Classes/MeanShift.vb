@@ -92,10 +92,12 @@ Public Class MeanShift_PyrFilter
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
-        sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
-        sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
+            sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
+            sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
+        End If
         task.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run()
@@ -125,8 +127,10 @@ Public Class Meanshift_TopObjects
         mats2 = New Mat_4to1()
 
         blob = New Blob_DepthClusters()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
+        End If
         For i = 0 To cams.Length - 1
             cams(i) = New MeanShift_Basics()
             cams(i).rectangleEdgeWidth = 8

@@ -9,8 +9,10 @@ Public Class Threshold_LaplacianFilter
         inrange.depth32fAfterMasking = True
 
         edges = New Filter_Laplacian()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "dist Threshold", 1, 100, 40)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "dist Threshold", 1, 100, 40)
+        End If
         label1 = "Foreground Input"
         task.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
     End Sub

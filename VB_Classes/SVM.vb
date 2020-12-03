@@ -9,24 +9,28 @@ Public Class SVM_Options
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 8)
-        sliders.setupTrackBar(0, "SampleCount", 5, 1000, 500)
-        sliders.setupTrackBar(1, "Granularity", 1, 50, 5)
-        sliders.setupTrackBar(2, "SVM Degree", 1, 200, 100)
-        sliders.setupTrackBar(3, "SVM Gamma ", 1, 200, 100)
-        sliders.setupTrackBar(3, "SVM Coef0 X100", 1, 200, 100)
-        sliders.setupTrackBar(4, "SVM C X100", 0, 100, 100)
-        sliders.setupTrackBar(5, "SVM Nu X100", 1, 85, 50)
-        sliders.setupTrackBar(6, "SVM P X100", 0, 100, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 8)
+            sliders.setupTrackBar(0, "SampleCount", 5, 1000, 500)
+            sliders.setupTrackBar(1, "Granularity", 1, 50, 5)
+            sliders.setupTrackBar(2, "SVM Degree", 1, 200, 100)
+            sliders.setupTrackBar(3, "SVM Gamma ", 1, 200, 100)
+            sliders.setupTrackBar(3, "SVM Coef0 X100", 1, 200, 100)
+            sliders.setupTrackBar(4, "SVM C X100", 0, 100, 100)
+            sliders.setupTrackBar(5, "SVM Nu X100", 1, 85, 50)
+            sliders.setupTrackBar(6, "SVM P X100", 0, 100, 10)
+        End If
 
-        radio.Setup(caller, 4)
-        radio.check(0).Text = "kernel Type = Linear"
-        radio.check(1).Text = "kernel Type = Poly (not working)"
-        radio.check(1).Enabled = False
-        radio.check(2).Text = "kernel Type = RBF"
-        radio.check(2).Checked = True
-        radio.check(3).Text = "kernel Type = Sigmoid (not working)"
-        radio.check(3).Enabled = False
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "kernel Type = Linear"
+            radio.check(1).Text = "kernel Type = Poly (not working)"
+            radio.check(1).Enabled = False
+            radio.check(2).Text = "kernel Type = RBF"
+            radio.check(2).Checked = True
+            radio.check(3).Text = "kernel Type = Sigmoid (not working)"
+            radio.check(3).Enabled = False
+        End If
 
         radio1.Setup(caller, 5)
         radio1.check(0).Text = "SVM Type = CSvc"
@@ -162,8 +166,10 @@ Public Class SVM_Random
 
         task.drawRect = New cv.Rect(task.color.Cols / 4, task.color.Rows / 4, task.color.Cols / 2, task.color.Rows / 2)
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Restrict random test to square area"
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Restrict random test to square area"
+        End If
 
         label1 = "SVM Training data"
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"

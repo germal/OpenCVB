@@ -6,8 +6,10 @@ Public Class Sieve_Basics
     Public primes As New List(Of Integer)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Count of desired primes", 1, 10000, 400)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Count of desired primes", 1, 10000, 400)
+        End If
 
         task.desc = "Implement the Sieve of Eratothenes"
     End Sub

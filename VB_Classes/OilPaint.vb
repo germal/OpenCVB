@@ -8,13 +8,17 @@ Public Class OilPaint_Pointilism
     Dim myRNG As New cv.RNG
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
-        sliders.setupTrackBar(1, "Smoothing Radius", 0, 100, 32)
-        radio.Setup(caller, 2)
-        radio.check(0).Text = "Use Elliptical stroke"
-        radio.check(1).Text = "Use Circular stroke"
-        radio.check(1).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
+            sliders.setupTrackBar(1, "Smoothing Radius", 0, 100, 32)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Use Elliptical stroke"
+            radio.check(1).Text = "Use Circular stroke"
+            radio.check(1).Checked = True
+        End If
 
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
         task.desc = "Alter the image to effect the pointilism style - Painterly Effect"
@@ -124,9 +128,11 @@ Public Class OilPaint_Manual
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
-        sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
+            sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
+        End If
         task.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
@@ -183,10 +189,12 @@ Public Class OilPaint_Manual_CS
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
-        sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
-        sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
+            sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
+            sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
+        End If
         task.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 

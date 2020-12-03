@@ -21,8 +21,10 @@ Public Class Fuzzy_Basics
         reduction = New Reduction_Basics()
         Fuzzy = Fuzzy_Open()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Threshold for rectangle size", 50, 50000, 10000)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold for rectangle size", 50, 50000, 10000)
+        End If
         If standalone Then sliders.Visible = False
 
         label1 = "Solid regions"
@@ -194,10 +196,11 @@ Public Class Fuzzy_TrackerDepth
         initParent()
         fuzzy = New Fuzzy_Basics()
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Display centroid and rectangle for each region"
-        check.Box(0).Checked = True
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Display centroid and rectangle for each region"
+            check.Box(0).Checked = True
+        End If
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run()

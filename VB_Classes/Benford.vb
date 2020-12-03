@@ -175,8 +175,10 @@ Public Class Benford_JPEG
 
         benford = New Benford_Basics()
 
-        sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 1)
+            sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
+        End If
 
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
@@ -206,9 +208,10 @@ Public Class Benford_JPEG99
         benford = New Benford_Basics()
         benford.setup99()
 
-        sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 1)
+            sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
+        End If
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Sub Run()
@@ -238,9 +241,10 @@ Public Class Benford_PNG
 
         benford = New Benford_Basics()
 
-        sliders.Setup(caller, 1)
-        sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 1)
+            sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
+        End If
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run()

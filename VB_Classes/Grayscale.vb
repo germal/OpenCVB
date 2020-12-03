@@ -3,10 +3,11 @@ Public Class Grayscale_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Use OpenCV to create grayscale image"
-        check.Box(0).Checked = True
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Use OpenCV to create grayscale image"
+            check.Box(0).Checked = True
+        End If
         task.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
         label1 = "Grayscale_Basics"
         label2 = ""

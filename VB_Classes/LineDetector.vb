@@ -8,12 +8,13 @@ Public Class LineDetector_Basics
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
-        sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
-        sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 50)
-        sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
+            sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
+            sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 50)
+            sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
+        End If
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Manually drawn"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
@@ -232,20 +233,23 @@ Public Class lineDetector_FLD_CPP
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 6)
-        sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
-        sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
-        sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
-        sliders.setupTrackBar(3, "FLD - Line Thickness", 1, 7, 3)
-        sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
-        sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 6)
+            sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
+            sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
+            sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
+            sliders.setupTrackBar(3, "FLD - Line Thickness", 1, 7, 3)
+            sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
+            sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
+        End If
 
-        check.Setup(caller, 2)
-        check.Box(0).Text = "FLD - incremental merge"
-        check.Box(0).Checked = True
-        check.Box(1).Text = "FLD - Draw lines on input image"
-        check.Box(1).Checked = True
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "FLD - incremental merge"
+            check.Box(0).Checked = True
+            check.Box(1).Text = "FLD - Draw lines on input image"
+            check.Box(1).Checked = True
+        End If
         task.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run()
@@ -285,9 +289,11 @@ Public Class LineDetector_3D_LongestLine
         initParent()
         lines = New lineDetector_FLD_CPP()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
-        sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
+            sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
+        End If
 
         task.desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
@@ -320,10 +326,11 @@ Public Class LineDetector_3D_FLD_MT
         initParent()
         lines = New lineDetector_FLD_CPP()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
-        sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
+            sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
+        End If
         task.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
@@ -357,15 +364,18 @@ Public Class LineDetector_3D_FitLineZ
         initParent()
         linesFLD = New lineDetector_FLD_CPP()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)
-        sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
-        sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)
-
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
-        check.Box(1).Text = "Display only the longest line"
-        check.Box(1).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)
+            sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
+            sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
+            check.Box(1).Text = "Display only the longest line"
+            check.Box(1).Checked = True
+        End If
 
         task.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
         label2 = ""
@@ -464,17 +474,21 @@ Public Class lineDetector_FLD
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 6)
-        sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
-        sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
-        sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
-        sliders.setupTrackBar(3, "FLD - Line Thickness", 1, 7, 3)
-        sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
-        sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 6)
+            sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
+            sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
+            sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
+            sliders.setupTrackBar(3, "FLD - Line Thickness", 1, 7, 3)
+            sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
+            sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
+        End If
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "FLD - incremental merge"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "FLD - incremental merge"
+            check.Box(0).Checked = True
+        End If
         task.desc = "A Fast Line Detector"
     End Sub
     Public Sub Run()

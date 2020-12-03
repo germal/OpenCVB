@@ -65,19 +65,22 @@ Public Class Blob_Detector_CS
         initParent()
         blob = New Blob_Input()
         blob.updateFrequency = 1 ' it is pretty fast but sloppy...
-        check.Setup(caller, 5)
-        check.Box(0).Text = "FilterByArea"
-        check.Box(1).Text = "FilterByCircularity"
-        check.Box(2).Text = "FilterByConvexity"
-        check.Box(3).Text = "FilterByInertia"
-        check.Box(4).Text = "FilterByColor"
-        check.Box(4).Checked = True ' filter by color...
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 5)
+            check.Box(0).Text = "FilterByArea"
+            check.Box(1).Text = "FilterByCircularity"
+            check.Box(2).Text = "FilterByConvexity"
+            check.Box(3).Text = "FilterByInertia"
+            check.Box(4).Text = "FilterByColor"
+            check.Box(4).Checked = True ' filter by color...
+        End If
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "min Threshold", 0, 255, 100)
-        sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
-        sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "min Threshold", 0, 255, 100)
+            sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
+            sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
+        End If
         label1 = "Blob_Detector_CS Input"
     End Sub
     Public Sub Run()

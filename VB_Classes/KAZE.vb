@@ -92,9 +92,11 @@ Public Class KAZE_LeftAligned_CS
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
-        sliders.setupTrackBar(1, "When matching, max possible distance", 1, 200, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
+            sliders.setupTrackBar(1, "When matching, max possible distance", 1, 200, 100)
+        End If
 
         task.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub

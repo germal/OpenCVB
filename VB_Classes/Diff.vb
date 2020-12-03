@@ -4,8 +4,10 @@ Public Class Diff_Basics
     Public lastFrame As New cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Change threshold for each pixel", 1, 255, 25)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Change threshold for each pixel", 1, 255, 25)
+        End If
         label1 = "Stable Color"
         label2 = "Unstable Color mask"
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"

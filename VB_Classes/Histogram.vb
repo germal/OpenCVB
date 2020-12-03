@@ -14,10 +14,11 @@ Public Class Histogram_Basics
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 50)
-        sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 50)
+            sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
+        End If
         task.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run()
@@ -141,15 +142,19 @@ Public Class Histogram_NormalizeGray
     Public histogram As Histogram_KalmanSmoothed
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
-        sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
+            sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
+        End If
         histogram = New Histogram_KalmanSmoothed()
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Normalize Before Histogram"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Normalize Before Histogram"
+            check.Box(0).Checked = True
+        End If
+
         task.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run()
@@ -176,9 +181,11 @@ Public Class Histogram_2D_HueSaturation
 
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
-        sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
+            sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
+        End If
         task.desc = "Create a histogram for hue and saturation."
     End Sub
     Public Sub Run()
@@ -217,8 +224,10 @@ Public Class Histogram_KalmanSmoothed
 
         kalman = New Kalman_Basics()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
+        End If
 
         label2 = "Histogram - x=bins/y=count"
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
@@ -278,8 +287,10 @@ Public Class Histogram_Depth
         plotHist = New Plot_Histogram()
 
         inrange = New Depth_InRange()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
+        End If
 
         task.desc = "Show depth data as a histogram."
     End Sub
@@ -452,11 +463,12 @@ Public Class Histogram_2D_XZ_YZ
         inrange = New Depth_InRange()
         inrange.sliders.trackbar(1).Value = 1500 ' up to x meters away
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram X bins", 1, src.Cols, 30)
-        sliders.setupTrackBar(1, "Histogram Y bins", 1, src.Rows, 30)
-        sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram X bins", 1, src.Cols, 30)
+            sliders.setupTrackBar(1, "Histogram Y bins", 1, src.Rows, 30)
+            sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
+        End If
         task.desc = "Create a 2D histogram for depth in XZ and YZ."
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
@@ -594,11 +606,13 @@ Public Class Histogram_Equalize255
         eqHist.kalman.sliders.trackbar(0).Value = 255
         eqHist.displayHist = True
 
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "Equalize the Blue channel"
-        radio.check(1).Text = "Equalize the Green channel"
-        radio.check(2).Text = "Equalize the Red channel"
-        radio.check(2).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Equalize the Blue channel"
+            radio.check(1).Text = "Equalize the Green channel"
+            radio.check(2).Text = "Equalize the Red channel"
+            radio.check(2).Checked = True
+        End If
         label1 = "Resulting equalized image"
         label2 = "Upper plot is before equalization.  Bottom is after."
         task.desc = "Reproduce the results of the hist.py example with existing algorithms"
@@ -626,8 +640,10 @@ Public Class Histogram_Simple
         initParent()
         plotHist = New Plot_Histogram()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 2, src.Cols, 50)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Bins", 2, src.Cols, 50)
+        End If
 
         task.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
@@ -664,18 +680,21 @@ Public Class Histogram_ColorsAndGray
         initParent()
         mats = New Mat_4to1()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
-        sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
+            sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
+        End If
         histogram = New Histogram_KalmanSmoothed()
         histogram.kalman.check.Box(0).Checked = False
         histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.trackbar(0).Value = 40
 
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Normalize Before Histogram"
-        check.Box(0).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Normalize Before Histogram"
+            check.Box(0).Checked = True
+        End If
 
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Create a histogram of a normalized image"
@@ -917,11 +936,12 @@ Public Class Histogram_Concentration
         'Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
         'minDepthSlider.Value = 1000
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
-        sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
-        sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
+            sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
+            sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
+        End If
         task.desc = "Highlight the histogram projections where concentrations are highest"
     End Sub
     Private Function plotHighlights( histOutput As cv.Mat, dst As cv.Mat) As String
@@ -990,9 +1010,11 @@ Public Class Histogram_SideView2D
         initParent()
 
         cmat = New PointCloud_Colorize()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
-        sliders.setupTrackBar(1, "sideCameraPoint.x adjustment", -100, 100, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
+            sliders.setupTrackBar(1, "sideCameraPoint.x adjustment", -100, 100, 0)
+        End If
         frustrumSlider = sliders.trackbar(0)
         cameraYSlider = sliders.trackbar(1)
 
@@ -1067,9 +1089,11 @@ Public Class Histogram_TopView2D
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
-        sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
+            sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
+        End If
         frustrumSlider = sliders.trackbar(0)
         cameraXSlider = sliders.trackbar(1)
 
@@ -1145,9 +1169,11 @@ Public Class Histogram_TopData
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "X scale negative value in meters (meterMin) X100", -400, -5, -200)
-        sliders.setupTrackBar(1, "X scale positive value in meters (meterMax) X100", 5, 400, 200)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "X scale negative value in meters (meterMin) X100", -400, -5, -200)
+            sliders.setupTrackBar(1, "X scale positive value in meters (meterMax) X100", 5, 400, 200)
+        End If
 
         kalman = New Kalman_Basics()
         gCloud = New Depth_PointCloud_IMU()
@@ -1208,10 +1234,11 @@ Public Class Histogram_SideData
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Y scale negative value in meters (meterMin) X100", -400, -5, -200)
-        sliders.setupTrackBar(1, "Y scale positive value in meters (meterMax) X100", 5, 400, 200)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Y scale negative value in meters (meterMin) X100", -400, -5, -200)
+            sliders.setupTrackBar(1, "Y scale positive value in meters (meterMax) X100", 5, 400, 200)
+        End If
         kalman = New Kalman_Basics()
         gCloud = New Depth_PointCloud_IMU()
 

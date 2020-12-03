@@ -41,9 +41,10 @@ Public Class Depth_Flatland
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Region Count", 1, 250, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Region Count", 1, 250, 10)
+        End If
         label2 = "Grayscale version"
         task.desc = "Attempt to stabilize the depth image."
     End Sub
@@ -90,9 +91,10 @@ Public Class Depth_HolesRect
     Dim shadow As Depth_Holes
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "shadowRect Min Size", 1, 20000, 2000)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "shadowRect Min Size", 1, 20000, 2000)
+        End If
         shadow = New Depth_Holes()
 
         task.desc = "Identify the minimum rectangles of contours of the depth shadow"
@@ -207,9 +209,10 @@ Public Class Depth_FlatData
         initParent()
         shadow = New Depth_Holes()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "FlatData Region Count", 1, 250, 200)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FlatData Region Count", 1, 250, 200)
+        End If
         label1 = "Reduced resolution RGBDepth"
         task.desc = "Attempt to stabilize the depth image."
     End Sub
@@ -241,9 +244,10 @@ Public Class Depth_Zero
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Depth_Zero Max Depth", 200, 10000, 4000)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Depth_Zero Max Depth", 200, 10000, 4000)
+        End If
         label2 = "Mask for depth zero or out-of-range"
         task.desc = "Create a mask for zero depth - depth shadow and depth out-of-range"
     End Sub
@@ -292,9 +296,11 @@ Public Class Depth_MeanStdev_MT
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 40
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "MeanStdev Max Depth Range", 1, 20000, 3500)
-        sliders.setupTrackBar(1, "MeanStdev Frame Series", 1, 100, 5)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "MeanStdev Max Depth Range", 1, 20000, 3500)
+            sliders.setupTrackBar(1, "MeanStdev Frame Series", 1, 100, 5)
+        End If
         task.desc = "Collect a time series of depth and measure where the stdev is unstable.  Plan is to avoid depth where unstable."
     End Sub
     Public Sub Run()
@@ -424,9 +430,10 @@ Public Class Depth_Uncertainty
         initParent()
         retina = New Retina_Basics_CPP()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
+        End If
         label2 = "Mask of areas with unstable depth"
         task.desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
     End Sub
@@ -559,9 +566,11 @@ Public Class Depth_ManualTrim
     Public Mask As New cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Min Depth", 200, 1000, 200)
-        sliders.setupTrackBar(1, "Max Depth", 200, 10000, 1400)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Min Depth", 200, 1000, 200)
+            sliders.setupTrackBar(1, "Max Depth", 200, 10000, 1400)
+        End If
         task.desc = "Manually show depth with varying min and max depths."
     End Sub
     Public Sub Run()
@@ -684,10 +693,11 @@ Public Class Depth_ColorizerVB_MT
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
-        sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
+            sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
+        End If
         grid = New Thread_Grid()
 
         task.desc = "Colorize depth manually with multi-threading."
@@ -752,10 +762,11 @@ Public Class Depth_Colorizer_MT
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Min Depth", 100, 1000, 100)
-        sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Min Depth", 100, 1000, 100)
+            sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
+        End If
         grid = New Thread_Grid()
 
         task.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
@@ -923,10 +934,11 @@ Public Class Depth_ColorMap
     Public Sub New()
         initParent()
         Palette = New Palette_Basics()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 5)
-        sliders.setupTrackBar(1, "Depth ColorMap Beta", 1, 100, 3)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 5)
+            sliders.setupTrackBar(1, "Depth ColorMap Beta", 1, 100, 3)
+        End If
         task.desc = "Display the depth as a color map"
     End Sub
     Public Sub Run()
@@ -1014,9 +1026,10 @@ Public Class Depth_Decreasing
     Public Increasing As Boolean
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
+        End If
         task.desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub Run()
@@ -1092,8 +1105,10 @@ Public Class Depth_SmoothingMat
         inrange = New Depth_InRange()
         inrange.depth32fAfterMasking = True
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 10)
+        End If
         label2 = "Depth pixels after smoothing"
         task.desc = "Use depth rate of change to smooth the depth values beyond close range"
     End Sub
@@ -1181,8 +1196,10 @@ Public Class Depth_Edges
         initParent()
         edges = New Edges_Laplacian()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
+        End If
         task.desc = "Find edges in depth data"
     End Sub
     Public Sub Run()
@@ -1207,9 +1224,10 @@ Public Class Depth_HolesOverTime
         initParent()
         holes = New Depth_Holes()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Number of images to retain", 0, 10, 3)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of images to retain", 0, 10, 3)
+        End If
         label2 = "Latest hole mask"
         task.desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
@@ -1244,10 +1262,11 @@ Public Class Depth_Holes
     Dim element As New cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
-        sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
+            sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
+        End If
         label2 = "Shadow Edges (use sliders to expand)"
         element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
         task.desc = "Identify holes in the depth image."
@@ -1281,9 +1300,10 @@ Public Class Depth_TooClose
         initParent()
         holes = New Depth_Holes()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Amount of depth padded to minimum depth (mm)", 1, 4000, 1000)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Amount of depth padded to minimum depth (mm)", 1, 4000, 1000)
+        End If
         label2 = "Non-Zero depth mask"
         task.desc = "Tests to determine if the camera is too close"
     End Sub
@@ -1357,10 +1377,11 @@ Public Class Depth_TooCloseCentroids
         initParent()
         depth = New Depth_NoiseRemovalMask()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Size of rejected rects that are likely too close", 1, 500, 250)
-        sliders.setupTrackBar(1, "Percent of zero depth in rejected rect", 1, 100, 20) ' Empircally determined - subject to change!
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Size of rejected rects that are likely too close", 1, 500, 250)
+            sliders.setupTrackBar(1, "Percent of zero depth in rejected rect", 1, 100, 20) ' Empircally determined - subject to change!
+        End If
         task.desc = "Plot the rejected centroids and rects in FloodFill - search for points that are too close"
     End Sub
     Public Sub Run()
@@ -1552,21 +1573,25 @@ Public Class Depth_InRange
     Public depth32fAfterMasking As Boolean
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 2000, 200)
-        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
-        sliders.setupTrackBar(2, "Histogram threshold", 0, 3000, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 2000, 200)
+            sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
+            sliders.setupTrackBar(2, "Histogram threshold", 0, 3000, 10)
+        End If
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
-        Dim min = If(minVal <> 0, minVal, sliders.trackbar(0).Value)
-        Dim max = If(minVal <> 0, maxVal, sliders.trackbar(1).Value)
-        If src.Type = cv.MatType.CV_32F Then depth32f = src Else depth32f = getDepth32f()
-        cv.Cv2.InRange(depth32f, cv.Scalar.All(min), cv.Scalar.All(max), depthMask)
+        Static minSlider = findSlider("InRange Min Depth (mm)")
+        Static maxSlider = findSlider("InRange Max Depth (mm)")
+        Dim min = If(minVal <> 0, minVal, minSlider.Value)
+        Dim max = If(minVal <> 0, maxVal, maxSlider.Value)
+        If min >= max Then max = min + 1
+        depth32f = If(src.Type = cv.MatType.CV_32FC1, src, getDepth32f())
+        cv.Cv2.InRange(depth32f, min, max, depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
         Dim tmp = depth32f.Clone
         dst1 = tmp.SetTo(0, noDepthMask)
@@ -1595,14 +1620,17 @@ Public Class Depth_PointCloud_IMU
         inrange = New Depth_InRange()
         imu = New IMU_GVector()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Amount to rotate pointcloud around Y-axis (degrees)", -180, 180, 0)
-
-        check.Setup(caller, 2)
-        check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"
-        check.Box(1).Text = "Rotate pointcloud around Z-axis using angleX of the gravity vector"
-        check.Box(0).Checked = True
-        check.Box(1).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Amount to rotate pointcloud around Y-axis (degrees)", -180, 180, 0)
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"
+            check.Box(1).Text = "Rotate pointcloud around Z-axis using angleX of the gravity vector"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
 
         label1 = "Depth range values.  Pointcloud also prepared."
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."

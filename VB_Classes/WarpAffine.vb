@@ -92,9 +92,10 @@ Public Class WarpAffine_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Angle", 0, 360, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Angle", 0, 360, 10)
+        End If
         SetInterpolationRadioButtons(caller, radio, "WarpAffine")
 
         task.desc = "Use WarpAffine to transform input images."

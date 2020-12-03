@@ -394,17 +394,18 @@ Public Class Mat_Inverse
     Public Sub New()
         initParent()
         flow = New Font_FlowText()
-        radio.Setup(caller, 6)
-        radio.check(0).Text = "Cholesky"
-        radio.check(1).Text = "Eig (works but results are incorrect)"
-        radio.check(2).Text = "LU"
-        radio.check(3).Text = "Normal (not working)"
-        radio.check(4).Text = "QR (not working)"
-        radio.check(5).Text = "SVD (works but results are incorrect)"
-        radio.check(0).Checked = True
-        radio.check(3).Enabled = False ' not accepted!
-        radio.check(4).Enabled = False ' not accepted!
-
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 6)
+            radio.check(0).Text = "Cholesky"
+            radio.check(1).Text = "Eig (works but results are incorrect)"
+            radio.check(2).Text = "LU"
+            radio.check(3).Text = "Normal (not working)"
+            radio.check(4).Text = "QR (not working)"
+            radio.check(5).Text = "SVD (works but results are incorrect)"
+            radio.check(0).Checked = True
+            radio.check(3).Enabled = False ' not accepted!
+            radio.check(4).Enabled = False ' not accepted!
+        End If
         task.desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
     Public Sub Run()

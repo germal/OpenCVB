@@ -3,14 +3,18 @@ Public Class DCT_Basics
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
-        sliders.setupTrackBar(1, "Run Length Minimum", 1, 100, 15)
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "DCT Flags None"
-        radio.check(1).Text = "DCT Flags Row"
-        radio.check(2).Text = "DCT Flags Inverse"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
+            sliders.setupTrackBar(1, "Run Length Minimum", 1, 100, 15)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "DCT Flags None"
+            radio.check(1).Text = "DCT Flags Row"
+            radio.check(2).Text = "DCT Flags Inverse"
+            radio.check(0).Checked = True
+        End If
 
         task.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         label2 = "Difference from original"

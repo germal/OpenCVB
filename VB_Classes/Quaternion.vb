@@ -17,16 +17,18 @@ Public Class Quaterion_Basics
     Public Sub New()
         initParent()
 
-        sliders.Setup(caller, 8)
-        sliders.setupTrackBar(0, "quaternion A.x X100", -100, 100, -50)
-        sliders.setupTrackBar(1, "quaternion A.y X100", -100, 100, 10)
-        sliders.setupTrackBar(2, "quaternion A.z X100", -100, 100, 20)
-        sliders.setupTrackBar(3, "quaternion Theta X100", -100, 100, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 8)
+            sliders.setupTrackBar(0, "quaternion A.x X100", -100, 100, -50)
+            sliders.setupTrackBar(1, "quaternion A.y X100", -100, 100, 10)
+            sliders.setupTrackBar(2, "quaternion A.z X100", -100, 100, 20)
+            sliders.setupTrackBar(3, "quaternion Theta X100", -100, 100, 100)
 
-        sliders.setupTrackBar(4, "quaternion B.x X100", -100, 100, -10)
-        sliders.setupTrackBar(5, "quaternion B.y X100", -100, 100, -10)
-        sliders.setupTrackBar(6, "quaternion B.z X100", -100, 100, -10)
-        sliders.setupTrackBar(7, "quaternion Theta X100", -100, 100, 100)
+            sliders.setupTrackBar(4, "quaternion B.x X100", -100, 100, -10)
+            sliders.setupTrackBar(5, "quaternion B.y X100", -100, 100, -10)
+            sliders.setupTrackBar(6, "quaternion B.z X100", -100, 100, -10)
+            sliders.setupTrackBar(7, "quaternion Theta X100", -100, 100, 100)
+        End If
 
         task.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub

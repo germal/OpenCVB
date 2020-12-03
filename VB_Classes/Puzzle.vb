@@ -286,19 +286,22 @@ Public Class Puzzle_Solver
         initParent()
         puzzle = New Puzzle_Basics()
 
-        radio.Setup(caller, 3)
-        radio.check(0).Text = "256x180 tile - Easy Puzzle"
-        radio.check(1).Text = "128x90  tile - Medium Puzzle"
-        radio.check(2).Text = "64x90   tile - Hard Puzzle"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "256x180 tile - Easy Puzzle"
+            radio.check(1).Text = "128x90  tile - Medium Puzzle"
+            radio.check(2).Text = "64x90   tile - Hard Puzzle"
+            radio.check(0).Checked = True
+        End If
 
-        check.Setup(caller, 3)
-        check.Box(0).Text = "Reshuffle pieces"
-        check.Box(1).Text = "Show poor correlation coefficients"
-        check.Box(2).Text = "Clean display (no grid or correlations)"
-        check.Box(0).Checked = True
-        check.Box(1).Checked = False
-
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Reshuffle pieces"
+            check.Box(1).Text = "Show poor correlation coefficients"
+            check.Box(2).Text = "Clean display (no grid or correlations)"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = False
+        End If
         task.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
     End Sub
     Private Function checkUsedList(best As List(Of Integer)) As bestFit

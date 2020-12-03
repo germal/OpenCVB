@@ -72,17 +72,20 @@ Public Class xPhoto_OilPaint_CPP
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
-        sliders.setupTrackBar(1, "xPhoto Block Size", 1, 100, 3)
-
-        radio.Setup(caller, 5)
-        radio.check(0).Text = "BGR2GRAY"
-        radio.check(1).Text = "BGR2HSV"
-        radio.check(2).Text = "BGR2YUV  "
-        radio.check(3).Text = "BGR2XYZ"
-        radio.check(4).Text = "BGR2Lab"
-        radio.check(0).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
+            sliders.setupTrackBar(1, "xPhoto Block Size", 1, 100, 3)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 5)
+            radio.check(0).Text = "BGR2GRAY"
+            radio.check(1).Text = "BGR2HSV"
+            radio.check(2).Text = "BGR2YUV  "
+            radio.check(3).Text = "BGR2XYZ"
+            radio.check(4).Text = "BGR2Lab"
+            radio.check(0).Checked = True
+        End If
 
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()

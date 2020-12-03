@@ -3,10 +3,13 @@ Public Class Math_Subtract
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Red", 0, 255, 255)
-        sliders.setupTrackBar(1, "Green", 0, 255, 255)
-        sliders.setupTrackBar(2, "Blue", 0, 255, 255)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Red", 0, 255, 255)
+            sliders.setupTrackBar(1, "Green", 0, 255, 255)
+            sliders.setupTrackBar(2, "Blue", 0, 255, 255)
+        End If
+
         task.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run()
@@ -51,8 +54,10 @@ Public Class Math_Median_CDF
     Public bins As integer = 10
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
+        End If
         task.desc = "Compute the src image median"
     End Sub
     Public Sub Run()

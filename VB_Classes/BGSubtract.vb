@@ -7,15 +7,17 @@ Public Class BGSubtract_Basics_CPP
     Public currMethod As integer = -1
     Public Sub New()
         initParent()
-        radio.Setup(caller, 7)
-        radio.check(0).Text = "GMG"
-        radio.check(1).Text = "CNT - Counting"
-        radio.check(2).Text = "KNN"
-        radio.check(3).Text = "MOG"
-        radio.check(4).Text = "MOG2"
-        radio.check(5).Text = "GSOC"
-        radio.check(6).Text = "LSBP"
-        radio.check(4).Checked = True ' mog2 appears to be the best...
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 7)
+            radio.check(0).Text = "GMG"
+            radio.check(1).Text = "CNT - Counting"
+            radio.check(2).Text = "KNN"
+            radio.check(3).Text = "MOG"
+            radio.check(4).Text = "MOG2"
+            radio.check(5).Text = "GSOC"
+            radio.check(6).Text = "LSBP"
+            radio.check(4).Checked = True ' mog2 appears to be the best...
+        End If
         task.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run()
@@ -58,14 +60,18 @@ Public Class BGSubtract_MotionDetect_MT
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
-        radio.Setup(caller, 6)
-        For i = 0 To radio.check.Length - 1
-            radio.check(i).Text = CStr(2 ^ i) + " threads"
-        Next
-        radio.check(0).Text = "1 thread"
-        radio.check(5).Checked = True
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 6)
+            For i = 0 To radio.check.Length - 1
+                radio.check(i).Text = CStr(2 ^ i) + " threads"
+            Next
+            radio.check(0).Text = "1 thread"
+            radio.check(5).Checked = True
+        End If
         label2 = "Only Motion Added"
         task.desc = "Detect Motion for use with background subtraction"
     End Sub
@@ -118,8 +124,10 @@ Public Class BGSubtract_Basics_MT
         initParent()
         grid = New Thread_Grid()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
+        End If
 
         label2 = "Only Motion Added"
         task.desc = "Detect Motion in the color image"
@@ -176,8 +184,10 @@ Public Class BGSubtract_MOG
     Public gray As New cv.Mat
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
+        End If
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         task.desc = "Subtract background using a mixture of Gaussians"
@@ -203,9 +213,10 @@ Public Class BGSubtract_MOG2
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
+        End If
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         task.desc = "Subtract background using a mixture of Gaussians"
     End Sub
@@ -225,8 +236,10 @@ Public Class BGSubtract_GMG_KNN
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Learn Rate", 1, 1000, 1)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Learn Rate", 1, 1000, 1)
+        End If
 
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
@@ -258,8 +271,10 @@ Public Class BGSubtract_MOG_RGBDepth
     Dim MOGRGB As cv.BackgroundSubtractorMOG
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "MOG Learn Rate x1000", 0, 1000, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "MOG Learn Rate x1000", 0, 1000, 10)
+        End If
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
@@ -403,11 +418,13 @@ Public Class BGSubtract_Synthetic_CPP
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Synthetic Amplitude x100", 1, 400, 200)
-        sliders.setupTrackBar(1, "Synthetic Magnitude", 1, 40, 20)
-        sliders.setupTrackBar(2, "Synthetic Wavespeed x100", 1, 400, 20)
-        sliders.setupTrackBar(3, "Synthetic ObjectSpeed", 1, 20, 15)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Synthetic Amplitude x100", 1, 400, 200)
+            sliders.setupTrackBar(1, "Synthetic Magnitude", 1, 40, 20)
+            sliders.setupTrackBar(2, "Synthetic Wavespeed x100", 1, 400, 20)
+            sliders.setupTrackBar(3, "Synthetic ObjectSpeed", 1, 20, 15)
+        End If
         label1 = "Synthetic background/foreground image."
         task.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub

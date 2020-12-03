@@ -4,8 +4,10 @@ Public Class Brightness_Clahe ' Contrast Limited Adaptive Histogram Equalization
     Inherits VBparent
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
+        End If
         sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
         task.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
@@ -52,9 +54,11 @@ Public Class Brightness_AlphaBeta
     Public Sub New()
         initParent()
         task.desc = "Use alpha and beta with ConvertScaleAbs."
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
-        sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
+            sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
+        End If
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -71,8 +75,10 @@ Public Class Brightness_Gamma
     Public Sub New()
         initParent()
         task.desc = "Use gamma with ConvertScaleAbs."
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
+        End If
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -112,9 +118,10 @@ Public Class Brightness_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New()
         initParent()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
-
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
+        End If
         wPtr = WhiteBalance_Open()
         label1 = "Image with auto white balance"
         label2 = "White pixels were altered from the original"
