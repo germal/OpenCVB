@@ -192,21 +192,24 @@ Public Class EMax_Centroids
         initParent()
 
         flood = New FloodFill_Basics()
+
+        emaxCPP = New EMax_CPP()
         Dim lowDiffslider = findSlider("FloodFill LoDiff")
         Dim highDiffslider = findSlider("FloodFill HiDiff")
         lowDiffslider.Value = 1
         highDiffslider.Value = 1
-        emaxCPP = New EMax_CPP()
+
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         gridWidthSlider.Value = src.Width * 170 / 640
 
         task.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         emaxCPP.Run()
 
-        flood.src = emaxCPP.dst2.Clone
+            flood.src = emaxCPP.dst2.Clone
         flood.Run()
         dst1 = flood.dst2
 

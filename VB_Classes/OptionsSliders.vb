@@ -39,6 +39,7 @@ Public Class OptionsSliders
         If count > 4 Then
             defaultHeight = count * 58 ' add space for the additional unexpected trackbars.
             FlowLayoutPanel1.Height = defaultHeight - 30
+            Me.Height = FlowLayoutPanel1.Height + 30
         End If
     End Sub
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)

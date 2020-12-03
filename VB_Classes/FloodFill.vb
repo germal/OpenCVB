@@ -118,7 +118,7 @@ Public Class FloodFill_8bit
             dst2.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
         Next
 
-        allRegionMask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+        allRegionMask = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
 
         Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
         palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 

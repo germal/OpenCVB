@@ -11,6 +11,7 @@ Public Class OptionsCheckbox
             Box(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(Box(i))
         Next
+        Me.Show()
     End Sub
     Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
         Get

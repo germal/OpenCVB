@@ -5,12 +5,6 @@ Public Class allOptionsFrm
     Public optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public offset = 30
-    Private Sub Options_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Left = GetSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", ocvb.defaultRect.X - offset)
-        Me.Top = GetSetting("OpenCVB", "aOptionsTop", "aOptionsTop", ocvb.defaultRect.Y - offset)
-        Me.Width = GetSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", ocvb.defaultRect.Width)
-        Me.Height = GetSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", ocvb.defaultRect.Height)
-    End Sub
     Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         SaveSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", Me.Left)
         SaveSetting("OpenCVB", "aOptionsTop", "aOptionsTop", Me.Top)
@@ -33,7 +27,6 @@ Public Class allOptionsFrm
         frm.show
     End Sub
     Public Sub layoutOptions()
-        Me.Show()
         Application.DoEvents()
         Dim sliderOffset As New cv.Point(0, 0)
         Dim w = GetSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", ocvb.defaultRect.Width)
@@ -70,5 +63,10 @@ Public Class allOptionsFrm
         End Try
         optionsTitle.Clear()
         hiddenOptions.Clear()
+
+        Me.Left = GetSetting("OpenCVB", "aOptionsLeft", "aOptionsLeft", ocvb.defaultRect.X - offset)
+        Me.Top = GetSetting("OpenCVB", "aOptionsTop", "aOptionsTop", ocvb.defaultRect.Y - offset)
+        Me.Width = GetSetting("OpenCVB", "aOptionsWidth", "aOptionsWidth", ocvb.defaultRect.Width)
+        Me.Height = GetSetting("OpenCVB", "aOptionsHeight", "aOptionsHeight", ocvb.defaultRect.Height)
     End Sub
 End Class

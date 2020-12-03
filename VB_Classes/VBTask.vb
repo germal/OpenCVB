@@ -154,6 +154,8 @@ Public Class ActiveTask : Implements IDisposable
 
         buildColors()
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
+        aOptions = New allOptionsFrm
+        aOptions.Show()
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +

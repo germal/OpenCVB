@@ -42,8 +42,6 @@ Public Class VBparent : Implements IDisposable
     Dim callStack = ""
     Public Sub initParent()
         If task.callTrace.Count = 0 Then
-            aOptions = New allOptionsFrm
-
             standalone = True
             task.callTrace.Clear()
             task.callTrace.Add(callStack)
