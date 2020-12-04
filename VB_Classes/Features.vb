@@ -46,7 +46,6 @@ Public Class Features_PointTracker
         pTrack = New KNN_PointTracker()
         Dim drawRectCheck = findCheckBox("Draw rectangle and centroid for each mask")
         drawRectCheck.Checked = False
-        hideForm("Draw_ViewObjects CheckBox Options")
 
         label1 = "Good features without Kalman"
         label2 = "Good features with Kalman"
