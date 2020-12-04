@@ -73,7 +73,7 @@ Public Class Filter_Normalized2D
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Filter_Normalized2D kernel size", 1, 21, 3)
+            sliders.setupTrackBar(0, "Filter Normalized 2D kernel size", 1, 21, 3)
         End If
         task.desc = "Create and apply a normalized kernel."
     End Sub
