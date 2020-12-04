@@ -55,11 +55,6 @@ Public Class OptionsSliders
     Private Sub TrackBar_ValueChanged(sender As Object, e As EventArgs)
         countLabel(sender.tag).Text = CStr(trackbar(sender.tag).Value)
     End Sub
-    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
-        Get
-            Return True
-        End Get
-    End Property
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth
         Me.Height = defaultHeight

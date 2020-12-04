@@ -34,12 +34,18 @@ Public Class CamShift_Basics
         Static roi_hist As New cv.Mat
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
-        Dim bins = sliders.trackbar(3).Value
+
+        Static vMinSlider = findSlider("CamShift vMin")
+        Static vMaxSlider = findSlider("CamShift vMax")
+        Static sMinSlider = findSlider("CamShift Smin")
+        Static histBinsSlider = findSlider("CamShift Histogram bins")
+
+        Dim bins = histBinsSlider.Value
         Dim hsize() As integer = {bins, bins, bins}
         Dim ranges() = {New cv.Rangef(0, 180)}
-        Dim min = Math.Min(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
-        Dim max = Math.Max(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
-        Dim sbins = New cv.Scalar(0, sliders.trackbar(2).Value, min)
+        Dim min = Math.Min(vMinSlider.value, vMaxSlider.Value)
+        Dim max = Math.Max(vMinSlider.value, vMaxSlider.Value)
+        Dim sbins = New cv.Scalar(0, sMinSlider.Value, min)
 
         cv.Cv2.MixChannels({hsv}, {hue}, {0, 0})
         Dim mask = hsv.InRange(sbins, New cv.Scalar(180, 255, max))

@@ -124,8 +124,12 @@ Public Class Plot_OverTime
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
-        Dim pixelHeight = CInt(sliders.trackbar(0).Value)
-        Dim pixelWidth = CInt(sliders.trackbar(1).Value)
+
+        Static widthSlider = findSlider("Plot Pixel Width")
+        Static heightSlider = findSlider("Plot Pixel Height")
+        Dim pixelHeight = CInt(heightSlider.Value)
+        Dim pixelWidth = CInt(widthSlider.Value)
+
         If ocvb.frameCount = 0 Then dst1.SetTo(0)
         If columnIndex + pixelWidth >= src.Width Then
             dst1.ColRange(columnIndex, src.Width).SetTo(backColor)
@@ -142,7 +146,8 @@ Public Class Plot_OverTime
         Next
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
-        If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount) Or check.Box(0).Checked Then
+        Static resetCheck = findCheckBox("Reset the plot scale")
+        If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount) Or resetCheck.Checked Then
             check.Box(0).Checked = False
             dst1.SetTo(0)
             maxScale = Integer.MinValue

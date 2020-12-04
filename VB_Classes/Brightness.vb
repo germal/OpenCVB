@@ -133,7 +133,8 @@ Public Class Brightness_WhiteBalance_CPP
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
         Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
 
-        Dim thresholdVal As Single = sliders.trackbar(0).Value / 100
+        Static thresholdSlider = findSlider("White balance threshold X100")
+        Dim thresholdVal As Single = thresholdSlider.Value / 100
         Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
 
@@ -230,10 +231,10 @@ Public Class Brightness_ChangeMask
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static countdown = 60
+        Static countdown = 120
         Static whiteFlag As Boolean
         If countdown = 0 Then
-            countdown = 60
+            countdown = 120
             whiteFlag = Not whiteFlag
         End If
         countdown -= 1

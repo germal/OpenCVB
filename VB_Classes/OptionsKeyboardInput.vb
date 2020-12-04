@@ -17,9 +17,4 @@ Public Class OptionsKeyboardInput
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
         TextBox1.Text = ""
     End Sub
-    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
-        Get
-            Return True
-        End Get
-    End Property
 End Class

@@ -13,9 +13,4 @@ Public Class OptionsCheckbox
         Next
         Me.Show()
     End Sub
-    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
-        Get
-            Return True
-        End Get
-    End Property
 End Class

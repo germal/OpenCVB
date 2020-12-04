@@ -864,7 +864,7 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        If camera.frameCount < 30 Then Me.Activate() ' after all the algorithm options forms have appeared, set focus on the main form.
+        If camera.frameCount < 60 Then Me.Activate() ' after all the algorithm options forms have appeared, set focus on the main form.
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If

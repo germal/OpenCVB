@@ -63,20 +63,26 @@ Public Class Gabor_Basics_MT
 
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics()
-            gabor(i).sliders.trackbar(2).Value = i * 180 / gabor.Length
+            gabor(i).theta = i * 180 / gabor.Length
         Next
 
-        gabor(0).sliders.Visible = True
         task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static ksizeSlider = findSlider("Gabor Kernel Size")
+        Static sigmaSlider = findSlider("Gabor Sigma")
+        Static lambdaSlider = findSlider("Gabor lambda")
+        Static gammaSlider = findSlider("Gabor gamma X10")
+        Static phaseSlider = findSlider("Gabor Phase offset X100")
+        Static thetaSlider = findSlider("Gabor Theta (degrees)")
         For i = 0 To gabor.Count - 1
-            gabor(i).ksize = gabor(0).sliders.trackbar(0).Value * 2 + 1
-            gabor(i).Sigma = gabor(0).sliders.trackbar(1).Value
-            gabor(i).lambda = gabor(0).sliders.trackbar(3).Value
-            gabor(i).gamma = gabor(0).sliders.trackbar(4).Value / 10
-            gabor(i).phaseOffset = gabor(0).sliders.trackbar(5).Value / 1000
+            gabor(i).ksize = ksizeSlider.Value * 2 + 1
+            gabor(i).Sigma = sigmaSlider.Value
+            gabor(i).lambda = lambdaSlider.Value
+            gabor(i).gamma = gammaSlider.Value / 10
+            gabor(i).phaseOffset = phaseSlider.Value / 1000
             gabor(i).theta = Math.PI * i / gabor.Length
         Next
 

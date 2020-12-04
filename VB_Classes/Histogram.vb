@@ -577,8 +577,12 @@ Public Class Histogram_EqualizeGray
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        histogram.sliders.trackbar(0).Value = histogramEq.sliders.trackbar(0).Value
-        histogram.kalman.check.Box(0).Checked = histogramEq.kalman.check.Box(0).Checked
+
+        Static binSlider = findSlider("Histogram Bins")
+        Static eqCheckBox = findCheckBox("Turn Kalman filtering on")
+
+        binSlider.Value = histogramEq.sliders.trackbar(0).Value
+        eqCheckBox.Checked = histogramEq.kalman.check.Box(0).Checked
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.src = src.Clone

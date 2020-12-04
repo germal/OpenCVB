@@ -21,17 +21,15 @@ Public Class Benford_Basics
     Dim use99 As Boolean
     Public Sub New()
         initParent()
+        weight = New AddWeighted_Basics()
+        weight.weightSlider.Value = 75
+
         plot = New Plot_Histogram()
-        If standalone Then
-            benford = New Benford_NormalizedImage()
-            hideForm("AddWeighted_Basics Slider Options")
-        End If
+        If standalone Then benford = New Benford_NormalizedImage()
 
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
-
-        weight = New AddWeighted_Basics()
 
         task.desc = "Build the capability to perform a Benford analysis."
     End Sub
@@ -54,8 +52,6 @@ Public Class Benford_Basics
             Exit Sub
         End If
 
-        Static weightSlider = findSlider("Weight")
-        If ocvb.frameCount = 0 Then weightSlider.Value = 75
 
         src = src.Reshape(1, src.Width * src.Height)
         Dim indexer = src.GetGenericIndexer(Of Single)()
@@ -98,7 +94,7 @@ Public Class Benford_Basics
         weight.Run()
         dst1 = weight.dst1
 
-        label2 = "AddWeighted: " + CStr(weightSlider.Value) + "% actual vs. " + CStr(100 - weightSlider.Value) + "% Benford distribution"
+        label2 = "AddWeighted: " + CStr(weight.weightSlider.Value) + "% actual vs. " + CStr(100 - weight.weightSlider.Value) + "% Benford distribution"
     End Sub
 End Class
 

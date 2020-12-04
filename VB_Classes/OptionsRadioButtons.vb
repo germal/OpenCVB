@@ -12,9 +12,4 @@ Public Class OptionsRadioButtons
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
     End Sub
-    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
-        Get
-            Return True
-        End Get
-    End Property
 End Class

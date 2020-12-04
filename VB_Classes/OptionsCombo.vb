@@ -10,9 +10,4 @@ Public Class OptionsCombo
         Next
         Box.SelectedIndex = 0
     End Sub
-    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
-        Get
-            Return True
-        End Get
-    End Property
 End Class
