@@ -95,11 +95,11 @@ Public Class KNN_QueryTrain
 
         If useRandomData Then
             Static trainSlider = findSlider("KNN Train count")
-            randomTrain.sliders.trackbar(0).Value = trainSlider.Value
+            randomTrain.countSlider.Value = trainSlider.Value
             randomTrain.Run()
 
             Static querySlider = findSlider("KNN Query count")
-            randomQuery.sliders.trackbar(0).Value = querySlider.Value
+            randomQuery.countSlider.Value = querySlider.Value
             randomQuery.Run()
         End If
 

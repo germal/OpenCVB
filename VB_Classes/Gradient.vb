@@ -90,7 +90,6 @@ End Class
 
 
 
-
 ' https://github.com/anopara/genetic-drawing
 Public Class Gradient_CartToPolar
     Inherits VBparent
@@ -100,7 +99,9 @@ Public Class Gradient_CartToPolar
     Public Sub New()
         initParent()
         basics = New Gradient_Basics()
-        basics.sobel.sliders.trackbar(0).Value = 1
+
+        Static ksizeSlider = findSlider("Sobel kernel Size")
+        ksizeSlider.value = 1
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -120,7 +121,8 @@ Public Class Gradient_CartToPolar
 
         cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
         magnitude = magnitude.Normalize()
-        Dim exponent = sliders.trackbar(0).Value / 100
+        Static contrastSlider = findSlider("Contrast exponent to use X100")
+        Dim exponent = contrastSlider.Value / 100
         magnitude = magnitude.Pow(exponent)
 
         dst1 = magnitude

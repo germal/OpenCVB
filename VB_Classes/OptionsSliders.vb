@@ -9,7 +9,7 @@ Public Class OptionsSliders
     Dim defaultWidth = 630
     Dim algoIndex As Integer
     Public Sub Setup(caller As String, Optional count As Integer = 4)
-        Me.MdiParent = aOptions
+        If aOptions.Text <> "" Then Me.MdiParent = aOptions
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)

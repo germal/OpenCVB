@@ -514,10 +514,10 @@ Public Class Histogram_EqualizeColor
     Public Sub New()
         initParent()
         kalmanEq = New Histogram_KalmanSmoothed()
-        kalmanEq.sliders.trackbar(0).Value = 40
-
         kalman = New Histogram_KalmanSmoothed()
-        kalman.sliders.trackbar(0).Value = 40
+
+        Static binSlider = findSlider("Histogram Bins")
+        binSlider.Value = 40
 
         mats = New Mat_2to1()
 
@@ -526,7 +526,7 @@ Public Class Histogram_EqualizeColor
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        kalman.sliders.trackbar(0).Value = kalmanEq.sliders.trackbar(0).Value
+
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
         cv.Cv2.Split(src, rgbEq)
@@ -606,8 +606,8 @@ Public Class Histogram_Equalize255
         initParent()
 
         eqHist = New Histogram_EqualizeColor()
-        eqHist.kalmanEq.sliders.trackbar(0).Value = 255
-        eqHist.kalman.sliders.trackbar(0).Value = 255
+        Static binSlider = findSlider("Histogram Bins")
+        binSlider.Value = 255
         eqHist.displayHist = True
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -1017,10 +1017,11 @@ Public Class Histogram_SideView2D
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
-            sliders.setupTrackBar(1, "sideCameraPoint.x adjustment", -100, 100, 0)
+            sliders.setupTrackBar(1, "SideCameraPoint.x adjustment", -100, 100, 0)
         End If
-        frustrumSlider = sliders.trackbar(0)
-        cameraYSlider = sliders.trackbar(1)
+
+        frustrumSlider = findSlider("SideView Frustrum adjustment")
+        cameraYSlider = findSlider("SideCameraPoint.x adjustment")
 
         ' The specification for each camera spells out the vertical FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
@@ -1098,8 +1099,9 @@ Public Class Histogram_TopView2D
             sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
             sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
         End If
-        frustrumSlider = sliders.trackbar(0)
-        cameraXSlider = sliders.trackbar(1)
+
+        frustrumSlider = findSlider("TopView Frustrum adjustment")
+        cameraXSlider = findSlider("TopCameraPoint.x adjustment")
 
         ' The specification for each camera spells out the vertical FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.

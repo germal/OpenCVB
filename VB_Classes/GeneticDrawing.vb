@@ -60,7 +60,7 @@ Public Class GeneticDrawing_Basics
     Dim options As GeneticDrawing_Options
     Dim stageTotal = 100
     Public gradient As Gradient_CartToPolar
-    Public restartRequested As Boolean
+    Public restartRequested As Boolean = True
     Public Sub New()
         initParent()
 
@@ -254,8 +254,11 @@ End Class
 Public Class GeneticDrawing_Color
     Inherits VBparent
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
+    Dim options As GeneticDrawing_Options
     Public Sub New()
         initParent()
+
+        If standalone Then options = New GeneticDrawing_Options()
 
         gDraw(0) = New GeneticDrawing_Basics()
         gDraw(1) = New GeneticDrawing_Basics()

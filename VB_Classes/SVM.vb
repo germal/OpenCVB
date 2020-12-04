@@ -40,14 +40,15 @@ Public Class SVM_Options
         radio1.check(3).Text = "SVM Type = NuSvr"
         radio1.check(4).Text = "SVM Type = OneClass"
 
-        radio.Text = caller + " Kernel Options"
-        radio1.Text = caller + " SVM Type Options"
+        radio1.Text = caller + " SVM Type Radio Options"
+        aOptions.optionsTitle.Add(radio1.Text)
+        aOptions.hiddenOptions.Remove(caller + " Radio Options")
         radio1.Show()
         label1 = "SVM_Options - only options, no output"
         task.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
-        Static frm = findfrm("SVM_Options Kernel Options")
+        Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 kernelType = Choose(i + 1, cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid)
@@ -55,7 +56,7 @@ Public Class SVM_Options
             End If
         Next
 
-        Static frm1 = findfrm("SVM_Options SVM Type Options")
+        Static frm1 = findfrm(caller + " SVM Type Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 SVMType = Choose(i + 1, cv.ML.SVM.Types.CSvc, cv.ML.SVM.Types.EpsSvr, cv.ML.SVM.Types.NuSvc, cv.ML.SVM.Types.NuSvr, cv.ML.SVM.Types.OneClass)

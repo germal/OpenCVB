@@ -171,8 +171,10 @@ Public Class Blob_DepthClusters
         histBlobs = New Histogram_DepthClusters()
 
         flood = New FloodFill_RelativeRange()
-        flood.fBasics.sliders.trackbar(1).Value = 1 ' pixels are exact.
-        flood.fBasics.sliders.trackbar(2).Value = 1 ' pixels are exact.
+        Dim loSlider = findSlider("FloodFill LoDiff")
+        Dim hiSlider = findSlider("FloodFill HiDiff")
+        loSlider.Value = 1 ' pixels are exact.
+        hiSlider.Value = 1 ' pixels are exact.
 
         label2 = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."

@@ -123,8 +123,10 @@ Public Class Smoothing_Interior
 	Public Sub New()
 		initParent()
 		hull = New Hull_Basics()
-		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
-		hull.sliders.trackbar(0).Value = 16
+
+		Dim hullSlider = findSlider("Hull random points")
+		hullSlider.Minimum = 4 ' required minimum number of points for the algorithm.
+		hullSlider.Value = 16
 
 		If findfrm(caller + " Slider Options") Is Nothing Then
 			sliders.Setup(caller)

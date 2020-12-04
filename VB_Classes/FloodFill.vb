@@ -32,10 +32,10 @@ Public Class FloodFill_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static minSizeSlider = sliders.trackbar(0)
-        Static loDiffSlider = sliders.trackbar(1)
-        Static hiDiffSlider = sliders.trackbar(2)
-        Static stepSlider = sliders.trackbar(3)
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static loDiffSlider = findSlider("FloodFill LoDiff")
+        Static hiDiffSlider = findSlider("FloodFill HiDiff")
+        Static stepSlider = findSlider("Step Size")
         minFloodSize = minSizeSlider.Value
         Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
         Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
@@ -463,10 +463,15 @@ Public Class Floodfill_Identifiers
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        minFloodSize = basics.sliders.trackbar(0).Value
-        Dim loDiff = cv.Scalar.All(basics.sliders.trackbar(1).Value)
-        Dim hiDiff = cv.Scalar.All(basics.sliders.trackbar(2).Value)
-        Dim stepSize = basics.sliders.trackbar(3).Value
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static loDiffSlider = findSlider("FloodFill LoDiff")
+        Static hiDiffSlider = findSlider("FloodFill HiDiff")
+        Static stepSlider = findSlider("Step Size")
+
+        minFloodSize = minSizeSlider.Value
+        Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
+        Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
+        Dim stepSize = stepSlider.Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
@@ -482,7 +487,7 @@ Public Class Floodfill_Identifiers
                 If src.Get(Of Byte)(y, x) < 255 Then
                     Dim rect As New cv.Rect
                     maskPlus.SetTo(0)
-                    Dim count = cv.Cv2.FloodFill(src, maskPlus, New cv.Point(x, y), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
+                    Dim count = cv.Cv2.FloodFill(src, maskPlus, New cv.Point(CInt(x), CInt(y)), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                     If count > minFloodSize Then
                         rects.Add(rect)
                         masks.Add(maskPlus(rect).Clone())
