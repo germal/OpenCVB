@@ -286,3 +286,34 @@ Public Class Reduction_Lines
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Reduction_Histogram
+    Inherits VBparent
+    Dim basics As Reduction_Basics
+    Dim hist As Histogram_BackProjectionGrayscale
+    Public Sub New()
+        initParent()
+
+        basics = New Reduction_Basics()
+        hist = New Histogram_BackProjectionGrayscale()
+        task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        basics.src = src
+        basics.Run()
+        Static reductionSlider = findSlider("Reduction factor")
+        reductionSlider.value = 112
+
+        hist.src = basics.dst1
+        hist.Run()
+        dst1 = hist.dst1
+        dst2 = hist.dst2
+    End Sub
+End Class

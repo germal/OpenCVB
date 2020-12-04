@@ -224,6 +224,7 @@ Public Class StructuredDepth_MultiSliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
     Public structD As StructuredDepth_SliceH
+    Public maskPlane As cv.Mat
     Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
@@ -247,7 +248,7 @@ Public Class StructuredDepth_MultiSliceH
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
-        Dim maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
             Dim planeY = side2D.meterMin * (side2D.cameraLoc - yCoordinate) / side2D.cameraLoc
             If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)

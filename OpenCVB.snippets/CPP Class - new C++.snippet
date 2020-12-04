@@ -69,11 +69,35 @@ Public Class AnyName_CPP
     Dim anyname As IntPtr
     Public Sub New()
         initParent()
-		    anyname = Anyname_Open()
+        
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FirstSlider", 0, 100, 50)
+        End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 1)
+            radio.check(0).Text = "FirstRadio"
+            radio.check(0).Checked = True
+        End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "FirstCheckBox"
+            check.Box(0).Checked = True
+        End If
+        
+        anyname = Anyname_Open()
         task.desc = "New class description"
 	  End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        
+        static firstSlider = findSlider("FirstSlider")
+        dim testSlider = firstSlider.value
+        static firstRadio = findRadio("FirstRadio")
+        dim testRadio = firstRadio.checked
+        static firstCheck = findCheckBox("FirstCheckBox")
+        dim testCheck = firstCheck.checked
+        
         Dim src = task.color
         Dim srcData(src.Total * src.ElemSize) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)

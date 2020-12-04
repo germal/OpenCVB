@@ -522,7 +522,6 @@ Public Class OpenGL_FloorTexture
         shuffle.Run()
         floor.ogl.textureInput = shuffle.rgbaTexture
 
-
         Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         data.Set(Of Single)(0, 0, ocvb.maxZ)
         data.Set(Of Single)(1, 0, 0)
@@ -533,5 +532,38 @@ Public Class OpenGL_FloorTexture
         floor.ogl.pointCloudInput.SetTo(0, floor.plane.maskPlane)
         floor.ogl.src = src
         floor.ogl.Run()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_DepthSliceH
+    Inherits VBparent
+    Public ogl As OpenGL_Basics
+    Dim slices As StructuredDepth_MultiSliceH
+    Public Sub New()
+        initParent()
+
+        slices = New StructuredDepth_MultiSliceH()
+        ogl = New OpenGL_Basics()
+        ogl.OpenGLTitle = "OpenGL_Callbacks"
+
+        task.desc = "View depth slices in 3D with OpenGL"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        slices.Run()
+        dst1 = slices.dst1
+        Dim mask As New cv.Mat
+        cv.Cv2.BitwiseNot(slices.maskPlane, mask)
+
+        ogl.pointCloudInput = task.pointCloud.Clone
+        ogl.pointCloudInput.SetTo(0, mask)
+        ogl.src = New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
+        ogl.Run()
     End Sub
 End Class
