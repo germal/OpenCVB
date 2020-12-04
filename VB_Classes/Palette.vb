@@ -7,21 +7,23 @@ Public Class Palette_Basics
     Public gradMap As Palette_BuildGradientColorMap
     Public colormap As cv.ColormapTypes
     Public colorMat As cv.Mat
+    Dim radioFrm As OptionsRadioButtons
     Public Sub New()
         initParent()
         gradMap = New Palette_BuildGradientColorMap()
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
+        radioFrm = findfrm(caller + " Radio Options")
+        If radioFrm Is Nothing Then
             radio.Setup(caller, 21)
             For i = 0 To radio.check.Length - 1
                 radio.check(i).Text = mapNames(i)
                 If mapNames(i) = "Hot" Then radio.check(i).Checked = True
             Next
+            radioFrm = radio
         End If
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
-        Static radioFrm = findfrm(caller + " Radio Options")
         For i = 0 To radioFrm.check.Length - 1
             If radioFrm.check(i).Checked Then
                 Dim scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
