@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Blob_Input
     Inherits VBparent
-    Dim rectangles As Draw_rotatedRectangles
+    Dim rectangles As Rectangle_Rotated
     Dim circles As Draw_Circles
     Dim ellipses As Draw_Ellipses
     Dim poly As Draw_Polygon
@@ -9,7 +9,7 @@ Public Class Blob_Input
     Public updateFrequency = 30
     Public Sub New()
         initParent()
-        rectangles = New Draw_rotatedRectangles()
+        rectangles = New Rectangle_Rotated()
         circles = New Draw_Circles()
         ellipses = New Draw_Ellipses()
         poly = New Draw_Polygon()

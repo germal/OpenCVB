@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 
 Public Class Contours_Basics
     Inherits VBparent
-    Public rotatedRect As Draw_rotatedRectangles
+    Public rotatedRect As Rectangle_Rotated
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
     Public contours As New List(Of cv.Point())
@@ -24,7 +24,7 @@ Public Class Contours_Basics
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
 
-        rotatedRect = New Draw_rotatedRectangles()
+        rotatedRect = New Rectangle_Rotated()
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         task.desc = "Demo options on FindContours."
         label2 = "FindContours output"
@@ -92,10 +92,10 @@ End Class
 
 Public Class Contours_FindandDraw
     Inherits VBparent
-    Dim rotatedRect As Draw_rotatedRectangles
+    Dim rotatedRect As Rectangle_Rotated
     Public Sub New()
         initParent()
-        rotatedRect = New Draw_rotatedRectangles()
+        rotatedRect = New Rectangle_Rotated()
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"

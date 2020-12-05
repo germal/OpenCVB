@@ -21,6 +21,8 @@ Public Class Diff_Basics
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
             dst2 = dst2.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
             dst1 = src.Clone().SetTo(0, dst2)
+        Else
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
         End If
         lastFrame = gray.Clone()
     End Sub

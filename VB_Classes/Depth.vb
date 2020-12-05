@@ -1701,3 +1701,60 @@ Public Class Depth_PointCloud_IMU
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Depth_Extrema
+    Inherits VBparent
+    Dim stable As IMU_IscameraStable
+    Public stableDepth As cv.Mat
+    Dim motion As Motion_Basics
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public Sub New()
+        initParent()
+        stable = New IMU_IscameraStable
+        colorize = New Depth_ColorizerFastFade_CPP
+        motion = New Motion_Basics
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Use farthest distance"
+            radio.check(1).Text = "Use closest distance"
+            radio.check(1).Checked = True
+        End If
+        stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ * 1000)
+        task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static closestRadio = findRadio("Use closest distance")
+
+
+        If src.Type <> cv.MatType.CV_32F Then src = getDepth32f()
+        stable.Run()
+        If stable.cameraStable Then
+            motion.src = task.color
+            motion.Run()
+            dst2 = motion.dst2
+            src.CopyTo(stableDepth, dst2)
+            If closestRadio.checked Then
+                cv.Cv2.Min(src, stableDepth, stableDepth)
+            Else
+                cv.Cv2.Max(src, stableDepth, stableDepth)
+            End If
+        Else
+            If closestRadio.checked Then
+                stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ * 1000)
+            Else
+                stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
+            End If
+        End If
+
+        colorize.src = stableDepth
+        colorize.Run()
+        dst1 = colorize.dst1
+    End Sub
+End Class

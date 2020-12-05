@@ -37,68 +37,6 @@ End Module
 
 
 
-Public Class Draw_rotatedRectangles
-    Inherits VBparent
-    Public rect As Draw_rectangles
-    Public Sub New()
-        initParent()
-        rect = New Draw_rectangles()
-        Dim rotatedCheck = findCheckBox("Draw Rotated Rectangles")
-        rotatedCheck.Checked = True
-        task.desc = "Draw the requested number of rectangles."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        rect.src = src
-        rect.Run()
-        dst1 = rect.dst1
-    End Sub
-End Class
-
-
-
-
-
-Public Class Draw_rectangles
-    Inherits VBparent
-    Public updateFrequency = 30
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
-        End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Draw Rotated Rectangles"
-        End If
-
-        task.desc = "Draw the requested number of rotated rectangles."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod updateFrequency = 0 Then
-            dst1.SetTo(cv.Scalar.Black)
-            For i = 0 To sliders.trackbar(0).Value - 1
-                Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-                Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
-                Dim height = msRNG.Next(0, src.Rows - nPoint.Y - 1)
-                Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
-                Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
-                Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
-
-                Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
-                If check.Box(0).Checked Then
-                    drawRotatedRectangle(rotatedRect, dst1, nextColor)
-                Else
-                    cv.Cv2.Rectangle(dst1, New cv.Rect(nPoint.X, nPoint.Y, width, height), nextColor, -1)
-                End If
-            Next
-        End If
-    End Sub
-End Class
-
-
 
 
 
@@ -415,18 +353,6 @@ Public Class Draw_Arc
 
     Dim colorIndex As Integer
     Dim thickness As Integer
-    Private Sub setup()
-        saveMargin = sliders.trackbar(0).Value ' work in the middle of the image.
-
-        rect = initRandomRect(dst1.Width, dst1.Height, saveMargin)
-        angle = msRNG.Next(0, 360)
-        colorIndex = msRNG.Next(0, 255)
-        thickness = msRNG.Next(1, 5)
-        startAngle = msRNG.Next(1, 360)
-        endAngle = msRNG.Next(1, 360)
-
-        kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-    End Sub
     Public Sub New()
         initParent()
 
@@ -448,6 +374,18 @@ Public Class Draw_Arc
         setup()
 
         task.desc = "Use OpenCV's ellipse function to draw an arc"
+    End Sub
+    Private Sub setup()
+        saveMargin = sliders.trackbar(0).Value ' work in the middle of the image.
+
+        rect = initRandomRect(dst1.Width, dst1.Height, saveMargin)
+        angle = msRNG.Next(0, 360)
+        colorIndex = msRNG.Next(0, 255)
+        thickness = msRNG.Next(1, 5)
+        startAngle = msRNG.Next(1, 360)
+        endAngle = msRNG.Next(1, 360)
+
+        kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -479,106 +417,6 @@ Public Class Draw_Arc
     End Sub
 End Class
 
-
-
-
-
-Public Class Draw_OverlappingRectangles
-    Inherits VBparent
-    Dim flood As FloodFill_Basics
-    Public inputRects As New List(Of cv.Rect)
-    Public inputMasks As New List(Of cv.Mat)
-    Public rects As New List(Of cv.Rect)
-    Public masks As New List(Of cv.Mat)
-    Public Sub New()
-        initParent()
-
-        If standalone Then flood = New FloodFill_Basics()
-
-        label1 = "(First 5) Overlapping rectangles are red, original in yellow"
-        label2 = "Original list of rectangles"
-        task.desc = "Find first 5 rectangles that are overlapping."
-    End Sub
-    Private Class CompareMasks : Implements IComparer(Of cv.Rect)
-        Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
-            If a.Width * a.Height > b.Width * b.Height Then Return 1
-            Return -1 ' never returns equal because duplicates can happen.
-        End Function
-    End Class
-    Private Function overlapping(r1 As cv.Rect, r2 As cv.Rect)
-        Dim w = r1.Width
-        Dim h = r1.Height
-        For i = 0 To 4 - 1
-            Dim p1 = Choose(i + 1, New cv.Point(r1.X, r1.Y), New cv.Point(r1.X + w, r1.Y), New cv.Point(r1.X, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h))
-            If p1.x >= r2.X And p1.x <= r2.X + r2.Width And p1.y >= r2.Y And p1.y <= r2.Y + r2.Height Then Return True
-            Dim p2 = Choose(i + 1, New cv.Point(r1.X + w, r1.Y), New cv.Point(r1.X, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h), New cv.Point(r1.X + w, r1.Y + h))
-        Next
-        Return False
-    End Function
-    Private Function addOverlapping(overlapping As List(Of cv.Rect), r As cv.Rect) As List(Of cv.Rect)
-        For Each rect In overlapping
-            If rect.X = r.X And rect.Y = r.Y Then
-                overlapping.Remove(rect)
-                r.Width = Math.Max(rect.Width, r.Width)
-                r.Height = Math.Max(rect.Height, r.Height)
-                Exit For
-            End If
-        Next
-        overlapping.Add(r)
-        Return overlapping
-    End Function
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
-            flood.src = src
-            flood.Run()
-            dst1 = flood.dst2
-            inputRects.Clear()
-            inputMasks.Clear()
-
-            For i = 0 To Math.Min(5, flood.rects.Count) - 1
-                inputRects.Add(flood.rects(i))
-                inputMasks.Add(flood.masks(i))
-            Next
-        End If
-
-        dst2.SetTo(0)
-        For Each r In inputRects
-            dst1.Rectangle(r, cv.Scalar.Yellow, 5)
-            dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-        Next
-
-        Dim removeRects As New List(Of cv.Rect)
-        Dim overlappingRects As New List(Of cv.Rect)
-
-        For i = 0 To inputRects.Count - 1
-            Dim r1 = inputRects(i)
-            For j = i + 1 To inputRects.Count - 1
-                Dim r2 = inputRects(j)
-                Dim overlap1 = overlapping(r1, r2)
-                Dim overlap2 = overlapping(r2, r1)
-                If overlap1 Or overlap2 Then
-                    Dim pt1 = New cv.Point(Math.Min(r1.X, r2.X), Math.Min(r1.Y, r2.Y))
-                    Dim pt2 = New cv.Point(Math.Max(r1.X + r1.Width, r2.X + r2.Width), Math.Max(r1.Y + r1.Height, r2.Y + r2.Height))
-                    Dim rect = New cv.Rect(pt1.X, pt1.Y, pt2.X - pt1.X, pt2.Y - pt1.Y)
-                    overlappingRects = addOverlapping(overlappingRects, rect)
-                    If removeRects.Contains(r1) = False Then removeRects.Add(r1)
-                    If removeRects.Contains(r2) = False Then removeRects.Add(r2)
-                End If
-            Next
-        Next
-        For Each r In removeRects
-            inputRects.Remove(r)
-        Next
-        For Each r In overlappingRects
-            inputRects.Add(r)
-        Next
-
-        For Each r In inputRects
-            dst1.Rectangle(r, cv.Scalar.Red, 2)
-        Next
-    End Sub
-End Class
 
 
 
@@ -773,3 +611,4 @@ Public Class Draw_Intersection
         End If
     End Sub
 End Class
+

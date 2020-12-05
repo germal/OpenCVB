@@ -414,10 +414,10 @@ Public Class OpenCVB
     Private Sub recentList_Clicked(sender As Object, e As EventArgs)
         Dim item = TryCast(sender, ToolStripMenuItem)
         If AvailableAlgorithms.Items.Contains(item.Text) = False Then
-            ' the list of active algorithms for this group does not contain the algorithm requested so just add it!
-            AvailableAlgorithms.Items.Add(item.Text)
+            AvailableAlgorithms.SelectedIndex = 0
+        Else
+            AvailableAlgorithms.SelectedItem = item.Name
         End If
-        AvailableAlgorithms.SelectedItem = item.Name
     End Sub
     Private Sub RestartCamera()
         camera.stopCamera()

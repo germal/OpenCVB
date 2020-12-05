@@ -6,6 +6,7 @@ Public Class Motion_Basics
     Dim diff As Diff_Basics
     Dim dilate As DilateErode_Basics
     Dim contours As Contours_Basics
+    Public rectList As New List(Of cv.Rect)
     Public Sub New()
         initParent()
         contours = New Contours_Basics()
@@ -21,12 +22,15 @@ Public Class Motion_Basics
 
         Dim iterSlider = findSlider("Dilate/Erode Kernel Size")
         iterSlider.Value = 2
+
+        Static threshSlider = findSlider("Change threshold for each pixel")
+        threshSlider.value = 25
+
         task.desc = "Detect contours in the motion data"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static rectList As New List(Of cv.Rect)
 
         If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
         blur.src = dst1
@@ -44,8 +48,6 @@ Public Class Motion_Basics
             rectList.Clear()
         End If
 
-        Static threshSlider = findSlider("Change threshold for each pixel")
-        If ocvb.frameCount = 0 Then threshSlider.value = 25
         diff.src = dst1
         diff.lastFrame = firstFrame
         diff.Run()
