@@ -19,7 +19,8 @@ Public Class Diff_Basics
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
-            dst2 = dst2.Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+            Static thresholdSlider = findSlider("Change threshold for each pixel")
+            dst2 = dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
             dst1 = src.Clone().SetTo(0, dst2)
         Else
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)

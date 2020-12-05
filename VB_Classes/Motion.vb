@@ -32,7 +32,7 @@ Public Class Motion_Basics
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
 
-        If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
+        If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src.Clone
         blur.src = dst1
         blur.Run()
         dst1 = blur.dst1
@@ -69,7 +69,7 @@ Public Class Motion_Basics
             End If
         Next
 
-        dst1 = task.color
+        dst1 = src
         For i = 0 To rectList.Count - 1
             dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
         Next

@@ -21,16 +21,24 @@ Public Class DilateErode_Basics
         End If
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim iterations = sliders.trackbar(1).Value
-        Dim kernelsize = sliders.trackbar(0).Value
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static iterSlider = findSlider("Erode (-) to Dilate (+)")
+        Dim iterations = iterSlider.Value
+
+        Static kernelSlider = findSlider("Dilate/Erode Kernel Size")
+        Dim kernelsize As Integer = kernelSlider.Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
+
+        Static ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
+        Static rectRadio = findRadio("Dilate/Erode shape: Rect")
         Dim morphShape = cv.MorphShapes.Cross
-        If radio.check(1).Checked Then morphShape = cv.MorphShapes.Ellipse
-        If radio.check(2).Checked Then morphShape = cv.MorphShapes.Rect
+        If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
+        If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelsize, kernelsize))
 
-        If radio.check(3).Checked Then
+        Static noShape = findRadio("Dilate/Erode shape: None")
+        If noShape.Checked Then
             dst1 = src
         Else
             If iterations >= 0 Then

@@ -24,8 +24,7 @@ Public Class Contours_Basics
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
 
-        rotatedRect = New Rectangle_Rotated()
-        rotatedRect.rect.sliders.trackbar(0).Value = 5
+        rotatedRect = New Rectangle_Rotated
         task.desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub

@@ -10,12 +10,13 @@ Module Draw_Exports
         Next
         cv.Cv2.FillConvexPoly(dst1, vertices, color, cv.LineTypes.AntiAlias)
     End Sub
-    Public Sub drawRotatedOutline(rr As cv.RotatedRect, dst1 As cv.Mat, color As cv.Scalar)
+    Public Sub drawRotatedOutline(rr As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
         Dim vertices = rr.Points()
         For i = 0 To 4 - 1
-            dst1.Line(New cv.Point(vertices(i).X, vertices(i).Y), New cv.Point(vertices((i + 1) Mod 4).X, vertices((i + 1) Mod 4).Y), cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+            dst.Line(New cv.Point(vertices(i).X, vertices(i).Y), New cv.Point(vertices((i + 1) Mod 4).X, vertices((i + 1) Mod 4).Y),
+                     color, 1, cv.LineTypes.AntiAlias)
         Next
-        dst1.Rectangle(rr.BoundingRect, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+        dst.Rectangle(rr.BoundingRect, color, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Function initRandomRect(width As Integer, height As Integer, margin As Integer) As cv.Rect
         Dim x As Integer, y As Integer, w As Integer, h As Integer

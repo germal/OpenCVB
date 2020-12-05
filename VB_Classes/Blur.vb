@@ -11,8 +11,9 @@ Public Class Blur_Basics
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim kernelSize As integer = sliders.trackbar(0).Value
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static kernelSlider = findSlider("Blur Kernel Size")
+        Dim kernelSize As Integer = kernelSlider.Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             cv.Cv2.GaussianBlur(src, dst1, New cv.Size(kernelSize, kernelSize), 0, 0)

@@ -97,7 +97,7 @@ Module UI_GeneratorMain
             If nextName.EndsWith(".py") Then
                 sw.WriteLine(vbTab + vbTab + "return new Python_Run()")
             Else
-                sw.WriteLine(vbTab + vbTab + "return new " + nextName + "()")
+                sw.WriteLine(vbTab + vbTab + "return new " + nextName)
             End If
         Next
         sw.WriteLine("End Select")
