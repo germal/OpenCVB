@@ -56,11 +56,9 @@ Public Class Rectangle_Rotated
     Public rect As Rectangle_Basics
     Public Sub New()
         initParent()
-        If standalone Then
-            rect = New Rectangle_Basics
-            Dim rotatedCheck = findCheckBox("Draw Rotated Rectangles")
-            rotatedCheck.Checked = True
-        End If
+        rect = New Rectangle_Basics
+        Dim rotatedCheck = findCheckBox("Draw Rotated Rectangles")
+        rotatedCheck.Checked = True
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run()
@@ -71,61 +69,6 @@ Public Class Rectangle_Rotated
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Rectangle_Overlap
-    Inherits VBparent
-    Public rect1 As cv.Rect
-    Public rect2 As cv.Rect
-    Public enclosingRect As cv.Rect
-    Dim draw As Rectangle_Basics
-    Public Sub New()
-        initParent()
-
-        draw = New Rectangle_Basics
-        Dim countSlider = findSlider("Rectangle Count")
-        countSlider.Value = 2
-
-        task.desc = "Test if 2 rectangles overlap"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        If standalone Then
-            draw.Run()
-            dst1 = draw.dst1
-        End If
-
-        dst2.SetTo(0)
-        Static typeCheckBox = findCheckBox("Draw Rotated Rectangles")
-        If typeCheckBox.Checked Then
-            Dim r1 As cv.RotatedRect = draw.rotatedRectangles(0)
-            Dim r2 As cv.RotatedRect = draw.rotatedRectangles(1)
-            rect1 = r1.BoundingRect
-            rect2 = r2.BoundingRect
-            drawRotatedOutline(r1, dst2, cv.Scalar.Yellow)
-            drawRotatedOutline(r2, dst2, cv.Scalar.Yellow)
-        Else
-            rect1 = draw.rectangles(0)
-            rect2 = draw.rectangles(1)
-        End If
-
-        If rect1.IntersectsWith(rect2) Then
-            enclosingRect = rect1.Union(rect2)
-            dst2.Rectangle(enclosingRect, cv.Scalar.White, 4)
-            label2 = "Rectangles intersect - red marks overlapping rectangle"
-            dst2.Rectangle(rect1.Intersect(rect2), cv.Scalar.Red, -1)
-        Else
-            label2 = "Rectangles don't intersect"
-        End If
-        dst2.Rectangle(rect1, cv.Scalar.Yellow, 2)
-        dst2.Rectangle(rect2, cv.Scalar.Yellow, 2)
-    End Sub
-End Class
 
 
 
@@ -259,5 +202,139 @@ Public Class Rectangle_Concentration
         rMotionTop.src = topSide.dst2
         rMotionTop.Run()
         dst2 = rMotionTop.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Rectangle_Overlap
+    Inherits VBparent
+    Public rect1 As cv.Rect
+    Public rect2 As cv.Rect
+    Public enclosingRect As cv.Rect
+    Dim draw As Rectangle_Basics
+    Public Sub New()
+        initParent()
+
+        draw = New Rectangle_Basics
+        Dim countSlider = findSlider("Rectangle Count")
+        countSlider.Value = 2
+
+        task.desc = "Test if 2 rectangles overlap"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then
+            draw.Run()
+            dst1 = draw.dst1
+        End If
+
+        dst2.SetTo(0)
+        Static typeCheckBox = findCheckBox("Draw Rotated Rectangles")
+        If typeCheckBox.Checked Then
+            Dim r1 As cv.RotatedRect = draw.rotatedRectangles(0)
+            Dim r2 As cv.RotatedRect = draw.rotatedRectangles(1)
+            rect1 = r1.BoundingRect
+            rect2 = r2.BoundingRect
+            drawRotatedOutline(r1, dst2, cv.Scalar.Yellow)
+            drawRotatedOutline(r2, dst2, cv.Scalar.Yellow)
+        Else
+            rect1 = draw.rectangles(0)
+            rect2 = draw.rectangles(1)
+        End If
+
+        If rect1.IntersectsWith(rect2) Then
+            enclosingRect = rect1.Union(rect2)
+            dst2.Rectangle(enclosingRect, cv.Scalar.White, 4)
+            label2 = "Rectangles intersect - red marks overlapping rectangle"
+            dst2.Rectangle(rect1.Intersect(rect2), cv.Scalar.Red, -1)
+        Else
+            label2 = "Rectangles don't intersect"
+        End If
+        dst2.Rectangle(rect1, cv.Scalar.Yellow, 2)
+        dst2.Rectangle(rect2, cv.Scalar.Yellow, 2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Rectangle_MultiOverlap
+    Inherits VBparent
+    Public rect1 As cv.Rect
+    Public rect2 As cv.Rect
+    Public enclosingRect As cv.Rect
+    Public inputRects As New List(Of cv.Rect)
+    Dim draw As Rectangle_Basics
+    Public enclosingRects As New List(Of cv.Rect)
+    Dim otherRects As New List(Of cv.Rect)
+    Public Sub New()
+        initParent()
+
+        draw = New Rectangle_Basics
+        Dim countSlider = findSlider("Rectangle Count")
+        countSlider.Value = 2
+
+        task.desc = "Test if any number of rectangles overlap"
+    End Sub
+    Private Function findEnclosingRect(rects As List(Of cv.Rect)) As cv.Rect
+        Dim enclosing = rects(0)
+        Dim newOther As New List(Of cv.Rect)
+        For i = 1 To rects.Count - 1
+            Dim r1 = rects(i)
+            If enclosing.IntersectsWith(r1) Then
+                enclosing = enclosing.Union(r1)
+            Else
+                newOther.Add(r1)
+            End If
+        Next
+        otherRects = New List(Of cv.Rect)(newOther)
+        Return enclosing
+    End Function
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then
+            draw.Run()
+            dst1 = draw.dst1
+            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles")
+            If rotatedCheck.checked Then
+                For Each r In draw.rectangles
+
+                Next
+            End If
+            inputRects = New List(Of cv.Rect)(draw.rectangles)
+        End If
+
+        Dim sortedRect As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
+        For Each r In inputRects
+            sortedRect.Add(r.Width * r.Height, r)
+        Next
+
+        otherRects.Clear()
+        For Each r In sortedRect
+            otherRects.Add(r.Value)
+        Next
+
+        label2 = CStr(enclosingRects.Count) + " enclosing rectangles were found"
+        enclosingRects.Clear()
+        While otherRects.Count
+            Dim enclosing = findEnclosingRect(otherRects)
+            enclosingRects.Add(enclosing)
+        End While
+
+        dst2.SetTo(0)
+        For Each r In enclosingRects
+            dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+        Next
     End Sub
 End Class

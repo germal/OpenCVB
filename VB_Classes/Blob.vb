@@ -14,7 +14,9 @@ Public Class Blob_Input
         ellipses = New Draw_Ellipses()
         poly = New Draw_Polygon()
 
-        rectangles.rect.sliders.trackbar(0).Value = 5
+        Dim countSlider = findSlider("Rectangle Count")
+        countSlider.Value = 5
+
         circles.sliders.trackbar(0).Value = 5
         ellipses.sliders.trackbar(0).Value = 5
         poly.sliders.trackbar(0).Value = 5
