@@ -1742,10 +1742,6 @@ Public Class Depth_Extrema
             If src.Type <> cv.MatType.CV_32FC1 Then src = getDepth32f() / 1000
             stable.Run()
             If stable.cameraStable Then
-                Static saveSetting = Not closestRadio.checked
-                If saveSetting <> closestRadio.checked Then
-                    saveSetting = closestRadio.checked
-                End If
                 zeroMask = src.Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255).Resize(task.color.Size)
                 stableDepth.SetTo(If(closestRadio.checked, 0, ocvb.maxZ), zeroMask)
 
