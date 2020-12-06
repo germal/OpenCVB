@@ -154,4 +154,10 @@ Public Class CameraKinect
             End SyncLock
         End If
     End Sub
+    Public Sub stopCamera()
+        KinectClose(cPtr)
+        pipelineClosed = True
+        frameCount = 0
+        cPtr = 0
+    End Sub
 End Class

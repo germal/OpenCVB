@@ -1714,7 +1714,8 @@ Public Class Depth_Extrema
     Public stableDepth As cv.Mat
     Dim rMotion As Rectangle_Motion
     Dim colorize As Depth_ColorizerFastFade_CPP
-    Dim zeroMask As cv.Mat
+    Public zeroMask As cv.Mat
+    Public resetAll As Boolean
     Public Sub New()
         initParent()
         stable = New IMU_IscameraStable
@@ -1742,7 +1743,7 @@ Public Class Depth_Extrema
             If src.Type <> cv.MatType.CV_32FC1 Then src = getDepth32f() / 1000
             stable.Run()
             If stable.cameraStable Then
-                zeroMask = src.Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255).Resize(task.color.Size)
+                zeroMask = src.ConvertScaleAbs(255).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
                 stableDepth.SetTo(If(closestRadio.checked, 0, ocvb.maxZ), zeroMask)
 
                 rMotion.src = task.color.Clone
@@ -1762,6 +1763,7 @@ Public Class Depth_Extrema
                     stableDepth.SetTo(0, zeroMask)
                 End If
             Else
+                resetAll = True
                 If closestRadio.checked Then
                     stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ)
                 Else

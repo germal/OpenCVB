@@ -906,8 +906,8 @@ provided by Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azu
 camera is a valuable addition to the 3D camera effort. And lastly, it should be
 obvious that Google’s contribution to this effort was invaluable. Thanks to all
 the computer vision developers who posted algorithms where Google could find
-them. All these varied organizations deserve most of the credit for this
-software.
+them. From this author’s perspective, the work of all these organizations is
+like catnip and feathers to a kitten.
 
 MIT License
 ===========
@@ -970,12 +970,12 @@ Addendum 2: Some Thoughts
 
 2.  There are few comments in the code. Documenting code is a second, parallel
     explanation of the algorithm. There is no need for a second explanation when
-    the code is short and can be easily debugged. There are comments but they
-    explain settings or assumptions from external algorithms. In common practice
-    elsewhere, code comments are padded with spaces and too often out-of-date.
-    Automated comments are a waste of screen space. Room for improvement: allow
-    images in the code. The algorithm output can go a long way toward explaining
-    the algorithm.
+    the code is short and can be stepped through with a debugger. There are rare
+    comments but they explain settings or assumptions not explicitly in the
+    code. In common practice elsewhere, code comments are padded with spaces and
+    too often out-of-date. Automated comments are a waste of screen space. Room
+    for improvement: allow images in the code. An algorithm’s output can go a
+    long way toward explaining the algorithm.
 
 3.  Sliders and checkboxes are located by the text for the slider or checkbox,
     not by the name of some variable. The user interface is the documentation –
@@ -985,12 +985,13 @@ Addendum 2: Some Thoughts
 
 4.  All algorithms are run through a regression test with a single click.
     Algorithms can still fail when sliders or settings are changed but every
-    effort is made to test with abrupt and reckless changes. Room for
-    improvement: test combinations of settings automatically.
+    effort is made to test with abrupt and reckless changes to the settings.
+    Room for improvement: test combinations of settings automatically.
 
-5.  Each algorithm is short. The application caption contains the average number
-    of lines – currently around 33. Short algorithms are easier to write and
-    test. Short algorithms may be easily rewritten in another language.
+5.  Each algorithm is short. The caption of the user interface (at the top)
+    contains the average number of lines – currently around 35 lines per
+    algorithm. Short algorithms are easier to write and test. Short algorithms
+    may be easily rewritten in another language.
 
 6.  Algorithms should run standalone. This enables testing and isolates
     problems. The “standalone” variable is available to all algorithms to
@@ -1003,55 +1004,62 @@ Addendum 2: Some Thoughts
     public variables in the algorithm’s object.
 
 8.  Camera interfaces are run in their own task and are always running and
-    presented in the user interface whether the data is consumed or not.
+    presented in the user interface whether the data is consumed or not. Without
+    the camera updates to the screen, a long-running algorithm looks like a hung
+    system.
 
-9.  Cameras are always run at 1280x720. Requesting a lower resolution simply
-    resizes the camera input before images are shared with the algorithm task.
-    The goal is to keep the camera interface simple. Room for improvement:
-    support a full camera interface with different resolutions and settings.
+9.  Cameras are always run at 1280x720 or 640x480. Room for improvement: support
+    a full camera interface with different resolutions and settings (a lot of
+    work given the number of supported cameras.)
 
 10. The user interface is the main task. The camera task is independent of the
-    user interface.
+    user interface. The algorithm is run in its own task as well.
 
-11. Algorithms are run in their own task as well. All threads are labeled for
-    the “Threads” debugging use. The algorithm will wait on camera data if
-    camera frame rate does not keep up.
+11. All threads are labeled so they are visible in the debugger in the “Threads”
+    display. The algorithm will wait on camera data if camera frame rate does
+    not keep up but most often, the next camera buffers are ready as soon as the
+    algorithm finishes the current set of buffers.
 
 12. Algorithm groupings are subsets organized by specific OpenCV and OpenCVB
     API’s or objects. Changes made to an OpenCVB algorithm can be easily
     validated by selecting the group of algorithms that use the OpenCVB
-    algorithm and running the regression test.
+    algorithm and running the regression test on that subset. That was the
+    motivation behind grouping algorithms although other uses are interesting
+    (such as searching for examples of OpenCV API’s – see next Thought)
 
 13. OpenCV API’s can always be found with an editor but selecting an OpenCV API
     group will show how each algorithm uses the OpenCV API.
 
-14. Every time that OpenCVB is compiled, the groupings are reorganized.
+14. Every time that OpenCVB is compiled, the groupings are reset just like the
+    list of algorithms (see next Thought.)
 
 15. Every time OpenCVB is compiled, the list of all algorithms is created and
     provided to the user interface. The user interface is aware of the code used
     to create the user interface.
 
 16. The last algorithm to execute is automatically run when starting OpenCVB.
-    There is only a “Pause” button, no “Stop” button. When developing, a
-    crashing algorithm has only to be renamed to allow OpenCVB to come back up.
-    When the last algorithm is not found, the first algorithm in the algorithm
-    list is run.
+    There is only a “Pause” button, no “Stop” button. When developing,
+    commenting out code or renaming the algorithm will allow work to continue
+    and OpenCVB to come back up. When the last algorithm is not found, the first
+    algorithm in the algorithm list is run.
 
 17. Regression tests run every algorithm with all resolutions and with each
-    available camera. Setting the algorithm group to “\<All\>” will run 10’s of
-    thousands of tests without incident.
+    available camera. Setting the algorithm group to “\<All\>” can repeatedly
+    run the list of algorithms 10’s of thousands of times without incident.
 
-18. Algorithms can run for extremely long durations. Not a problem normally, it
+18. Some algorithms can run for long durations. Not a problem normally but it
     was a problem for the regression tests when algorithm B is started before
     algorithm A is finished. This was fixed with Synclock around the algorithm
     thread – only one algorithm can run at a time. Algorithm B waits until
-    algorithm A completes and relinquishes the lock.
+    algorithm A completes and relinquishes the lock. However, in extreme cases,
+    the queue of tasks waiting for the synclock may grow and lag the displayed
+    algorithm.
 
 19. Options for each algorithm are presented by the algorithm itself and are
-    automatically part of the algorithm task. The appearance is that of an MDI –
-    Multiple Document Interface – application and seems the share the
-    inconveniences. However, click the main form and all the options will
-    conveniently reappear.
+    automatically part of the algorithm task. A Single-Document Interface shows
+    all the options in a single window as cascading windows. The sliders (or
+    trackbars) are on the left of the SDI window while the checkboxes and radio
+    buttons are on the right.
 
 20. With multiple tasks for camera, user interface, and algorithm, there is no
     guarantee that all 4 images are for the same instant. However, the left and

@@ -212,4 +212,9 @@ Public Class CameraZED2
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
     End Sub
+    Public Sub stopCamera()
+        pipelineClosed = True
+        frameCount = 0
+        cPtr = 0
+    End Sub
 End Class

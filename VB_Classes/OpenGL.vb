@@ -579,26 +579,37 @@ Public Class OpenGL_Extrema
     Inherits VBparent
     Dim extrema As Depth_Extrema
     Public ogl As OpenGL_Basics
+    Dim diff As Diff_Basics
     Public Sub New()
         initParent()
+        diff = New Diff_Basics
         extrema = New Depth_Extrema
-        ogl = New OpenGL_Basics()
+        ogl = New OpenGL_Basics
         ogl.OpenGLTitle = "OpenGL_Callbacks"
+
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static stableCloud = task.pointCloud
 
-        Dim pc = task.pointCloud
-        Dim split = cv.Cv2.Split(pc)
-
+        Dim split = cv.Cv2.Split(task.pointCloud)
         extrema.src = split(2)
         extrema.Run()
+        If extrema.resetAll Then
+            extrema.resetAll = False
+            stableCloud = task.pointCloud.Clone
+        End If
+
+        cv.Cv2.Absdiff(split(2), extrema.stableDepth, dst2)
+        dst2 = dst2.ConvertScaleAbs(255).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.BitwiseNot(dst2, dst2)
+        dst2.SetTo(0, extrema.zeroMask)
+
         dst1 = extrema.dst1
 
-        split(2) = extrema.stableDepth
-        cv.Cv2.Merge(split, pc)
-        ogl.pointCloudInput = pc
+        task.pointCloud.CopyTo(stableCloud, dst2)
+        ogl.pointCloudInput = stableCloud
         ogl.src = task.color
         ogl.Run()
     End Sub

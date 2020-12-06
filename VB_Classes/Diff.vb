@@ -20,7 +20,11 @@ Public Class Diff_Basics
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
             Static thresholdSlider = findSlider("Change threshold for each pixel")
-            dst2 = dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+            If dst2.Type = cv.MatType.CV_8U Then
+                dst2 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+            Else
+                dst2 = dst2.ConvertScaleAbs(255).Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+            End If
             dst1 = src.Clone().SetTo(0, dst2)
         Else
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)

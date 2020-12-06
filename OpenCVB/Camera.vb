@@ -30,7 +30,7 @@ Public Class Camera
     Public width As Integer
     Public height As Integer
 
-    Public deviceCount As integer
+    Public deviceCount As Integer
     Public deviceName As String = ""
     Public Extrinsics_VB As VB_Classes.ActiveTask.Extrinsics_VB
     Public intrinsicsLeft_VB As VB_Classes.ActiveTask.intrinsics_VB
@@ -45,7 +45,7 @@ Public Class Camera
 
     Public serialNumber As String
     Public deviceIndex As Integer
-    Public failedImageCount As integer
+    Public failedImageCount As Integer
     Public modelInverse As Boolean
     Public newImagesAvailable As Boolean
     Public cPtr As IntPtr
@@ -74,8 +74,8 @@ Public Class Camera
         Public rotation As Quaternion
         Public angularVelocity As cv.Point3f
         Public angularAcceleration As cv.Point3f
-        Public trackerConfidence As integer
-        Public mapperConfidence As integer
+        Public trackerConfidence As Integer
+        Public mapperConfidence As Integer
     End Structure
     Public Function setintrinsics(intrinsicsHW As rs.Intrinsics) As VB_Classes.ActiveTask.intrinsics_VB
         Dim intrinsics As New VB_Classes.ActiveTask.intrinsics_VB
@@ -113,9 +113,5 @@ Public Class Camera
 
         frameCount += 1
         newImagesAvailable = True
-    End Sub
-    Public Sub stopCamera()
-        pipelineClosed = True
-        frameCount = 0
     End Sub
 End Class

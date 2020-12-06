@@ -197,4 +197,5 @@ extern "C" __declspec(dllexport)
 void RS2Stop(RealSense2Camera * tp)
 {
 	tp->pipeline.stop();
+	delete tp;
 }
