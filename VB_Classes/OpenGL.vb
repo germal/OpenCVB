@@ -567,3 +567,39 @@ Public Class OpenGL_DepthSliceH
         ogl.Run()
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class OpenGL_Extrema
+    Inherits VBparent
+    Dim extrema As Depth_Extrema
+    Public ogl As OpenGL_Basics
+    Public Sub New()
+        initParent()
+        extrema = New Depth_Extrema
+        ogl = New OpenGL_Basics()
+        ogl.OpenGLTitle = "OpenGL_Callbacks"
+        task.desc = "Use the extrema stableDepth as input the an OpenGL display"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim pc = task.pointCloud
+        Dim split = cv.Cv2.Split(pc)
+
+        extrema.src = split(2)
+        extrema.Run()
+        dst1 = extrema.dst1
+
+        split(2) = extrema.stableDepth
+        cv.Cv2.Merge(split, pc)
+        ogl.pointCloudInput = pc
+        ogl.src = task.color
+        ogl.Run()
+    End Sub
+End Class

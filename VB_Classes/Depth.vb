@@ -1712,49 +1712,73 @@ Public Class Depth_Extrema
     Inherits VBparent
     Dim stable As IMU_IscameraStable
     Public stableDepth As cv.Mat
-    Dim motion As Motion_Basics
+    Dim rMotion As Rectangle_Motion
     Dim colorize As Depth_ColorizerFastFade_CPP
+    Dim zeroMask As cv.Mat
     Public Sub New()
         initParent()
         stable = New IMU_IscameraStable
         colorize = New Depth_ColorizerFastFade_CPP
-        motion = New Motion_Basics
+        rMotion = New Rectangle_Motion
         If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+            radio.Setup(caller, 3)
             radio.check(0).Text = "Use farthest distance"
             radio.check(1).Text = "Use closest distance"
+            radio.check(2).Text = "Use unchanged depth input"
             radio.check(1).Checked = True
         End If
-        stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ * 1000)
+
+        stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ)
         task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static closestRadio = findRadio("Use closest distance")
+        Static farthestRadio = findRadio("Use farthest distance")
+        If ocvb.frameCount = 1 Then farthestRadio.checked = True
 
+        Static noExtrema = findRadio("Use unchanged depth input")
+        If noExtrema.checked = False Then
+            If src.Type <> cv.MatType.CV_32FC1 Then src = getDepth32f() / 1000
+            stable.Run()
+            If stable.cameraStable Then
+                Static saveSetting = Not closestRadio.checked
+                If saveSetting <> closestRadio.checked Then
+                    saveSetting = closestRadio.checked
+                End If
+                zeroMask = src.Threshold(0.001, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255).Resize(task.color.Size)
+                stableDepth.SetTo(If(closestRadio.checked, 0, ocvb.maxZ), zeroMask)
 
-        If src.Type <> cv.MatType.CV_32F Then src = getDepth32f()
-        stable.Run()
-        If stable.cameraStable Then
-            motion.src = task.color
-            motion.Run()
-            dst2 = motion.dst2
-            src.CopyTo(stableDepth, dst2)
-            If closestRadio.checked Then
-                cv.Cv2.Min(src, stableDepth, stableDepth)
+                rMotion.src = task.color.Clone
+                rMotion.Run()
+                dst2 = rMotion.motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                For Each r In rMotion.mOverlap.enclosingRects
+                    r.Inflate(If(r.X - 10 > 0 And r.X + r.Width + 10 < src.Width, 10, 0), If(r.Y - 10 > 0 And r.Y + r.Height + 10 < src.Height, 10, 0))
+                    src(r).CopyTo(stableDepth(r))
+                    dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+                Next
+                rMotion.mOverlap.enclosingRects.Clear()
+
+                If closestRadio.checked Then
+                    cv.Cv2.Min(src, stableDepth, stableDepth)
+                Else
+                    cv.Cv2.Max(src, stableDepth, stableDepth)
+                    stableDepth.SetTo(0, zeroMask)
+                End If
             Else
-                cv.Cv2.Max(src, stableDepth, stableDepth)
+                If closestRadio.checked Then
+                    stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ)
+                Else
+                    stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
+                End If
             End If
+
+            colorize.src = stableDepth * 1000
+            colorize.Run()
+            dst1 = colorize.dst1
         Else
-            If closestRadio.checked Then
-                stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ * 1000)
-            Else
-                stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
-            End If
+            dst1 = task.RGBDepth
+            stableDepth = src
         End If
-
-        colorize.src = stableDepth
-        colorize.Run()
-        dst1 = colorize.dst1
     End Sub
 End Class

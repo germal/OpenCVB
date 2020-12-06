@@ -59,6 +59,10 @@ End Class
 
 
 
+
+
+
+
 Public Class Blob_Detector_CS
     Inherits VBparent
     Dim blob As Blob_Input

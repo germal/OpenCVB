@@ -27,7 +27,8 @@ Public Class Rectangle_Basics
             rectangles.Clear()
             rotatedRectangles.Clear()
             For i = 0 To sliders.trackbar(0).Value - 1
-                Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                ' Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
+                Dim nPoint = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
                 Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
                 Dim height = msRNG.Next(0, src.Rows - nPoint.Y - 1)
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
@@ -74,68 +75,6 @@ End Class
 
 
 
-Public Class Rectangle_Motion
-    Inherits VBparent
-    Dim motion As Motion_Basics
-    Dim otherRects As New List(Of cv.Rect)
-    Public enclosingRects As New List(Of cv.Rect)
-    Public Sub New()
-        initParent()
-        motion = New Motion_Basics
-        label1 = "Rectangles from contours of motion (unconsolidated)"
-        label2 = "Consolidated Enclosing Rectangles"
-        task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles."
-    End Sub
-    Private Function findEnclosingRect(rects As List(Of cv.Rect)) As cv.Rect
-        Dim enclosing = rects(0)
-        Dim newOther As New List(Of cv.Rect)
-        For i = 1 To rects.Count - 1
-            Dim r1 = rects(i)
-            If enclosing.IntersectsWith(r1) Then
-                enclosing = enclosing.Union(r1)
-            Else
-                newOther.Add(r1)
-            End If
-        Next
-        otherRects = New List(Of cv.Rect)(newOther)
-        Return enclosing
-    End Function
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst2 = src.Clone
-
-        motion.src = src
-        motion.Run()
-        dst1 = motion.dst1.Clone
-
-        If motion.rectList.Count > 0 Then
-            enclosingRects.Clear()
-            Dim sortedRect As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
-            For Each r In motion.rectList
-                sortedRect.Add(r.Width * r.Height, r)
-            Next
-
-            otherRects.Clear()
-            For Each r In sortedRect
-                otherRects.Add(r.Value)
-            Next
-
-            While otherRects.Count
-                Dim enclosing = findEnclosingRect(otherRects)
-                enclosingRects.Add(enclosing)
-            End While
-
-            For Each r In enclosingRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Rectangle_CComp
@@ -161,7 +100,7 @@ Public Class Rectangle_CComp
         rMotion.Run()
         If ocvb.frameCount Mod 2 = 0 Then
             dst2 = task.color
-            For Each r In rMotion.enclosingRects
+            For Each r In rMotion.mOverlap.enclosingRects
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
         End If
@@ -272,7 +211,6 @@ Public Class Rectangle_MultiOverlap
     Inherits VBparent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
-    Public enclosingRect As cv.Rect
     Public inputRects As New List(Of cv.Rect)
     Dim draw As Rectangle_Basics
     Public enclosingRects As New List(Of cv.Rect)
@@ -281,9 +219,6 @@ Public Class Rectangle_MultiOverlap
         initParent()
 
         draw = New Rectangle_Basics
-        Dim countSlider = findSlider("Rectangle Count")
-        countSlider.Value = 2
-
         task.desc = "Test if any number of rectangles overlap"
     End Sub
     Private Function findEnclosingRect(rects As List(Of cv.Rect)) As cv.Rect
@@ -304,6 +239,9 @@ Public Class Rectangle_MultiOverlap
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If standalone Then
+            Static countSlider = findSlider("Rectangle Count")
+            countSlider.Value = msRNG.Next(1, 30)
+            label1 = "Input rectangles = " + CStr(countSlider.value)
             draw.Run()
             dst1 = draw.dst1
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles")
@@ -336,5 +274,42 @@ Public Class Rectangle_MultiOverlap
         For Each r In enclosingRects
             dst2.Rectangle(r, cv.Scalar.Yellow, 2)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Rectangle_Motion
+    Inherits VBparent
+    Public motion As Motion_Basics
+    Public mOverlap As Rectangle_MultiOverlap
+    Public Sub New()
+        initParent()
+        motion = New Motion_Basics
+        mOverlap = New Rectangle_MultiOverlap
+        label1 = "Rectangles from contours of motion (unconsolidated)"
+        label2 = "Consolidated Enclosing Rectangles"
+        task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles."
+    End Sub
+
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst2 = src.Clone
+
+        motion.src = src
+        motion.Run()
+        dst1 = motion.dst1.Clone
+
+        If motion.rectList.Count > 0 Then
+            mOverlap.inputRects = New List(Of cv.Rect)(motion.rectList)
+            mOverlap.Run()
+
+            For Each r In mOverlap.enclosingRects
+                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+            Next
+        End If
     End Sub
 End Class

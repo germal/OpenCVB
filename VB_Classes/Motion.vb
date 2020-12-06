@@ -69,7 +69,7 @@ Public Class Motion_Basics
             End If
         Next
 
-        dst1 = src
+        dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src)
         For i = 0 To rectList.Count - 1
             dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
         Next
