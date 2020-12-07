@@ -29,6 +29,7 @@ Public Class TreeviewForm
         OpenCVB.AvailableAlgorithms.Text = split(0)
         SaveSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
         SaveSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
+        OpenCVB.TreeButton.Checked = False
     End Sub
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If botDistance = 0 Then botDistance = Me.Height - Label1.Top
@@ -60,11 +61,6 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
-    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
-        Get
-            Return True
-        End Get
-    End Property
     Dim titleStr = " - Click on any node to review the algorithm's input and output."
     Public Sub updateTree()
         If OpenCVB.callTrace.Count = 0 Then Exit Sub
