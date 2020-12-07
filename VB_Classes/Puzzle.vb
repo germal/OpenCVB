@@ -287,11 +287,18 @@ Public Class Puzzle_Solver
         puzzle = New Puzzle_Basics()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+            radio.Setup(caller, 4)
             radio.check(0).Text = "256x180 tile - Easy Puzzle"
             radio.check(1).Text = "128x90  tile - Medium Puzzle"
             radio.check(2).Text = "64x90   tile - Hard Puzzle"
+            radio.check(3).Text = "128x80  tile - Hard Puzzle"
             radio.check(0).Checked = True
+            If src.Width = 640 Then ' must be an even multiple
+                radio.check(3).Checked = True
+                radio.check(0).Enabled = False
+                radio.check(1).Enabled = False
+                radio.check(2).Enabled = False
+            End If
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -315,7 +322,7 @@ Public Class Puzzle_Solver
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveWidth As Integer
-        If src.Height = 180 Then ' can't support the smaller tiles are the low resolution.
+        If src.Height = 180 Then ' can't support the smaller tiles at the low resolution.
             radio.check(1).Enabled = False
             radio.check(2).Enabled = False
             radio.check(0).Checked = True
@@ -349,6 +356,9 @@ Public Class Puzzle_Solver
                 Case 360
                     factor = 2
                     ocvb.fontSize = 0.7
+                Case 480
+                    factor = 1
+                    ocvb.fontSize = 0.7
                 Case 720
                     factor = 1
                     ocvb.fontSize = 1.8
@@ -365,9 +375,15 @@ Public Class Puzzle_Solver
                 ocvb.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 3
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value * 3 / 4
-            Else
+            ElseIf radio.check(2).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 64 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 90 / factor
+                ocvb.fontSize /= 2
+                xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
+                yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
+            Else
+                puzzle.grid.sliders.trackbar(0).Value = 128 / factor
+                puzzle.grid.sliders.trackbar(1).Value = 80 / factor
                 ocvb.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2

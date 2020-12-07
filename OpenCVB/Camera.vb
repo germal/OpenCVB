@@ -27,8 +27,7 @@ Public Class Camera
     Public rightView As New cv.Mat
     Public pointCloud As New cv.Mat
     Public depth16 As New cv.Mat
-    Public width As Integer
-    Public height As Integer
+    Public width As Integer, height As Integer
 
     Public deviceCount As Integer
     Public deviceName As String = ""

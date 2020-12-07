@@ -420,8 +420,10 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub RestartCamera()
-        camera.stopCamera()
-        camera.devicename = ""
+        If camera.width <> resolutionXY.Width Then
+            camera.stopCamera()
+            camera.devicename = ""
+        End If
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
@@ -1025,14 +1027,13 @@ Public Class OpenCVB
         saveAlgorithmName = ""
 
         Dim saveCurrentCamera = optionsForm.cameraIndex
-        Dim saveCurrentWidth = resolutionXY.Width
 
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
             optionsForm.saveResolution()
             optionsForm.TestEnableNumPy()
-            If saveCurrentCamera <> optionsForm.cameraIndex Or saveCurrentWidth <> resolutionXY.Width Then RestartCamera()
+            If saveCurrentCamera <> optionsForm.cameraIndex Or camera.width <> resolutionXY.Width Then RestartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
             LineUpCamPics(resizing:=False)

@@ -583,6 +583,11 @@ Public Class OpenGL_Extrema
     Public Sub New()
         initParent()
         diff = New Diff_Basics
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
+        End If
+
         extrema = New Depth_Extrema
         ogl = New OpenGL_Basics
         ogl.OpenGLTitle = "OpenGL_Callbacks"
@@ -608,7 +613,14 @@ Public Class OpenGL_Extrema
 
         dst1 = extrema.dst1
 
-        task.pointCloud.CopyTo(stableCloud, dst2)
+        Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
+        If zCheck.checked Then
+            split(2) = extrema.stableDepth
+            cv.Cv2.Merge(split, stableCloud)
+        Else
+            task.pointCloud.CopyTo(stableCloud, dst2)
+        End If
+
         ogl.pointCloudInput = stableCloud
         ogl.src = task.color
         ogl.Run()

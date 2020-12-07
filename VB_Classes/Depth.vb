@@ -1722,10 +1722,11 @@ Public Class Depth_Extrema
         colorize = New Depth_ColorizerFastFade_CPP
         rMotion = New Rectangle_Motion
         If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+            radio.Setup(caller, 4)
             radio.check(0).Text = "Use farthest distance"
             radio.check(1).Text = "Use closest distance"
-            radio.check(2).Text = "Use unchanged depth input"
+            radio.check(2).Text = "Use average distance"
+            radio.check(3).Text = "Use unchanged depth input"
             radio.check(1).Checked = True
         End If
 
@@ -1758,9 +1759,11 @@ Public Class Depth_Extrema
 
                 If closestRadio.checked Then
                     cv.Cv2.Min(src, stableDepth, stableDepth)
-                Else
+                ElseIf farthestRadio.checked Then
                     cv.Cv2.Max(src, stableDepth, stableDepth)
                     stableDepth.SetTo(0, zeroMask)
+                Else
+                    'stableDepth = cv.Cv2.a
                 End If
             Else
                 resetAll = True
