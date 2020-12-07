@@ -34,9 +34,10 @@ Public Class OpenGL_Basics
     Public pointCloudInput As New cv.Mat
     Dim openGLHeight = 1200
     Dim openGLWidth = 1500
+    Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
-        pointCloudInput = task.pointCloud
+        inrange = New Depth_InRange
         task.desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate()
@@ -84,6 +85,9 @@ Public Class OpenGL_Basics
             src = src
             pointCloudInput = task.pointCloud
         End If
+
+        inrange.Run()
+        pointCloudInput.SetTo(0, inrange.noDepthMask)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If ocvb.frameCount = 0 Then startOpenGLWindow()
@@ -578,7 +582,7 @@ End Class
 Public Class OpenGL_Extrema
     Inherits VBparent
     Dim extrema As Depth_Extrema
-    Public ogl As OpenGL_Basics
+    Public ogl As OpenGL_Options
     Dim diff As Diff_Basics
     Public Sub New()
         initParent()
@@ -589,8 +593,7 @@ Public Class OpenGL_Extrema
         End If
 
         extrema = New Depth_Extrema
-        ogl = New OpenGL_Basics
-        ogl.OpenGLTitle = "OpenGL_Callbacks"
+        ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
@@ -621,7 +624,7 @@ Public Class OpenGL_Extrema
             task.pointCloud.CopyTo(stableCloud, dst2)
         End If
 
-        ogl.pointCloudInput = stableCloud
+        task.pointCloud = stableCloud
         ogl.src = task.color
         ogl.Run()
     End Sub

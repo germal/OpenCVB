@@ -287,18 +287,11 @@ Public Class Puzzle_Solver
         puzzle = New Puzzle_Basics()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+            radio.Setup(caller, 3)
             radio.check(0).Text = "256x180 tile - Easy Puzzle"
             radio.check(1).Text = "128x90  tile - Medium Puzzle"
             radio.check(2).Text = "64x90   tile - Hard Puzzle"
-            radio.check(3).Text = "128x80  tile - Hard Puzzle"
             radio.check(0).Checked = True
-            If src.Width = 640 Then ' must be an even multiple
-                radio.check(3).Checked = True
-                radio.check(0).Enabled = False
-                radio.check(1).Enabled = False
-                radio.check(2).Enabled = False
-            End If
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -320,7 +313,21 @@ Public Class Puzzle_Solver
         Return bfit
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If src.Width = 640 Then
+            ocvb.trueText("This algorithm was not setup to work at 640x480.  It works only at 1270x720")
+            Exit Sub
+        End If
+        If ocvb.frameCount = 0 Then
+            If src.Width = 640 Then ' must be an even multiple
+                radio.check(0).Enabled = False
+                radio.check(1).Enabled = False
+                radio.check(2).Enabled = False
+                radio.check(3).Checked = True
+            End If
+        End If
+
         Static saveWidth As Integer
         If src.Height = 180 Then ' can't support the smaller tiles at the low resolution.
             radio.check(1).Enabled = False
@@ -355,9 +362,6 @@ Public Class Puzzle_Solver
                     ocvb.fontSize = 0.4
                 Case 360
                     factor = 2
-                    ocvb.fontSize = 0.7
-                Case 480
-                    factor = 1
                     ocvb.fontSize = 0.7
                 Case 720
                     factor = 1
