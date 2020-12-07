@@ -42,10 +42,10 @@ Public Class OptionsDialog
         'cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Or
         If cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Or
            cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
-            mediumResolution.Enabled = False
-            If mediumResolution.Checked Then HighResolution.Checked = True
+            resolution640.Enabled = False
+            If resolution640.Checked Then resolution1280.Checked = True
         Else
-            mediumResolution.Enabled = True
+            resolution640.Enabled = True
         End If
     End Sub
     Public Sub enableCameras()
@@ -56,11 +56,11 @@ Public Class OptionsDialog
     Public Sub saveResolution()
         Select Case OpenCVB.resolutionXY.Width
             Case 640
-                mediumResolution.Checked = True
+                resolution640.Checked = True
                 OpenCVB.resolutionXY = New cv.Size(640, 480)
                 resolutionName = "Medium"
             Case 1280
-                HighResolution.Checked = True
+                resolution1280.Checked = True
                 OpenCVB.resolutionXY = New cv.Size(1280, 720)
                 resolutionName = "High"
         End Select
@@ -166,10 +166,10 @@ Public Class OptionsDialog
             fontInfo.Text = FontDialog1.Font.Name + " with size = " + CStr(fontInfo.Font.Size)
         End If
     End Sub
-    Private Sub HighResolution_CheckedChanged(sender As Object, e As EventArgs) Handles HighResolution.CheckedChanged
+    Private Sub HighResolution_CheckedChanged(sender As Object, e As EventArgs) Handles resolution1280.CheckedChanged
         OpenCVB.resolutionXY = New cv.Size(1280, 720)
     End Sub
-    Private Sub mediumResolution_CheckedChanged(sender As Object, e As EventArgs) Handles mediumResolution.CheckedChanged
+    Private Sub mediumResolution_CheckedChanged(sender As Object, e As EventArgs) Handles resolution640.CheckedChanged
         OpenCVB.resolutionXY = New cv.Size(640, 480)
     End Sub
 End Class

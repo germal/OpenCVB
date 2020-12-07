@@ -25,8 +25,8 @@ Partial Class OptionsDialog
         Me.CameraGroup = New System.Windows.Forms.GroupBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.SnapToGrid = New System.Windows.Forms.CheckBox()
-        Me.HighResolution = New System.Windows.Forms.RadioButton()
-        Me.mediumResolution = New System.Windows.Forms.RadioButton()
+        Me.resolution1280 = New System.Windows.Forms.RadioButton()
+        Me.resolution640 = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ShowConsoleLog = New System.Windows.Forms.CheckBox()
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
@@ -66,8 +66,8 @@ Partial Class OptionsDialog
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.SnapToGrid)
-        Me.GroupBox1.Controls.Add(Me.HighResolution)
-        Me.GroupBox1.Controls.Add(Me.mediumResolution)
+        Me.GroupBox1.Controls.Add(Me.resolution1280)
+        Me.GroupBox1.Controls.Add(Me.resolution640)
         Me.GroupBox1.Location = New System.Drawing.Point(21, 228)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 105)
@@ -85,27 +85,27 @@ Partial Class OptionsDialog
         Me.SnapToGrid.Text = "Snap to Grid - unchecked leaves main form size alone"
         Me.SnapToGrid.UseVisualStyleBackColor = True
         '
-        'HighResolution
+        'resolution1280
         '
-        Me.HighResolution.AutoSize = True
-        Me.HighResolution.Location = New System.Drawing.Point(18, 67)
-        Me.HighResolution.Name = "HighResolution"
-        Me.HighResolution.Size = New System.Drawing.Size(223, 24)
-        Me.HighResolution.TabIndex = 1
-        Me.HighResolution.TabStop = True
-        Me.HighResolution.Text = "1280x720 - High resolution"
-        Me.HighResolution.UseVisualStyleBackColor = True
+        Me.resolution1280.AutoSize = True
+        Me.resolution1280.Location = New System.Drawing.Point(18, 67)
+        Me.resolution1280.Name = "resolution1280"
+        Me.resolution1280.Size = New System.Drawing.Size(223, 24)
+        Me.resolution1280.TabIndex = 1
+        Me.resolution1280.TabStop = True
+        Me.resolution1280.Text = "1280x720 - High resolution"
+        Me.resolution1280.UseVisualStyleBackColor = True
         '
-        'mediumResolution
+        'resolution640
         '
-        Me.mediumResolution.AutoSize = True
-        Me.mediumResolution.Location = New System.Drawing.Point(18, 37)
-        Me.mediumResolution.Name = "mediumResolution"
-        Me.mediumResolution.Size = New System.Drawing.Size(237, 24)
-        Me.mediumResolution.TabIndex = 0
-        Me.mediumResolution.TabStop = True
-        Me.mediumResolution.Text = "640x480 - Medium resolution"
-        Me.mediumResolution.UseVisualStyleBackColor = True
+        Me.resolution640.AutoSize = True
+        Me.resolution640.Location = New System.Drawing.Point(18, 37)
+        Me.resolution640.Name = "resolution640"
+        Me.resolution640.Size = New System.Drawing.Size(237, 24)
+        Me.resolution640.TabIndex = 0
+        Me.resolution640.TabStop = True
+        Me.resolution640.Text = "640x480 - Medium resolution"
+        Me.resolution640.UseVisualStyleBackColor = True
         '
         'GroupBox2
         '
@@ -316,8 +316,8 @@ Partial Class OptionsDialog
     End Sub
     Friend WithEvents CameraGroup As GroupBox
     Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents HighResolution As RadioButton
-    Friend WithEvents mediumResolution As RadioButton
+    Friend WithEvents resolution1280 As RadioButton
+    Friend WithEvents resolution640 As RadioButton
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowLabels As CheckBox
     Friend WithEvents GroupBox4 As GroupBox

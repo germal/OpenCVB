@@ -15,7 +15,6 @@ Module opencv_module
 End Module
 Public Class OpenCVB
 #Region "Globals"
-    Const displayFrames As Integer = 3
     Dim AlgorithmCount As Integer
     Dim AlgorithmTestCount As Integer
     Dim algorithmTaskHandle As Thread
@@ -30,7 +29,7 @@ Public Class OpenCVB
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
     Dim cameraTaskHandle As Thread
-    Dim camPic(displayFrames - 1) As PictureBox
+    Dim camPic(3 - 1) As PictureBox
     Dim cameraRefresh As Boolean
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Integer
@@ -54,7 +53,6 @@ Public Class OpenCVB
     Dim myBrush = New SolidBrush(System.Drawing.Color.White)
     Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
     Dim openCVKeywords As New List(Of String)
-    'Dim OptionsBringToFront As Boolean
     Dim optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
     Dim openFileForm As OpenFilename
@@ -81,7 +79,6 @@ Public Class OpenCVB
     Dim logAlgorithms As StreamWriter
     Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
-    'Dim startAlgorithmTime As DateTime
     Const MAX_RECENT = 25
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
@@ -419,10 +416,6 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub RestartCamera()
-        If camera.width <> resolutionXY.Width Then
-            camera.stopCamera()
-            camera.devicename = ""
-        End If
         cameraTaskHandle = Nothing
         updateCamera()
     End Sub
@@ -864,7 +857,7 @@ Public Class OpenCVB
     End Sub
     Public Sub raiseEventCamera()
         SyncLock delegateLock
-            For i = 0 To displayFrames - 1
+            For i = 0 To camPic.Length - 1
                 camPic(i).Refresh()
             Next
         End SyncLock
@@ -981,16 +974,16 @@ Public Class OpenCVB
 
                 only1Resolution = True
             Else
-                If optionsForm.mediumResolution.Checked Then
-                    optionsForm.HighResolution.Checked = True
-                ElseIf optionsForm.HighResolution.Checked Then
-                    optionsForm.mediumResolution.Checked = True
+                If optionsForm.resolution640.Checked Then
+                    optionsForm.resolution1280.Checked = True
+                ElseIf optionsForm.resolution1280.Checked Then
+                    optionsForm.resolution640.Checked = True
                 End If
             End If
             saveLayout()
         End If
 
-        If optionsForm.mediumResolution.Checked Or only1Resolution Then ' only change cameras when in medium resolution or when only 1 resolution
+        If optionsForm.resolution640.Checked Or only1Resolution Then ' only change cameras when in medium resolution or when only 1 resolution
             ' after sweeping through resolutions, sweep through the cameras as well...
             If (AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0) Or specialSingleCount Then
                 Dim cameraIndex = optionsForm.cameraIndex
