@@ -1056,10 +1056,10 @@ Addendum 2: Some Thoughts
     algorithm.
 
 19. Options for each algorithm are presented by the algorithm itself and are
-    automatically part of the algorithm task. A Single-Document Interface shows
-    all the options in a single window as cascading windows. The sliders (or
-    trackbars) are on the left of the SDI window while the checkboxes and radio
-    buttons are on the right.
+    automatically part of the algorithm task. A Multiple-Document Interface
+    (MDI) window shows all the options in a single window as cascading windows.
+    The sliders (or trackbars) are on the left side of the MDI window while
+    checkboxes and radio buttons are on the right.
 
 20. With multiple tasks for camera, user interface, and algorithm, there is no
     guarantee that all 4 images are for the same instant. However, the left and

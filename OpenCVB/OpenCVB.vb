@@ -55,7 +55,6 @@ Public Class OpenCVB
     Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
     Dim openCVKeywords As New List(Of String)
     'Dim OptionsBringToFront As Boolean
-    Dim treeViewBringToFront As Boolean
     Dim optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
     Dim openFileForm As OpenFilename
@@ -451,7 +450,6 @@ Public Class OpenCVB
             TreeViewDialog.TreeviewForm_Resize(sender, e)
         Else
             TreeViewDialog.Show()
-            TreeViewDialog.BringToFront()
         End If
     End Sub
     Public Function USBenumeration(searchName As String) As Integer
