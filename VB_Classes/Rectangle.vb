@@ -292,7 +292,7 @@ Public Class Rectangle_Motion
         mOverlap = New Rectangle_MultiOverlap
         label1 = "Rectangles from contours of motion (unconsolidated)"
         label2 = "Consolidated Enclosing Rectangles"
-        task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles."
+        task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
     End Sub
 
     Public Sub Run()
@@ -307,9 +307,55 @@ Public Class Rectangle_Motion
             mOverlap.inputRects = New List(Of cv.Rect)(motion.rectList)
             mOverlap.Run()
 
+            If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each r In mOverlap.enclosingRects
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Rectangle_MotionDepth
+    Inherits VBparent
+    Public motion As Motion_Basics
+    Public mOverlap As Rectangle_MultiOverlap
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public Sub New()
+        initParent()
+        colorize = New Depth_ColorizerFastFade_CPP
+        motion = New Motion_Basics
+        mOverlap = New Rectangle_MultiOverlap
+        label1 = "Rectangles from contours of motion (unconsolidated)"
+        label2 = "Consolidated Enclosing Rectangles"
+        task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the depth image."
+    End Sub
+
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static lastDepth = getDepth32f()
+        Dim depth32f = getDepth32f()
+        cv.Cv2.Min(depth32f, lastDepth, motion.src)
+
+        ' motion.Run()
+        colorize.src = motion.src.Clone
+        colorize.Run()
+        dst1 = colorize.dst1
+
+        'If motion.rectList.Count > 0 Then
+        '    mOverlap.inputRects = New List(Of cv.Rect)(motion.rectList)
+        '    mOverlap.Run()
+
+        '    dst2 = motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        '    For Each r In mOverlap.enclosingRects
+        '        dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+        '    Next
+        '    mOverlap.enclosingRects.Clear()
+        'End If
+        lastDepth = motion.src.Clone
     End Sub
 End Class

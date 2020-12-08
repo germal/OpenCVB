@@ -863,7 +863,7 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        If camera.frameCount < 60 Then Me.Activate() ' after all the algorithm options forms have appeared, set focus on the main form.
+        If camera.frameCount < 60 And AvailableAlgorithms.Text.StartsWith("OpenGL") = False Then Me.Activate() ' after all the algorithm options forms have appeared, set focus on the main form.
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
@@ -1171,7 +1171,7 @@ Public Class OpenCVB
                 task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
                 task.leftView = camera.leftView.Resize(resolutionXY)
                 task.rightView = camera.rightView.Resize(resolutionXY)
-                task.pointCloud = camera.PointCloud.clone
+                task.pointCloud = camera.PointCloud.clone.resize(resolutionXY)
 
                 task.depth16 = camera.depth16.clone
                 task.transformationMatrix = camera.transformationMatrix

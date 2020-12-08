@@ -579,53 +579,53 @@ End Class
 
 
 
-Public Class OpenGL_Extrema
-    Inherits VBparent
-    Dim extrema As Depth_Extrema
-    Public ogl As OpenGL_Options
-    Dim diff As Diff_Basics
-    Public Sub New()
-        initParent()
-        diff = New Diff_Basics
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
-        End If
+'Public Class OpenGL_Extrema
+'    Inherits VBparent
+'    Dim extrema As Depth_Extrema
+'    Public ogl As OpenGL_Options
+'    Dim diff As Diff_Basics
+'    Public Sub New()
+'        initParent()
+'        diff = New Diff_Basics
+'        If findfrm(caller + " CheckBox Options") Is Nothing Then
+'            check.Setup(caller, 1)
+'            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
+'        End If
 
-        extrema = New Depth_Extrema
-        ogl = New OpenGL_Options
+'        extrema = New Depth_Extrema
+'        ogl = New OpenGL_Options
 
-        task.desc = "Use the extrema stableDepth as input the an OpenGL display"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static stableCloud = task.pointCloud
+'        task.desc = "Use the extrema stableDepth as input the an OpenGL display"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        Static stableCloud = task.pointCloud
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
-        extrema.src = split(2)
-        extrema.Run()
-        If extrema.resetAll Then
-            extrema.resetAll = False
-            stableCloud = task.pointCloud.Clone
-        End If
+'        Dim split = cv.Cv2.Split(task.pointCloud)
+'        extrema.src = split(2)
+'        extrema.Run()
+'        If extrema.resetAll Then
+'            extrema.resetAll = False
+'            stableCloud = task.pointCloud.Clone
+'        End If
 
-        cv.Cv2.Absdiff(split(2), extrema.stableDepth, dst2)
-        dst2 = dst2.ConvertScaleAbs(255).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.BitwiseNot(dst2, dst2)
-        dst2.SetTo(0, extrema.zeroMask)
+'        cv.Cv2.Absdiff(split(2), extrema.stableDepth, dst2)
+'        dst2 = dst2.ConvertScaleAbs(255).Threshold(0, 255, cv.ThresholdTypes.Binary)
+'        cv.Cv2.BitwiseNot(dst2, dst2)
+'        dst2.SetTo(0, extrema.zeroMask)
 
-        dst1 = extrema.dst1
+'        dst1 = extrema.dst1
 
-        Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
-        If zCheck.checked Then
-            split(2) = extrema.stableDepth
-            cv.Cv2.Merge(split, stableCloud)
-        Else
-            task.pointCloud.CopyTo(stableCloud, dst2)
-        End If
+'        Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
+'        If zCheck.checked Then
+'            split(2) = extrema.stableDepth
+'            cv.Cv2.Merge(split, stableCloud)
+'        Else
+'            task.pointCloud.CopyTo(stableCloud, dst2)
+'        End If
 
-        task.pointCloud = stableCloud
-        ogl.src = task.color
-        ogl.Run()
-    End Sub
-End Class
+'        task.pointCloud = stableCloud
+'        ogl.src = task.color
+'        ogl.Run()
+'    End Sub
+'End Class

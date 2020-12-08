@@ -7,6 +7,7 @@ Public Class Motion_Basics
     Dim dilate As DilateErode_Basics
     Dim contours As Contours_Basics
     Public rectList As New List(Of cv.Rect)
+    Public changedPixels As Integer
     Public Sub New()
         initParent()
         contours = New Contours_Basics()
@@ -15,9 +16,8 @@ Public Class Motion_Basics
         blur = New Blur_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Frames to persist", 1, 100, 10)
+            sliders.setupTrackBar(0, "Frames to persist", 1, 10000, 10)
             sliders.setupTrackBar(1, "Minimum size for motion rectangle", 1, 10000, 1000)
-            sliders.setupTrackBar(2, "Milliseconds to detect no motion", 1, 1000, 100)
         End If
 
         Dim iterSlider = findSlider("Dilate/Erode Kernel Size")
@@ -30,7 +30,6 @@ Public Class Motion_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
 
         If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src.Clone
         blur.src = dst1
@@ -52,6 +51,7 @@ Public Class Motion_Basics
         diff.lastFrame = firstFrame
         diff.Run()
         dst2 = diff.dst2
+        changedPixels = dst2.CountNonZero()
 
         dilate.src = dst2
         dilate.Run()
@@ -69,9 +69,11 @@ Public Class Motion_Basics
             End If
         Next
 
-        dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src)
-        For i = 0 To rectList.Count - 1
-            dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
-        Next
+        If src.Channels = 1 And dst1.Type = cv.MatType.CV_8U Then
+            dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For i = 0 To rectList.Count - 1
+                dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
+            Next
+        End If
     End Sub
 End Class
