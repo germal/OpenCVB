@@ -8,6 +8,7 @@ Public Class Motion_Basics
     Dim contours As Contours_Basics
     Public rectList As New List(Of cv.Rect)
     Public changedPixels As Integer
+    Dim threshSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         contours = New Contours_Basics()
@@ -18,12 +19,13 @@ Public Class Motion_Basics
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Frames to persist", 1, 10000, 10)
             sliders.setupTrackBar(1, "Minimum size for motion rectangle", 1, 10000, 1000)
+            sliders.setupTrackBar(2, "Total motion threshold to resync", 1, 20000, 5000)
         End If
 
         Dim iterSlider = findSlider("Dilate/Erode Kernel Size")
         iterSlider.Value = 2
 
-        Static threshSlider = findSlider("Change threshold for each pixel")
+        threshSlider = findSlider("Change threshold for each pixel")
         threshSlider.value = 25
 
         task.desc = "Detect contours in the motion data"
@@ -75,5 +77,6 @@ Public Class Motion_Basics
                 dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
             Next
         End If
+        label2 = "Mask of pixel difference > " + CStr(threshSlider.Value)
     End Sub
 End Class

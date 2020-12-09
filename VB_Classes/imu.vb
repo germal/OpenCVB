@@ -575,7 +575,8 @@ Public Class IMU_IscameraStable
         yaw = task.IMU_AngularVelocity.Y
         roll = task.IMU_AngularVelocity.Z
 
-        Dim threshold = sliders.trackbar(0).Value / 100
+        Static thresholdSlider = findSlider("Threshold in motion radian X100")
+        Dim threshold = thresholdSlider.Value / 100
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
         cameraStable = If(totalRadians > threshold, False, True)
         If standalone Then

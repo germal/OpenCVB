@@ -1,42 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Depth_Median
-    Inherits VBparent
-    Dim median As Math_Median_CDF
-    Public Sub New()
-        initParent()
-        median = New Math_Median_CDF()
-        median.src = New cv.Mat
-        median.rangeMax = 10000
-        median.rangeMin = 1 ' ignore depth of zero as it is not known.
-        task.desc = "Divide the depth image ahead and behind the median."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        median.src = getDepth32f()
-        median.Run()
-
-        Dim mask As cv.Mat
-        mask = median.src.LessThan(median.medianVal)
-        task.RGBDepth.CopyTo(dst1, mask)
-
-        Dim zeroMask = median.src.Equals(0)
-        cv.Cv2.ConvertScaleAbs(zeroMask, zeroMask.ToMat)
-        dst1.SetTo(0, zeroMask)
-
-        label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
-
-        cv.Cv2.BitwiseNot(mask, mask)
-        dst2.SetTo(0)
-        task.RGBDepth.CopyTo(dst2, mask)
-        dst2.SetTo(0, zeroMask)
-        label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
-    End Sub
-End Class
-
-
-
-
 Public Class Depth_Flatland
     Inherits VBparent
     Public Sub New()
@@ -1096,6 +1059,44 @@ End Class
 
 
 
+Public Class Depth_Median
+    Inherits VBparent
+    Dim median As Math_Median_CDF
+    Public Sub New()
+        initParent()
+        median = New Math_Median_CDF()
+        median.src = New cv.Mat
+        median.rangeMax = 10000
+        median.rangeMin = 1 ' ignore depth of zero as it is not known.
+        task.desc = "Divide the depth image ahead and behind the median."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        median.src = getDepth32f()
+        median.Run()
+
+        Dim mask As cv.Mat
+        mask = median.src.LessThan(median.medianVal)
+        task.RGBDepth.CopyTo(dst1, mask)
+
+        Dim zeroMask = median.src.Equals(0)
+        cv.Cv2.ConvertScaleAbs(zeroMask, zeroMask.ToMat)
+        dst1.SetTo(0, zeroMask)
+
+        label1 = "Median Depth < " + Format(median.medianVal, "#0.0")
+
+        cv.Cv2.BitwiseNot(mask, mask)
+        dst2.SetTo(0)
+        task.RGBDepth.CopyTo(dst2, mask)
+        dst2.SetTo(0, zeroMask)
+        label2 = "Median Depth > " + Format(median.medianVal, "#0.0")
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class Depth_SmoothingMat
     Inherits VBparent
@@ -1718,6 +1719,7 @@ Public Class Depth_LowQualityMask
         ellipseRadio.Checked = True
 
         inrange = New Depth_InRange
+        label2 = "Dilated zero depth - reduces flyout particles"
         task.desc = "Monitor motion in the mask where depth is zero"
     End Sub
     Public Sub Run()
@@ -1737,100 +1739,19 @@ End Class
 
 
 
-'Public Class Depth_Extrema
-'    Inherits VBparent
-'    Dim stable As IMU_IscameraStable
-'    Public stableDepth As cv.Mat
-'    Dim stableDepthMin As cv.Mat
-'    Dim rMotion As Rectangle_Motion
-'    Dim colorize As Depth_ColorizerFastFade_CPP
-'    Public zeroMask As cv.Mat
-'    Public resetAll As Boolean
-'    Public Sub New()
-'        initParent()
-'        stable = New IMU_IscameraStable
-'        colorize = New Depth_ColorizerFastFade_CPP
-'        rMotion = New Rectangle_Motion
-'        If findfrm(caller + " Radio Options") Is Nothing Then
-'            radio.Setup(caller, 3)
-'            radio.check(0).Text = "Use farthest distance"
-'            radio.check(1).Text = "Use closest distance"
-'            radio.check(2).Text = "Use unchanged depth input"
-'            radio.check(1).Checked = True
-'        End If
-
-'        stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ)
-'        stableDepthMin = stableDepth.Clone
-'        task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
-'    End Sub
-'    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-'        Static farthestRadio = findRadio("Use farthest distance")
-'        Static closestRadio = findRadio("Use closest distance")
-'        Static noExtrema = findRadio("Use unchanged depth input")
-
-'        stable.Run()
-
-'        If noExtrema.checked Or stable.cameraStable = False Then
-'            resetAll = True
-'            dst1 = task.RGBDepth
-'            stableDepth = src
-'            stableDepthMin = src
-'        Else
-'            resetAll = False
-'            If src.Type <> cv.MatType.CV_32FC1 Then src = getDepth32f()
-'            zeroMask = src.ConvertScaleAbs(255).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-'            stableDepth.SetTo(ocvb.maxZ * 1000, zeroMask)
-'            stableDepthMin.SetTo(0, zeroMask)
-
-'            rMotion.src = task.color.Clone
-'            rMotion.Run()
-'            dst2 = rMotion.motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-'            For Each r In rMotion.mOverlap.enclosingRects
-'                r.Inflate(If(r.X - 10 > 0 And r.X + r.Width + 10 < src.Width, 10, 0), If(r.Y - 10 > 0 And r.Y + r.Height + 10 < src.Height, 10, 0))
-'                src(r).CopyTo(stableDepth(r))
-'                src(r).CopyTo(stableDepthMin(r))
-'            Next
-'            For Each r In rMotion.mOverlap.enclosingRects
-'                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-'            Next
-
-'            ' always run min because any pixels that get zero get eliminated (until reset).  This preserves the stable 3D pixels.
-'            cv.Cv2.Min(src, stableDepthMin, stableDepthMin)
-
-'            If closestRadio.checked Then
-'                stableDepth = stableDepthMin
-'            Else
-'                cv.Cv2.Max(src, stableDepth, stableDepth)
-'                stableDepth.SetTo(0, zeroMask)
-
-'                Dim unStableMask = stableDepthMin.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
-'                cv.Cv2.BitwiseNot(unStableMask, unStableMask)
-'                stableDepth.SetTo(0, unStableMask)
-'                cv.Cv2.ImShow("unstable", unStableMask)
-'            End If
-
-'            colorize.src = stableDepth * 1000
-'            colorize.Run()
-'            dst1 = colorize.dst1
-'        End If
-'    End Sub
-'End Class
-
-
-
-
-
-
 
 Public Class Depth_Extrema
     Inherits VBparent
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public dMin As Depth_Min
+    Public dMax As Depth_Max
     Public stableDepth As cv.Mat
-    Dim depthMin As Depth_Min
+    Public resetAll As Boolean
     Public Sub New()
         initParent()
-        depthMin = New Depth_Min
+        colorize = New Depth_ColorizerFastFade_CPP
+        dMin = New Depth_Min
+        dMax = New Depth_Max
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "Use farthest distance"
@@ -1839,21 +1760,51 @@ Public Class Depth_Extrema
             radio.check(1).Checked = True
         End If
 
+        label1 = "Depth map colorized"
+        label2 = "32-bit StableDepth"
         task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static farthestRadio = findRadio("Use farthest distance")
-        Static closestRadio = findRadio("Use closest distance")
-        Static noExtrema = findRadio("Use unchanged depth input")
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f()
 
-        If closestRadio.checked Then
-            depthMin.src = getDepth32f()
-            depthMin.Run()
-            dst1 = depthMin.dst1
-            dst2 = depthMin.dst2
+        Dim radioVal As Integer
+        Static frm As OptionsRadioButtons = findfrm("Depth_Extrema Radio Options")
+        For radioVal = 0 To frm.check.Count - 1
+            If frm.check(radioVal).Checked Then Exit For
+        Next
+
+        Static saveRadioVal = -1
+        If radioVal <> saveRadioVal Then
+            saveRadioVal = radioVal
+            stableDepth = getDepth32f()
+            resetAll = True
+        Else
+            Select Case saveRadioVal
+                Case 0
+                    dMax.src = input
+                    dMax.Run()
+                    stableDepth = dMax.stableMax
+                    dst1 = dMax.dst1
+                    resetAll = dMax.dMin.resetAll
+                Case 1
+                    dMin.src = input
+                    dMin.Run()
+                    stableDepth = dMin.stableMin
+                    dst1 = dMin.dst1
+                    resetAll = dMin.resetAll
+                Case 2
+                    stableDepth = getDepth32f()
+                    colorize.src = stableDepth
+                    colorize.Run()
+                    dst1 = colorize.dst1
+                    resetAll = True
+            End Select
         End If
+
+        dst2 = stableDepth
     End Sub
 End Class
 
@@ -1866,13 +1817,13 @@ End Class
 
 Public Class Depth_Min
     Inherits VBparent
-    Dim stable As IMU_IscameraStable
-    Public stableDepth As cv.Mat
-    Dim rgbMotion As Rectangle_Motion
+    Public stable As IMU_IscameraStable
+    Public stableMin As cv.Mat
+    Public rgbMotion As Rectangle_Motion
     Dim colorize As Depth_ColorizerFastFade_CPP
-    Dim lowQuality As Depth_LowQualityMask
-    Public zeroMask As cv.Mat
+    Public lowQuality As Depth_LowQualityMask
     Public resetAll As Boolean
+    Public updateMask As cv.Mat
     Public Sub New()
         initParent()
 
@@ -1880,46 +1831,145 @@ Public Class Depth_Min
         stable = New IMU_IscameraStable
         colorize = New Depth_ColorizerFastFade_CPP
         rgbMotion = New Rectangle_Motion
+        updateMask = New cv.Mat(src.Size, cv.MatType.CV_8U)
 
-        stableDepth = New cv.Mat(src.Size, cv.MatType.CV_32F, ocvb.maxZ * 1000)
-
-        label1 = "In range depth with zero/low quality removed."
-        label2 = "Refresh depth in rectangle with motion"
-        task.desc = "To reduce z-Jitter, use the closest as long as the camera is stable"
+        label1 = "InRange depth with zero/low quality depth removed."
+        label2 = "Motion in the RGB image. Depth updated in rectangle."
+        task.desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If src.Type <> cv.MatType.CV_32FC1 Then src = getDepth32f()
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f()
 
         stable.Run()
 
         lowQuality.Run()
+        rgbMotion.src = task.color.Clone
+        rgbMotion.Run()
+        dst2 = rgbMotion.motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If stable.cameraStable = False Then
+        Static motionThreshold = findSlider("Total motion threshold to resync")
+        If stable.cameraStable = False Or rgbMotion.motion.changedPixels > motionThreshold.value Or stableMin Is Nothing Then
             resetAll = True
-            stableDepth = src
-            stableDepth.SetTo(0, lowQuality.dst2)
+            stableMin = input
         Else
             resetAll = False
+            stableMin.SetTo(0, lowQuality.dst2)
 
-            stableDepth.SetTo(0, lowQuality.dst2)
-            rgbMotion.src = task.color.Clone
-            rgbMotion.Run()
-            dst2 = rgbMotion.motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            updateMask = rgbMotion.motion.dst2
             For Each r In rgbMotion.mOverlap.enclosingRects
-                'r.Inflate(If(r.X - 10 > 0 And r.X + r.Width + 10 < src.Width, 10, 0), If(r.Y - 10 > 0 And r.Y + r.Height + 10 < src.Height, 10, 0))
-                src(r).CopyTo(stableDepth(r))
+                r.Inflate(If(r.X - 10 > 0 And r.X + r.Width + 10 < src.Width, 10, 0), If(r.Y - 10 > 0 And r.Y + r.Height + 10 < src.Height, 10, 0))
+                updateMask.Rectangle(r, 255, -1)
             Next
+            input.CopyTo(stableMin, updateMask)
             For Each r In rgbMotion.mOverlap.enclosingRects
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
             rgbMotion.mOverlap.enclosingRects.Clear()
 
-            cv.Cv2.Min(src, stableDepth, stableDepth)
+            cv.Cv2.Min(input, stableMin, stableMin)
         End If
-        colorize.src = stableDepth
+        stableMin.SetTo(0, lowQuality.dst2)
+        colorize.src = stableMin
         colorize.Run()
         dst1 = colorize.dst1
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Depth_Max
+    Inherits VBparent
+    Public dMin As Depth_Min
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public stableMax As cv.Mat
+    Public Sub New()
+        initParent()
+
+        colorize = New Depth_ColorizerFastFade_CPP
+        dMin = New Depth_Min
+
+        label1 = "InRange depth with zero/low quality depth removed."
+        label2 = "32-bit format StableMax"
+        task.desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f()
+
+        dMin.src = input
+        dMin.Run()
+
+        If dMin.resetAll Then
+            stableMax = input
+            stableMax.SetTo(0, dMin.lowQuality.dst2)
+        Else
+            Dim zeroMask As New cv.Mat
+            cv.Cv2.InRange(dMin.stableMin, 0, 0, zeroMask)
+            cv.Cv2.Max(input, stableMax, stableMax) ' max does not seem to do what it should!  
+            'Static saveMaxZ As Single
+            'Static maxZMat As cv.Mat
+            'If saveMaxZ <> ocvb.maxZ Then
+            '    stableMax = dMin.stableMin ' just to get the size...
+            '    maxZMat = New cv.Mat(stableMax.Size, cv.MatType.CV_32F, ocvb.maxZ)
+            '    saveMaxZ = ocvb.maxZ
+            'End If
+            'cv.Cv2.Subtract(maxZMat, input, input)
+            'Static stableInverse = stableMax
+            'cv.Cv2.Min(input, stableInverse, stableInverse)
+            'cv.Cv2.Subtract(maxZMat, stableInverse, stableMax)
+            stableMax.SetTo(0, zeroMask)
+
+            'If task.drawRect <> New cv.Rect Then
+            '    Console.WriteLine("Mean of stableMin = " + CStr(dMin.stableMin(task.drawRect).Mean().Item(0)))
+            '    Console.WriteLine("Mean of input = " + CStr(input(task.drawRect).Mean().Item(0)))
+            '    Console.WriteLine("Mean of stableMax = " + CStr(stableMax(task.drawRect).Mean().Item(0)))
+            'End If
+        End If
+
+        colorize.src = stableMax
+        colorize.Run()
+        dst1 = colorize.dst1
+        dst2 = stableMax
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_Average
+    Inherits VBparent
+    Dim dMin As Depth_Min
+    Dim dMax As Depth_Max
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public Sub New()
+        initParent()
+
+        colorize = New Depth_ColorizerFastFade_CPP
+        dMin = New Depth_Min
+        dMax = New Depth_Max
+
+        label1 = "InRange average depth (zero/low quality depth removed)"
+        label2 = "32-bit format average stable depth"
+        task.desc = "To reduce z-Jitter, use the average depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        dMax.src = getDepth32f()
+        dMax.Run()
+        dst1 = dMax.dMin.dst1
+
+        cv.Cv2.AddWeighted(dMax.dMin.stableMin, 0.5, dMax.stableMax, 0.5, 0, dst2)
+    End Sub
+End Class
+
