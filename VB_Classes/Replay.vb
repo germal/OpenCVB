@@ -215,17 +215,22 @@ Public Class Replay_Play
                 ' start playback...
                 fs = New FileStream(recordingFilename.FullName, FileMode.Open, FileAccess.Read)
                 binRead = New BinaryReader(fs)
-                playbackActive = True
                 readHeader(fh, binRead)
 
-                bytesPerColor = fh.colorWidth * fh.colorHeight * fh.colorElemsize
-                bytesPerDepth16 = fh.cloudWidth * fh.cloudHeight * fh.depth16Elemsize
-                bytesPerRGBDepth = fh.colorWidth * fh.colorHeight * fh.RGBDepthElemsize
-                bytesPerCloud = fh.cloudWidth * fh.cloudHeight * fh.cloudElemsize
+                If fh.colorWidth = src.Width Then ' the current width/height don't agree with the recorded data.  Often happens during "Test All"
+                    bytesPerColor = fh.colorWidth * fh.colorHeight * fh.colorElemsize
+                    bytesPerDepth16 = fh.cloudWidth * fh.cloudHeight * fh.depth16Elemsize
+                    bytesPerRGBDepth = fh.colorWidth * fh.colorHeight * fh.RGBDepthElemsize
+                    bytesPerCloud = fh.cloudWidth * fh.cloudHeight * fh.cloudElemsize
 
-                ReDim colorBytes(bytesPerColor - 1)
-                ReDim RGBDepthBytes(bytesPerRGBDepth - 1)
-                ReDim cloudBytes(bytesPerCloud - 1)
+                    ReDim colorBytes(bytesPerColor - 1)
+                    ReDim RGBDepthBytes(bytesPerRGBDepth - 1)
+                    ReDim cloudBytes(bytesPerCloud - 1)
+                    playbackActive = True
+                Else
+                    Console.WriteLine("Recorded data was saved at " + CStr(fh.colorWidth) + "x" + CStr(fh.colorHeight) + vbCrLf +
+                                      "and the current format is " + CStr(src.Width) + "x" + CStr(src.Height))
+                End If
             End If
         Else
             If playbackActive Then
