@@ -323,6 +323,7 @@ imread
 imreadmulti
 imshow
 imwrite
+inflate
 initCameraMatrix2D
 initUndistortRectifyMap
 inpaint
@@ -331,6 +332,8 @@ insertChannel
 integral
 integral2
 integral3
+intersect
+intersectsWith
 intersectConvexConvex
 invert
 invertAffineTransform
@@ -523,6 +526,7 @@ UMat_queue
 undistort
 undistortPoints
 undistortPointsIter
+union
 updateMotionHistory
 useOpenVX
 useOptimized

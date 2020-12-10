@@ -156,21 +156,15 @@ public:
 			float* depthImage = (float*)depth32f.data;
 			for (int i = 0; i < output.cols * output.rows; i++)
 			{
-				if (int d = (int)depthImage[i]) // For valid depth values (depth > 0)
+				int d = (int)depthImage[i];
+				if (d > 0 && d < histSize)
 				{
-					if (d < histSize)
-					{
-						auto t = histogram[d]; // Use the histogram entry (in the range of 0..1) to interpolate between nearColor and farColor
-						*rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
-						*rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
-						*rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
-					}
-					else {
-						*rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
-					}
+					auto t = histogram[d]; // Use the histogram entry (in the range of 0..1) to interpolate between nearColor and farColor
+					*rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
+					*rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
+					*rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
 				}
-				else // Use black pixels for invalid values (depth16 == 0)
-				{
+				else {
 					*rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
 				}
 			}

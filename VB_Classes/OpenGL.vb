@@ -581,7 +581,7 @@ End Class
 
 Public Class OpenGL_Extrema
     Inherits VBparent
-    Dim extrema As Depth_Extrema
+    Dim extrema As Depth_SmoothExtrema
     Public ogl As OpenGL_Options
     Public Sub New()
         initParent()
@@ -590,8 +590,59 @@ Public Class OpenGL_Extrema
             check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
         End If
 
-        extrema = New Depth_Extrema
+        extrema = New Depth_SmoothExtrema
         ogl = New OpenGL_Options
+
+        task.desc = "Use the extrema stableDepth as input the an OpenGL display"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static stableCloud = task.pointCloud
+
+        Dim split = cv.Cv2.Split(task.pointCloud)
+        extrema.src = split(2) * 1000
+        extrema.Run()
+
+        dst1 = extrema.dst1
+        dst2 = extrema.dst2
+
+        If extrema.resetAll Then
+            stableCloud = task.pointCloud
+        Else
+            Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
+            If zCheck.checked Then
+                split(2) = extrema.dst2 * 0.001
+                cv.Cv2.Merge(split, stableCloud)
+            Else
+                task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
+            End If
+        End If
+
+        task.pointCloud = stableCloud
+        ogl.src = task.color
+        ogl.Run()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_ExtremaMouse
+    Inherits VBparent
+    Dim extrema As Depth_SmoothExtrema
+    Public ogl As OpenGL_Callbacks
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
+        End If
+
+        extrema = New Depth_SmoothExtrema
+        ogl = New OpenGL_Callbacks
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
