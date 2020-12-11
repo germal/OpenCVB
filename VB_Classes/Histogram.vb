@@ -937,8 +937,6 @@ Public Class Histogram_Concentration
         palette = New Palette_Basics()
         sideview = New Histogram_SideView2D()
         topview = New Histogram_TopView2D()
-        'Dim minDepthSlider = findSlider("InRange Min Depth (mm)")
-        'minDepthSlider.Value = 1000
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

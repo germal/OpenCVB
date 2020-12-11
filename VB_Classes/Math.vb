@@ -89,10 +89,10 @@ End Class
 
 Public Class Math_DepthMeanStdev
     Inherits VBparent
-    Dim minMax As Depth_Stable
+    Dim minMax As Depth_NotMissing
     Public Sub New()
         initParent()
-        minMax = New Depth_Stable()
+        minMax = New Depth_NotMissing()
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run()

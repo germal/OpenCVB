@@ -579,46 +579,23 @@ End Class
 
 
 
-Public Class OpenGL_Extrema
+Public Class OpenGL_StableDepth
     Inherits VBparent
-    Dim extrema As Depth_SmoothExtrema
+    Dim pcValid As Depth_PointCloud_Stable
     Public ogl As OpenGL_Options
     Public Sub New()
         initParent()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
-        End If
 
-        extrema = New Depth_SmoothExtrema
+        pcValid = New Depth_PointCloud_Stable
         ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static stableCloud = task.pointCloud
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
-        extrema.src = split(2) * 1000
-        extrema.Run()
-
-        dst1 = extrema.dst1
-        dst2 = extrema.dst2
-
-        If extrema.resetAll Then
-            stableCloud = task.pointCloud
-        Else
-            Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
-            If zCheck.checked Then
-                split(2) = extrema.dst2 * 0.001
-                cv.Cv2.Merge(split, stableCloud)
-            Else
-                task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
-            End If
-        End If
-
-        task.pointCloud = stableCloud
+        pcValid.Run()
+        task.pointCloud = pcValid.stableCloud
         ogl.src = task.color
         ogl.Run()
     End Sub
@@ -630,46 +607,64 @@ End Class
 
 
 
-Public Class OpenGL_ExtremaMouse
+Public Class OpenGL_StableDepthMouse
     Inherits VBparent
-    Dim extrema As Depth_SmoothExtrema
+    Dim pcValid As Depth_PointCloud_Stable
     Public ogl As OpenGL_Callbacks
     Public Sub New()
         initParent()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
-        End If
 
-        extrema = New Depth_SmoothExtrema
+        pcValid = New Depth_PointCloud_Stable
         ogl = New OpenGL_Callbacks
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static stableCloud = task.pointCloud
+
+        pcValid.Run()
+        dst1 = pcValid.dst1
+        dst2 = pcValid.dst2
+
+        task.pointCloud = pcValid.stableCloud
+        ogl.src = task.color
+        ogl.Run()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_StabilizedDepth
+    Inherits VBparent
+    Dim stable As Depth_Stabilizer
+    Public ogl As OpenGL_Callbacks
+    Public Sub New()
+        initParent()
+
+        stable = New Depth_Stabilizer
+        ogl = New OpenGL_Callbacks
+
+        label2 = "32-bit format stabilized depth data"
+        task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim split = cv.Cv2.Split(task.pointCloud)
-        extrema.src = split(2) * 1000
-        extrema.Run()
 
-        dst1 = extrema.dst1
-        dst2 = extrema.dst2
+        stable.src = src
+        If stable.src.Type <> cv.MatType.CV_32F Then stable.src = split(2) * 1000
 
-        If extrema.resetAll Then
-            stableCloud = task.pointCloud
-        Else
-            Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
-            If zCheck.checked Then
-                split(2) = extrema.dst2 * 0.001
-                cv.Cv2.Merge(split, stableCloud)
-            Else
-                task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
-            End If
-        End If
+        stable.Run()
+        dst1 = stable.dst1
+        dst2 = stable.dst2
 
-        task.pointCloud = stableCloud
+        split(2) = stable.dst2 * 0.001
+        cv.Cv2.Merge(split, task.pointCloud)
         ogl.src = task.color
         ogl.Run()
     End Sub

@@ -39,14 +39,14 @@ End Class
 Public Class Diff_UnstableDepthAndColor
     Inherits VBparent
     Public diff As Diff_Basics
-    Public depth As Depth_Stable
+    Public depth As Depth_NotMissing
     Dim lastFrames() As cv.Mat
     Public Sub New()
         initParent()
         diff = New Diff_Basics()
         diff.sliders.trackbar(0).Value = 20 ' this is color threshold - low means detecting more motion.
 
-        depth = New Depth_Stable()
+        depth = New Depth_NotMissing()
 
         label1 = "Stable depth and color"
         task.desc = "Build a mask for any pixels that have either unstable depth or color"

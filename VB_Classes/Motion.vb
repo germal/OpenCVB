@@ -19,7 +19,7 @@ Public Class Motion_Basics
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Frames to persist", 1, 10000, 10)
             sliders.setupTrackBar(1, "Minimum size for motion rectangle", 1, 10000, 1000)
-            sliders.setupTrackBar(2, "Total motion threshold to resync", 1, 20000, 5000)
+            sliders.setupTrackBar(2, "Total motion threshold to resync", 1, 100000, If(task.color.Width = 1280, 20000, 5000))
         End If
 
         Dim iterSlider = findSlider("Dilate/Erode Kernel Size")

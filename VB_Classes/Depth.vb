@@ -924,7 +924,7 @@ End Class
 
 
 
-Public Class Depth_Stable
+Public Class Depth_NotMissing
     Inherits VBparent
     Public mog As BGSubtract_Basics_CPP
     Public Sub New()
@@ -954,16 +954,19 @@ End Class
 
 Public Class Depth_Stabilizer
     Inherits VBparent
-    Public stable As Depth_Stable
+    Public stable As Depth_NotMissing
     Public mean As Mean_Basics
+    Dim inrange As Depth_InRange
     Public colorize As Depth_Colorizer_CPP
     Public Sub New()
         initParent()
 
+        inrange = New Depth_InRange
         mean = New Mean_Basics()
         colorize = New Depth_Colorizer_CPP()
-        stable = New Depth_Stable()
+        stable = New Depth_NotMissing()
 
+        label2 = "32-bit format depth data"
         task.desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
     End Sub
     Public Sub Run()
@@ -971,15 +974,17 @@ Public Class Depth_Stabilizer
         stable.src = src
         stable.Run()
 
-        mean.src = getDepth32f()
+        inrange.src = src
+        If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = getDepth32f()
+        inrange.Run()
+
+        mean.src = inrange.dst1
         mean.src.SetTo(0, stable.dst1)
         mean.Run()
-
-        If standalone Then
-            colorize.src = mean.dst1.Threshold(256 * 256 - 1, 256 * 256 - 1, cv.ThresholdTypes.Trunc)
-            colorize.Run()
-            dst1 = colorize.dst1
-        End If
+        dst2 = mean.dst1.Threshold(256 * 256 - 1, 256 * 256 - 1, cv.ThresholdTypes.Trunc)
+        colorize.src = dst2
+        colorize.Run()
+        dst1 = colorize.dst1
     End Sub
 End Class
 
@@ -1960,5 +1965,55 @@ Public Class Depth_PointCloud_IMU
         Else
             imuPointCloud = task.pointCloud.Clone
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_PointCloud_Stable
+    Inherits VBparent
+    Dim extrema As Depth_SmoothExtrema
+    Public stableCloud As cv.Mat
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
+        End If
+
+        stableCloud = task.pointCloud
+        extrema = New Depth_SmoothExtrema
+        task.desc = "Provide only a validated point cloud - one which has consistent depth data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim split = cv.Cv2.Split(task.pointCloud)
+
+        extrema.src = src
+        If extrema.src.Type <> cv.MatType.CV_32F Then extrema.src = split(2) * 1000
+
+        extrema.Run()
+
+        ' if many pixels changed, then resetAll was triggered.  Leave task.pointcloud alone...
+        If extrema.resetAll = False Then
+            Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
+            If zCheck.checked Then
+                split(2) = extrema.dst2 * 0.001
+                cv.Cv2.Merge(split, stableCloud)
+            Else
+                task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
+            End If
+        Else
+            stableCloud = task.pointCloud
+        End If
+        dst1 = extrema.dst1
+        dst2 = extrema.dst2
+        task.pointCloud = stableCloud
     End Sub
 End Class
