@@ -272,8 +272,8 @@ Public Class Brightness_PlotHist
         initParent()
         white = New Brightness_ChangeMask()
 
-        hist1 = New Histogram_KalmanSmoothed()
-        hist2 = New Histogram_KalmanSmoothed()
+        hist1 = New Histogram_KalmanSmoothed
+        hist2 = New Histogram_KalmanSmoothed
         hideForm("Histogram_KalmanSmoothed Slider Options")
         mat2to1 = New Mat_2to1()
 

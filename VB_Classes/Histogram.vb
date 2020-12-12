@@ -7,8 +7,8 @@ Public Class Histogram_Basics
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
     Public bins = 50
-    Public minRange = 0
-    Public maxRange = 255
+    Public minRange As Single = 0
+    Public maxRange As Single = 255
     Public backColor = cv.Scalar.Gray
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
@@ -147,7 +147,7 @@ Public Class Histogram_NormalizeGray
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
-        histogram = New Histogram_KalmanSmoothed()
+        histogram = New Histogram_KalmanSmoothed
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -229,6 +229,12 @@ Public Class Histogram_KalmanSmoothed
             sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
         End If
 
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Remove the zero histogram value"
+            check.Box(0).Checked = False
+        End If
+
         label2 = "Histogram - x=bins/y=count"
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
@@ -254,6 +260,9 @@ Public Class Histogram_KalmanSmoothed
 
         Dim dimensions() = New Integer() {plotHist.bins}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
+
+        Static zeroCheck = findCheckBox("Remove the zero histogram value")
+        If zeroCheck.checked Then histogram.Set(Of Single)(0, 0, 0)
 
         label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
@@ -518,8 +527,8 @@ Public Class Histogram_EqualizeColor
     Public channel = 2
     Public Sub New()
         initParent()
-        kalmanEq = New Histogram_KalmanSmoothed()
-        kalman = New Histogram_KalmanSmoothed()
+        kalmanEq = New Histogram_KalmanSmoothed
+        kalman = New Histogram_KalmanSmoothed
 
         Static binSlider = findSlider("Histogram Bins")
         binSlider.Value = 40
@@ -572,9 +581,9 @@ Public Class Histogram_EqualizeGray
     Public histogram As Histogram_KalmanSmoothed
     Public Sub New()
         initParent()
-        histogramEq = New Histogram_KalmanSmoothed()
+        histogramEq = New Histogram_KalmanSmoothed
 
-        histogram = New Histogram_KalmanSmoothed()
+        histogram = New Histogram_KalmanSmoothed
 
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
@@ -694,7 +703,7 @@ Public Class Histogram_ColorsAndGray
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
-        histogram = New Histogram_KalmanSmoothed()
+        histogram = New Histogram_KalmanSmoothed
         histogram.kalman.check.Box(0).Checked = False
         histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.trackbar(0).Value = 40
@@ -742,7 +751,7 @@ Public Class Histogram_BackProjectionPeak
     Public Sub New()
         initParent()
 
-        hist = New Histogram_KalmanSmoothed()
+        hist = New Histogram_KalmanSmoothed
         hist.kalman.check.Box(0).Checked = False
 
         task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
@@ -766,6 +775,8 @@ Public Class Histogram_BackProjectionPeak
         Dim mask = hist.src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
         label1 = "BackProjection of most frequent gray pixel"
         dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
     End Sub
@@ -889,7 +900,7 @@ Public Class Histogram_BackProjectionGrayscale
     Public histIndex As Integer
     Public Sub New()
         initParent()
-        hist = New Histogram_KalmanSmoothed()
+        hist = New Histogram_KalmanSmoothed
         Dim binSlider = findSlider("Histogram Bins")
         binSlider.Value = 10
 

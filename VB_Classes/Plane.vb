@@ -260,7 +260,6 @@ Public Class Plane_XYDiff
 
         pcValid.Run()
         Dim mask = pcValid.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        cv.Cv2.ImShow("mask", mask)
 
         Dim split = cv.Cv2.Split(pcValid.stableCloud)
         Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
@@ -327,12 +326,20 @@ End Class
 Public Class Plane_XYHistogram
     Inherits VBparent
     Dim pcValid As Depth_PointCloud_Stable
-    Dim hist As Histogram_Basics
-    Dim plotHist As Plot_Histogram
+    Dim histX As Histogram_KalmanSmoothed
+    Dim histY As Histogram_KalmanSmoothed
+    Dim mats As Mat_4to1
     Public Sub New()
         initParent()
-        hist = New Histogram_Basics
-        plotHist = New Plot_Histogram
+
+        mats = New Mat_4to1
+
+        histX = New Histogram_KalmanSmoothed
+        histY = New Histogram_KalmanSmoothed
+
+        Dim zeroCheck = findCheckBox("Remove the zero histogram value")
+        zeroCheck.Checked = True
+
         pcValid = New Depth_PointCloud_Stable
 
         label1 = "Stabilized x delta"
@@ -355,12 +362,21 @@ Public Class Plane_XYHistogram
         cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
         cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1))
 
-        hist.src = xDiff
-        hist.Run()
+        xDiff.SetTo(0, mask)
+        yDiff.SetTo(0, mask)
 
+        histX.src = xDiff.ConvertScaleAbs(255)
+        histX.Run()
+        mats.mat(0) = histX.dst1
 
-        plotHist.hist = hist.histRaw
-        plotHist.Run()
-        dst1 = plotHist.dst1
+        histY.src = yDiff.ConvertScaleAbs(255)
+        histY.Run()
+        mats.mat(1) = histY.dst1
+
+        mats.mat(2) = histX.src.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        mats.mat(3) = histY.src.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+
+        mats.Run()
+        dst1 = mats.dst1
     End Sub
 End Class
