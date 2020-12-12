@@ -692,8 +692,8 @@ Public Class OpenGL_SmoothSurfaces
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         smooth.Run()
-        dst1 = smooth.pcValid.dst1
-        dst2 = smooth.pcValid.dst2
+        dst1 = smooth.dst1
+        dst2 = smooth.dst2
 
         smooth.pcValid.stableCloud.CopyTo(task.pointCloud, smooth.dst2)
         ogl.src = task.color

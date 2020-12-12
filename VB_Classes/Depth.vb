@@ -1769,7 +1769,7 @@ Public Class Depth_SmoothMin
 
             updateMask = rgbMotion.motion.dst2
             For Each r In rgbMotion.mOverlap.enclosingRects
-                r.Inflate(If(r.X - 10 > 0 And r.X + r.Width + 10 < src.Width, 10, 0), If(r.Y - 10 > 0 And r.Y + r.Height + 10 < src.Height, 10, 0))
+                r.Inflate(If(r.X - 50 > 0 And r.X + r.Width + 50 < src.Width, 50, 0), If(r.Y - 50 > 0 And r.Y + r.Height + 50 < src.Height, 50, 0))
                 updateMask.Rectangle(r, 255, -1)
             Next
             input.CopyTo(stableMin, updateMask)

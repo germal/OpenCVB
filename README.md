@@ -1,33 +1,38 @@
-Recent changes:
-===============
+Recent Changes - 12/12/2020
+===========================
 
--   Dropped support for Intel T265 camera (no point cloud) and the Intel
-    RealSense L515 (no IMU). All supported cameras have a point cloud and IMU.
+-   Over 800 algorithms – almost all less than a page of code.
 
--   Tree view – some of the algorithms are a combination of several other
-    algorithms. A tree view was built to display the hierarchy.
+-   Depth updates are guided by motion – produces more stable 3D images. See
+    Depth_SmoothMin algorithm.
 
--   There are now over 750 algorithms implemented.
+-   Recently used algorithms are listed in the menus.
+
+-   More snippets to help adding options to existing algorithms.
+
+-   Algorithm options are now collected in a single form – easier usage on
+    laptops or smaller screens.
+
+-   Intel Realsense cameras are supported in native 640x480 modes (as well as
+    1280x720.)
 
 Introduction
 ============
 
 There is no better documentation of an algorithm than a working example. Now
-imagine hundreds of OpenCV examples in a single app where each algorithm is less
+imagine over 800 OpenCV examples in a single app where each algorithm is less
 than a page of code and is in a familiar language – C++, C\#, Python, or VB.Net.
 And each algorithm is *just the algorithm* without the baggage from a user
-interface. That is what "OpenCVB" Version 1.0 provides.
+interface. And each algorithm is reusable by other algorithms to build
+variations and combinations. That is what "OpenCVB" provides.
 
-In the sample output below, any of the hundreds of algorithms can be selected
-from the first combo box at the top of the form. The second combo box is used to
-select different groups algorithms. The default grouping is to select “\<All\>”
+In the sample output below, any of the algorithms can be selected from the first
+combo box at the top of the form. The second combo box is used to select
+different groups algorithms. The default grouping is to select “\<All\>”
 algorithms while other special groupings allow selecting Python or C++
-algorithms. The text at the right side of the toolbar is a brief description of
-the algorithm. Icons on the left side are to (l. to r.): pause/resume the
-algorithm, change global settings for OpenCVB, run regression tests, and take a
-picture of the current output.
+algorithms.
 
-![](media/aeec548511d99538594068b76ca4b49b.png)
+![](media/3dcdb4ef057b7696445216bbe30b4286.png)
 
 The output images above are the RGB output (upper left), the colorized depth
 image (upper right), the output of the current algorithm (lower left) and an
@@ -71,14 +76,14 @@ The Objective
 The objective is to solve many small computer vision problems and do so in a way
 that enables any of the solutions to be reused. The result is a toolkit for
 solving ever bigger and more difficult problems. The philosophy behind this
-approach is that human vision is built on many seemingly trivial approaches
-working together. Is the combined effort of many small operations what produces
+approach is that human vision is built on many almost trivial algorithms working
+together. Is the combined effort of many small operations what produces
 understanding? It make take years to answer that question.
 
-One key to this approach is the abundance of options with sliders and check
-boxes and radio buttons for the different choices available. There is no single
-measure for a concept but each concept needs at least one measure or choice. A
-property with a measure is at the root of every concept.
+One key to this approach is each algorithm presents its own options
+(sliders/check boxes/radio buttons/text boxes) for the different choices that
+come with the algorithm. A property with a measure is at the root of every
+concept.
 
 OpenCVB is targeting only cameras that produce depth and color and have an IMU
 to detect gravity and motion. These newer cameras have prompted a review of
@@ -95,8 +100,8 @@ automation and aids simplify the process of adding variants and experiments.
 The languages used are those often found in OpenCV projects - C++, C\#, Python
 and even VB.Net. Secondly, it is important to get access to multiple libraries -
 OpenCV, OpenCVSharp, OpenGL, Emgu, NumPy, NAudio, and OpenMP. And lastly, it is
-important to use all the possible image representations - 3D, bitmaps, plots,
-bar charts, spreadsheets, or text.
+important to enable all possible image representations - 3D, bitmaps, plots, bar
+charts, spreadsheets, or text.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for OpenCVB algorithms. Implementing
@@ -135,7 +140,9 @@ You will need to download and install the following before starting:
 
 -   Microsoft Visual Studio 2019 Community Edition (Free)
 
-    -   <https://visualstudio.microsoft.com/downloads/>
+    -   OpenCVB works with any recent Visual Studio.
+
+    -   Download: <https://visualstudio.microsoft.com/downloads/>
 
     -   Be sure to install the latest Python that comes with Visual Studio
 
@@ -154,8 +161,6 @@ Installation – Quick Reference
 
 This is the short description of install process:
 
--   <https://github.com/bobdavies2000/OpenCVB> - download OpenCVB from GitHub
-
 -   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
     and run CMake for needed libraries. After building it will occupy about 18Gb
     of disk space – plan accordingly.
@@ -172,67 +177,67 @@ This is the short description of install process:
 -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download> –
     Select “Windows Installer” to get proprietary Kinect4Azure support.
 
--   Build and run OpenCVB.sln
+-   Build and run OpenCVB.sln – set OpenCVB as the “Startup Project”
 
 Installation – Full Description with Discussion
 ===============================================
 
 The first step is to download OpenCVB from GitHub:
 
--   <https://github.com/bobdavies2000/OpenCVB>
+1.  <https://github.com/bobdavies2000/OpenCVB>
 
--   Python should have been installed with Visual Studio. Only Python 3.x is
+2.  Python should have been installed with Visual Studio. Only Python 3.x is
     supported.
 
--   The third step is where all the work is.
+3.  The third step is where all the work is.
 
     -   Run the “PrepareTree.bat” script in the OpenCVB directory.
 
-The “PrepareTree.bat” script will download OpenCV, librealsense, and
-Kinect4Azure from their respective GitHub locations and install them in the
-OpenCVB tree. In addition, the script will run the CMake commands that setup
-OpenCV, librealsense, and Kinect4Azure for OpenCVB’s use. The script will then
-open Visual Studio for each solution file. Build the Debug and Release versions
-of each with the “Build/Batch Build” Visual Studio menu entry. The steps to
-download and run CMake take about 20 minutes depending on the speed of the
-network connection. The Visual Studio builds may take an equal amount of time
-depending on the speed of the machine.
+>   The “PrepareTree.bat” script will download OpenCV, librealsense, and
+>   Kinect4Azure from their respective GitHub locations and install them in the
+>   OpenCVB tree. In addition, the script will run the CMake commands that setup
+>   OpenCV, librealsense, and Kinect4Azure for OpenCVB’s use. The script will
+>   then open Visual Studio for each solution file. Build the Debug and Release
+>   versions of each with the “Build/Batch Build” Visual Studio menu entry. The
+>   steps to download and run CMake take about 20 minutes depending on the speed
+>   of the network connection. The Visual Studio builds may take an equal amount
+>   of time depending on the speed of the machine.
 
-After all the packages have been built, then there is one environmental variable
-that needs to be set and it will depend on which version of OpenCV was just
-downloaded and built.
+1.  After all the packages have been built, then there is one environmental
+    variable that needs to be set and it will depend on which version of OpenCV
+    was just downloaded and built.
 
 -   Environmental variable “OpenCV_Version” should be set to 450
 
-The currently available OpenCV download is 4.50 so setting OpenCV_Version to 450
-reflects that but note that OpenCV is updated several times a year and the
-environmental variable may need to be updated.
+-   The currently available OpenCV download is 4.50 so setting OpenCV_Version to
+    450 reflects that but note that OpenCV is updated several times a year and
+    the environmental variable may need to be updated.
 
-The last step before building OpenCVB is to download the proprietary binaries
-from Microsoft for their Kinect4Azure camera. The “PrepareTree.bat” script built
-the open source portion of the Kinect4Azure camera but this step will complete
-the installation of the Kinect4Azure camera:
+1.  The last step before building OpenCVB is to download the proprietary
+    binaries from Microsoft for their Kinect4Azure camera. The “PrepareTree.bat”
+    script built the open source portion of the Kinect4Azure camera but this
+    step will complete the installation of the Kinect4Azure camera:
 
--   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download>
+    -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download>
 
     -   Click “Microsoft Installer” to download and install the proprietary
         Kinect code from Microsoft
 
-The last step is to open the OpenCVB.sln file and build OpenCVB.
+2.  The last step is to open the OpenCVB.sln file and build OpenCVB.
 
-Support for some optional cameras can be easily added:
+    -   Support for some optional cameras can be easily added:
 
--   For the StereoLabs ZED 2 camera (released Q1 2020), install the StereoLabs
-    SDK from
+        -   For the StereoLabs ZED 2 camera (released Q1 2020), install the
+            StereoLabs SDK from
 
-    -   <https://www.stereolabs.com/>
+        -   <https://www.stereolabs.com/>
 
--   For the Mynt Eye D 1000 camera, download the SDK from:
+        -   For the Mynt Eye D 1000 camera, download the SDK from:
 
-    -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
+        -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
 
--   Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
-    StereoLabs Zed 2 or Mynt Eye D 1000 support.
+    -   Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
+        StereoLabs Zed 2 or Mynt Eye D 1000 support.
 
 Trouble-Shooting New Install
 ============================
@@ -252,9 +257,9 @@ Some typical problems with new installations:
 -   Python Scripts Fail: this is likely a missing package. Run the algorithm
     “PythonPackages.py” in OpenCVB to verify that all the necessary packages are
     installed. If still failing, check the Python setting in the Options (click
-    the Settings icon for OpenCVB.) Make sure it points to the Python 3.x
-    version that was installed. Test Python scripts independently using
-    \<OpenCVB Home Directory\>/VB_Classes/Python/PythonDebug.sln.
+    the Settings icon for OpenCVB.) Make sure it points to a Python 3.x version.
+    Test Python scripts independently using \<OpenCVB Home
+    Directory\>/VB_Classes/Python/PythonDebug.sln.
 
 Build New Experiments
 =====================
@@ -274,13 +279,17 @@ VB_Classes project.
 
 Code “snippets” are provided to accelerate development of new VB.Net, OpenGL,
 and C++ algorithms. To use any snippets, first install them in Visual Studio:
-use the menu “Tools/Code Snippets Manager” and add the “\<OpenCVB Home
-Directory\>/OpenCVB.snippets” directory. After installing, access the code
-snippets with a right-click in the VB.Net code, select “Snippet/Insert Snippet”
-and select “OpenCVB.snippets”. NOTE: even C++ algorithms can use snippets, but
-each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net
-code in the snippet. The C++ portion is to be cut and pasted anywhere in
-OpenCVB’s “CPP_Classes” Visual Studio project.
+
+-   Use the menu “Tools/Code Snippets Manager” then add the “\<OpenCVB Home
+    Directory\>/OpenCVB.snippets” directory.
+
+-   Access the code snippets with a right-click in the VB.Net code, select
+    “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
+
+-   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net
+    entry that includes both the C++ and the VB.Net code in the snippet. The C++
+    portion is to be cut and pasted anywhere in OpenCVB’s “CPP_Classes” Visual
+    Studio project.
 
 Experimental Subsets
 ====================
@@ -547,23 +556,26 @@ The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that
 allows the OpenCVB build to locate the Mynt D camera support no matter where it
 was installed.
 
-VTK Support
+Tree Viewfv
 ===========
 
-VTK (the Visualization ToolKit) is supported through OpenCV but it takes a
-non-trivial amount of time and effort to install and build it. The support is
-present in this version but is turned off. All the algorithms using VTK will
-work with or without VTK installed but if it is not present, the VTK algorithms
-will simply display a message explaining how to enable VTK with the following
-steps:
+The tree view shows how the algorithm was built using the other algorithms
+present. Here is a simple algorithm tree view that shows how the Benform_JPEG
+algorithm was build:
 
--   Run “Support\\PrepareVTK.bat” in \<OpenCVB_Home\>
+![](media/eee2426c6b6dc32aae9454fdc4dfc1f5.png)
 
--   Build VTK for both Debug and Release
+The Benford_JPEG algorithm applies the “Benford_Basics” algorithm to a JPEG
+image. The Benford_Basics code builds a histogram that is combined with the
+standard Benford distribution using OpenCV’s AddWeighted API.
 
--   Build OpenCV for both Debug and Release
-
--   Edit mainVTK.cpp (project VTKDataExample) and modify the first line
+Note that there is a pair of radio buttons below the tree view. The tree view is
+“live” in the sense that clicking on any entry in the view will show one of 2
+different outputs: 1) the output of the clicked algorithm’s “standalone” run; or
+2) the output of the currently running algorithm. The objective is to show the
+intermediate stages of the different algorithms that comprise the current on
+that is running. All output will show up in OpenCVB’s main form in the bottom 2
+images.
 
 Sample Results
 ==============
@@ -1067,3 +1079,17 @@ Addendum 2: Some Thoughts
     right destination images are for the same iteration. Room for improvement:
     sync the presentation of the RGB and RGB Depth images like the dst1 and dst2
     images.
+
+Addendum 3: Log of Recent Changes
+=================================
+
+Recent Changes 9/15/2020:
+=========================
+
+-   Dropped support for Intel T265 camera (no point cloud) and the Intel
+    RealSense L515 (no IMU). All supported cameras have a point cloud and IMU.
+
+-   Tree view – some of the algorithms are a combination of several other
+    algorithms. A tree view was built to display the hierarchy.
+
+-   There are now over 750 algorithms implemented.

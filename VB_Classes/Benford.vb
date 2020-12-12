@@ -61,7 +61,7 @@ Public Class Benford_Basics
                 Dim val = indexer(i).ToString
                 If val <> 0 And Single.IsNaN(val) = False Then
                     Dim firstInt = Regex.Match(val, "[1-9]{1}")
-                    counts(firstInt.Value) += 1
+                    If firstInt.Length > 0 Then counts(firstInt.Value) += 1
                 End If
             Next
         Else
