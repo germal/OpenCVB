@@ -24,7 +24,7 @@ Public Class EMax_Basics
             sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
         End If
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = src.Width / 2

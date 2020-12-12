@@ -110,7 +110,7 @@ Public Class Thread_GridTest
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64

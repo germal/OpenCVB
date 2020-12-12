@@ -64,7 +64,7 @@ Public Class ML_FillRGBDepth_MT
     Public Sub New()
         initParent()
         colorizer = New Depth_Colorizer_CPP()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = src.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
@@ -143,7 +143,7 @@ Public Class ML_DepthFromColor_MT
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
         End If
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 16
@@ -394,7 +394,7 @@ Public Class ML_EdgeDepth_MT
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
         End If
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 16

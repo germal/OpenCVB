@@ -191,7 +191,7 @@ Public Class DCT_Surfaces_debug
         initParent()
         flow = New Font_FlowText()
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 100

@@ -50,7 +50,7 @@ Public Class Sift_Basics_CS_MT
         initParent()
         fisheye = New FishEye_Rectified()
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Maximum = task.color.Cols * 2

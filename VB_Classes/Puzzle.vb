@@ -227,7 +227,7 @@ Public Class Puzzle_Basics
     Dim gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = src.Cols / 10

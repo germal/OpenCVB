@@ -142,7 +142,7 @@ Public Class FloodFill_Top16_MT
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2000)
@@ -186,7 +186,7 @@ Public Class FloodFill_Color_MT
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         flood = New FloodFill_Top16_MT()
 
         task.desc = "Use floodfill to build image segments in an RGB image."

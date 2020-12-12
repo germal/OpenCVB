@@ -353,7 +353,7 @@ Public Class kMeans_Color_MT
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
         End If
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
 
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
@@ -452,7 +452,7 @@ Public Class kMeans_ColorDepth_MT
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
         End If
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         grid.sliders.trackbar(0).Value = 32
         grid.sliders.trackbar(1).Value = 32
 

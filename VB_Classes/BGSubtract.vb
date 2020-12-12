@@ -122,7 +122,7 @@ Public Class BGSubtract_Basics_MT
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

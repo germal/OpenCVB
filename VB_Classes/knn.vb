@@ -268,7 +268,7 @@ Public Class KNN_Test
     Dim knn As KNN_Basics
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
@@ -315,7 +315,7 @@ Public Class KNN_Test_1_to_1
     Dim knn As KNN_1_to_1
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.

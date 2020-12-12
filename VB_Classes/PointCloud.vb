@@ -246,7 +246,7 @@ Public Class PointCloud_Raw_CPP
     Dim depthBytes() As Byte
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
@@ -305,7 +305,7 @@ Public Class PointCloud_Raw
     Dim depthBytes() As Byte
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64

@@ -9,7 +9,7 @@ Public Class Featureless_Basics
 
         edges = New Edges_Basics()
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 10

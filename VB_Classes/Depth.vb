@@ -253,7 +253,7 @@ Public Class Depth_MeanStdev_MT
     Dim meanSeries As New cv.Mat
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
@@ -665,7 +665,7 @@ Public Class Depth_ColorizerVB_MT
             sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
             sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
         End If
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
 
         task.desc = "Colorize depth manually with multi-threading."
     End Sub
@@ -734,7 +734,7 @@ Public Class Depth_Colorizer_MT
             sliders.setupTrackBar(0, "Min Depth", 100, 1000, 100)
             sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
         End If
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
 
         task.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
     End Sub
@@ -782,7 +782,7 @@ Public Class Depth_LocalMinMax_MT
     Public maxPoint(0) As cv.Point2f
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
 
         label1 = "Red is min distance, blue is max distance"
         task.desc = "Find min and max depth in each segment."
@@ -830,7 +830,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
     Public grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 128
@@ -1534,7 +1534,7 @@ Public Class Depth_WorldXYZ_MT
     Public depthUnitsMeters = False
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         task.desc = "Create OpenGL point cloud from depth data (slow)"
     End Sub
     Public Sub Run()
@@ -1979,6 +1979,7 @@ Public Class Depth_PointCloud_Stable
     Inherits VBparent
     Dim extrema As Depth_SmoothExtrema
     Public stableCloud As cv.Mat
+    Public split() As cv.Mat
     Public Sub New()
         initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -1993,7 +1994,7 @@ Public Class Depth_PointCloud_Stable
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
+        split = cv.Cv2.Split(task.pointCloud)
 
         extrema.src = src
         If extrema.src.Type <> cv.MatType.CV_32F Then extrema.src = split(2) * 1000

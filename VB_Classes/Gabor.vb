@@ -53,7 +53,7 @@ Public Class Gabor_Basics_MT
     Public Sub New()
         initParent()
         label2 = "The 32 kernels used"
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = src.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.

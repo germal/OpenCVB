@@ -8,11 +8,9 @@ Imports System.IO.Pipes
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics
     Inherits VBparent
-    Public plotHist As Plot_Histogram
     Public trackBox As New cv.RotatedRect
     Public Sub New()
         initParent()
-        plotHist = New Plot_Histogram()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

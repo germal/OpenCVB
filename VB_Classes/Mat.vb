@@ -235,7 +235,7 @@ Public Class Mat_ImageXYZ_MT
     Public xyzPlanes() As cv.Mat
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 32

@@ -136,7 +136,7 @@ Public Class Random_CheckUniformSmoothed
     Dim rUniform As Random_UniformDist
     Public Sub New()
         initParent()
-        histogram = New Histogram_KalmanSmoothed()
+        histogram = New Histogram_KalmanSmoothed
         histogram.sliders.trackbar(0).Value = 255
 
         rUniform = New Random_UniformDist()
@@ -223,7 +223,7 @@ Public Class Random_CheckNormalDistSmoothed
     Dim normalDist As Random_NormalDist
     Public Sub New()
         initParent()
-        histogram = New Histogram_KalmanSmoothed()
+        histogram = New Histogram_KalmanSmoothed
         histogram.sliders.trackbar(0).Value = 255
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist()

@@ -582,7 +582,7 @@ Public Class Palette_Layout2D
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Dim widthSlider = findSlider("ThreadGrid Width")
         Dim heightslider = findSlider("ThreadGrid Height")
         widthSlider.Value = 40

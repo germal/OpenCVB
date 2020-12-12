@@ -298,9 +298,14 @@ Public Class Histogram_Depth
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         inrange.src = getDepth32f()
         inrange.Run()
-        plotHist.minRange = inrange.sliders.trackbar(0).Value
-        plotHist.maxRange = inrange.sliders.trackbar(1).Value
-        plotHist.bins = sliders.trackbar(0).Value
+
+        Static minSlider = findSlider("InRange Min Depth (mm)")
+        Static maxSlider = findSlider("InRange Max Depth (mm)")
+        Static binsSlider = findSlider("Histogram Depth Bins")
+
+        plotHist.minRange = minSlider.Value
+        plotHist.maxRange = maxSlider.Value
+        plotHist.bins = binsSlider.Value
 
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}

@@ -133,7 +133,7 @@ Public Class Hough_Lines_MT
         End If
         edges = New Edges_Basics()
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
 
         task.desc = "Multithread Houghlines to find lines in image fragments."
         label1 = "Hough_Lines_MT"

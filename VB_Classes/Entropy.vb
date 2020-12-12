@@ -46,7 +46,7 @@ Public Class Entropy_Highest_MT
     Public Sub New()
         initParent()
 
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64

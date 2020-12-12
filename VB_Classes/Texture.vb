@@ -10,7 +10,7 @@ Public Class Texture_Basics
     Public tChange As Boolean ' if the texture hasn't changed this will be false.
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64

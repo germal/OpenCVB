@@ -97,7 +97,7 @@ Public Class Plane_Detect
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
@@ -107,7 +107,7 @@ Public Class Plane_Detect
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = getDepth32f()
         grid.Run()
 
@@ -171,7 +171,7 @@ Public Class Plane_DetectDebug
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 32
@@ -181,7 +181,7 @@ Public Class Plane_DetectDebug
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim depth32f = getDepth32f()
         grid.Run()
 
@@ -241,3 +241,126 @@ End Class
 
 
 
+
+Public Class Plane_XYDiff
+    Inherits VBparent
+    Dim pcValid As Depth_PointCloud_Stable
+    Dim grid As Thread_Grid
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid
+        pcValid = New Depth_PointCloud_Stable
+
+        label1 = "Stabilized x delta"
+        label2 = "Stabilized y delta"
+        task.desc = "Find planes using the pointcloud X and Y differences"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        pcValid.Run()
+        Dim mask = pcValid.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        cv.Cv2.ImShow("mask", mask)
+
+        Dim split = cv.Cv2.Split(pcValid.stableCloud)
+        Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
+        Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
+
+        grid.Run()
+
+        'Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        '    Sub(roi)
+        '        For i = 0 To grid.roiList.Count - 1
+        'Dim roi = grid.roiList(i)
+        Dim roi = New cv.Rect(500, 100, 70, 60)
+        Dim r1 = New cv.Rect(roi.X + 0, roi.Y + 0, roi.Width - 1, roi.Height - 1)
+        Dim r2 = New cv.Rect(roi.X + 1, roi.Y + 1, roi.Width - 1, roi.Height - 1)
+
+        cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
+        cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1)) ' r2 - r1 to make all values positive...
+
+        Dim xMean = xDiff(r1).Mean(mask(r1)).Item(0)
+        Dim yMean = yDiff(r1).Mean(mask(r1)).Item(0)
+
+        Dim tmpx = xDiff.InRange(xMean - 0.001, xMean + 0.001)
+        Dim tmpy = yDiff.InRange(yMean - 0.001, yMean + 0.001)
+
+        dst1 = tmpx
+        dst2 = tmpy
+        'xDiff(r1) *= 128 / xMean
+        'xDiff(r1).ConvertTo(dst1(r1), cv.MatType.CV_8UC1)
+
+        'yDiff(r1) *= 128 / yMean
+        'yDiff(r1).ConvertTo(dst2(r1), cv.MatType.CV_8UC1)
+
+        'dst1(roi).SetTo(0, mask(roi))
+        'dst2(roi).SetTo(0, mask(roi))
+        '    Next
+        'End Sub)
+
+        'Dim r1 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height - 1)
+        'Dim r2 = New cv.Rect(1, 1, dst1.Width - 1, dst1.Height - 1)
+
+        'cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
+        'cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1)) ' r2 - r1 to make all values positive...
+
+        'Dim xMean = xDiff.Mean(mask).Item(0)
+        'Dim yMean = yDiff.Mean(mask).Item(0)
+
+        'xDiff *= 128 / xMean
+        'xDiff.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+        'yDiff *= 128 / yMean
+        'yDiff.ConvertTo(dst2, cv.MatType.CV_8UC1)
+
+        'dst1.SetTo(0, mask)
+        'dst2.SetTo(0, mask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Plane_XYHistogram
+    Inherits VBparent
+    Dim pcValid As Depth_PointCloud_Stable
+    Dim hist As Histogram_Basics
+    Dim plotHist As Plot_Histogram
+    Public Sub New()
+        initParent()
+        hist = New Histogram_Basics
+        plotHist = New Plot_Histogram
+        pcValid = New Depth_PointCloud_Stable
+
+        label1 = "Stabilized x delta"
+        label2 = "Stabilized y delta"
+        task.desc = "Find planes using the pointcloud X and Y differences"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        pcValid.Run()
+        Dim mask = pcValid.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+
+        Dim split = cv.Cv2.Split(pcValid.stableCloud)
+        Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
+        Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
+
+        Dim r1 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height - 1)
+        Dim r2 = New cv.Rect(1, 1, dst1.Width - 1, dst1.Height - 1)
+
+        cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
+        cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1))
+
+        hist.src = xDiff
+        hist.Run()
+
+
+        plotHist.hist = hist.histRaw
+        plotHist.Run()
+        dst1 = plotHist.dst1
+    End Sub
+End Class

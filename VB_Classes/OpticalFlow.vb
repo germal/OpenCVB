@@ -160,7 +160,7 @@ Public Class OpticalFlow_DenseBasics_MT
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New()
         initParent()
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         Static gridBorderSlider = findSlider("ThreadGrid Border")

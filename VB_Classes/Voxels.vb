@@ -21,7 +21,7 @@ Public Class Voxels_Basics_MT
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
         End If
-        grid = New Thread_Grid()
+        grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 16
