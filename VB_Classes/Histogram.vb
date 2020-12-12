@@ -898,10 +898,11 @@ Public Class Histogram_BackProjectionGrayscale
     Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
     Public histIndex As Integer
+    Dim binSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         hist = New Histogram_KalmanSmoothed
-        Dim binSlider = findSlider("Histogram Bins")
+        binSlider = findSlider("Histogram Bins")
         binSlider.Value = 10
 
         label1 = "Move mouse to backproject each histogram column"
@@ -914,21 +915,16 @@ Public Class Histogram_BackProjectionGrayscale
         dst1 = hist.dst1
 
         histIndex = CInt(hist.histogram.Rows * task.mousePoint.X / src.Width)
-        Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
-        Dim barRange = 255 / hist.sliders.trackbar(0).Value
+        Dim barWidth = dst1.Width / binSlider.Value
+        Dim barRange = 255 / binSlider.Value
 
-        Dim mask As New cv.Mat
         Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) '  = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mat() As cv.Mat = {gray}
         Dim bins() = {0}
-        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
+        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, dst2, ranges)
 
-        gray.SetTo(0)
-        gray.SetTo(255, mask)
-        dst2 = gray.Clone
-
-        label2 = "Backprojection index " + CStr(histIndex) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
+        label2 = "Backprojecting " + CStr(histIndex * barRange) + " to " + CStr((histIndex + 1) * barRange) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
         dst1.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
     End Sub
 End Class

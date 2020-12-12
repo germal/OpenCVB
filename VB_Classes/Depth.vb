@@ -1812,7 +1812,7 @@ Public Class Depth_SmoothMax
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f()
 
-        dMin.src = input
+        dMin.src = input.Clone
         dMin.Run()
 
         If dMin.resetAll Then
@@ -1823,6 +1823,7 @@ Public Class Depth_SmoothMax
             cv.Cv2.InRange(dMin.stableMin, 0, 0, zeroMask)
             cv.Cv2.Max(input, stableMax, stableMax) ' max does not seem to do what it should!  
             stableMax.SetTo(0, zeroMask)
+
         End If
 
         colorize.src = stableMax

@@ -242,88 +242,9 @@ End Class
 
 
 
-Public Class Plane_XYDiff
-    Inherits VBparent
-    Dim pcValid As Depth_PointCloud_Stable
-    Dim grid As Thread_Grid
-    Public Sub New()
-        initParent()
-        grid = New Thread_Grid
-        pcValid = New Depth_PointCloud_Stable
-
-        label1 = "Stabilized x delta"
-        label2 = "Stabilized y delta"
-        task.desc = "Find planes using the pointcloud X and Y differences"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        pcValid.Run()
-        Dim mask = pcValid.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-
-        Dim split = cv.Cv2.Split(pcValid.stableCloud)
-        Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
-        Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
-
-        grid.Run()
-
-        'Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        '    Sub(roi)
-        '        For i = 0 To grid.roiList.Count - 1
-        'Dim roi = grid.roiList(i)
-        Dim roi = New cv.Rect(500, 100, 70, 60)
-        Dim r1 = New cv.Rect(roi.X + 0, roi.Y + 0, roi.Width - 1, roi.Height - 1)
-        Dim r2 = New cv.Rect(roi.X + 1, roi.Y + 1, roi.Width - 1, roi.Height - 1)
-
-        cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
-        cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1)) ' r2 - r1 to make all values positive...
-
-        Dim xMean = xDiff(r1).Mean(mask(r1)).Item(0)
-        Dim yMean = yDiff(r1).Mean(mask(r1)).Item(0)
-
-        Dim tmpx = xDiff.InRange(xMean - 0.001, xMean + 0.001)
-        Dim tmpy = yDiff.InRange(yMean - 0.001, yMean + 0.001)
-
-        dst1 = tmpx
-        dst2 = tmpy
-        'xDiff(r1) *= 128 / xMean
-        'xDiff(r1).ConvertTo(dst1(r1), cv.MatType.CV_8UC1)
-
-        'yDiff(r1) *= 128 / yMean
-        'yDiff(r1).ConvertTo(dst2(r1), cv.MatType.CV_8UC1)
-
-        'dst1(roi).SetTo(0, mask(roi))
-        'dst2(roi).SetTo(0, mask(roi))
-        '    Next
-        'End Sub)
-
-        'Dim r1 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height - 1)
-        'Dim r2 = New cv.Rect(1, 1, dst1.Width - 1, dst1.Height - 1)
-
-        'cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
-        'cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1)) ' r2 - r1 to make all values positive...
-
-        'Dim xMean = xDiff.Mean(mask).Item(0)
-        'Dim yMean = yDiff.Mean(mask).Item(0)
-
-        'xDiff *= 128 / xMean
-        'xDiff.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-        'yDiff *= 128 / yMean
-        'yDiff.ConvertTo(dst2, cv.MatType.CV_8UC1)
-
-        'dst1.SetTo(0, mask)
-        'dst2.SetTo(0, mask)
-    End Sub
-End Class
 
 
-
-
-
-
-
-Public Class Plane_XYHistogram
+Public Class Plane_SmoothSurfaces
     Inherits VBparent
     Dim pcValid As Depth_PointCloud_Stable
     Dim histX As Histogram_KalmanSmoothed
@@ -333,17 +254,12 @@ Public Class Plane_XYHistogram
         initParent()
 
         mats = New Mat_4to1
-
         histX = New Histogram_KalmanSmoothed
         histY = New Histogram_KalmanSmoothed
-
-        Dim zeroCheck = findCheckBox("Remove the zero histogram value")
-        zeroCheck.Checked = True
-
         pcValid = New Depth_PointCloud_Stable
 
-        label1 = "Stabilized x delta"
-        label2 = "Stabilized y delta"
+        label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
+        label2 = "Likely smooth surfaces"
         task.desc = "Find planes using the pointcloud X and Y differences"
     End Sub
     Public Sub Run()
@@ -373,10 +289,17 @@ Public Class Plane_XYHistogram
         histY.Run()
         mats.mat(1) = histY.dst1
 
-        mats.mat(2) = histX.src.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        mats.mat(3) = histY.src.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(1, 2)}
+        Dim mat() As cv.Mat = {histX.src}
+        Dim bins() = {0}
+        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(2), ranges)
+
+        mat(0) = histY.src
+        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(3), ranges)
 
         mats.Run()
         dst1 = mats.dst1
+
+        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), dst2)
     End Sub
 End Class
