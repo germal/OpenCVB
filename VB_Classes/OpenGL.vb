@@ -606,6 +606,44 @@ End Class
 
 
 
+Public Class OpenGL_StabilizedDepth
+    Inherits VBparent
+    Dim stable As Depth_Stabilizer
+    Public ogl As OpenGL_Callbacks
+    Public Sub New()
+        initParent()
+
+        stable = New Depth_Stabilizer
+        ogl = New OpenGL_Callbacks
+
+        label2 = "32-bit format stabilized depth data"
+        task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim split = cv.Cv2.Split(task.pointCloud)
+
+        stable.src = src
+        If stable.src.Type <> cv.MatType.CV_32F Then stable.src = split(2) * 1000
+
+        stable.Run()
+        dst1 = stable.dst1
+        dst2 = stable.dst2
+
+        split(2) = stable.dst2 * 0.001
+        cv.Cv2.Merge(split, task.pointCloud)
+        ogl.src = task.color
+        ogl.Run()
+    End Sub
+End Class
+
+
+
+
+
+
+
 
 Public Class OpenGL_StableDepthMouse
     Inherits VBparent
@@ -638,33 +676,26 @@ End Class
 
 
 
-Public Class OpenGL_StabilizedDepth
+Public Class OpenGL_SmoothSurfaces
     Inherits VBparent
-    Dim stable As Depth_Stabilizer
+    Dim smooth As Depth_SmoothSurfaces
     Public ogl As OpenGL_Callbacks
     Public Sub New()
         initParent()
 
-        stable = New Depth_Stabilizer
+        smooth = New Depth_SmoothSurfaces
         ogl = New OpenGL_Callbacks
 
-        label2 = "32-bit format stabilized depth data"
-        task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
+        task.desc = "Filter the 3D image to show only smooth surfaces."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
+        smooth.Run()
+        dst1 = smooth.pcValid.dst1
+        dst2 = smooth.pcValid.dst2
 
-        stable.src = src
-        If stable.src.Type <> cv.MatType.CV_32F Then stable.src = split(2) * 1000
-
-        stable.Run()
-        dst1 = stable.dst1
-        dst2 = stable.dst2
-
-        split(2) = stable.dst2 * 0.001
-        cv.Cv2.Merge(split, task.pointCloud)
+        smooth.pcValid.stableCloud.CopyTo(task.pointCloud, smooth.dst2)
         ogl.src = task.color
         ogl.Run()
     End Sub
