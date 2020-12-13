@@ -4,7 +4,7 @@ Imports System.Windows.Forms
 Module Algorithm_Module
     Public ocvb As VBocvb
     Public task As ActiveTask
-    Public aOptions As allOptionsFrm
+    Public aOptions As OptionsAll
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public PipeTaskIndex As Integer
@@ -154,7 +154,7 @@ Public Class ActiveTask : Implements IDisposable
 
         buildColors()
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
-        aOptions = New allOptionsFrm
+        aOptions = New OptionsAll
         aOptions.Show()
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then

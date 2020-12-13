@@ -28,9 +28,9 @@ variations and combinations. That is what "OpenCVB" provides.
 
 In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
-different groups algorithms. The default grouping is to select “\<All\>”
-algorithms while other special groupings allow selecting Python or C++
-algorithms.
+algorithms grouped by OpenCV API or OpenCVB algorithm. The default grouping is
+to select “\<All\>” algorithms while other special groupings allow selecting
+Python or C++ algorithms.
 
 ![](media/3dcdb4ef057b7696445216bbe30b4286.png)
 

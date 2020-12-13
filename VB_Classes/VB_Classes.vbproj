@@ -113,10 +113,10 @@
     <Compile Include="Fuzzy.vb" />
     <Compile Include="Highlight.vb" />
     <Compile Include="Motion.vb" />
-    <Compile Include="allOptionsFrm.Designer.vb">
-      <DependentUpon>allOptionsFrm.vb</DependentUpon>
+    <Compile Include="OptionsAll.Designer.vb">
+      <DependentUpon>OptionsAll.vb</DependentUpon>
     </Compile>
-    <Compile Include="allOptionsFrm.vb">
+    <Compile Include="OptionsAll.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ParticleFilter.vb" />
@@ -336,8 +336,8 @@
     <Compile Include="XPhoto.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="allOptionsFrm.resx">
-      <DependentUpon>allOptionsFrm.vb</DependentUpon>
+    <EmbeddedResource Include="OptionsAll.resx">
+      <DependentUpon>OptionsAll.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsKeyboardInput.resx">
       <DependentUpon>OptionsKeyboardInput.vb</DependentUpon>

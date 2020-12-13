@@ -938,239 +938,6 @@ End Class
 
 
 
-Public Class Histogram_Concentration
-    Inherits VBparent
-    Public sideview As Histogram_SideView2D
-    Public topview As Histogram_TopView2D
-    Dim palette As Palette_Basics
-    Public Sub New()
-        initParent()
-
-        palette = New Palette_Basics()
-        sideview = New Histogram_SideView2D()
-        topview = New Histogram_TopView2D()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
-            sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
-            sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
-        End If
-        task.desc = "Highlight the histogram projections where concentrations are highest"
-    End Sub
-    Private Function plotHighlights( histOutput As cv.Mat, dst As cv.Mat) As String
-        Static concentrationSlider = findSlider("Concentration Factor x100")
-        Dim concentrationFactor = concentrationSlider.Value / 100
-
-        Static cThresholdSlider = findSlider("Concentration Threshold")
-        Dim concentrationThreshold = cThresholdSlider.Value
-
-        Static minDepthSlider = findSlider("InRange Min Depth (mm)")
-        Dim minPixel = CInt(concentrationFactor * minDepthSlider.value * ocvb.pixelsPerMeterH / 1000)
-
-        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
-        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For y = 0 To tmp.Height - 1
-            For x = minPixel To tmp.Width - 1
-                Dim val = tmp.Get(Of Single)(y, x)
-                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / concentrationFactor), CInt(y / concentrationFactor)))
-            Next
-        Next
-
-        Static topXslider = findSlider("Display the top x highlights")
-        Dim topX = topXslider.value
-        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
-            Dim pt = pts.ElementAt(i).Value
-            dst.Circle(pt, ocvb.dotSize, cv.Scalar.All((i * 27 + 100) Mod 255), -1, cv.LineTypes.AntiAlias)
-        Next
-        palette.src = dst
-        palette.Run()
-        Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
-        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
-    End Function
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideview.Run()
-        dst1 = sideview.dst1
-        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
-        label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst1 = palette.dst1.Clone
-
-        topview.Run()
-        dst2 = topview.dst1
-        label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst2 = palette.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Histogram_SideView2D
-    Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Dim cameraYSlider As Windows.Forms.TrackBar
-    Dim frustrumSlider As Windows.Forms.TrackBar
-    Dim cmat As PointCloud_Colorize
-    Public frustrumAdjust As Single
-    Public resizeHistOutput As Boolean = True
-    Public Sub New()
-        initParent()
-
-        cmat = New PointCloud_Colorize()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
-            sliders.setupTrackBar(1, "SideCameraPoint.x adjustment", -100, 100, 0)
-        End If
-
-        frustrumSlider = findSlider("SideView Frustrum adjustment")
-        cameraYSlider = findSlider("SideCameraPoint.x adjustment")
-
-        ' The specification for each camera spells out the vertical FOV angle
-        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
-        Select Case ocvb.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                frustrumSlider.Value = 58
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -2)
-            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-                frustrumSlider.Value = 53
-                cameraYSlider.Value = -3
-            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
-                frustrumSlider.Value = 50
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 3, -8, -3)
-            Case VB_Classes.ActiveTask.algParms.camNames.D435i
-                frustrumSlider.Value = 57
-                cameraYSlider.Value = 0
-            Case VB_Classes.ActiveTask.algParms.camNames.D455
-                frustrumSlider.Value = 58
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
-        End Select
-        gCloud = New Depth_PointCloud_IMU()
-
-        label1 = "ZY (Side View)"
-        task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run()
-
-        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
-        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
-        ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraYSlider.Value)
-
-        frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        Static histThresholdSlider = findSlider("Histogram threshold")
-        If standalone And ocvb.frameCount = 0 Then histThresholdSlider.Value = 1
-        Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = cmat.CameraLocationSide(dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Histogram_TopView2D
-    Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Public markers(2 - 1) As cv.Point2f
-    Dim cmat As PointCloud_Colorize
-    Dim cameraXSlider As Windows.Forms.TrackBar
-    Dim frustrumSlider As Windows.Forms.TrackBar
-    Public resizeHistOutput As Boolean = True
-    Public Sub New()
-        initParent()
-
-        cmat = New PointCloud_Colorize()
-        gCloud = New Depth_PointCloud_IMU()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
-            sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
-        End If
-
-        frustrumSlider = findSlider("TopView Frustrum adjustment")
-        cameraXSlider = findSlider("TopCameraPoint.x adjustment")
-
-        ' The specification for each camera spells out the vertical FOV angle
-        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
-        Select Case ocvb.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                frustrumSlider.Value = 180
-                cameraXSlider.Value = 0
-            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-                frustrumSlider.Value = 162
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
-            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
-                frustrumSlider.Value = 105
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
-            Case VB_Classes.ActiveTask.algParms.camNames.D435i
-                frustrumSlider.Value = 175
-                cameraXSlider.Value = 0
-            Case VB_Classes.ActiveTask.algParms.camNames.D455
-                frustrumSlider.Value = 184
-                cameraXSlider.Value = 0
-        End Select
-
-        label1 = "XZ (Top View)"
-        task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run()
-
-        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
-        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
-        ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraXSlider.Value, CInt(src.Height))
-
-        Static frustrumSlider = findSlider("TopView Frustrum adjustment")
-        Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        histOutput = histOutput.Flip(cv.FlipMode.X)
-        Static histThresholdSlider = findSlider("Histogram threshold")
-        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        If standalone Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = cmat.CameraLocationBot(dst2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Histogram_TopData
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
@@ -1287,5 +1054,404 @@ Public Class Histogram_SideData
         dst1.Circle(New cv.Point(0, cameraLoc), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         label1 = "Camera dot below at " + CStr(cameraLoc) + " rows from the top"
         label2 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00")
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_TopView2D
+    Inherits VBparent
+    Public gCloud As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public markers(2 - 1) As cv.Point2f
+    Public cmat As PointCloud_Colorize
+    Public cameraXSlider As Windows.Forms.TrackBar
+    Public frustrumSlider As Windows.Forms.TrackBar
+    Public histThresholdSlider As Windows.Forms.TrackBar
+    Public resizeHistOutput As Boolean = True
+    Public Sub New()
+        initParent()
+
+        cmat = New PointCloud_Colorize()
+        gCloud = New Depth_PointCloud_IMU()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "TopView Frustrum adjustment", 1, 300, 175)
+            sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
+        End If
+
+        histThresholdSlider = findSlider("Histogram threshold")
+        frustrumSlider = findSlider("TopView Frustrum adjustment")
+        cameraXSlider = findSlider("TopCameraPoint.x adjustment")
+
+        ' The specification for each camera spells out the vertical FOV angle
+        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
+        Select Case ocvb.parms.cameraName
+            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+                frustrumSlider.Value = 180
+                cameraXSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
+                frustrumSlider.Value = 162
+                cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
+            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
+                frustrumSlider.Value = 105
+                cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
+            Case VB_Classes.ActiveTask.algParms.camNames.D435i
+                frustrumSlider.Value = 175
+                cameraXSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.camNames.D455
+                frustrumSlider.Value = 184
+                cameraXSlider.Value = 0
+        End Select
+
+        label1 = "XZ (Top View)"
+        task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloud.Run()
+
+        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
+        ocvb.topCameraPoint = New cv.Point(src.Width / 2 + cameraXSlider.Value, CInt(src.Height))
+
+        Static frustrumSlider = findSlider("TopView Frustrum adjustment")
+        Dim fFactor = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        If standalone Then
+            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = cmat.CameraLocationBot(dst2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Histogram_SmoothTopView2D
+    Inherits VBparent
+    Public topView As Histogram_TopView2D
+    Dim stable As Depth_PointCloud_Stable
+    Public Sub New()
+        initParent()
+
+        topView = New Histogram_TopView2D
+        topView.histThresholdSlider.Value = 1
+
+        stable = New Depth_PointCloud_Stable
+
+        label1 = "XZ (Top View)"
+        task.desc = "Create a 2D top view with stable depth data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        topView.gCloud.Run()
+        task.pointCloud = topView.gCloud.imuPointCloud
+
+        Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+        Static saveYRotate As Integer
+        If saveYRotate <> yRotateSlider.value Then
+            saveYRotate = yRotateSlider.value
+            stable.myResetAll = True
+        End If
+
+        stable.Run()
+
+        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
+        ocvb.topCameraPoint = New cv.Point(src.Width / 2 + topView.cameraXSlider.Value, CInt(src.Height))
+
+        Dim fFactor = ocvb.maxZ * topView.frustrumSlider.Value / 100 / 2
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-fFactor, fFactor)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        If topView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
+
+        topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
+        dst1 = topView.histOutput.Threshold(topView.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        If standalone Then
+            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = topView.cmat.CameraLocationBot(dst2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_SideView2D
+    Inherits VBparent
+    Public gCloud As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public cameraYSlider As Windows.Forms.TrackBar
+    Public frustrumSlider As Windows.Forms.TrackBar
+    Public histThresholdSlider As Windows.Forms.TrackBar
+    Public cmat As PointCloud_Colorize
+    Public frustrumAdjust As Single
+    Public resizeHistOutput As Boolean = True
+    Public Sub New()
+        initParent()
+
+        cmat = New PointCloud_Colorize()
+        gCloud = New Depth_PointCloud_IMU()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 100, 57)
+            sliders.setupTrackBar(1, "SideCameraPoint.x adjustment", -100, 100, 0)
+        End If
+
+        histThresholdSlider = findSlider("Histogram threshold")
+        If standalone Then histThresholdSlider.Value = 1
+        frustrumSlider = findSlider("SideView Frustrum adjustment")
+        cameraYSlider = findSlider("SideCameraPoint.x adjustment")
+
+        ' The specification for each camera spells out the vertical FOV angle
+        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
+        Select Case ocvb.parms.cameraName
+            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+                frustrumSlider.Value = 58
+                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -2)
+            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
+                frustrumSlider.Value = 53
+                cameraYSlider.Value = -3
+            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
+                frustrumSlider.Value = 50
+                cameraYSlider.Value = If(ocvb.resolutionIndex = 3, -8, -3)
+            Case VB_Classes.ActiveTask.algParms.camNames.D435i
+                frustrumSlider.Value = 57
+                cameraYSlider.Value = 0
+            Case VB_Classes.ActiveTask.algParms.camNames.D455
+                frustrumSlider.Value = 58
+                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
+        End Select
+
+        label1 = "ZY (Side View)"
+        task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloud.Run()
+
+        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
+        ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraYSlider.Value)
+
+        frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = cmat.CameraLocationSide(dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_SmoothSideView2D
+    Inherits VBparent
+    Public sideView As Histogram_SideView2D
+    Dim stable As Depth_PointCloud_Stable
+    Public Sub New()
+        initParent()
+
+        sideView = New Histogram_SideView2D
+        sideView.histThresholdSlider.Value = 1
+
+        stable = New Depth_PointCloud_Stable
+
+        label1 = "ZY (Side View)"
+        task.desc = "Create a 2D side view of stable depth data"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sideView.gCloud.Run()
+        task.pointCloud = sideView.gCloud.imuPointCloud
+
+        Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+        Static saveYRotate As Integer
+        If saveYRotate <> yRotateSlider.value Then
+            saveYRotate = yRotateSlider.value
+            stable.myResetAll = True
+        End If
+
+        stable.Run()
+
+        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
+        ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + sideView.cameraYSlider.Value)
+
+        sideView.frustrumAdjust = ocvb.maxZ * sideView.frustrumSlider.Value / 100 / 2
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-sideView.frustrumAdjust, sideView.frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        If sideView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
+
+        Dim tmp = sideView.histOutput.Threshold(sideView.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = sideView.cmat.CameraLocationSide(dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_Concentration
+    Inherits VBparent
+    Public sideview As Histogram_SideView2D
+    Public topview As Histogram_TopView2D
+    Public palette As Palette_Basics
+    Public Sub New()
+        initParent()
+
+        palette = New Palette_Basics()
+        sideview = New Histogram_SideView2D()
+        topview = New Histogram_TopView2D()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
+            sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
+            sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
+        End If
+        task.desc = "Highlight the histogram projections where concentrations are highest"
+    End Sub
+    Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
+        Static concentrationSlider = findSlider("Concentration Factor x100")
+        Dim concentrationFactor = concentrationSlider.Value / 100
+
+        Static cThresholdSlider = findSlider("Concentration Threshold")
+        Dim concentrationThreshold = cThresholdSlider.Value
+
+        Static minDepthSlider = findSlider("InRange Min Depth (mm)")
+        Dim minPixel = CInt(concentrationFactor * minDepthSlider.value * ocvb.pixelsPerMeterH / 1000)
+
+        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
+        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        For y = 0 To tmp.Height - 1
+            For x = minPixel To tmp.Width - 1
+                Dim val = tmp.Get(Of Single)(y, x)
+                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / concentrationFactor), CInt(y / concentrationFactor)))
+            Next
+        Next
+
+        Static topXslider = findSlider("Display the top x highlights")
+        Dim topX = topXslider.value
+        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
+            Dim pt = pts.ElementAt(i).Value
+            dst.Circle(pt, ocvb.dotSize, cv.Scalar.All((i * 27 + 100) Mod 255), -1, cv.LineTypes.AntiAlias)
+        Next
+        palette.src = dst
+        palette.Run()
+        Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
+        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
+    End Function
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sideview.Run()
+        dst1 = sideview.dst1
+        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
+        label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst1 = palette.dst1.Clone
+
+        topview.Run()
+        dst2 = topview.dst1
+        label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst2 = palette.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_SmoothConcentration
+    Inherits VBparent
+    Public sideview As Histogram_SmoothSideView2D
+    Public topview As Histogram_SmoothTopView2D
+    Dim concent As Histogram_Concentration
+    Public Sub New()
+        initParent()
+
+        sideview = New Histogram_SmoothSideView2D
+        topview = New Histogram_SmoothTopView2D
+        concent = New Histogram_Concentration
+
+        task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sideview.Run()
+        dst1 = sideview.dst1
+        Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
+        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst1 = concent.palette.dst1.Clone
+
+        topview.Run()
+        dst2 = topview.dst1
+        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst2 = concent.palette.dst1.Clone
     End Sub
 End Class

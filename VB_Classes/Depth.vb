@@ -1977,9 +1977,10 @@ End Class
 
 Public Class Depth_PointCloud_Stable
     Inherits VBparent
-    Dim extrema As Depth_SmoothExtrema
+    Public extrema As Depth_SmoothExtrema
     Public stableCloud As cv.Mat
     Public split() As cv.Mat
+    Public myResetAll As Boolean
     Public Sub New()
         initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -2002,7 +2003,7 @@ Public Class Depth_PointCloud_Stable
         extrema.Run()
 
         ' if many pixels changed, then resetAll was triggered.  Leave task.pointcloud alone...
-        If extrema.resetAll = False Then
+        If extrema.resetAll = False And myResetAll = False Then
             Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
             If zCheck.checked Then
                 split(2) = extrema.dst2 * 0.001
@@ -2011,6 +2012,7 @@ Public Class Depth_PointCloud_Stable
                 task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
             End If
         Else
+            myResetAll = False
             stableCloud = task.pointCloud
         End If
         dst1 = extrema.dst1

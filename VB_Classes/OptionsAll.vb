@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.ComponentModel
 Imports System.Windows.Forms
-Public Class allOptionsFrm
+Public Class OptionsAll
     Public optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public offset = 30
@@ -60,7 +60,10 @@ Public Class allOptionsFrm
         Catch ex As Exception
             Console.WriteLine("Error in layoutOptions: " + ex.Message)
         End Try
-        optionsTitle.Clear()
         hiddenOptions.Clear()
+    End Sub
+
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        layoutOptions()
     End Sub
 End Class
