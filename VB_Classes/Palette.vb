@@ -6,8 +6,8 @@ Public Class Palette_Basics
     Inherits VBparent
     Public gradMap As Palette_BuildGradientColorMap
     Public colormap As cv.ColormapTypes
-    Public colorMat As cv.Mat
     Dim radioFrm As OptionsRadioButtons
+    Public whiteBack As Boolean
     Public Sub New()
         initParent()
         gradMap = New Palette_BuildGradientColorMap()
@@ -38,7 +38,7 @@ Public Class Palette_Basics
         Return 0
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         colormap = checkRadios()
         label1 = "ColorMap = " + mapNames(colormap)
 
@@ -48,30 +48,24 @@ Public Class Palette_Basics
             saveColorMap = colormap
             Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
             ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
-            If str.Contains("Ocean") Then
-                str = str.Replace("Ocean", "Hsv")
-            ElseIf str.Contains("Hsv") Then
-                str = str.Replace("Hsv", "Ocean")
+            If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
+            Dim mapFile As New FileInfo(str)
+            If colormap = 20 Then
+                gradMap.Run()
+            Else
+                gradMap.gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
             End If
-            Dim mapFile = New FileInfo(str)
-            If mapFile.Exists Then
-                colorMat = cv.Cv2.ImRead(mapFile.FullName)
-                If standalone Then dst2 = colorMat.Resize(src.Size())
-            End If
+            If standalone Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
+            If whiteBack And gradMap.gradientColorMap.Cols <> 0 Then gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.White)
         End If
 
-        ' special case the random color map!
-        If colormap = 20 Then
-            gradMap.Run()
+        ' Uncomment this to test if the .NET interface for ApplyColorMap for custom color maps is working
+        ' cv.Cv2.ApplyColorMap(src, dst2, gradMap.gradientColorMap) 
 
-            ' Uncomment this to test if the .NET interface for ApplyColorMap for custom color maps is working
-            ' cv.Cv2.ApplyColorMap(src, dst2, gradMap.gradientColorMap) 
-
-            ' In the meantime, this will work!
+        ' In the meantime, this will work!
+        If gradMap.gradientColorMap.Cols > 0 Then
             dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
             dst2 = gradMap.gradientColorMap.Resize(dst2.Size)
-        Else
-            cv.Cv2.ApplyColorMap(src, dst1, colormap)
         End If
     End Sub
 End Class
@@ -365,16 +359,13 @@ Public Class Palette_BuildGradientColorMap
         Static saveGradCount = -1
         Static transitionSlider = findSlider("Number of color transitions (Used only with Random)")
         Dim gradCount = transitionSlider.Value
-        If saveGradCount <> gradCount Then
-            saveGradCount = gradCount
-            Dim gradMat As New cv.Mat
-            For i = 0 To gradCount - 1
-                gradMat = colorTransition(color1, color2, src.Width)
-                color2 = color1
-                color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-            Next
-        End If
+        Dim gradMat As New cv.Mat
+        For i = 0 To gradCount - 1
+            gradMat = colorTransition(color1, color2, src.Width)
+            color2 = color1
+            color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+        Next
         gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
         dst1 = Palette_Custom_Apply(src, gradientColorMap)
         If standalone Then dst2 = gradientColorMap

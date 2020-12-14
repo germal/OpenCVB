@@ -44,14 +44,14 @@ Public Class OptionsAll
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
             For Each title In optionsTitle
+                Dim frm = findfrm(title)
+                frm.SendToBack()
                 If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
-                    Dim frm = findfrm(title)
                     If frm Is Nothing Then Continue For
                     frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
                     indexS += 1
                 End If
                 If title.EndsWith(" Radio Options") Or title.EndsWith(" CheckBox Options") Then
-                    Dim frm = findfrm(title)
                     If frm Is Nothing Then Continue For
                     frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
                     indexO += 1
@@ -62,7 +62,6 @@ Public Class OptionsAll
         End Try
         hiddenOptions.Clear()
     End Sub
-
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         layoutOptions()
     End Sub

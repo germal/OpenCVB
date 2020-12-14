@@ -1648,12 +1648,11 @@ End Class
 
 
 
-Public Class Depth_SmoothExtrema
+Public Class Depth_Stable
     Inherits VBparent
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public dMin As Depth_SmoothMin
     Public dMax As Depth_SmoothMax
-    Public stableDepth As cv.Mat
     Public resetAll As Boolean
     Public Sub New()
         initParent()
@@ -1679,7 +1678,7 @@ Public Class Depth_SmoothExtrema
         If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f()
 
         Dim radioVal As Integer
-        Static frm As OptionsRadioButtons = findfrm("Depth_SmoothExtrema Radio Options")
+        Static frm As OptionsRadioButtons = findfrm("Depth_Stable Radio Options")
         For radioVal = 0 To frm.check.Count - 1
             If frm.check(radioVal).Checked Then Exit For
         Next
@@ -1687,32 +1686,30 @@ Public Class Depth_SmoothExtrema
         Static saveRadioVal = -1
         If radioVal <> saveRadioVal Then
             saveRadioVal = radioVal
-            stableDepth = getDepth32f()
+            dst2 = getDepth32f()
             resetAll = True
         Else
             Select Case saveRadioVal
                 Case 0
                     dMax.src = input
                     dMax.Run()
-                    stableDepth = dMax.stableMax
+                    dst2 = dMax.stableMax
                     dst1 = dMax.dst1
                     resetAll = dMax.dMin.resetAll
                 Case 1
                     dMin.src = input
                     dMin.Run()
-                    stableDepth = dMin.stableMin
+                    dst2 = dMin.stableMin
                     dst1 = dMin.dst1
                     resetAll = dMin.resetAll
                 Case 2
-                    stableDepth = getDepth32f()
-                    colorize.src = stableDepth
+                    dst2 = getDepth32f()
+                    colorize.src = dst2
                     colorize.Run()
                     dst1 = colorize.dst1
                     resetAll = True
             End Select
         End If
-
-        dst2 = stableDepth
     End Sub
 End Class
 
@@ -1977,7 +1974,7 @@ End Class
 
 Public Class Depth_PointCloud_Stable
     Inherits VBparent
-    Public extrema As Depth_SmoothExtrema
+    Public extrema As Depth_Stable
     Public stableCloud As cv.Mat
     Public split() As cv.Mat
     Public myResetAll As Boolean
@@ -1989,7 +1986,7 @@ Public Class Depth_PointCloud_Stable
         End If
 
         stableCloud = task.pointCloud
-        extrema = New Depth_SmoothExtrema
+        extrema = New Depth_Stable
         task.desc = "Provide only a validated point cloud - one which has consistent depth data."
     End Sub
     Public Sub Run()

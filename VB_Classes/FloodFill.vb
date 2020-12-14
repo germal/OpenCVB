@@ -128,7 +128,7 @@ Public Class FloodFill_8bit
         palette.dst1.CopyTo(dst1, allRegionMask)
 
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(basics.minFloodSize) + " pixels"
-        If standalone Or task.intermediateReview = caller Then dst2 = palette.colorMat.Resize(src.Size())
+        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradMap.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 

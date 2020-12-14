@@ -305,7 +305,9 @@ Public Class Histogram_Depth
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f()
+
+        inrange.src = src
+        If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = getDepth32f()
         inrange.Run()
 
         Static minSlider = findSlider("InRange Min Depth (mm)")
@@ -329,139 +331,6 @@ Public Class Histogram_Depth
 End Class
 
 
-
-
-Public Class Histogram_DepthValleys
-    Inherits VBparent
-    Dim kalman As Kalman_Basics
-    Dim hist As Histogram_Depth
-    Public rangeBoundaries As New List(Of cv.Point)
-    Public sortedSizes As New List(Of Integer)
-    Private Class CompareCounts : Implements IComparer(Of Single)
-        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
-            ' why have compare for just integer?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a <= b Then Return -1
-            Return 1
-        End Function
-    End Class
-    Private Sub histogramBarsValleys(img As cv.Mat, hist As cv.Mat, plotColors() As cv.Scalar)
-        Dim binCount = hist.Height
-        Dim binWidth = CInt(img.Width / hist.Height)
-        Dim minVal As Single, maxVal As Single
-        hist.MinMaxLoc(minVal, maxVal)
-        img.SetTo(0)
-        If maxVal = 0 Then Exit Sub
-        For i = 0 To binCount - 1
-            Dim nextHistCount = hist.Get(Of Single)(i, 0)
-            Dim h = CInt(img.Height * nextHistCount / maxVal)
-            If h = 0 Then h = 1 ' show the color range in the plot
-            Dim barRect As cv.Rect
-            barRect = New cv.Rect(i * binWidth, img.Height - h, binWidth, h)
-            cv.Cv2.Rectangle(img, barRect, plotColors(i), -1)
-        Next
-    End Sub
-    Public Sub New()
-        initParent()
-        hist = New Histogram_Depth()
-        hist.inrange.sliders.trackbar(1).Value = 5000 ' depth to 5 meters.
-        hist.sliders.trackbar(0).Value = 40 ' number of bins.
-
-        kalman = New Kalman_Basics()
-
-        task.desc = "Identify valleys in the Depth histogram."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        hist.Run()
-        ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
-        For i = 0 To hist.plotHist.hist.Rows - 1
-            kalman.kInput(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
-        Next
-        kalman.Run()
-        For i = 0 To hist.plotHist.hist.Rows - 1
-            hist.plotHist.hist.Set(Of Single)(i, 0, kalman.kOutput(i))
-        Next
-
-        Dim depthIncr = CInt(hist.inrange.sliders.trackbar(1).Value / hist.sliders.trackbar(0).Value) ' each bar represents this number of millimeters
-        Dim pointCount = hist.plotHist.hist.Get(Of Single)(0, 0) + hist.plotHist.hist.Get(Of Single)(1, 0)
-        Dim startDepth = 1
-        Dim startEndDepth As cv.Point
-        Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
-        For i = 2 To kalman.kOutput.Length - 3
-            Dim prev2 = If(i > 2, kalman.kOutput(i - 2), 0)
-            Dim prev = If(i > 1, kalman.kOutput(i - 1), 0)
-            Dim curr = kalman.kOutput(i)
-            Dim post = If(i < kalman.kOutput.Length - 1, kalman.kOutput(i + 1), 0)
-            Dim post2 = If(i < kalman.kOutput.Length - 2, kalman.kOutput(i + 2), 0)
-            pointCount += kalman.kOutput(i)
-            If prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1 Then
-                If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
-                    startEndDepth = New cv.Point(startDepth, i * depthIncr)
-                    depthBoundaries.Add(pointCount, startEndDepth)
-                    pointCount = 0
-                    startDepth = i * depthIncr + 0.1
-                End If
-            End If
-        Next
-
-        startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.trackbar(1).Value)
-        depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
-
-        rangeBoundaries.Clear()
-        sortedSizes.Clear()
-        For i = depthBoundaries.Count - 1 To 0 Step -1
-            rangeBoundaries.Add(depthBoundaries.ElementAt(i).Value)
-            sortedSizes.Add(depthBoundaries.ElementAt(i).Key)
-        Next
-
-        Dim plotColors(hist.plotHist.hist.Rows - 1) As cv.Scalar
-        For i = 0 To hist.plotHist.hist.Rows - 1
-            Dim depth = i * depthIncr + 1
-            For j = 0 To rangeBoundaries.Count - 1
-                Dim startEnd = rangeBoundaries.ElementAt(j)
-                If depth >= startEnd.X And depth < startEnd.Y Then
-                    plotColors(i) = ocvb.scalarColors(j Mod 255)
-                    Exit For
-                End If
-            Next
-        Next
-        histogramBarsValleys(dst1, hist.plotHist.hist, plotColors)
-        label1 = "Histogram clustered by valleys and smoothed"
-    End Sub
-End Class
-
-
-
-
-
-Public Class Histogram_DepthClusters
-    Inherits VBparent
-    Public valleys As Histogram_DepthValleys
-    Public Sub New()
-        initParent()
-        valleys = New Histogram_DepthValleys()
-        task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        valleys.Run()
-        dst1 = valleys.dst1
-
-        Dim mask As New cv.Mat
-        Dim tmp As New cv.Mat
-        dst2.SetTo(0)
-        For i = 0 To valleys.rangeBoundaries.Count - 1
-            Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
-            cv.Cv2.InRange(getDepth32f(), startEndDepth.X, startEndDepth.Y, tmp)
-            cv.Cv2.ConvertScaleAbs(tmp, mask)
-            dst2.SetTo(ocvb.scalarColors(i), mask)
-        Next
-        If standalone Then
-            label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
-            label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
-        End If
-    End Sub
-End Class
 
 
 
@@ -1359,9 +1228,9 @@ Public Class Histogram_Concentration
     Public Sub New()
         initParent()
 
-        palette = New Palette_Basics()
-        sideview = New Histogram_SideView2D()
-        topview = New Histogram_TopView2D()
+        palette = New Palette_Basics
+        sideview = New Histogram_SideView2D
+        topview = New Histogram_TopView2D
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -1453,5 +1322,161 @@ Public Class Histogram_SmoothConcentration
         dst2 = topview.dst1
         label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst2 = concent.palette.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class Histogram_DepthClusters
+    Inherits VBparent
+    Public valleys As Histogram_DepthValleys
+    Public Sub New()
+        initParent()
+        valleys = New Histogram_DepthValleys()
+        task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        valleys.src = src
+        If valleys.src.Type <> cv.MatType.CV_32F Then valleys.src = getDepth32f()
+
+        valleys.Run()
+        dst1 = valleys.dst1
+
+        Dim mask As New cv.Mat
+        Dim tmp As New cv.Mat
+        Dim colorIncr = (255 / valleys.rangeBoundaries.Count)
+        valleys.palette.src = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To valleys.rangeBoundaries.Count - 1
+            Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
+            cv.Cv2.InRange(valleys.src, startEndDepth.X, startEndDepth.Y, tmp)
+            cv.Cv2.ConvertScaleAbs(tmp, mask)
+            valleys.palette.src.SetTo(i * colorIncr + 1, mask)
+        Next
+        valleys.palette.Run()
+        dst2 = valleys.palette.dst1
+        If standalone Then
+            label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
+            label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class Histogram_DepthValleys
+    Inherits VBparent
+    Dim kalman As Kalman_Basics
+    Dim hist As Histogram_Depth
+    Public rangeBoundaries As New List(Of cv.Point)
+    Public sortedSizes As New List(Of Integer)
+    Public palette As Palette_Basics
+    Private Class CompareCounts : Implements IComparer(Of Single)
+        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
+            ' why have compare for just integer?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return -1
+            Return 1
+        End Function
+    End Class
+    Private Function histogramBarsValleys(hist As cv.Mat, paletteColors() As Integer) As cv.Mat
+        Dim img = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        Dim binCount = hist.Rows
+        Dim binWidth = CInt(img.Width / hist.Rows)
+        Dim minVal As Single, maxVal As Single
+        hist.MinMaxLoc(minVal, maxVal)
+        If maxVal > 0 Then
+            For i = 0 To binCount - 1
+                Dim nextHistCount = hist.Get(Of Single)(i, 0)
+                Dim h = CInt(img.Height * nextHistCount / maxVal)
+                If h = 0 Then h = 1 ' show the color range in the plot
+                Dim barRect As cv.Rect
+                barRect = New cv.Rect(i * binWidth, img.Height - h, binWidth, h)
+                cv.Cv2.Rectangle(img, barRect, paletteColors(i), -1)
+            Next
+        End If
+        Return img
+    End Function
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics
+        palette.whiteBack = True
+        Dim radioJet = findRadio("Hsv")
+        radioJet.Checked = True
+        hist = New Histogram_Depth()
+        hist.inrange.sliders.trackbar(1).Value = 5000 ' depth to 5 meters.
+        hist.sliders.trackbar(0).Value = 40 ' number of bins.
+
+        kalman = New Kalman_Basics()
+
+        label1 = "Histogram clustered by valleys and smoothed"
+        task.desc = "Identify valleys in the Depth histogram."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        hist.src = src
+        If hist.src.Type <> cv.MatType.CV_32F Then hist.src = getDepth32f()
+        hist.Run()
+        ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
+        For i = 0 To hist.plotHist.hist.Rows - 1
+            kalman.kInput(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
+        Next
+        kalman.Run()
+        For i = 0 To hist.plotHist.hist.Rows - 1
+            hist.plotHist.hist.Set(Of Single)(i, 0, kalman.kOutput(i))
+        Next
+
+        Dim depthIncr = CInt(hist.inrange.sliders.trackbar(1).Value / hist.sliders.trackbar(0).Value) ' each bar represents this number of millimeters
+        Dim pointCount = hist.plotHist.hist.Get(Of Single)(0, 0) + hist.plotHist.hist.Get(Of Single)(1, 0)
+        Dim startDepth = 1
+        Dim startEndDepth As cv.Point
+        Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
+        For i = 2 To kalman.kOutput.Length - 3
+            Dim prev2 = If(i > 2, kalman.kOutput(i - 2), 0)
+            Dim prev = If(i > 1, kalman.kOutput(i - 1), 0)
+            Dim curr = kalman.kOutput(i)
+            Dim post = If(i < kalman.kOutput.Length - 1, kalman.kOutput(i + 1), 0)
+            Dim post2 = If(i < kalman.kOutput.Length - 2, kalman.kOutput(i + 2), 0)
+            pointCount += kalman.kOutput(i)
+            If prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1 Then
+                If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
+                    startEndDepth = New cv.Point(startDepth, i * depthIncr)
+                    depthBoundaries.Add(pointCount, startEndDepth)
+                    pointCount = 0
+                    startDepth = i * depthIncr + 0.1
+                End If
+            End If
+        Next
+
+        startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.trackbar(1).Value)
+        depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
+
+        rangeBoundaries.Clear()
+        sortedSizes.Clear()
+        For i = depthBoundaries.Count - 1 To 0 Step -1
+            rangeBoundaries.Add(depthBoundaries.ElementAt(i).Value)
+            sortedSizes.Add(depthBoundaries.ElementAt(i).Key)
+        Next
+
+        Dim paletteColors(hist.plotHist.hist.Rows - 1) As Integer
+        Dim colorIncr = (255 / rangeBoundaries.Count)
+        For i = 0 To hist.plotHist.hist.Rows - 1
+            Dim depth = i * depthIncr + 1
+            For j = 0 To rangeBoundaries.Count - 1
+                Dim startEnd = rangeBoundaries.ElementAt(j)
+                If depth >= startEnd.X And depth < startEnd.Y Then
+                    paletteColors(i) = j * colorIncr + 1
+                    Exit For
+                End If
+            Next
+        Next
+
+        dst1 = histogramBarsValleys(hist.plotHist.hist, paletteColors)
+        palette.src = dst1
+        palette.Run()
+        dst1 = palette.dst1
     End Sub
 End Class
