@@ -23,7 +23,6 @@ Public Class OptionsAll
         Else
             hiddenOptions.Add(frm.Text)
         End If
-
         frm.show
     End Sub
     Public Sub layoutOptions()
@@ -45,16 +44,18 @@ Public Class OptionsAll
             Dim indexO As Integer = 0
             For Each title In optionsTitle
                 Dim frm = findfrm(title)
-                frm.SendToBack()
-                If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
-                    If frm Is Nothing Then Continue For
-                    frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
-                    indexS += 1
-                End If
-                If title.EndsWith(" Radio Options") Or title.EndsWith(" CheckBox Options") Then
-                    If frm Is Nothing Then Continue For
-                    frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
-                    indexO += 1
+                If frm IsNot Nothing Then
+                    frm.SendToBack()
+                    If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
+                        If frm Is Nothing Then Continue For
+                        frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                        indexS += 1
+                    End If
+                    If title.EndsWith(" Radio Options") Or title.EndsWith(" CheckBox Options") Then
+                        If frm Is Nothing Then Continue For
+                        frm.SetDesktopLocation(otherOffset.X + indexO * offset, otherOffset.Y + indexO * offset)
+                        indexO += 1
+                    End If
                 End If
             Next
         Catch ex As Exception

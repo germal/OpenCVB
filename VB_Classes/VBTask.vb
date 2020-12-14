@@ -176,6 +176,7 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.vFov = vFOVangles(parms.cameraName)
 
         aOptions.layoutOptions()
+        aOptions.BringToFront()
         Application.DoEvents()
     End Sub
     Public Sub RunAlgorithm()
