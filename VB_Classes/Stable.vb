@@ -46,10 +46,15 @@ Public Class Stable_Pointcloud
 
         Dim split = cv.Cv2.Split(task.pointCloud)
         Static splitPC() = split
-        splitPC(2) = (stable.dst1 * 0.001).ToMat
-        split(0).CopyTo(splitPC(0), stable.dst2)
-        split(1).CopyTo(splitPC(1), stable.dst2)
-        cv.Cv2.Merge(splitPC, task.pointCloud)
+        label2 = "Cumulative changes = " + Format(stable.cumulativeChanges / 1000, "#0.0") + "k pixels"
+        If stable.resetAll Then
+            splitPC = split
+        Else
+            splitPC(2) = (stable.dst1 * 0.001).ToMat
+            split(0).CopyTo(splitPC(0), stable.dst2)
+            split(1).CopyTo(splitPC(1), stable.dst2)
+            cv.Cv2.Merge(splitPC, task.pointCloud)
+        End If
     End Sub
 End Class
 
@@ -67,6 +72,7 @@ Public Class Stable_Depth
     Public roll As Single ' in radians.
     Public cameraStable As Boolean
     Public zeroDepthMask As cv.Mat
+    Public cumulativeChanges As Integer
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -74,6 +80,14 @@ Public Class Stable_Depth
             sliders.setupTrackBar(0, "Motion threshold before resyncing entire image", 1, 100000, If(task.color.Width = 1280, 20000, 5000))
             sliders.setupTrackBar(1, "Motion change threshold", 1, 255, 25)
             sliders.setupTrackBar(2, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much motion is reasonable?
+        End If
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Use farthest distance"
+            radio.check(1).Text = "Use closest distance"
+            radio.check(2).Text = "Use unchanged depth input"
+            radio.check(1).Checked = True
         End If
 
         label1 = "32-bit format of the stable depth"
@@ -100,17 +114,28 @@ Public Class Stable_Depth
 
         Static nonZeroThreshold = findSlider("Motion threshold before resyncing entire image")
         Dim changedPixels = dst2.CountNonZero()
-        If cameraStable = False Or changedPixels > nonZeroThreshold.value Or dst1.Type <> cv.MatType.CV_32FC1 Then
+        cumulativeChanges += changedPixels
+        If cameraStable = False Or cumulativeChanges > nonZeroThreshold.value Or dst1.Type <> cv.MatType.CV_32FC1 Then
             resetAll = True
             dst1 = input
+            cumulativeChanges = 0
         Else
             resetAll = False
             input.CopyTo(dst1, dst2)
-            cv.Cv2.Max(input, dst1, dst1)
 
-            zeroDepthMask = input.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-            ' clearing out the zeros degrades the image but does eliminate a small number of pixels where depth should be zero.  Uncomment to review...
-            'dst1.SetTo(0, zeroMask)
+            Static useNone = findRadio("Use unchanged depth input")
+            Static useMin = findRadio("Use closest distance")
+            Static useMax = findRadio("Use farthest distance")
+            If useNone.checked = False Then
+                If useMax.checked Then cv.Cv2.Max(input, dst1, dst1)
+                If useMin.checked Then
+                    cv.Cv2.Min(input, dst1, dst1)
+                    zeroDepthMask = input.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+                    dst1.SetTo(0, zeroDepthMask)
+                End If
+            Else
+                input.CopyTo(dst1)
+            End If
         End If
     End Sub
 End Class

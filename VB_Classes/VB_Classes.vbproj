@@ -107,7 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
-    <Compile Include="Extrema.vb" />
     <Compile Include="Rectangle.vb" />
     <Compile Include="Fibonacci.vb" />
     <Compile Include="Fuzzy.vb" />

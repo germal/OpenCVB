@@ -700,3 +700,33 @@ Public Class OpenGL_SmoothSurfaces
         ogl.Run()
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class OpenGL_Stable
+    Inherits VBparent
+    Dim stable As Stable_Pointcloud
+    Dim ogl As OpenGL_Callbacks
+    Public Sub New()
+        initParent()
+        stable = New Stable_Pointcloud
+        ogl = New OpenGL_Callbacks
+        task.desc = "Use the Stable_PointCloud in 3D"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        stable.Run() ' Updates Task.pointcloud
+        dst1 = stable.dst1
+        dst2 = stable.dst2
+
+        ogl.src = task.color
+        ogl.Run()
+
+        label2 = stable.label2
+    End Sub
+End Class
