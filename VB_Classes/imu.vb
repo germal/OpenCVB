@@ -564,7 +564,7 @@ Public Class IMU_IscameraStable
         If standalone Then flow = New Font_FlowText()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
-            sliders.setupTrackBar(0, "Threshold in motion radian X100", 1, 100, 3) ' how much motion is reasonable?
+            sliders.setupTrackBar(0, "Threshold in camera motion in radians X100", 1, 100, 3) ' how much motion is reasonable?
         End If
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
@@ -575,7 +575,7 @@ Public Class IMU_IscameraStable
         yaw = task.IMU_AngularVelocity.Y
         roll = task.IMU_AngularVelocity.Z
 
-        Static thresholdSlider = findSlider("Threshold in motion radian X100")
+        Static thresholdSlider = findSlider("Threshold in camera motion in radians X100")
         Dim threshold = thresholdSlider.Value / 100
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
         cameraStable = If(totalRadians > threshold, False, True)
