@@ -50,7 +50,7 @@ Public Class OptionsAll
             For Each title In optionsTitle
                 frm = findfrm(title)
                 If frm IsNot Nothing And title <> "Options_InRange Slider Options" Then
-                    frm.SendToBack()
+                    frm.BringToFront()
                     If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                         If frm Is Nothing Then Continue For
                         frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
