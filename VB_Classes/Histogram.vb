@@ -1096,6 +1096,7 @@ Public Class Histogram_SideView2D
         sideOpts = New Histogram_SideViewOptions
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
+        frustrumSlider = findSlider("SideView Frustrum adjustment")
         histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         If standalone Then histThresholdSlider.Value = 1
 

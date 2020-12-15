@@ -160,6 +160,7 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
         aOptions = New OptionsAll
         aOptions.Show()
+        inrange = algoList.createAlgorithm("Options_InRange")
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
@@ -179,7 +180,6 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 
-        inrange = algoList.createAlgorithm("Options_InRange")
         aOptions.layoutOptions()
 
         Application.DoEvents()
