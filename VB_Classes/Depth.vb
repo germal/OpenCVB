@@ -560,7 +560,7 @@ Public Class Depth_ColorizerFastFade_CPP
         inrange = New Depth_InRange()
 
         label2 = "Mask from Depth_InRange"
-        task.desc = "Display depth data with inrange inrange.  Higher contrast than others - yellow to blue always present."
+        task.desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -1562,12 +1562,6 @@ Public Class Depth_InRange
     Public depth32fAfterMasking As Boolean
     Public Sub New()
         initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 2000, 200)
-            sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
-            sliders.setupTrackBar(2, "Top/Side View Histogram threshold", 0, 3000, 10)
-        End If
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
@@ -1579,11 +1573,12 @@ Public Class Depth_InRange
         Dim min = If(minVal <> 0, minVal, minSlider.Value)
         Dim max = If(minVal <> 0, maxVal, maxSlider.Value)
         If min >= max Then max = min + 1
-        depth32f = If(src.Type = cv.MatType.CV_32FC1, src, task.depth32f)
+        depth32f = src
+        If depth32f.Type <> cv.MatType.CV_32FC1 Then task.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
         cv.Cv2.InRange(depth32f, min, max, depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
-        dst1 = depth32f.SetTo(0, noDepthMask)
-        If standalone Or depth32fAfterMasking Then dst2 = depth32f.SetTo(0, depthMask)
+        dst1 = depth32f.Clone.SetTo(0, noDepthMask)
+        If standalone Or depth32fAfterMasking Then dst2 = depth32f.Clone.SetTo(0, depthMask)
     End Sub
 End Class
 
