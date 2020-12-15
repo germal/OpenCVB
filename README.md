@@ -67,7 +67,7 @@ Here are the requirements:
 
 All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
 Kinect for Azure has the best depth accuracy but requires more power and is not
-as portable as the Intel cameras. All the cameras use USB 3 to provide data to
+as portable as the Intel cameras. All the cameras use USB-C to provide data to
 the host platform. A brief comparison of each camera is provided in Addendum 1.
 
 The Objective

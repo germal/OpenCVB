@@ -495,7 +495,6 @@ End Class
 Public Class Palette_ObjectColors
     Inherits VBparent
     Dim reduction As Reduction_KNN_Color
-    Dim inrange As Depth_InRange
     Dim palette As Palette_Basics
     Public gray As cv.Mat
     Public Sub New()
@@ -504,7 +503,6 @@ Public Class Palette_ObjectColors
         palette = New Palette_Basics()
         hideForm("Palette_BuildGradientColorMap Slider Options")
         reduction = New Reduction_KNN_Color()
-        inrange = New Depth_InRange()
 
         label1 = "Consistent colors"
         label2 = "Original colors"
@@ -516,13 +514,13 @@ Public Class Palette_ObjectColors
         reduction.Run()
         dst2 = reduction.dst2
 
-        inrange.Run()
-        Static minDepthSlider = findSlider("InRange Min Depth")
         Static maxDepthSlider = findSlider("InRange Max Depth")
-        If ocvb.frameCount = 0 Then maxDepthSlider.value = maxDepthSlider.maximum
-        Dim minDepth = minDepthSlider.value
-        Dim maxDepth = maxDepthSlider.value
-        If maxDepth - minDepth < 2 Then Exit Sub
+        If ocvb.frameCount = 0 Then
+            maxDepthSlider.value = maxDepthSlider.maximum
+            task.inrange.maxval = maxDepthSlider.value
+        End If
+        Dim minDepth = task.inrange.minval
+        Dim maxDepth = task.inrange.maxval
 
         Dim depth32f = getDepth32f()
         Dim blobList As New SortedList(Of Single, Integer)
@@ -531,7 +529,7 @@ Public Class Palette_ObjectColors
             If vo.mask IsNot Nothing Then
                 Dim mask = vo.mask.Clone
                 Dim r = vo.preKalmanRect
-                mask.SetTo(0, inrange.noDepthMask(r)) ' count only points with depth
+                mask.SetTo(0, task.inrange.noDepthMask(r)) ' count only points with depth
                 Dim countDepthPixels = mask.CountNonZero()
                 If countDepthPixels > 30 Then
                     Dim depth = depth32f(r).Mean(mask)

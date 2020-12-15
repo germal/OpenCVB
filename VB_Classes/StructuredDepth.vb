@@ -20,7 +20,7 @@ Public Class StructuredDepth_SliceH
             sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
         End If
 
-        histThresholdSlider = findSlider("Histogram threshold")
+        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
 

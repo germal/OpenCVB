@@ -567,7 +567,7 @@ Public Class PointCloud_Kalman_TopView
 
         topView.Run()
 
-        Static sliderHistThreshold = findSlider("Histogram threshold")
+        Static sliderHistThreshold = findSlider("Top/Side View Histogram threshold")
         flood.src = topView.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run()
 
@@ -614,7 +614,7 @@ Public Class PointCloud_Kalman_SideView
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.Run()
 
-        Static sliderHistThreshold = findSlider("Histogram threshold")
+        Static sliderHistThreshold = findSlider("Top/Side View Histogram threshold")
         flood.src = sideView.histOutput.ConvertScaleAbs(255)
         flood.Run()
 
@@ -861,7 +861,7 @@ Public Class PointCloud_IMU_TopView
         initParent()
 
         topView = New Histogram_TopView2D()
-        Dim histSlider = findSlider("Histogram threshold")
+        Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 20
 
         kTopView = New PointCloud_Kalman_TopView()
@@ -909,9 +909,8 @@ Public Class PointCloud_FrustrumTop
 
         topView = New Histogram_TopView2D()
 
-        Dim histSlider = findSlider("Histogram threshold")
+        Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 0
-        topView.gCloud.clipDepthData = False
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
@@ -952,9 +951,8 @@ Public Class PointCloud_FrustrumSide
         frustrum = New Draw_Frustrum()
 
         sideView = New Histogram_SideView2D()
-        sideView.gCloud.clipDepthData = False
 
-        Dim histSlider = findSlider("Histogram threshold")
+        Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 0
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
@@ -1003,7 +1001,7 @@ Public Class PointCloud_IMU_SideView
         kSideView = New PointCloud_Kalman_SideView()
         sideView = New Histogram_SideView2D()
 
-        Dim histSlider = findSlider("Histogram threshold")
+        Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 20
 
         label1 = "side view AFTER align/threshold using gravity vector"
@@ -1048,7 +1046,7 @@ Public Class PointCloud_IMU_SideCompare
         kSideView = New PointCloud_Kalman_SideView()
         sideView = New Histogram_SideView2D()
 
-        Dim histSlider = findSlider("Histogram threshold")
+        Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 20
 
         label1 = "side view AFTER align/threshold using gravity vector"
@@ -1435,7 +1433,7 @@ Public Class PointCloud_Singletons
         topView = New Histogram_TopView2D()
         topView.resizeHistOutput = False
         inrange = New Depth_InRange()
-        Dim histThreshold = findSlider("Histogram threshold")
+        Dim histThreshold = findSlider("Top/Side View Histogram threshold")
         histThreshold.Value = 1
 
         label1 = "Top down view before inrange sampling"

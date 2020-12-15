@@ -35,6 +35,9 @@ Public Class ActiveTask : Implements IDisposable
     Public leftView As cv.Mat
     Public rightView As cv.Mat
 
+    ' add any global option algorithms here
+    Public inrange As Object
+
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point
     Public mousePicTag As Integer ' which image was the mouse in?
@@ -176,7 +179,8 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.vFov = vFOVangles(parms.cameraName)
 
         aOptions.layoutOptions()
-        aOptions.BringToFront()
+        inrange = algoList.createAlgorithm("Options_InRange")
+
         Application.DoEvents()
     End Sub
     Public Sub RunAlgorithm()
@@ -189,6 +193,9 @@ Public Class ActiveTask : Implements IDisposable
                 End If
                 recordedData.Run()
             End If
+
+            ' run any global options algorithms here.
+            inrange.run()
             algorithmObject.NextFrame()
             label1 = ocvb.label1
             label2 = ocvb.label2

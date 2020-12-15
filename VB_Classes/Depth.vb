@@ -91,16 +91,11 @@ End Class
 
 Public Class Depth_Foreground
     Inherits VBparent
-    Public inrange As Depth_InRange
     Public kalman As Kalman_Basics
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange()
-        Dim maxDepthSlider = findSlider("InRange Max Depth (mm)")
-        maxDepthSlider.Value = 1500 ' just 1.5 meters or less...
-
         kalman = New Kalman_Basics()
 
         label1 = "Blue is current, red is kalman, green is trusted"
@@ -108,9 +103,11 @@ Public Class Depth_Foreground
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f()
-        inrange.Run()
-        Dim tmp = inrange.depthMask.Clone
+
+        Static maxSlider = findSlider("InRange Max Depth (mm)")
+        If ocvb.frameCount = 0 Then maxSlider.Value = 1500 ' just 1.5 meters or less...
+
+        Dim tmp As cv.Mat = task.inrange.depthMask.Clone
         ' find the largest blob and use that as the body.  Head is highest in the image.
         Dim blobSize As New List(Of Integer)
         Dim blobLocation As New List(Of cv.Point)
@@ -143,7 +140,7 @@ Public Class Depth_Foreground
             Dim yy = blobLocation.Item(maxIndex).Y
             If xx < 0 Then xx = 0
             If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
-            dst1 = inrange.depthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst1 = task.inrange.depthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             kalman.kInput = {xx, yy, rectSize, rectSize}
             kalman.Run()
@@ -416,26 +413,24 @@ End Class
 
 Public Class Depth_Palette
     Inherits VBparent
-    Public inrange As Depth_InRange
     Dim customColorMap As New cv.Mat
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange()
-        inrange.sliders.trackbar(1).Value = 5000
+
+        Dim maxSlider = findSlider("InRange Max Depth (mm)")
+        maxSlider.Value = 5000
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
         task.desc = "Use a palette to display depth from the raw depth data."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f()
-        inrange.Run()
-        Dim minDepth = inrange.sliders.trackbar(0).Value
-        Dim maxDepth = inrange.sliders.trackbar(1).Value
+        Dim minDepth = task.inrange.minVal
+        Dim maxDepth = task.inrange.maxVal
 
-        Dim depthNorm = (inrange.depth32f * 255 / (maxDepth - minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
+        Dim depthNorm = (task.inrange.depth32f * 255 / (maxDepth - minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, inrange.noDepthMask)
+        dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, task.inrange.noDepthMask)
     End Sub
 End Class
 
@@ -484,10 +479,11 @@ Module Depth_Colorizer_CPP_Module
     Public Function Depth_Colorizer32f2_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer, histSize As Integer) As IntPtr
     End Function
     Public Function getDepth32f() As cv.Mat
-        Dim depth32f As New cv.Mat
-        task.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
-        If depth32f.Size <> task.color.Size Then Return depth32f.Resize(task.color.Size())
-        Return depth32f
+        Return task.inrange.depth32f
+        'Dim depth32f As New cv.Mat
+        'task.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        'If depth32f.Size <> task.color.Size Then Return depth32f.Resize(task.color.Size())
+        'Return depth32f
     End Function
 End Module
 
@@ -1587,7 +1583,7 @@ Public Class Depth_InRange
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "InRange Min Depth (mm)", 0, 2000, 200)
             sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
-            sliders.setupTrackBar(2, "Histogram threshold", 0, 3000, 10)
+            sliders.setupTrackBar(2, "Top/Side View Histogram threshold", 0, 3000, 10)
         End If
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
@@ -1616,7 +1612,6 @@ End Class
 
 Public Class Depth_LowQualityMask
     Inherits VBparent
-    Dim inrange As Depth_InRange
     Dim dilate As DilateErode_Basics
     Public Sub New()
         initParent()
@@ -1625,16 +1620,13 @@ Public Class Depth_LowQualityMask
         Dim ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
         ellipseRadio.Checked = True
 
-        inrange = New Depth_InRange
         label2 = "Dilated zero depth - reduces flyout particles"
         task.desc = "Monitor motion in the mask where depth is zero"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        inrange.src = getDepth32f()
-        inrange.Run()
-        dst1 = inrange.noDepthMask
+        dst1 = task.inrange.noDepthMask
 
         dilate.src = dst1
         dilate.Run()
@@ -1876,12 +1868,9 @@ Public Class Depth_PointCloud_IMU
     Public imuPointCloud As cv.Mat
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
-    Public inrange As Depth_InRange
-    Public clipDepthData As Boolean = True
     Public Sub New()
         initParent()
 
-        inrange = New Depth_InRange()
         imu = New IMU_GVector()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -1903,17 +1892,10 @@ Public Class Depth_PointCloud_IMU
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        Static rangeSlider = findSlider("InRange Max Depth (mm)")
         ocvb.imuXAxis = If(ocvb.useIMU, xCheckbox.checked, False)
         ocvb.imuZAxis = If(ocvb.useIMU, zCheckbox.checked, False)
-        ocvb.maxZ = rangeSlider.Value / 1000
 
-        If clipDepthData Then
-            inrange.Run()
-            dst1 = inrange.dst1
-        Else
-            dst1 = getDepth32f()
-        End If
+        dst1 = task.inrange.dst1
 
         imu.Run()
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0

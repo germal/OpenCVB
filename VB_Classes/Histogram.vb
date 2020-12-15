@@ -307,16 +307,15 @@ Public Class Histogram_Depth
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         inrange.src = src
-        If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = getDepth32f()
-        inrange.Run()
+        If inrange.src.Type = cv.MatType.CV_32F Then
+            inrange.Run()
+        Else
+            inrange.depth32f = task.inrange.depth32f
+        End If
 
-        Static minSlider = findSlider("InRange Min Depth (mm)")
-        Static maxSlider = findSlider("InRange Max Depth (mm)")
-        Static binsSlider = findSlider("Histogram Depth Bins")
-
-        plotHist.minRange = minSlider.Value
-        plotHist.maxRange = maxSlider.Value
-        plotHist.bins = binsSlider.Value
+        plotHist.minRange = task.inrange.minval
+        plotHist.maxRange = task.inrange.maxval
+        plotHist.bins = task.inrange.bins
 
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
@@ -337,14 +336,16 @@ End Class
 
 Public Class Histogram_2D_XZ_YZ
     Inherits VBparent
-    Dim inrange As Depth_InRange
     Dim xyz As Mat_ImageXYZ_MT
+    Dim minSlider As Windows.Forms.TrackBar
+    Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         xyz = New Mat_ImageXYZ_MT()
 
-        inrange = New Depth_InRange()
-        inrange.sliders.trackbar(1).Value = 1500 ' up to x meters away
+        minSlider = findSlider("InRange Min Depth (mm)")
+        maxSlider = findSlider("InRange Max Depth (mm)")
+        maxSlider.Value = 1500 ' up to x meters away
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -360,8 +361,8 @@ Public Class Histogram_2D_XZ_YZ
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
         Dim zbins = sliders.trackbar(2).Value
-        Dim minRange = inrange.sliders.trackbar(0).Value
-        Dim maxRange = inrange.sliders.trackbar(1).Value
+        Dim minRange = minSlider.Value
+        Dim maxRange = maxSlider.Value
 
         Dim histogram As New cv.Mat
 
@@ -852,7 +853,7 @@ Public Class Histogram_TopData
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
 
-        Static histThresholdSlider = findSlider("Histogram threshold")
+        Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -913,7 +914,7 @@ Public Class Histogram_SideData
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Static histThresholdSlider = findSlider("Histogram threshold")
+        Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -957,7 +958,7 @@ Public Class Histogram_TopView2D
             sliders.setupTrackBar(1, "TopCameraPoint.x adjustment", -10, 10, 0)
         End If
 
-        histThresholdSlider = findSlider("Histogram threshold")
+        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         frustrumSlider = findSlider("TopView Frustrum adjustment")
         cameraXSlider = findSlider("TopCameraPoint.x adjustment")
 
@@ -1080,6 +1081,7 @@ End Class
 
 Public Class Histogram_SideView2D
     Inherits VBparent
+    Dim sideOpts As Histogram_SideViewOptions
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public cameraYSlider As Windows.Forms.TrackBar
@@ -1091,8 +1093,56 @@ Public Class Histogram_SideView2D
     Public Sub New()
         initParent()
 
+        sideOpts = New Histogram_SideViewOptions
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
+        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
+        If standalone Then histThresholdSlider.Value = 1
+
+        label1 = "ZY (Side View)"
+        task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloud.Run()
+
+        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
+        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
+        Static cameraYSlider = findSlider("SideCameraPoint.x adjustment")
+        ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
+
+        frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
+        Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = cmat.CameraLocationSide(dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_SideViewOptions
+    Inherits VBparent
+    Public frustrumAdjust As Single
+    Dim frustrumSlider As Windows.Forms.TrackBar
+    Public Sub New()
+        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -1100,10 +1150,8 @@ Public Class Histogram_SideView2D
             sliders.setupTrackBar(1, "SideCameraPoint.x adjustment", -100, 100, 0)
         End If
 
-        histThresholdSlider = findSlider("Histogram threshold")
-        If standalone Then histThresholdSlider.Value = 1
         frustrumSlider = findSlider("SideView Frustrum adjustment")
-        cameraYSlider = findSlider("SideCameraPoint.x adjustment")
+        Dim cameraYSlider = findSlider("SideCameraPoint.x adjustment")
 
         ' The specification for each camera spells out the vertical FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
@@ -1125,29 +1173,12 @@ Public Class Histogram_SideView2D
                 cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
         End Select
 
-        label1 = "ZY (Side View)"
-        task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
+        task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run()
-
-        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
-        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
-        ocvb.sideCameraPoint = New cv.Point(0, src.Height / 2 + cameraYSlider.Value)
-
         frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-frustrumAdjust, frustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = cmat.CameraLocationSide(dst2)
+        ocvb.trueText("This algorithm was created only to share the sliders used for the side views.")
     End Sub
 End Class
 
@@ -1161,7 +1192,7 @@ End Class
 
 
 
-Public Class Histogram_SmoothSideView2D
+Public Class Histogram_SmoothSideView2D1
     Inherits VBparent
     Public sideView As Histogram_SideView2D
     Dim stable As Depth_PointCloud_Stable
@@ -1298,13 +1329,13 @@ End Class
 
 Public Class Histogram_SmoothConcentration
     Inherits VBparent
-    Public sideview As Histogram_SmoothSideView2D
+    Public sideview As Histogram_SmoothSideView2D1
     Public topview As Histogram_SmoothTopView2D
     Dim concent As Histogram_Concentration
     Public Sub New()
         initParent()
 
-        sideview = New Histogram_SmoothSideView2D
+        sideview = New Histogram_SmoothSideView2D1
         topview = New Histogram_SmoothTopView2D
         concent = New Histogram_Concentration
 

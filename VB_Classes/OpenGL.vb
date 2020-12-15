@@ -34,10 +34,8 @@ Public Class OpenGL_Basics
     Public pointCloudInput As New cv.Mat
     Dim openGLHeight = 1200
     Dim openGLWidth = 1500
-    Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange
         task.desc = "Create an OpenGL window and update it with images"
     End Sub
     Private Sub memMapUpdate()
@@ -86,8 +84,7 @@ Public Class OpenGL_Basics
             pointCloudInput = task.pointCloud
         End If
 
-        inrange.Run()
-        pointCloudInput.SetTo(0, inrange.noDepthMask)
+        pointCloudInput.SetTo(0, task.inrange.noDepthMask)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If ocvb.frameCount = 0 Then startOpenGLWindow()

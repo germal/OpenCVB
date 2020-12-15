@@ -1,70 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Stable_Clusters
-    Inherits VBparent
-    Dim clusters As Histogram_DepthClusters
-    Dim stableD As Depth_Stable
-    Public Sub New()
-        initParent()
-
-        clusters = New Histogram_DepthClusters
-        stableD = New Depth_Stable
-        task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        stableD.Run()
-        clusters.src = stableD.dst2
-        clusters.Run()
-        dst1 = clusters.dst1
-        dst2 = clusters.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Stable_Pointcloud
-    Inherits VBparent
-    Public stable As Stable_Depth
-    Public Sub New()
-        initParent()
-        stable = New Stable_Depth
-        label1 = stable.label1
-        label2 = stable.label2
-        task.desc = "Use the stable depth values to create a stable point cloud"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        stable.Run()
-        dst1 = stable.dst1
-        dst2 = stable.dst2
-
-        Dim split = cv.Cv2.Split(task.pointCloud)
-        Static splitPC() = split
-        label2 = "Cumulative changes = " + Format(stable.cumulativeChanges / 1000, "#0.0") + "k pixels"
-        If stable.resetAll Then
-            splitPC = split
-        Else
-            splitPC(2) = (stable.dst1 * 0.001).ToMat
-            split(0).CopyTo(splitPC(0), stable.dst2)
-            split(1).CopyTo(splitPC(1), stable.dst2)
-            cv.Cv2.Merge(splitPC, task.pointCloud)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Stable_Depth
+Public Class Stable_Basics
     Inherits VBparent
     Public resetAll As Boolean
     Public pitch As Single ' in radians.
@@ -149,18 +84,83 @@ End Class
 
 
 
-
-Public Class Stable_DepthColorized
+Public Class Stable_Clusters
     Inherits VBparent
-    Dim stable As Stable_Depth
+    Dim clusters As Histogram_DepthClusters
+    Dim stableD As Depth_Stable
+    Public Sub New()
+        initParent()
+
+        clusters = New Histogram_DepthClusters
+        stableD = New Depth_Stable
+        task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        stableD.Run()
+        clusters.src = stableD.dst2
+        clusters.Run()
+        dst1 = clusters.dst1
+        dst2 = clusters.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Stable_Pointcloud
+    Inherits VBparent
+    Public stable As Stable_Basics
+    Public Sub New()
+        initParent()
+        stable = New Stable_Basics
+        label1 = stable.label1
+        label2 = stable.label2
+        task.desc = "Use the stable depth values to create a stable point cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        stable.Run()
+        dst1 = stable.dst1
+        dst2 = stable.dst2
+
+        Dim split = cv.Cv2.Split(task.pointCloud)
+        Static splitPC() = split
+        label2 = "Cumulative Motion = " + Format(stable.cumulativeChanges / 1000, "#0.0") + "k pixels"
+        If stable.resetAll Then
+            splitPC = split
+        Else
+            splitPC(2) = (stable.dst1 * 0.001).ToMat
+            split(0).CopyTo(splitPC(0), stable.dst2)
+            split(1).CopyTo(splitPC(1), stable.dst2)
+            cv.Cv2.Merge(splitPC, task.pointCloud)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Stable_BasicsColorized
+    Inherits VBparent
+    Dim stable As Stable_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
         initParent()
         colorize = New Depth_ColorizerFastFade_CPP
-        stable = New Stable_Depth
+        stable = New Stable_Basics
         label1 = "32-bit format stable depth data"
         label2 = "Colorized version of image at left"
-        task.desc = "Colorize the stable depth (keeps Stable_Depth at a minimum complexity)"
+        task.desc = "Colorize the stable depth (keeps Stable_Basics at a minimum complexity)"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me

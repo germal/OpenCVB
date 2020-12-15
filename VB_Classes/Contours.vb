@@ -124,19 +124,15 @@ End Class
 
 Public Class Contours_RGB
     Inherits VBparent
-    Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange()
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f()
-        inrange.Run()
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        img.SetTo(0, inrange.noDepthMask)
+        img.SetTo(0, task.inrange.noDepthMask)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
@@ -162,7 +158,7 @@ Public Class Contours_RGB
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         dst2.SetTo(0)
-        src.CopyTo(dst2, inrange.noDepthMask)
+        src.CopyTo(dst2, task.inrange.noDepthMask)
     End Sub
 End Class
 
@@ -186,7 +182,7 @@ Public Class Contours_RemoveLines
         task.desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
@@ -222,22 +218,18 @@ End Class
 
 Public Class Contours_Depth
     Inherits VBparent
-    Public inrange As Depth_InRange
     Public contours As New List(Of cv.Point)
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange()
         task.desc = "Find and draw the contour of the depth foreground."
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f()
-        inrange.Run()
-        dst1 = inrange.noDepthMask
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1 = task.inrange.noDepthMask
         dst2.SetTo(0)
-        Dim contours0 = cv.Cv2.FindContoursAsArray(inrange.depthMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours0 = cv.Cv2.FindContoursAsArray(task.inrange.depthMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
         Dim maxNodes As Integer
         For i = 0 To contours0.Length - 1

@@ -4,12 +4,9 @@ Imports cvext = OpenCvSharp.Extensions
 ' https://docs.microsoft.com/en-us/dotnet/api/system.drawing.bitmap.maketransparent?view=dotnet-plat-ext-3.1
 Public Class AlphaChannel_Basics
     Inherits VBparent
-    Dim fg As Depth_InRange
     Dim alpha As New OptionsAlphaBlend
     Public Sub New()
         initParent()
-
-        fg = New Depth_InRange()
 
         alpha.Show()
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
@@ -18,11 +15,10 @@ Public Class AlphaChannel_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        fg.Run()
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
         Dim split() = cv.Cv2.Split(src)
-        split(3) = fg.depthMask
+        split(3) = task.inrange.depthMask
         cv.Cv2.Merge(split, src)
         alpha.AlphaPic.Image = cvext.BitmapConverter.ToBitmap(src, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
     End Sub
@@ -35,11 +31,8 @@ End Class
 ' https://www.learnopencv.com/alpha-blending-using-opencv-cpp-python/
 Public Class AlphaChannel_Blend
     Inherits VBparent
-    Dim fg As Depth_InRange
     Public Sub New()
         initParent()
-
-        fg = New Depth_InRange()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -50,9 +43,8 @@ Public Class AlphaChannel_Blend
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        fg.Run()
         dst2.SetTo(0)
-        src.CopyTo(dst2, fg.noDepthMask)
+        src.CopyTo(dst2, task.inrange.noDepthMask)
 
         Static transparencySlider = findSlider("Transparency amount")
         Dim alpha = transparencySlider.Value / 255

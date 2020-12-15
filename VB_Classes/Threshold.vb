@@ -2,11 +2,9 @@ Imports cv = OpenCvSharp
 Public Class Threshold_LaplacianFilter
     Inherits VBparent
     Dim edges As Filter_Laplacian
-    Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange()
-        inrange.depth32fAfterMasking = True
+        task.inrange.depth32fAfterMasking = True
 
         edges = New Filter_Laplacian()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -21,9 +19,7 @@ Public Class Threshold_LaplacianFilter
         edges.src = src
         edges.Run()
         dst2 = edges.dst2
-        inrange.src = getDepth32f()
-        inrange.Run()
-        dst1 = inrange.dst1
+        dst1 = task.inrange.dst1
 
         Dim mask = dst1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         dst2.SetTo(0, mask)

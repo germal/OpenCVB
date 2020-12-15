@@ -1,11 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Object_Basics
     Inherits VBparent
-    Dim inrange As Depth_InRange
     Dim ccomp As CComp_ColorDepth
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange()
 
         ccomp = New CComp_ColorDepth()
 
@@ -15,15 +13,13 @@ Public Class Object_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        inrange.src = getDepth32f()
-        inrange.Run()
         If standalone Then
-            dst1 = inrange.depthMask
-            dst2 = inrange.noDepthMask
+            dst1 = task.inrange.depthMask
+            dst2 = task.inrange.noDepthMask
         End If
 
         ccomp.src.SetTo(0)
-        src.CopyTo(ccomp.src, inrange.depthMask)
+        src.CopyTo(ccomp.src, task.inrange.depthMask)
         ccomp.Run()
         dst1 = ccomp.dst1
     End Sub
