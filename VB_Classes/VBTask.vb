@@ -37,6 +37,7 @@ Public Class ActiveTask : Implements IDisposable
 
     ' add any global option algorithms here
     Public inrange As Object
+    Public depth32f As New cv.Mat
 
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point
@@ -178,8 +179,8 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 
-        aOptions.layoutOptions()
         inrange = algoList.createAlgorithm("Options_InRange")
+        aOptions.layoutOptions()
 
         Application.DoEvents()
     End Sub

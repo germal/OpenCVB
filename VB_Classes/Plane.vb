@@ -108,7 +108,6 @@ Public Class Plane_Detect
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = getDepth32f()
         grid.Run()
 
         dst2.SetTo(0)
@@ -116,7 +115,7 @@ Public Class Plane_Detect
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim depthROI = depth32f(roi)
+            Dim depthROI = task.depth32f(roi)
 
             If depthROI.CountNonZero() < roi.Width * roi.Height / 2 Then Exit Sub
             Dim contours As cv.Point()() = Nothing
@@ -182,7 +181,6 @@ Public Class Plane_DetectDebug
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = getDepth32f()
         grid.Run()
 
         dst2.SetTo(0)
@@ -190,7 +188,7 @@ Public Class Plane_DetectDebug
 
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim depthROI = depth32f(roi)
+            Dim depthROI = task.depth32f(roi)
 
             If depthROI.CountNonZero() < roi.Width * roi.Height / 2 Then Exit Sub
             Dim contours As cv.Point()() = Nothing

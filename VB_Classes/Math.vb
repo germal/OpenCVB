@@ -103,12 +103,11 @@ Public Class Math_DepthMeanStdev
         Dim mask = minMax.dst2 ' the mask for stable depth.
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst2, mask)
-        Dim depth32f = getDepth32f()
-        cv.Cv2.MeanStdDev(depth32f, mean, stdev, mask)
+        cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, mask)
         label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
 
         dst1 = task.RGBDepth
-        cv.Cv2.MeanStdDev(depth32f, mean, stdev)
+        cv.Cv2.MeanStdDev(task.depth32f, mean, stdev)
         label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
 End Class

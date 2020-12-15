@@ -463,15 +463,14 @@ Public Class Kalman_Depth32f
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = getDepth32f()
-        resize.src = depth32f
+        resize.src = task.depth32f
         resize.Run()
 
         kalman.input = resize.dst1.Reshape(1, resize.dst1.Width * resize.dst1.Height)
         kalman.Run()
         dst1 = kalman.output.Reshape(1, resize.dst1.Height)
         dst1 = dst1.Resize(src.Size())
-        cv.Cv2.Subtract(dst1, depth32f, dst2)
+        cv.Cv2.Subtract(dst1, task.depth32f, dst2)
         dst2 = dst2.Normalize(255)
     End Sub
 End Class

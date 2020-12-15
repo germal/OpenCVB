@@ -42,9 +42,14 @@ Public Class OptionsAll
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
+            ' Set any global options forms in the back by placing them here and skipping them below
+            Dim frm = findfrm("Options_InRange Slider Options")
+            frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+            frm.SendToBack()
+            indexS += 1
             For Each title In optionsTitle
-                Dim frm = findfrm(title)
-                If frm IsNot Nothing Then
+                frm = findfrm(title)
+                If frm IsNot Nothing And title <> "Options_InRange Slider Options" Then
                     frm.SendToBack()
                     If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                         If frm Is Nothing Then Continue For

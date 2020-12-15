@@ -33,7 +33,7 @@ Public Class Stable_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC1 Then input = getDepth32f()
+        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
 
         pitch = task.IMU_AngularVelocity.X
         yaw = task.IMU_AngularVelocity.Y

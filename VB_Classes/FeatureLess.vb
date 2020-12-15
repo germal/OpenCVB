@@ -135,7 +135,9 @@ Public Class FeatureLess_Prediction
         Dim percent = Math.Sqrt(sliders.trackbar(0).Value / 100)
         Dim newSize = New cv.Size(src.Width * percent, src.Height * percent)
 
-        Dim rgb = src.Clone(), depth32f = getDepth32f().Resize(newSize), mask = fLess.dst2
+        Dim rgb = src.Clone()
+        Dim depth32f As cv.Mat = task.depth32f.Resize(newSize)
+        Dim mask = fLess.dst2
 
         rgb = rgb.Resize(newSize)
 
@@ -165,7 +167,7 @@ Public Class FeatureLess_Prediction
         Dim learnInput As New cv.Mat
         Dim planes() = rgb32f.Split()
         ReDim Preserve planes(3)
-        planes(3) = getDepth32f().Resize(newSize)
+        planes(3) = task.depth32f.Resize(newSize)
         cv.Cv2.Merge(planes, learnInput)
 
         Dim rtree = cv.ML.RTrees.Create()

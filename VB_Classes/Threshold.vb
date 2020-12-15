@@ -4,14 +4,13 @@ Public Class Threshold_LaplacianFilter
     Dim edges As Filter_Laplacian
     Public Sub New()
         initParent()
-        task.inrange.depth32fAfterMasking = True
-
         edges = New Filter_Laplacian()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "dist Threshold", 1, 100, 40)
+            sliders.setupTrackBar(0, "z-Distance", 1, 3000, 200)
         End If
         label1 = "Foreground Input"
+        label2 = "Edges of foreground input"
         task.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
     End Sub
     Public Sub Run()
@@ -19,9 +18,10 @@ Public Class Threshold_LaplacianFilter
         edges.src = src
         edges.Run()
         dst2 = edges.dst2
-        dst1 = task.inrange.dst1
+        dst1 = task.depth32f
 
-        Dim mask = dst1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+        Static distSlider = findSlider("z-Distance")
+        Dim mask = dst1.Threshold(distSlider.value, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         dst2.SetTo(0, mask)
     End Sub
 End Class

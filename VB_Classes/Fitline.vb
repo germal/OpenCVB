@@ -69,13 +69,12 @@ Public Class Fitline_3DBasics_MT
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         src.CopyTo(dst1)
-        Dim depth32f = getDepth32f()
 
         Dim lines As New List(Of cv.Line3D)
         Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
         Parallel.ForEach(Of cv.Rect)(hlines.grid.roiList,
         Sub(roi)
-            Dim depth = depth32f(roi)
+            Dim depth = task.depth32f(roi)
             Dim fMask = mask(roi)
             Dim points As New List(Of cv.Point3f)
             Dim rows = src.Rows, cols = src.Cols

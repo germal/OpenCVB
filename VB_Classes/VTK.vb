@@ -93,7 +93,7 @@ Public Class VTK_Basics
 
         If usingDepthAndRGB Then
             rgbInput = src.Clone()
-            dataInput = getDepth32f()
+            dataInput = task.depth32f
         End If
 
         If rgbBuffer.Length <= rgbInput.Total * rgbInput.ElemSize Then MsgBox("Stopping VTK.  rgbInput Buffer > buffer limit.")

@@ -219,8 +219,7 @@ Public Class DCT_Surfaces_debug
         Dim mask = dct.dst1.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, notMask)
-        Dim depth32f = getDepth32f()
-        depth32f.SetTo(0, notMask) ' remove non-featureless surface depth data.
+        task.depth32f.SetTo(0, notMask) ' remove non-featureless surface depth data.
 
         ' find the most featureless roi
         Dim maxIndex As integer
@@ -243,7 +242,7 @@ Public Class DCT_Surfaces_debug
                 Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
                 For j = 0 To roi.Height - 1
                     For i = 0 To roi.Width - 1
-                        Dim nextD = depth32f(roi).Get(Of Single)(j, i)
+                        Dim nextD = task.depth32f(roi).Get(Of Single)(j, i)
                         If nextD <> 0 Then
                             If minDepth > nextD Then minDepth = nextD
                             If maxDepth < nextD Then maxDepth = nextD

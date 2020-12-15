@@ -270,7 +270,7 @@ Public Class Benford_Depth
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        benford.src = getDepth32f()
+        benford.src = task.depth32f
         benford.Run()
         dst1 = benford.dst1
         label1 = benford.label2

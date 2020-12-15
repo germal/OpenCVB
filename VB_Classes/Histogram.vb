@@ -310,7 +310,7 @@ Public Class Histogram_Depth
         If inrange.src.Type = cv.MatType.CV_32F Then
             inrange.Run()
         Else
-            inrange.depth32f = task.inrange.depth32f
+            inrange.depth32f = task.depth32f
         End If
 
         plotHist.minRange = task.inrange.minval
@@ -1372,7 +1372,7 @@ Public Class Histogram_DepthClusters
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         valleys.src = src
-        If valleys.src.Type <> cv.MatType.CV_32F Then valleys.src = getDepth32f()
+        If valleys.src.Type <> cv.MatType.CV_32F Then valleys.src = task.depth32f
 
         valleys.Run()
         dst1 = valleys.dst1
@@ -1449,7 +1449,7 @@ Public Class Histogram_DepthValleys
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         hist.src = src
-        If hist.src.Type <> cv.MatType.CV_32F Then hist.src = getDepth32f()
+        If hist.src.Type <> cv.MatType.CV_32F Then hist.src = task.depth32f
         hist.Run()
         ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1

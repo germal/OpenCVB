@@ -255,10 +255,9 @@ Public Class Mat_ImageXYZ_MT
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
-        Dim depth32f = getDepth32f()
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
           Sub(roi)
-              xyzPlanes(2)(roi) = depth32f(roi)
+              xyzPlanes(2)(roi) = task.depth32f(roi)
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)

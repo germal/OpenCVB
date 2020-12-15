@@ -79,14 +79,13 @@ Public Class ML_FillRGBDepth_MT
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run()
         grid.Run()
-        Dim depth32f = getDepth32f()
         Dim minLearnCount = 5
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
-                depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.borderMask(roi), depth32f(roi), src(roi), minLearnCount)
+                task.depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.dst2(roi), task.depth32f(roi), src(roi), minLearnCount)
             End Sub)
 
-        colorizer.src = depth32f
+        colorizer.src = task.depth32f
         colorizer.Run()
         dst1 = colorizer.dst1.Clone()
         dst1.SetTo(cv.Scalar.White, grid.gridMask)
@@ -114,13 +113,12 @@ Public Class ML_FillRGBDepth
         task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run()
         Dim minLearnCount = sliders.trackbar(0).Value
         task.RGBDepth.CopyTo(dst1)
-        Dim depth32f = getDepth32f()
-        depth32f = detectAndFillShadow(shadow.holeMask, shadow.borderMask, depth32f, src, minLearnCount)
-        colorizer.src = depth32f
+        task.depth32f = detectAndFillShadow(shadow.holeMask, shadow.dst2, task.depth32f, src, minLearnCount)
+        colorizer.src = task.depth32f
         colorizer.Run()
         dst2 = colorizer.dst1
     End Sub
@@ -154,17 +152,15 @@ Public Class ML_DepthFromColor_MT
         task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
-        Dim depth32f = getDepth32f()
+        Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        task.depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
-        Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        depth32f.SetTo(sliders.trackbar(0).Value, mask)
+        Dim predictedDepth As New cv.Mat(task.depth32f.Size(), cv.MatType.CV_32F, 0)
 
-        Dim predictedDepth As New cv.Mat(depth32f.Size(), cv.MatType.CV_32F, 0)
-
-        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.src = mask
         dilate.Run()
         mask = dilate.dst1
@@ -172,7 +168,7 @@ Public Class ML_DepthFromColor_MT
 
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
-        Dim predictedRegions As integer
+        Dim predictedRegions As Integer
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
             Sub(roi)
                 Dim maskCount = roi.Width * roi.Height - mask(roi).CountNonZero()
@@ -180,7 +176,7 @@ Public Class ML_DepthFromColor_MT
                     Interlocked.Add(predictedRegions, 1)
                     Dim learnInput = color32f(roi).Clone()
                     learnInput = learnInput.Reshape(1, roi.Width * roi.Height)
-                    Dim depthResponse = depth32f(roi).Clone()
+                    Dim depthResponse = task.depth32f(roi).Clone()
                     depthResponse = depthResponse.Reshape(1, roi.Width * roi.Height)
 
                     Dim rtree = cv.ML.RTrees.Create()
@@ -223,7 +219,7 @@ Public Class ML_DepthFromColor
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run()
         mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -236,7 +232,7 @@ Public Class ML_DepthFromColor
         resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = mats.mat(1).Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-        Dim depth32f = getDepth32f().Resize(color32f.Size())
+        Dim depth32f = task.depth32f.Resize(color32f.Size())
 
         Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
@@ -305,7 +301,7 @@ Public Class ML_DepthFromXYColor
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         shadow.Run()
         mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -318,7 +314,7 @@ Public Class ML_DepthFromXYColor
         resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = shadow.holeMask.Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-        Dim depth32f = getDepth32f().Resize(color32f.Size())
+        Dim depth32f = task.depth32f.Resize(color32f.Size())
 
         Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.BinaryInv)
         mask.SetTo(0, shadowSmall) ' remove the unknown depth...
@@ -405,17 +401,15 @@ Public Class ML_EdgeDepth_MT
         task.desc = "Use RGB to predict depth near edges."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
-        Dim depth32f = getDepth32f()
+        Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        task.depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
-        Dim mask = depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        depth32f.SetTo(sliders.trackbar(0).Value, mask)
+        Dim predictedDepth As New cv.Mat(task.depth32f.Size(), cv.MatType.CV_32F, 0)
 
-        Dim predictedDepth As New cv.Mat(depth32f.Size(), cv.MatType.CV_32F, 0)
-
-        mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.src = mask
         dilate.Run()
         dst1 = dilate.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -431,7 +425,7 @@ Public Class ML_EdgeDepth_MT
                     Interlocked.Add(predictedRegions, 1)
                     Dim learnInput = color32f(roi).Clone()
                     learnInput = learnInput.Reshape(1, maskCount)
-                    Dim depthResponse = depth32f(roi).Clone()
+                    Dim depthResponse = task.depth32f(roi).Clone()
                     depthResponse = depthResponse.Reshape(1, maskCount)
 
                     Dim rtree = cv.ML.RTrees.Create()

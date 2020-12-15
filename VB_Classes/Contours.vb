@@ -229,7 +229,8 @@ Public Class Contours_Depth
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = task.inrange.noDepthMask
         dst2.SetTo(0)
-        Dim contours0 = cv.Cv2.FindContoursAsArray(task.inrange.depthMask, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        Dim input As cv.Mat = task.inrange.depthmask
+        Dim contours0 = cv.Cv2.FindContoursAsArray(input, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
         Dim maxNodes As Integer
         For i = 0 To contours0.Length - 1

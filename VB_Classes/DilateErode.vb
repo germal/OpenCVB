@@ -91,15 +91,14 @@ Public Class DilateErode_DepthSeed
         If dilate.radio.check(2).Checked Then morphShape = cv.MorphShapes.Rect
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelsize, kernelsize))
 
-        Dim depth32f = getDepth32f()
         Dim mat As New cv.Mat
-        cv.Cv2.Erode(depth32f, mat, element)
-        mat = depth32f - mat
+        cv.Cv2.Erode(task.depth32f, mat, element)
+        mat = task.depth32f - mat
         Dim seeds = mat.LessThan(sliders.trackbar(0).Value).ToMat
         dst2 = seeds
 
-        Dim validImg = depth32f.GreaterThan(0).ToMat
-        validImg.SetTo(0, depth32f.GreaterThan(sliders.trackbar(1).Value)) ' max distance
+        Dim validImg = task.depth32f.GreaterThan(0).ToMat
+        validImg.SetTo(0, task.depth32f.GreaterThan(sliders.trackbar(1).Value)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
         dst1.SetTo(0)
         task.RGBDepth.CopyTo(dst1, seeds)

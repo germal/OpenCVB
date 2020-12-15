@@ -147,10 +147,9 @@ Public Class kMeans_RGB_Plus_XYDepth
         Dim rgb32f As New cv.Mat
         km.dst1.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim xyDepth32f As New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC3, 0)
-        Dim depth32f = getDepth32f()
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
-                Dim nextVal = depth32f.Get(Of Single)(y, x)
+                Dim nextVal = task.depth32f.Get(Of Single)(y, x)
                 If nextVal Then xyDepth32f.Set(Of cv.Vec3f)(y, x, New cv.Vec3f(x, y, nextVal))
             Next
         Next
@@ -205,13 +204,12 @@ Public Class kMeans_XYDepth
         task.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim roi = task.drawRect
-        Dim depth32f = getDepth32f()
-        Dim xyDepth32f As New cv.Mat(depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
+        Dim xyDepth32f As New cv.Mat(task.depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To xyDepth32f.Rows - 1
             For x = 0 To xyDepth32f.Cols - 1
-                Dim nextVal = depth32f(roi).Get(Of Single)(y, x)
+                Dim nextVal = task.depth32f(roi).Get(Of Single)(y, x)
                 If nextVal Then xyDepth32f.Set(Of cv.Vec3f)(y, x, New cv.Vec3f(x, y, nextVal))
             Next
         Next
@@ -240,21 +238,20 @@ Public Class kMeans_Depth_FG_BG
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim columnVector As New cv.Mat
-        Dim depth32f = getDepth32f()
-        columnVector = depth32f.Reshape(1, depth32f.Rows * depth32f.Cols)
+        columnVector = task.depth32f.Reshape(1, task.depth32f.Rows * task.depth32f.Cols)
         columnVector.ConvertTo(columnVector, cv.MatType.CV_32FC1)
         Dim labels = New cv.Mat()
         Dim depthCenters As New cv.Mat
         cv.Cv2.Kmeans(columnVector, 2, labels, term, 3, cv.KMeansFlags.PpCenters, depthCenters)
-        labels = labels.Reshape(1, depth32f.Rows)
+        labels = labels.Reshape(1, task.depth32f.Rows)
 
         Dim foregroundLabel = 0
         If depthCenters.Get(Of Single)(0, 0) > depthCenters.Get(Of Single)(1, 0) Then foregroundLabel = 1
 
         Dim mask = labels.InRange(foregroundLabel, foregroundLabel)
-        Dim shadowMask = depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        Dim shadowMask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         mask.SetTo(0, shadowMask)
         dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim backMask As New cv.Mat
@@ -281,7 +278,7 @@ Public Class kMeans_LAB
         task.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim roi = task.drawRect
         Dim labMat = src(roi).CvtColor(cv.ColorConversionCodes.RGB2Lab)
         Dim columnVector As New cv.Mat
@@ -320,7 +317,7 @@ Public Class kMeans_Color
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -368,10 +365,9 @@ Public Class kMeans_Color_MT
         End If
         grid.Run()
         Dim clusterCount = sliders.trackbar(0).Value
-        Dim depth32f = getDepth32f()
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim zeroDepth = depth32f(roi).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+            Dim zeroDepth = task.depth32f(roi).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
             Dim color = src(roi).Clone()
             Dim columnVector = color.Reshape(src.Channels, roi.Height * roi.Width)
             Dim rgb32f As New cv.Mat
@@ -409,13 +405,13 @@ Public Class kMeans_ColorDepth
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim srcPlanes() As cv.Mat = Nothing
         cv.Cv2.Split(rgb32f, srcPlanes)
         ReDim Preserve srcPlanes(3)
-        srcPlanes(3) = getDepth32f()
+        srcPlanes(3) = task.depth32f
         Dim zeroMask = srcPlanes(3).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
         Dim rgbDepth As New cv.Mat
@@ -459,11 +455,10 @@ Public Class kMeans_ColorDepth_MT
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
         Dim clusterCount = sliders.trackbar(0).Value
-        Dim depth32f = getDepth32f()
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
        Sub(roi)
            Dim rgb32f As New cv.Mat
@@ -471,7 +466,7 @@ Public Class kMeans_ColorDepth_MT
            Dim srcPlanes() As cv.Mat = Nothing
            cv.Cv2.Split(rgb32f, srcPlanes)
            ReDim Preserve srcPlanes(4 - 1)
-           srcPlanes(3) = depth32f(roi)
+           srcPlanes(3) = task.depth32f(roi)
 
            Dim rgbDepth As New cv.Mat
            cv.Cv2.Merge(srcPlanes, rgbDepth)

@@ -271,18 +271,17 @@ Public Class PointCloud_Raw_CPP
         Dim desiredMin = CSng(foreground.sliders.trackbar(0).Value)
         Dim desiredMax = CSng(foreground.sliders.trackbar(1).Value)
         Dim range = CSng(desiredMax - desiredMin)
-        Dim depth32f = getDepth32f()
         If depthBytes Is Nothing Then
-            ReDim depthBytes(depth32f.Total * depth32f.ElemSize - 1)
+            ReDim depthBytes(task.depth32f.Total * task.depth32f.ElemSize - 1)
         End If
 
-        Marshal.Copy(depth32f.Data, depthBytes, 0, depthBytes.Length)
+        Marshal.Copy(task.depth32f.Data, depthBytes, 0, depthBytes.Length)
         Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
 
-        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, desiredMin, desiredMax, depth32f.Height, depth32f.Width)
+        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, desiredMin, desiredMax, task.depth32f.Height, task.depth32f.Width)
 
-        dst1 = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = New cv.Mat(depth32f.Rows, depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = New cv.Mat(task.depth32f.Rows, task.depth32f.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = New cv.Mat(task.depth32f.Rows, task.depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         handleDepth.Free()
         label1 = "Top View (looking down)"
@@ -330,7 +329,6 @@ Public Class PointCloud_Raw
         Dim desiredMin = CSng(foreground.sliders.trackbar(0).Value)
         Dim desiredMax = CSng(foreground.sliders.trackbar(1).Value)
         Dim range = CSng(desiredMax - desiredMin)
-        Dim depth32f = getDepth32f()
 
         ' this VB.Net version is much slower than the optimized C++ version below.
         dst1 = src.EmptyClone.SetTo(cv.Scalar.White)
@@ -342,7 +340,7 @@ Public Class PointCloud_Raw
                      For x = roi.X To roi.X + roi.Width - 1
                          Dim m = foreground.Mask.Get(Of Byte)(y, x)
                          If m > 0 Then
-                             Dim depth = depth32f.Get(Of Single)(y, x)
+                             Dim depth = task.depth32f.Get(Of Single)(y, x)
                              Dim dy = CInt(h * (depth - desiredMin) / range)
                              If dy < h And dy > 0 Then dst1.Set(Of cv.Vec3b)(h - dy, x, black)
                              Dim dx = CInt(w * (depth - desiredMin) / range)
@@ -717,8 +715,6 @@ Public Class PointCloud_BothViews
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
-        Dim depth32f = getDepth32f()
-
         topPixel.Run()
         sidePixel.Run()
 
@@ -802,11 +798,11 @@ Public Class PointCloud_BothViews
         End If
 
         If vw.Count > 0 Then
-            If roi.X + roi.Width > depth32f.Width Then roi.Width = depth32f.Width - roi.X
-            If roi.Y + roi.Height > depth32f.Height Then roi.Height = depth32f.Height - roi.Y
+            If roi.X + roi.Width > task.depth32f.Width Then roi.Width = task.depth32f.Width - roi.X
+            If roi.Y + roi.Height > task.depth32f.Height Then roi.Height = task.depth32f.Height - roi.Y
             If roi.Width > 0 And roi.Height > 0 Then
                 backMatMask.SetTo(0)
-                cv.Cv2.InRange(depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
+                cv.Cv2.InRange(task.depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
 
                 backMat.SetTo(0)
                 backMat(roi).SetTo(vw.Values(minIndex).LayoutColor, backMatMask(roi))

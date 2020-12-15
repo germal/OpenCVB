@@ -318,7 +318,7 @@ Public Class Blob_LargestDepthCluster
         Dim maxSize = blobs.histBlobs.valleys.sortedSizes.ElementAt(0)
         Dim startEndDepth = blobs.histBlobs.valleys.rangeBoundaries.ElementAt(0)
         Dim tmp As New cv.Mat, mask As New cv.Mat
-        cv.Cv2.InRange(getDepth32f(), startEndDepth.X, startEndDepth.Y, tmp)
+        cv.Cv2.InRange(task.depth32f, startEndDepth.X, startEndDepth.Y, tmp)
         cv.Cv2.ConvertScaleAbs(tmp, mask)
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)

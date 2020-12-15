@@ -33,18 +33,17 @@ Public Class PyStream_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = getDepth32f()
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize,
-                                                depth32f.Total * depth32f.ElemSize, src.Rows, src.Cols)
+                                                task.depth32f.Total * task.depth32f.ElemSize, src.Rows, src.Cols)
             Next
             memMap.Run()
 
             If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
-            If depthBuffer.Length <> depth32f.Total * depth32f.ElemSize Then ReDim depthBuffer(depth32f.Total * depth32f.ElemSize - 1)
+            If depthBuffer.Length <> task.depth32f.Total * task.depth32f.ElemSize Then ReDim depthBuffer(task.depth32f.Total * task.depth32f.ElemSize - 1)
             Marshal.Copy(src.Data, rgbBuffer, 0, src.Total * src.ElemSize)
-            Marshal.Copy(depth32f.Data, depthBuffer, 0, depthBuffer.Length)
+            Marshal.Copy(task.depth32f.Data, depthBuffer, 0, depthBuffer.Length)
             If pipeImages.IsConnected Then
                 On Error Resume Next
                 pipeImages.Write(rgbBuffer, 0, rgbBuffer.Length)

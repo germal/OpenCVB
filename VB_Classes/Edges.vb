@@ -56,7 +56,7 @@ Public Class Edges_DepthAndColor
         canny.Run()
         shadow.Run()
 
-        dst2 = shadow.borderMask
+        dst2 = shadow.dst2
         dst2 += canny.dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dilate.src = dst2

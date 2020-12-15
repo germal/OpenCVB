@@ -442,8 +442,7 @@ Public Class CComp_InRange_MT
         Dim maxDepth = sliders.trackbar(1).Value
         Dim minBlobSize = sliders.trackbar(2).Value * 1000
 
-        Dim depth32f = getDepth32f()
-        Dim mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        Dim mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
         dst1.SetTo(0)
         Dim totalBlobs As Integer
@@ -461,7 +460,7 @@ Public Class CComp_InRange_MT
             roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
             For j = roiList.Count - 1 To 0 Step -1
                 Dim bin = binary(roiList(j)).Clone()
-                Dim depth = depth32f(roiList(j))
+                Dim depth = task.depth32f(roiList(j))
                 Dim meanDepth = depth.Mean(mask(roiList(j)))
                 If meanDepth.Item(0) < maxDepth Then
                     Dim avg = task.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
@@ -495,7 +494,7 @@ Public Class CComp_InRange
         Dim rangeCount As Integer = sliders.trackbar(0).Value
         Dim minBlobSize = sliders.trackbar(1).Value * 1000
 
-        Dim mask = getDepth32f().Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+        Dim mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
         Dim roiList As New List(Of cv.Rect)
         For i = 0 To rangeCount - 1

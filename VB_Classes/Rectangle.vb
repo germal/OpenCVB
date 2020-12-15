@@ -337,25 +337,14 @@ Public Class Rectangle_MotionDepth
 
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static lastDepth = getDepth32f()
-        Dim depth32f = getDepth32f()
-        cv.Cv2.Min(depth32f, lastDepth, motion.src)
+        Static lastDepth = task.depth32f
+        cv.Cv2.Min(task.depth32f, lastDepth, motion.src)
 
         ' motion.Run()
         colorize.src = motion.src.Clone
         colorize.Run()
         dst1 = colorize.dst1
 
-        'If motion.rectList.Count > 0 Then
-        '    mOverlap.inputRects = New List(Of cv.Rect)(motion.rectList)
-        '    mOverlap.Run()
-
-        '    dst2 = motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        '    For Each r In mOverlap.enclosingRects
-        '        dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-        '    Next
-        '    mOverlap.enclosingRects.Clear()
-        'End If
         lastDepth = motion.src.Clone
     End Sub
 End Class

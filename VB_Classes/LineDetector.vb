@@ -305,13 +305,11 @@ Public Class LineDetector_3D_LongestLine
         lines.Run()
         src.CopyTo(dst1)
 
-        Dim depth32f = getDepth32f()
-
         If lines.sortedLines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
             Dim maskLineWidth As Integer = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
-            find3DLineSegment(dst1, mask, depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
+            find3DLineSegment(dst1, mask, task.depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
     End Sub
 End Class
@@ -341,14 +339,12 @@ Public Class LineDetector_3D_FLD_MT
         lines.Run()
         src.CopyTo(dst1)
 
-        Dim depth32f = getDepth32f()
-
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
         Dim maskLineWidth As Integer = sliders.trackbar(0).Value
         Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
         Parallel.For(lines.sortedLines.Count - 20, lines.sortedLines.Count,
             Sub(i)
-                find3DLineSegment(dst1, mask, depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
+                find3DLineSegment(dst1, mask, task.depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
         label1 = "Showing the " + CStr(Math.Min(lines.sortedLines.Count, 20)) + " longest lines out of " + CStr(lines.sortedLines.Count)
     End Sub
@@ -388,8 +384,6 @@ Public Class LineDetector_3D_FitLineZ
         linesFLD.Run()
         src.CopyTo(dst1)
 
-        Dim depth32f = getDepth32f()
-
         Dim sortedlines As SortedList(Of cv.Vec6f, Integer)
         sortedlines = linesFLD.sortedLines
 
@@ -422,7 +416,7 @@ Public Class LineDetector_3D_FitLineZ
                     For y = 0 To roi.Height - 1
                         For x = 0 To roi.Width - 1
                             If _mask.Get(Of Byte)(y, x) = i Then
-                                Dim w = getWorldCoordinatesD6(New cv.Point3f(x + roi.X, y + roi.Y, depth32f.Get(Of Single)(y, x)))
+                                Dim w = getWorldCoordinatesD6(New cv.Point3f(x + roi.X, y + roi.Y, task.depth32f.Get(Of Single)(y, x)))
                                 points.Add(New cv.Point(If(useX, w.Item0, w.Item1), w.Item2))
                                 worldDepth.Add(w)
                             End If

@@ -200,7 +200,7 @@ Public Class Reduction_Depth
         If src.Type = cv.MatType.CV_32S Then
             reduction.src = src
         Else
-            src = getDepth32f()
+            src = task.depth32f
             src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         End If
         reduction.Run()

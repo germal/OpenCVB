@@ -413,7 +413,7 @@ Public Class Palette_DepthColorMap
             Next
         End If
         Static cvtScaleSlider = findSlider("Convert and Scale value X100")
-        Dim depth8u = getDepth32f().ConvertScaleAbs(cvtScaleSlider.Value / 100)
+        Dim depth8u = task.depth32f.ConvertScaleAbs(cvtScaleSlider.Value / 100)
         dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
         holes.Run()
@@ -452,7 +452,7 @@ Public Class Palette_Consistency
         task.desc = "Using a histogram, assign the same colors to the same areas across frames"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             emax.Run()
             src = emax.dst2
@@ -509,7 +509,7 @@ Public Class Palette_ObjectColors
         task.desc = "New class description"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run()
         dst2 = reduction.dst2
@@ -522,7 +522,6 @@ Public Class Palette_ObjectColors
         Dim minDepth = task.inrange.minval
         Dim maxDepth = task.inrange.maxval
 
-        Dim depth32f = getDepth32f()
         Dim blobList As New SortedList(Of Single, Integer)
         For i = 0 To reduction.pTrack.drawRC.viewObjects.Count - 1
             Dim vo = reduction.pTrack.drawRC.viewObjects.Values(i)
@@ -532,7 +531,7 @@ Public Class Palette_ObjectColors
                 mask.SetTo(0, task.inrange.noDepthMask(r)) ' count only points with depth
                 Dim countDepthPixels = mask.CountNonZero()
                 If countDepthPixels > 30 Then
-                    Dim depth = depth32f(r).Mean(mask)
+                    Dim depth = task.depth32f(r).Mean(mask)
                     If blobList.ContainsKey(depth.Item(0)) = False Then
                         If depth.Item(0) > minDepth And depth.Item(0) < maxDepth Then blobList.Add(depth.Item(0), i)
                     End If
