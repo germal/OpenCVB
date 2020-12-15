@@ -315,7 +315,8 @@ Public Class Histogram_Depth
 
         plotHist.minRange = task.inrange.minval
         plotHist.maxRange = task.inrange.maxval
-        plotHist.bins = task.inrange.bins
+        Static binSlider = findSlider("Histogram Depth Bins")
+        plotHist.bins = binSlider.value
 
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
@@ -1407,6 +1408,7 @@ Public Class Histogram_DepthValleys
     Public rangeBoundaries As New List(Of cv.Point)
     Public sortedSizes As New List(Of Integer)
     Public palette As Palette_Basics
+    Dim histSlider As Windows.Forms.TrackBar
     Private Class CompareCounts : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
             ' why have compare for just integer?  So we can get duplicates.  Nothing below returns a zero (equal)
@@ -1439,8 +1441,9 @@ Public Class Histogram_DepthValleys
         Dim radioJet = findRadio("Hsv")
         radioJet.Checked = True
         hist = New Histogram_Depth()
-        hist.inrange.sliders.trackbar(1).Value = 5000 ' depth to 5 meters.
-        hist.sliders.trackbar(0).Value = 40 ' number of bins.
+
+        histSlider = findSlider("Histogram Depth Bins")
+        histSlider.Value = 40 ' number of bins.
 
         kalman = New Kalman_Basics()
 
@@ -1461,7 +1464,8 @@ Public Class Histogram_DepthValleys
             hist.plotHist.hist.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
-        Dim depthIncr = CInt(hist.inrange.sliders.trackbar(1).Value / hist.sliders.trackbar(0).Value) ' each bar represents this number of millimeters
+        Static maxSlider = findSlider("InRange Max Depth (mm)")
+        Dim depthIncr = CInt(maxSlider.Value / histSlider.Value) ' each bar represents this number of millimeters
         Dim pointCount = hist.plotHist.hist.Get(Of Single)(0, 0) + hist.plotHist.hist.Get(Of Single)(1, 0)
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
@@ -1483,7 +1487,7 @@ Public Class Histogram_DepthValleys
             End If
         Next
 
-        startEndDepth = New cv.Point(startDepth, hist.inrange.sliders.trackbar(1).Value)
+        startEndDepth = New cv.Point(startDepth, CInt(maxSlider.Value))
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
 
         rangeBoundaries.Clear()

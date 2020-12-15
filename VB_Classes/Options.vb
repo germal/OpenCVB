@@ -7,7 +7,6 @@ Public Class Options_InRange
     Public maxVal As Single
     Public bins As Integer
     Public Sub New()
-        ' initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
