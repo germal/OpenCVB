@@ -843,12 +843,15 @@ Public Class Depth_LocalMinMax_Kalman_MT
         dst1 = src.Clone()
         dst1.SetTo(cv.Scalar.White, grid.gridMask)
 
+        Dim depth32f As cv.Mat = task.depth32f
+        Dim depthmask As cv.Mat = task.inrange.depthmask
+
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
             Dim minVal As Double, maxVal As Double
             Dim minPt As cv.Point, maxPt As cv.Point
-            cv.Cv2.MinMaxLoc(task.depth32f(roi), minVal, maxVal, minPt, maxPt, task.inrange.depthmask(roi))
+            cv.Cv2.MinMaxLoc(depth32f(roi), minVal, maxVal, minPt, maxPt, depthmask(roi))
             If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
             kalman.kInput(i * 4) = minPt.X
             kalman.kInput(i * 4 + 1) = minPt.Y
