@@ -73,6 +73,7 @@ Public Class Stable_Depth
     Public cameraStable As Boolean
     Public zeroDepthMask As cv.Mat
     Public cumulativeChanges As Integer
+    Public externalReset As Boolean
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -102,21 +103,24 @@ Public Class Stable_Depth
         pitch = task.IMU_AngularVelocity.X
         yaw = task.IMU_AngularVelocity.Y
         roll = task.IMU_AngularVelocity.Z
+
         Static cameraMotionThreshold = findSlider("Camera Motion threshold in radians X100")
+        Static nonZeroThreshold = findSlider("Motion threshold before resyncing entire image")
+        Static thresholdSlider = findSlider("Motion change threshold")
+
         Dim cameraStable = If(cameraMotionThreshold.Value / 100 < Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll), False, True)
 
         Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastFrame As cv.Mat = gray.Clone
         cv.Cv2.Absdiff(gray, lastFrame, dst2)
         lastFrame = gray
-        Static thresholdSlider = findSlider("Motion change threshold")
         dst2 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
 
-        Static nonZeroThreshold = findSlider("Motion threshold before resyncing entire image")
         Dim changedPixels = dst2.CountNonZero()
         cumulativeChanges += changedPixels
-        If cameraStable = False Or cumulativeChanges > nonZeroThreshold.value Or dst1.Type <> cv.MatType.CV_32FC1 Then
+        If cameraStable = False Or cumulativeChanges > nonZeroThreshold.value Or dst1.Type <> cv.MatType.CV_32FC1 Or externalReset Then
             resetAll = True
+            externalReset = False
             dst1 = input
             cumulativeChanges = 0
         Else
@@ -160,6 +164,12 @@ Public Class Stable_DepthColorized
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static minSlider = findSlider("InRange Min Depth (mm)")
+        Static maxSlider = findSlider("InRange Max Depth (mm)")
+        Static saveMin = minSlider.value
+        Static saveMax = maxslider.value
+        If saveMin <> minSlider.value Or saveMax <> maxSlider.value Then stable.externalReset = True
         stable.Run()
 
         colorize.src = stable.dst1
