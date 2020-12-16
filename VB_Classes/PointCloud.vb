@@ -725,11 +725,11 @@ Public Class PointCloud_BothViews
             If ocvb.imuXAxis Or ocvb.imuZAxis Then
                 levelCheck.Run()
                 If levelCheck.cameraLevel Then
-                    accMsg1 = "TopView - distances are APPROXIMATE - level cam"
-                    accMsg2 = "SideView - distances are APPROXIMATE - level cam"
+                    accMsg1 = "Distances are good - camera is level"
+                    accMsg2 = "Distances are good - camera is level"
                 Else
-                    accMsg1 = "TopView - distances are NOT accurate"
-                    accMsg2 = "SideView - distances are NOT accurate"
+                    accMsg1 = "Camera NOT level - distances approximate"
+                    accMsg2 = "Camera NOT level - distances approximate"
                 End If
             End If
 

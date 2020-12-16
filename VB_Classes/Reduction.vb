@@ -16,10 +16,11 @@ Public Class Reduction_Basics
             radio.check(1).Checked = True
         End If
 
+        label2 = "Unstable after reduction"
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reductionSlider = findSlider("Reduction factor")
         Dim reductionVal = reductionSlider.Value
         If radio.check(0).Checked Then
@@ -39,6 +40,16 @@ Public Class Reduction_Basics
         Else
             dst1 = src
             label1 = "No reduction requested"
+        End If
+
+        If dst1.Type = cv.MatType.CV_8U Or dst1.Type = cv.MatType.CV_8UC3 Then
+            Dim gray = If(dst1.Channels = 3, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst1)
+            Static lastFrame As cv.Mat = gray
+            cv.Cv2.Absdiff(gray, lastFrame, dst2)
+            dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            lastFrame = gray
+        Else
+            label1 = ""
         End If
     End Sub
 End Class
@@ -269,7 +280,7 @@ Public Class Reduction_Lines
         task.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.Run()
 
         sideView.Run()

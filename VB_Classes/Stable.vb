@@ -22,7 +22,7 @@ Public Class Stable_Basics
             radio.check(0).Text = "Use farthest distance"
             radio.check(1).Text = "Use closest distance"
             radio.check(2).Text = "Use unchanged depth input"
-            radio.check(1).Checked = True
+            radio.check(0).Checked = True
         End If
 
         label1 = "32-bit format of the stable depth"
@@ -52,8 +52,13 @@ Public Class Stable_Basics
 
         Dim changedPixels = dst2.CountNonZero()
         cumulativeChanges += changedPixels
-        If cameraStable = False Or cumulativeChanges > nonZeroThreshold.value Or dst1.Type <> cv.MatType.CV_32FC1 Or externalReset Then
+        Static saveMaxRange As Integer
+        Static saveMinRange As Integer
+        If cameraStable = False Or cumulativeChanges > nonZeroThreshold.value Or saveMaxRange <> task.maxRangeSlider.Value Or
+            dst1.Type <> cv.MatType.CV_32FC1 Or externalReset Or saveMinRange <> task.minRangeSlider.Value Then
             resetAll = True
+            saveMaxRange = task.maxRangeSlider.Value
+            saveMinRange = task.minRangeSlider.Value
             externalReset = False
             dst1 = input
             cumulativeChanges = 0
@@ -66,10 +71,8 @@ Public Class Stable_Basics
             Static useMax = findRadio("Use farthest distance")
             If useNone.checked = False Then
                 If useMax.checked Then cv.Cv2.Max(input, dst1, dst1)
-                If useMin.checked Then
-                    cv.Cv2.Min(input, dst1, dst1)
-                    dst1.SetTo(0, task.inrange.noDepthMask)
-                End If
+                If useMin.checked Then cv.Cv2.Min(input, dst1, dst1)
+                dst1.SetTo(0, task.inrange.noDepthMask)
             Else
                 input.CopyTo(dst1)
             End If
@@ -139,6 +142,8 @@ Public Class Stable_Pointcloud
             split(0).CopyTo(splitPC(0), stable.dst2)
             split(1).CopyTo(splitPC(1), stable.dst2)
             cv.Cv2.Merge(splitPC, task.pointCloud)
+            'Dim mask = split(0).ConvertScaleAbs(255).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+            'task.pointCloud.SetTo(0, mask)
         End If
     End Sub
 End Class
@@ -186,8 +191,10 @@ End Class
 Public Class Stable_SideView
     Inherits VBparent
     Dim stablePC As Stable_Pointcloud
+    Dim gCloud As Depth_PointCloud_IMU
     Public Sub New()
         initParent()
+        gCloud = New Depth_PointCloud_IMU
         stablePC = New Stable_Pointcloud
         task.desc = "Create a stable side view of the point cloud"
     End Sub
@@ -195,5 +202,8 @@ Public Class Stable_SideView
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         stablePC.Run()
         dst1 = stablePC.dst1
+
+        gCloud.Run()
+
     End Sub
 End Class

@@ -32,6 +32,6 @@ Public Class Options_InRange
         task.depth16.ConvertTo(task.depth32f, cv.MatType.CV_32F)
         cv.Cv2.InRange(task.depth32f, minVal, maxVal, depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
-        If standalone Then dst1 = task.depth32f.SetTo(0, noDepthMask)
+        dst1 = task.depth32f.SetTo(0, noDepthMask)
     End Sub
 End Class
