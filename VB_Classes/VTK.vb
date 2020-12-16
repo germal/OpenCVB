@@ -42,7 +42,6 @@ Public Class VTK_Basics
     Public Sub New()
         initParent()
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
-        Dispose() ' make sure there wasn't an old VTKWindow sitting around...
         task.desc = "Create VTK window and update it with images"
     End Sub
     Private Sub memMapUpdate()

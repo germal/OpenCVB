@@ -42,10 +42,7 @@ Public Class OptionsAll
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
-            ' Set any global options forms in the back by placing them here and skipping them below
-            task.inrange.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
-            task.inrange.SendToBack()
-            indexS += 1
+            indexS += 1 ' adding 1 for the Options_InRange form which is always first and in the back.
             For Each title In optionsTitle
                 Dim frm = findfrm(title)
                 If frm IsNot Nothing And title <> "Options_InRange Slider Options" Then
