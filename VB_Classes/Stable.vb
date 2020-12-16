@@ -6,7 +6,6 @@ Public Class Stable_Basics
     Public yaw As Single ' in radians.
     Public roll As Single ' in radians.
     Public cameraStable As Boolean
-    Public zeroDepthMask As cv.Mat
     Public cumulativeChanges As Integer
     Public externalReset As Boolean
     Public Sub New()
@@ -33,7 +32,7 @@ Public Class Stable_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim input = src
-        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
+        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
         pitch = task.IMU_AngularVelocity.X
         yaw = task.IMU_AngularVelocity.Y
@@ -43,7 +42,7 @@ Public Class Stable_Basics
         Static nonZeroThreshold = findSlider("Motion threshold before resyncing entire image")
         Static thresholdSlider = findSlider("Motion change threshold")
 
-        Dim cameraStable = If(cameraMotionThreshold.Value / 100 < Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll), False, True)
+        cameraStable = If(cameraMotionThreshold.Value / 100 < Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll), False, True)
 
         Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastFrame As cv.Mat = gray.Clone
@@ -69,8 +68,7 @@ Public Class Stable_Basics
                 If useMax.checked Then cv.Cv2.Max(input, dst1, dst1)
                 If useMin.checked Then
                     cv.Cv2.Min(input, dst1, dst1)
-                    zeroDepthMask = input.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-                    dst1.SetTo(0, zeroDepthMask)
+                    dst1.SetTo(0, task.inrange.noDepthMask)
                 End If
             Else
                 input.CopyTo(dst1)
@@ -87,18 +85,20 @@ End Class
 Public Class Stable_Clusters
     Inherits VBparent
     Dim clusters As Histogram_DepthClusters
-    Dim stableD As Depth_Stable
+    Dim stableD As Stable_Basics
     Public Sub New()
         initParent()
 
         clusters = New Histogram_DepthClusters
-        stableD = New Depth_Stable
+        stableD = New Stable_Basics
+        label1 = "Histogram of stable depth"
+        label2 = "Backprojection of stable depth"
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         stableD.Run()
-        clusters.src = stableD.dst2
+        clusters.src = stableD.dst1
         clusters.Run()
         dst1 = clusters.dst1
         dst2 = clusters.dst2
@@ -176,5 +176,26 @@ Public Class Stable_BasicsColorized
         colorize.Run()
         dst1 = stable.dst1
         dst2 = colorize.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Stable_SideView
+    Inherits VBparent
+    Dim stablePC As Stable_Pointcloud
+    Public Sub New()
+        initParent()
+        stablePC = New Stable_Pointcloud
+        task.desc = "Create a stable side view of the point cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        stablePC.Run()
+        dst1 = stablePC.dst1
     End Sub
 End Class

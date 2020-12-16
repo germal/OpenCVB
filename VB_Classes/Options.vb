@@ -7,12 +7,15 @@ Public Class Options_InRange
     Public maxVal As Single
     Public bins As Integer
     Public Sub New()
+        initParent()
+        task.callTrace.Clear() ' special line to clear the tree view otherwise Options_InRange is standalone.
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
             sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
             sliders.setupTrackBar(2, "Top/Side View Histogram threshold", 0, 3000, 10)
         End If
+
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."

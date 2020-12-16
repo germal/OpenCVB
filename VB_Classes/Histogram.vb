@@ -1373,9 +1373,9 @@ Public Class Histogram_DepthClusters
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        valleys.src = src
-        If valleys.src.Type <> cv.MatType.CV_32F Then valleys.src = task.depth32f
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
+        valleys.src = src
         valleys.Run()
         dst1 = valleys.dst1
 
@@ -1385,7 +1385,7 @@ Public Class Histogram_DepthClusters
         valleys.palette.src = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
-            cv.Cv2.InRange(valleys.src, startEndDepth.X, startEndDepth.Y, tmp)
+            cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
             valleys.palette.src.SetTo(i * colorIncr + 1, mask)
         Next
