@@ -99,6 +99,7 @@ Public Class Depth_Foreground
     Public Sub New()
         initParent()
         kalman = New Kalman_Basics()
+        task.maxRangeSlider.Value = 1500 ' just 1.5 meters or less...
 
         label1 = "Blue is current, red is kalman, green is trusted"
         task.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
@@ -106,8 +107,6 @@ Public Class Depth_Foreground
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static maxSlider = findSlider("InRange Max Depth (mm)")
-        If ocvb.frameCount = 0 Then maxSlider.Value = 1500 ' just 1.5 meters or less...
 
         Dim tmp As cv.Mat = task.inrange.depthMask.Clone
         ' find the largest blob and use that as the body.  Head is highest in the image.
@@ -576,8 +575,7 @@ Public Class Depth_ColorizerFastFade_CPP
         Dim depthData(input.Total * input.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(input.Data, depthData, 0, depthData.Length)
-        Static maxDepthSlider = findSlider("InRange Max Depth (mm)")
-        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, maxDepthSlider.value)
+        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, task.maxRangeSlider.Value)
         handleSrc.Free()
 
         If imagePtr <> 0 Then
@@ -1125,9 +1123,7 @@ Public Class Depth_SmoothingMat
         cv.Cv2.Add(inrange.dst1, dst1, dst2)
         lastDepth = inrange.dst1
 
-        Static inrangeMinSlider = findSlider("InRange Min Depth")
-        Static inrangeMaxSlider = findSlider("InRange Max Depth")
-        label1 = "Smoothing Mat: range from " + CStr(inrangeMinSlider.Value) + " to +" + CStr(inrangeMaxSlider.Value)
+        label1 = "Smoothing Mat: range from " + CStr(task.inrange.minval) + " to +" + CStr(task.inrange.maxval)
     End Sub
 End Class
 
@@ -1571,10 +1567,8 @@ Public Class Depth_InRange
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static minSlider = findSlider("InRange Min Depth (mm)")
-        Static maxSlider = findSlider("InRange Max Depth (mm)")
-        Dim min = If(minVal <> 0, minVal, minSlider.Value)
-        Dim max = If(minVal <> 0, maxVal, maxSlider.Value)
+        Dim min = If(minVal <> 0, minVal, task.minRangeSlider.Value)
+        Dim max = If(minVal <> 0, maxVal, task.maxRangeSlider.Value)
         If min >= max Then max = min + 1
         depth32f = src
         If depth32f.Type <> cv.MatType.CV_32FC1 Then task.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)

@@ -428,8 +428,7 @@ Public Class CComp_InRange_MT
         initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
-        sliders.setupTrackBar(1, "InRange Max Depth", 150, 10000, 3000)
-        sliders.setupTrackBar(2, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
+        sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
         task.desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
@@ -439,8 +438,7 @@ Public Class CComp_InRange_MT
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
-        Dim maxDepth = sliders.trackbar(1).Value
-        Dim minBlobSize = sliders.trackbar(2).Value * 1000
+        Dim minBlobSize = sliders.trackbar(1).Value * 1000
 
         Dim mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
@@ -462,7 +460,7 @@ Public Class CComp_InRange_MT
                 Dim bin = binary(roiList(j)).Clone()
                 Dim depth = task.depth32f(roiList(j))
                 Dim meanDepth = depth.Mean(mask(roiList(j)))
-                If meanDepth.Item(0) < maxDepth Then
+                If meanDepth.Item(0) < task.inrange.maxVal Then
                     Dim avg = task.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
                     dst1(roiList(j)).SetTo(avg, bin)
                     dst2(roiList(j)).SetTo(avg)

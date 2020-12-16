@@ -165,11 +165,9 @@ Public Class Stable_BasicsColorized
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static minSlider = findSlider("InRange Min Depth (mm)")
-        Static maxSlider = findSlider("InRange Max Depth (mm)")
-        Static saveMin = minSlider.value
-        Static saveMax = maxslider.value
-        If saveMin <> minSlider.value Or saveMax <> maxSlider.value Then stable.externalReset = True
+        Static saveMin = task.minRangeSlider.Value
+        Static saveMax = task.maxRangeSlider.Value
+        If saveMin <> task.minRangeSlider.Value Or saveMax <> task.maxRangeSlider.Value Then stable.externalReset = True
         stable.Run()
 
         colorize.src = stable.dst1

@@ -504,6 +504,9 @@ Public Class Palette_ObjectColors
         hideForm("Palette_BuildGradientColorMap Slider Options")
         reduction = New Reduction_KNN_Color()
 
+        task.maxRangeSlider.Value = task.maxRangeSlider.Maximum
+        task.inrange.maxval = task.maxRangeSlider.Value
+
         label1 = "Consistent colors"
         label2 = "Original colors"
         task.desc = "New class description"
@@ -514,11 +517,6 @@ Public Class Palette_ObjectColors
         reduction.Run()
         dst2 = reduction.dst2
 
-        Static maxDepthSlider = findSlider("InRange Max Depth")
-        If ocvb.frameCount = 0 Then
-            maxDepthSlider.value = maxDepthSlider.maximum
-            task.inrange.maxval = maxDepthSlider.value
-        End If
         Dim minDepth = task.inrange.minval
         Dim maxDepth = task.inrange.maxval
 

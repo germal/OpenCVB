@@ -9,12 +9,13 @@ Public Class Options_InRange
     Public Sub New()
         initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_InRange is standalone.
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
-            sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
-            sliders.setupTrackBar(2, "Top/Side View Histogram threshold", 0, 3000, 10)
-        End If
+        sliders.Setup(caller)
+        sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
+        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
+        sliders.setupTrackBar(2, "Top/Side View Histogram threshold", 0, 3000, 10)
+        task.minRangeSlider = sliders.trackbar(0) ' one of the few places we can be certain there is only one...
+        task.maxRangeSlider = sliders.trackbar(1)
+        task.binSlider = sliders.trackbar(2)
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
@@ -22,12 +23,10 @@ Public Class Options_InRange
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static minSlider = findSlider("InRange Min Depth (mm)")
-        Static maxSlider = findSlider("InRange Max Depth (mm)")
-        Static binSlider = findSlider("Top/Side View Histogram threshold")
-        minVal = minSlider.Value
-        maxVal = maxSlider.Value
-        bins = binSlider.value
+        minVal = task.minRangeSlider.Value
+        maxVal = task.maxRangeSlider.Value
+        ocvb.maxZ = maxVal / 1000
+        bins = task.binSlider.value
         If minVal >= maxVal Then maxVal = minVal + 1
         task.depth16.ConvertTo(task.depth32f, cv.MatType.CV_32F)
         cv.Cv2.InRange(task.depth32f, minVal, maxVal, depthMask)

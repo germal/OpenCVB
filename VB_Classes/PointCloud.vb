@@ -1084,8 +1084,6 @@ Public Class PointCloud_DistanceSideClick
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static saveMaxZ As Single
-        Static inRangeSlider = findSlider("InRange Max Depth (mm)")
-        ocvb.maxZ = inRangeSlider.Value / 1000
 
         If ocvb.maxZ <> saveMaxZ Then
             clicks.Clear()
@@ -1158,8 +1156,7 @@ Public Class PointCloud_GVectorCeiling
         ceiling = New PointCloud_GVectorPlane()
         ceiling.floorRun = False
 
-        Dim maxDepthSlider = findSlider("InRange Max Depth (mm)")
-        maxDepthSlider.Value = 8000
+        task.maxRangeSlider.Value = 8000
 
         Dim cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
         cushionSlider.Value = 200
