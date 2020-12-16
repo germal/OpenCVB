@@ -1095,6 +1095,7 @@ Public Class Histogram_SideView2D
         sideOpts = New Histogram_SideViewOptions
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
+        cameraYSlider = findSlider("SideCameraPoint.x adjustment")
         frustrumSlider = findSlider("SideView Frustrum adjustment")
         histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         If standalone Then histThresholdSlider.Value = 1
@@ -1108,7 +1109,6 @@ Public Class Histogram_SideView2D
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
         ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
-        Static cameraYSlider = findSlider("SideCameraPoint.x adjustment")
         ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
 
         frustrumAdjust = ocvb.maxZ * frustrumSlider.Value / 100 / 2
@@ -1192,7 +1192,7 @@ End Class
 
 
 
-Public Class Histogram_SmoothSideView2D1
+Public Class Histogram_SmoothSideView2D
     Inherits VBparent
     Public sideView As Histogram_SideView2D
     Dim stable As Depth_PointCloud_Stable
@@ -1328,13 +1328,13 @@ End Class
 
 Public Class Histogram_SmoothConcentration
     Inherits VBparent
-    Public sideview As Histogram_SmoothSideView2D1
+    Public sideview As Histogram_SmoothSideView2D
     Public topview As Histogram_SmoothTopView2D
     Dim concent As Histogram_Concentration
     Public Sub New()
         initParent()
 
-        sideview = New Histogram_SmoothSideView2D1
+        sideview = New Histogram_SmoothSideView2D
         topview = New Histogram_SmoothTopView2D
         concent = New Histogram_Concentration
 
