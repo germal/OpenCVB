@@ -1001,7 +1001,6 @@ Public Class Histogram_SmoothTopView2D
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
         topView.viewOpts.Run()
         topView.gCloud.Run()
         task.pointCloud = topView.gCloud.imuPointCloud
