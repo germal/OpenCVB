@@ -9,10 +9,8 @@ Public Class AddWeighted_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Weight", 0, 100, 50)
-            weightSlider = sliders.trackbar(0)
-        Else
-            weightSlider = findSlider("Weight")
         End If
+        weightSlider = findSlider("Weight")
         task.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run()
@@ -21,7 +19,7 @@ Public Class AddWeighted_Basics
             src1 = src
             src2 = task.RGBDepth
         End If
-        Dim alpha = weightSlider.Value / weightSlider.Maximum
+        Dim alpha = weightSlider.Value / 100
         cv.Cv2.AddWeighted(src1, alpha, src2, 1.0 - alpha, 0, dst1)
         label1 = "depth " + Format(1 - weightSlider.Value / 100, "#0%") + " RGB " + Format(weightSlider.Value / 100, "#0%")
     End Sub

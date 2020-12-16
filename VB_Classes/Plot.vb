@@ -81,7 +81,7 @@ Public Class Plot_Basics_CPP
         handlePlot.Free()
         handleX.Free()
         handleY.Free()
-        label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + vbTab + " y-axis: " + CStr(minY) + " to " + CStr(maxY)
+        label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
 End Class
 
@@ -318,9 +318,9 @@ Public Class Plot_Depth
         plot.Run()
         dst1 = plot.dst1
 
-        label1 = "histogram: " + plot.label1
+        label1 = plot.label1
         Dim Split = Regex.Split(label1, "\W+")
-        Dim lineCount = CInt(Split(5) / 1000)
+        Dim lineCount = CInt(Split(4) / 1000)
         If lineCount > 0 Then
             Dim meterDepth = CInt(src.Width / lineCount)
             For i = 1 To lineCount
