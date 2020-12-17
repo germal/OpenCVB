@@ -312,6 +312,8 @@ Public Class Reduction_Histogram
 
         basics = New Reduction_Basics()
         hist = New Histogram_BackProjectionGrayscale()
+
+        label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
     End Sub
     Public Sub Run()
@@ -326,5 +328,6 @@ Public Class Reduction_Histogram
         hist.Run()
         dst1 = hist.dst1
         dst2 = hist.dst2
+        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(hist.binSlider.Value)
     End Sub
 End Class

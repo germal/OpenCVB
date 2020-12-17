@@ -767,7 +767,7 @@ Public Class Histogram_BackProjectionGrayscale
     Inherits VBparent
     Dim hist As Histogram_KalmanSmoothed
     Public histIndex As Integer
-    Dim binSlider As Windows.Forms.TrackBar
+    Public binSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         hist = New Histogram_KalmanSmoothed
@@ -785,7 +785,7 @@ Public Class Histogram_BackProjectionGrayscale
 
         histIndex = CInt(hist.histogram.Rows * task.mousePoint.X / src.Width)
         Dim barWidth = dst1.Width / binSlider.Value
-        Dim barRange = 255 / binSlider.Value
+        Dim barRange = Math.Round(255 / binSlider.Value)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
