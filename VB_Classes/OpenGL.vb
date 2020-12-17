@@ -390,34 +390,6 @@ Public Class OpenGL_GravityTransform
         gCloud.src = task.pointCloud
         gCloud.Run()
 
-        ogl.pointCloudInput = gCloud.imuPointCloud
-        ogl.src = src
-        ogl.Run()
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class OpenGL_Reduced
-    Inherits VBparent
-    Dim reduction As Reduction_PointCloud
-    Public ogl As OpenGL_Basics
-    Public Sub New()
-        initParent()
-        reduction = New Reduction_PointCloud()
-
-        ogl = New OpenGL_Basics()
-        ogl.OpenGLTitle = "OpenGL_Callbacks"
-        task.desc = "Use the reduced depth pointcloud in OpenGL"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        reduction.Run()
-        dst1 = reduction.dst1
-
         ogl.pointCloudInput = task.pointCloud
         ogl.src = src
         ogl.Run()
@@ -725,5 +697,62 @@ Public Class OpenGL_Stable
         ogl.Run()
 
         label2 = stable.label2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_Reduced
+    Inherits VBparent
+    Dim reduction As Reduction_PointCloud
+    Public ogl As OpenGL_Basics
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_PointCloud()
+
+        ogl = New OpenGL_Basics()
+        ogl.OpenGLTitle = "OpenGL_Callbacks"
+        task.desc = "Use the reduced depth pointcloud in OpenGL"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        reduction.Run()
+        dst1 = reduction.dst1
+
+        ogl.pointCloudInput = task.pointCloud
+        ogl.src = src
+        ogl.Run()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_ReducedSideView
+    Inherits VBparent
+    Dim reduced As PointCloud_ReducedSideView
+    Dim ogl As OpenGL_Callbacks
+    Public Sub New()
+        initParent()
+        reduced = New PointCloud_ReducedSideView
+        ogl = New OpenGL_Callbacks
+        task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        reduced.Run() ' Updates Task.pointcloud
+        dst1 = reduced.dst1
+
+        ogl.src = task.color
+        ogl.Run()
+
+        label1 = reduced.label1
     End Sub
 End Class

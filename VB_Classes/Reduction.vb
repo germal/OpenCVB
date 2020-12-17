@@ -5,7 +5,7 @@ Public Class Reduction_Basics
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Reduction factor", 0, 4000, 64)
+            sliders.setupTrackBar(0, "Reduction factor", 0, 4096, 64)
         End If
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -16,40 +16,40 @@ Public Class Reduction_Basics
             radio.check(1).Checked = True
         End If
 
-        label2 = "Unstable after reduction"
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim reductionSlider = findSlider("Reduction factor")
-        Dim reductionVal = reductionSlider.Value
+        Static reductionSlider = findSlider("Reduction factor")
+        Dim reductionVal = CInt(reductionSlider.Value)
+        Dim power As Integer
+        label2 = ""
         If radio.check(0).Checked Then
-            Dim nearestPowerOf2 = Math.Round(Math.Log(reductionVal, 2)) ' Math.Pow(2, Math.Round(Math.Log(reductionVal) / Math.Log(2)))
+            Dim nearestPowerOf2 = Math.Round(Math.Log(reductionVal, 2))
             If nearestPowerOf2 = Double.NegativeInfinity Then nearestPowerOf2 = 0
-            Dim power = Choose(nearestPowerOf2 + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096) - 1
-            Dim maskval = 256 - power
-            If src.Type = cv.MatType.CV_32S Then maskval = Integer.MaxValue - power
-            Dim tmp = New cv.Mat(src.Size, src.Type).SetTo(cv.Scalar.All(maskval))
+            power = Choose(nearestPowerOf2 + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
+            Dim maskval = power - 1
+            If src.Type = cv.MatType.CV_32S Then maskval = Integer.MaxValue - power + 1 Else If power >= 256 Then maskval = 255
+            Dim tmp = New cv.Mat(src.Size, src.Type, cv.Scalar.All(maskval))
             cv.Cv2.BitwiseAnd(src, tmp, dst1)
-            label1 = "Reduced color image after zero'ing bit(s) 0x" + Hex(power)
         ElseIf radio.check(1).Checked Then
             If reductionVal = 0 Then reductionVal = 1
             dst1 = src / reductionVal
             dst1 *= reductionVal
-            label1 = "Reduced image - factor = " + CStr(reductionVal)
+            If dst1.Type = cv.MatType.CV_8U Or dst1.Type = cv.MatType.CV_8UC3 Then
+                Dim gray = If(dst1.Channels = 3, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst1)
+                Static lastFrame As cv.Mat = gray
+                cv.Cv2.Absdiff(gray, lastFrame, dst2)
+                dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                lastFrame = gray
+                label1 = If(radio.check(1).Checked, "Reduced image - factor = " + CStr(reductionVal), "Reduced color image after zero'ing bit(s) 0x" + Hex(power))
+                label2 = "Unstable after reduction"
+            Else
+                label1 = "Reduced 32S image after zero'ing bit(s) 0x" + Hex(power)
+            End If
         Else
             dst1 = src
             label1 = "No reduction requested"
-        End If
-
-        If dst1.Type = cv.MatType.CV_8U Or dst1.Type = cv.MatType.CV_8UC3 Then 
-            Dim gray = If(dst1.Channels = 3, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst1)
-            Static lastFrame As cv.Mat = gray
-            cv.Cv2.Absdiff(gray, lastFrame, dst2)
-            dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            lastFrame = gray
-        Else
-            label1 = ""
         End If
     End Sub
 End Class

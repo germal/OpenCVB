@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Options_InRange
+Public Class Options_Common
     Inherits VBparent
     Public depthMask As New cv.Mat
     Public noDepthMask As New cv.Mat
@@ -8,7 +8,7 @@ Public Class Options_InRange
     Public bins As Integer
     Public Sub New()
         initParent()
-        task.callTrace.Clear() ' special line to clear the tree view otherwise Options_InRange is standalone.
+        task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
         standalone = False
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)

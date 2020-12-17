@@ -547,7 +547,7 @@ Public Class StructuredDepth_LinearizeFloor
         If maskPlane.CountNonZero() > 0 Then
             Dim nonFloorMask As New cv.Mat
             cv.Cv2.BitwiseNot(maskPlane, nonFloorMask)
-            imuPC = floor.structD.side2D.gCloud.imuPointCloud.Clone
+            imuPC = task.pointCloud.Clone
             imuPointCloud = imuPC.Clone
             imuPC.SetTo(0, nonFloorMask)
 

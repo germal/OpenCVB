@@ -838,7 +838,7 @@ Public Class Histogram_TopData
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloud.Run()
-        Dim imuPC = gCloud.imuPointCloud
+        Dim imuPC = task.pointCloud
         split = imuPC.Split()
 
         Static minSlider = findSlider("X scale negative value in meters (meterMin) X100")
@@ -847,7 +847,7 @@ Public Class Histogram_TopData
         meterMax = maxSlider.value / 100
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
@@ -900,7 +900,7 @@ Public Class Histogram_SideData
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloud.Run()
-        Dim imuPC = gCloud.imuPointCloud
+        Dim imuPC = task.pointCloud
         split = imuPC.Split()
 
         Static minSlider = findSlider("Y scale negative value in meters (meterMin) X100")
@@ -909,7 +909,7 @@ Public Class Histogram_SideData
         meterMax = maxSlider.value / 100
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
@@ -961,9 +961,9 @@ Public Class Histogram_TopView2D
         viewOpts.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-viewOpts.topFrustrumAdjust, viewOpts.topFrustrumAdjust)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
         dst1 = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
@@ -1001,7 +1001,6 @@ Public Class Histogram_SmoothTopView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         topView.viewOpts.Run()
         topView.gCloud.Run()
-        task.pointCloud = topView.gCloud.imuPointCloud
 
         Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static saveYRotate As Integer
@@ -1063,9 +1062,9 @@ Public Class Histogram_SideView2D
         viewOpts.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {gCloud.imuPointCloud.Height, gCloud.imuPointCloud.Width}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
@@ -1190,7 +1189,6 @@ Public Class Histogram_SmoothSideView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.viewOpts.Run()
         sideView.gCloud.Run()
-        task.pointCloud = sideView.gCloud.imuPointCloud
 
         Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static saveYRotate As Integer

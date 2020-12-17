@@ -164,7 +164,7 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
         aOptions = New OptionsAll
         aOptions.Show()
-        inrange = algoList.createAlgorithm("Options_InRange")
+        inrange = algoList.createAlgorithm("Options_Common")
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +

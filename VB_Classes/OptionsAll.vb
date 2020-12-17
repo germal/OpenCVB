@@ -42,10 +42,10 @@ Public Class OptionsAll
         Try
             Dim indexS As Integer = 0
             Dim indexO As Integer = 0
-            indexS += 1 ' adding 1 for the Options_InRange form which is always first and in the back.
+            indexS += 1 ' adding 1 for the Options_Common form which is always first and in the back.
             For Each title In optionsTitle
                 Dim frm = findfrm(title)
-                If frm IsNot Nothing And title <> "Options_InRange Slider Options" Then
+                If frm IsNot Nothing And title <> "Options_Common Slider Options" Then
                     frm.BringToFront()
                     If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                         If frm Is Nothing Then Continue For

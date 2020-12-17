@@ -1840,7 +1840,6 @@ End Class
 Public Class Depth_PointCloud_IMU
     Inherits VBparent
     Public Mask As New cv.Mat
-    Public imuPointCloud As cv.Mat
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
     Public Sub New()
@@ -1911,9 +1910,9 @@ Public Class Depth_PointCloud_IMU
             ocvb.gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
             Dim gInput = task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols)
             Dim gOutput = (gInput * ocvb.gMat).ToMat
-            imuPointCloud = gOutput.Reshape(3, task.pointCloud.Rows)
+            task.pointCloud = gOutput.Reshape(3, task.pointCloud.Rows)
         Else
-            imuPointCloud = task.pointCloud.Clone
+            task.pointCloud = task.pointCloud.Clone
         End If
 
         ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ

@@ -1237,7 +1237,7 @@ Public Class PointCloud_GVectorPlane
             Dim minRow = dst2.Height * maxAngle / 180
 
             Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeterV * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
-            Dim split = gLine.sideIMU.sideView.gCloud.imuPointCloud.Split()
+            Dim split = task.pointCloud.Split()
             Dim ySplit = split(1)
             inrange.src = split(1)
             inrange.minVal = planeY - If(floorRun, 0, cushion)
@@ -1454,5 +1454,92 @@ Public Class PointCloud_Singletons
         cv.Cv2.Merge(singleFrames, mask8uc3)
         dst2.SetTo(0)
         dst2.SetTo(cv.Scalar.White, mask8uc3.Resize(dst2.Size))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_ReducedSideView
+    Inherits VBparent
+    Dim viewOpts As Histogram_ViewOptions
+    Dim gCloud As Depth_PointCloud_IMU
+    Dim reduction As Reduction_Basics
+    Dim histOutput As New cv.Mat
+    Public Sub New()
+        initParent()
+        viewOpts = New Histogram_ViewOptions
+        gCloud = New Depth_PointCloud_IMU
+        reduction = New Reduction_Basics
+        task.desc = "Create a stable side view of the point cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        viewOpts.Run()
+
+        gCloud.Run()
+
+        Dim split = cv.Cv2.Split(task.pointCloud)
+        reduction.src = split(2) * 1000
+        reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
+        reduction.Run()
+        reduction.dst1.ConvertTo(split(2), cv.MatType.CV_32F)
+        split(2) *= 0.001
+        cv.Cv2.Merge(split, task.pointCloud)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_ReducedTopView
+    Inherits VBparent
+    Dim viewOpts As Histogram_ViewOptions
+    Dim gCloud As Depth_PointCloud_IMU
+    Dim reduction As Reduction_Basics
+    Dim histOutput As New cv.Mat
+    Public Sub New()
+        initParent()
+        viewOpts = New Histogram_ViewOptions
+        gCloud = New Depth_PointCloud_IMU
+        reduction = New Reduction_Basics
+        task.desc = "Create a stable side view of the point cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        viewOpts.Run()
+
+        gCloud.Run()
+
+        Dim split = cv.Cv2.Split(task.pointCloud)
+        reduction.src = split(2) * 1000
+        reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
+        reduction.Run()
+        reduction.dst1.ConvertTo(split(2), cv.MatType.CV_32F)
+        split(2) *= 0.001
+        cv.Cv2.Merge(split, task.pointCloud)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-viewOpts.topFrustrumAdjust, viewOpts.topFrustrumAdjust)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        dst1 = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
     End Sub
 End Class
