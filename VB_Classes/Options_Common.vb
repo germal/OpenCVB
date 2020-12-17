@@ -29,8 +29,12 @@ Public Class Options_Common
         minVal = task.minRangeSlider.Value
         maxVal = task.maxRangeSlider.Value
         ocvb.maxZ = maxVal / 1000
-        bins = task.binSlider.value
+        bins = task.binSlider.Value
         If minVal >= maxVal Then maxVal = minVal + 1
+
+        ' forced resize of the depth16 - probably a mistake but avoids failure when switching from 1280 to 640 and vice versa
+        If src.Width <> task.depth16.Width Then task.depth16 = task.depth16.Resize(task.color.Size)
+
         task.depth16.ConvertTo(task.depth32f, cv.MatType.CV_32F)
         cv.Cv2.InRange(task.depth32f, minVal, maxVal, depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
