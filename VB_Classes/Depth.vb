@@ -1848,10 +1848,6 @@ Public Class Depth_PointCloud_IMU
 
         imu = New IMU_GVector()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Amount to rotate pointcloud around Y-axis (degrees)", -180, 180, 0)
-        End If
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)
             check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"

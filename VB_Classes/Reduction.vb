@@ -42,7 +42,7 @@ Public Class Reduction_Basics
             label1 = "No reduction requested"
         End If
 
-        If dst1.Type = cv.MatType.CV_8U Or dst1.Type = cv.MatType.CV_8UC3 Then
+        If dst1.Type = cv.MatType.CV_8U Or dst1.Type = cv.MatType.CV_8UC3 Then 
             Dim gray = If(dst1.Channels = 3, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst1)
             Static lastFrame As cv.Mat = gray
             cv.Cv2.Absdiff(gray, lastFrame, dst2)

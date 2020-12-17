@@ -942,7 +942,6 @@ Public Class Histogram_TopView2D
     Public markers(2 - 1) As cv.Point2f
     Public cmat As PointCloud_Colorize
     Public viewOpts As Histogram_ViewOptions
-    Public histThresholdSlider As Windows.Forms.TrackBar
     Public resizeHistOutput As Boolean = True
     Public Sub New()
         initParent()
@@ -952,7 +951,6 @@ Public Class Histogram_TopView2D
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
 
-        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
@@ -968,7 +966,7 @@ Public Class Histogram_TopView2D
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1 = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -992,7 +990,7 @@ Public Class Histogram_SmoothTopView2D
         initParent()
 
         topView = New Histogram_TopView2D
-        topView.histThresholdSlider.Value = 1
+        topView.viewOpts.histThresholdSlider.Value = 1
 
         stable = New Depth_PointCloud_Stable
 
@@ -1020,7 +1018,7 @@ Public Class Histogram_SmoothTopView2D
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
-        dst1 = topView.histOutput.Threshold(topView.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1 = topView.histOutput.Threshold(topView.viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1044,7 +1042,6 @@ Public Class Histogram_SideView2D
     Public viewOpts As Histogram_ViewOptions
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public histThresholdSlider As Windows.Forms.TrackBar
     Public cmat As PointCloud_Colorize
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
@@ -1055,8 +1052,7 @@ Public Class Histogram_SideView2D
 
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
-        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
-        If standalone Then histThresholdSlider.Value = 1
+        If standalone Then viewOpts.histThresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
@@ -1071,7 +1067,7 @@ Public Class Histogram_SideView2D
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.imuPointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Dim tmp = histOutput.Threshold(histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1100,6 +1096,7 @@ Public Class Histogram_ViewOptions
     Dim topFrustrumSlider As Windows.Forms.TrackBar
     Dim cameraYSlider As Windows.Forms.TrackBar
     Dim cameraXSlider As Windows.Forms.TrackBar
+    Public histThresholdSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
 
@@ -1115,6 +1112,7 @@ Public Class Histogram_ViewOptions
         topFrustrumSlider = findSlider("TopView Frustrum adjustment")
         cameraYSlider = findSlider("SideCameraPoint adjustment")
         cameraXSlider = findSlider("TopCameraPoint adjustment")
+        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
@@ -1181,7 +1179,7 @@ Public Class Histogram_SmoothSideView2D
         initParent()
 
         sideView = New Histogram_SideView2D
-        sideView.histThresholdSlider.Value = 1
+        sideView.viewOpts.histThresholdSlider.Value = 1
 
         stable = New Depth_PointCloud_Stable
 
@@ -1208,7 +1206,7 @@ Public Class Histogram_SmoothSideView2D
         If sideView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
-        Dim tmp = sideView.histOutput.Threshold(sideView.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Dim tmp = sideView.histOutput.Threshold(sideView.viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
