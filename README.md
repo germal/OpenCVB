@@ -182,6 +182,11 @@ This is the short description of install process:
 Installation – Full Description with Discussion
 ===============================================
 
+The installation of OpenCVB may seem formidable but it is automated to a high
+degree – just click on “PrepareTree.bat” after downloading OpenCVB from GitHub.
+The key to remember is that getting one example to work gets all the examples to
+work.
+
 The first step is to download OpenCVB from GitHub:
 
 1.  <https://github.com/bobdavies2000/OpenCVB>
@@ -556,8 +561,8 @@ The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that
 allows the OpenCVB build to locate the Mynt D camera support no matter where it
 was installed.
 
-Tree Viewfv
-===========
+Tree View
+=========
 
 The tree view shows how the algorithm was built using the other algorithms
 present. Here is a simple algorithm tree view that shows how the Benform_JPEG
@@ -576,6 +581,13 @@ different outputs: 1) the output of the clicked algorithm’s “standalone” r
 intermediate stages of the different algorithms that comprise the current on
 that is running. All output will show up in OpenCVB’s main form in the bottom 2
 images.
+
+How to Contribute
+=================
+
+Adding more examples is the goal and that is the best way to contribute to this
+effort. There are plenty of examples to use as a model but there are also
+snippets that assist in the process of adding new examples.
 
 Sample Results
 ==============

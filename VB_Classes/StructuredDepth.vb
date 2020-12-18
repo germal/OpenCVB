@@ -1,135 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Public Class StructuredDepth_SliceH
-    Inherits VBparent
-    Public side2D As Histogram_SideData
-    Dim inrange As Depth_InRange
-    Public histThresholdSlider As Windows.Forms.TrackBar
-    Public cushionSlider As Windows.Forms.TrackBar
-    Public offsetSlider As Windows.Forms.TrackBar
-    Public maskPlane As cv.Mat
-    Public yPlaneOffset As Integer
-    Public Sub New()
-        initParent()
-        side2D = New Histogram_SideData()
-        inrange = New Depth_InRange()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-            sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2 - 20)
-            sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
-        End If
-
-        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
-        cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the slice")
-
-        label2 = "Yellow bar is ceiling.  Yellow line is camera level."
-        task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        side2D.Run()
-        dst2 = side2D.dst2
-
-        Dim yCoordinate = CInt(offsetSlider.Value)
-
-        Dim planeY = side2D.meterMin * (side2D.cameraLoc - yCoordinate) / side2D.cameraLoc
-        If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)
-
-        Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
-        Dim cushion = cushionSlider.Value
-        Dim thicknessMeters = cushion * metersPerPixel
-        inrange.minVal = planeY - thicknessMeters
-        inrange.maxVal = planeY + thicknessMeters
-        inrange.src = side2D.split(1).Clone
-        inrange.Run()
-        maskPlane = inrange.depthMask
-
-        label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
-                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
-
-        dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane)
-        label2 = side2D.label2
-
-        dst2 = dst2.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(New cv.Point(0, side2D.cameraLoc), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        yPlaneOffset = If(offsetSlider.value < dst2.Height - cushion, CInt(offsetSlider.Value), dst2.Height - cushion - 1)
-        dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class StructuredDepth_SliceV
-    Inherits VBparent
-    Public top2D As Histogram_TopData
-    Public inrange As Depth_InRange
-    Dim sideStruct As StructuredDepth_SliceH
-    Public cushionSlider As Windows.Forms.TrackBar
-    Public offsetSlider As Windows.Forms.TrackBar
-    Public maskPlane As cv.Mat
-    Public Sub New()
-        initParent()
-        top2D = New Histogram_TopData()
-        inrange = New Depth_InRange()
-        sideStruct = New StructuredDepth_SliceH()
-
-        cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the slice")
-        offsetSlider.Value = src.Width / 2 - 20
-
-        task.desc = "Find and isolate planes using the top view histogram data"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim xCoordinate = offsetSlider.Value
-        top2D.Run()
-        dst2 = top2D.dst2
-
-        Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
-        If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
-
-        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
-        Dim cushion = cushionSlider.Value
-        Dim thicknessMeters = cushion * metersPerPixel
-
-        inrange.minVal = planeX - thicknessMeters
-        inrange.maxVal = planeX + thicknessMeters
-        inrange.src = top2D.split(0).Clone
-        inrange.Run()
-        maskPlane = inrange.depthMask
-
-        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
-                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
-
-        dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane)
-        label2 = top2D.label2
-
-        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(New cv.Point(top2D.cameraLoc, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Dim offset = CInt(offsetSlider.Value)
-        dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class StructuredDepth_Floor
     Inherits VBparent
     Public structD As StructuredDepth_SliceH
@@ -615,5 +484,203 @@ Public Class StructuredDepth_LinearizeFloor
 
             imuPC.CopyTo(imuPointCloud, maskPlane)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class StructuredDepth_SliceH
+    Inherits VBparent
+    Public side2D As Histogram_SideData
+    Dim inrange As Depth_InRange
+    Public histThresholdSlider As Windows.Forms.TrackBar
+    Public cushionSlider As Windows.Forms.TrackBar
+    Public offsetSlider As Windows.Forms.TrackBar
+    Public maskPlane As cv.Mat
+    Public yPlaneOffset As Integer
+    Public Sub New()
+        initParent()
+        side2D = New Histogram_SideData()
+        inrange = New Depth_InRange()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
+            sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2 - 20)
+            sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
+        End If
+
+        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
+        cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        offsetSlider = findSlider("Offset for the slice")
+
+        label2 = "Yellow bar is ceiling.  Yellow line is camera level."
+        task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        side2D.Run()
+        dst2 = side2D.dst2
+
+        Dim yCoordinate = CInt(offsetSlider.Value)
+
+        Dim planeY = side2D.meterMin * (side2D.cameraLoc - yCoordinate) / side2D.cameraLoc
+        If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)
+
+        Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
+        Dim cushion = cushionSlider.Value
+        Dim thicknessMeters = cushion * metersPerPixel
+        inrange.minVal = planeY - thicknessMeters
+        inrange.maxVal = planeY + thicknessMeters
+        inrange.src = side2D.split(1).Clone
+        inrange.Run()
+        maskPlane = inrange.depthMask
+
+        label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
+
+        dst1 = task.color.Clone
+        dst1.SetTo(cv.Scalar.White, maskPlane)
+        label2 = side2D.label2
+
+        dst2 = dst2.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2.Circle(New cv.Point(0, side2D.cameraLoc), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        yPlaneOffset = If(offsetSlider.Value < dst2.Height - cushion, CInt(offsetSlider.Value), dst2.Height - cushion - 1)
+        dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class StructuredDepth_SliceV
+    Inherits VBparent
+    Public top2D As Histogram_TopData
+    Public inrange As Depth_InRange
+    Dim sideStruct As StructuredDepth_SliceH
+    Public cushionSlider As Windows.Forms.TrackBar
+    Public offsetSlider As Windows.Forms.TrackBar
+    Public maskPlane As cv.Mat
+    Public Sub New()
+        initParent()
+        top2D = New Histogram_TopData()
+        inrange = New Depth_InRange()
+        sideStruct = New StructuredDepth_SliceH()
+
+        cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        offsetSlider = findSlider("Offset for the slice")
+        offsetSlider.Value = src.Width / 2 - 20
+
+        task.desc = "Find and isolate planes using the top view histogram data"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim xCoordinate = offsetSlider.Value
+        top2D.Run()
+        dst2 = top2D.dst2
+
+        Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
+        If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
+
+        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
+        Dim cushion = cushionSlider.Value
+        Dim thicknessMeters = cushion * metersPerPixel
+
+        inrange.minVal = planeX - thicknessMeters
+        inrange.maxVal = planeX + thicknessMeters
+        inrange.src = top2D.split(0).Clone
+        inrange.Run()
+        maskPlane = inrange.depthMask
+
+        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
+
+        dst1 = task.color.Clone
+        dst1.SetTo(cv.Scalar.White, maskPlane)
+        label2 = top2D.label2
+
+        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2.Circle(New cv.Point(top2D.cameraLoc, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Dim offset = CInt(offsetSlider.Value)
+        dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class StructuredDepth_SliceVStable
+    Inherits VBparent
+    Public top2D As Histogram_TopData
+    Public inrange As Depth_InRange
+    Dim sideStruct As StructuredDepth_SliceH
+    Public cushionSlider As Windows.Forms.TrackBar
+    Public offsetSlider As Windows.Forms.TrackBar
+    Public maskPlane As cv.Mat
+    Public Sub New()
+        initParent()
+        top2D = New Histogram_TopData()
+        inrange = New Depth_InRange()
+        sideStruct = New StructuredDepth_SliceH()
+
+        cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        offsetSlider = findSlider("Offset for the slice")
+        offsetSlider.Value = src.Width / 2 - 20
+
+        task.desc = "Find and isolate planes using the top view histogram data"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim xCoordinate = offsetSlider.Value
+        top2D.Run()
+        dst2 = top2D.dst2
+
+        Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
+        If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
+
+        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
+        Dim cushion = cushionSlider.Value
+        Dim thicknessMeters = cushion * metersPerPixel
+
+        inrange.minVal = planeX - thicknessMeters
+        inrange.maxVal = planeX + thicknessMeters
+        inrange.src = top2D.split(0).Clone
+        inrange.Run()
+        maskPlane = inrange.depthMask
+
+        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
+
+        dst1 = task.color.Clone
+        dst1.SetTo(cv.Scalar.White, maskPlane)
+        label2 = top2D.label2
+
+        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2.Circle(New cv.Point(top2D.cameraLoc, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Dim offset = CInt(offsetSlider.Value)
+        dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
 End Class

@@ -68,7 +68,6 @@ Public Class Stable_Basics
             cumulativeChanges = 0
         Else
             resetAll = False
-            dst1.SetTo(0)
             input.CopyTo(dst1, dst2)
 
             Static useNone = findRadio("Use unchanged depth input")
@@ -76,8 +75,10 @@ Public Class Stable_Basics
             Static useMax = findRadio("Use farthest distance")
             If useNone.checked = False Then
                 If useMax.checked Then cv.Cv2.Max(input, dst1, dst1)
-                If useMin.checked Then cv.Cv2.Min(input, dst1, dst1)
-                dst1.SetTo(0, task.inrange.noDepthMask)
+                If useMin.checked Then
+                    cv.Cv2.Min(input, dst1, dst1)
+                    dst1.SetTo(0, task.inrange.noDepthMask)
+                End If
             Else
                 input.CopyTo(dst1)
             End If

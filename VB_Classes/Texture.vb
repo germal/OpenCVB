@@ -117,6 +117,33 @@ End Class
 
 
 
+Public Class Texture_Flow_Reduction
+    Inherits VBparent
+    Dim texture As Texture_Flow
+    Dim reduction As Reduction_Basics
+    Public Sub New()
+        initParent()
+        texture = New Texture_Flow
+        reduction = New Reduction_Basics
+        task.desc = "Display texture flow in the reduced color image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        reduction.src = task.color
+        reduction.Run()
+        dst1 = reduction.dst1
+
+        texture.src = reduction.dst1
+        texture.Run()
+        dst2 = texture.dst1
+    End Sub
+End Class
+
+
+
+
+
+
 
 Public Class Texture_Shuffle
     Inherits VBparent
@@ -130,7 +157,7 @@ Public Class Texture_Shuffle
         If standalone Then floor = New OpenGL_FloorPlane()
         texture = New Texture_Basics()
         shuffle = New Random_Shuffle()
-        task.desc = "Use random shuffling to homogenize a texture sample"
+        task.desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
