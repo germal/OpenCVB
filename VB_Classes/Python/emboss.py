@@ -18,7 +18,7 @@ def kernel_generator(size):
 def emboss(img):
     cv2.namedWindow('image')
     cv2.createTrackbar('size', 'image', 0, 8, nothing)
-    switch = '0 : BL n1 : BR n2 : TR n3 : BR'
+    switch = '0 : BL n1 : BR n2 : TR n3 : TL'
     cv2.createTrackbar(switch, 'image', 0, 3, nothing)
 
     while True:
