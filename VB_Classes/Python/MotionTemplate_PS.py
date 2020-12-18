@@ -22,13 +22,13 @@ def draw_motion_comp(vis, rect, angle, color):
     cv.line(vis, (int(cx), int(cy)), (int(cx+np.cos(angle)*r), int(cy+np.sin(angle)*r)), color, 3)
 
 def OpenCVCode(imgRGB, depth_colormap, frameCount):
-    global frameCount, prev_imgRGB
+    global myFrameCount, prev_imgRGB
     height, width = imgRGB.shape[:2]
     motion_history = np.zeros((height, width), np.float32)
     hsv = np.zeros((height, width, 3), np.uint8)
     hsv[:,:,1] = 255
      
-    if frameCount > 0:
+    if myFrameCount > 0:
         frame_diff = cv.absdiff(imgRGB, prev_imgRGB)
         gray_diff = cv.cvtColor(frame_diff, cv.COLOR_BGR2GRAY)
         thrs = cv.getTrackbarPos('threshold', title_window)
@@ -70,9 +70,9 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
         cv.imshow(title_window, vis)
 
     prev_imgRGB = imgRGB.copy()
-    frameCount += 1
+    myFrameCount += 1
 
-frameCount = 0
+myFrameCount = 0
 cv.namedWindow(title_window)
 visuals = ['input', 'frame_diff', 'motion_hist', 'grad_orient']
 cv.createTrackbar('visual', title_window, 2, len(visuals)-1, nothing)

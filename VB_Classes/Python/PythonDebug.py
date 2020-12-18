@@ -1,66 +1,81 @@
+#!/usr/bin/env python
 import numpy as np
 import cv2 as cv
-import common
 import sys
-title_window = "SuperPixel_PS.py - use spacebar to switch views."
+title_window = "MotionTemplate_PS.py"
+
+MHI_DURATION = 0.5
+DEFAULT_THRESHOLD = 32
+MAX_TIME_DELTA = 0.25
+MIN_TIME_DELTA = 0.05
+
+# (empty) trackbar callback
+def nothing(dummy):
+    pass
+
+def draw_motion_comp(vis, rect, angle, color):
+    cv.rectangle(vis, (rect[0], rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (0, 255, 0))
+    r = min(rect[2]/2, rect[3]/2)
+    cx, cy = rect[0]+rect[2]/2, rect[1]+rect[3]/2
+    angle = angle*np.pi/180
+    cv.circle(vis, (int(cx), int(cy)), int(r), color, 3)
+    cv.line(vis, (int(cx), int(cy)), (int(cx+np.cos(angle)*r), int(cy+np.sin(angle)*r)), color, 3)
 
 def OpenCVCode(imgRGB, depth_colormap, frameCount):
-    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, scalarRed
-    converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
-    height,width,channels = converted_img.shape
-    num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)
-    num_iterations = cv.getTrackbarPos('Iterations', title_window)
+    global myFrameCount, prev_imgRGB
+    height, width = imgRGB.shape[:2]
+    motion_history = np.zeros((height, width), np.float32)
+    hsv = np.zeros((height, width, 3), np.uint8)
+    hsv[:,:,1] = 255
+     
+    if myFrameCount > 0:
+        frame_diff = cv.absdiff(imgRGB, prev_imgRGB)
+        gray_diff = cv.cvtColor(frame_diff, cv.COLOR_BGR2GRAY)
+        thrs = cv.getTrackbarPos('threshold', title_window)
+        ret, motion_mask = cv.threshold(gray_diff, thrs, 1, cv.THRESH_BINARY)
+        timestamp = cv.getTickCount() / cv.getTickFrequency()
+        cv.motempl.updateMotionHistory(motion_mask, motion_history, timestamp, MHI_DURATION)
+        mg_mask, mg_orient = cv.motempl.calcMotionGradient( motion_history, MAX_TIME_DELTA, MIN_TIME_DELTA, apertureSize=5 )
+        seg_mask, seg_bounds = cv.motempl.segmentMotion(motion_history, timestamp, MAX_TIME_DELTA)
 
-    if frameCount == 0:
-        scalarRed = np.zeros((height,width,3), np.uint8)
-        scalarRed[:] = (0, 0, 255)
+        visual_name = visuals[cv.getTrackbarPos('visual', title_window)]
+        if visual_name == 'input':
+            vis = imgRGB.copy()
+        elif visual_name == 'frame_diff':
+            vis = frame_diff.copy()
+        elif visual_name == 'motion_hist':
+            vis = np.uint8(np.clip((motion_history-(timestamp-MHI_DURATION)) / MHI_DURATION, 0, 1)*255)
+            vis = cv.cvtColor(vis, cv.COLOR_GRAY2BGR)
+        elif visual_name == 'grad_orient':
+            hsv[:,:,0] = mg_orient/2
+            hsv[:,:,2] = mg_mask*255
+            vis = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
 
-    if not seeds or num_SuperPixel_new != num_superpixels:
-        num_superpixels = num_SuperPixel_new
-        seeds = cv.ximgproc.createSuperpixelSEEDS(width, height, channels,
-                num_superpixels, num_levels, prior, num_histogram_bins)
+        for i, rect in enumerate([(0, 0, width, height)] + list(seg_bounds)):
+            x, y, rw, rh = rect
+            area = rw*rh
+            if area < 64**2:
+                continue
+            silh_roi   = motion_mask   [y:y+rh,x:x+rw]
+            orient_roi = mg_orient     [y:y+rh,x:x+rw]
+            mask_roi   = mg_mask       [y:y+rh,x:x+rw]
+            mhi_roi    = motion_history[y:y+rh,x:x+rw]
+            if cv.norm(silh_roi, cv.NORM_L1) < area*0.05:
+                continue
+            angle = cv.motempl.calcGlobalOrientation(orient_roi, mask_roi, mhi_roi, timestamp, MHI_DURATION)
+            color = ((255, 0, 0), (0, 0, 255))[i == 0]
+            draw_motion_comp(vis, rect, angle, color)
 
-    seeds.iterate(converted_img, num_iterations)
+        cv.putText(vis, visual_name, (20, 20), cv.FONT_HERSHEY_PLAIN, 1.0, (200,0,0))
+        cv.imshow(title_window, vis)
 
-    # retrieve the segmentation result
-    labels = seeds.getLabels()
+    prev_imgRGB = imgRGB.copy()
+    myFrameCount += 1
 
-    # labels output: use the last x bits to determine the color
-    num_label_bits = 2
-    labels &= (1<<num_label_bits)-1
-    labels *= 1<<(16-num_label_bits)
-
-    mask = seeds.getLabelContourMask(False)
-
-    # stitch foreground & background together
-    mask_inv = cv.bitwise_not(mask)
-    result_bg = cv.bitwise_and(imgRGB, imgRGB, mask=mask_inv)
-    result_fg = cv.bitwise_and(scalarRed, scalarRed, mask=mask)
-    result = cv.add(result_bg, result_fg)
-
-    if display_mode == 0:
-        cv.imshow(title_window, result)
-    elif display_mode == 1:
-        cv.imshow(title_window, mask)
-    else:
-        cv.imshow(title_window, labels)
-
-    ch = cv.waitKey(1)
-    if ch & 0xff == ord(' '):
-        display_mode = (display_mode + 1) % 2 # set this to 3 to get the labels working but it won't display...
-    frameCount += 1
-
-if __name__ == '__main__':
-    cv.namedWindow(title_window)
-    cv.createTrackbar('Number of Superpixels', title_window, 400, 1000, common.nothing)
-    cv.createTrackbar('Iterations', title_window, 4, 12, common.nothing)
-
-    frameCount = 0
-    seeds = None
-    display_mode = 0
-    num_superpixels = 400
-    prior = 2
-    num_levels = 4
-    num_histogram_bins = 5
-    from PyStream import PyStreamRun
-    PyStreamRun(OpenCVCode, 'SuperPixels_PS.py')
+myFrameCount = 0
+cv.namedWindow(title_window)
+visuals = ['input', 'frame_diff', 'motion_hist', 'grad_orient']
+cv.createTrackbar('visual', title_window, 2, len(visuals)-1, nothing)
+cv.createTrackbar('threshold', title_window, DEFAULT_THRESHOLD, 255, nothing)
+from PyStream import PyStreamRun
+PyStreamRun(OpenCVCode, 'MotionTemplate_PS.py')

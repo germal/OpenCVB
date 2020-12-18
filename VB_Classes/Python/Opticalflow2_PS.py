@@ -37,9 +37,9 @@ def warp_flow(img, flow):
     return res
 
 def OpenCVCode(imgRGB, depth_colormap, frameCount):
-    global frameCount, prev_imgRGB, prev, show_hsv, show_glitch, cur_glitch
+    global myFrameCount, prev_imgRGB, prev, show_hsv, show_glitch, cur_glitch
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
-    if frameCount == 0:
+    if myFrameCount == 0:
         show_hsv = True
         show_glitch = True
         prev = imgRGB.copy()
@@ -64,10 +64,10 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
                 cur_glitch = imgRGB.copy()
             print('glitch is', ['off', 'on'][show_glitch])
     prev_imgRGB = gray.copy()
-    frameCount += 1
+    myFrameCount += 1
 
 if __name__ == '__main__':
-    frameCount = 0
+    myFrameCount = 0
 
     from PyStream import PyStreamRun
     PyStreamRun(OpenCVCode, 'OpticalFlow2_PS.py')
