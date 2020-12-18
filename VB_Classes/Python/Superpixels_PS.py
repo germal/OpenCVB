@@ -5,7 +5,7 @@ import sys
 title_window = "SuperPixel_PS.py - use spacebar to switch views."
 
 def OpenCVCode(imgRGB, depth_colormap, frameCount):
-    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, frameCount, scalarRed
+    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, scalarRed
     converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
     height,width,channels = converted_img.shape
     num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)

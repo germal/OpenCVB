@@ -1,33 +1,66 @@
-import cv2
 import numpy as np
-# https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-in-OpenCV
-def nothing(x):
-    pass
+import cv2 as cv
+import common
+import sys
+title_window = "SuperPixel_PS.py - use spacebar to switch views."
 
-def tv_60(img):
-    cv2.namedWindow('image')
-    cv2.createTrackbar('val', 'image', 0, 255, nothing)
-    cv2.createTrackbar('threshold', 'image', 0, 100, nothing)
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
+    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, scalarRed
+    converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
+    height,width,channels = converted_img.shape
+    num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)
+    num_iterations = cv.getTrackbarPos('Iterations', title_window)
 
-    while True:
-        height, width = img.shape[:2]
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        thresh = cv2.getTrackbarPos('threshold', 'image')
-        val = cv2.getTrackbarPos('val', 'image')
-        for i in range(height):
-            for j in range(width):
-                if np.random.randint(100) <= thresh:
-                    if np.random.randint(2) == 0:
-                        gray[i, j] = min(gray[i, j] + np.random.randint(0, val+1), 255) # adding noise to image and setting values > 255 to 255. 
-                    else:
-                        gray[i, j] = max(gray[i, j] - np.random.randint(0, val+1), 0) # subtracting noise to image and setting values < 0 to 0.
+    if frameCount == 0:
+        scalarRed = np.zeros((height,width,3), np.uint8)
+        scalarRed[:] = (0, 0, 255)
 
-        cv2.imshow('Original', img)
-        cv2.imshow('image', gray)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cv2.destroyAllWindows()
-    
-if __name__ == "__main__":
-    img = cv2.imread("../../Data/image.jpg")
-    tv_60(img)
+    if not seeds or num_SuperPixel_new != num_superpixels:
+        num_superpixels = num_SuperPixel_new
+        seeds = cv.ximgproc.createSuperpixelSEEDS(width, height, channels,
+                num_superpixels, num_levels, prior, num_histogram_bins)
+
+    seeds.iterate(converted_img, num_iterations)
+
+    # retrieve the segmentation result
+    labels = seeds.getLabels()
+
+    # labels output: use the last x bits to determine the color
+    num_label_bits = 2
+    labels &= (1<<num_label_bits)-1
+    labels *= 1<<(16-num_label_bits)
+
+    mask = seeds.getLabelContourMask(False)
+
+    # stitch foreground & background together
+    mask_inv = cv.bitwise_not(mask)
+    result_bg = cv.bitwise_and(imgRGB, imgRGB, mask=mask_inv)
+    result_fg = cv.bitwise_and(scalarRed, scalarRed, mask=mask)
+    result = cv.add(result_bg, result_fg)
+
+    if display_mode == 0:
+        cv.imshow(title_window, result)
+    elif display_mode == 1:
+        cv.imshow(title_window, mask)
+    else:
+        cv.imshow(title_window, labels)
+
+    ch = cv.waitKey(1)
+    if ch & 0xff == ord(' '):
+        display_mode = (display_mode + 1) % 2 # set this to 3 to get the labels working but it won't display...
+    frameCount += 1
+
+if __name__ == '__main__':
+    cv.namedWindow(title_window)
+    cv.createTrackbar('Number of Superpixels', title_window, 400, 1000, common.nothing)
+    cv.createTrackbar('Iterations', title_window, 4, 12, common.nothing)
+
+    frameCount = 0
+    seeds = None
+    display_mode = 0
+    num_superpixels = 400
+    prior = 2
+    num_levels = 4
+    num_histogram_bins = 5
+    from PyStream import PyStreamRun
+    PyStreamRun(OpenCVCode, 'SuperPixels_PS.py')
