@@ -50,6 +50,12 @@ Public Class PyStream_Basics
                 If pipeImages.IsConnected Then pipeImages.Write(depthBuffer, 0, depthBuffer.Length)
             End If
         End If
+
+        If ocvb.pythonTaskName.EndsWith("Python_SurfaceBlit_PS.py") Then
+            ocvb.trueText("Blit works fine when using the Python_SurfaceBlit VB.Net algorithm but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
+                          "The callback in the PyStream interface does not allow the SurfaceBlit API to work." + vbCrLf +
+                          "See 'Python_SurfaceBlit.py' to see how the surfaceBlit works then review Python_SurfaceBlit_PS.py failure.")
+        End If
     End Sub
 End Class
 

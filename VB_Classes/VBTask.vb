@@ -162,9 +162,12 @@ Public Class ActiveTask : Implements IDisposable
 
         buildColors()
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
-        aOptions = New OptionsAll
-        aOptions.Show()
-        inrange = algoList.createAlgorithm("Options_Common")
+        If algName.EndsWith(".py") And algName.EndsWith("_PS.py") = False Then
+        Else
+            aOptions = New OptionsAll
+            aOptions.Show()
+            inrange = algoList.createAlgorithm("Options_Common")
+        End If
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
@@ -184,7 +187,7 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 
-        aOptions.layoutOptions()
+        If aOptions IsNot Nothing Then aOptions.layoutOptions()
 
         Application.DoEvents()
     End Sub
@@ -200,7 +203,7 @@ Public Class ActiveTask : Implements IDisposable
             End If
 
             ' run any global options algorithms here.
-            inrange.run()
+            If inrange IsNot Nothing Then inrange.run()
             algorithmObject.NextFrame()
             label1 = ocvb.label1
             label2 = ocvb.label2

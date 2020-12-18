@@ -183,8 +183,9 @@ Public Class Python_SurfaceBlit
                 On Error Resume Next
                 pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
             End If
-            ocvb.trueText("Blit works fine when run inline but fails with Python callback." + vbCrLf +
-                                                  "See 'Python_SurfaceBlit_PS.py' for the surfaceBlit failure")
+            ocvb.trueText("Blit works fine when here (Python_SurfaceBlit) but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
+                          "The callback in the PyStream interface does not allow the SurfaceBlit API to work." + vbCrLf +
+                          "See 'Python_SurfaceBlit.py' to see how the surfaceBlit works then review Python_SurfaceBlit_PS.py failure.")
         Else
             ocvb.trueText("Python is not available")
         End If

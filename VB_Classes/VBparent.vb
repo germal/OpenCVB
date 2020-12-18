@@ -245,7 +245,7 @@ Public Class VBparent : Implements IDisposable
         If pyStream IsNot Nothing Then pyStream.Dispose()
         Dim type As Type = algorithm.GetType()
         If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
-        aOptions.Close()
+        If aOptions IsNot Nothing Then aOptions.Close()
         sliders.Dispose()
         check.Dispose()
         radio.Dispose()

@@ -1146,7 +1146,7 @@ Public Class OpenCVB
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         textDesc = ""
         saveLayout()
-        End
+        Application.DoEvents()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
         MsgBox("The objective is to solve many small computer vision problems and do so in a way that enables " +

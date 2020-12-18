@@ -108,6 +108,7 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="Options_Common.vb" />
+    <Compile Include="PhotoShop.vb" />
     <Compile Include="Rectangle.vb" />
     <Compile Include="Fibonacci.vb" />
     <Compile Include="Fuzzy.vb" />
@@ -384,8 +385,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Python\60s_TV.py" />
+    <Content Include="Python\brightness.py" />
     <Content Include="Python\Coherence.py" />
     <Content Include="Python\Dither_Burkes.py" />
+    <Content Include="Python\duo_tone.py" />
+    <Content Include="Python\emboss.py" />
     <Content Include="Python\FunHouseMirror_PS.py" />
     <Content Include="Python\GeneticDrawing.py" />
     <Content Include="Python\GetRotationMatrix2d.py" />
@@ -407,6 +412,7 @@
     <Content Include="Python\Reg_shift.py" />
     <Content Include="Python\RotateImage.py" />
     <Content Include="Python\SelectiveSearchSegmentation_Demo.py" />
+    <Content Include="Python\sepia.py" />
     <Content Include="Python\Superpixels_PS.py" />
     <Content Include="Python\Tetris.py" />
     <Content Include="Python\Threshold_inRange_PS.py" />
