@@ -107,6 +107,7 @@ Public Class StructuredDepth_MultiSliceH
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
         dst2 = side2D.dst2
+        Dim Split = task.pointCloud.Split()
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
@@ -123,7 +124,7 @@ Public Class StructuredDepth_MultiSliceH
             If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
-            inrange.src = side2D.split(1).Clone
+            inrange.src = Split(1).Clone
             inrange.Run()
             maskPlane.SetTo(255, inrange.depthMask)
         Next
@@ -158,6 +159,8 @@ Public Class StructuredDepth_MultiSliceV
         top2D.Run()
         dst2 = top2D.dst2
 
+        Dim split = task.pointCloud.Split()
+
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
 
@@ -173,7 +176,7 @@ Public Class StructuredDepth_MultiSliceV
             If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
-            inrange.src = top2D.split(0).Clone
+            inrange.src = split(0).Clone
             inrange.Run()
             maskPlane.SetTo(255, inrange.depthMask)
         Next
@@ -196,6 +199,7 @@ Public Class StructuredDepth_MultiSlice
     Dim struct As StructuredDepth_SliceV
     Public inrange As Depth_InRange
     Public maskPlane As cv.Mat
+    Public split() As cv.Mat
     Public Sub New()
         initParent()
 
@@ -211,6 +215,7 @@ Public Class StructuredDepth_MultiSlice
         top2D.Run()
         side2D.Run()
         ' dst2 = top2D.dst2
+        split = task.pointCloud.Split()
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
@@ -221,13 +226,15 @@ Public Class StructuredDepth_MultiSlice
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
+        split = task.pointCloud.Split()
+
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
             Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
             If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
-            inrange.src = top2D.split(0).Clone
+            inrange.src = split(0).Clone
             inrange.Run()
             maskPlane = inrange.depthMask
             dst2.SetTo(255, maskPlane)
@@ -238,7 +245,7 @@ Public Class StructuredDepth_MultiSlice
             If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
-            inrange.src = side2D.split(1).Clone
+            inrange.src = Split(1).Clone
             inrange.Run()
             Dim tmp = inrange.depthMask
             cv.Cv2.BitwiseOr(tmp, maskPlane, maskPlane)
@@ -358,11 +365,11 @@ Public Class StructuredDepth_SliceXPlot
         dst2.Circle(New cv.Point(col, maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Dim filterZ = (dst2.Height - maxLoc.Y) / dst2.Height * ocvb.maxZ
 
-        Dim maskZplane As New cv.Mat(multi.top2D.split(0).Size, cv.MatType.CV_8U, 255)
+        Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U, 255)
         If filterZ > 0 Then
             multi.inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
             multi.inrange.maxVal = filterZ + 0.05
-            multi.inrange.src = multi.top2D.split(2)
+            multi.inrange.src = multi.split(2)
             multi.inrange.Run()
             maskZplane = multi.inrange.depthMask
         End If
@@ -525,6 +532,7 @@ Public Class StructuredDepth_SliceH
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
         dst2 = side2D.dst2
+        Dim Split = task.pointCloud.Split()
 
         Dim yCoordinate = CInt(offsetSlider.Value)
 
@@ -536,7 +544,7 @@ Public Class StructuredDepth_SliceH
         Dim thicknessMeters = cushion * metersPerPixel
         inrange.minVal = planeY - thicknessMeters
         inrange.maxVal = planeY + thicknessMeters
-        inrange.src = side2D.split(1).Clone
+        inrange.src = Split(1).Clone
         inrange.Run()
         maskPlane = inrange.depthMask
 
@@ -588,6 +596,8 @@ Public Class StructuredDepth_SliceV
         top2D.Run()
         dst2 = top2D.dst2
 
+        Dim split = task.pointCloud.Split()
+
         Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
         If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
 
@@ -597,7 +607,7 @@ Public Class StructuredDepth_SliceV
 
         inrange.minVal = planeX - thicknessMeters
         inrange.maxVal = planeX + thicknessMeters
-        inrange.src = top2D.split(0).Clone
+        inrange.src = split(0).Clone
         inrange.Run()
         maskPlane = inrange.depthMask
 
@@ -655,6 +665,7 @@ Public Class StructuredDepth_SliceVStable
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
         dst2 = top2D.dst2
+        Dim split = task.pointCloud.Split()
 
         Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
         If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
@@ -665,7 +676,7 @@ Public Class StructuredDepth_SliceVStable
 
         inrange.minVal = planeX - thicknessMeters
         inrange.maxVal = planeX + thicknessMeters
-        inrange.src = top2D.split(0).Clone
+        inrange.src = split(0).Clone
         inrange.Run()
         maskPlane = inrange.depthMask
 

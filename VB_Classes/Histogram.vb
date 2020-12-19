@@ -813,7 +813,6 @@ Public Class Histogram_TopData
     Public histOutput As New cv.Mat
     Public meterMin As Single
     Public meterMax As Single
-    Public split() As cv.Mat
     Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
     Dim IntelBug As Boolean
@@ -838,8 +837,6 @@ Public Class Histogram_TopData
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloud.Run()
-        Dim imuPC = task.pointCloud
-        split = imuPC.Split()
 
         Static minSlider = findSlider("X scale negative value in meters (meterMin) X100")
         Static maxSlider = findSlider("X scale positive value in meters (meterMax) X100")
@@ -849,7 +846,7 @@ Public Class Histogram_TopData
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput = histOutput.Flip(cv.FlipMode.X)
 
         Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
@@ -879,7 +876,6 @@ Public Class Histogram_SideData
     Public histOutput As New cv.Mat
     Public meterMin As Single
     Public meterMax As Single
-    Public split() As cv.Mat
     Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
     Public resizeHistOutput As Boolean = True
@@ -900,8 +896,6 @@ Public Class Histogram_SideData
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloud.Run()
-        Dim imuPC = task.pointCloud
-        split = imuPC.Split()
 
         Static minSlider = findSlider("Y scale negative value in meters (meterMin) X100")
         Static maxSlider = findSlider("Y scale positive value in meters (meterMax) X100")
@@ -911,7 +905,7 @@ Public Class Histogram_SideData
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {imuPC}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
