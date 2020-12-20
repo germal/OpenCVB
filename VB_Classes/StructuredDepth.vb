@@ -532,6 +532,7 @@ Public Class StructuredDepth_SliceH
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
         dst2 = side2D.dst2
+        Dim depthShadow = task.inrange.noDepthMask
         Dim Split = task.pointCloud.Split()
 
         Dim yCoordinate = CInt(offsetSlider.Value)

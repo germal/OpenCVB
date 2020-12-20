@@ -346,13 +346,21 @@ Why VB.Net?
 ===========
 
 VB.Net is not a language associated with computer vision algorithms. But the
-proliferation of examples in OpenCVB suggests this may be an oversight. Even the
+abundance of examples in OpenCVB suggests this may be an oversight. Even the
 seasoned developer should recognize what is obvious to the beginner: VB.Net can
-keep the code simple to read and write. VB.Net is a full-featured language just
-like C\# with lambda functions and multi-threading and VB.Net includes user
-interface tools that are flexible and complete (check boxes, radio buttons,
-sliders, TrueType fonts, and much more) - options missing from OpenCV's popular
-HighGUI library. (All existing HighGUI interfaces are still supported though.)
+keep the code simple to read and write. Many papers and software articles will
+often use something called “pseudo-code” to present an algorithm. In many
+respects, VB.Net code often resembles pseudo-code except that it is an actual
+working implementation of the algorithm.
+
+VB.Net provides a full-featured language just like C\# with lambda functions and
+multi-threading except VB.Net uses only a small subset of the keys available on
+the standard keyboard. Contrasted with Python or C++, VB.Net need make no
+apologies for using real keywords instead of the arbitrary meanings assigned to
+all the special keys. VB.Net includes user interface tools that are flexible and
+complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) -
+options missing from OpenCV's popular HighGUI library. (All existing HighGUI
+interfaces are still supported in OpenCVB.)
 
 The main caution in using VB.Net is to treat it as a scripting language like
 Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be
@@ -364,12 +372,12 @@ OpenCVSharp is active even when the solution is in Debug mode.
 Critics will point out that a Windows 10 app using VB.Net is not easily portable
 to other platforms but the entire OpenCVB application does not need to be ported
 to other platforms. Only individual algorithms will need to be ported after they
-are debugged and polished and most algorithms consist almost entirely of OpenCV
-APIs which are available everywhere. OpenCVB’s value lies in the ability to
-experiment and finish an OpenCV algorithm before even starting a port to a
-different platform. Confining development to OpenCVB’s C++ interface should
-provide the most portable version of any algorithm but even VB.Net code can be
-ported to a variety of non-Windows platforms.
+are debugged and polished, Most algorithms consist almost entirely of OpenCV
+APIs which are already available everywhere OpenCV runs. OpenCVB’s value lies in
+the ability to experiment and finish an OpenCV algorithm before even starting a
+port to a different platform. Confining development to OpenCVB’s C++ interface
+should provide the most portable version of any algorithm but even VB.Net code
+can be ported to a variety of non-Windows platforms.
 
 Camera Interface
 ================
@@ -487,15 +495,19 @@ Python Debugging
 
 Python scripts are run in a separate address space when invoked by OpenCVB so
 Visual Studio’s Python debug environment is not available directly from OpenCVB.
-When a Python script fails in OpenCVB, it may be debugged in the separate
-PythonDebug project. Here are the steps to debug Python:
+When a Python script fails in OpenCVB, it may be debugged in the PythonDebug
+project. Here are the steps to debug Python:
 
--   Open VB_Classes\\Python\\PythonDebug.pyproj in Visual Studio.
+-   In OpenCVB, set the startup project as “PythonDebug”
 
--   Copy the failing Python script into the PythonDebug.py file, and run it.
+-   Include the failing Python script in the PythonDebug project
 
-The Python script will be running in the same environment as if it were invoked
-from OpenCVB except the Python debugger will be active.
+-   Set the Python script that was just included as the “Startup File” in the
+    PythonDebug Properties/General
+
+Then running the PythonDebug project will test the Python script in the same
+environment as if it were invoked from OpenCVB except the Python debugger will
+be active and single-stepping through the script will be possible.
 
 All OpenCVB Python scripts can be debugged with the PythonDebug project
 including those that stream data from OpenCVB. For Python scripts requiring a
@@ -521,13 +533,13 @@ VB.Net project and invoke the algorithm requiring C++ debugging.
 Record and Playback
 ===================
 
-The ability to record and playback is provided with OpenCVB – see Replay_Record
-and Replay_Play algorithms. RGB, Depth, point cloud, and IMU data are written to
-the recording file. Any algorithm that normally runs with the live camera input
-and IMU data can be run with recorded data. Use the “Subset Combo Box” to select
-the option: “\<All using recorded data\>”. Running the regression tests with
-that setting will run all the algorithms with recorded data instead of a live
-camera feed.
+The ability to record and playback is provided with OpenCVB – see the algorithms
+labeled “Replay_Record” and “Replay_Play”. RGB, Depth, point cloud, and IMU data
+are written to the recording file. Any algorithm that normally runs with the
+live camera input and IMU data can be run with recorded data. Use the “Subset
+Combo Box” to select the option: “\<All using recorded data\>”. Running the
+regression tests with that setting will run all the algorithms with recorded
+data instead of a live camera feed.
 
 StereoLabs Zed 2 Support
 ========================
@@ -566,7 +578,7 @@ Tree View
 
 The tree view shows how the algorithm was built using the other algorithms
 present. Here is a simple algorithm tree view that shows how the Benform_JPEG
-algorithm was build:
+algorithm was built:
 
 ![](media/eee2426c6b6dc32aae9454fdc4dfc1f5.png)
 
@@ -576,18 +588,33 @@ standard Benford distribution using OpenCV’s AddWeighted API.
 
 Note that there is a pair of radio buttons below the tree view. The tree view is
 “live” in the sense that clicking on any entry in the view will show one of 2
-different outputs: 1) the output of the clicked algorithm’s “standalone” run; or
-2) the output of the currently running algorithm. The objective is to show the
-intermediate stages of the different algorithms that comprise the current on
-that is running. All output will show up in OpenCVB’s main form in the bottom 2
-images.
+different outputs in the main OpenCVB form: 1) the output of the clicked
+algorithm’s “standalone” run; or 2) the output of the currently running
+algorithm. The objective is to show and understand the intermediate stages of
+the different algorithms that comprise the current one that is running. All
+output will show up in OpenCVB’s main form in the bottom 2 images.
+
+Release vs. Beta
+================
+
+There are no release versions of OpenCVB. The infrastructure for OpenCVB – see
+the OpenCVB project – is stable and likely to just be tweaked, not reworked. The
+objective is continuing development of algorithms where each algorithm is
+independent. New algorithms are tested thoroughly before being added but even if
+a new algorithm fails, the vast majority of algorithms will continue to work.
+All algorithms are subject to continual overnight testing that should highlight
+deficiencies with default settings. The plan is that release is beta and beta is
+release – there will be no distinction – and any download will work.
 
 How to Contribute
 =================
 
 Adding more examples is the goal and that is the best way to contribute to this
 effort. There are plenty of examples to use as a model but there are also
-snippets that assist in the process of adding new examples.
+snippets that assist in the process of adding new examples. Any pull request
+that adds an algorithm will be welcome and quickly reviewed. Changes to the
+OpenCVB infrastructure – not the algorithms – is discouraged but always welcome.
+(See previous section on “Release vs. Beta” to understand why.)
 
 Sample Results
 ==============
