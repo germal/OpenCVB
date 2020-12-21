@@ -385,7 +385,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Python\60s_TV.py" />
+    <Content Include="Python\AntiqueTV.py" />
     <Content Include="Python\brightness.py" />
     <Content Include="Python\Coherence.py" />
     <Content Include="Python\Dither_Burkes.py" />

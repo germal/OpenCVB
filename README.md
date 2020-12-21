@@ -373,11 +373,11 @@ Critics will point out that a Windows 10 app using VB.Net is not easily portable
 to other platforms but the entire OpenCVB application does not need to be ported
 to other platforms. Only individual algorithms will need to be ported after they
 are debugged and polished, Most algorithms consist almost entirely of OpenCV
-APIs which are already available everywhere OpenCV runs. OpenCVB’s value lies in
-the ability to experiment and finish an OpenCV algorithm before even starting a
-port to a different platform. Confining development to OpenCVB’s C++ interface
-should provide the most portable version of any algorithm but even VB.Net code
-can be ported to a variety of non-Windows platforms.
+APIs which are already available everywhere. OpenCVB’s value lies in the ability
+to experiment and finish an OpenCV algorithm before even starting a port to a
+different platform. Confining development to OpenCVB’s C++ interface should
+provide the most portable version of any algorithm but even VB.Net code can be
+ported to a variety of non-Windows platforms.
 
 Camera Interface
 ================
@@ -464,7 +464,7 @@ the pre-defined subset group called “\<PyStream\>”.
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
 and each Python script will be run when performing the regression tests. To
-change which version of Python is used, open the “Options” dialog and in the
+change which version of Python is used, open the “Options” dialog. In the
 “Python” section, there is a browse button to select any Python.exe available on
 the system.
 
@@ -493,10 +493,11 @@ has been unreliable, the enabled setting is not saved when OpenCVB is closed.
 Python Debugging
 ================
 
-Python scripts are run in a separate address space when invoked by OpenCVB so
-Visual Studio’s Python debug environment is not available directly from OpenCVB.
-When a Python script fails in OpenCVB, it may be debugged in the PythonDebug
-project. Here are the steps to debug Python:
+Python scripts are run in a separate address space when invoked by OpenCVB just
+like the OpenGL interface in OpenCVB. Visual Studio’s Python debug environment
+is not available directly from OpenCVB. When a Python script fails in OpenCVB,
+it may be debugged in the PythonDebug project. Here are the steps to debug
+Python:
 
 -   In OpenCVB, set the startup project as “PythonDebug”
 
@@ -513,7 +514,7 @@ All OpenCVB Python scripts can be debugged with the PythonDebug project
 including those that stream data from OpenCVB. For Python scripts requiring a
 stream of images or point clouds, the process is reversed and the OpenCVB
 executable is invoked automatically and run in a separate address space. Images
-and point clouds will then be streamed to the Python script running in the
+and point clouds can then be streamed to the Python script running in the
 debugger.
 
 Visual Studio C++ Debugging
@@ -576,35 +577,37 @@ was installed.
 Tree View
 =========
 
-The tree view shows how the algorithm was built using the other algorithms
-present. Here is a simple algorithm tree view that shows how the Benform_JPEG
+The tree view shows how an algorithm was built using the other algorithms
+present. Here is a simple algorithm tree view that shows how the Benford_JPEG
 algorithm was built:
 
 ![](media/eee2426c6b6dc32aae9454fdc4dfc1f5.png)
 
 The Benford_JPEG algorithm applies the “Benford_Basics” algorithm to a JPEG
-image. The Benford_Basics code builds a histogram that is combined with the
-standard Benford distribution using OpenCV’s AddWeighted API.
+image data. The “Benford_Basics” algorithm builds a histogram. The histogram is
+then displayed using OpenCV’s “AddWeighted_Basics” API and a histogram plot
+algorithm called “Plot_Histogram”.
 
-Note that there is a pair of radio buttons below the tree view. The tree view is
-“live” in the sense that clicking on any entry in the view will show one of 2
-different outputs in the main OpenCVB form: 1) the output of the clicked
-algorithm’s “standalone” run; or 2) the output of the currently running
-algorithm. The objective is to show and understand the intermediate stages of
-the different algorithms that comprise the current one that is running. All
-output will show up in OpenCVB’s main form in the bottom 2 images.
+Note the pair of radio buttons below the tree view. The tree view is “live” in
+the sense that clicking on any entry in the view will show one of 2 different
+outputs in the main OpenCVB form: 1) the output of the clicked algorithm’s
+“standalone” run; or 2) the output of the currently running algorithm. The
+objective is to show and understand the intermediate stages of the different
+algorithms that comprise the current one that is running. All output will show
+up in OpenCVB’s main form in the bottom 2 images.
 
 Release vs. Beta
 ================
 
 There are no release versions of OpenCVB. The infrastructure for OpenCVB – see
-the OpenCVB project – is stable and likely to just be tweaked, not reworked. The
-objective is continuing development of algorithms where each algorithm is
-independent. New algorithms are tested thoroughly before being added but even if
-a new algorithm fails, the vast majority of algorithms will continue to work.
-All algorithms are subject to continual overnight testing that should highlight
-deficiencies with default settings. The plan is that release is beta and beta is
-release – there will be no distinction – and any download will work.
+the OpenCVB project – is stable and likely to just be tweaked with support for
+new cameras. The objective is continuing development of algorithms where each
+algorithm is independent. New algorithms are tested thoroughly before being
+added but even if a new algorithm fails, the vast majority of algorithms will
+continue to work. All algorithms are subject to continual overnight testing that
+should highlight deficiencies in any algorithm run with default settings. The
+plan is that release is beta and beta is release – there will be no distinction
+– and any download will work.
 
 How to Contribute
 =================
