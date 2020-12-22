@@ -96,6 +96,8 @@ End Class
 
 Public Class Random_UniformDist
     Inherits VBparent
+    Public minVal = 0
+    Public maxVal = 255
     Public Sub New()
         initParent()
         task.desc = "Create a uniform distribution."
@@ -103,7 +105,7 @@ Public Class Random_UniformDist
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
-        cv.Cv2.Randu(dst1, 0, 255)
+        cv.Cv2.Randu(dst1, minVal, maxVal)
     End Sub
 End Class
 
@@ -115,15 +117,23 @@ Public Class Random_NormalDist
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 25)
-            sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 127)
+            sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 125)
+            sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 25)
             sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
             sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
         End If
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Use Grayscale image"
+        End If
+
         task.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static grayCheck = findCheckBox("Use Grayscale image")
+        If grayCheck.checked And dst1.Channels <> 1 Then dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
     End Sub
 End Class
@@ -443,5 +453,142 @@ Public Class Random_CustomHistogram
             hist.plotHist.Run()
             dst2 = hist.plotHist.dst1
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-In-OpenCV
+Public Class Random_60sTV
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Range of noise to apply (from 0 to this value)", 0, 255, 50)
+            sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
+        End If
+        task.desc = "Imitate an old TV appearance using randomness."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
+        Static threshSlider = findSlider("Percentage of pixels to include noise")
+        Dim val = valSlider.value
+        Dim thresh = threshSlider.value
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        For y = 0 To dst1.Height - 1
+            For x = 0 To dst1.Width - 1
+                If 255 * Rnd() <= thresh Then
+                    Dim v = dst1.Get(Of Byte)(y, x)
+                    dst1.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (val + 1) * Rnd(), 255), Math.Max(v - (val + 1) * Rnd(), 0)))
+                End If
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+' https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-In-OpenCV
+Public Class Random_60sTVFaster
+    Inherits VBparent
+    Dim random As Random_UniformDist
+    Dim mats As Mat_4to1
+    Public Sub New()
+        initParent()
+
+        mats = New Mat_4to1
+        random = New Random_UniformDist
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Range of noise to apply (from 0 to this value)", 0, 255, 100)
+            sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
+        End If
+        label2 = "Changed pixels, add/sub mask, plusMask, minusMask"
+        task.desc = "A faster way to apply noise to imitate an old TV appearance using randomness."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
+        Static percentSlider = findSlider("Percentage of pixels to include noise")
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        random.Run()
+        mats.mat(0) = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.Binary)
+        Dim nochangeMask = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+
+        random.Run()
+        Dim valMask = random.dst1.Threshold(valSlider.value, 255, cv.ThresholdTypes.BinaryInv)
+        Dim valMat As New cv.Mat(valMask.Size, cv.MatType.CV_8U, 0)
+        random.dst1.CopyTo(valMat, valMask)
+
+        random.Run()
+        Dim plusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.Binary).SetTo(0, nochangeMask)
+        Dim minusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.BinaryInv).SetTo(0, nochangeMask)
+
+        mats.mat(2) = plusMask
+        mats.mat(3) = minusMask
+        mats.mat(1) = plusMask + minusMask
+
+        cv.Cv2.Add(dst1, valMat, dst1, plusMask)
+        cv.Cv2.Subtract(dst1, valMat, dst1, minusMask)
+        mats.Run()
+        dst2 = mats.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-In-OpenCV
+Public Class Random_60sTVFastSimple
+    Inherits VBparent
+    Dim random As Random_UniformDist
+    Public Sub New()
+        initParent()
+
+        random = New Random_UniformDist
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Range of noise to apply (from 0 to this value)", 0, 255, 100)
+            sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
+        End If
+        task.desc = "Remove diagnostics from the faster algorithm to simplify code."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
+        Static percentSlider = findSlider("Percentage of pixels to include noise")
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        random.Run()
+        Dim nochangeMask = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+
+        random.Run()
+        Dim valMask = random.dst1.Threshold(valSlider.value, 255, cv.ThresholdTypes.BinaryInv)
+        Dim valMat As New cv.Mat(valMask.Size, cv.MatType.CV_8U, 0)
+        random.dst1.CopyTo(valMat, valMask)
+
+        random.Run()
+        Dim plusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.Binary).SetTo(0, nochangeMask)
+        Dim minusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.BinaryInv).SetTo(0, nochangeMask)
+
+        cv.Cv2.Add(dst1, valMat, dst1, plusMask)
+        cv.Cv2.Subtract(dst1, valMat, dst1, minusMask)
     End Sub
 End Class
