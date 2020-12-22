@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-# https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-in-OpenCV
+# https://github.com/spmallick/learnopencv/tree/master/
 def sepia(img):
     res = img.copy()
     res = cv2.cvtColor(res, cv2.COLOR_BGR2RGB) # converting to RGB as sepia matrix is for RGB

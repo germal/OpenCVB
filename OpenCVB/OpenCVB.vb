@@ -863,26 +863,26 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        If camera.frameCount < 60 And AvailableAlgorithms.Text.StartsWith("OpenGL") = False Then Me.Activate() ' after all the algorithm options forms have appeared, set focus on the main form.
+        Static lastAlgorithmFrame As Integer
+        Static lastCameraFrame As Integer
+        If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
+        If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
+        If AvailableAlgorithms.Text.StartsWith("OpenGL") = False And lastAlgorithmFrame < 2 Then Me.Activate()
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
 
-        Static lastFrame As Integer
-        If lastFrame > frameCount Then lastFrame = 0
-        Dim countFrames = frameCount - lastFrame
-        lastFrame = frameCount
-        Dim fps As Single = countFrames / (fpsTimer.Interval / 1000)
+        Dim countFrames = frameCount - lastAlgorithmFrame
+        lastAlgorithmFrame = frameCount
+        Dim algorithmFPS As Single = countFrames / (fpsTimer.Interval / 1000)
 
-        Static lastCameraFrame As Integer
-        If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
         Dim camFrames = camera.frameCount - lastCameraFrame
         lastCameraFrame = camera.frameCount
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
         Me.Text = "OpenCVB (" + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " + CStr(CInt(CodeLineCount / AlgorithmCount)) +
                   " lines per) - " + optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + " - " + Format(cameraFPS, "#0.0") +
-                  "/" + Format(fps, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set)"
+                  "/" + Format(algorithmFPS, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set)"
     End Sub
     Private Sub saveLayout()
         optionsForm.saveResolution()

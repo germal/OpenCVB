@@ -1,23 +1,15 @@
 ﻿Imports cv = OpenCvSharp
-' https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-in-OpenCV
+' https://github.com/spmallick/learnopencv/tree/master/
 Public Class PhotoShop_Sepia
     Inherits VBparent
     Public Sub New()
         initParent()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Sepia Multiplier X100", 0, 1000, 100)
-        End If
-
         task.desc = "Create a sepia image"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
-        Static multSlider = findSlider("Sepia Multiplier X100")
-        Dim m As Double = multSlider.value / 100
-        Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393 * m, 0.769 * m, 0.189 * m}, {0.349 * m, 0.686 * m, 0.168 * m}, {0.272 * m, 0.534 * m, 0.131 * m}})
+        Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
         dst1 = dst1.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
     End Sub
 End Class
@@ -28,10 +20,10 @@ End Class
 
 
 
-
+' https://github.com/spmallick/learnopencv/tree/master/
 Public Class PhotoShop_Emboss
     Inherits VBparent
-    Dim gray128 As cv.Mat
+    Public gray128 As cv.Mat
     Public Sub New()
         initParent()
 
@@ -53,7 +45,7 @@ Public Class PhotoShop_Emboss
         label2 = "Embossed output"
         task.desc = "Use the video stream to make it appear like an embossed paper image."
     End Sub
-    Private Function kernelGenerator(size As Integer) As cv.Mat
+    Public Function kernelGenerator(size As Integer) As cv.Mat
         Dim kernel As New cv.Mat(size, size, cv.MatType.CV_8S, 0)
         For i = 0 To size - 1
             For j = 0 To size - 1
@@ -86,5 +78,87 @@ Public Class PhotoShop_Emboss
 
         dst2 = dst1.Filter2D(-1, kernel)
         cv.Cv2.Add(dst2, gray128, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://github.com/spmallick/learnopencv/tree/master/
+Public Class PhotoShop_EmbossAll
+    Inherits VBparent
+    Dim emboss As PhotoShop_Emboss
+    Dim mats As Mat_4to1
+    Dim sizeSlider As Windows.Forms.TrackBar
+    Public Sub New()
+        initParent()
+        mats = New Mat_4to1
+        emboss = New PhotoShop_Emboss
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Emboss threshold", 0, 255, 200)
+        End If
+        sizeSlider = findSlider("Emboss Kernel Size")
+        sizeSlider.Value = 5
+        hideForm("PhotoShop_Emboss Radio Options")
+
+        label1 = "The combination of all angles"
+        label2 = "bottom left, bottom right, top left, top right"
+        task.desc = "Emboss using all the directions provided"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
+
+        Static threshSlider = findSlider("Emboss threshold")
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst1.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(0))
+        mats.mat(0) = mats.mat(0).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
+
+        cv.Cv2.Flip(kernel, kernel, cv.FlipMode.Y)
+        dst2 = dst1.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(1))
+        mats.mat(1) = mats.mat(1).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
+
+        cv.Cv2.Flip(kernel, kernel, cv.FlipMode.X)
+        dst2 = dst1.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(2))
+        mats.mat(2) = mats.mat(2).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
+
+        cv.Cv2.Flip(kernel, kernel, cv.FlipMode.XY)
+        dst2 = dst1.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(3))
+        mats.mat(3) = mats.mat(3).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
+
+        dst1.SetTo(0)
+        For i = 0 To mats.mat.Count - 1
+            cv.Cv2.BitwiseOr(mats.mat(i), dst1, dst1)
+        Next
+
+        mats.Run()
+        dst2 = mats.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PhotoShop_DuoTone
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.desc = "Create a DuoTone image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
     End Sub
 End Class

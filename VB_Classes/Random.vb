@@ -462,7 +462,7 @@ End Class
 
 
 
-' https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-In-OpenCV
+' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Random_60sTV
     Inherits VBparent
     Public Sub New()
@@ -499,7 +499,7 @@ End Class
 
 
 
-' https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-In-OpenCV
+' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Random_60sTVFaster
     Inherits VBparent
     Dim random As Random_UniformDist
@@ -525,18 +525,17 @@ Public Class Random_60sTVFaster
         mats.mat(0) = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.Binary)
         Dim nochangeMask = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
-        random.Run()
-        Dim valMask = random.dst1.Threshold(valSlider.value, 255, cv.ThresholdTypes.BinaryInv)
-        Dim valMat As New cv.Mat(valMask.Size, cv.MatType.CV_8U, 0)
-        random.dst1.CopyTo(valMat, valMask)
+        Dim valMat As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        cv.Cv2.Randu(valMat, 0, valSlider.value)
+        valMat.SetTo(0, nochangeMask)
 
         random.Run()
-        Dim plusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.Binary).SetTo(0, nochangeMask)
-        Dim minusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.BinaryInv).SetTo(0, nochangeMask)
+        Dim plusMask = random.dst1.Threshold(128, 255, cv.ThresholdTypes.Binary)
+        Dim minusMask = random.dst1.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
 
         mats.mat(2) = plusMask
         mats.mat(3) = minusMask
-        mats.mat(1) = plusMask + minusMask
+        mats.mat(1) = (plusMask + minusMask).ToMat.SetTo(0, nochangeMask)
 
         cv.Cv2.Add(dst1, valMat, dst1, plusMask)
         cv.Cv2.Subtract(dst1, valMat, dst1, minusMask)
@@ -551,7 +550,7 @@ End Class
 
 
 
-' https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-In-OpenCV
+' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Random_60sTVFastSimple
     Inherits VBparent
     Dim random As Random_UniformDist
@@ -572,12 +571,17 @@ Public Class Random_60sTVFastSimple
         random.Run()
         Dim nochangeMask = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
-        random.Run()
-        Dim valMat As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        random.dst1.CopyTo(valMat, random.dst1.Threshold(valSlider.value, 255, cv.ThresholdTypes.BinaryInv))
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        cv.Cv2.Randu(dst2, 0, valSlider.value)
+        dst2.SetTo(0, nochangeMask)
 
-        random.Run()
-        cv.Cv2.Add(dst1, valMat, dst1, random.dst1.Threshold(127, 255, cv.ThresholdTypes.Binary).SetTo(0, nochangeMask))
-        cv.Cv2.Subtract(dst1, valMat, dst1, random.dst1.Threshold(127, 255, cv.ThresholdTypes.BinaryInv).SetTo(0, nochangeMask))
+        Dim tmp As New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        cv.Cv2.Randu(tmp, 0, 255)
+        Dim plusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.Binary)
+        Dim minusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
+
+        cv.Cv2.Add(dst1, dst2, dst1, plusMask)
+        cv.Cv2.Subtract(dst1, dst2, dst1, minusMask)
+        label2 = "Mat of random values < " + CStr(valSlider.value)
     End Sub
 End Class

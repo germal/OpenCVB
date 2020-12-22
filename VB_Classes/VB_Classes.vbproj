@@ -385,12 +385,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Python\AntiqueTV.py" />
-    <Content Include="Python\brightness.py" />
+    <Content Include="Python\PhotoShop_60sTV.py" />
+    <Content Include="Python\PhotoShop_brightness.py" />
     <Content Include="Python\Coherence.py" />
     <Content Include="Python\Dither_Burkes.py" />
-    <Content Include="Python\duo_tone.py" />
-    <Content Include="Python\emboss.py" />
+    <Content Include="Python\PhotoShop_duo_tone.py" />
+    <Content Include="Python\PhotoShop_emboss.py" />
     <Content Include="Python\FunHouseMirror_PS.py" />
     <Content Include="Python\GeneticDrawing.py" />
     <Content Include="Python\GetRotationMatrix2d.py" />
@@ -412,7 +412,7 @@
     <Content Include="Python\Reg_shift.py" />
     <Content Include="Python\RotateImage.py" />
     <Content Include="Python\SelectiveSearchSegmentation_Demo.py" />
-    <Content Include="Python\sepia.py" />
+    <Content Include="Python\PhotoShop_sepia.py" />
     <Content Include="Python\Superpixels_PS.py" />
     <Content Include="Python\Tetris.py" />
     <Content Include="Python\Threshold_inRange_PS.py" />

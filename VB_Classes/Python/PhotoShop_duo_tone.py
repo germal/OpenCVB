@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-# https://github.com/spmallick/learnopencv/tree/master/Photoshop-Filters-in-OpenCV
+# https://github.com/spmallick/learnopencv/tree/master/
 def nothing(x):
     pass
     
