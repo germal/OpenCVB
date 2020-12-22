@@ -504,18 +504,15 @@ Public Class Random_60sTVFaster
     Inherits VBparent
     Dim random As Random_UniformDist
     Dim mats As Mat_4to1
+    Dim options As Random_60sTV
     Public Sub New()
         initParent()
 
         mats = New Mat_4to1
         random = New Random_UniformDist
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Range of noise to apply (from 0 to this value)", 0, 255, 100)
-            sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
-        End If
+        options = New Random_60sTV
         label2 = "Changed pixels, add/sub mask, plusMask, minusMask"
-        task.desc = "A faster way to apply noise to imitate an old TV appearance using randomness."
+        task.desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -558,15 +555,11 @@ End Class
 Public Class Random_60sTVFastSimple
     Inherits VBparent
     Dim random As Random_UniformDist
+    Dim options As Random_60sTV
     Public Sub New()
         initParent()
-
         random = New Random_UniformDist
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Range of noise to apply (from 0 to this value)", 0, 255, 100)
-            sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
-        End If
+        options = New Random_60sTV
         task.desc = "Remove diagnostics from the faster algorithm to simplify code."
     End Sub
     Public Sub Run()
@@ -580,15 +573,11 @@ Public Class Random_60sTVFastSimple
         Dim nochangeMask = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
         random.Run()
-        Dim valMask = random.dst1.Threshold(valSlider.value, 255, cv.ThresholdTypes.BinaryInv)
-        Dim valMat As New cv.Mat(valMask.Size, cv.MatType.CV_8U, 0)
-        random.dst1.CopyTo(valMat, valMask)
+        Dim valMat As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        random.dst1.CopyTo(valMat, random.dst1.Threshold(valSlider.value, 255, cv.ThresholdTypes.BinaryInv))
 
         random.Run()
-        Dim plusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.Binary).SetTo(0, nochangeMask)
-        Dim minusMask = random.dst1.Threshold(127, 255, cv.ThresholdTypes.BinaryInv).SetTo(0, nochangeMask)
-
-        cv.Cv2.Add(dst1, valMat, dst1, plusMask)
-        cv.Cv2.Subtract(dst1, valMat, dst1, minusMask)
+        cv.Cv2.Add(dst1, valMat, dst1, random.dst1.Threshold(127, 255, cv.ThresholdTypes.Binary).SetTo(0, nochangeMask))
+        cv.Cv2.Subtract(dst1, valMat, dst1, random.dst1.Threshold(127, 255, cv.ThresholdTypes.BinaryInv).SetTo(0, nochangeMask))
     End Sub
 End Class
