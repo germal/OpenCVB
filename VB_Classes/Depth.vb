@@ -1947,7 +1947,7 @@ Public Class Depth_PointCloud_Stable
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        split = cv.Cv2.Split(task.pointCloud)
+        split = task.pointCloud.Split
 
         extrema.src = src
         If extrema.src.Type <> cv.MatType.CV_32F Then extrema.src = split(2) * 1000
@@ -2005,7 +2005,7 @@ Public Class Depth_SmoothSurfaces
         pcValid.Run()
         Dim mask = pcValid.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        Dim split = cv.Cv2.Split(pcValid.stableCloud)
+        Dim split = pcValid.stableCloud.Split()
         Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
         Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
 

@@ -591,7 +591,7 @@ Public Class OpenGL_StabilizedDepth
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
+        Dim split = task.pointCloud.Split()
 
         stable.src = src
         If stable.src.Type <> cv.MatType.CV_32F Then stable.src = split(2) * 1000

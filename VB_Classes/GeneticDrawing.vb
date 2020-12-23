@@ -270,7 +270,7 @@ Public Class GeneticDrawing_Color
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split() As cv.Mat
-        split = cv.Cv2.Split(src)
+        split = src.Split()
 
         Static restartCheck = findCheckBox("Restart the algorithm with the current settings")
         Dim restartRequested = restartCheck.checked

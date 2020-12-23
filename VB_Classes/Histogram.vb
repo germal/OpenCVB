@@ -243,7 +243,7 @@ Public Class Histogram_KalmanSmoothed
         Static splitIndex = -1
         Static colorName As String
         If standalone Then
-            Dim split() = cv.Cv2.Split(src)
+            Dim split() = src.Split()
             If ocvb.frameCount Mod 100 = 0 Then
                 splitIndex += 1
                 If splitIndex > 2 Then splitIndex = 0
@@ -412,7 +412,7 @@ Public Class Histogram_EqualizeColor
 
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
-        cv.Cv2.Split(src, rgbEq)
+        rgbEq = src.Split()
 
         For i = 0 To rgb.Count - 1
             cv.Cv2.EqualizeHist(rgbEq(i), rgbEq(i))

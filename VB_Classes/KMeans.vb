@@ -409,7 +409,7 @@ Public Class kMeans_ColorDepth
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim srcPlanes() As cv.Mat = Nothing
-        cv.Cv2.Split(rgb32f, srcPlanes)
+        srcPlanes = rgb32f.Split()
         ReDim Preserve srcPlanes(3)
         srcPlanes(3) = task.depth32f
         Dim zeroMask = srcPlanes(3).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
@@ -464,7 +464,7 @@ Public Class kMeans_ColorDepth_MT
            Dim rgb32f As New cv.Mat
            src(roi).ConvertTo(rgb32f, cv.MatType.CV_32FC3)
            Dim srcPlanes() As cv.Mat = Nothing
-           cv.Cv2.Split(rgb32f, srcPlanes)
+           srcPlanes = rgb32f.Split()
            ReDim Preserve srcPlanes(4 - 1)
            srcPlanes(3) = task.depth32f(roi)
 

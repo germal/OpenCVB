@@ -156,9 +156,54 @@ Public Class PhotoShop_DuoTone
     Inherits VBparent
     Public Sub New()
         initParent()
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "DuoTone 1 Blue"
+            radio.check(1).Text = "DuoTone 1 Green"
+            radio.check(2).Text = "DuoTone 1 Red"
+            radio.check(0).Checked = True
+
+            radio1.Setup(caller + " ContourApproximation Mode", 3)
+            radio1.check(0).Text = "DuoTone 2 Blue"
+            radio1.check(1).Text = "DuoTone 2 Green"
+            radio1.check(2).Text = "DuoTone 2 Red"
+            radio1.check(0).Checked = True
+        End If
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "DuoTone Dark if checked, Light otherwise"
+            check.Box(0).Checked = True
+        End If
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "DuoTone Exponent", 0, 10, 0)
+        End If
+
         task.desc = "Create a DuoTone image"
+    End Sub
+    Private Sub expFunction(channel As Integer, exp As Single)
+
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static expSlider = findSlider("DuoTone Exponent")
+        Dim exp = 1 + expSlider.value / 100
+
+        Dim dt1 As Integer
+        For dt1 = 0 To radio.check.Count - 1
+            If radio.check(dt1).Checked Then Exit For
+        Next
+
+        Dim dt2 As Integer
+        For dt2 = 0 To radio.check.Count - 1
+            If radio.check(dt2).Checked Then Exit For
+        Next
+
+        Dim dark = check.Box(0).Checked
+        Dim split = src.Split()
+
     End Sub
 End Class

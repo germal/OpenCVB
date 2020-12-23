@@ -62,8 +62,7 @@ Public Class DCT_RGB
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim srcPlanes() As cv.Mat = Nothing
-        cv.Cv2.Split(src, srcPlanes)
+        Dim srcPlanes = src.Split()
 
         Dim dctFlag As cv.DctFlags
         For i = 0 To 2

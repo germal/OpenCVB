@@ -38,7 +38,7 @@ Public Class Brightness_Hue
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
-        cv.Cv2.Split(imghsv, hsv_planes)
+        Dim hsv_planes = imghsv.Split()
 
         label1 = "Hue"
         label2 = "Saturation"

@@ -248,7 +248,7 @@ Public Class Mat_ImageXYZ_MT
                 xyDepth.Set(Of cv.Point3f)(xyz.Y, xyz.X, xyz)
             Next
         Next
-        cv.Cv2.Split(xyDepth, xyzPlanes)
+        xyzPlanes = xyDepth.Split()
 
         task.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub

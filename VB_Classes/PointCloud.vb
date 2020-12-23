@@ -1484,7 +1484,7 @@ Public Class PointCloud_ReducedSideView
 
         gCloud.Run()
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
+        Dim split = task.pointCloud.Split()
         reduction.src = split(2) * 1000
         reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
@@ -1526,7 +1526,7 @@ Public Class PointCloud_ReducedTopView
 
         gCloud.Run()
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
+        Dim split = task.pointCloud.Split()
         reduction.src = split(2) * 1000
         reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()

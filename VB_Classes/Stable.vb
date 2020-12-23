@@ -135,7 +135,7 @@ Public Class Stable_Pointcloud
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim split = cv.Cv2.Split(task.pointCloud)
+        Dim split = task.pointCloud.Split()
         stable.src = split(2) * 1000
 
         stable.Run()

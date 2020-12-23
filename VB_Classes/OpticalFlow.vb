@@ -14,7 +14,7 @@ Module OpticalFlowModule_Exports
 
         cv.Cv2.CalcOpticalFlowFarneback(oldGray, gray, flow, pyrScale, levels, winSize, iterations, polyN, polySigma, OpticalFlowFlags)
         Dim flowVec(1) As cv.Mat
-        cv.Cv2.Split(flow, flowVec)
+        flowVec = flow.Split()
 
         Dim hsv As New cv.Mat
         Dim hsv0 As New cv.Mat

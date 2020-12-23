@@ -50,7 +50,7 @@ Public Class DFT_Basics
 
         If standalone Then
             ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
-            cv.Cv2.Split(complexImage, planes)
+            planes = complexImage.Split
 
             cv.Cv2.Magnitude(planes(0), planes(1), magnitude)
             magnitude += cv.Scalar.All(1) ' switch To logarithmic scale
