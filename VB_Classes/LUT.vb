@@ -1,6 +1,70 @@
-
-
 Imports cv = OpenCvSharp
+Public Class LUT_Basics
+    Inherits VBparent
+    Public reduction As Reduction_Basics
+    Dim gradMap As Palette_BuildGradientColorMap
+    Public colorMap As cv.Mat
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
+        gradMap = New Palette_BuildGradientColorMap
+
+        label2 = "Custom Color Lookup Table"
+        task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then
+            reduction.src = src
+            reduction.Run()
+        End If
+
+        gradMap.Run()
+        colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
+        dst1 = reduction.dst1.LUT(colorMap)
+        dst2 = colorMap.Resize(src.Size())
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+Public Class LUT_Simple
+    Inherits VBparent
+    Public reduction As Reduction_Basics
+    Public colorMat As cv.Mat
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
+        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors)
+        label2 = "Custom Color Lookup Table"
+        task.desc = "Build and use a custom color palette - Painterly Effect"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        reduction.src = src
+        reduction.Run()
+        dst1 = reduction.dst1.LUT(colorMat)
+        If standalone Then dst2 = colorMat.Resize(src.Size())
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
 Public Class LUT_Gray
     Inherits VBparent
     Public Sub New()
@@ -34,28 +98,6 @@ Public Class LUT_Gray
     End Sub
 End Class
 
-
-
-
-' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Basics
-    Inherits VBparent
-    Public reduction As Reduction_Basics
-    Public colorMat As cv.Mat
-    Public Sub New()
-        initParent()
-        reduction = New Reduction_Basics()
-        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors)
-        task.desc = "Build and use a custom color palette - Painterly Effect"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        reduction.src = src
-        reduction.Run()
-        dst1 = reduction.dst1.LUT(colorMat)
-        If standalone Then dst2 = colorMat.Resize(src.Size())
-    End Sub
-End Class
 
 
 

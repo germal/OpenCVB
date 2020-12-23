@@ -44,17 +44,17 @@ Public Class Palette_Basics
 
         Static cMapDir As New DirectoryInfo(ocvb.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Static saveColorMap As Integer = -1
+        If colormap = 20 Then
+            saveColorMap = colormap
+            gradMap.Run()
+        End If
         If saveColorMap <> colormap Then
             saveColorMap = colormap
             Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
             ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
             Dim mapFile As New FileInfo(str)
-            If colormap = 20 Then
-                gradMap.Run()
-            Else
-                gradMap.gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
-            End If
+            gradMap.gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
             If standalone Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
             If whiteBack And gradMap.gradientColorMap.Cols <> 0 Then gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.White)
         End If
@@ -349,26 +349,40 @@ Public Class Palette_BuildGradientColorMap
             sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
         End If
 
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Reset the random gradient color map"
+        End If
+
         label2 = "Generated colormap"
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        Static saveGradCount = -1
         Static transitionSlider = findSlider("Number of color transitions (Used only with Random)")
-        Dim gradCount = transitionSlider.Value
-        Dim gradMat As New cv.Mat
-        For i = 0 To gradCount - 1
-            gradMat = colorTransition(color1, color2, src.Width)
-            color2 = color1
-            color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-        Next
-        gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
-        dst1 = Palette_Custom_Apply(src, gradientColorMap)
-        If standalone Then dst2 = gradientColorMap
+        Static tranSetting = transitionSlider.value
+        Static resetCheck = findCheckBox("Reset the random gradient color map")
+        Static changeColorMap As Boolean = True
+        If changeColorMap <> resetCheck.checked Or tranSetting <> transitionSlider.value Then
+            changeColorMap = False
+            resetCheck.checked = False
+            tranSetting = transitionSlider.value
+
+            Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            Static saveGradCount = -1
+            Dim gradCount = transitionSlider.Value
+            Dim gradMat As New cv.Mat
+            For i = 0 To gradCount - 1
+                gradMat = colorTransition(color1, color2, src.Width)
+                color2 = color1
+                color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+            Next
+            gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
+            dst1 = Palette_Custom_Apply(src, gradientColorMap)
+            If standalone Then dst2 = gradientColorMap
+        End If
     End Sub
 End Class
 
