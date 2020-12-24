@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-title_window = 'Brightness_Contrast_Example2.py'
+title_window = 'PhotoShop_Contrast_Example2.py'
 
 alpha = 1.0
 alpha_max = 500

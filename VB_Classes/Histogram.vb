@@ -723,13 +723,13 @@ End Class
 
 Public Class Histogram_HueSaturation2DPlot
     Inherits VBparent
-    Dim hueSat As Brightness_Hue
+    Dim hueSat As PhotoShop_Hue
     Dim hist2d As Histogram_BackProjection2D
     Dim mats As Mat_4to1
     Public Sub New()
         initParent()
 
-        hueSat = New Brightness_Hue()
+        hueSat = New PhotoShop_Hue()
         hist2d = New Histogram_BackProjection2D()
         mats = New Mat_4to1()
         ocvb.quadrantIndex = QUAD3

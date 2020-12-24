@@ -165,7 +165,6 @@
     <Compile Include="Blob.vb" />
     <Compile Include="BlockMatching.vb" />
     <Compile Include="Blur.vb" />
-    <Compile Include="Brightness.vb" />
     <Compile Include="BRISK.vb" />
     <Compile Include="CamShift.vb" />
     <Compile Include="CComp.vb" />
@@ -438,7 +437,7 @@
     <Content Include="Python\Turing.py" />
     <Content Include="Python\WarpAffine_SIFT.py" />
     <Content Include="Python\PythonPackages.py" />
-    <Content Include="Python\Brightness_Contrast_Example1.py" />
+    <Content Include="Python\PhotoShop_Contrast_Example1.py" />
     <Content Include="Python\Draw_Basic.py" />
     <Content Include="Python\BGSubtract.py" />
     <Content Include="Python\Polyline_Browse.py" />
@@ -448,7 +447,7 @@
     <Content Include="Python\Calibrate.py" />
     <Content Include="Python\Calibrate_ShowExtrinsics.py" />
     <Content Include="Python\Edges_CannyDetector.py" />
-    <Content Include="Python\Brightness_Contrast_Example2.py" />
+    <Content Include="Python\PhotoShop_Contrast_Example2.py" />
     <Content Include="Python\Histogram_Compare_Demo.py" />
     <Content Include="Python\Contours.py" />
     <Content Include="Python\Copy_make_border.py" />

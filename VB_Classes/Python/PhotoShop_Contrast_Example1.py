@@ -26,7 +26,7 @@ new_image = cv.convertScaleAbs(image, new_image, alpha, beta)
 
 both = np.empty((image.shape[0], image.shape[1]*2, image.shape[2]), image.dtype)
 both = cv.hconcat([image, new_image])
-cv.imshow('Brightness_Contrast_Example1.py: Alpha 3.0 and beta = 50', both)
+cv.imshow('PhotoShop_Contrast_Example1.py: Alpha 3.0 and beta = 50', both)
 
 cv.waitKey()
  

@@ -1,4 +1,311 @@
 ﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
+Public Class PhotoShop_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
+        End If
+        sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
+        label1 = "GrayScale"
+        label2 = "CLAHE Result"
+        task.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src
+        Dim claheObj = cv.Cv2.CreateCLAHE()
+        claheObj.TilesGridSize() = New cv.Size(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
+        claheObj.ClipLimit = sliders.trackbar(0).Value
+        claheObj.Apply(src, dst2)
+    End Sub
+End Class
+
+
+
+Public Class PhotoShop_Hue
+    Inherits VBparent
+    Public hsv_planes(2) As cv.Mat
+    Public Sub New()
+        initParent()
+        label1 = "Hue"
+        label2 = "Saturation"
+        task.desc = "Show hue (Result1) and Saturation (Result2)."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
+        Dim hsv_planes = imghsv.Split()
+
+        cv.Cv2.CvtColor(hsv_planes(0), dst1, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(hsv_planes(1), dst2, cv.ColorConversionCodes.GRAY2BGR)
+    End Sub
+End Class
+
+
+
+Public Class PhotoShop_AlphaBeta
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.desc = "Use alpha and beta with ConvertScaleAbs."
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
+            sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
+        End If
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
+    End Sub
+End Class
+
+
+
+
+Public Class PhotoShop_Gamma
+    Inherits VBparent
+    Dim lookupTable(255) As Byte
+    Public Sub New()
+        initParent()
+        task.desc = "Use gamma with ConvertScaleAbs."
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
+        End If
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static lastGamma As Integer = -1
+        If lastGamma <> sliders.trackbar(0).Value Then
+            lastGamma = sliders.trackbar(0).Value
+            For i = 0 To lookupTable.Length - 1
+                lookupTable(i) = Math.Pow(i / 255, sliders.trackbar(0).Value / 100) * 255
+            Next
+        End If
+        dst1 = src.LUT(lookupTable)
+    End Sub
+End Class
+
+
+
+
+Module PhotoShop_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function WhiteBalance_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub WhiteBalance_Close(wPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function WhiteBalance_Run(wPtr As IntPtr, rgb As IntPtr, rows As Integer, cols As Integer, thresholdVal As Single) As IntPtr
+    End Function
+End Module
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class PhotoShop_WhiteBalance_CPP
+    Inherits VBparent
+    Dim wPtr As IntPtr
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
+        End If
+        wPtr = WhiteBalance_Open()
+        label1 = "Image with auto white balance"
+        label2 = "White pixels were altered from the original"
+        task.desc = "Automate getting the right white balance"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim rgbData(src.Total * src.ElemSize - 1) As Byte
+        Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
+        Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
+
+        Static thresholdSlider = findSlider("White balance threshold X100")
+        Dim thresholdVal As Single = thresholdSlider.Value / 100
+        Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
+        handleSrc.Free()
+
+        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
+        Dim diff = dst1 - src
+        diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+    End Sub
+    Public Sub Close()
+        WhiteBalance_Close(wPtr)
+    End Sub
+End Class
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class PhotoShop_WhiteBalance
+    Inherits VBparent
+    Dim hist As Histogram_Basics
+    Dim whiteCPP As PhotoShop_WhiteBalance_CPP
+    Dim wPtr As IntPtr
+    Public Sub New()
+        initParent()
+        hist = New Histogram_Basics()
+        hist.plotRequested = True
+        hist.bins = 256 * 3
+        hist.maxRange = hist.bins
+
+        whiteCPP = New PhotoShop_WhiteBalance_CPP()
+
+        label1 = "Image with auto white balance"
+        task.desc = "Automate getting the right white balance"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim rgb32f As New cv.Mat
+        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+        Dim maxVal As Double, minVal As Double
+        rgb32f.MinMaxLoc(minVal, maxVal)
+
+        Dim planes() = rgb32f.Split()
+        Dim sum32f = New cv.Mat(src.Size(), cv.MatType.CV_32F)
+        sum32f = planes(0) + planes(1) + planes(2)
+        hist.src = sum32f
+        hist.Run()
+        dst2 = hist.dst1
+
+        Static thresholdSlider = findSlider("White balance threshold X100")
+        Dim thresholdVal = thresholdSlider.Value / 100
+        Dim sum As Single
+        Dim threshold As Integer
+        For i = hist.histRaw(0).Rows - 1 To 0 Step -1
+            sum += hist.histRaw(0).Get(Of Single)(i, 0)
+            If sum > hist.src.Rows * hist.src.Cols * thresholdVal Then
+                threshold = i
+                Exit For
+            End If
+        Next
+
+        Dim mask = sum32f.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(1)
+
+        Dim mean = rgb32f.Mean(mask)
+        For i = 0 To rgb32f.Channels - 1
+            planes(i) *= maxVal / mean.Item(i)
+            planes(i) = planes(i).Threshold(255, 255, cv.ThresholdTypes.Trunc)
+        Next
+
+        cv.Cv2.Merge(planes, rgb32f)
+        rgb32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
+    End Sub
+    Public Sub Close()
+        WhiteBalance_Close(wPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class PhotoShop_ChangeMask
+    Inherits VBparent
+    Dim white As PhotoShop_WhiteBalance
+    Dim whiteCPP As PhotoShop_WhiteBalance_CPP
+    Public Sub New()
+        initParent()
+        white = New PhotoShop_WhiteBalance()
+        whiteCPP = New PhotoShop_WhiteBalance_CPP()
+
+        task.desc = "Create a mask for the changed pixels after white balance"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static countdown = 120
+        Static whiteFlag As Boolean
+        If countdown = 0 Then
+            countdown = 120
+            whiteFlag = Not whiteFlag
+        End If
+        countdown -= 1
+
+        If whiteFlag Then
+            white.src = src
+            white.Run()
+            dst1 = white.dst1
+            label1 = "White balanced image - VB version"
+            label2 = "Mask of changed pixels - VB version"
+        Else
+            whiteCPP.src = src
+            whiteCPP.Run()
+            dst1 = whiteCPP.dst1
+            label1 = "White balanced image - C++ version"
+            label2 = "Mask of changed pixels - C++ version"
+        End If
+        Dim diff = dst1 - src
+        dst2 = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+' https://blog.csdn.net/just_sort/article/details/85982871
+Public Class PhotoShop_PlotHist
+    Inherits VBparent
+    Dim white As PhotoShop_ChangeMask
+    Public hist1 As Histogram_KalmanSmoothed
+    Public hist2 As Histogram_KalmanSmoothed
+    Dim mat2to1 As Mat_2to1
+    Public Sub New()
+        initParent()
+        white = New PhotoShop_ChangeMask()
+
+        hist1 = New Histogram_KalmanSmoothed
+        hist2 = New Histogram_KalmanSmoothed
+        hideForm("Histogram_KalmanSmoothed Slider Options")
+        mat2to1 = New Mat_2to1()
+
+        task.desc = "Plot the histogram of the before and after white balancing"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        hist1.src = src
+        hist1.Run()
+        mat2to1.mat(0) = hist1.dst1
+
+        white.src = src
+        white.Run()
+        dst1 = white.dst1
+        label1 = white.label1
+
+        hist2.src = dst1
+        hist2.Run()
+        mat2to1.mat(1) = hist2.dst1
+
+        mat2to1.Run()
+        dst2 = mat2to1.dst1
+        label2 = "The top is before white balance"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class PhotoShop_Sepia
     Inherits VBparent
@@ -219,5 +526,47 @@ Public Class PhotoShop_DuoTone
         Next
 
         cv.Cv2.Merge(split, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PhotoShop_Brightness
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Brightness Value", 0, 150, 100)
+        End If
+
+        label1 = "RGB straight to HSV"
+        task.desc = "Implement the traditional brightness effect"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static brightnessSlider = findSlider("Brightness Value")
+        Dim brightness As Single = brightnessSlider.value / 100
+
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim hsv64 As New cv.Mat
+        dst1.ConvertTo(hsv64, cv.MatType.CV_64F)
+        Dim split = hsv64.Split()
+
+        split(1) *= brightness
+        split(1) = split(1).Threshold(255, 255, cv.ThresholdTypes.Trunc)
+
+        split(2) *= brightness
+        split(2) = split(2).Threshold(255, 255, cv.ThresholdTypes.Trunc)
+
+        cv.Cv2.Merge(split, hsv64)
+        hsv64.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+        label2 = "Brightness level = " + CStr(brightnessSlider.value)
     End Sub
 End Class
