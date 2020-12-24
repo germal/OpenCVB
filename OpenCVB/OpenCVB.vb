@@ -1149,11 +1149,13 @@ Public Class OpenCVB
         Application.DoEvents()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
-        MsgBox("The objective is to solve many small computer vision problems and do so in a way that enables " +
-               "any of the examples to be reused. The result is a toolkit for solving ever bigger and more " +
-               "difficult problems. The philosophy behind this approach is that human vision is built on many " +
-               "seemingly trivial approaches working together. Is the combined effort of many small operations " +
-               "the source of understanding?  It may take years to answer that question. " + vbCrLf + vbCrLf +
+        MsgBox("The objective is to solve many small computer vision problems" + vbCrLf +
+               "and do so in a way that enables any of the solutions " + vbCrLf +
+               "to be reused. The result is a toolkit for solving " + vbCrLf +
+               "ever bigger and more difficult problems. The " + vbCrLf +
+               "philosophy behind this approach is that human vision " + vbCrLf +
+               "is not computationally intensive but is built " + vbCrLf +
+               "on many almost trivial algorithms working together.  " + vbCrLf + vbCrLf +
                "Fall 2020 Fremont CA")
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)

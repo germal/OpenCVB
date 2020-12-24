@@ -534,7 +534,7 @@ End Class
 
 
 
-
+' https://github.com/spmallick/learnopencv/tree/master/
 Public Class PhotoShop_Brightness
     Inherits VBparent
     Public Sub New()

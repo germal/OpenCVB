@@ -76,9 +76,10 @@ The Objective
 The objective is to solve many small computer vision problems and do so in a way
 that enables any of the solutions to be reused. The result is a toolkit for
 solving ever bigger and more difficult problems. The philosophy behind this
-approach is that human vision is built on many almost trivial algorithms working
-together. Is the combined effort of many small operations what produces
-understanding? It make take years to answer that question.
+approach is that human vision is not computationally intensive but is built on
+many almost trivial algorithms working together. Is the combined effort of many
+small operations what produces understanding? It make take years to answer that
+question.
 
 One key to this approach is each algorithm presents its own options
 (sliders/check boxes/radio buttons/text boxes) for the different choices that
