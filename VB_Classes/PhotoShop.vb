@@ -151,7 +151,7 @@ End Class
 
 
 
-
+' https://github.com/spmallick/learnopencv/tree/master/
 Public Class PhotoShop_DuoTone
     Inherits VBparent
     Public Sub New()
@@ -159,51 +159,65 @@ Public Class PhotoShop_DuoTone
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
-            radio.check(0).Text = "DuoTone 1 Blue"
-            radio.check(1).Text = "DuoTone 1 Green"
-            radio.check(2).Text = "DuoTone 1 Red"
-            radio.check(0).Checked = True
+            radio.check(0).Text = "First DuoTone Blue"
+            radio.check(1).Text = "First DuoTone Green"
+            radio.check(2).Text = "First DuoTone Red"
+            radio.check(1).Checked = True
 
-            radio1.Setup(caller + " ContourApproximation Mode", 3)
-            radio1.check(0).Text = "DuoTone 2 Blue"
-            radio1.check(1).Text = "DuoTone 2 Green"
-            radio1.check(2).Text = "DuoTone 2 Red"
-            radio1.check(0).Checked = True
+            radio1.Setup(caller + " ContourApproximation Mode", 4)
+            radio1.check(0).Text = "Second DuoTone Blue"
+            radio1.check(1).Text = "Second DuoTone Green"
+            radio1.check(2).Text = "Second DuoTone Red"
+            radio1.check(3).Text = "Second DuoTone None"
+            radio1.check(3).Checked = True
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "DuoTone Dark if checked, Light otherwise"
-            check.Box(0).Checked = True
         End If
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "DuoTone Exponent", 0, 10, 0)
+            sliders.setupTrackBar(0, "DuoTone Exponent", 0, 50, 0)
         End If
 
         task.desc = "Create a DuoTone image"
     End Sub
-    Private Sub expFunction(channel As Integer, exp As Single)
-
-    End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         Static expSlider = findSlider("DuoTone Exponent")
         Dim exp = 1 + expSlider.value / 100
-
-        Dim dt1 As Integer
-        For dt1 = 0 To radio.check.Count - 1
-            If radio.check(dt1).Checked Then Exit For
+        Dim expMat As New cv.Mat(256, 1, cv.MatType.CV_8U)
+        Dim expDark As New cv.Mat(256, 1, cv.MatType.CV_8U)
+        For i = 0 To expMat.Rows - 1
+            expMat.Set(Of Byte)(0, i, Math.Min(Math.Pow(i, exp), 255))
+            expDark.Set(Of Byte)(0, i, Math.Min(Math.Pow(i, 2 - exp), 255))
         Next
 
-        Dim dt2 As Integer
-        For dt2 = 0 To radio.check.Count - 1
-            If radio.check(dt2).Checked Then Exit For
-        Next
-
-        Dim dark = check.Box(0).Checked
         Dim split = src.Split()
 
+        Dim sw1 As Integer
+        For sw1 = 0 To radio.check.Count - 1
+            If radio.check(sw1).Checked Then Exit For
+        Next
+
+        Dim sw2 As Integer
+        For sw2 = 0 To radio1.check.Count - 1
+            If radio1.check(sw2).Checked Then Exit For
+        Next
+
+        For i = 0 To split.Count - 1
+            If i = sw1 Or i = sw2 Then
+                split(i) = split(i).LUT(expMat)
+            ElseIf check.Box(0).Checked Then
+                split(i) = split(i).LUT(expDark)
+            Else
+                split(i).setto(0)
+            End If
+        Next
+
+        cv.Cv2.Merge(split, dst1)
     End Sub
 End Class

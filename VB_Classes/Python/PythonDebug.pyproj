@@ -5,7 +5,7 @@
     <ProjectGuid>04f094af-642d-4b23-8c46-0198ad9eb478</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>AddWeighted_Trackbar_PS.py</StartupFile>
+    <StartupFile>PhotoShop_duo_tone.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -29,7 +29,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AddWeighted_Trackbar_PS.py" />
+    <Compile Include="PhotoShop_duo_tone.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
