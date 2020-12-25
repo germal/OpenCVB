@@ -44,8 +44,8 @@ Public Class EMax_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then
             ocvb.trueText("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
-                                    "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100)
-            Exit Sub
+                          "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100)
+            Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
         End If
 
         grid.Run()
@@ -80,17 +80,13 @@ Public Class EMax_Basics
             em_model.TrainEM(samples, Nothing, labels, Nothing)
 
             ' now classify every image pixel based on the samples.
-            Dim sample As New cv.Mat(1, 2, cv.MatType.CV_64F, 0)
+            Dim sample As New cv.Mat(1, 2, cv.MatType.CV_32FC1, 0)  ' tried doubles but it fails as well...
             For i = 0 To dst1.Rows - 1
                 For j = 0 To dst1.Cols - 1
-                    sample.Set(Of Double)(0, 0, CSng(j))
-                    sample.Set(Of Double)(0, 1, CSng(i))
+                    sample.Set(Of Single)(0, 0, CSng(j))
+                    sample.Set(Of Single)(0, 1, CSng(i))
 
-                    ' remove the " 0 '" to see the error in Predict2.
-                    ' remove the " 0 '" to see the error in Predict2.
-                    ' remove the " 0 '" to see the error in Predict2.
-                    ' remove the " 0 '" to see the error in Predict2.
-                    Dim response = 0 ' Math.Round(em_model.Predict2(sample)(1))
+                    Dim response = Math.Round(em_model.Predict2(sample).Item1)
 
                     Dim c = ocvb.vecColors(response)
                     dst1.Circle(New cv.Point(j, i), 1, c, -1)
