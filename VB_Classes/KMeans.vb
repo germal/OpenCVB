@@ -1,4 +1,55 @@
 Imports cv = OpenCvSharp
+Public Class kMeans_Basics
+    Inherits VBparent
+    Public kmeansK As Integer
+    Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
+        End If
+
+        task.desc = "Cluster the rgb image pixels using kMeans."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
+        Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
+        Dim src32f As New cv.Mat
+        columnVector.ConvertTo(src32f, cv.MatType.CV_32FC3)
+        Static lastClusterCount As Integer
+        If lastClusterCount <> sliders.trackbar(0).Value Then
+            lastClusterCount = sliders.trackbar(0).Value
+            kmeansK = lastClusterCount
+        End If
+
+        Dim labels = New cv.Mat()
+        Dim colors As New cv.Mat
+        cv.Cv2.Kmeans(src32f, kmeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
+        labels.Reshape(1, kInput.Height).ConvertTo(labels, cv.MatType.CV_8U)
+        labels = labels.Resize(New cv.Size(src.Width, src.Height))
+
+        Dim centroids As New List(Of cv.Point)
+        For i = 0 To kmeansK - 1
+            Dim mask = labels.InRange(i, i)
+            Dim m = cv.Cv2.Moments(mask, True)
+            centroids.Add(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00))
+            dst1.SetTo(ocvb.scalarColors(i), mask)
+        Next
+
+        For i = 0 To centroids.Count - 1
+            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class kMeans_BasicsDepthColor
     Inherits VBparent
     Public kmeansK As Integer
@@ -581,57 +632,3 @@ Public Class KMeans_Subdivision1
         Next
     End Sub
 End Class
-
-
-
-
-
-
-Public Class kMeans_Basics
-    Inherits VBparent
-    Public kmeansK As Integer
-    Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
-        End If
-
-        task.desc = "Cluster the rgb image pixels using kMeans."
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
-        Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
-        Dim src32f As New cv.Mat
-        columnVector.ConvertTo(src32f, cv.MatType.CV_32FC3)
-        Static lastClusterCount As Integer
-        If lastClusterCount <> sliders.trackbar(0).Value Then
-            lastClusterCount = sliders.trackbar(0).Value
-            kmeansK = lastClusterCount
-        End If
-
-        Dim labels = New cv.Mat()
-        Dim colors As New cv.Mat
-        cv.Cv2.Kmeans(src32f, kmeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
-        labels.Reshape(1, kInput.Height).ConvertTo(labels, cv.MatType.CV_8U)
-        labels = labels.Resize(New cv.Size(src.Width, src.Height))
-
-        Dim centroids As New List(Of cv.Point)
-        For i = 0 To kmeansK - 1
-            Dim mask = labels.InRange(i, i)
-            Dim m = cv.Cv2.Moments(mask, True)
-            centroids.Add(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00))
-            dst1.SetTo(ocvb.scalarColors(i), mask)
-        Next
-
-        For i = 0 To centroids.Count - 1
-            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Next
-    End Sub
-End Class
-
-
-
-

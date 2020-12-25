@@ -229,3 +229,36 @@ Public Class Binarize_Bernson_MT
 End Class
 
 
+
+
+
+
+
+
+Public Class Binarize_Reduction
+    Inherits VBparent
+    Dim reduction As Reduction_Basics
+    Dim basics As Binarize_Basics
+    Public Sub New()
+        initParent()
+        basics = New Binarize_Basics
+        reduction = New Reduction_Basics
+        Dim reductionRadio = findRadio("Use bitwise reduction")
+        reductionRadio.Checked = True
+        Dim reductionSlider = findSlider("Reduction factor")
+        reductionSlider.Value = 256
+        label1 = "Binarize output from reduction"
+        label2 = "Binarize Basics Output"
+        task.desc = "Binarize an image using reduction"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        reduction.Run()
+        dst1 = reduction.dst1.Threshold(reduction.maskVal / 2, 255, cv.ThresholdTypes.Binary)
+
+        basics.src = reduction.src
+        basics.Run()
+        dst2 = basics.dst1
+    End Sub
+End Class

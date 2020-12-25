@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Reduction_Basics
     Inherits VBparent
+    Public maskVal As Integer
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -28,8 +29,8 @@ Public Class Reduction_Basics
             Dim nearestPowerOf2 = Math.Round(Math.Log(reductionVal, 2))
             If nearestPowerOf2 = Double.NegativeInfinity Then nearestPowerOf2 = 0
             power = Choose(nearestPowerOf2 + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
-            Dim maskval = power - 1
-            If src.Type = cv.MatType.CV_32S Then maskval = Integer.MaxValue - power + 1 Else If power >= 256 Then maskval = 255
+            maskVal = power - 1
+            If src.Type = cv.MatType.CV_32S Then maskVal = Integer.MaxValue - power + 1
             Dim tmp = New cv.Mat(src.Size, src.Type, cv.Scalar.All(maskval))
             cv.Cv2.BitwiseAnd(src, tmp, dst1)
         ElseIf radio.check(1).Checked Then
