@@ -977,7 +977,7 @@ End Class
 
 
 
-Public Class Depth_Decreasing
+Public Class Depth_PunchDecreasing
     Inherits VBparent
     Public Increasing As Boolean
     Public Sub New()
@@ -990,9 +990,8 @@ Public Class Depth_Decreasing
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = If(standalone, task.depth32f, src)
-        Static lastDepth As cv.Mat = depth32f.Clone()
-        If lastDepth.Size <> depth32f.Size Then lastDepth = depth32f
+        Dim depth32f = If(src.Type = cv.MatType.CV_32F, src, task.depth32f)
+        Static lastDepth As cv.Mat = depth32f
 
         Dim mmThreshold = sliders.trackbar(0).Value
         If Increasing Then
@@ -1000,8 +999,8 @@ Public Class Depth_Decreasing
         Else
             cv.Cv2.Subtract(lastDepth, depth32f, dst1)
         End If
-        dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        lastDepth = depth32f
+        dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        lastDepth = depth32f.Clone
     End Sub
 End Class
 
@@ -1009,12 +1008,12 @@ End Class
 
 
 
-Public Class Depth_Increasing
+Public Class Depth_PunchIncreasing
     Inherits VBparent
-    Public depth As Depth_Decreasing
+    Public depth As Depth_PunchDecreasing
     Public Sub New()
         initParent()
-        depth = New Depth_Decreasing()
+        depth = New Depth_PunchDecreasing()
         depth.Increasing = True
         task.desc = "Identify where depth is increasing - retreating from the camera."
     End Sub
@@ -1026,26 +1025,6 @@ Public Class Depth_Increasing
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Depth_Punch
-    Inherits VBparent
-    Dim depth As Depth_Decreasing
-    Public Sub New()
-        initParent()
-        depth = New Depth_Decreasing()
-        task.desc = "Identify the largest blob in the depth decreasing output"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        depth.src = task.depth32f
-        depth.Run()
-        dst1 = depth.dst1
-    End Sub
-End Class
 
 
 

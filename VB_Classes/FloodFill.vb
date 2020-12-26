@@ -63,7 +63,7 @@ Public Class FloodFill_Basics
                 If gray.Get(Of Byte)(y, x) > 0 Then
                     Dim rect As New cv.Rect
                     Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(x), CInt(y)), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
-                    If count > minFloodSize Then
+                    If count > minFloodSize And count <> gray.Total Then
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
                         masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
                         maskSizes.Add(rect.Width * rect.Height, masks.Count - 1)
@@ -152,7 +152,7 @@ Public Class FloodFill_Top16_MT
         task.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim minFloodSize = sliders.trackbar(0).Value
         Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
         Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
@@ -313,59 +313,6 @@ Public Class FloodFill_RelativeRange
     End Sub
 End Class
 
-
-
-
-Public Class FloodFill_Top16
-    Inherits VBparent
-    Public flood As FloodFill_Basics
-
-    Public thumbNails As New cv.Mat
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
-        End If
-
-        flood = New FloodFill_Basics()
-
-        label1 = "Input image to floodfill"
-        task.desc = "Use floodfill to build image segments in a grayscale image."
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        flood.src = src
-
-        thumbNails = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-        Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
-
-        flood.Run()
-
-        dst1.SetTo(0)
-        Dim thumbCount As Integer
-        Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
-        For i = 0 To flood.masks.Count - 1
-            Dim maskIndex = flood.maskSizes.ElementAt(i).Value
-            Dim nextColor = ocvb.scalarColors(i Mod 255)
-            dst1.SetTo(nextColor, flood.masks(maskIndex))
-            If thumbCount < 16 Then
-                thumbNails(allRect) = flood.masks(maskIndex).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                thumbNails.Rectangle(allRect, cv.Scalar.White, 1)
-                allRect.X += allSize.Width
-                If allRect.X >= thumbNails.Width Then
-                    allRect.X = 0
-                    allRect.Y += allSize.Height
-                End If
-                thumbCount += 1
-            End If
-        Next
-        If check.Box(0).Checked Then dst1 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label1 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
-    End Sub
-End Class
 
 
 
@@ -576,3 +523,94 @@ Public Class FloodFill_PointTracker
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+Public Class FloodFill_Top16
+    Inherits VBparent
+    Public flood As FloodFill_Basics
+
+    Public thumbNails As New cv.Mat
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
+        End If
+
+        flood = New FloodFill_Basics()
+
+        label1 = "Input image to floodfill"
+        task.desc = "Use floodfill to build image segments in a grayscale image."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        flood.src = src
+        thumbNails = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
+        flood.Run()
+
+        dst1.SetTo(0)
+        Dim thumbCount As Integer
+        Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
+        For i = 0 To flood.masks.Count - 1
+            Dim maskIndex = flood.maskSizes.ElementAt(i).Value
+            Dim nextColor = ocvb.scalarColors(i Mod 255)
+            dst1.SetTo(nextColor, flood.masks(maskIndex))
+            If thumbCount < 16 Then
+                thumbNails(allRect) = flood.masks(maskIndex).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
+                thumbNails.Rectangle(allRect, cv.Scalar.White, 1)
+                allRect.X += allSize.Width
+                If allRect.X >= thumbNails.Width Then
+                    allRect.X = 0
+                    allRect.Y += allSize.Height
+                End If
+                thumbCount += 1
+            End If
+        Next
+        If check.Box(0).Checked Then dst1 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        label1 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class FloodFill_Largest1
+    Inherits VBparent
+    Public flood As FloodFill_Basics
+
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public Sub New()
+        initParent()
+        flood = New FloodFill_Basics()
+
+        label1 = "Input image to floodfill"
+        task.desc = "Use floodfill to find the largest blob"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type = cv.MatType.CV_8U Then src = src.ConvertScaleAbs(255)
+
+        flood.src = src
+        flood.Run()
+
+        'Dim maskIndex = flood.maskSizes.ElementAt(1).Value
+        'dst1.SetTo(0)
+        'dst1.SetTo(255, flood.masks(maskIndex))
+        'label1 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+    End Sub
+End Class
