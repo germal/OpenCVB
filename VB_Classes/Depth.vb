@@ -201,29 +201,6 @@ End Class
 
 
 
-Public Class Depth_Zero
-    Inherits VBparent
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Depth_Zero Max Depth", 200, 10000, 4000)
-        End If
-        label2 = "Mask for depth zero or out-of-range"
-        task.desc = "Create a mask for zero depth - depth shadow and depth out-of-range"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        cv.Cv2.InRange(task.depth32f, 1, sliders.trackbar(0).Value, dst2)
-        dst1.SetTo(0)
-        task.RGBDepth.CopyTo(dst1, dst2)
-        cv.Cv2.BitwiseNot(dst2, dst2)
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -510,67 +487,25 @@ End Class
 
 
 
-Public Class Depth_ManualTrim
-    Inherits VBparent
-    Public Mask As New cv.Mat
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Min Depth", 200, 1000, 200)
-            sliders.setupTrackBar(1, "Max Depth", 200, 10000, 1400)
-        End If
-        task.desc = "Manually show depth with varying min and max depths."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If sliders.trackbar(0).Value >= sliders.trackbar(1).Value Then sliders.trackbar(1).Value = sliders.trackbar(0).Value + 1
-        Dim minDepth = sliders.trackbar(0).Value
-        Dim maxDepth = sliders.trackbar(1).Value
-        dst1 = task.depth32f
-        Mask = dst1.Threshold(maxDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-
-        Dim maskMin = dst1.Threshold(minDepth, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        cv.Cv2.BitwiseAnd(Mask, maskMin, Mask)
-
-        If standalone Then
-            task.RGBDepth.CopyTo(dst1, Mask)
-        Else
-            Dim notMask As New cv.Mat
-            cv.Cv2.BitwiseNot(Mask, notMask)
-            dst1.SetTo(0, notMask)
-        End If
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Depth_ColorizerFastFade_CPP
     Inherits VBparent
-    Public inrange As Depth_InRange
     Dim dcPtr As IntPtr
     Public Sub New()
         initParent()
         dcPtr = Depth_Colorizer2_Open()
-
-        inrange = New Depth_InRange()
-
         label2 = "Mask from Depth_InRange"
         task.desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then src = inrange.depth32f
+        If standalone Then src = task.depth32f
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
-        inrange.src = input
-        inrange.Run()
-        dst2 = inrange.depthMask
+        dst2 = task.inrange.depthMask
 
         Dim depthData(input.Total * input.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -714,13 +649,7 @@ Public Class Depth_Colorizer_MT
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Min Depth", 100, 1000, 100)
-            sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
-        End If
         grid = New Thread_Grid
-
         task.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
     End Sub
     Public Sub Run()
@@ -731,9 +660,7 @@ Public Class Depth_Colorizer_MT
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
-        Dim minDepth = sliders.trackbar(0).Value
-        Dim maxDepth = sliders.trackbar(1).Value
-
+        Dim range = task.inrange.maxval - task.inrange.minval
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
          Sub(roi)
              Dim depth = src(roi)
@@ -742,8 +669,8 @@ Public Class Depth_Colorizer_MT
              For y = 0 To depth.Rows - 1
                  For x = 0 To depth.Cols - 1
                      Dim pixel = depth.Get(Of Single)(y, x)
-                     If pixel > minDepth And pixel <= maxDepth Then
-                         Dim t = (pixel - minDepth) / (maxDepth - minDepth)
+                     If pixel > task.inrange.minval And pixel <= task.inrange.maxval Then
+                         Dim t = (pixel - task.inrange.minval) / range
                          rgbdata(x * 3 + 0 + y * stride) = ((1 - t) * nearColor(0) + t * farColor(0)) * 255
                          rgbdata(x * 3 + 1 + y * stride) = ((1 - t) * nearColor(1) + t * farColor(1)) * 255
                          rgbdata(x * 3 + 2 + y * stride) = ((1 - t) * nearColor(2) + t * farColor(2)) * 255

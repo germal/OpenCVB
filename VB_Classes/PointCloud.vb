@@ -240,7 +240,6 @@ End Class
 
 Public Class PointCloud_Raw_CPP
     Inherits VBparent
-    Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
@@ -252,9 +251,6 @@ Public Class PointCloud_Raw_CPP
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 32
 
-        foreground = New Depth_ManualTrim()
-        foreground.sliders.trackbar(0).Value = 300  ' fixed distance to keep the images stable.
-        foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
         task.desc = "Project the depth data onto a top view and side view."
@@ -264,13 +260,10 @@ Public Class PointCloud_Raw_CPP
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
-        foreground.Run()
 
         Dim h = src.Height
         Dim w = src.Width
-        Dim desiredMin = CSng(foreground.sliders.trackbar(0).Value)
-        Dim desiredMax = CSng(foreground.sliders.trackbar(1).Value)
-        Dim range = CSng(desiredMax - desiredMin)
+        Dim range = CSng(task.inrange.maxval - task.inrange.minval)
         If depthBytes Is Nothing Then
             ReDim depthBytes(task.depth32f.Total * task.depth32f.ElemSize - 1)
         End If
@@ -278,7 +271,7 @@ Public Class PointCloud_Raw_CPP
         Marshal.Copy(task.depth32f.Data, depthBytes, 0, depthBytes.Length)
         Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
 
-        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, desiredMin, desiredMax, task.depth32f.Height, task.depth32f.Width)
+        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, task.inrange.minval, task.inrange.maxval, task.depth32f.Height, task.depth32f.Width)
 
         dst1 = New cv.Mat(task.depth32f.Rows, task.depth32f.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = New cv.Mat(task.depth32f.Rows, task.depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -298,7 +291,6 @@ End Class
 
 Public Class PointCloud_Raw
     Inherits VBparent
-    Dim foreground As Depth_ManualTrim
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
@@ -310,9 +302,6 @@ Public Class PointCloud_Raw
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 32
 
-        foreground = New Depth_ManualTrim()
-        foreground.sliders.trackbar(0).Value = 300  ' fixed distance to keep the images stable.
-        foreground.sliders.trackbar(1).Value = 4000 ' fixed distance to keep the images stable.
         label1 = "Top View"
         label2 = "Side View"
         task.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
@@ -322,13 +311,10 @@ Public Class PointCloud_Raw
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
-        foreground.Run()
 
         Dim h = src.Height
         Dim w = src.Width
-        Dim desiredMin = CSng(foreground.sliders.trackbar(0).Value)
-        Dim desiredMax = CSng(foreground.sliders.trackbar(1).Value)
-        Dim range = CSng(desiredMax - desiredMin)
+        Dim range = CSng(task.inrange.maxval - task.inrange.minval)
 
         ' this VB.Net version is much slower than the optimized C++ version below.
         dst1 = src.EmptyClone.SetTo(cv.Scalar.White)
@@ -338,12 +324,12 @@ Public Class PointCloud_Raw
              Sub(roi)
                  For y = roi.Y To roi.Y + roi.Height - 1
                      For x = roi.X To roi.X + roi.Width - 1
-                         Dim m = foreground.Mask.Get(Of Byte)(y, x)
+                         Dim m = task.inrange.depthMask.Get(Of Byte)(y, x)
                          If m > 0 Then
                              Dim depth = task.depth32f.Get(Of Single)(y, x)
-                             Dim dy = CInt(h * (depth - desiredMin) / range)
+                             Dim dy = CInt(h * (depth - task.inrange.minval) / range)
                              If dy < h And dy > 0 Then dst1.Set(Of cv.Vec3b)(h - dy, x, black)
-                             Dim dx = CInt(w * (depth - desiredMin) / range)
+                             Dim dx = CInt(w * (depth - task.inrange.minval) / range)
                              If dx < w And dx > 0 Then dst2.Set(Of cv.Vec3b)(y, dx, black)
                          End If
                      Next
