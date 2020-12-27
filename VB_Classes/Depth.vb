@@ -500,7 +500,6 @@ Public Class Depth_ColorizerFastFade_CPP
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then src = task.depth32f
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
@@ -514,9 +513,8 @@ Public Class Depth_ColorizerFastFade_CPP
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            Dim tmp = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC3, imagePtr)
-            dst1.SetTo(0)
-            tmp.CopyTo(dst1, dst2)
+            dst1 = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC3, imagePtr)
+            If standalone Then dst1.SetTo(0, dst2)
         End If
     End Sub
     Public Sub Close()

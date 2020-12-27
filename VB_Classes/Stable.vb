@@ -181,10 +181,10 @@ Public Class Stable_BasicsColorized
         Static saveMax = task.maxRangeSlider.Value
         If saveMin <> task.minRangeSlider.Value Or saveMax <> task.maxRangeSlider.Value Then stable.externalReset = True
         stable.Run()
-
-        colorize.src = stable.dst1
-        colorize.Run()
         dst1 = stable.dst1
+
+        colorize.src = dst1
+        colorize.Run()
         dst2 = colorize.dst1
     End Sub
 End Class
