@@ -38,6 +38,7 @@ Public Class ActiveTask : Implements IDisposable
     ' add any global option algorithms here
     Public inrange As Object
     Public depth32f As New cv.Mat
+    Public depthOptionsChanged As Boolean
     Public minRangeSlider As Windows.Forms.TrackBar
     Public maxRangeSlider As Windows.Forms.TrackBar
     Public binSlider As Windows.Forms.TrackBar

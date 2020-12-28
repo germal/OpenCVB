@@ -26,11 +26,24 @@ Public Class Options_Common
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         minVal = task.minRangeSlider.Value
         maxVal = task.maxRangeSlider.Value
         ocvb.maxZ = maxVal / 1000
         bins = task.binSlider.Value
         If minVal >= maxVal Then maxVal = minVal + 1
+
+        Static saveMaxVal As Integer
+        Static saveMinVal As Integer
+        Static saveYRotate As Integer
+        If saveMaxVal <> maxVal Or saveMinVal <> minVal Or saveYRotate <> task.yRotateSlider.Value Then
+            task.depthOptionsChanged = True
+            saveMaxVal = maxVal
+            saveMinVal = minVal
+            saveYRotate = task.yRotateSlider.Value
+        Else
+            task.depthOptionsChanged = False
+        End If
 
         ' forced resize of the depth16 - probably a mistake but avoids failure when switching from 1280 to 640 and vice versa
         If src.Width <> task.depth16.Width Then task.depth16 = task.depth16.Resize(task.color.Size)
