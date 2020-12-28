@@ -61,9 +61,10 @@ int main(int argc, char* argv[])
 		{
 			for (int x = 0; x < imageWidth; ++x)
 			{
-				if (pcIntel[pcIndex].z > 0)
+				float3 v = pcIntel[pcIndex];
+				if (v.z > 0 && v.x != 0 && v.y != 0)
 				{
-					glVertex3fv((float*)&pcIntel[pcIndex]);
+					glVertex3fv((float*)&v);
 					pt.x = (float)((x + 0.5f) / imageWidth);
 					pt.y = (float)((y + 0.5f) / imageHeight);
 					glTexCoord2fv((const GLfloat*)& pt);

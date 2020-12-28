@@ -131,14 +131,13 @@ Public Class Stable_Pointcloud
 
         dst1 = stable.dst1
         dst2 = stable.dst2
-        splitPC = split
         label2 = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
         If stable.resetAll Then
             splitPC = split
         Else
             splitPC(2) = (stable.dst1 * 0.001).ToMat
-            split(0).CopyTo(splitPC(0), stable.dst2)
-            split(1).CopyTo(splitPC(1), stable.dst2)
+            split(0).CopyTo(splitPC(0), dst2)
+            split(1).CopyTo(splitPC(1), dst2)
             cv.Cv2.Merge(splitPC, task.pointCloud)
         End If
     End Sub
