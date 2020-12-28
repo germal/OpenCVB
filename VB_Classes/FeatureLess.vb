@@ -248,7 +248,7 @@ Public Class FeatureLess_Highlights
         fLessP.src = src
         fLessP.Run()
 
-        addW.src1 = src
+        addW.src = src
         addW.src2 = fLessP.dst1
         addW.Run()
         dst1 = addW.dst1

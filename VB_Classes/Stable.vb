@@ -23,7 +23,7 @@ Public Class Stable_Basics
             radio.check(0).Text = "Use farthest distance"
             radio.check(1).Text = "Use closest distance"
             radio.check(2).Text = "Use unchanged depth input"
-            radio.check(0).Checked = True
+            radio.check(1).Checked = True
         End If
 
         label1 = "32-bit format of the stable depth"
@@ -56,7 +56,6 @@ Public Class Stable_Basics
         Static saveMaxRange As Integer
         Static saveMinRange As Integer
         Static saveYRotate As Integer
-        '  If cameraStable = False Or cumulativeChanges > nonZeroThreshold.value Or saveMaxRange <> task.maxRangeSlider.Value Or
         If cameraStable = False Or changedPixels > nonZeroThreshold.value Or saveMaxRange <> task.maxRangeSlider.Value Or
             saveYRotate <> task.yRotateSlider.Value Or externalReset Or saveMinRange <> task.minRangeSlider.Value Then
             resetAll = True

@@ -17,12 +17,12 @@ Public Class Benford_Basics
     Public counts(expectedDistribution.Count - 1) As Single
     Dim plot As Plot_Histogram
     Dim benford As Benford_NormalizedImage
-    Dim weight As AddWeighted_Basics
+    Dim addW As AddWeighted_Basics
     Dim use99 As Boolean
     Public Sub New()
         initParent()
-        weight = New AddWeighted_Basics()
-        weight.weightSlider.Value = 75
+        addW = New AddWeighted_Basics
+        addW.weightSlider.Value = 75
 
         plot = New Plot_Histogram()
         If standalone Then benford = New Benford_NormalizedImage()
@@ -81,7 +81,7 @@ Public Class Benford_Basics
 
         plot.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
         plot.Run()
-        weight.src1 = plot.dst1.Clone
+        addW.src = plot.dst1.Clone
 
         For i = 0 To counts.Count - 1
             counts(i) = src.Rows * expectedDistribution(i)
@@ -90,11 +90,11 @@ Public Class Benford_Basics
         plot.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
         plot.Run()
 
-        cv.Cv2.BitwiseNot(plot.dst1, weight.src2)
-        weight.Run()
-        dst1 = weight.dst1
+        cv.Cv2.BitwiseNot(plot.dst1, addW.src2)
+        addW.Run()
+        dst1 = addW.dst1
 
-        label2 = "AddWeighted: " + CStr(weight.weightSlider.Value) + "% actual vs. " + CStr(100 - weight.weightSlider.Value) + "% Benford distribution"
+        label2 = "AddWeighted: " + CStr(addW.weightSlider.Value) + "% actual vs. " + CStr(100 - addW.weightSlider.Value) + "% Benford distribution"
     End Sub
 End Class
 

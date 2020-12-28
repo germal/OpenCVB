@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class Watershed_Basics
     Inherits VBparent
-    Dim weighted As AddWeighted_Basics
+    Dim addW As AddWeighted_Basics
     Dim rects As New List(Of cv.Rect)
     Dim palette As Palette_Basics
     Public UseCorners As Boolean
     Public Sub New()
         initParent()
-        palette = New Palette_Basics()
-        weighted = New AddWeighted_Basics()
+        palette = New Palette_Basics
+        addW = New AddWeighted_Basics
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
         task.desc = "Watershed API experiment.  Draw on the image to test."
@@ -46,10 +46,10 @@ Public Class Watershed_Basics
             palette.Run()
             dst2 = palette.dst1
 
-            weighted.src1 = src
-            weighted.src2 = palette.dst1
-            weighted.Run()
-            dst1 = weighted.dst1
+            addW.src = src
+            addW.src2 = palette.dst1
+            addW.Run()
+            dst1 = addW.dst1
         Else
             dst1 = src
         End If
