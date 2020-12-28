@@ -614,7 +614,7 @@ Public Class PhotoShop_SharpenDetail
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
-            sliders.setupTrackBar(1, "DetailEnhance Sigma_r", 1, 100, 7)
+            sliders.setupTrackBar(1, "DetailEnhance Sigma_r X100", 1, 100, 7)
         End If
         task.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
@@ -637,7 +637,7 @@ Public Class PhotoShop_SharpenStylize
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
-            sliders.setupTrackBar(1, "Stylize Sigma_r", 1, 100, 7)
+            sliders.setupTrackBar(1, "Stylize Sigma_r X100", 1, 100, 7)
         End If
         task.desc = "Stylize an image - Painterly Effect"
     End Sub
@@ -645,6 +645,6 @@ Public Class PhotoShop_SharpenStylize
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
-        cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
+        cv.Cv2.Stylization(src, dst1, sigma_s, sigma_r)
     End Sub
 End Class
