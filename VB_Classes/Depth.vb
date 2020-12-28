@@ -1764,7 +1764,7 @@ End Class
 
 Public Class Depth_SmoothSurfaces
     Inherits VBparent
-    Public pcValid As Stable_WithRectangle
+    Public pcValid As Motion_StableDepthRectangleUpdate
     Dim histX As Histogram_KalmanSmoothed
     Dim histY As Histogram_KalmanSmoothed
     Dim mats As Mat_4to1
@@ -1774,7 +1774,7 @@ Public Class Depth_SmoothSurfaces
         mats = New Mat_4to1
         histX = New Histogram_KalmanSmoothed
         histY = New Histogram_KalmanSmoothed
-        pcValid = New Stable_WithRectangle
+        pcValid = New Motion_StableDepthRectangleUpdate
 
         label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
         label2 = "Likely smooth surfaces"
@@ -1884,10 +1884,10 @@ End Class
 Public Class Depth_PunchBlob
     Inherits VBparent
     Public depth As Depth_PunchDecreasing
-    Dim blob As Blob_Largest
+    Dim contours As Contours_Basics
     Public Sub New()
         initParent()
-        blob = New Blob_Largest
+        contours = New Contours_Basics
         depth = New Depth_PunchDecreasing
         task.desc = "Identify the punch with a rectangle around the largest blob"
     End Sub
@@ -1897,9 +1897,8 @@ Public Class Depth_PunchBlob
         depth.Run()
         dst1 = depth.dst1
 
-        blob.src = dst1
-        blob.Run()
-        dst2.SetTo(0)
-        dst1.SetTo(255, blob.masks(blob.maskIndex))
+        contours.src = dst1
+        contours.Run()
+        dst2 = contours.dst2
     End Sub
 End Class

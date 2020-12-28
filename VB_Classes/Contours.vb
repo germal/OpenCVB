@@ -5,7 +5,6 @@ Public Class Contours_Basics
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
     Public contours As New List(Of cv.Point())
-    Public minArea As Integer = 1
     Public Sub New()
         initParent()
         radio.Setup(caller + " Retrieval Mode", 5)
@@ -22,6 +21,12 @@ Public Class Contours_Basics
         radio1.check(2).Text = "ApproxTC89KCOS"
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
+
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Contour minimum area", 0, 5000, 1000)
+        End If
 
         rotatedRect = New Rectangle_Rotated
         task.desc = "Demo options on FindContours."
@@ -71,6 +76,9 @@ Public Class Contours_Basics
             contours0 = cv.Cv2.FindContoursAsArray(dst1, retrievalMode, ApproximationMode)
         End If
 
+        Static areaSlider = findSlider("Contour minimum area")
+        Dim minArea = areaSlider.value
+
         contours.Clear()
         For i = 0 To contours0.Length - 1
             If cv.Cv2.ContourArea(contours0(i)) > minArea Then contours.Add(cv.Cv2.ApproxPolyDP(contours0(i), 3, True))
@@ -79,9 +87,9 @@ Public Class Contours_Basics
         dst2.SetTo(0)
         Dim cnt = contours.ToArray
         If retrievalMode = cv.RetrievalModes.FloodFill Then
-            cv.Cv2.DrawContours(dst2, cnt, 0, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Else
-            cv.Cv2.DrawContours(dst2, cnt, 0, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
         End If
     End Sub
 End Class

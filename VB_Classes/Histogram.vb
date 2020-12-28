@@ -979,14 +979,14 @@ End Class
 Public Class Histogram_SmoothTopView2D
     Inherits VBparent
     Public topView As Histogram_TopView2D
-    Dim stable As Stable_WithRectangle
+    Dim stable As Motion_StableDepthRectangleUpdate
     Public Sub New()
         initParent()
 
         topView = New Histogram_TopView2D
         topView.viewOpts.histThresholdSlider.Value = 1
 
-        stable = New Stable_WithRectangle
+        stable = New Motion_StableDepthRectangleUpdate
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
@@ -1143,7 +1143,7 @@ Public Class Histogram_ViewOptions
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         sideFrustrumAdjust = ocvb.maxZ * sideFrustrumSlider.Value / 100 / 2
-        topfrustrumAdjust = ocvb.maxZ * topFrustrumSlider.Value / 100 / 2
+        topFrustrumAdjust = ocvb.maxZ * topFrustrumSlider.Value / 100 / 2
         ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
         ocvb.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
 
@@ -1167,14 +1167,14 @@ End Class
 Public Class Histogram_SmoothSideView2D
     Inherits VBparent
     Public sideView As Histogram_SideView2D
-    Dim stable As Stable_WithRectangle
+    Dim stable As Motion_StableDepthRectangleUpdate
     Public Sub New()
         initParent()
 
         sideView = New Histogram_SideView2D
         sideView.viewOpts.histThresholdSlider.Value = 1
 
-        stable = New Stable_WithRectangle
+        stable = New Motion_StableDepthRectangleUpdate
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"
@@ -1358,6 +1358,34 @@ Public Class Histogram_DepthClusters
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Histogram_StableDepthClusters
+    Inherits VBparent
+    Dim clusters As Histogram_DepthClusters
+    Dim stableD As Motion_StableDepth
+    Public Sub New()
+        initParent()
+
+        clusters = New Histogram_DepthClusters
+        stableD = New Motion_StableDepth
+        label1 = "Histogram of stable depth"
+        label2 = "Backprojection of stable depth"
+        task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        stableD.Run()
+        clusters.src = stableD.dst1
+        clusters.Run()
+        dst1 = clusters.dst1
+        dst2 = clusters.dst2
     End Sub
 End Class
 

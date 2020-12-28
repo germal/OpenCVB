@@ -550,12 +550,12 @@ End Class
 
 Public Class OpenGL_StableDepth
     Inherits VBparent
-    Dim pcValid As Stable_WithRectangle
+    Dim pcValid As Motion_StableDepthRectangleUpdate
     Public ogl As OpenGL_Options
     Public Sub New()
         initParent()
 
-        pcValid = New Stable_WithRectangle
+        pcValid = New Motion_StableDepthRectangleUpdate
         ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
@@ -616,12 +616,12 @@ End Class
 
 Public Class OpenGL_StableDepthMouse
     Inherits VBparent
-    Dim pcValid As Stable_WithRectangle
+    Dim pcValid As Motion_StableDepthRectangleUpdate
     Public ogl As OpenGL_Callbacks
     Public Sub New()
         initParent()
 
-        pcValid = New Stable_WithRectangle
+        pcValid = New Motion_StableDepthRectangleUpdate
         ogl = New OpenGL_Callbacks
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
@@ -678,13 +678,13 @@ End Class
 
 Public Class OpenGL_Stable
     Inherits VBparent
-    Dim stable As Stable_Pointcloud
+    Dim stable As Motion_StablePointCloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
         initParent()
-        stable = New Stable_Pointcloud
+        stable = New Motion_StablePointCloud
         ogl = New OpenGL_Callbacks
-        task.desc = "Use the Stable_PointCloud in 3D"
+        task.desc = "Use the Motion_StablePointCloud in 3D"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me

@@ -1168,7 +1168,6 @@ Public Class OpenCVB
 
             ' bring the data into the algorithm task.
             SyncLock bufferLock
-                If camera.color.width = 0 Or camera.RGBDepth.width = 0 Or camera.leftView.width = 0 Or camera.rightView.width = 0 Then Continue While
                 task.color = camera.color.Resize(resolutionXY)
                 task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
                 task.leftView = camera.leftView.Resize(resolutionXY)
