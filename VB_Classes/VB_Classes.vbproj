@@ -317,7 +317,6 @@
     <Compile Include="PCA.vb" />
     <Compile Include="Random.vb" />
     <Compile Include="Remap.vb" />
-    <Compile Include="Sharpen.vb" />
     <Compile Include="Video.vb" />
     <Compile Include="Stabilizer.vb" />
     <Compile Include="Voronoi.vb" />
