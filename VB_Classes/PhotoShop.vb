@@ -606,6 +606,9 @@ End Class
 
 
 
+
+
+
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class PhotoShop_SharpenDetail
     Inherits VBparent
@@ -629,6 +632,9 @@ End Class
 
 
 
+
+
+
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class PhotoShop_SharpenStylize
     Inherits VBparent
@@ -646,5 +652,77 @@ Public Class PhotoShop_SharpenStylize
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.Stylization(src, dst1, sigma_s, sigma_r)
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
+Public Class PhotoShop_Pencil_Basics
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
+            sliders.setupTrackBar(1, "Pencil Sigma_r", 1, 100, 7)
+            sliders.setupTrackBar(2, "Pencil Shade Factor X100", 1, 200, 40)
+        End If
+
+        task.desc = "Convert image to a pencil sketch - Painterly Effect"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim sigma_s = sliders.trackbar(0).Value
+        Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
+        Dim shadowFactor = sliders.trackbar(2).Value / 1000
+        cv.Cv2.PencilSketch(src, dst2, dst1, sigma_s, sigma_r, shadowFactor)
+    End Sub
+End Class
+
+
+
+
+
+
+' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
+Public Class PhotoShop_Pencil_Manual
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
+        End If
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Pencil grayscale image"
+            radio.check(1).Text = "Pencil grayscale inverted image"
+            radio.check(2).Text = "Pencil blur image"
+            radio.check(0).Checked = True
+        End If
+        task.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim grayinv As New cv.Mat
+        cv.Cv2.BitwiseNot(src, grayinv)
+        Dim ksize = sliders.trackbar(0).Value
+        If ksize Mod 2 = 0 Then ksize += 1
+        Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
+        cv.Cv2.Divide(src, 255 - blur, dst1, 256)
+
+        Static index As Integer = -1
+        For index = 0 To radio.check.Count - 1
+            If radio.check(index).Checked Then Exit For
+        Next
+        label2 = "Intermediate result: " + Choose(index + 1, "grayscale image", "grayscale inverted image", "blur image")
+        dst2 = Choose(index + 1, src, grayinv, blur)
     End Sub
 End Class

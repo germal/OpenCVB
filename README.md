@@ -286,8 +286,11 @@ VB_Classes project.
 Code “snippets” are provided to accelerate development of new VB.Net, OpenGL,
 and C++ algorithms. To use any snippets, first install them in Visual Studio:
 
--   Use the menu “Tools/Code Snippets Manager” then add the “\<OpenCVB Home
-    Directory\>/OpenCVB.snippets” directory.
+-   Click the menu “Tools/Code Snippets Manager”
+
+-   Select “Basic” as the Language.
+
+-   Add the “\<OpenCVB Home Directory\>/OpenCVB.snippets” directory.
 
 -   Access the code snippets with a right-click in the VB.Net code, select
     “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
