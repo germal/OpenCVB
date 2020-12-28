@@ -13,7 +13,7 @@ Public Class Motion_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Minimum size for contour bounding rectangle", 1, 1000, 200)
-            sliders.setupTrackBar(1, "Total motion threshold to resync", 1, 100000, If(task.color.Width = 1280, 20000, 5000)) ' used only externally...
+            sliders.setupTrackBar(1, "Total motion threshold to resync", 1, 100000, If(task.color.Width = 1280, 20000, 10000)) ' used only externally...
         End If
 
         label2 = "Mask of pixel differences "

@@ -14,7 +14,8 @@ Public Class Stable_Basics
         motion = New Motion_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much motion is reasonable?
+            sliders.setupTrackBar(0, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much camera motion is reasonable?
+            sliders.setupTrackBar(1, "Image change threshold for single image", 1, 5000, 3000) ' how much motion is reasonable in a single image?
         End If
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -39,8 +40,8 @@ Public Class Stable_Basics
         roll = task.IMU_AngularVelocity.Z
 
         Static cameraMotionThreshold = findSlider("Camera Motion threshold in radians X100")
-        Static nonZeroThreshold = findSlider("Total motion threshold to resync")
-        Static pixelThreshold = findSlider("Change threshold for each pixel")
+        Static resyncThreshold = findSlider("Total motion threshold to resync")
+        Static pixelThreshold = findSlider("Image change threshold for single image")
 
         cameraStable = If(cameraMotionThreshold.Value / 100 < Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll), False, True)
 
@@ -49,7 +50,7 @@ Public Class Stable_Basics
         dst2 = motion.dst2
 
         cumulativeChanges += motion.changedPixels
-        If cameraStable = False Or cumulativeChanges > nonZeroThreshold.value Or motion.changedPixels > pixelThreshold.value Or task.depthOptionsChanged Or externalReset Then
+        If cameraStable = False Or cumulativeChanges > resyncThreshold.value Or motion.changedPixels > pixelThreshold.value Or task.depthOptionsChanged Or externalReset Then
             resetAll = True
             externalReset = False
             dst1 = input
