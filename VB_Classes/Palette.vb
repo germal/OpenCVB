@@ -393,11 +393,8 @@ End Class
 Public Class Palette_DepthColorMap
     Inherits VBparent
     Dim gradientColorMap As New cv.Mat
-    Dim holes As Depth_Holes
     Public Sub New()
         initParent()
-        holes = New Depth_Holes()
-        hideForm("Depth_Holes Slider Options")
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -430,8 +427,7 @@ Public Class Palette_DepthColorMap
         Dim depth8u = task.depth32f.ConvertScaleAbs(cvtScaleSlider.Value / 100)
         dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
-        holes.Run()
-        dst1.SetTo(0, holes.holeMask)
+        dst1.SetTo(0, task.inrange.noDepthMask)
     End Sub
 End Class
 

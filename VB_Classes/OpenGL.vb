@@ -550,12 +550,12 @@ End Class
 
 Public Class OpenGL_StableDepth
     Inherits VBparent
-    Dim pcValid As Depth_PointCloud_Stable
+    Dim pcValid As Stable_WithRectangle
     Public ogl As OpenGL_Options
     Public Sub New()
         initParent()
 
-        pcValid = New Depth_PointCloud_Stable
+        pcValid = New Stable_WithRectangle
         ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
@@ -616,12 +616,12 @@ End Class
 
 Public Class OpenGL_StableDepthMouse
     Inherits VBparent
-    Dim pcValid As Depth_PointCloud_Stable
+    Dim pcValid As Stable_WithRectangle
     Public ogl As OpenGL_Callbacks
     Public Sub New()
         initParent()
 
-        pcValid = New Depth_PointCloud_Stable
+        pcValid = New Stable_WithRectangle
         ogl = New OpenGL_Callbacks
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"

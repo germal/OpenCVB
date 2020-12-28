@@ -979,14 +979,14 @@ End Class
 Public Class Histogram_SmoothTopView2D
     Inherits VBparent
     Public topView As Histogram_TopView2D
-    Dim stable As Depth_PointCloud_Stable
+    Dim stable As Stable_WithRectangle
     Public Sub New()
         initParent()
 
         topView = New Histogram_TopView2D
         topView.viewOpts.histThresholdSlider.Value = 1
 
-        stable = New Depth_PointCloud_Stable
+        stable = New Stable_WithRectangle
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
@@ -1167,14 +1167,14 @@ End Class
 Public Class Histogram_SmoothSideView2D
     Inherits VBparent
     Public sideView As Histogram_SideView2D
-    Dim stable As Depth_PointCloud_Stable
+    Dim stable As Stable_WithRectangle
     Public Sub New()
         initParent()
 
         sideView = New Histogram_SideView2D
         sideView.viewOpts.histThresholdSlider.Value = 1
 
-        stable = New Depth_PointCloud_Stable
+        stable = New Stable_WithRectangle
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"

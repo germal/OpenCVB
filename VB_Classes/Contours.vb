@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-
 Public Class Contours_Basics
     Inherits VBparent
     Public rotatedRect As Rectangle_Rotated
@@ -46,7 +45,7 @@ Public Class Contours_Basics
         Next
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         setOptions()
         If standalone Then
             Dim imageInput As New cv.Mat

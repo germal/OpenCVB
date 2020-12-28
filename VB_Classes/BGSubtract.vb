@@ -155,24 +155,21 @@ End Class
 
 Public Class BGSubtract_Depth_MT
     Inherits VBparent
-    Dim shadow As Depth_Holes
     Dim bgsub As BGSubtract_Basics_MT
     Public Sub New()
         initParent()
         bgsub = New BGSubtract_Basics_MT()
-        shadow = New Depth_Holes()
         task.desc = "Detect Motion in the depth image - needs more work"
         label1 = "Depth data input"
         label2 = "Accumulated depth image"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        shadow.Run() ' get where depth is zero
         bgsub.src = task.RGBDepth
         bgsub.Run()
         dst1 = bgsub.src
         dst2 = bgsub.dst2
-        dst2.SetTo(0, shadow.holeMask)
+        dst2.SetTo(0, task.inrange.nodepthmask)
     End Sub
 End Class
 

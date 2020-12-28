@@ -66,7 +66,7 @@ Public Class FloodFill_Basics
                     If count > minFloodSize And count <> gray.Total Then
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
                         masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
-                        maskSizes.Add(rect.Width * rect.Height, masks.Count - 1)
+                        maskSizes.Add(count, masks.Count - 1)
                         rects.Add(rect)
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
@@ -366,10 +366,8 @@ End Class
 Public Class FloodFill_WithDepth
     Inherits VBparent
     Dim range As FloodFill_RelativeRange
-    Dim shadow As Depth_Holes
     Public Sub New()
         initParent()
-        shadow = New Depth_Holes()
 
         range = New FloodFill_RelativeRange()
 
@@ -378,14 +376,12 @@ Public Class FloodFill_WithDepth
         task.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        shadow.Run()
-
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         range.src = src
-        range.fBasics.initialMask = shadow.holeMask
         range.Run()
+        dst2 = task.inrange.noDepthMask
         dst1 = range.dst2
-        dst2 = shadow.holeMask
+        dst1.SetTo(0, dst2)
     End Sub
 End Class
 
@@ -578,39 +574,5 @@ Public Class FloodFill_Top16
         Next
         If check.Box(0).Checked Then dst1 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         label1 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class FloodFill_Largest1
-    Inherits VBparent
-    Public flood As FloodFill_Basics
-
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public Sub New()
-        initParent()
-        flood = New FloodFill_Basics()
-
-        label1 = "Input image to floodfill"
-        task.desc = "Use floodfill to find the largest blob"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type = cv.MatType.CV_8U Then src = src.ConvertScaleAbs(255)
-
-        flood.src = src
-        flood.Run()
-
-        'Dim maskIndex = flood.maskSizes.ElementAt(1).Value
-        'dst1.SetTo(0)
-        'dst1.SetTo(255, flood.masks(maskIndex))
-        'label1 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
     End Sub
 End Class

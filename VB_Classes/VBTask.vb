@@ -204,7 +204,7 @@ Public Class ActiveTask : Implements IDisposable
             End If
 
             ' run any global options algorithms here.
-            If inrange IsNot Nothing Then inrange.run()
+            If inrange IsNot Nothing Then inrange.Run()
             algorithmObject.NextFrame()
             label1 = ocvb.label1
             label2 = ocvb.label2

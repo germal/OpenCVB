@@ -168,11 +168,8 @@ Public Class Blob_DepthClusters
     Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_RelativeRange
-    Dim shadow As Depth_Holes
     Public Sub New()
         initParent()
-
-        shadow = New Depth_Holes()
 
         histBlobs = New Histogram_DepthClusters()
 
@@ -187,17 +184,17 @@ Public Class Blob_DepthClusters
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        shadow.Run()
-        histBlobs.src = shadow.dst1
+        histBlobs.src = task.inrange.noDepthMask
         histBlobs.Run()
         dst1 = histBlobs.dst1
         flood.src = histBlobs.dst2
-        flood.fBasics.initialMask = shadow.holeMask
+        flood.fBasics.initialMask = task.inrange.noDepthMask
         flood.Run()
         dst2 = flood.fBasics.dst2
         label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
 End Class
+
 
 
 
@@ -266,6 +263,7 @@ Public Class Blob_Largest
     Public masks As List(Of cv.Mat)
     Public kalman As Kalman_Basics
     Public blobIndex As Integer
+    Public maskIndex As Integer
     Public Sub New()
         initParent()
         kalman = New Kalman_Basics()
@@ -276,6 +274,7 @@ Public Class Blob_Largest
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        blobs.src = src
         blobs.Run()
         dst2 = blobs.dst2
         rects = blobs.flood.fBasics.rects
@@ -283,7 +282,7 @@ Public Class Blob_Largest
 
         If masks.Count > 0 Then
             dst1.SetTo(0)
-            Dim maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest contiguous blob
+            maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
             src.CopyTo(dst1, masks(maskIndex))
             kalman.kInput = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
             kalman.Run()

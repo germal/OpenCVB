@@ -165,11 +165,8 @@ End Class
 
 Public Class Depth_FlatData
     Inherits VBparent
-    Dim shadow As Depth_Holes
     Public Sub New()
         initParent()
-        shadow = New Depth_Holes()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FlatData Region Count", 1, 250, 200)
@@ -179,14 +176,11 @@ Public Class Depth_FlatData
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        shadow.Run() ' get where depth is zero
-
-        Dim mask As New cv.Mat
         Dim gray As New cv.Mat
         Dim gray8u As New cv.Mat
 
-        cv.Cv2.BitwiseNot(shadow.holeMask, mask)
-        gray = task.depth32f.Normalize(0, 255, cv.NormTypes.MinMax, -1, mask)
+        Dim depthMask As cv.Mat = task.inrange.depthMask
+        gray = task.depth32f.Normalize(0, 255, cv.NormTypes.MinMax, -1, depthMask)
         gray.ConvertTo(gray8u, cv.MatType.CV_8U)
 
         Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
@@ -313,12 +307,10 @@ End Class
 
 Public Class Depth_MeanStdevPlot
     Inherits VBparent
-    Dim shadow As Depth_Holes
     Dim plot1 As Plot_OverTime
     Dim plot2 As Plot_OverTime
     Public Sub New()
         initParent()
-        shadow = New Depth_Holes()
 
         plot1 = New Plot_OverTime()
         plot1.dst1 = dst1
@@ -334,12 +326,10 @@ Public Class Depth_MeanStdevPlot
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        shadow.Run()
 
         Dim mean As Single = 0, stdev As Single = 0
-        Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(shadow.holeMask, mask)
-        cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, mask)
+        Dim depthMask As cv.Mat = task.inrange.depthMask
+        cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, depthMask)
 
         If mean > plot1.maxScale Then plot1.maxScale = mean + 1000 - (mean + 1000) Mod 1000
         If stdev > plot2.maxScale Then plot2.maxScale = stdev + 1000 - (stdev + 1000) Mod 1000
@@ -902,59 +892,6 @@ End Class
 
 
 
-Public Class Depth_PunchDecreasing
-    Inherits VBparent
-    Public Increasing As Boolean
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
-        End If
-        task.desc = "Identify where depth is decreasing - coming toward the camera."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim depth32f = If(src.Type = cv.MatType.CV_32F, src, task.depth32f)
-        Static lastDepth As cv.Mat = depth32f
-
-        Dim mmThreshold = sliders.trackbar(0).Value
-        If Increasing Then
-            cv.Cv2.Subtract(depth32f, lastDepth, dst1)
-        Else
-            cv.Cv2.Subtract(lastDepth, depth32f, dst1)
-        End If
-        dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        lastDepth = depth32f.Clone
-    End Sub
-End Class
-
-
-
-
-
-Public Class Depth_PunchIncreasing
-    Inherits VBparent
-    Public depth As Depth_PunchDecreasing
-    Public Sub New()
-        initParent()
-        depth = New Depth_PunchDecreasing()
-        depth.Increasing = True
-        task.desc = "Identify where depth is increasing - retreating from the camera."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        depth.src = src
-        depth.Run()
-        dst1 = depth.dst1
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Depth_Median
     Inherits VBparent
@@ -1114,33 +1051,28 @@ End Class
 
 Public Class Depth_HolesOverTime
     Inherits VBparent
-    Dim holes As Depth_Holes
     Dim recentImages As New List(Of cv.Mat)
     Public Sub New()
         initParent()
-        holes = New Depth_Holes()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Number of images to retain", 0, 10, 3)
+            sliders.setupTrackBar(0, "Number of images to retain", 0, 30, 3)
         End If
         label2 = "Latest hole mask"
         task.desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        holes.Run()
-        recentImages.Add(holes.holeMask)
+        recentImages.Add(task.inrange.noDepthMask.clone) ' To see the value of clone, remove it temporarily.  Only the most recent depth holes are added in.
 
-        dst2 = recentImages.ElementAt(0)
+        dst2 = task.inrange.noDepthMask
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For Each img In recentImages
             cv.Cv2.BitwiseOr(dst1, img, dst1)
         Next
         label1 = "Depth holes integrated over the past " + CStr(recentImages.Count) + " images"
-        If recentImages.Count >= sliders.trackbar(0).Value Then
-            recentImages.RemoveAt(0)
-        End If
+        If recentImages.Count >= sliders.trackbar(0).Value Then recentImages.RemoveAt(0)
     End Sub
 End Class
 
@@ -1168,7 +1100,7 @@ Public Class Depth_Holes
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        holeMask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        holeMask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         holeMask = holeMask.Dilate(element, Nothing, sliders.trackbar(1).Value)
         dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -1185,12 +1117,10 @@ End Class
 
 Public Class Depth_TooClose
     Inherits VBparent
-    Public holes As Depth_Holes
     Public minVal As Double
     Public depth32f As cv.Mat
     Public Sub New()
         initParent()
-        holes = New Depth_Holes()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -1201,11 +1131,10 @@ Public Class Depth_TooClose
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        holes.Run()
-        cv.Cv2.BitwiseNot(holes.holeMask, dst2)
         depth32f = task.depth32f
         Dim maxval As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
+        dst2 = task.inrange.depthMask
         depth32f.MinMaxLoc(minVal, maxval, minLoc, maxLoc, dst2)
         cv.Cv2.InRange(depth32f, cv.Scalar.All(minVal), cv.Scalar.All(minVal + sliders.trackbar(0).Value), dst1)
 
@@ -1282,13 +1211,13 @@ Public Class Depth_TooCloseCentroids
         dst2 = depth.noiseMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst1 = depth.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In depth.flood.basics.rejectedCentroids
-            If pt <> New cv.Point Then dst1.Circle(pt, 25, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            If pt <> New cv.Point Then dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
 
         Static maxPixelSlider = findSlider("Size of rejected rects that are likely too close")
         Static percentSlider = findSlider("Percent of zero depth in rejected rect")
         Dim maxPixels = maxPixelSlider.value
-        Dim holes = depth.noise.holes.holeMask
+        Dim holes As cv.Mat = task.inrange.noDepthMask
         Dim percentThreshold = percentSlider.value / 100
         tooClosePoints.Clear()
         For Each r In depth.flood.basics.rejectedRects
@@ -1831,63 +1760,11 @@ End Class
 
 
 
-Public Class Depth_PointCloud_Stable
-    Inherits VBparent
-    Public extrema As Depth_Stable
-    Public stableCloud As cv.Mat
-    Public split() As cv.Mat
-    Public myResetAll As Boolean
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
-        End If
-
-        stableCloud = task.pointCloud
-        extrema = New Depth_Stable
-        task.desc = "Provide only a validated point cloud - one which has consistent depth data."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        split = task.pointCloud.Split
-
-        extrema.src = src
-        If extrema.src.Type <> cv.MatType.CV_32F Then extrema.src = split(2) * 1000
-
-        extrema.Run()
-
-        ' if many pixels changed, then resetAll was triggered.  Leave task.pointcloud alone...
-        If extrema.resetAll = False And myResetAll = False Then
-            Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
-            If zCheck.checked Then
-                split(2) = extrema.dst2 * 0.001
-                cv.Cv2.Merge(split, stableCloud)
-            Else
-                task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
-            End If
-        Else
-            myResetAll = False
-            stableCloud = task.pointCloud
-        End If
-        dst1 = extrema.dst1
-        dst2 = extrema.dst2
-        task.pointCloud = stableCloud
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Depth_SmoothSurfaces
     Inherits VBparent
-    Public pcValid As Depth_PointCloud_Stable
+    Public pcValid As Stable_WithRectangle
     Dim histX As Histogram_KalmanSmoothed
     Dim histY As Histogram_KalmanSmoothed
     Dim mats As Mat_4to1
@@ -1897,7 +1774,7 @@ Public Class Depth_SmoothSurfaces
         mats = New Mat_4to1
         histX = New Histogram_KalmanSmoothed
         histY = New Histogram_KalmanSmoothed
-        pcValid = New Depth_PointCloud_Stable
+        pcValid = New Stable_WithRectangle
 
         label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
         label2 = "Likely smooth surfaces"
@@ -1942,5 +1819,87 @@ Public Class Depth_SmoothSurfaces
         dst1 = mats.dst1
 
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_PunchDecreasing
+    Inherits VBparent
+    Public Increasing As Boolean
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
+        End If
+        task.desc = "Identify where depth is decreasing - coming toward the camera."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim depth32f = If(src.Type = cv.MatType.CV_32F, src, task.depth32f)
+        Static lastDepth As cv.Mat = depth32f
+
+        Dim mmThreshold = sliders.trackbar(0).Value
+        If Increasing Then
+            cv.Cv2.Subtract(depth32f, lastDepth, dst1)
+        Else
+            cv.Cv2.Subtract(lastDepth, depth32f, dst1)
+        End If
+        dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        lastDepth = depth32f.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class Depth_PunchIncreasing
+    Inherits VBparent
+    Public depth As Depth_PunchDecreasing
+    Public Sub New()
+        initParent()
+        depth = New Depth_PunchDecreasing
+        depth.Increasing = True
+        task.desc = "Identify where depth is increasing - retreating from the camera."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        depth.src = src
+        depth.Run()
+        dst1 = depth.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_PunchBlob
+    Inherits VBparent
+    Public depth As Depth_PunchDecreasing
+    Dim blob As Blob_Largest
+    Public Sub New()
+        initParent()
+        blob = New Blob_Largest
+        depth = New Depth_PunchDecreasing
+        task.desc = "Identify the punch with a rectangle around the largest blob"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        depth.src = src
+        depth.Run()
+        dst1 = depth.dst1
+
+        blob.src = dst1
+        blob.Run()
+        dst2.SetTo(0)
+        dst1.SetTo(255, blob.masks(blob.maskIndex))
     End Sub
 End Class

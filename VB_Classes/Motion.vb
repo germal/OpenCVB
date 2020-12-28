@@ -86,18 +86,15 @@ Public Class Motion_WithBlurDilate
         dst1 = blur.dst1
 
         Static delayCounter = 0
-        Static firstFrame = dst1.Clone
         delayCounter += 1
 
         Static persistSlider = findSlider("Frames to persist")
         If delayCounter > persistSlider.value Then
             delayCounter = 0
-            firstFrame = dst1.Clone
             rectList.Clear()
         End If
 
         diff.src = dst1
-        diff.lastFrame = firstFrame
         diff.Run()
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()

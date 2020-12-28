@@ -80,6 +80,57 @@ End Class
 
 
 
+
+
+Public Class Stable_WithRectangle
+    Inherits VBparent
+    Public extrema As Depth_Stable
+    Public stableCloud As cv.Mat
+    Public split() As cv.Mat
+    Public myResetAll As Boolean
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
+        End If
+
+        stableCloud = task.pointCloud
+        extrema = New Depth_Stable
+        task.desc = "Provide only a validated point cloud - one which has consistent depth data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        split = task.pointCloud.Split
+
+        extrema.src = src
+        If extrema.src.Type <> cv.MatType.CV_32F Then extrema.src = split(2) * 1000
+
+        extrema.Run()
+
+        ' if many pixels changed, then resetAll was triggered.  Leave task.pointcloud alone...
+        If extrema.resetAll = False And myResetAll = False Then
+            Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
+            If zCheck.checked Then
+                split(2) = extrema.dst2 * 0.001
+                cv.Cv2.Merge(split, stableCloud)
+            Else
+                task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
+            End If
+        Else
+            myResetAll = False
+            stableCloud = task.pointCloud
+        End If
+        dst1 = extrema.dst1
+        dst2 = extrema.dst2
+        task.pointCloud = stableCloud
+    End Sub
+End Class
+
+
+
+
 Public Class Stable_Clusters
     Inherits VBparent
     Dim clusters As Histogram_DepthClusters
