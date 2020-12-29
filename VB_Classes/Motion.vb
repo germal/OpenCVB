@@ -207,7 +207,7 @@ End Class
 
 Public Class Motion_StableDepthRectangleUpdate
     Inherits VBparent
-    Public extrema As Depth_Stable
+    Public extrema As Depth_Smooth
     Public stableCloud As cv.Mat
     Public split() As cv.Mat
     Public myResetAll As Boolean
@@ -219,7 +219,7 @@ Public Class Motion_StableDepthRectangleUpdate
         End If
 
         stableCloud = task.pointCloud
-        extrema = New Depth_Stable
+        extrema = New Depth_Smooth
         task.desc = "Provide only a validated point cloud - one which has consistent depth data."
     End Sub
     Public Sub Run()

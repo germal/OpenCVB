@@ -873,11 +873,11 @@ Public Class Depth_Stabilizer
         stable.src = src
         stable.Run()
 
-        inrange.src = src
-        If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = task.depth32f
-        inrange.Run()
+        'inrange.src = src
+        'If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = task.depth32f
+        'inrange.Run()
 
-        mean.src = inrange.dst1
+        mean.src = task.depth32f ' inrange.dst1
         mean.src.SetTo(0, stable.dst1)
         mean.Run()
         dst2 = mean.dst1.Threshold(256 * 256 - 1, 256 * 256 - 1, cv.ThresholdTypes.Trunc)
@@ -1037,6 +1037,7 @@ Public Class Depth_Edges
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        cv.Cv2.ImShow("src", src)
         edges.src = src
         edges.Run()
         dst1 = edges.dst2
@@ -1448,7 +1449,7 @@ End Class
 
 
 
-Public Class Depth_Stable
+Public Class Depth_Smooth
     Inherits VBparent
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public dMin As Depth_SmoothMin
@@ -1478,7 +1479,7 @@ Public Class Depth_Stable
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
 
         Dim radioVal As Integer
-        Static frm As OptionsRadioButtons = findfrm("Depth_Stable Radio Options")
+        Static frm As OptionsRadioButtons = findfrm("Depth_Smooth Radio Options")
         For radioVal = 0 To frm.check.Count - 1
             If frm.check(radioVal).Checked Then Exit For
         Next
