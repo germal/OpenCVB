@@ -17,7 +17,7 @@ Public Class Palette_Basics
             radio.Setup(caller, 21)
             For i = 0 To radio.check.Length - 1
                 radio.check(i).Text = mapNames(i)
-                If mapNames(i) = "Hot" Then radio.check(i).Checked = True
+                If mapNames(i) = "Hsv" Then radio.check(i).Checked = True
             Next
             radioFrm = radio
         End If
@@ -524,6 +524,7 @@ Public Class Palette_ObjectColors
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
+        reduction.src.SetTo(0, task.inrange.nodepthMask)
         reduction.Run()
         dst2 = reduction.dst2
 
@@ -564,7 +565,8 @@ Public Class Palette_ObjectColors
             dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * ocvb.fontSize, 30 * ocvb.fontSize), cv.Scalar.Black, -1)
             ocvb.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
-        label1 = CStr(blobList.Count) + " regions between " + Format(minDepth / 1000, "0.0") + " and " + Format(maxDepth / 1000, "0.0") + "meters"
+        dst1.SetTo(0, task.inrange.nodepthmask)
+        label1 = CStr(blobList.Count) + " regions between " + Format(minDepth / 1000, "0.0") + " and " + Format(maxDepth / 1000, "0.0") + " meters"
     End Sub
 End Class
 

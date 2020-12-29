@@ -1226,6 +1226,8 @@ Public Class Histogram_Concentration
         initParent()
 
         palette = New Palette_Basics
+        Dim radioHot = findRadio("Hot")
+        radioHot.Checked = True
         sideview = New Histogram_SideView2D
         topview = New Histogram_TopView2D
 
