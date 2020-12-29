@@ -11,8 +11,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Diagnostics;
+using System.Threading;
 using cv = OpenCvSharp;
 
 //                                                                      
@@ -327,7 +327,7 @@ namespace CS_Classes
                 {
                     for (int y = 0; y < rect_height; ++y)
                     {
-                        float nextVal = (float) MinDistanceOrderedSet(new Point(x, y), pnt_comparer, test_points);
+                        float nextVal = (float)MinDistanceOrderedSet(new Point(x, y), pnt_comparer, test_points);
                         dist.Set<float>(y, x, nextVal);
                     }
                 }

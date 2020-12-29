@@ -1,10 +1,10 @@
-﻿using System;
+﻿using OpenCvSharp;
+using OpenCvSharp.Dnn;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
-using OpenCvSharp;
-using OpenCvSharp.Dnn;
- 
+
 namespace CS_Classes
 {
     public class DNN

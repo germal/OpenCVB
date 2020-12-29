@@ -1,7 +1,6 @@
-﻿using cv = OpenCvSharp;
-
-//https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
+﻿//https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
 using System;
+using cv = OpenCvSharp;
 namespace CS_Classes
 {
     public class MatrixInverse
@@ -16,7 +15,7 @@ namespace CS_Classes
             double d = MatDeterminant(m);
             if (Math.Abs(d) < 1.0e-5)
                 if (showIntermediate) Console.WriteLine("\nMatrix has no inverse");
-            else
+                else
                 if (showIntermediate) Console.WriteLine("\nDet(m) = " + d.ToString("F4"));
 
             inverse = MatInverse(m);
@@ -65,7 +64,7 @@ namespace CS_Classes
                 VecShow(solution, 1, 8);
             }
             return inverse;
-        } 
+        }
 
         static cv.Mat MatInverse(cv.Mat m)
         {
@@ -153,10 +152,10 @@ namespace CS_Classes
                             lum.Set<double>(i, k, lum.At<double>(i, k) - xij * lum.At<double>(j, k));
                     }
                 }
-            } 
+            }
 
             return toggle;  // for determinant
-        } 
+        }
 
         static double[] Reduce(cv.Mat luMatrix, double[] b) // helper
         {
@@ -183,7 +182,7 @@ namespace CS_Classes
             }
 
             return x;
-        } 
+        }
 
         static double MatDeterminant(cv.Mat m)
         {
@@ -299,6 +298,6 @@ namespace CS_Classes
             }
             Console.WriteLine("");
         }
-    } 
+    }
 
 }

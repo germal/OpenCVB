@@ -1,7 +1,7 @@
-﻿using cv = OpenCvSharp;
+﻿using OpenCvSharp.Aruco;
 using System;
 using System.Collections.Generic;
-using OpenCvSharp.Aruco;
+using cv = OpenCvSharp;
 
 // https://github.com/shimat/opencvsharp_samples/blob/master/SamplesCS/Samples/ArucoSample.cs
 namespace CS_Classes

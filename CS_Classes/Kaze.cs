@@ -1,10 +1,8 @@
-﻿using System;
+﻿using OpenCvSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using OpenCvSharp;
 
 /// https://github.com/shimat/opencvsharp/issues/176
 
@@ -270,7 +268,7 @@ namespace CS_Classes
                                 maskData[i] = 0;
                         }
                     }
-                 }
+                }
                 m.CopyTo(mask);
             }
             maskHandle.Free();

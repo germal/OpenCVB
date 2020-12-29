@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using cv = OpenCvSharp;
+﻿using cv = OpenCvSharp;
 
 namespace CS_Classes
 {
@@ -12,7 +7,7 @@ namespace CS_Classes
         public void New() { }
 
         public void Start(cv.Mat input, cv.Mat output, cv.SimpleBlobDetector.Params detectorParams)
-        { 
+        {
             var binaryImage = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             cv.Cv2.Threshold(binaryImage, binaryImage, thresh: 100, maxval: 255, type: cv.ThresholdTypes.Binary);
 

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using OpenCvSharp;
-using OpenCvSharp.XFeatures2D;
+﻿using OpenCvSharp;
 using OpenCvSharp.Features2D;
+using OpenCvSharp.XFeatures2D;
 
 /// http://www.prism.gatech.edu/~ahuaman3/docs/OpenCV_Docs/tutorials/nonfree_1/nonfree_1.html
 namespace CS_Classes
@@ -15,7 +9,7 @@ namespace CS_Classes
     {
         public bool drawPoints = true;
         public KeyPoint[] keypoints1, keypoints2;
-        public void New(){}
+        public void New() { }
         public void Run(Mat gray1, Mat gray2, out Mat output, int hessianThreshold, bool useBFMatcher)
         {
             var surf = SURF.Create(hessianThreshold, 4, 2, true);

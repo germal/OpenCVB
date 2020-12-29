@@ -1,14 +1,10 @@
-﻿using cv = OpenCvSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using cv = OpenCvSharp;
 
 namespace CS_Classes
 {
     public class OilPaintManual
-    { 
+    {
         private static byte ClipByte(double colour)
         {
             return (byte)(colour > 255 ? 255 : (colour < 0 ? 0 : colour));
