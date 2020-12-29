@@ -25,7 +25,7 @@ Public Class Contours_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Contour minimum area", 0, 5000, 1000)
+            sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
         End If
 
         rotatedRect = New Rectangle_Rotated

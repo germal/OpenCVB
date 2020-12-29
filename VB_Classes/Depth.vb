@@ -1883,22 +1883,43 @@ End Class
 
 Public Class Depth_PunchBlob
     Inherits VBparent
-    Public depth As Depth_PunchDecreasing
+    Dim depthDec As Depth_PunchDecreasing
+    Dim depthInc As Depth_PunchDecreasing
     Dim contours As Contours_Basics
     Public Sub New()
         initParent()
         contours = New Contours_Basics
-        depth = New Depth_PunchDecreasing
+        Dim areaSlider = findSlider("Contour minimum area")
+        areaSlider.Value = 15000
+
+        Dim maxSlider = findSlider("InRange Max Depth (mm)")
+        maxSlider.Value = 2000 ' must be close to the camera.
+
+        depthInc = New Depth_PunchDecreasing
         task.desc = "Identify the punch with a rectangle around the largest blob"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        depth.src = src
-        depth.Run()
-        dst1 = depth.dst1
+        depthInc.src = src
+        depthInc.Run()
+        dst1 = depthInc.dst1
 
         contours.src = dst1
         contours.Run()
         dst2 = contours.dst2
+
+        Static lastContoursCount As Integer
+        Static punchCount As Integer
+        Static showMessage As Integer
+        If contours.contours.Count > 0 Then showMessage = 30
+
+        If showMessage = 30 And lastContoursCount = 0 Then punchCount += 1
+        lastContoursCount = contours.contours.Count
+        label2 = CStr(punchCount) + " Punches Thrown"
+
+        If showMessage Then
+            ocvb.trueText("Punched!!!", 10, 100, 3)
+            showMessage -= 1
+        End If
     End Sub
 End Class
