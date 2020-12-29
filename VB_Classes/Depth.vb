@@ -494,7 +494,7 @@ Public Class Depth_ColorizerFastFade_CPP
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
-        dst2 = task.inrange.depthMask
+        dst2 = task.inrange.nodepthMask
 
         Dim depthData(input.Total * input.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -1921,7 +1921,6 @@ Public Class Depth_PunchBlob
             ocvb.trueText("Punched!!!", 10, 100, 3)
             showMessage -= 1
         End If
-
 
         Static showWarningInfo As Integer
         If contours.contours.Count > 3 Then showWarningInfo = 100
