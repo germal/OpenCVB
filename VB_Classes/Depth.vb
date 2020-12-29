@@ -1890,7 +1890,7 @@ Public Class Depth_PunchBlob
         initParent()
         contours = New Contours_Basics
         Dim areaSlider = findSlider("Contour minimum area")
-        areaSlider.Value = 15000
+        areaSlider.Value = 5000
 
         Dim maxSlider = findSlider("InRange Max Depth (mm)")
         maxSlider.Value = 2000 ' must be close to the camera.
