@@ -1921,5 +1921,14 @@ Public Class Depth_PunchBlob
             ocvb.trueText("Punched!!!", 10, 100, 3)
             showMessage -= 1
         End If
+
+
+        Static showWarningInfo As Integer
+        If contours.contours.Count > 3 Then showWarningInfo = 100
+
+        If showWarningInfo Then
+            showWarningInfo -= 1
+            ocvb.trueText("Too many contours!  Reduce the Max Depth.", 10, 130, 3)
+        End If
     End Sub
 End Class
