@@ -385,13 +385,13 @@ Public Class PointCloud_Objects
         measure.Run()
         dst1 = measure.dst1
 
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / ocvb.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeterV))
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / ocvb.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
         Dim FOV = If(SideViewFlag, ocvb.vFov / 2, ocvb.hFov / 2)
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
-            Dim pixeldistance = src.Width * ((distanceSlider.Value / 1000) / ocvb.maxZ)
+            Dim pixeldistance = src.Width * (distanceSlider.Value / 1000) / ocvb.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
             If SideViewFlag Then
@@ -403,9 +403,8 @@ Public Class PointCloud_Objects
             End If
             distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
-            ocvb.trueText("Test line is " + CStr(lineHalf * 2) + " pixels or " + Format(lineHalf * 2 / ocvb.pixelsPerMeterV, "#0.00") + " meters" + vbCrLf +
-                          "Pixels per meter horizontal = " + CStr(CInt(ocvb.pixelsPerMeterH)) + vbCrLf +
-                          "Pixels per meter vertical = " + CStr(CInt(ocvb.pixelsPerMeterV)), 10, 40, 3)
+            ocvb.trueText("Test line is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters" + vbCrLf +
+                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters", 10, 40, 3)
         End If
 
         viewObjects.Clear()
@@ -491,13 +490,22 @@ Public Class PointCloud_Objects_TopView
         initParent()
         view = New PointCloud_Objects()
         view.SideViewFlag = False
+        Dim radioPalette = findRadio("Hot")
+        radioPalette.Checked = True
 
+        label1 = "Back projection of object identified in the top view"
+        label2 = "Objects identified in the top view"
         task.desc = "Display only the top view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         view.Run()
-        dst1 = view.dst1
+        dst2 = view.dst1
+
+        For Each obj In view.viewObjects
+            Console.WriteLine("Object " + CStr(view.viewObjects.IndexOfKey(obj.Key)) + " is " +
+                              CStr((dst2.Height - obj.Value.centroid.Y) / ocvb.pixelsPerMeter) + " meters from the camera")
+        Next
     End Sub
 End Class
 
@@ -513,12 +521,16 @@ Public Class PointCloud_Objects_SideView
         view = New PointCloud_Objects()
         view.SideViewFlag = True
 
+        label1 = "Back projection of object identified in the side view"
+        label2 = "Objects identified in the side view"
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         view.Run()
-        dst1 = view.dst1
+        dst2 = view.dst1
+
+
     End Sub
 End Class
 
@@ -532,7 +544,6 @@ Public Class PointCloud_Kalman_TopView
     Public pTrack As KNN_PointTracker
     Public flood As FloodFill_8bit
     Public topView As Histogram_TopView2D
-    Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmats As PointCloud_Colorize
     Public Sub New()
         initParent()
@@ -564,9 +575,7 @@ Public Class PointCloud_Kalman_TopView
 
         dst1 = cmats.CameraLocationBot(dst1)
         Dim FOV = ocvb.hFov
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
-        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * ocvb.maxZ)
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(ocvb.maxZ, "0.0") + " meters"
+        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(ocvb.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -588,6 +597,8 @@ Public Class PointCloud_Kalman_SideView
         pTrack = New KNN_PointTracker()
         cmats = New PointCloud_Colorize()
         flood = New Floodfill_Identifiers()
+        Dim radioPalette = findRadio("Hot")
+        radioPalette.Checked = True
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
         sideView = New Histogram_SideView2D()
@@ -612,9 +623,7 @@ Public Class PointCloud_Kalman_SideView
         dst1 = cmats.CameraLocationSide(dst1)
 
         Dim FOV = (180 - ocvb.vFov) / 2
-        Dim lineHalf = CInt(Math.Tan(FOV / 2 * 0.0174533) * src.Height)
-        pixelsPerMeter = lineHalf / (Math.Tan(FOV / 2 * 0.0174533) * ocvb.maxZ)
-        label1 = Format(pixelsPerMeter, "0") + " pixels per meter at " + Format(ocvb.maxZ, "0.0") + " meters"
+        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter at " + Format(ocvb.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -852,6 +861,9 @@ Public Class PointCloud_IMU_TopView
         lDetect = New LineDetector_Basics()
         lDetect.drawLines = True
 
+        Dim radioPalette = findRadio("Hot")
+        radioPalette.Checked = True
+
         label1 = "Top view aligned using the IMU gravity vector"
         label2 = "Top view aligned without using the IMU gravity vector"
         task.desc = "Present the top view with and without the IMU filter."
@@ -1064,6 +1076,8 @@ Public Class PointCloud_DistanceSideClick
     Public Sub New()
         initParent()
         sideIMU = New PointCloud_IMU_SideView()
+        Dim radioPalette = findRadio("Hot")
+        radioPalette.Checked = True
         label1 = "Click anywhere to get distance from camera and x dist"
         task.desc = "Click to find distance from the camera in the rotated side view"
     End Sub
@@ -1089,11 +1103,10 @@ Public Class PointCloud_DistanceSideClick
         For Each pt In clicks
             dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim pixelsPerMeter = dst2.Width / ocvb.maxZ
             Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
             Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
-            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / pixelsPerMeter
-            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / pixelsPerMeter, "#0.00") + "m", pt, 3)
+            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / ocvb.pixelsPerMeter
+            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / ocvb.pixelsPerMeter, "#0.00") + "m", pt, 3)
         Next
 
         dst1.Line(New cv.Point(ocvb.sideCameraPoint.X, 0), New cv.Point(ocvb.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
@@ -1206,12 +1219,12 @@ Public Class PointCloud_GVectorPlane
 
         Static consistencySlider = findSlider("Y-coordinate consistency check count")
         If leftPoints.Count > consistencySlider.value Then
-            planeHeight = CInt(ocvb.pixelsPerMeterV * cushion)
+            planeHeight = CInt(ocvb.pixelsPerMeter * cushion)
             If planeHeight = 0 Then planeHeight = 1
             Dim cam = ocvb.sideCameraPoint
 
             Static adjustmentSlider = findSlider("Y-coordinate up/down adjustment (mm)")
-            Dim adjustPixels = ocvb.pixelsPerMeterV * adjustmentSlider.value / 1000
+            Dim adjustPixels = ocvb.pixelsPerMeter * adjustmentSlider.value / 1000
 
             planePoint1 = New cv.Point(0, leftPoint.Y + CInt(If(floorRun, planeHeight / 2, -planeHeight / 2) + adjustPixels))
             planePoint2 = New cv.Point(dst2.Width, planePoint1.Y)
@@ -1222,7 +1235,7 @@ Public Class PointCloud_GVectorPlane
             Dim maxAngle = Math.Atan(dst2.Width / gPlaneDeltaY) * 57.2958
             Dim minRow = dst2.Height * maxAngle / 180
 
-            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeterV * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
+            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeter * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
             Dim split = task.pointCloud.Split()
             Dim ySplit = split(1)
             inrange.src = split(1)

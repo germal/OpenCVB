@@ -1743,8 +1743,7 @@ Public Class Depth_PointCloud_IMU
             task.pointCloud = task.pointCloud.Clone
         End If
 
-        ocvb.pixelsPerMeterH = dst1.Width / ocvb.maxZ
-        ocvb.pixelsPerMeterV = 2 * ocvb.pixelsPerMeterH * Math.Tan(cv.Cv2.PI / 180 * ocvb.vFov / 2)
+        ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ
     End Sub
 End Class
 

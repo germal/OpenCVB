@@ -379,8 +379,7 @@ Public Class StructuredDepth_SliceXPlot
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskZplane)
 
-        Dim pixelsPerMeter = dst2.Height / ocvb.maxZ
-        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / pixelsPerMeter, "#0.00") + " m"
+        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / ocvb.pixelsPerMeter, "#0.00") + " m"
     End Sub
 End Class
 

@@ -1246,7 +1246,7 @@ Public Class Histogram_Concentration
         Static cThresholdSlider = findSlider("Concentration Threshold")
         Dim concentrationThreshold = cThresholdSlider.Value
 
-        Dim minPixel = CInt(concentrationFactor * task.minRangeSlider.Value * ocvb.pixelsPerMeterH / 1000)
+        Dim minPixel = CInt(concentrationFactor * task.minRangeSlider.Value * ocvb.pixelsPerMeter / 1000)
 
         Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
         Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)

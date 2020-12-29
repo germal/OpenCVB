@@ -100,19 +100,16 @@ Imports cv = OpenCvSharp
 
 'Public Class Tracker_Methods
 '    Inherits VBparent
-'    Dim tracker As Tracker_Basics
+'    Public tracker As cv.Tracking.Tracker
 '    Public Sub New()
 '        initParent()
-'        tracker = New Tracker_Basics()
 
 '        If findfrm(caller + " Radio Options") Is Nothing Then
 '            radio.Setup(caller, 8)
-'            radio.check(0).Text = "TrackerBoosting"
 '            radio.check(1).Text = "TrackerCSRT"
-'            radio.check(2).Text = "TrackerGOTURN - disabled (not working)"
+'            radio.check(2).Text = "TrackerGOTURN"
 '            radio.check(2).Enabled = False
 '            radio.check(3).Text = "TrackerKCF"
-'            radio.check(4).Text = "TrackerMedianFlow"
 '            radio.check(5).Text = "TrackerMIL"
 '            radio.check(6).Text = "TrackerMOSSE"
 '            radio.check(7).Text = "TrackerTLD"
@@ -122,13 +119,14 @@ Imports cv = OpenCvSharp
 '        task.desc = "Experiment with the different types of tracking methods - apparently not much difference..."
 '    End Sub
 '    Public Sub Run()
-'		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        Static saveMethod As Integer
 
 '        Static frm = findfrm("Tracker_Methods Radio Options")
 '        For i = 0 To frm.check.length - 1
 '            If frm.check(i).Checked = True Then
-'                tracker.trackerIndex = i
+'                ' tracker.trackerIndex = i
+'                cv.Tracking.TrackerCSRT.Params()
 '                label1 = "Method: " + radio.check(i).Text
 '                Exit For
 '            End If

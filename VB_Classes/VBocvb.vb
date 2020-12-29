@@ -23,8 +23,7 @@ Public Class VBocvb
     Public resolutionIndex As Integer
     Public Const MAXZ_DEFAULT = 4
     Public maxZ As Single = MAXZ_DEFAULT
-    Public pixelsPerMeterH As Single
-    Public pixelsPerMeterV As Single
+    Public pixelsPerMeter As Single
     Public hFov As Single
     Public vFov As Single
     Public angleX As Single  ' rotation angle in radians around x-axis to align with gravity
