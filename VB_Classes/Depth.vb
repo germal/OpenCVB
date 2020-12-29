@@ -851,16 +851,14 @@ End Class
 
 
 
-Public Class Depth_Stabilizer
+Public Class Depth_SmoothMean
     Inherits VBparent
     Public stable As Depth_NotMissing
     Public mean As Mean_Basics
-    Dim inrange As Depth_InRange
     Public colorize As Depth_Colorizer_CPP
     Public Sub New()
         initParent()
 
-        inrange = New Depth_InRange
         mean = New Mean_Basics()
         colorize = New Depth_Colorizer_CPP()
         stable = New Depth_NotMissing()
@@ -873,11 +871,7 @@ Public Class Depth_Stabilizer
         stable.src = src
         stable.Run()
 
-        'inrange.src = src
-        'If inrange.src.Type <> cv.MatType.CV_32F Then inrange.src = task.depth32f
-        'inrange.Run()
-
-        mean.src = task.depth32f ' inrange.dst1
+        mean.src = task.depth32f
         mean.src.SetTo(0, stable.dst1)
         mean.Run()
         dst2 = mean.dst1.Threshold(256 * 256 - 1, 256 * 256 - 1, cv.ThresholdTypes.Trunc)
