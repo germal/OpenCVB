@@ -493,6 +493,9 @@ Public Class PointCloud_Objects_TopView
         Dim radioPalette = findRadio("Hot")
         radioPalette.Checked = True
 
+        Dim minSlider = findSlider("InRange Min Depth (mm)")
+        minSlider.Value = 1200
+
         label1 = "Back projection of object identified in the top view"
         label2 = "Objects identified in the top view"
         task.desc = "Display only the top view of the depth data - with and without the IMU active"
@@ -502,10 +505,31 @@ Public Class PointCloud_Objects_TopView
         view.Run()
         dst2 = view.dst1
 
+        Dim rectList As New List(Of cv.Rect)
+        Dim depthRanges As New List(Of cv.Vec2f)
         For Each obj In view.viewObjects
-            Console.WriteLine("Object " + CStr(view.viewObjects.IndexOfKey(obj.Key)) + " is " +
-                              CStr((dst2.Height - obj.Value.centroid.Y) / ocvb.pixelsPerMeter) + " meters from the camera")
+            'Console.WriteLine("Object " + CStr(view.viewObjects.IndexOfKey(obj.Key)) + " is " +
+            '                  CStr(ocvb.maxZ * (dst2.Height - obj.Value.centroid.Y) / dst2.Height) + " meters from the camera")
+            Dim r = New cv.Rect(obj.Value.rectView.X, 0, obj.Value.rectView.Width, dst2.Height)
+            If r.Width > 0 Then
+                rectList.Add(r)
+                Dim minDepth = 1000 * ocvb.maxZ * (dst2.Height - (obj.Value.rectView.Y + obj.Value.rectView.Height)) / dst2.Height
+                Dim maxDepth = 1000 * ocvb.maxZ * (dst2.Height - obj.Value.rectView.Y) / dst2.Height
+                depthRanges.Add(New cv.Vec2f(minDepth, maxDepth))
+            End If
         Next
+
+        cv.Cv2.ImShow("depth32f", task.depth32f)
+        dst1 = src
+        Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To rectList.Count - 1
+            Dim r = rectList(i)
+            Dim minMax = depthRanges(i)
+            cv.Cv2.InRange(task.depth32f(r), depthRanges(i).Item0, depthRanges(i).Item1, mask(r))
+        Next
+        dst1 = mask
+        ' dst1.SetTo(255, mask)
+
     End Sub
 End Class
 
@@ -756,9 +780,8 @@ Public Class PointCloud_BothViews
 
             minDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
             maxDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y) / src.Height
-            Dim pixelPerMeter = topPixel.measure.pixelsPerMeter
-            If pixelPerMeter > 0 Then
-                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / pixelPerMeter, "0.0") + "m"
+            If ocvb.pixelsPerMeter > 0 Then
+                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / ocvb.pixelsPerMeter, "0.0") + "m"
             End If
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
 
@@ -778,9 +801,8 @@ Public Class PointCloud_BothViews
             minDepth = ocvb.maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
             maxDepth = ocvb.maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
 
-            Dim pixelPerMeter = sidePixel.measure.pixelsPerMeter
-            If pixelPerMeter > 0 Then
-                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / pixelPerMeter, "0.0") + "m"
+            If ocvb.pixelsPerMeter > 0 Then
+                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / ocvb.pixelsPerMeter, "0.0") + "m"
             End If
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
 
