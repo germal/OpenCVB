@@ -1553,7 +1553,7 @@ Public Class Depth_SmoothMin
         Static motionThreshold = findSlider("Total motion threshold to resync")
         If stable.cameraStable = False Or rgbMotion.motion.changedPixels > motionThreshold.value Or stableMin Is Nothing Then
             resetAll = True
-            stableMin = input
+            stableMin = input.Clone
             stableMin.SetTo(0, lowQuality.dst2)
         Else
             resetAll = False

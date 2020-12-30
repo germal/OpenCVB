@@ -796,7 +796,7 @@ Public Class PointCloud_BothViews
         If vwSide.Count And sideActive Then
             minIndex = findNearestPoint(task.mouseClickPoint, vwSide)
             Dim rView = vwSide.Values(minIndex).rectView
-            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
+            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y - 15))
             Dim rFront = vwSide.Values(minIndex).rectFront
             minDepth = ocvb.maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
             maxDepth = ocvb.maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
