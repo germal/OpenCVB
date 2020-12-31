@@ -247,11 +247,13 @@ Public Class Contours_Depth
                 maxNodes = c.Length
             End If
         Next
-        cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
-        contours.Clear()
-        For Each ct In contours0(maxIndex)
-            contours.Add(ct)
-        Next
+        If contours0.Length Then
+            cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+            contours.Clear()
+            For Each ct In contours0(maxIndex)
+                contours.Add(ct)
+            Next
+        End If
     End Sub
 End Class
 
