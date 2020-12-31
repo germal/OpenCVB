@@ -1385,7 +1385,6 @@ Public Class Histogram_TopView2D
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public histOriginal As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Public cmat As PointCloud_Colorize
     Public viewOpts As Histogram_ViewOptions
@@ -1410,10 +1409,11 @@ Public Class Histogram_TopView2D
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-viewOpts.topFrustrumAdjust, viewOpts.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOriginal, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        histOutput = histOriginal.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        histOutput = histOutput.Flip(cv.FlipMode.X)
+        histOutput = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
