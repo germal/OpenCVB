@@ -29,7 +29,7 @@ Public Class Highlight_Basics
         If highlightPoint <> New cv.Point And viewObjects.Count > 0 Then
             Dim index = findNearestPoint(highlightPoint, viewObjects)
             highlightPoint = viewObjects.ElementAt(index).Value.centroid
-            highlightRect = viewObjects.ElementAt(index).Value.rectView
+            highlightRect = viewObjects.ElementAt(index).Value.rectInHist
             highlightMask = New cv.Mat
             highlightMask = viewObjects.ElementAt(index).Value.mask
             preKalmanRect = viewObjects.ElementAt(index).Value.preKalmanRect

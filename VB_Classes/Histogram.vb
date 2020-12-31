@@ -762,48 +762,6 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjectionGrayscale
-    Inherits VBparent
-    Dim hist As Histogram_KalmanSmoothed
-    Public histIndex As Integer
-    Public binSlider As Windows.Forms.TrackBar
-    Public Sub New()
-        initParent()
-        hist = New Histogram_KalmanSmoothed
-        binSlider = findSlider("Histogram Bins")
-        binSlider.Value = 10
-
-        label1 = "Move mouse to backproject each histogram column"
-        task.desc = "Explore Backprojection of each element of a grayscale histogram."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        hist.src = src
-        hist.Run()
-        dst1 = hist.dst1
-
-        histIndex = CInt(hist.histogram.Rows * task.mousePoint.X / src.Width)
-        Dim barWidth = dst1.Width / binSlider.Value
-        Dim barRange = Math.Round(255 / binSlider.Value)
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim mat() As cv.Mat = {gray}
-        Dim bins() = {0}
-        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, dst2, ranges)
-
-        label2 = "Backprojecting " + CStr(histIndex * barRange) + " to " + CStr((histIndex + 1) * barRange) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
-        dst1.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -927,55 +885,6 @@ End Class
 
 
 
-
-
-Public Class Histogram_TopView2D
-    Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Public markers(2 - 1) As cv.Point2f
-    Public cmat As PointCloud_Colorize
-    Public viewOpts As Histogram_ViewOptions
-    Public resizeHistOutput As Boolean = True
-    Public Sub New()
-        initParent()
-
-        viewOpts = New Histogram_ViewOptions
-
-        cmat = New PointCloud_Colorize()
-        gCloud = New Depth_PointCloud_IMU()
-
-
-        label1 = "XZ (Top View)"
-        task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run()
-        viewOpts.Run()
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-viewOpts.topFrustrumAdjust, viewOpts.topFrustrumAdjust)}
-        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        If standalone Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = cmat.CameraLocationBot(dst2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Histogram_SmoothTopView2D
     Inherits VBparent
     Public topView As Histogram_TopView2D
@@ -1020,53 +929,6 @@ Public Class Histogram_SmoothTopView2D
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-
-Public Class Histogram_SideView2D
-    Inherits VBparent
-    Public viewOpts As Histogram_ViewOptions
-    Public gCloud As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Public cmat As PointCloud_Colorize
-    Public frustrumAdjust As Single
-    Public resizeHistOutput As Boolean = True
-    Public Sub New()
-        initParent()
-
-        viewOpts = New Histogram_ViewOptions
-
-        cmat = New PointCloud_Colorize()
-        gCloud = New Depth_PointCloud_IMU()
-        If standalone Then viewOpts.histThresholdSlider.Value = 1
-
-        label1 = "ZY (Side View)"
-        task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run()
-        viewOpts.Run()
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = cmat.CameraLocationSide(dst2)
-    End Sub
-End Class
 
 
 
@@ -1506,5 +1368,146 @@ Public Class Histogram_DepthValleys
         palette.src = dst1
         palette.Run()
         dst1 = palette.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_TopView2D
+    Inherits VBparent
+    Public gCloud As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public histOriginal As New cv.Mat
+    Public markers(2 - 1) As cv.Point2f
+    Public cmat As PointCloud_Colorize
+    Public viewOpts As Histogram_ViewOptions
+    Public resizeHistOutput As Boolean = True
+    Public Sub New()
+        initParent()
+
+        viewOpts = New Histogram_ViewOptions
+
+        cmat = New PointCloud_Colorize()
+        gCloud = New Depth_PointCloud_IMU()
+
+
+        label1 = "XZ (Top View)"
+        task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloud.Run()
+        viewOpts.Run()
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-viewOpts.topFrustrumAdjust, viewOpts.topFrustrumAdjust)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOriginal, 2, histSize, ranges)
+
+        histOutput = histOriginal.Flip(cv.FlipMode.X)
+        dst1 = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        If standalone Then
+            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = cmat.CameraLocationBot(dst2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Histogram_SideView2D
+    Inherits VBparent
+    Public viewOpts As Histogram_ViewOptions
+    Public gCloud As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Public cmat As PointCloud_Colorize
+    Public frustrumAdjust As Single
+    Public resizeHistOutput As Boolean = True
+    Public Sub New()
+        initParent()
+
+        viewOpts = New Histogram_ViewOptions
+
+        cmat = New PointCloud_Colorize()
+        gCloud = New Depth_PointCloud_IMU()
+        If standalone Then viewOpts.histThresholdSlider.Value = 1
+
+        label1 = "ZY (Side View)"
+        task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        gCloud.Run()
+        viewOpts.Run()
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = cmat.CameraLocationSide(dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+Public Class Histogram_BackProjectionGrayscale
+    Inherits VBparent
+    Dim hist As Histogram_KalmanSmoothed
+    Public histIndex As Integer
+    Public binSlider As Windows.Forms.TrackBar
+    Public Sub New()
+        initParent()
+        hist = New Histogram_KalmanSmoothed
+        binSlider = findSlider("Histogram Bins")
+        binSlider.Value = 10
+
+        label1 = "Move mouse to backproject each histogram column"
+        task.desc = "Explore Backprojection of each element of a grayscale histogram."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        hist.src = src
+        hist.Run()
+        dst1 = hist.dst1
+
+        histIndex = CInt(hist.histogram.Rows * task.mousePoint.X / src.Width)
+        Dim barWidth = dst1.Width / binSlider.Value
+        Dim barRange = Math.Round(255 / binSlider.Value)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mat() As cv.Mat = {gray}
+        Dim bins() = {0}
+        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, dst2, ranges)
+
+        label2 = "Backprojecting " + CStr(histIndex * barRange) + " to " + CStr((histIndex + 1) * barRange) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
+        dst1.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
     End Sub
 End Class

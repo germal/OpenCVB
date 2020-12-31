@@ -797,7 +797,7 @@ Public Structure viewObject
     Dim centroid As cv.Point2f
     Dim preKalmanRect As cv.Rect
     Dim rectFront As cv.Rect ' this becomes the front view after processing.
-    Dim rectView As cv.Rect ' rectangle in the view presented (could be top/side or front view.
+    Dim rectInHist As cv.Rect ' this rectangle describe the object in the histogram (side or top view.)
     Dim LayoutColor As cv.Scalar
     Dim contourMat As cv.Mat
     Dim mask As cv.Mat
@@ -919,7 +919,7 @@ Public Class KNN_PointTracker
                     If outRect.Y + outRect.Height > src.Height Then outRect.Height = src.Height - outRect.Y
                     If outRect.Width < 0 Then outRect.Width = 1
                     If outRect.Height < 0 Then outRect.Height = 1
-                    vo.rectView = outRect
+                    vo.rectInHist = outRect
 
                     Dim pt = vo.centroid
                     If pt.X < 0 Then pt.X = 0

@@ -342,7 +342,8 @@ Public Class LineDetector_3D_FLD_MT
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
         Dim maskLineWidth As Integer = sliders.trackbar(0).Value
         Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
-        Parallel.For(lines.sortedLines.Count - 20, lines.sortedLines.Count,
+        Dim lineCount = Math.Max(lines.sortedLines.Count - 20, 0)
+        Parallel.For(lineCount, lines.sortedLines.Count,
             Sub(i)
                 find3DLineSegment(dst1, mask, task.depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)

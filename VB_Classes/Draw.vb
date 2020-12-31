@@ -466,7 +466,7 @@ Public Class Draw_ViewObjects
                     Dim pt = vw.centroid
                     cv.Cv2.Circle(dst1, pt, ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
                     cv.Cv2.Circle(dst1, pt, ocvb.dotSize - 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-                    dst1.Rectangle(vw.rectView, cv.Scalar.White, 1)
+                    dst1.Rectangle(vw.rectInHist, cv.Scalar.White, 1)
                 Next
             End If
         End If
