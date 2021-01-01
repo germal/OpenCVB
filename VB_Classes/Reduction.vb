@@ -262,12 +262,14 @@ Public Class Reduction_Lines
     Dim sideView As Histogram_SideView2D
     Dim topView As Histogram_TopView2D
     Public lDetect As LineDetector_Basics
+    Public cmatSide As PointCloud_ColorizeSide
+    Public cmatTop As PointCloud_ColorizeTop
     Dim reduction As Reduction_PointCloud
-    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
-        cmat = New PointCloud_Colorize()
+        cmatSide = New PointCloud_ColorizeSide
+        cmatTop = New PointCloud_ColorizeTop
         sideView = New Histogram_SideView2D()
         topView = New Histogram_TopView2D()
         reduction = New Reduction_PointCloud()
@@ -283,24 +285,23 @@ Public Class Reduction_Lines
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
-
         reduction.Run()
 
         sideView.Run()
-        dst1 = sideView.dst1
-        lDetect.src = sideView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.src = sideView.dst1
         lDetect.Run()
-        dst1 = cmat.CameraLocationSide(lDetect.dst1)
+
+        cmatSide.src = lDetect.dst1
+        cmatSide.Run()
+        dst1 = cmatSide.dst1
 
         topView.Run()
-        dst2 = topView.dst1
-        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        lDetect.src = topView.dst1
         lDetect.Run()
-        dst2 = cmat.CameraLocationBot(lDetect.dst1)
+
+        cmatTop.src = lDetect.dst1
+        cmatTop.Run()
+        dst2 = cmatTop.dst1
     End Sub
 End Class
 
