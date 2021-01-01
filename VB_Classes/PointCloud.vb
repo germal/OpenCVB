@@ -245,6 +245,58 @@ End Class
 
 
 
+
+
+
+Public Class PointCloud_ColorizeSide
+    Inherits VBparent
+    Public cmat As PointCloud_Colorize
+    Public Sub New()
+        initParent()
+        cmat = New PointCloud_Colorize
+        task.desc = "Colorize a pointcloud recognizing the check boxes."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
+
+        If standalone Then src = cmat.dst1
+        dst1 = cmat.CameraLocationSide(src)
+    End Sub
+End Class
+
+
+
+
+
+Public Class PointCloud_ColorizeTop
+    Inherits VBparent
+    Public cmat As PointCloud_Colorize
+    Public Sub New()
+        initParent()
+        cmat = New PointCloud_Colorize
+        task.desc = "Colorize a pointcloud recognizing the check boxes."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
+
+        If standalone Then src = cmat.dst1
+        dst1 = cmat.CameraLocationBot(src)
+    End Sub
+End Class
+
+
+
+
 Public Class PointCloud_Raw_CPP
     Inherits VBparent
     Dim grid As Thread_Grid
@@ -360,26 +412,19 @@ Public Class PointCloud_Kalman_TopView
     Public pTrack As KNN_PointTracker
     Public flood As FloodFill_8bit
     Public topView As Histogram_TopView2D
-    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
-        pTrack = New KNN_PointTracker()
-        cmat = New PointCloud_Colorize()
-        flood = New FloodFill_8bit()
+        pTrack = New KNN_PointTracker
+        flood = New FloodFill_8bit
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
-        topView = New Histogram_TopView2D()
+        topView = New Histogram_TopView2D
 
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
 
         topView.Run()
 
@@ -394,7 +439,11 @@ Public Class PointCloud_Kalman_TopView
         pTrack.Run()
         dst1 = pTrack.dst1
 
-        If standalone Or task.intermediateReview = caller Then dst1 = cmat.CameraLocationBot(dst1)
+        If standalone Or task.intermediateReview = caller Then
+            topView.cmat.src = dst1
+            topView.cmat.Run()
+            dst1 = topView.cmat.dst1
+        End If
         Dim FOV = ocvb.hFov
         label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(ocvb.maxZ, "0.0") + " meters"
     End Sub
@@ -410,13 +459,14 @@ Public Class PointCloud_Kalman_SideView
     Public flood As Floodfill_Identifiers
     Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
-    Dim cmat As PointCloud_Colorize
+    Public cmat As PointCloud_ColorizeSide
     Public Sub New()
         initParent()
 
-        pTrack = New KNN_PointTracker()
-        cmat = New PointCloud_Colorize()
-        flood = New Floodfill_Identifiers()
+
+        pTrack = New KNN_PointTracker
+        cmat = New PointCloud_ColorizeSide
+        flood = New Floodfill_Identifiers
 
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
@@ -427,11 +477,6 @@ Public Class PointCloud_Kalman_SideView
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.Run()
-
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
 
         Static sliderHistThreshold = findSlider("Top/Side View Histogram threshold")
         flood.src = sideView.histOutput.ConvertScaleAbs(255)
@@ -444,7 +489,11 @@ Public Class PointCloud_Kalman_SideView
         pTrack.Run()
         dst1 = pTrack.dst1
 
-        If standalone Or task.intermediateReview = caller Then dst1 = cmat.CameraLocationSide(dst1)
+        If standalone Or task.intermediateReview = caller Then
+            cmat.src = dst1
+            cmat.Run()
+            dst1 = cmat.dst1
+        End If
 
         Dim FOV = (180 - ocvb.vFov) / 2
         label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter at " + Format(ocvb.maxZ, "0.0") + " meters"
@@ -534,18 +583,21 @@ Public Class PointCloud_FrustrumTop
     Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim topView As Histogram_TopView2D
-    Dim cmat As PointCloud_Colorize
+    Dim cmat As PointCloud_ColorizeTop
     Public Sub New()
         initParent()
 
-        cmat = New PointCloud_Colorize()
-
-        frustrum = New Draw_Frustrum()
-
-        topView = New Histogram_TopView2D()
+        cmat = New PointCloud_ColorizeTop
+        frustrum = New Draw_Frustrum
+        topView = New Histogram_TopView2D
 
         Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 0
+
+        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        xCheckbox.Checked = False
+        zCheckbox.Checked = False
 
         label2 = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
@@ -557,8 +609,10 @@ Public Class PointCloud_FrustrumTop
 
         task.pointCloud = frustrum.xyzDepth.xyzFrame
         topView.Run()
-        dst1 = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
-        dst1 = cmat.CameraLocationBot(dst1)
+
+        cmat.src = topView.dst1 '.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
+        cmat.Run()
+        dst1 = cmat.dst1
     End Sub
 End Class
 
@@ -573,14 +627,13 @@ Public Class PointCloud_FrustrumSide
     Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim sideView As Histogram_SideView2D
-    Dim cmat As PointCloud_Colorize
+    Dim cmat As PointCloud_ColorizeSide
     Public Sub New()
         initParent()
 
-        cmat = New PointCloud_Colorize()
-        frustrum = New Draw_Frustrum()
-
-        sideView = New Histogram_SideView2D()
+        cmat = New PointCloud_ColorizeSide
+        frustrum = New Draw_Frustrum
+        sideView = New Histogram_SideView2D
 
         Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 0
@@ -601,61 +654,12 @@ Public Class PointCloud_FrustrumSide
         task.pointCloud = frustrum.xyzDepth.xyzFrame
         sideView.Run()
 
-        dst1 = sideView.dst1
-        dst1 = cmat.CameraLocationSide(dst1)
+        cmat.src = sideView.dst1
+        cmat.Run()
+        dst1 = cmat.dst1
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class PointCloud_IMU_SideCompare
-    Inherits VBparent
-    Public sideView As Histogram_SideView2D
-    Public kSideView As PointCloud_Kalman_SideView
-    Public lDetect As LineDetector_Basics
-    Public Sub New()
-        initParent()
-
-        lDetect = New LineDetector_Basics()
-        lDetect.drawLines = True
-        kSideView = New PointCloud_Kalman_SideView()
-        sideView = New Histogram_SideView2D()
-
-        Dim histSlider = findSlider("Top/Side View Histogram threshold")
-        histSlider.Value = 20
-
-        label1 = "side view AFTER align/threshold using gravity vector"
-        label2 = "side view BEFORE align/threshold using gravity vector"
-        task.desc = "Present the side view with and without the IMU filter."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        xCheckbox.checked = True
-        zCheckbox.checked = True
-
-        sideView.Run()
-        dst1 = sideView.dst2.Clone()
-        lDetect.src = sideView.dst1.Resize(task.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lDetect.Run()
-        dst1 = lDetect.dst1
-        dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-
-        xCheckbox.checked = False
-        zCheckbox.checked = False
-
-        kSideView.Run()
-        dst2 = kSideView.dst1
-    End Sub
-End Class
 
 
 
@@ -1251,95 +1255,16 @@ End Class
 
 
 
-Public Class PointCloud_BackProjectTopView
-    Inherits VBparent
-    Dim view As PointCloud_ObjectsTop
-    Public Sub New()
-        initParent()
-        view = New PointCloud_ObjectsTop
-
-        label1 = "Back projection of objects identified in the top view"
-        label2 = "Objects identified in the top view"
-        task.desc = "Display only the top view of the depth data - with and without the IMU active"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        view.Run()
-        dst2 = view.dst1
-
-        Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
-        For Each obj In view.viewObjects
-            rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
-        Next
-
-        Static minSlider = findSlider("InRange Min Depth (mm)")
-        If ocvb.frameCount = 0 Then minSlider.Value = 1
-        Dim minVal = minSlider.value
-
-        dst1 = src
-        Dim xRange = 2 * view.measureTop.topView.viewOpts.topFrustrumAdjust
-        Dim histogram = view.measureTop.topView.histOutput.Flip(cv.FlipMode.X)
-        Dim mat = New cv.Mat() {task.pointCloud}
-        Dim bins() = {2, 0}
-        For i = 0 To rectList.Count - 1
-            Dim r = rectList.ElementAt(i).Value
-            If r.Width > 0 And r.Height > 0 Then
-                Dim minDepth As Single = 1000 * ocvb.maxZ * CSng(dst2.Height - (r.Y + r.Height)) / dst2.Height
-                Dim maxDepth As Single = 1000 * ocvb.maxZ * (dst2.Height - r.Y) / dst2.Height
-                Dim leftX = -view.measureTop.topView.viewOpts.topFrustrumAdjust ' r.X / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
-                Dim rightX = view.measureTop.topView.viewOpts.topFrustrumAdjust ' (r.X + r.Width) / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
-                Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
-                ' Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
-                Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-                Dim histTmp As New cv.Mat(histogram.Size, cv.MatType.CV_32F, 0)
-                histogram(r).CopyTo(histTmp(r))
-                cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
-                dst1.SetTo(255, mask.ConvertScaleAbs(255))
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class PointCloud_BackProjectSideView
-    Inherits VBparent
-    Dim view As PointCloud_ObjectsSide
-    Public Sub New()
-        initParent()
-        view = New PointCloud_ObjectsSide
-
-        task.desc = "Display only the side view of the depth data - with and without the IMU active"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        view.Run()
-        dst2 = view.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class PointCloud_ObjectsTop
     Inherits VBparent
     Public measureTop As PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_Colorize
+    Dim cmat As PointCloud_ColorizeTop
+    Public colorizeNeeded As Boolean
     Public Sub New()
         initParent()
 
-        cmat = New PointCloud_Colorize
-        cmat.imuXaxis = True
-        cmat.imuZaxis = True
+        cmat = New PointCloud_ColorizeTop
         measureTop = New PointCloud_Kalman_TopView
 
         If standalone Then
@@ -1357,7 +1282,9 @@ Public Class PointCloud_ObjectsTop
         measureTop.Run()
         dst1 = measureTop.dst1
 
+        ocvb.pixelsPerMeter = dst1.Height / ocvb.maxZ
         label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / ocvb.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
+
         Dim FOV = ocvb.hFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
@@ -1411,12 +1338,10 @@ Public Class PointCloud_ObjectsTop
             vo.rectFront = New cv.Rect(newX, r.Y, newWidth, r.Height)
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
-        If standalone Or task.intermediateReview = caller Then
-            Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-            Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-            cmat.imuXaxis = xCheckbox.checked
-            cmat.imuZaxis = zCheckbox.checked
-            dst1 = cmat.CameraLocationBot(dst1)
+        If standalone Or task.intermediateReview = caller Or colorizeNeeded Then
+            cmat.src = dst1
+            cmat.Run()
+            dst1 = cmat.dst1
         End If
     End Sub
 End Class
@@ -1437,13 +1362,11 @@ Public Class PointCloud_ObjectsSide
     Inherits VBparent
     Public measureSide As PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_Colorize
+    Dim cmat As PointCloud_ColorizeSide
     Public Sub New()
         initParent()
 
-        cmat = New PointCloud_Colorize
-        cmat.imuXaxis = False
-        cmat.imuZaxis = False
+        cmat = New PointCloud_ColorizeSide
         measureSide = New PointCloud_Kalman_SideView
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -1525,11 +1448,9 @@ Public Class PointCloud_ObjectsSide
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
         If standalone Or task.intermediateReview = caller Then
-            Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-            Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-            cmat.imuXaxis = xCheckbox.checked
-            cmat.imuZaxis = zCheckbox.checked
-            dst1 = cmat.CameraLocationSide(dst1)
+            cmat.src = dst1
+            cmat.Run()
+            dst1 = cmat.dst1
         End If
     End Sub
 End Class
@@ -1551,14 +1472,16 @@ Public Class PointCloud_BothViews
     Public backMatMask As New cv.Mat
     Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_Colorize
+    Dim cmatSide As PointCloud_ColorizeSide
+    Dim cmatTop As PointCloud_ColorizeTop
     Public Sub New()
         initParent()
 
         levelCheck = New IMU_IscameraLevel
         topPixel = New PointCloud_ObjectsTop
         sidePixel = New PointCloud_ObjectsSide
-        cmat = New PointCloud_Colorize()
+        cmatSide = New PointCloud_ColorizeSide
+        cmatTop = New PointCloud_ColorizeTop
 
         backMat = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         backMatMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
@@ -1570,10 +1493,6 @@ Public Class PointCloud_BothViews
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
 
         topPixel.Run()
         sidePixel.Run()
@@ -1582,7 +1501,7 @@ Public Class PointCloud_BothViews
             Dim instructions = "Click any centroid to get details"
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
-            If cmat.imuXaxis Or cmat.imuZaxis Then
+            If cmatSide.cmat.imuXaxis Or cmatSide.cmat.imuZaxis Then
                 levelCheck.Run()
                 If levelCheck.cameraLevel Then
                     accMsg1 = "Distances are good - camera is level"
@@ -1597,9 +1516,6 @@ Public Class PointCloud_BothViews
             ocvb.trueText(accMsg1 + vbCrLf + instructions, 10, src.Height - pad)
             ocvb.trueText(accMsg2 + vbCrLf + instructions, 10, src.Height - pad, 3)
         End If
-
-        dst1 = topPixel.dst1
-        dst2 = sidePixel.dst1
 
         Static minDepth As Single, maxDepth As Single
         Dim activeView = ocvb.quadrantIndex
@@ -1663,8 +1579,13 @@ Public Class PointCloud_BothViews
             End If
         End If
 
-        dst1 = cmat.CameraLocationBot(dst1)
-        dst2 = cmat.CameraLocationSide(dst2)
+        cmatSide.src = sidePixel.dst1
+        cmatSide.Run()
+        dst1 = cmatSide.dst1
+
+        cmatTop.src = topPixel.dst1
+        cmatTop.Run()
+        dst2 = cmatTop.dst1
     End Sub
 End Class
 
@@ -1675,131 +1596,81 @@ End Class
 
 
 
-
-
-Public Class PointCloud_BothViews1
+Public Class PointCloud_BackProjectTopView
     Inherits VBparent
-    Public topPixel As PointCloud_ObjectsTop
-    Public sidePixel As PointCloud_ObjectsSide
-    Dim levelCheck As IMU_IscameraLevel
-    Public detailText As String
-    Public backMat As New cv.Mat
-    Public backMatMask As New cv.Mat
-    Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_Colorize
+    Dim view As PointCloud_ObjectsTop
     Public Sub New()
         initParent()
+        view = New PointCloud_ObjectsTop
+        view.colorizeNeeded = True
 
-        levelCheck = New IMU_IscameraLevel
-        topPixel = New PointCloud_ObjectsTop
-        sidePixel = New PointCloud_ObjectsSide
-        cmat = New PointCloud_Colorize()
-
-        backMat = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        backMatMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
-
-        task.desc = "Find the actual width in pixels for the objects detected in the top view"
+        label1 = "Back projection of objects identified in the top view"
+        label2 = "Objects identified in the top view"
+        task.desc = "Display only the top view of the depth data and backproject the histogram onto the RGB image."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
-        Dim showDetails = showRectanglesCheck.checked
+        view.Run()
+        dst2 = view.dst1
 
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
+        Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
+        For Each obj In view.viewObjects
+            rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
+        Next
 
-        topPixel.Run()
-        sidePixel.Run()
+        Static minSlider = findSlider("InRange Min Depth (mm)")
+        If ocvb.frameCount = 0 Then minSlider.Value = 1
+        Dim minVal = minSlider.value
 
-        If standalone Or task.intermediateReview = caller Then
-            Dim instructions = "Click any centroid to get details"
-            Dim accMsg1 = "TopView - distances are accurate"
-            Dim accMsg2 = "SideView - distances are accurate"
-            If cmat.imuXaxis Or cmat.imuZaxis Then
-                levelCheck.Run()
-                If levelCheck.cameraLevel Then
-                    accMsg1 = "Distances are good - camera is level"
-                    accMsg2 = "Distances are good - camera is level"
-                Else
-                    accMsg1 = "Camera NOT level - distances approximate"
-                    accMsg2 = "Camera NOT level - distances approximate"
+        dst1 = src
+        Dim xRange = 2 * view.measureTop.topView.viewOpts.topFrustrumAdjust
+        Dim histogram = view.measureTop.topView.histOutput.Flip(cv.FlipMode.X)
+        Dim mat = New cv.Mat() {task.pointCloud}
+        Dim bins() = {2, 0}
+        For i = 0 To rectList.Count - 1
+            Dim r = rectList.ElementAt(i).Value
+            If r.Width > 0 And r.Height > 0 Then
+                Dim minDepth As Single = 1000 * ocvb.maxZ * CSng(dst2.Height - (r.Y + r.Height)) / dst2.Height
+                If minDepth >= 2 Then
+                    Dim maxDepth As Single = 1000 * ocvb.maxZ * (dst2.Height - r.Y) / dst2.Height
+                    Dim leftX = -view.measureTop.topView.viewOpts.topFrustrumAdjust ' r.X / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
+                    Dim rightX = view.measureTop.topView.viewOpts.topFrustrumAdjust ' (r.X + r.Width) / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
+                    Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
+                    ' Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
+                    Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+                    Dim histTmp As New cv.Mat(histogram.Size, cv.MatType.CV_32F, 0)
+                    histogram(r).CopyTo(histTmp(r))
+                    cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
+                    dst1.SetTo(255, mask.ConvertScaleAbs(255))
+                    Exit For
                 End If
             End If
+        Next
+    End Sub
+End Class
 
-            Dim pad = CInt(src.Width / 15)
-            ocvb.trueText(accMsg1 + vbCrLf + instructions, 10, src.Height - pad)
-            ocvb.trueText(accMsg2 + vbCrLf + instructions, 10, src.Height - pad, 3)
-        End If
 
-        dst1 = topPixel.dst1
-        dst2 = sidePixel.dst1
 
-        Static minDepth As Single, maxDepth As Single
-        Dim activeView = ocvb.quadrantIndex
-        vwTop = topPixel.viewObjects
-        vwSide = sidePixel.viewObjects
-        Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
-        Dim minIndex As Integer
-        Dim detailPoint As cv.Point
-        Dim vw As New SortedList(Of Single, viewObject)
-        Dim topActive = If(standalone, True, (activeView = QUAD0 Or activeView = QUAD2))
-        Dim sideActive = If(standalone, True, (activeView = QUAD1 Or activeView = QUAD3))
 
-        Dim widthInfo As String = ""
-        If vwTop.Count And topActive Then
-            minIndex = findNearestPoint(task.mouseClickPoint, vwTop)
-            Dim rView = vwTop.Values(minIndex).rectInHist
-            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
-            Dim rFront = vwTop.Values(minIndex).rectFront
 
-            minDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
-            maxDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y) / src.Height
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / ocvb.pixelsPerMeter, "0.0") + "m"
-            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
 
-            roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
-            vw = vwTop
-            If showDetails Then
-                ocvb.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
-                If standalone Or task.intermediateReview = caller Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
-            End If
-        End If
 
-        If vwSide.Count And sideActive Then
-            minIndex = findNearestPoint(task.mouseClickPoint, vwSide)
-            Dim rView = vwSide.Values(minIndex).rectInHist
-            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y - 15))
-            Dim rFront = vwSide.Values(minIndex).rectFront
-            minDepth = ocvb.maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
-            maxDepth = ocvb.maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
 
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / ocvb.pixelsPerMeter, "0.0") + "m"
-            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
-
-            roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
-            vw = vwSide
-            If showDetails Then
-                ocvb.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
-                label2 = "Clicked: " + detailText
-            End If
-        End If
-
-        If vw.Count > 0 Then
-            If roi.X + roi.Width > task.depth32f.Width Then roi.Width = task.depth32f.Width - roi.X
-            If roi.Y + roi.Height > task.depth32f.Height Then roi.Height = task.depth32f.Height - roi.Y
-            If roi.Width > 0 And roi.Height > 0 Then
-                backMatMask.SetTo(0)
-                cv.Cv2.InRange(task.depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
-
-                backMat.SetTo(0)
-                backMat(roi).SetTo(vw.Values(minIndex).LayoutColor, backMatMask(roi))
-            End If
-        End If
-
-        dst1 = cmat.CameraLocationBot(dst1)
-        dst2 = cmat.CameraLocationSide(dst2)
+Public Class PointCloud_BackProjectSideView
+    Inherits VBparent
+    Dim view As PointCloud_ObjectsSide
+    Dim cmatSide As PointCloud_ColorizeSide
+    Public Sub New()
+        initParent()
+        view = New PointCloud_ObjectsSide
+        cmatSide = New PointCloud_ColorizeSide
+        task.desc = "Display only the side view of the depth data - with and without the IMU active"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        view.Run()
+        cmatSide.src = view.dst1
+        cmatSide.Run()
+        dst2 = cmatSide.dst1
     End Sub
 End Class

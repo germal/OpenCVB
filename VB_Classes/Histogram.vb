@@ -888,10 +888,12 @@ End Class
 Public Class Histogram_SmoothTopView2D
     Inherits VBparent
     Public topView As Histogram_TopView2D
+    Dim cmat As PointCloud_ColorizeTop
     Dim stable As Motion_StableDepthRectangleUpdate
     Public Sub New()
         initParent()
 
+        cmat = New PointCloud_ColorizeTop
         topView = New Histogram_TopView2D
         topView.viewOpts.histThresholdSlider.Value = 1
 
@@ -924,7 +926,9 @@ Public Class Histogram_SmoothTopView2D
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = topView.cmat.CameraLocationBot(dst2)
+            cmat.src = dst2
+            cmat.Run()
+            dst2 = cmat.dst1
         End If
     End Sub
 End Class
@@ -1043,10 +1047,12 @@ End Class
 Public Class Histogram_SmoothSideView2D
     Inherits VBparent
     Public sideView As Histogram_SideView2D
+    Dim cmat As PointCloud_ColorizeSide
     Dim stable As Motion_StableDepthRectangleUpdate
     Public Sub New()
         initParent()
 
+        cmat = New PointCloud_ColorizeSide
         sideView = New Histogram_SideView2D
         sideView.viewOpts.histThresholdSlider.Value = 1
 
@@ -1078,7 +1084,9 @@ Public Class Histogram_SmoothSideView2D
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = sideView.cmat.CameraLocationSide(dst2)
+        cmat.src = dst2
+        cmat.Run()
+        dst2 = cmat.dst1
     End Sub
 End Class
 
@@ -1399,7 +1407,7 @@ Public Class Histogram_TopView2D
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
-    Public cmat As PointCloud_Colorize
+    Public cmat As PointCloud_ColorizeTop
     Public viewOpts As Histogram_ViewOptions
     Public resizeHistOutput As Boolean = True
     Public Sub New()
@@ -1407,18 +1415,14 @@ Public Class Histogram_TopView2D
 
         viewOpts = New Histogram_ViewOptions
 
-        cmat = New PointCloud_Colorize()
-        gCloud = New Depth_PointCloud_IMU()
+        cmat = New PointCloud_ColorizeTop
+        gCloud = New Depth_PointCloud_IMU
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
 
         gCloud.Run()
         viewOpts.Run()
@@ -1434,7 +1438,9 @@ Public Class Histogram_TopView2D
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = cmat.CameraLocationBot(dst2)
+            cmat.src = dst2
+            cmat.Run()
+            dst2 = cmat.dst1
         End If
     End Sub
 End Class
@@ -1452,7 +1458,7 @@ Public Class Histogram_SideView2D
     Public viewOpts As Histogram_ViewOptions
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public cmat As PointCloud_Colorize
+    Public cmat As PointCloud_ColorizeSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
     Public Sub New()
@@ -1460,8 +1466,8 @@ Public Class Histogram_SideView2D
 
         viewOpts = New Histogram_ViewOptions
 
-        cmat = New PointCloud_Colorize()
-        gCloud = New Depth_PointCloud_IMU()
+        cmat = New PointCloud_ColorizeSide
+        gCloud = New Depth_PointCloud_IMU
         If standalone Or task.intermediateReview = caller Then viewOpts.histThresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
@@ -1469,10 +1475,6 @@ Public Class Histogram_SideView2D
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
 
         gCloud.Run()
         viewOpts.Run()
@@ -1487,7 +1489,9 @@ Public Class Histogram_SideView2D
 
         If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst2 = cmat.CameraLocationSide(dst2)
+            cmat.src = dst2
+            cmat.Run()
+            dst2 = cmat.dst1
         End If
     End Sub
 End Class
