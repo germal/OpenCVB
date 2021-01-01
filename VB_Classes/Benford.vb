@@ -25,7 +25,7 @@ Public Class Benford_Basics
         addW.weightSlider.Value = 75
 
         plot = New Plot_Histogram()
-        If standalone Then benford = New Benford_NormalizedImage()
+        If standalone or task.intermediateReview = caller Then benford = New Benford_NormalizedImage()
 
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
@@ -43,7 +43,7 @@ Public Class Benford_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             benford.src = src
             benford.Run()
             dst1 = benford.dst1
@@ -51,7 +51,6 @@ Public Class Benford_Basics
             label2 = benford.label2
             Exit Sub
         End If
-
 
         src = src.Reshape(1, src.Width * src.Height)
         Dim indexer = src.GetGenericIndexer(Of Single)()

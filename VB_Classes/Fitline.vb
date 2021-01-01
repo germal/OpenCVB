@@ -19,7 +19,7 @@ Public Class Fitline_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             draw.Run()
             dst2 = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -41,7 +41,7 @@ Public Class Fitline_Basics
             Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
             Dim p1 = New cv.Point(0, leftY)
             Dim p2 = New cv.Point(src.Cols - 1, rightY)
-            If standalone Then
+            If standalone or task.intermediateReview = caller Then
                 lines.Add(p1)
                 lines.Add(p2)
             End If

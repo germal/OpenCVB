@@ -458,7 +458,7 @@ Public Class Depth_Colorizer_CPP
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Type <> cv.MatType.CV_32F Then
-            If standalone Then src = task.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+            If standalone Or task.intermediateReview = caller Then src = task.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         End If
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -504,7 +504,7 @@ Public Class Depth_ColorizerFastFade_CPP
 
         If imagePtr <> 0 Then
             dst1 = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC3, imagePtr)
-            If standalone Then dst1.SetTo(0, dst2)
+            If standalone Or task.intermediateReview = caller Then dst1.SetTo(0, dst2)
         End If
     End Sub
     Public Sub Close()
@@ -581,7 +581,7 @@ Public Class Depth_ColorizerVB_MT
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
-        If standalone Then src = task.depth32f
+        If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -644,7 +644,7 @@ Public Class Depth_Colorizer_MT
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
-        If standalone Then src = task.depth32f
+        If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -694,7 +694,7 @@ Public Class Depth_LocalMinMax_MT
         Dim mask = task.depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
         End If
@@ -836,7 +836,7 @@ Public Class Depth_NotMissing
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then src = task.RGBDepth
+        If standalone Or task.intermediateReview = caller Then src = task.RGBDepth
         mog.src = src
         mog.Run()
         dst1 = mog.dst1
@@ -943,7 +943,7 @@ Public Class Depth_SmoothingMat
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then src = task.depth32f
+        If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim rect = If(task.drawRect.Width <> 0, task.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
         inrange.src = src(rect)
         inrange.Run()
@@ -1101,7 +1101,7 @@ Public Class Depth_Holes
 
         dst2 = holeMask.Dilate(element, Nothing, sliders.trackbar(0).Value)
         cv.Cv2.BitwiseXor(dst2, holeMask, dst2)
-        If standalone Then task.RGBDepth.CopyTo(dst2, dst2)
+        If standalone Or task.intermediateReview = caller Then task.RGBDepth.CopyTo(dst2, dst2)
     End Sub
 End Class
 
@@ -1321,7 +1321,7 @@ Public Class Depth_WorldXYZ
                 End If
             Next
         Next
-        If standalone Then ocvb.trueText("OpenGL data prepared.")
+        If standalone Or task.intermediateReview = caller Then ocvb.trueText("OpenGL data prepared.")
     End Sub
     Public Sub Close()
         xyzFrame.Dispose()
@@ -1685,7 +1685,6 @@ Public Class Depth_PointCloud_IMU
             check.Box(1).Checked = True
         End If
 
-        If standalone Then label1 = "Original depth, absDiff, absdiff thresholded "
         label2 = "Depth values after rotation"
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
@@ -1695,6 +1694,7 @@ Public Class Depth_PointCloud_IMU
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
 
         If standalone Or task.intermediateReview = caller Then
+            label1 = "Original depth, absDiff, absdiff thresholded "
             Dim split = task.pointCloud.Split()
             dst1 = split(2)
             mats.mat(0) = split(2).ConvertScaleAbs(255)

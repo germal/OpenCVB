@@ -49,7 +49,7 @@ Public Class DilateErode_Basics
         End If
 
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             If iterations >= 0 Then
                 dst2 = task.RGBDepth.Dilate(element, Nothing, iterations)
                 label1 = "Dilate RGB " + CStr(iterations) + " times"

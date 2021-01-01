@@ -25,7 +25,7 @@ Public Class Entropy_Basics
             entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
             entropy += nextEntropy
         Next
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
             flow.Run()
         End If
@@ -96,7 +96,7 @@ Public Class Entropy_Highest_MT
         dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         bestContrast = grid.roiList(maxIndex)
-        If standalone Then dst1.Rectangle(bestContrast, cv.Scalar.Red, 4)
+        If standalone or task.intermediateReview = caller Then dst1.Rectangle(bestContrast, cv.Scalar.Red, 4)
         label2 = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
 End Class

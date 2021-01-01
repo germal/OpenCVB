@@ -48,7 +48,7 @@ Public Class DFT_Basics
         cv.Cv2.Merge(planes, complexImage)
         cv.Cv2.Dft(complexImage, complexImage)
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
             planes = complexImage.Split
 

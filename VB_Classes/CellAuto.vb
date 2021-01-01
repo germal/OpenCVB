@@ -62,7 +62,7 @@ Public Class CellAuto_Basics
     End Function
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             src = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             src.Set(Of Byte)(0, src.Width / 2, 1)
             If ocvb.frameCount Mod 2 Then dst2 = createCells(combo.Box.Text) Else dst1 = createCells(combo.Box.Text)
@@ -268,7 +268,7 @@ Public Class CellAuto_Basics_MP
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.src.Set(Of Byte)(0, cell.src.Width / 2, 1)
         End If

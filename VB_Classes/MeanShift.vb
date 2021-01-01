@@ -13,7 +13,7 @@ Public Class MeanShift_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then usingDrawRect = True
+        If standalone or task.intermediateReview = caller Then usingDrawRect = True
         If usingDrawRect Then inputRect = task.drawRect
         If inputRect.X + inputRect.Width > src.Width Then inputRect.Width = src.Width - inputRect.X
         If inputRect.Y + inputRect.Height > src.Height Then inputRect.Height = src.Height - inputRect.Y

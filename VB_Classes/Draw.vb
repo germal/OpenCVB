@@ -441,7 +441,7 @@ Public Class Draw_ViewObjects
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             ocvb.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -589,7 +589,7 @@ Public Class Draw_Intersection
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             If ocvb.frameCount Mod 100 <> 0 Then Exit Sub
             p1 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
             p2 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)

@@ -86,27 +86,27 @@ int main(int argc, char* argv[])
 		drawAxes(10, 0, 0, 1);
 		
 		// pretend there is a wall ------------------------------------------------------------------------------------------------------------
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glEnable(GL_BLEND);
-			glMatrixMode(GL_TEXTURE);
-			glEnable(GL_TEXTURE_2D);
+		//{
+		//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//	glEnable(GL_BLEND);
+		//	glMatrixMode(GL_TEXTURE);
+		//	glEnable(GL_TEXTURE_2D);
 
-			glBegin(GL_POLYGON);
-			glColor4f(1, 1, 1, 1);
+		//	glColor4f(1, 1, 1, 1);
+		//	glBegin(GL_POLYGON);
 
-			float x = 10;
-			float y = 10;
-			float z = data[0];
-			glVertex3f(-x, -y, z);
-			glVertex3f(-x, y, z);
-			glVertex3f(x, y, z);
-			glVertex3f(x, -y, z);
+		//	float x = 10;
+		//	float y = 10;
+		//	float z = data[0];
+		//	glVertex3f(-x, -y, z);
+		//	glVertex3f(-x, y, z);
+		//	glVertex3f(x, y, z);
+		//	glVertex3f(x, -y, z);
 
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_BLEND);
-		}
+		//	glEnd();
+		//	glDisable(GL_TEXTURE_2D);
+		//	glDisable(GL_BLEND);
+		//}
 
 
 		// draw and texture the floor --------------------------------------------------------------------------------------------------------
@@ -116,6 +116,7 @@ int main(int argc, char* argv[])
 			glMatrixMode(GL_TEXTURE);
 			glEnable(GL_TEXTURE_2D);
 			
+			glColor4f(1, 1, 1, 1);
 			glBindTexture(GL_TEXTURE_2D, tBuffer.get_gl_handle());
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

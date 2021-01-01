@@ -242,7 +242,7 @@ Public Class Histogram_KalmanSmoothed
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static splitIndex = -1
         Static colorName As String
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             Dim split() = src.Split()
             If ocvb.frameCount Mod 100 = 0 Then
                 splitIndex += 1
@@ -276,7 +276,7 @@ Public Class Histogram_KalmanSmoothed
         Next
 
         plotHist.hist = histogram
-        If standalone Then plotHist.backColor = splitColors(splitIndex)
+        If standalone Or task.intermediateReview = caller Then plotHist.backColor = splitColors(splitIndex)
         plotHist.src = src
         plotHist.Run()
         dst1 = plotHist.dst1
@@ -322,7 +322,7 @@ Public Class Histogram_Depth
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {inrange.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             plotHist.Run()
             dst1 = plotHist.dst1
         End If
@@ -922,7 +922,7 @@ Public Class Histogram_SmoothTopView2D
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
         dst1 = topView.histOutput.Threshold(topView.viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst2 = topView.cmat.CameraLocationBot(dst2)
         End If
@@ -1009,7 +1009,7 @@ Public Class Histogram_ViewOptions
         ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
         ocvb.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
 
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             ocvb.trueText("This algorithm was created only to share the sliders used for the side views." + vbCrLf +
                           "Each camera setting was carefully set to reflect the specification for each camera.")
         End If
@@ -1217,7 +1217,7 @@ Public Class Histogram_DepthClusters
         Next
         valleys.palette.Run()
         dst2 = valleys.palette.dst1
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
         End If
@@ -1418,7 +1418,7 @@ Public Class Histogram_TopView2D
         histOutput = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst2 = cmat.CameraLocationBot(dst2)
         End If
@@ -1448,7 +1448,7 @@ Public Class Histogram_SideView2D
 
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
-        If standalone Then viewOpts.histThresholdSlider.Value = 1
+        If standalone Or task.intermediateReview = caller Then viewOpts.histThresholdSlider.Value = 1
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
@@ -1471,7 +1471,7 @@ Public Class Histogram_SideView2D
         Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst2 = cmat.CameraLocationSide(dst2)
         End If

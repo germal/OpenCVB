@@ -74,7 +74,7 @@ Public Class Annealing_Basics_CPP
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If closed = True Then Exit Sub
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             If ocvb.frameCount = 0 Then
                 setup()
                 Open()
@@ -93,7 +93,7 @@ Public Class Annealing_Basics_CPP
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then
             Annealing_Basics_Close(saPtr)
             restartComputation = False
-            If standalone Then
+            If standalone Or task.intermediateReview = caller Then
                 setup()
                 Open()
             End If

@@ -57,7 +57,7 @@ Public Class Kalman_Basics
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             dst1 = src.Clone()
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -123,7 +123,7 @@ Public Class Kalman_Stripped
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             dst1 = src.Clone()
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -353,7 +353,7 @@ Public Class Kalman_CVMat
         End If
 
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim rx(input.Rows - 1) As Single
             Dim testrect As New cv.Rect
             For i = 0 To input.Rows - 1
@@ -510,7 +510,7 @@ Public Class Kalman_Single
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
         End If
@@ -518,7 +518,7 @@ Public Class Kalman_Single
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run()
             dst2 = plot.dst1
@@ -760,7 +760,7 @@ Public Class Kalman_VB_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             kInput = gray.Mean().Item(0)
         End If
@@ -794,7 +794,7 @@ Public Class Kalman_VB_Basics
             kOutput = kInput
         End If
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
             plot.Run()
         End If

@@ -149,7 +149,7 @@ Public Class Reduction_KNN_Color
         pTrack.Run()
         dst1 = pTrack.dst1
 
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             highlight.viewObjects = pTrack.drawRC.viewObjects
             highlight.src = dst1
             highlight.Run()

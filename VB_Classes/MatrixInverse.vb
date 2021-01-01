@@ -43,7 +43,7 @@ Public Class MatrixInverse_Basics_CS
             Exit Sub
         End If
 
-        If standalone Then matrix.bVector = defaultBVector
+        If standalone or task.intermediateReview = caller Then matrix.bVector = defaultBVector
 
         Dim result = matrix.Run(input) ' C# class Run - see MatrixInverse.cs file...
 

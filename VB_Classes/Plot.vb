@@ -51,7 +51,7 @@ Public Class Plot_Basics_CPP
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             ReDim srcX(50 - 1)
             ReDim srcY(50 - 1)
             For i = 0 To srcX.Length - 1
@@ -136,7 +136,7 @@ Public Class Plot_OverTime
             columnIndex = 0
         End If
         dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
-        If standalone Then plotData = src.Mean()
+        If standalone or task.intermediateReview = caller Then plotData = src.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
@@ -197,7 +197,7 @@ Public Class Plot_OverTime
 
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
-        If standalone Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
+        If standalone or task.intermediateReview = caller Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, ocvb.fontSize * 2)
     End Sub
 End Class
@@ -220,7 +220,7 @@ Public Class Plot_Histogram
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {bins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}

@@ -168,7 +168,7 @@ Public Class Rectangle_Overlap
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             draw.Run()
             dst1 = draw.dst1
         End If
@@ -238,7 +238,7 @@ Public Class Rectangle_MultiOverlap
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Static countSlider = findSlider("Rectangle Count")
             countSlider.Value = msRNG.Next(1, 30)
             label1 = "Input rectangles = " + CStr(countSlider.value)

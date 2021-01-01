@@ -27,7 +27,7 @@ Public Class Gabor_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             ksize = sliders.trackbar(0).Value * 2 + 1
             Sigma = sliders.trackbar(1).Value
             lambda = sliders.trackbar(3).Value

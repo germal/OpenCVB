@@ -128,7 +128,7 @@ Public Class Python_MemMap
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then memMapValues(0) = ocvb.frameCount
+        If standalone or task.intermediateReview = caller Then memMapValues(0) = ocvb.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub

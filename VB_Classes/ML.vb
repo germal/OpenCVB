@@ -457,7 +457,7 @@ End Class
 '    Public Sub New()
 '        initParent()
 
-'        If standalone Then
+'        If standalone or task.intermediateReview = caller Then
 '            emax = New EMax_Centroids()
 '            emax.emaxCPP.basics.grid.sliders.trackbar(0).Value = 270
 '            emax.emaxCPP.basics.grid.sliders.trackbar(1).Value = 150
@@ -476,7 +476,7 @@ End Class
 '    Public Sub Run()
 '		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        Static lastColors As New cv.Mat
-'        If standalone Then
+'        If standalone or task.intermediateReview = caller Then
 '            emax.Run()
 '            dst1 = emax.dst1.Clone()
 '        End If
@@ -500,7 +500,7 @@ End Class
 
 '        rtree.Predict(nextInput, predictions)
 
-'        If standalone Then
+'        If standalone or task.intermediateReview = caller Then
 '            Dim truthCount As Integer
 '            For i = 0 To nextInput.Rows - 1
 '                Dim pt = nextInput.Get(Of cv.Point2f)(i, 0)

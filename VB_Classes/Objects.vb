@@ -13,7 +13,7 @@ Public Class Object_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             dst1 = task.inrange.depthMask
             dst2 = task.inrange.noDepthMask
         End If

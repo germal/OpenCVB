@@ -15,7 +15,7 @@ Public Class LUT_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             reduction.src = src
             reduction.Run()
         End If
@@ -50,7 +50,7 @@ Public Class LUT_Simple
         reduction.src = src
         reduction.Run()
         dst1 = reduction.dst1.LUT(colorMat)
-        If standalone Then dst2 = colorMat.Resize(src.Size())
+        If standalone or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
     End Sub
 End Class
 
@@ -121,12 +121,12 @@ Public Class LUT_Color
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim reduction = sliders.trackbar(0).Value
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             src /= reduction
             src *= reduction
         End If
         dst1 = src.LUT(colorMat)
-        If standalone Then dst2 = colorMat.Resize(src.Size())
+        If standalone or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
     End Sub
 End Class
 
@@ -149,7 +149,7 @@ Public Class LUT_Rebuild
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
         dst1 = src.LUT(lut)
-        If standalone Then dst2 = lut.Resize(src.Size())
+        If standalone or task.intermediateReview = caller Then dst2 = lut.Resize(src.Size())
     End Sub
 End Class
 

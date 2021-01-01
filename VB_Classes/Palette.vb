@@ -55,7 +55,7 @@ Public Class Palette_Basics
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
             Dim mapFile As New FileInfo(str)
             gradMap.gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
-            If standalone Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
+            If standalone or task.intermediateReview = caller Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
             If whiteBack And gradMap.gradientColorMap.Cols <> 0 Then gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.White)
         End If
 
@@ -313,7 +313,7 @@ Public Class Palette_Gradient
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.frameCount Mod frameModulo = 0 Then
-            If standalone Then
+            If standalone or task.intermediateReview = caller Then
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             End If
@@ -381,7 +381,7 @@ Public Class Palette_BuildGradientColorMap
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
             dst1 = Palette_Custom_Apply(src, gradientColorMap)
-            If standalone Then dst2 = gradientColorMap
+            If standalone or task.intermediateReview = caller Then dst2 = gradientColorMap
         End If
     End Sub
 End Class
@@ -463,7 +463,7 @@ Public Class Palette_Consistency
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             emax.Run()
             src = emax.dst2
         End If
@@ -474,7 +474,7 @@ Public Class Palette_Consistency
 
         hist.src = img
         hist.Run()
-        If standalone Then dst2 = hist.dst1.Resize(src.Size)
+        If standalone or task.intermediateReview = caller Then dst2 = hist.dst1.Resize(src.Size)
 
         Dim histogram = hist.plotHist.hist
         Dim orderedByCount As New SortedList(Of Single, Integer)(New CompareHistCounts)

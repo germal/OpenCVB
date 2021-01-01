@@ -14,7 +14,7 @@ Public Class Highlight_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             reduction.src = src
             reduction.Run()
             viewObjects = reduction.pTrack.drawRC.viewObjects

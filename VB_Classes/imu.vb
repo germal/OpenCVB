@@ -42,7 +42,7 @@ Public Class IMU_Basics
             theta.X = theta.X * alpha + accelAngle.X * (1 - alpha)
             theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
         End If
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             flow.msgs.Add("ts = " + Format(task.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(task.IMU_Acceleration.X, "#0.00") +
                                   " y = " + Format(task.IMU_Acceleration.Y, "#0.00") + " z = " + Format(task.IMU_Acceleration.Z, "#0.00") + vbTab +
                                   " Motion (rads/sec) pitch = " + Format(task.IMU_AngularVelocity.X, "#0.00") +
@@ -239,7 +239,7 @@ Public Class IMU_FrameTime
 
         histogramIMU(CInt(task.IMU_FrameTime)) += 1
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                         "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                         "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
@@ -326,7 +326,7 @@ Public Class IMU_HostFrameTimes
 
         hist(CInt(task.CPU_FrameTime)) += 1
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                          "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                          "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
@@ -470,7 +470,7 @@ Public Class IMU_GVector
             ocvb.angleZ = kalman.kOutput(5)
         End If
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
@@ -533,7 +533,7 @@ Public Class IMU_IscameraLevel
 
         Dim degreesThreshold = sliders.trackbar(0).Value / 10 ' 0-100 --> 0-10 degrees
         If Math.Abs(angleX) > degreesThreshold Or Math.Abs(angleZ) > degreesThreshold Then cameraLevel = False Else cameraLevel = True
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             flow.msgs.Add(" Angle X = " + Format(angleX, "0.00") + " degrees" +
                           " Angle Y = " + Format(angleY, "0.00") + " degrees" +
                           " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
@@ -579,7 +579,7 @@ Public Class IMU_IscameraStable
         Dim threshold = thresholdSlider.Value / 100
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
         cameraStable = If(totalRadians > threshold, False, True)
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             flow.msgs.Add(" Pitch = " + Format(pitch, "0.00") + " radians" +
                           " Yaw = " + Format(yaw, "0.00") + " radians" +
                           " Roll = " + Format(roll, "0.00") + " radians" +

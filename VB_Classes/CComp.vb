@@ -42,7 +42,7 @@ Public Class CComp_Basics
             Dim m = cv.Cv2.Moments(nextMask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
-            If standalone Then dst1(blob.Rect).SetTo(ocvb.scalarColors(count), (dst2)(blob.Rect))
+            If standalone or task.intermediateReview = caller Then dst1(blob.Rect).SetTo(ocvb.scalarColors(count), (dst2)(blob.Rect))
             count += 1
         Next
         Return count
@@ -77,7 +77,7 @@ Public Class CComp_Basics
         connectedComponents.renderblobs(mats.mat(3))
 
         count += renderBlobs(minSize, mats.mat(1), maxSize)
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             For i = 0 To centroids.Count - 1
                 dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                 dst1.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
@@ -341,7 +341,7 @@ Public Class CComp_DepthEdges
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         depth.Run()
-        If standalone Then dst2 = depth.dst2
+        If standalone or task.intermediateReview = caller Then dst2 = depth.dst2
 
         'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
         If check.Box(0).Checked Then src.SetTo(0, depth.dst2)

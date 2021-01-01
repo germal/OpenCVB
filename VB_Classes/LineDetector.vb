@@ -519,7 +519,7 @@ Public Class lineDetector_FLD
                 Next
             End If
         End If
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             For j = 0 To lines.Count - 1 Step 4
                 Dim v = lines(j)
                 Dim pt1 = New cv.Point(v(0), v(1))

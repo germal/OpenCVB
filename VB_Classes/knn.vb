@@ -89,7 +89,7 @@ Public Class KNN_QueryTrain
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             If check.Box(0).Checked = False Then useRandomData = True
         End If
 
@@ -104,7 +104,7 @@ Public Class KNN_QueryTrain
         End If
 
         ' algorithm does nothing but provide a location for query/train points when not running standalone.
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             ' query/train points need to be manufactured when standalone
             trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
             queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
@@ -241,14 +241,14 @@ Public Class KNN_Emax
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
             emax.Run()
             knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.flood.centroids)
         End If
 
         knn.Run()
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             dst1 = emax.dst1 + knn.dst1
             dst2 = knn.dst1
         Else
@@ -376,7 +376,7 @@ Public Class KNN_Point3d
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             ReDim lastSet(sliders.trackbar(0).Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
@@ -405,7 +405,7 @@ Public Class KNN_Point3d
             dst2.Circle(p, 9, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
 
-        If standalone Then findXnearest = sliders.trackbar(1).Value
+        If standalone or task.intermediateReview = caller Then findXnearest = sliders.trackbar(1).Value
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
             query.Set(Of cv.Point3f)(0, 0, querySet(i))
@@ -413,7 +413,7 @@ Public Class KNN_Point3d
             For j = 0 To findXnearest - 1
                 responseSet(i * findXnearest + j) = CInt(neighbors.Get(Of Single)(0, j))
             Next
-            If standalone Then
+            If standalone or task.intermediateReview = caller Then
                 For j = 0 To findXnearest - 1
                     Dim plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Y)
                     Dim pQ = New cv.Point2f(querySet(i).X, querySet(i).Y)
@@ -765,7 +765,7 @@ Public Class KNN_Point2d
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then prepareImage(dst1, ocvb.dotSize)
+        If standalone or task.intermediateReview = caller Then prepareImage(dst1, ocvb.dotSize)
 
         knn.Run()
 
@@ -778,7 +778,7 @@ Public Class KNN_Point2d
                 Dim index = neighbors.Get(Of Single)(0, j)
                 responseSet(i * findXnearest + j) = CInt(index)
             Next
-            If standalone Then
+            If standalone or task.intermediateReview = caller Then
                 For j = 0 To findXnearest - 1
                     dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                     cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
@@ -851,7 +851,7 @@ Public Class KNN_PointTracker
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             topView.src = task.pointCloud
             topView.Run()
             dst1 = topView.dst1

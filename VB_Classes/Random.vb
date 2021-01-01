@@ -352,7 +352,7 @@ Public Class Random_CustomDistribution
             Next
         Next
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             plotHist.hist = outputHistogram
             plotHist.Run()
             dst1 = plotHist.dst1
@@ -398,7 +398,7 @@ Public Class Random_MonteCarlo
             End While
         Next
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             plotHist.hist = histogram
             plotHist.Run()
             dst1 = plotHist.dst1
@@ -447,7 +447,7 @@ Public Class Random_CustomHistogram
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.Run()
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             hist.plotHist.fixedMaxVal = 100
             hist.plotHist.hist = random.outputHistogram
             hist.plotHist.Run()

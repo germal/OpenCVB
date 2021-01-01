@@ -17,7 +17,7 @@ Public Class Blur_Basics
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             cv.Cv2.GaussianBlur(src, dst1, New cv.Size(kernelSize, kernelSize), 0, 0)
-            If standalone Then cv.Cv2.GaussianBlur(task.RGBDepth, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
+            If standalone or task.intermediateReview = caller Then cv.Cv2.GaussianBlur(task.RGBDepth, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
         Else
             dst1 = src
         End If
@@ -45,7 +45,7 @@ Public Class Blur_Gaussian_CS
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             CS_BlurGaussian.Run(src, dst1, kernelSize)
-            If standalone Then CS_BlurGaussian.Run(task.RGBDepth, dst2, kernelSize)
+            If standalone or task.intermediateReview = caller Then CS_BlurGaussian.Run(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
         End If
@@ -73,7 +73,7 @@ Public Class Blur_Median_CS
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             CS_BlurMedian.Run(src, dst1, kernelSize)
-            If standalone Then CS_BlurMedian.Run(task.RGBDepth, dst2, kernelSize)
+            If standalone or task.intermediateReview = caller Then CS_BlurMedian.Run(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
         End If
@@ -100,7 +100,7 @@ Public Class Blur_Homogeneous
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             dst1 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
-            If standalone Then dst2 = task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+            If standalone or task.intermediateReview = caller Then dst2 = task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         Else
             dst1 = src
             dst2 = task.RGBDepth
@@ -129,7 +129,7 @@ Public Class Blur_Median
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             cv.Cv2.MedianBlur(src, dst1, kernelSize)
-            If standalone Then cv.Cv2.MedianBlur(task.RGBDepth, dst2, kernelSize)
+            If standalone or task.intermediateReview = caller Then cv.Cv2.MedianBlur(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
             dst2 = task.RGBDepth

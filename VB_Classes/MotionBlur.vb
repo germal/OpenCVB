@@ -14,7 +14,7 @@ Public Class MotionBlur_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        if standalone Then
+        If standalone or task.intermediateReview = caller Then
             If sliders.trackbar(1).Value < sliders.trackbar(1).Maximum Then
                 sliders.trackbar(1).Value += 1
             Else

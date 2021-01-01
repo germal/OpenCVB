@@ -25,7 +25,7 @@ Public Class BRISK_Basics
                 dst1.Circle(pt.Pt, 2, cv.Scalar.Green, r / 2, cv.LineTypes.AntiAlias)
             End If
         Next
-        If standalone Then cv.Cv2.AddWeighted(src, 0.5, dst1, 0.5, 0, dst1)
+        If standalone or task.intermediateReview = caller Then cv.Cv2.AddWeighted(src, 0.5, dst1, 0.5, 0, dst1)
     End Sub
 End Class
 

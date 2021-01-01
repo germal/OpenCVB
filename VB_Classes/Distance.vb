@@ -17,7 +17,7 @@ Public Class Distance_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then src = task.RGBDepth ' to get some zeros in the image...
+        If standalone or task.intermediateReview = caller Then src = task.RGBDepth ' to get some zeros in the image...
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim DistanceType = cv.DistanceTypes.L2

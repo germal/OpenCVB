@@ -171,7 +171,7 @@ Public Class GeneticDrawing_Basics
             generation = 0
             stage = 0
 
-            If standalone Then
+            If standalone or task.intermediateReview = caller Then
                 src = If(snapCheck.Checked, src.Clone, cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
             snapCheck.Checked = False

@@ -42,7 +42,7 @@ Public Class EMax_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             ocvb.trueText("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                           "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100)
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
@@ -67,7 +67,7 @@ Public Class EMax_Basics
         samples = samples.Reshape(1, 0)
 
         dst1.SetTo(cv.Scalar.Black)
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = regionCount
             Static frm = findfrm("EMax_Basics Radio Options")

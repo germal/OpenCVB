@@ -58,7 +58,7 @@ Public Class Font_FlowText
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
             msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")

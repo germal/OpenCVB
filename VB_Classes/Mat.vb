@@ -155,7 +155,7 @@ Public Class Mat_4to1
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             mat1 = src
             mat2 = task.RGBDepth
             mat3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -204,7 +204,7 @@ Public Class Mat_2to1
         Static nSize = New cv.Size(src.Width, src.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             mat1 = src
             mat2 = task.RGBDepth
             mat = {mat1, mat2}
@@ -261,7 +261,7 @@ Public Class Mat_ImageXYZ_MT
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)
-        If standalone Then ocvb.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
+        If standalone or task.intermediateReview = caller Then ocvb.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
     End Sub
 End Class
 

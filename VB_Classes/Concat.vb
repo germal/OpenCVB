@@ -33,7 +33,7 @@ Public Class Concat_4way
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        if standalone Then
+        If standalone or task.intermediateReview = caller Then
             img(0) = src
             img(1) = task.RGBDepth
             img(2) = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size())

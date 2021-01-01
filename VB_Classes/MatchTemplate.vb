@@ -30,7 +30,7 @@ Public Class MatchTemplate_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             sample1 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
             sample2 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(sample1, 100, 25)
@@ -50,7 +50,7 @@ Public Class MatchTemplate_Basics
         cv.Cv2.MatchTemplate(sample1, sample2, correlationMat, matchOption)
         Dim correlation = correlationMat.Get(Of Single)(0, 0)
         label1 = "Correlation = " + Format(correlation, "#,##0.000")
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             dst1.SetTo(0)
             label1 = matchText + " for " + CStr(sample1.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))

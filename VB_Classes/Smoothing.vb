@@ -56,7 +56,7 @@ Public Class Smoothing_Exterior
 	End Sub
 	Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-		If standalone Then
+		If standalone or task.intermediateReview = caller Then
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
 			hull.src = src
@@ -139,7 +139,7 @@ Public Class Smoothing_Interior
 	End Sub
 	Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-		If standalone Then
+		If standalone or task.intermediateReview = caller Then
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
 			hull.src = src

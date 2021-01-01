@@ -100,7 +100,7 @@ Public Class Hough_Lines
         segments = cv.Cv2.HoughLines(edges.dst1, rhoIn, thetaIn, threshold)
         label1 = "Found " + CStr(segments.Length) + " Lines"
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.White, edges.dst1)
             src.CopyTo(dst2)

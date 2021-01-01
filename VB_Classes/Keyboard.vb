@@ -16,7 +16,7 @@ Public Class Keyboard_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim inputText As String = ""
             For i = 0 To keyInput.Count - 1
                 inputText += keyInput(i).ToString()

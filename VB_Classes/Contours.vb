@@ -52,7 +52,7 @@ Public Class Contours_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         setOptions()
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim imageInput As New cv.Mat
             rotatedRect.src = src
             rotatedRect.Run()

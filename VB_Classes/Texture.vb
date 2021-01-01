@@ -44,12 +44,12 @@ Public Class Texture_Basics
             For Each roi In grid.roiList
                 sortcounts.Add(dst1(roi).CountNonZero(), roi)
             Next
-            If standalone Then dst2.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
+            If standalone or task.intermediateReview = caller Then dst2.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
             tRect = sortcounts.ElementAt(0).Value
             texture = task.color(tRect)
             texturePop = dst1(tRect).CountNonZero()
         End If
-        If standalone Then dst2.Rectangle(tRect, cv.Scalar.White, 2)
+        If standalone or task.intermediateReview = caller Then dst2.Rectangle(tRect, cv.Scalar.White, 2)
     End Sub
 End Class
 
@@ -154,14 +154,14 @@ Public Class Texture_Shuffle
     Public rgbaTexture As New cv.Mat
     Public Sub New()
         initParent()
-        If standalone Then floor = New OpenGL_FloorPlane()
+        floor = New OpenGL_FloorPlane()
         texture = New Texture_Basics()
         shuffle = New Random_Shuffle()
         task.desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             floor.plane.Run()
             dst2.SetTo(0)
             src.CopyTo(dst2, floor.plane.maskPlane)

@@ -21,7 +21,7 @@ Public Class Binarize_Basics
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
-        If standalone Then meanScalar = cv.Cv2.Mean(src)
+        If standalone or task.intermediateReview = caller Then meanScalar = cv.Cv2.Mean(src)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim dimensions() = New Integer() {maxRange}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}

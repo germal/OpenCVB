@@ -17,7 +17,7 @@ Public Class Resize_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static frm = findfrm("Resize_Basics Radio Options")
         Dim resizeFlag = getInterpolationRadioButtons(radio, frm)
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
             If task.drawRect.Width <> 0 Then roi = task.drawRect
 
@@ -59,7 +59,7 @@ Public Class Resize_Percentage
         resizeOptions.src = src
         resizeOptions.Run()
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)
             dst1 = resizeOptions.dst1(roi).Resize(resizeOptions.dst1.Size())
             label1 = "Image after resizing to " + Format(sliders.trackbar(0).Value, "#0.0") + "% of original size"

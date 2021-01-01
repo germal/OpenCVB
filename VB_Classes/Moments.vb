@@ -21,7 +21,7 @@ Public Class Moments_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             foreground.Run()
             dst1 = foreground.dst1
             inputMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -37,7 +37,7 @@ Public Class Moments_Basics
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
-        If standalone Then dst1.Circle(center, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        If standalone or task.intermediateReview = caller Then dst1.Circle(center, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         centroid = New cv.Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
     End Sub
 End Class

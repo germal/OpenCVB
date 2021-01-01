@@ -63,11 +63,11 @@ Public Class Math_Median_CDF
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone Then bins = sliders.trackbar(0).Value
+        If standalone or task.intermediateReview = caller Then bins = sliders.trackbar(0).Value
 
         medianVal = computeMedian(src, New cv.Mat, src.Total, bins, rangeMin, rangeMax)
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
 

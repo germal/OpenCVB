@@ -55,7 +55,7 @@ Public Class VBparent : Implements IDisposable
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame()
-        If standalone Then src = task.color
+        If standalone or task.intermediateReview = caller Then src = task.color
         If src.Width <> dst1.Width Or src.Width <> dst2.Width Then
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)

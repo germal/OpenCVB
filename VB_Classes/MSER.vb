@@ -64,7 +64,7 @@ Public Class MSER_Basics
         If check.Box(1).Checked Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, region, zone)
 
-        If standalone Then
+        If standalone or task.intermediateReview = caller Then
             Dim pixels As integer
             dst1.SetTo(0)
             For i = 0 To region.Length - 1
