@@ -491,8 +491,8 @@ Public Class Draw_Frustrum
             gCloud = New Depth_PointCloud_IMU
             Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
             Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-            xCheckbox.Checked = True
-            zCheckbox.Checked = True
+            xCheckbox.Checked = False
+            zCheckbox.Checked = False
         End If
 
         task.desc = "Draw a frustrum for a camera viewport"

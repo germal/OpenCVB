@@ -1740,7 +1740,7 @@ Public Class Depth_PointCloud_IMU
         End If
 
         gMatrix = gM
-        If ocvb.imuXAxis Or ocvb.imuZAxis Then
+        If xCheckbox.Checked Or zCheckbox.Checked Then
             ocvb.gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
             Dim gInput = task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols)
             Dim gOutput = (gInput * ocvb.gMat).ToMat

@@ -1396,12 +1396,16 @@ Public Class Histogram_TopView2D
         cmat = New PointCloud_Colorize()
         gCloud = New Depth_PointCloud_IMU()
 
-
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
+
         gCloud.Run()
         viewOpts.Run()
 
@@ -1453,6 +1457,10 @@ Public Class Histogram_SideView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         gCloud.Run()
         viewOpts.Run()
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
@@ -1462,8 +1470,10 @@ Public Class Histogram_SideView2D
         Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = cmat.CameraLocationSide(dst2)
+        If standalone Then
+            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = cmat.CameraLocationSide(dst2)
+        End If
     End Sub
 End Class
 

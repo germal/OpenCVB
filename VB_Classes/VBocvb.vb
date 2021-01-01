@@ -32,8 +32,6 @@ Public Class VBocvb
     Public cz As Single
     Public sz As Single
     Public gMat As cv.Mat
-    Public imuXAxis As Boolean
-    Public imuZAxis As Boolean
 
     Public intermediateObject As VBparent
 

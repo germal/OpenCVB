@@ -282,6 +282,12 @@ Public Class Reduction_Lines
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
+
         reduction.Run()
 
         sideView.Run()

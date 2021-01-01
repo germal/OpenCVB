@@ -102,6 +102,8 @@ Public Class PointCloud_Colorize
     Dim palette As Palette_Gradient
     Public rect As cv.Rect
     Dim arcSize As Integer
+    Public imuXaxis As Boolean ' Adjust cone for X-axis rotation
+    Public imuZaxis As Boolean ' Adjust cone for Z-axis rotation
     Public Function CameraLocationBot(dst As cv.Mat) As cv.Mat
         Dim distanceRatio As Single = 1
         Dim fsize = ocvb.fontSize * 1.5
@@ -119,7 +121,7 @@ Public Class PointCloud_Colorize
         Dim markerLeft = New cv.Point(cam.X - topLen, dst.Height - marker.Y)
         Dim markerRight = New cv.Point(cam.X + topLen, dst.Height - marker.Y)
 
-        If ocvb.imuXAxis Then
+        If imuXaxis Then
             Dim offset = Math.Sin(ocvb.angleZ) * topLen
             If ocvb.angleZ > 0 Then
                 markerLeft.X = markerLeft.X - offset
@@ -170,7 +172,7 @@ Public Class PointCloud_Colorize
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        If ocvb.imuZAxis Then
+        If imuZaxis Then
             Dim offset = Math.Sin(ocvb.angleX) * marker.Y
             If ocvb.angleX > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
@@ -181,7 +183,7 @@ Public Class PointCloud_Colorize
             End If
         End If
 
-        If ocvb.imuXAxis Then
+        If imuXaxis Then
             markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
             markerLeft = New cv.Point(markerLeft.X * Math.Cos(ocvb.angleZ) - markerLeft.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
                                       markerLeft.Y * Math.Cos(ocvb.angleZ) + markerLeft.X * Math.Sin(ocvb.angleZ))
@@ -358,12 +360,12 @@ Public Class PointCloud_Kalman_TopView
     Public pTrack As KNN_PointTracker
     Public flood As FloodFill_8bit
     Public topView As Histogram_TopView2D
-    Dim cmats As PointCloud_Colorize
+    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
         pTrack = New KNN_PointTracker()
-        cmats = New PointCloud_Colorize()
+        cmat = New PointCloud_Colorize()
         flood = New FloodFill_8bit()
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
@@ -373,6 +375,11 @@ Public Class PointCloud_Kalman_TopView
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
 
         topView.Run()
 
@@ -387,7 +394,7 @@ Public Class PointCloud_Kalman_TopView
         pTrack.Run()
         dst1 = pTrack.dst1
 
-        dst1 = cmats.CameraLocationBot(dst1)
+        If standalone Then dst1 = cmat.CameraLocationBot(dst1)
         Dim FOV = ocvb.hFov
         label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(ocvb.maxZ, "0.0") + " meters"
     End Sub
@@ -404,12 +411,12 @@ Public Class PointCloud_Kalman_SideView
     Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
     Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
-    Dim cmats As PointCloud_Colorize
+    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
         pTrack = New KNN_PointTracker()
-        cmats = New PointCloud_Colorize()
+        cmat = New PointCloud_Colorize()
         flood = New Floodfill_Identifiers()
 
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
@@ -422,6 +429,11 @@ Public Class PointCloud_Kalman_SideView
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.Run()
 
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
+
         Static sliderHistThreshold = findSlider("Top/Side View Histogram threshold")
         flood.src = sideView.histOutput.ConvertScaleAbs(255)
         flood.Run()
@@ -433,7 +445,7 @@ Public Class PointCloud_Kalman_SideView
         pTrack.Run()
         dst1 = pTrack.dst1
 
-        dst1 = cmats.CameraLocationSide(dst1)
+        If standalone Then dst1 = cmat.CameraLocationSide(dst1)
 
         Dim FOV = (180 - ocvb.vFov) / 2
         label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter at " + Format(ocvb.maxZ, "0.0") + " meters"
@@ -502,14 +514,14 @@ Public Class PointCloud_BothViews
     Public backMatMask As New cv.Mat
     Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmats As PointCloud_Colorize
+    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
         levelCheck = New IMU_IscameraLevel
         topPixel = New PointCloud_ObjectsTop
         sidePixel = New PointCloud_ObjectsSide
-        cmats = New PointCloud_Colorize()
+        cmat = New PointCloud_Colorize()
 
         backMat = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         backMatMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
@@ -521,6 +533,11 @@ Public Class PointCloud_BothViews
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        cmat.imuXaxis = xCheckbox.checked
+        cmat.imuZaxis = zCheckbox.checked
+
         topPixel.Run()
         sidePixel.Run()
 
@@ -528,7 +545,7 @@ Public Class PointCloud_BothViews
             Dim instructions = "Click any centroid to get details"
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
-            If ocvb.imuXAxis Or ocvb.imuZAxis Then
+            If cmat.imuXaxis Or cmat.imuZaxis Then
                 levelCheck.Run()
                 If levelCheck.cameraLevel Then
                     accMsg1 = "Distances are good - camera is level"
@@ -613,8 +630,8 @@ Public Class PointCloud_BothViews
             End If
         End If
 
-        dst1 = cmats.CameraLocationBot(dst1)
-        dst2 = cmats.CameraLocationSide(dst2)
+        dst1 = cmat.CameraLocationBot(dst1)
+        dst2 = cmat.CameraLocationSide(dst2)
     End Sub
 End Class
 
@@ -650,51 +667,51 @@ End Class
 
 
 
-Public Class PointCloud_IMU_TopView
-    Inherits VBparent
-    Public topView As Histogram_TopView2D
-    Public kTopView As PointCloud_Kalman_TopView
-    Public lDetect As LineDetector_Basics
-    Dim angleSlider As System.Windows.Forms.TrackBar
-    Dim cmats As PointCloud_Colorize
-    Public Sub New()
-        initParent()
+'Public Class PointCloud_IMU_TopView
+'    Inherits VBparent
+'    Public topView As Histogram_TopView2D
+'    Public kTopView As PointCloud_Kalman_TopView
+'    Public lDetect As LineDetector_Basics
+'    Dim angleSlider As System.Windows.Forms.TrackBar
+'    Dim cmat As PointCloud_Colorize
+'    Public Sub New()
+'        initParent()
 
-        topView = New Histogram_TopView2D()
-        Dim histSlider = findSlider("Top/Side View Histogram threshold")
-        histSlider.Value = 20
+'        topView = New Histogram_TopView2D()
+'        Dim histSlider = findSlider("Top/Side View Histogram threshold")
+'        histSlider.Value = 20
 
-        kTopView = New PointCloud_Kalman_TopView()
-        cmats = New PointCloud_Colorize()
+'        kTopView = New PointCloud_Kalman_TopView()
+'        cmat = New PointCloud_Colorize()
 
-        lDetect = New LineDetector_Basics()
-        lDetect.drawLines = True
+'        lDetect = New LineDetector_Basics()
+'        lDetect.drawLines = True
 
-        label1 = "Top view aligned using the IMU gravity vector"
-        label2 = "Top view aligned without using the IMU gravity vector"
-        task.desc = "Present the top view with and without the IMU filter."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        label1 = "Top view aligned using the IMU gravity vector"
+'        label2 = "Top view aligned without using the IMU gravity vector"
+'        task.desc = "Present the top view with and without the IMU filter."
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        xCheckbox.checked = True
-        zCheckbox.checked = True
+'        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+'        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+'        xCheckbox.checked = True
+'        zCheckbox.checked = True
 
-        topView.Run()
-        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lDetect.Run()
-        dst1 = lDetect.dst1
+'        topView.Run()
+'        lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+'        lDetect.Run()
+'        dst1 = lDetect.dst1
 
-        If standalone Then
-            xCheckbox.checked = False
-            zCheckbox.checked = False
-            kTopView.Run()
-            dst2 = cmats.CameraLocationBot(kTopView.dst1)
-        End If
-    End Sub
-End Class
+'        If standalone Then
+'            xCheckbox.checked = False
+'            zCheckbox.checked = False
+'            kTopView.Run()
+'            dst2 = cmat.CameraLocationBot(kTopView.dst1)
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -706,22 +723,18 @@ Public Class PointCloud_FrustrumTop
     Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim topView As Histogram_TopView2D
-    Dim cmats As PointCloud_Colorize
+    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
-        cmats = New PointCloud_Colorize()
+        cmat = New PointCloud_Colorize()
+
         frustrum = New Draw_Frustrum()
 
         topView = New Histogram_TopView2D()
 
         Dim histSlider = findSlider("Top/Side View Histogram threshold")
         histSlider.Value = 0
-
-        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        xCheckbox.Checked = False
-        zCheckbox.Checked = False
 
         label2 = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
@@ -734,7 +747,7 @@ Public Class PointCloud_FrustrumTop
         task.pointCloud = frustrum.xyzDepth.xyzFrame
         topView.Run()
         dst1 = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
-        dst1 = cmats.CameraLocationBot(dst1)
+        dst1 = cmat.CameraLocationBot(dst1)
     End Sub
 End Class
 
@@ -749,11 +762,11 @@ Public Class PointCloud_FrustrumSide
     Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim sideView As Histogram_SideView2D
-    Dim cmats As PointCloud_Colorize
+    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
-        cmats = New PointCloud_Colorize()
+        cmat = New PointCloud_Colorize()
         frustrum = New Draw_Frustrum()
 
         sideView = New Histogram_SideView2D()
@@ -778,7 +791,7 @@ Public Class PointCloud_FrustrumSide
         sideView.Run()
 
         dst1 = sideView.dst1
-        dst1 = cmats.CameraLocationSide(dst1)
+        dst1 = cmat.CameraLocationSide(dst1)
     End Sub
 End Class
 
@@ -791,48 +804,56 @@ End Class
 
 
 
-Public Class PointCloud_IMU_SideView
-    Inherits VBparent
-    Public sideView As Histogram_SideView2D
-    Public kSideView As PointCloud_Kalman_SideView
-    Public lDetect As LineDetector_Basics
-    Dim cmats As PointCloud_Colorize
-    Public Sub New()
-        initParent()
+'Public Class PointCloud_IMU_SideView
+'    Inherits VBparent
+'    Public sideView As Histogram_SideView2D
+'    Public kSideView As PointCloud_Kalman_SideView
+'    Public lDetect As LineDetector_Basics
+'    Dim cmat As PointCloud_Colorize
+'    Public Sub New()
+'        initParent()
 
-        cmats = New PointCloud_Colorize()
-        lDetect = New LineDetector_Basics()
-        lDetect.drawLines = True
+'        cmat = New PointCloud_Colorize()
+'        lDetect = New LineDetector_Basics()
+'        lDetect.drawLines = True
 
-        kSideView = New PointCloud_Kalman_SideView()
-        sideView = New Histogram_SideView2D()
+'        kSideView = New PointCloud_Kalman_SideView()
+'        sideView = New Histogram_SideView2D()
 
-        Dim histSlider = findSlider("Top/Side View Histogram threshold")
-        histSlider.Value = 20
+'        Dim histSlider = findSlider("Top/Side View Histogram threshold")
+'        histSlider.Value = 20
 
-        label1 = "side view AFTER align/threshold using gravity vector"
-        If standalone Then label2 = "side view BEFORE align/threshold using gravity vector"
-        task.desc = "Present the side view with and without the IMU filter."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        xCheckbox.checked = True
-        zCheckbox.checked = True
-        sideView.Run()
-        lDetect.src = sideView.dst1.Resize(task.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        lDetect.Run()
-        dst1 = cmats.CameraLocationSide(lDetect.dst1)
+'        label1 = "side view AFTER align/threshold using gravity vector"
+'        If standalone Then label2 = "side view BEFORE align/threshold using gravity vector"
+'        task.desc = "Present the side view with and without the IMU filter."
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        Dim pointcloud = task.pointCloud.Clone
 
-        If standalone Or task.intermediateReview = caller Then
-            xCheckbox.checked = False
-            zCheckbox.checked = False
-            kSideView.Run()
-            dst2 = kSideView.dst1
-        End If
-    End Sub
-End Class
+'        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+'        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+'        xCheckbox.checked = True
+'        zCheckbox.checked = True
+'        cmat.imuXaxis = True
+'        cmat.imuZaxis = True
+
+'        sideView.Run()
+'        lDetect.src = sideView.dst1.Resize(task.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+'        lDetect.Run()
+'        dst1 = cmat.CameraLocationSide(lDetect.dst1)
+
+'        If standalone Or task.intermediateReview = caller Then
+'            task.pointCloud = pointcloud.Clone
+'            xCheckbox.checked = False
+'            zCheckbox.checked = False
+'            cmat.imuXaxis = False
+'            cmat.imuZaxis = False
+'            kSideView.Run()
+'            dst2 = kSideView.dst1
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -889,48 +910,48 @@ End Class
 
 
 
-Public Class PointCloud_DistanceSideClick
-    Inherits VBparent
-    Dim sideIMU As PointCloud_IMU_SideView
-    Dim points As New List(Of cv.Point)
-    Dim clicks As New List(Of cv.Point)
-    Public Sub New()
-        initParent()
-        sideIMU = New PointCloud_IMU_SideView()
-        label1 = "Click anywhere to get distance from camera and x dist"
-        task.desc = "Click to find distance from the camera in the rotated side view"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static saveMaxZ As Single
+'Public Class PointCloud_DistanceSideClick
+'    Inherits VBparent
+'    Dim sideIMU As PointCloud_IMU_SideView
+'    Dim points As New List(Of cv.Point)
+'    Dim clicks As New List(Of cv.Point)
+'    Public Sub New()
+'        initParent()
+'        sideIMU = New PointCloud_IMU_SideView()
+'        label1 = "Click anywhere to get distance from camera and x dist"
+'        task.desc = "Click to find distance from the camera in the rotated side view"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        Static saveMaxZ As Single
 
-        If ocvb.maxZ <> saveMaxZ Then
-            clicks.Clear()
-            points.Clear()
-            saveMaxZ = ocvb.maxZ
-        End If
+'        If ocvb.maxZ <> saveMaxZ Then
+'            clicks.Clear()
+'            points.Clear()
+'            saveMaxZ = ocvb.maxZ
+'        End If
 
-        sideIMU.Run()
-        dst1 = sideIMU.dst1
-        dst2 = sideIMU.dst2
+'        sideIMU.Run()
+'        dst1 = sideIMU.dst1
+'        dst2 = sideIMU.dst2
 
-        If task.mouseClickFlag Then clicks.Add(task.mouseClickPoint)
+'        If task.mouseClickFlag Then clicks.Add(task.mouseClickPoint)
 
-        For Each pt In points
-            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Next
-        For Each pt In clicks
-            dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
-            Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
-            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / ocvb.pixelsPerMeter
-            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / ocvb.pixelsPerMeter, "#0.00") + "m", pt, 3)
-        Next
+'        For Each pt In points
+'            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+'        Next
+'        For Each pt In clicks
+'            dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+'            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+'            Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
+'            Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
+'            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / ocvb.pixelsPerMeter
+'            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / ocvb.pixelsPerMeter, "#0.00") + "m", pt, 3)
+'        Next
 
-        dst1.Line(New cv.Point(ocvb.sideCameraPoint.X, 0), New cv.Point(ocvb.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
-    End Sub
-End Class
+'        dst1.Line(New cv.Point(ocvb.sideCameraPoint.X, 0), New cv.Point(ocvb.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
+'    End Sub
+'End Class
 
 
 
@@ -938,25 +959,25 @@ End Class
 
 
 
-Public Class PointCloud_GVectorFloor
-    Inherits VBparent
-    Public floor As PointCloud_GVectorPlane
-    Dim maxDepthSlider As System.Windows.Forms.TrackBar
-    Public Sub New()
-        initParent()
+'Public Class PointCloud_GVectorFloor
+'    Inherits VBparent
+'    Public floor As PointCloud_GVectorPlane
+'    Dim maxDepthSlider As System.Windows.Forms.TrackBar
+'    Public Sub New()
+'        initParent()
 
-        floor = New PointCloud_GVectorPlane()
-        floor.floorRun = True
-        task.desc = "Find the floor plane in a side view oriented by gravity vector"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        floor = New PointCloud_GVectorPlane()
+'        floor.floorRun = True
+'        task.desc = "Find the floor plane in a side view oriented by gravity vector"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        floor.Run()
-        dst1 = floor.dst1
-        dst2 = floor.dst2
-    End Sub
-End Class
+'        floor.Run()
+'        dst1 = floor.dst1
+'        dst2 = floor.dst2
+'    End Sub
+'End Class
 
 
 
@@ -965,30 +986,30 @@ End Class
 
 
 
-Public Class PointCloud_GVectorCeiling
-    Inherits VBparent
-    Public ceiling As PointCloud_GVectorPlane
-    Public Sub New()
-        initParent()
+'Public Class PointCloud_GVectorCeiling
+'    Inherits VBparent
+'    Public ceiling As PointCloud_GVectorPlane
+'    Public Sub New()
+'        initParent()
 
-        ceiling = New PointCloud_GVectorPlane()
-        ceiling.floorRun = False
+'        ceiling = New PointCloud_GVectorPlane()
+'        ceiling.floorRun = False
 
-        task.maxRangeSlider.Value = 8000
-
-        Dim cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
-        cushionSlider.Value = 200
-
-        task.desc = "Find the floor and ceiling planes in a side view oriented by gravity vector"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        task.maxRangeSlider.Value = 8000
+
+'        Dim cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
+'        cushionSlider.Value = 200
+
+'        task.desc = "Find the floor and ceiling planes in a side view oriented by gravity vector"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        ceiling.Run()
-        dst1 = ceiling.dst1
-        dst2 = ceiling.dst2
-    End Sub
-End Class
+'        ceiling.Run()
+'        dst1 = ceiling.dst1
+'        dst2 = ceiling.dst2
+'    End Sub
+'End Class
 
 
 
@@ -997,236 +1018,236 @@ End Class
 
 
 
-Public Class PointCloud_GVectorPlane
-    Inherits VBparent
-    Public gLine As PointCloud_GVectorLine
-    Dim inrange As Depth_InRange
-    Public planeHeight As Integer
-    Public planePoint1 As cv.Point2f
-    Public planePoint2 As cv.Point2f
-    Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
-    Public Sub New()
-        initParent()
-
-        inrange = New Depth_InRange()
-        gLine = New PointCloud_GVectorLine()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Cushion when estimating the floor or ceiling plane (mm)", 1, 1000, 100)
-            sliders.setupTrackBar(1, "Y-coordinate consistency check count", 1, 100, 5)
-            sliders.setupTrackBar(2, "Y-coordinate up/down adjustment (mm)", -4000, 4000, 0)
-        End If
-
-        label1 = "Plane equation input"
-        label2 = "Side view rotated with gravity vector"
-        task.desc = "Find the floor or ceiling plane and translate it back to unrotated coordinates"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
-        Dim cushion = cushionSlider.value / 1000
-        gLine.floorRun = floorRun
-        gLine.src = task.pointCloud
-        gLine.Run()
-        dst2 = gLine.dst1
-        Dim maskplane = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-
-        Dim leftPoint = gLine.leftPoint
-        Static leftPoints As New List(Of cv.Point2f)
-        If leftPoint.Y = 0 Then leftPoints.Clear() Else leftPoints.Add(leftPoint)
-
-        Static consistencySlider = findSlider("Y-coordinate consistency check count")
-        If leftPoints.Count > consistencySlider.value Then
-            planeHeight = CInt(ocvb.pixelsPerMeter * cushion)
-            If planeHeight = 0 Then planeHeight = 1
-            Dim cam = ocvb.sideCameraPoint
-
-            Static adjustmentSlider = findSlider("Y-coordinate up/down adjustment (mm)")
-            Dim adjustPixels = ocvb.pixelsPerMeter * adjustmentSlider.value / 1000
-
-            planePoint1 = New cv.Point(0, leftPoint.Y + CInt(If(floorRun, planeHeight / 2, -planeHeight / 2) + adjustPixels))
-            planePoint2 = New cv.Point(dst2.Width, planePoint1.Y)
-
-            dst2.Line(planePoint1, planePoint2, cv.Scalar.Yellow, planeHeight)
-
-            Dim gPlaneDeltaY = Math.Abs(planePoint2.Y - cam.Y)
-            Dim maxAngle = Math.Atan(dst2.Width / gPlaneDeltaY) * 57.2958
-            Dim minRow = dst2.Height * maxAngle / 180
-
-            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeter * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
-            Dim split = task.pointCloud.Split()
-            Dim ySplit = split(1)
-            inrange.src = split(1)
-            inrange.minVal = planeY - If(floorRun, 0, cushion)
-            inrange.maxVal = planeY + If(floorRun, cushion, 0)
-            inrange.Run()
-            maskplane = split(1).ConvertScaleAbs(255)
-
-            Dim incr = ocvb.maxZ / split(2).Width
-            Dim tmp = New cv.Mat(split(2).Size, cv.MatType.CV_32F, 0)
-            If floorRun Then
-                For i = minRow To split(2).Rows - 1
-                    tmp.Row(i).SetTo(i * incr)
-                Next
-            Else
-                For i = 0 To minRow - 1
-                    tmp.Row(i).SetTo(i * incr)
-                Next
-            End If
-            tmp.CopyTo(split(2), maskplane)
-        End If
-        dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskplane.Resize(src.Size))
-    End Sub
-End Class
-
-
-
-
-
-Public Class PointCloud_GVectorLine
-    Inherits VBparent
-    Public sideIMU As PointCloud_IMU_SideView
-    Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
-    Public leftPoint As cv.Point2f
-    Public rightPoint As cv.Point2f
-    Dim kalman As Kalman_Basics
-    Public Sub New()
-        initParent()
-        sideIMU = New PointCloud_IMU_SideView()
-
-        kalman = New Kalman_Basics()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 40)
-            sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 20)
-        End If
-
-        task.desc = "Find the floor in a side view squared up with gravity"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static saveFrameCount = -1
-        If saveFrameCount <> ocvb.frameCount Then
-            saveFrameCount = ocvb.frameCount
-            sideIMU.Run()
-            dst1 = sideIMU.dst1
-            dst2 = sideIMU.dst2
-            Dim lines = sideIMU.lDetect.lines
-        End If
-
-        Static angleSlider = findSlider("Threshold for y-displacement of line")
-        Static lenSlider = findSlider("Threshold for length of line")
-
-        Dim angleTest = angleSlider.Value
-        Dim lengthTest = lenSlider.value
-
-        Dim sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
-        If floorRun = False Then sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalInteger)
-        Dim leftPoints As New List(Of cv.Point2f)
-        Dim rightPoints As New List(Of cv.Point2f)
-        If sideIMU.lDetect.lines.Count > 0 Then
-            For Each line In sideIMU.lDetect.lines
-                sortedLines.Add(Math.Max(line.Item1, line.Item3), line)
-            Next
-        End If
-
-        If sortedLines.Count > 0 Then
-            Dim bottomY = sortedLines.ElementAt(0).Key
-            Dim bottomLine = sortedLines.ElementAt(0).Value
-            Dim bottomCount As Integer
-            Dim bottomLength = Math.Abs(bottomLine.Item0 - bottomLine.Item2)
-            Dim minLeft = Math.Min(bottomLine.Item0, bottomLine.Item2)
-            Dim maxRight = Math.Max(bottomLine.Item0, bottomLine.Item2)
-            For i = 1 To sortedLines.Count - 1
-                Dim nextY = sortedLines.ElementAt(i).Key
-                If Math.Abs(bottomY - nextY) <= angleTest Then
-                    bottomCount += 1
-                    bottomLength += Math.Abs(bottomLine.Item0 - bottomLine.Item2)
-                    Dim nextVal = sortedLines.ElementAt(i).Value
-                    minLeft = Math.Min(nextVal.Item0, minLeft)
-                    minLeft = Math.Min(nextVal.Item2, minLeft)
-                    maxRight = Math.Max(nextVal.Item0, maxRight)
-                    maxRight = Math.Max(nextVal.Item2, maxRight)
-                Else
-                    Exit For
-                End If
-            Next
-
-            If bottomCount >= 3 And bottomLength >= lengthTest Then
-                leftPoint = New cv.Point(minLeft, bottomY)
-                rightPoint = New cv.Point(maxRight, bottomY)
-            Else
-                Dim maxY As Integer = 0
-                For i = 0 To sortedLines.Count - 1
-                    Dim line = sortedLines.ElementAt(i).Value
-                    Dim pf1 = New cv.Point2f(line.Item0, line.Item1)
-                    Dim pf2 = New cv.Point2f(line.Item2, line.Item3)
-                    If pf1.Y > maxY Then maxY = pf1.Y
-                    If pf2.Y > maxY Then maxY = pf2.Y
-                    If Math.Abs(pf1.X - pf2.X) > lengthTest And Math.Abs(pf1.Y - pf2.Y) < angleTest Then
-                        If pf1.X < pf2.X Then
-                            leftPoints.Add(pf1)
-                            rightPoints.Add(pf2)
-                        Else
-                            leftPoints.Add(pf2)
-                            rightPoints.Add(pf1)
-                        End If
-                    Else
-                        Exit For
-                    End If
-                Next
-
-                Const MAX_COUNTDOWN = 5
-                Static countDown = MAX_COUNTDOWN
-                If leftPoints.Count >= 2 Then
-                    Dim leftMat = New cv.Mat(leftPoints.Count, 1, cv.MatType.CV_32FC2, leftPoints.ToArray)
-                    Dim rightMat = New cv.Mat(rightPoints.Count, 1, cv.MatType.CV_32FC2, rightPoints.ToArray)
-                    Dim meanLeft = leftMat.Mean()
-                    Dim meanRight = rightMat.Mean()
-
-                    minLeft = src.Width
-                    For i = 0 To leftMat.Rows - 1
-                        Dim left = leftMat.Get(Of cv.Point2f)(i, 0)
-                        If left.X < minLeft Then minLeft = left.X
-                    Next
-                    leftPoint = New cv.Point2f(minLeft, bottomY)
-
-                    maxRight = 0
-                    For i = 0 To rightMat.Rows - 1
-                        Dim right = rightMat.Get(Of cv.Point2f)(i, 0)
-                        If right.X > maxRight Then maxRight = right.X
-                    Next
-                    rightPoint = New cv.Point2f(maxRight, bottomY)
-
-                    If Math.Abs(leftPoint.Y - rightPoint.Y) > angleTest Or leftPoints.Count = 0 Then ' should be level by this point...
-                        leftPoint = New cv.Point2f
-                        rightPoint = New cv.Point2f
-                    End If
-                    countDown = MAX_COUNTDOWN
-                Else
-                    countDown -= 1
-                    If countDown <= 0 Then
-                        leftPoint = New cv.Point2f
-                        rightPoint = New cv.Point2f
-                    End If
-                End If
-            End If
-        End If
-
-        If leftPoint <> New cv.Point2f Then
-            kalman.kInput(0) = leftPoint.X
-            kalman.kInput(1) = rightPoint.X
-            kalman.Run()
-            leftPoint.X = kalman.kOutput(0)
-            rightPoint.X = kalman.kOutput(1)
-            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
-        End If
-        label1 = "Side View with gravity "
-    End Sub
-End Class
+'Public Class PointCloud_GVectorPlane
+'    Inherits VBparent
+'    Public gLine As PointCloud_GVectorLine
+'    Dim inrange As Depth_InRange
+'    Public planeHeight As Integer
+'    Public planePoint1 As cv.Point2f
+'    Public planePoint2 As cv.Point2f
+'    Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
+'    Public Sub New()
+'        initParent()
+
+'        inrange = New Depth_InRange()
+'        gLine = New PointCloud_GVectorLine()
+
+'        If findfrm(caller + " Slider Options") Is Nothing Then
+'            sliders.Setup(caller)
+'            sliders.setupTrackBar(0, "Cushion when estimating the floor or ceiling plane (mm)", 1, 1000, 100)
+'            sliders.setupTrackBar(1, "Y-coordinate consistency check count", 1, 100, 5)
+'            sliders.setupTrackBar(2, "Y-coordinate up/down adjustment (mm)", -4000, 4000, 0)
+'        End If
+
+'        label1 = "Plane equation input"
+'        label2 = "Side view rotated with gravity vector"
+'        task.desc = "Find the floor or ceiling plane and translate it back to unrotated coordinates"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        Static cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
+'        Dim cushion = cushionSlider.value / 1000
+'        gLine.floorRun = floorRun
+'        gLine.src = task.pointCloud
+'        gLine.Run()
+'        dst2 = gLine.dst1
+'        Dim maskplane = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+
+'        Dim leftPoint = gLine.leftPoint
+'        Static leftPoints As New List(Of cv.Point2f)
+'        If leftPoint.Y = 0 Then leftPoints.Clear() Else leftPoints.Add(leftPoint)
+
+'        Static consistencySlider = findSlider("Y-coordinate consistency check count")
+'        If leftPoints.Count > consistencySlider.value Then
+'            planeHeight = CInt(ocvb.pixelsPerMeter * cushion)
+'            If planeHeight = 0 Then planeHeight = 1
+'            Dim cam = ocvb.sideCameraPoint
+
+'            Static adjustmentSlider = findSlider("Y-coordinate up/down adjustment (mm)")
+'            Dim adjustPixels = ocvb.pixelsPerMeter * adjustmentSlider.value / 1000
+
+'            planePoint1 = New cv.Point(0, leftPoint.Y + CInt(If(floorRun, planeHeight / 2, -planeHeight / 2) + adjustPixels))
+'            planePoint2 = New cv.Point(dst2.Width, planePoint1.Y)
+
+'            dst2.Line(planePoint1, planePoint2, cv.Scalar.Yellow, planeHeight)
+
+'            Dim gPlaneDeltaY = Math.Abs(planePoint2.Y - cam.Y)
+'            Dim maxAngle = Math.Atan(dst2.Width / gPlaneDeltaY) * 57.2958
+'            Dim minRow = dst2.Height * maxAngle / 180
+
+'            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeter * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
+'            Dim split = task.pointCloud.Split()
+'            Dim ySplit = split(1)
+'            inrange.src = split(1)
+'            inrange.minVal = planeY - If(floorRun, 0, cushion)
+'            inrange.maxVal = planeY + If(floorRun, cushion, 0)
+'            inrange.Run()
+'            maskplane = split(1).ConvertScaleAbs(255)
+
+'            Dim incr = ocvb.maxZ / split(2).Width
+'            Dim tmp = New cv.Mat(split(2).Size, cv.MatType.CV_32F, 0)
+'            If floorRun Then
+'                For i = minRow To split(2).Rows - 1
+'                    tmp.Row(i).SetTo(i * incr)
+'                Next
+'            Else
+'                For i = 0 To minRow - 1
+'                    tmp.Row(i).SetTo(i * incr)
+'                Next
+'            End If
+'            tmp.CopyTo(split(2), maskplane)
+'        End If
+'        dst1 = task.color.Clone
+'        dst1.SetTo(cv.Scalar.White, maskplane.Resize(src.Size))
+'    End Sub
+'End Class
+
+
+
+
+
+'Public Class PointCloud_GVectorLine
+'    Inherits VBparent
+'    Public sideIMU As PointCloud_IMU_SideView
+'    Public floorRun As Boolean = True ' the default is to look for a floor...  Set to False to look for ceiling....
+'    Public leftPoint As cv.Point2f
+'    Public rightPoint As cv.Point2f
+'    Dim kalman As Kalman_Basics
+'    Public Sub New()
+'        initParent()
+'        sideIMU = New PointCloud_IMU_SideView()
+
+'        kalman = New Kalman_Basics()
+
+'        If findfrm(caller + " Slider Options") Is Nothing Then
+'            sliders.Setup(caller)
+'            sliders.setupTrackBar(0, "Threshold for length of line", 1, 50, 40)
+'            sliders.setupTrackBar(1, "Threshold for y-displacement of line", 1, 50, 20)
+'        End If
+
+'        task.desc = "Find the floor in a side view squared up with gravity"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        Static saveFrameCount = -1
+'        If saveFrameCount <> ocvb.frameCount Then
+'            saveFrameCount = ocvb.frameCount
+'            sideIMU.Run()
+'            dst1 = sideIMU.dst1
+'            dst2 = sideIMU.dst2
+'            Dim lines = sideIMU.lDetect.lines
+'        End If
+
+'        Static angleSlider = findSlider("Threshold for y-displacement of line")
+'        Static lenSlider = findSlider("Threshold for length of line")
+
+'        Dim angleTest = angleSlider.Value
+'        Dim lengthTest = lenSlider.value
+
+'        Dim sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+'        If floorRun = False Then sortedLines = New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalInteger)
+'        Dim leftPoints As New List(Of cv.Point2f)
+'        Dim rightPoints As New List(Of cv.Point2f)
+'        If sideIMU.lDetect.lines.Count > 0 Then
+'            For Each line In sideIMU.lDetect.lines
+'                sortedLines.Add(Math.Max(line.Item1, line.Item3), line)
+'            Next
+'        End If
+
+'        If sortedLines.Count > 0 Then
+'            Dim bottomY = sortedLines.ElementAt(0).Key
+'            Dim bottomLine = sortedLines.ElementAt(0).Value
+'            Dim bottomCount As Integer
+'            Dim bottomLength = Math.Abs(bottomLine.Item0 - bottomLine.Item2)
+'            Dim minLeft = Math.Min(bottomLine.Item0, bottomLine.Item2)
+'            Dim maxRight = Math.Max(bottomLine.Item0, bottomLine.Item2)
+'            For i = 1 To sortedLines.Count - 1
+'                Dim nextY = sortedLines.ElementAt(i).Key
+'                If Math.Abs(bottomY - nextY) <= angleTest Then
+'                    bottomCount += 1
+'                    bottomLength += Math.Abs(bottomLine.Item0 - bottomLine.Item2)
+'                    Dim nextVal = sortedLines.ElementAt(i).Value
+'                    minLeft = Math.Min(nextVal.Item0, minLeft)
+'                    minLeft = Math.Min(nextVal.Item2, minLeft)
+'                    maxRight = Math.Max(nextVal.Item0, maxRight)
+'                    maxRight = Math.Max(nextVal.Item2, maxRight)
+'                Else
+'                    Exit For
+'                End If
+'            Next
+
+'            If bottomCount >= 3 And bottomLength >= lengthTest Then
+'                leftPoint = New cv.Point(minLeft, bottomY)
+'                rightPoint = New cv.Point(maxRight, bottomY)
+'            Else
+'                Dim maxY As Integer = 0
+'                For i = 0 To sortedLines.Count - 1
+'                    Dim line = sortedLines.ElementAt(i).Value
+'                    Dim pf1 = New cv.Point2f(line.Item0, line.Item1)
+'                    Dim pf2 = New cv.Point2f(line.Item2, line.Item3)
+'                    If pf1.Y > maxY Then maxY = pf1.Y
+'                    If pf2.Y > maxY Then maxY = pf2.Y
+'                    If Math.Abs(pf1.X - pf2.X) > lengthTest And Math.Abs(pf1.Y - pf2.Y) < angleTest Then
+'                        If pf1.X < pf2.X Then
+'                            leftPoints.Add(pf1)
+'                            rightPoints.Add(pf2)
+'                        Else
+'                            leftPoints.Add(pf2)
+'                            rightPoints.Add(pf1)
+'                        End If
+'                    Else
+'                        Exit For
+'                    End If
+'                Next
+
+'                Const MAX_COUNTDOWN = 5
+'                Static countDown = MAX_COUNTDOWN
+'                If leftPoints.Count >= 2 Then
+'                    Dim leftMat = New cv.Mat(leftPoints.Count, 1, cv.MatType.CV_32FC2, leftPoints.ToArray)
+'                    Dim rightMat = New cv.Mat(rightPoints.Count, 1, cv.MatType.CV_32FC2, rightPoints.ToArray)
+'                    Dim meanLeft = leftMat.Mean()
+'                    Dim meanRight = rightMat.Mean()
+
+'                    minLeft = src.Width
+'                    For i = 0 To leftMat.Rows - 1
+'                        Dim left = leftMat.Get(Of cv.Point2f)(i, 0)
+'                        If left.X < minLeft Then minLeft = left.X
+'                    Next
+'                    leftPoint = New cv.Point2f(minLeft, bottomY)
+
+'                    maxRight = 0
+'                    For i = 0 To rightMat.Rows - 1
+'                        Dim right = rightMat.Get(Of cv.Point2f)(i, 0)
+'                        If right.X > maxRight Then maxRight = right.X
+'                    Next
+'                    rightPoint = New cv.Point2f(maxRight, bottomY)
+
+'                    If Math.Abs(leftPoint.Y - rightPoint.Y) > angleTest Or leftPoints.Count = 0 Then ' should be level by this point...
+'                        leftPoint = New cv.Point2f
+'                        rightPoint = New cv.Point2f
+'                    End If
+'                    countDown = MAX_COUNTDOWN
+'                Else
+'                    countDown -= 1
+'                    If countDown <= 0 Then
+'                        leftPoint = New cv.Point2f
+'                        rightPoint = New cv.Point2f
+'                    End If
+'                End If
+'            End If
+'        End If
+
+'        If leftPoint <> New cv.Point2f Then
+'            kalman.kInput(0) = leftPoint.X
+'            kalman.kInput(1) = rightPoint.X
+'            kalman.Run()
+'            leftPoint.X = kalman.kOutput(0)
+'            rightPoint.X = kalman.kOutput(1)
+'            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
+'        End If
+'        label1 = "Side View with gravity "
+'    End Sub
+'End Class
 
 
 
@@ -1450,14 +1471,14 @@ Public Class PointCloud_ObjectsTop
     Inherits VBparent
     Public measureTop As PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmats As PointCloud_Colorize
+    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
-        cmats = New PointCloud_Colorize
+        cmat = New PointCloud_Colorize
+        cmat.imuXaxis = True
+        cmat.imuZaxis = True
         measureTop = New PointCloud_Kalman_TopView
-        ocvb.imuXAxis = False
-        ocvb.imuZAxis = False
 
         If standalone Then
             If findfrm(caller + " Slider Options") Is Nothing Then
@@ -1487,8 +1508,8 @@ Public Class PointCloud_ObjectsTop
             xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
             distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
-            ocvb.trueText("Test line is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters" + vbCrLf +
-                              "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters", 10, 40, 3)
+            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters" + vbCrLf +
+                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters", 10, 40, 3)
         End If
 
         viewObjects.Clear()
@@ -1528,7 +1549,13 @@ Public Class PointCloud_ObjectsTop
             vo.rectFront = New cv.Rect(newX, r.Y, newWidth, r.Height)
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
-        dst1 = cmats.CameraLocationBot(dst1)
+        If standalone Then
+            Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+            Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+            cmat.imuXaxis = xCheckbox.checked
+            cmat.imuZaxis = zCheckbox.checked
+            dst1 = cmat.CameraLocationBot(dst1)
+        End If
     End Sub
 End Class
 
@@ -1548,14 +1575,14 @@ Public Class PointCloud_ObjectsSide
     Inherits VBparent
     Public measureSide As PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmats As PointCloud_Colorize
+    Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
 
-        cmats = New PointCloud_Colorize
+        cmat = New PointCloud_Colorize
+        cmat.imuXaxis = False
+        cmat.imuZaxis = False
         measureSide = New PointCloud_Kalman_SideView
-        ocvb.imuXAxis = False
-        ocvb.imuZAxis = False
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -1583,7 +1610,7 @@ Public Class PointCloud_ObjectsSide
             xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)
             distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
-            ocvb.trueText("Test line is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters" + vbCrLf +
+            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters" + vbCrLf +
                           "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters", 10, 40, 3)
         End If
 
@@ -1635,6 +1662,12 @@ Public Class PointCloud_ObjectsSide
             vo.rectFront = New cv.Rect(r.X, newY, r.Width, newHeight)
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
-        dst1 = cmats.CameraLocationSide(dst1)
+        If standalone Then
+            Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+            Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+            cmat.imuXaxis = xCheckbox.checked
+            cmat.imuZaxis = zCheckbox.checked
+            dst1 = cmat.CameraLocationSide(dst1)
+        End If
     End Sub
 End Class
