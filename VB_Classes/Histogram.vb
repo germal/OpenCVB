@@ -988,15 +988,29 @@ Public Class Histogram_ViewOptions
                 cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
                 cameraYSlider.Value = If(ocvb.resolutionIndex = 3, -8, -3)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
-                sideFrustrumSlider.Value = 57
-                topFrustrumSlider.Value = 175
-                cameraXSlider.Value = 0
-                cameraYSlider.Value = 0
+                If src.Width = 640 Then
+                    sideFrustrumSlider.Value = 75
+                    topFrustrumSlider.Value = 101
+                    cameraXSlider.Value = 0
+                    cameraYSlider.Value = 0
+                Else
+                    sideFrustrumSlider.Value = 57
+                    topFrustrumSlider.Value = 175
+                    cameraXSlider.Value = 0
+                    cameraYSlider.Value = 0
+                End If
             Case VB_Classes.ActiveTask.algParms.camNames.D455
-                sideFrustrumSlider.Value = 58
-                topFrustrumSlider.Value = 184
-                cameraXSlider.Value = 0
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -3)
+                If src.Width = 640 Then
+                    sideFrustrumSlider.Value = 86
+                    topFrustrumSlider.Value = 113
+                    cameraXSlider.Value = 1
+                    cameraYSlider.Value = -1
+                Else
+                    sideFrustrumSlider.Value = 58
+                    topFrustrumSlider.Value = 184
+                    cameraXSlider.Value = 0
+                    cameraYSlider.Value = -3
+                End If
         End Select
 
         task.desc = "The options for the side view are shared with this algorithm"
