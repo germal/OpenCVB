@@ -1693,8 +1693,6 @@ Public Class Depth_PointCloud_IMU
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        ocvb.imuXAxis = If(ocvb.useIMU, xCheckbox.checked, False)
-        ocvb.imuZAxis = If(ocvb.useIMU, zCheckbox.checked, False)
 
         If standalone Then
             Dim split = task.pointCloud.Split()

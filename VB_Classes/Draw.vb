@@ -486,7 +486,13 @@ Public Class Draw_Frustrum
         xyzDepth = New Depth_WorldXYZ_MT()
         xyzDepth.depthUnitsMeters = True
 
-        If standalone = False Then ocvb.useIMU = True
+        If standalone = False Then
+            Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+            Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+            xCheckbox.Checked = True
+            zCheckbox.Checked = True
+        End If
+
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run()

@@ -17,7 +17,7 @@ Public Class Palette_Basics
             radio.Setup(caller, 21)
             For i = 0 To radio.check.Length - 1
                 radio.check(i).Text = mapNames(i)
-                If mapNames(i) = "Hsv" Then radio.check(i).Checked = True
+                If mapNames(i) = "Hot" Then radio.check(i).Checked = True
             Next
             radioFrm = radio
         End If

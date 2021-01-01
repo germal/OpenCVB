@@ -46,6 +46,8 @@ Public Class Features_PointTracker
         pTrack = New KNN_PointTracker()
         Dim drawRectCheck = findCheckBox("Draw rectangle and centroid for each mask")
         drawRectCheck.Checked = False
+        Dim pixelSlider = findSlider("Minimum size of object in pixels")
+        pixelSlider.Value = 1
 
         label1 = "Good features without Kalman"
         label2 = "Good features with Kalman"

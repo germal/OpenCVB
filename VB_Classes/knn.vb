@@ -829,6 +829,11 @@ Public Class KNN_PointTracker
         knn = New KNN_1_to_1()
         allocateKalman(16) ' allocate some kalman objects
 
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Minimum size of object in pixels", 1, 10000, 3000)
+        End If
+
         hideForm("Thread_Grid Slider Options")
         task.desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
@@ -921,20 +926,25 @@ Public Class KNN_PointTracker
                     If outRect.Height < 0 Then outRect.Height = 1
                     vo.rectInHist = outRect
 
-                    Dim pt = vo.centroid
-                    If pt.X < 0 Then pt.X = 0
-                    If pt.X >= src.Width Then pt.X = src.Width - 1
-                    If pt.Y < 0 Then pt.Y = 0
-                    If pt.Y >= src.Height Then pt.Y = src.Height - 1
+                    Static pixelSlider = findSlider("Minimum size of object in pixels")
+                    Dim minPixels = pixelSlider.value
 
-                    vo.preKalmanRect = inputRect
-                    If matchIndex < queryMasks.Count Then
-                        If queryMasks(matchIndex).Size <> src.Size Then vo.mask = queryMasks(matchIndex) Else vo.mask = queryMasks(matchIndex)(vo.preKalmanRect)
+                    If vo.rectInHist.Width * vo.rectInHist.Height >= minPixels Then
+                        Dim pt = vo.centroid
+                        If pt.X < 0 Then pt.X = 0
+                        If pt.X >= src.Width Then pt.X = src.Width - 1
+                        If pt.Y < 0 Then pt.Y = 0
+                        If pt.Y >= src.Height Then pt.Y = src.Height - 1
+
+                        vo.preKalmanRect = inputRect
+                        If matchIndex < queryMasks.Count Then
+                            If queryMasks(matchIndex).Size <> src.Size Then vo.mask = queryMasks(matchIndex) Else vo.mask = queryMasks(matchIndex)(vo.preKalmanRect)
+                        End If
+
+                        vo.LayoutColor = (i + 5) Mod 255
+                        If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(matchIndex)
+                        drawRC.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
                     End If
-
-                    vo.LayoutColor = (i + 5) Mod 255
-                    If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(matchIndex)
-                    drawRC.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
                 End If
             Next
 

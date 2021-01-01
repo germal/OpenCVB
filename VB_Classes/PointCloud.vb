@@ -104,7 +104,6 @@ Public Class PointCloud_Colorize
     Dim arcSize As Integer
     Public Function CameraLocationBot(dst As cv.Mat) As cv.Mat
         Dim distanceRatio As Single = 1
-        ' If ocvb.imuXAxis Then distanceRatio = Math.Cos(ocvb.angleZ)
         Dim fsize = ocvb.fontSize * 1.5
         dst.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = 1 To ocvb.maxZ
@@ -155,7 +154,6 @@ Public Class PointCloud_Colorize
     End Function
     Public Function CameraLocationSide(ByRef dst As cv.Mat) As cv.Mat
         Dim distanceRatio As Single = 1
-        ' If ocvb.imuXAxis Then distanceRatio = Math.Cos(ocvb.angleZ)
         Dim fsize = ocvb.fontSize * 1.5
 
         dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
@@ -371,9 +369,6 @@ Public Class PointCloud_Kalman_TopView
         minFloodSlider.Value = 100
         topView = New Histogram_TopView2D()
 
-        Dim radioPalette = findRadio("Hot")
-        radioPalette.Checked = True
-
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run()
@@ -416,8 +411,7 @@ Public Class PointCloud_Kalman_SideView
         pTrack = New KNN_PointTracker()
         cmats = New PointCloud_Colorize()
         flood = New Floodfill_Identifiers()
-        Dim radioPalette = findRadio("Hot")
-        radioPalette.Checked = True
+
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
         sideView = New Histogram_SideView2D()
@@ -676,23 +670,26 @@ Public Class PointCloud_IMU_TopView
         lDetect = New LineDetector_Basics()
         lDetect.drawLines = True
 
-        Dim radioPalette = findRadio("Hot")
-        radioPalette.Checked = True
-
         label1 = "Top view aligned using the IMU gravity vector"
         label2 = "Top view aligned without using the IMU gravity vector"
         task.desc = "Present the top view with and without the IMU filter."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ocvb.useIMU = True
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        xCheckbox.checked = True
+        zCheckbox.checked = True
+
         topView.Run()
         lDetect.src = topView.dst1.Resize(src.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run()
         dst1 = lDetect.dst1
 
         If standalone Then
-            ocvb.useIMU = False
+            xCheckbox.checked = False
+            zCheckbox.checked = False
             kTopView.Run()
             dst2 = cmats.CameraLocationBot(kTopView.dst1)
         End If
@@ -821,14 +818,16 @@ Public Class PointCloud_IMU_SideView
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        ocvb.useIMU = True
+        xCheckbox.checked = True
+        zCheckbox.checked = True
         sideView.Run()
         lDetect.src = sideView.dst1.Resize(task.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         lDetect.Run()
         dst1 = cmats.CameraLocationSide(lDetect.dst1)
 
         If standalone Or task.intermediateReview = caller Then
-            ocvb.useIMU = False
+            xCheckbox.checked = False
+            zCheckbox.checked = False
             kSideView.Run()
             dst2 = kSideView.dst1
         End If
@@ -864,7 +863,12 @@ Public Class PointCloud_IMU_SideCompare
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ocvb.useIMU = True
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        xCheckbox.checked = True
+        zCheckbox.checked = True
+
         sideView.Run()
         dst1 = sideView.dst2.Clone()
         lDetect.src = sideView.dst1.Resize(task.color.Size).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -872,7 +876,9 @@ Public Class PointCloud_IMU_SideCompare
         dst1 = lDetect.dst1
         dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 
-        ocvb.useIMU = False
+        xCheckbox.checked =False
+        zCheckbox.checked = False
+
         kSideView.Run()
         dst2 = kSideView.dst1
     End Sub
@@ -891,8 +897,6 @@ Public Class PointCloud_DistanceSideClick
     Public Sub New()
         initParent()
         sideIMU = New PointCloud_IMU_SideView()
-        Dim radioPalette = findRadio("Hot")
-        radioPalette.Checked = True
         label1 = "Click anywhere to get distance from camera and x dist"
         task.desc = "Click to find distance from the camera in the rotated side view"
     End Sub
@@ -1370,8 +1374,6 @@ Public Class PointCloud_BackProjectTopView
     Public Sub New()
         initParent()
         view = New PointCloud_ObjectsTop
-        Dim radioPalette = findRadio("Hot")
-        radioPalette.Checked = True
 
         label1 = "Back projection of objects identified in the top view"
         label2 = "Objects identified in the top view"
@@ -1553,11 +1555,9 @@ Public Class PointCloud_ObjectsSide
         ocvb.imuXAxis = False
         ocvb.imuZAxis = False
 
-        If standalone Then
-            If findfrm(caller + " Slider Options") Is Nothing Then
-                sliders.Setup(caller, 1)
-                sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
-            End If
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
         End If
         task.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
@@ -1588,7 +1588,6 @@ Public Class PointCloud_ObjectsSide
         viewObjects.Clear()
         For i = 0 To measureSide.pTrack.drawRC.viewObjects.Count - 1
             Dim r = measureSide.pTrack.drawRC.viewObjects.Values(i).rectInHist
-
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * (src.Height - (r.Y + r.Height)))
             Dim pixeldistance = src.Height - r.Y - r.Height
             xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
