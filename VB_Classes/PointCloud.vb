@@ -1398,20 +1398,22 @@ Public Class PointCloud_BackProjectTopView
         Dim histogram = view.measureTop.topView.histOutput.Flip(cv.FlipMode.X)
         Dim mat = New cv.Mat() {task.pointCloud}
         Dim bins() = {2, 0}
-        'For i = 0 To rectList.Count - 1
-        '    Dim r = rectList.ElementAt(i).Value
-        '    If r.Width > 0 And r.Height > 0 Then
-        'Dim minDepth As Single = 1000 * ocvb.maxZ * CSng(dst2.Height - (r.Y + r.Height)) / dst2.Height
-        'Dim maxDepth As Single = 1000 * ocvb.maxZ * (dst2.Height - r.Y) / dst2.Height
-        Dim leftX = -view.measureTop.topView.viewOpts.topFrustrumAdjust ' r.X / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
-        Dim rightX = view.measureTop.topView.viewOpts.topFrustrumAdjust ' (r.X + r.Width) / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
-        ' Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
-        Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
-        '    End If
-        'Next
-        dst1.SetTo(255, mask.ConvertScaleAbs(255))
+        For i = 0 To rectList.Count - 1
+            Dim r = rectList.ElementAt(i).Value
+            If r.Width > 0 And r.Height > 0 Then
+                Dim minDepth As Single = 1000 * ocvb.maxZ * CSng(dst2.Height - (r.Y + r.Height)) / dst2.Height
+                Dim maxDepth As Single = 1000 * ocvb.maxZ * (dst2.Height - r.Y) / dst2.Height
+                Dim leftX = -view.measureTop.topView.viewOpts.topFrustrumAdjust ' r.X / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
+                Dim rightX = view.measureTop.topView.viewOpts.topFrustrumAdjust ' (r.X + r.Width) / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
+                Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
+                ' Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
+                Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+                Dim histTmp As New cv.Mat(histogram.Size, cv.MatType.CV_32F, 0)
+                histogram(r).CopyTo(histTmp(r))
+                cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
+                dst1.SetTo(255, mask.ConvertScaleAbs(255))
+            End If
+        Next
     End Sub
 End Class
 

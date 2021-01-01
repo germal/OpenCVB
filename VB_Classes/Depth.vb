@@ -1694,7 +1694,7 @@ Public Class Depth_PointCloud_IMU
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
 
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             Dim split = task.pointCloud.Split()
             dst1 = split(2)
             mats.mat(0) = split(2).ConvertScaleAbs(255)
@@ -1704,7 +1704,8 @@ Public Class Depth_PointCloud_IMU
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
         '[cos(a) -sin(a)    0]
         '[sin(a)  cos(a)    0]
-        '[0       0         1] rotate the point cloud around the x-axis.
+        '[0       0         1] rotate the point cloud around
+        '  the x-axis.
         If xCheckbox.Checked Then
             cz = Math.Cos(ocvb.angleZ)
             sz = Math.Sin(ocvb.angleZ)
@@ -1748,7 +1749,7 @@ Public Class Depth_PointCloud_IMU
             task.pointCloud = task.pointCloud.Clone
         End If
 
-        If standalone Then
+        If standalone Or task.intermediateReview = caller Then
             Dim split = task.pointCloud.Split()
             dst2 = split(2)
             Dim tmp As New cv.Mat
