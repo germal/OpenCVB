@@ -410,7 +410,6 @@ Public Class PointCloud_Kalman_SideView
     Public flood As Floodfill_Identifiers
     Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
-    Public pixelsPerMeter As Single ' pixels per meter at the distance requested.
     Dim cmat As PointCloud_Colorize
     Public Sub New()
         initParent()
@@ -584,9 +583,7 @@ Public Class PointCloud_BothViews
 
             minDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
             maxDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y) / src.Height
-            If ocvb.pixelsPerMeter > 0 Then
-                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / ocvb.pixelsPerMeter, "0.0") + "m"
-            End If
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / ocvb.pixelsPerMeter, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
 
             roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
@@ -605,9 +602,7 @@ Public Class PointCloud_BothViews
             minDepth = ocvb.maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
             maxDepth = ocvb.maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
 
-            If ocvb.pixelsPerMeter > 0 Then
-                widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / ocvb.pixelsPerMeter, "0.0") + "m"
-            End If
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / ocvb.pixelsPerMeter, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
 
             roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
@@ -1508,8 +1503,8 @@ Public Class PointCloud_ObjectsTop
             xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
             distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
-            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters" + vbCrLf +
-                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters", 10, 40, 3)
+            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters from the camera" + vbCrLf +
+                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters or " + CStr(lineHalf * 2) + " pixels", 10, 40, 3)
         End If
 
         viewObjects.Clear()
@@ -1610,8 +1605,8 @@ Public Class PointCloud_ObjectsSide
             xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)
             distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
-            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters" + vbCrLf +
-                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters", 10, 40, 3)
+            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters from the camera" + vbCrLf +
+                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters or " + CStr(lineHalf * 2) + " pixels", 10, 40, 3)
         End If
 
         viewObjects.Clear()

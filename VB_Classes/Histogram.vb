@@ -1455,12 +1455,13 @@ Public Class Histogram_SideView2D
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.Run()
-        viewOpts.Run()
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
         cmat.imuXaxis = xCheckbox.checked
         cmat.imuZaxis = zCheckbox.checked
+
+        gCloud.Run()
+        viewOpts.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
