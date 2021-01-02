@@ -217,7 +217,7 @@ Public Class Replay_Play
                 binRead = New BinaryReader(fs)
                 readHeader(fh, binRead)
 
-                If fh.colorWidth = src.Width Then ' the current width/height don't agree with the recorded data.  Often happens during "Test All"
+                If fh.cloudWidth = src.Width Then ' the current width/height don't agree with the recorded data.  Often happens during "Test All"
                     bytesPerColor = fh.colorWidth * fh.colorHeight * fh.colorElemsize
                     bytesPerDepth16 = fh.cloudWidth * fh.cloudHeight * fh.depth16Elemsize
                     bytesPerRGBDepth = fh.colorWidth * fh.colorHeight * fh.RGBDepthElemsize
@@ -228,7 +228,7 @@ Public Class Replay_Play
                     ReDim cloudBytes(bytesPerCloud - 1)
                     playbackActive = True
                 Else
-                    Console.WriteLine("Recorded data was saved at " + CStr(fh.colorWidth) + "x" + CStr(fh.colorHeight) + vbCrLf +
+                    ocvb.trueText("Recorded data was saved at " + CStr(fh.cloudWidth) + "x" + CStr(fh.cloudHeight) + vbCrLf +
                                       "and the current format is " + CStr(src.Width) + "x" + CStr(src.Height))
                 End If
             End If
