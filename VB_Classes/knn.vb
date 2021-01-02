@@ -851,7 +851,8 @@ Public Class KNN_PointTracker
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
+            If topView Is Nothing Then topView = New PointCloud_Kalman_TopView()
             topView.src = task.pointCloud
             topView.Run()
             dst1 = topView.dst1

@@ -1198,6 +1198,8 @@ Public Class PointCloud_ReducedSideView
 
         Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+
     End Sub
 End Class
 

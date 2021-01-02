@@ -228,32 +228,6 @@ End Class
 
 
 
-Public Class Reduction_PointCloud
-    Inherits VBparent
-    Dim reduction As Reduction_Basics
-    Public Sub New()
-        initParent()
-        reduction = New Reduction_Basics()
-        reduction.radio.check(0).Checked = True
-        task.desc = "Use reduction to smooth depth data"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim split() = task.pointCloud.Split()
-        split(2) *= 1000 ' convert to mm's
-        split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-        reduction.Run()
-        reduction.dst1.ConvertTo(dst2, cv.MatType.CV_32F)
-        dst1 = dst2.Resize(task.pointCloud.Size)
-        split(2) = dst1 / 1000
-        cv.Cv2.Merge(split, task.pointCloud)
-        dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -337,5 +311,74 @@ Public Class Reduction_Histogram
         dst1 = hist.dst1
         dst2 = hist.dst2
         label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(hist.binSlider.Value)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Reduction_PointCloud
+    Inherits VBparent
+    Dim reduction As Reduction_Basics
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
+        reduction.radio.check(0).Checked = True
+        task.desc = "Use reduction to smooth depth data"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim split() = task.pointCloud.Split()
+        split(2) *= 1000 ' convert to mm's
+        split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
+        reduction.Run()
+        reduction.dst1.ConvertTo(dst2, cv.MatType.CV_32F)
+        dst1 = dst2.Resize(task.pointCloud.Size)
+        split(2) = dst1 / 1000
+        cv.Cv2.Merge(split, task.pointCloud)
+        dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Reduction_XYZ
+    Inherits VBparent
+    Dim reduction As Reduction_Basics
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
+        reduction.radio.check(0).Checked = True
+
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Slice point cloud in X direction"
+            radio.check(1).Text = "Slice point cloud in Y direction"
+            radio.check(2).Text = "Slice point cloud in Z direction"
+            radio.check(2).Checked = True
+        End If
+
+        task.desc = "Use reduction to slice the point cloud in 3 dimensions"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static xRadio = findRadio("Slice point cloud in X direction")
+        Static yRadio = findRadio("Slice point cloud in Y direction")
+        Dim split() = task.pointCloud.Split()
+
+        Dim index As Integer
+        If xRadio.checked Then index = 0
+        If yRadio.checked Then index = 1 Else index = 2
+        split(index) *= 1000 ' convert to mm's
+        split(index).ConvertTo(reduction.src, cv.MatType.CV_32S)
+        reduction.Run()
+        reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
+        split(index) = dst1 / 1000
+        cv.Cv2.Merge(split, task.pointCloud)
     End Sub
 End Class
