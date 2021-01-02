@@ -97,31 +97,165 @@ End Module
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_Colorize
+Public Class PointCloud_ColorizeSide
     Inherits VBparent
     Dim palette As Palette_Gradient
-    Public rect As cv.Rect
     Dim arcSize As Integer
-    Public imuXaxis As Boolean ' Adjust cone for X-axis rotation
-    Public imuZaxis As Boolean ' Adjust cone for Z-axis rotation
-    Public Function CameraLocationBot(dst As cv.Mat) As cv.Mat
+    Public xCheckbox As Windows.Forms.CheckBox
+    Public zCheckbox As Windows.Forms.CheckBox
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"
+            check.Box(1).Text = "Rotate pointcloud around Z-axis using angleX of the gravity vector"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+
+        xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+
+        palette = New Palette_Gradient()
+        palette.color1 = cv.Scalar.Yellow
+        palette.color2 = cv.Scalar.Blue
+        palette.frameModulo = 1
+        arcSize = src.Width / 15
+
+        palette.Run()
+        dst1 = palette.dst1
+        dst2 = dst1.Clone
+        Dim rect = New cv.Rect((src.Width - src.Height) / 2, 0, dst1.Height, dst1.Height)
+        cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
+
+        label1 = "Colorize mask for side view"
+        task.desc = "Create the colorized mat used for side projections"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then src = dst1 Else dst1 = src
+
         Dim distanceRatio As Single = 1
         Dim fsize = ocvb.fontSize * 1.5
-        dst.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+
+        dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
         For i = 1 To ocvb.maxZ
-            Dim ymeter = CInt(dst.Height - dst.Height * i / (ocvb.maxZ * distanceRatio))
-            dst.Line(New cv.Point(0, ymeter), New cv.Point(dst.Width, ymeter), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Dim xmeter = CInt(dst1.Width * i / ocvb.maxZ * distanceRatio)
+            dst1.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst1.Height), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst1.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
+
+        Dim cam = ocvb.sideCameraPoint
+        Dim marker As New cv.Point2f(dst1.Width / (ocvb.maxZ * distanceRatio), 0)
+        marker.Y = marker.X * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
+        Dim topLen = marker.X * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
+        Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
+        Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
+
+        If zCheckbox.checked Then
+            Dim offset = Math.Sin(ocvb.angleX) * marker.Y
+            If ocvb.angleX > 0 Then
+                markerLeft.Y = markerLeft.Y - offset
+                markerRight.Y = markerRight.Y + offset
+            Else
+                markerLeft.Y = markerLeft.Y + offset
+                markerRight.Y = markerRight.Y - offset
+            End If
+        End If
+
+        If xCheckbox.checked Then
+            markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
+            markerLeft = New cv.Point(markerLeft.X * Math.Cos(ocvb.angleZ) - markerLeft.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
+                                      markerLeft.Y * Math.Cos(ocvb.angleZ) + markerLeft.X * Math.Sin(ocvb.angleZ))
+            markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
+
+            ' Same as above for markerLeft but consolidated algebraically.
+            markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(ocvb.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(ocvb.angleZ) + cam.X,
+                                       (markerRight.Y - cam.Y) * Math.Cos(ocvb.angleZ) + (markerRight.X - cam.X) * Math.Sin(ocvb.angleZ) + cam.Y)
+        End If
+
+        dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+
+        ' draw the arc enclosing the camera FOV
+        Dim startAngle = (180 - ocvb.vFov) / 2
+        Dim y = dst1.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
+
+        Dim fovTop = New cv.Point(dst1.Width, cam.Y - y)
+        Dim fovBot = New cv.Point(dst1.Width, cam.Y + y)
+
+        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst1.Line(cam, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst1.Line(cam, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+
+        dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+
+        Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
+        cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
+                       cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+    End Sub
+End Class
+
+
+
+
+
+' https://www.intelrealsense.com/depth-camera-d435i/
+' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
+' https://www.stereolabs.com/zed/
+' https://www.mynteye.com/pages/mynt-eye-d
+Public Class PointCloud_ColorizeTop
+    Inherits VBparent
+    Dim palette As Palette_Gradient
+    Dim cmat As PointCloud_ColorizeSide
+    Dim arcSize As Integer
+    Public xCheckbox As Windows.Forms.CheckBox
+    Public Sub New()
+        initParent()
+        cmat = New PointCloud_ColorizeSide
+        xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+
+        palette = New Palette_Gradient()
+        palette.color1 = cv.Scalar.Yellow
+        palette.color2 = cv.Scalar.Blue
+        palette.frameModulo = 1
+        arcSize = src.Width / 15
+
+        palette.Run()
+        dst1 = palette.dst1
+        dst2 = dst1.Clone
+        Dim rect = New cv.Rect((src.Width - src.Height) / 2, 0, dst1.Height, dst1.Height)
+        cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
+
+        label1 = "Colorize mask for top down view"
+        task.desc = "Create the colorize the mat for a topdown projections"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then src = dst1 Else dst1 = src
+
+        Dim distanceRatio As Single = 1
+        Dim fsize = ocvb.fontSize * 1.5
+        dst1.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+        For i = 1 To ocvb.maxZ
+            Dim ymeter = CInt(dst1.Height - dst1.Height * i / (ocvb.maxZ * distanceRatio))
+            dst1.Line(New cv.Point(0, ymeter), New cv.Point(dst1.Width, ymeter), cv.Scalar.AliceBlue, 1)
+            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
         Dim cam = ocvb.topCameraPoint
-        Dim marker As New cv.Point2f(cam.X, dst.Height / (ocvb.maxZ * distanceRatio))
+        Dim marker As New cv.Point2f(cam.X, dst1.Height / (ocvb.maxZ * distanceRatio))
         Dim topLen = marker.Y * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
         Dim sideLen = marker.Y * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
-        Dim markerLeft = New cv.Point(cam.X - topLen, dst.Height - marker.Y)
-        Dim markerRight = New cv.Point(cam.X + topLen, dst.Height - marker.Y)
+        Dim markerLeft = New cv.Point(cam.X - topLen, dst1.Height - marker.Y)
+        Dim markerRight = New cv.Point(cam.X + topLen, dst1.Height - marker.Y)
 
-        If imuXaxis Then
+        If xCheckbox.checked Then
             Dim offset = Math.Sin(ocvb.angleZ) * topLen
             If ocvb.angleZ > 0 Then
                 markerLeft.X = markerLeft.X - offset
@@ -134,163 +268,24 @@ Public Class PointCloud_Colorize
 
         ' draw the arc enclosing the camera FOV
         Dim startAngle = (180 - ocvb.hFov) / 2
-        Dim x = dst.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
+        Dim x = dst1.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
 
         Dim fovRight = New cv.Point(ocvb.topCameraPoint.X + x, 0)
         Dim fovLeft = New cv.Point(ocvb.topCameraPoint.X - x, fovRight.Y)
 
-        dst.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(ocvb.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+        dst1.Line(ocvb.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        dst.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
 
         Dim shift = (src.Width - src.Height) / 2
-        Dim labelLocation = New cv.Point(dst.Width / 2 + shift, dst.Height * 15 / 16)
-        cv.Cv2.PutText(dst, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        Return dst
-    End Function
-    Public Function CameraLocationSide(ByRef dst As cv.Mat) As cv.Mat
-        Dim distanceRatio As Single = 1
-        Dim fsize = ocvb.fontSize * 1.5
-
-        dst.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
-        For i = 1 To ocvb.maxZ
-            Dim xmeter = CInt(dst.Width * i / ocvb.maxZ * distanceRatio)
-            dst.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst.Height), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        Next
-
-        Dim cam = ocvb.sideCameraPoint
-        Dim marker As New cv.Point2f(dst.Width / (ocvb.maxZ * distanceRatio), 0)
-        marker.Y = marker.X * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
-        Dim topLen = marker.X * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
-        Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
-        Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
-
-        If imuZaxis Then
-            Dim offset = Math.Sin(ocvb.angleX) * marker.Y
-            If ocvb.angleX > 0 Then
-                markerLeft.Y = markerLeft.Y - offset
-                markerRight.Y = markerRight.Y + offset
-            Else
-                markerLeft.Y = markerLeft.Y + offset
-                markerRight.Y = markerRight.Y - offset
-            End If
-        End If
-
-        If imuXaxis Then
-            markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
-            markerLeft = New cv.Point(markerLeft.X * Math.Cos(ocvb.angleZ) - markerLeft.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
-                                      markerLeft.Y * Math.Cos(ocvb.angleZ) + markerLeft.X * Math.Sin(ocvb.angleZ))
-            markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
-
-            ' Same as above for markerLeft but consolidated algebraically.
-            markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(ocvb.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(ocvb.angleZ) + cam.X,
-                                       (markerRight.Y - cam.Y) * Math.Cos(ocvb.angleZ) + (markerRight.X - cam.X) * Math.Sin(ocvb.angleZ) + cam.Y)
-        End If
-
-        dst.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-
-        ' draw the arc enclosing the camera FOV
-        Dim startAngle = (180 - ocvb.vFov) / 2
-        Dim y = dst.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
-
-        Dim fovTop = New cv.Point(dst.Width, cam.Y - y)
-        Dim fovBot = New cv.Point(dst.Width, cam.Y + y)
-
-        dst.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst.Line(cam, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cam, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-
-        dst.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        dst.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-
-        Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
-        cv.Cv2.PutText(dst, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
-                       cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-
-        Return dst
-    End Function
-    Public Sub New()
-        initParent()
-
-        palette = New Palette_Gradient()
-        palette.color1 = cv.Scalar.Yellow
-        palette.color2 = cv.Scalar.Blue
-        palette.frameModulo = 1
-        arcSize = src.Width / 15
-
-        palette.Run()
-        dst1 = palette.dst1
-        dst2 = dst1.Clone
-        rect = New cv.Rect((src.Width - src.Height) / 2, 0, dst1.Height, dst1.Height)
-        cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
-
-        label1 = "Colorize mask for top down view"
-        label2 = "Colorize mask for side view"
-        task.desc = "Create the colorizeMat's used for projections"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class PointCloud_ColorizeSide
-    Inherits VBparent
-    Public cmat As PointCloud_Colorize
-    Public Sub New()
-        initParent()
-        cmat = New PointCloud_Colorize
-        task.desc = "Colorize a pointcloud recognizing the check boxes."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
-
-        If standalone Then src = cmat.dst1
-        dst1 = cmat.CameraLocationSide(src)
-    End Sub
-End Class
-
-
-
-
-
-Public Class PointCloud_ColorizeTop
-    Inherits VBparent
-    Public cmat As PointCloud_Colorize
-    Public Sub New()
-        initParent()
-        cmat = New PointCloud_Colorize
-        task.desc = "Colorize a pointcloud recognizing the check boxes."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-        cmat.imuXaxis = xCheckbox.checked
-        cmat.imuZaxis = zCheckbox.checked
-
-        If standalone Then src = cmat.dst1
-        dst1 = cmat.CameraLocationBot(src)
+        Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
+        cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst1.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -1493,7 +1488,6 @@ Public Class PointCloud_BothViews
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
-
         topPixel.Run()
         sidePixel.Run()
 
@@ -1501,7 +1495,7 @@ Public Class PointCloud_BothViews
             Dim instructions = "Click any centroid to get details"
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
-            If cmatSide.cmat.imuXaxis Or cmatSide.cmat.imuZaxis Then
+            If cmatSide.xCheckbox.checked Or cmatSide.zCheckbox.checked Then
                 levelCheck.Run()
                 If levelCheck.cameraLevel Then
                     accMsg1 = "Distances are good - camera is level"

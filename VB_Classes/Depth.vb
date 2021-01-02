@@ -1671,19 +1671,13 @@ Public Class Depth_PointCloud_IMU
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
     Dim mats As Mat_4to1
+    Dim cmat As PointCloud_ColorizeSide
     Public Sub New()
         initParent()
 
+        cmat = New PointCloud_ColorizeSide
         mats = New Mat_4to1
         imu = New IMU_GVector
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
-            check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"
-            check.Box(1).Text = "Rotate pointcloud around Z-axis using angleX of the gravity vector"
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
 
         label2 = "Depth values after rotation"
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
