@@ -2,7 +2,8 @@
 Public Class MiniPC_Basics
     Inherits VBparent
     Dim resize As Resize_Percentage
-    Public gCloud As Depth_PointCloud_IMU
+    Public rect As cv.Rect
+    Dim gCloud As Depth_PointCloud_IMU
     Public Sub New()
         initParent()
         gCloud = New Depth_PointCloud_IMU()
@@ -18,7 +19,7 @@ Public Class MiniPC_Basics
         resize.Run()
 
         Dim split = resize.dst1.Split()
-        Dim rect = New cv.Rect(0, 0, resize.dst1.Width, resize.dst1.Height)
+        rect = New cv.Rect(0, 0, resize.dst1.Width, resize.dst1.Height)
         If rect.Height < dst1.Height / 2 Then rect.Y = dst1.Height / 4 ' move it below the dst1 caption
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst1(rect) = split(2).ConvertScaleAbs(255)
@@ -37,10 +38,12 @@ End Class
 
 Public Class MiniPC_Rotate
     Inherits VBparent
-    Dim mini As MiniPC_Basics
+    Public mini As MiniPC_Basics
+    Public histogram As New cv.Mat
     Public Sub New()
         initParent()
         mini = New MiniPC_Basics
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.desc = "Create a histogram for the mini point cloud"
     End Sub
     Public Sub Run()
@@ -69,8 +72,54 @@ Public Class MiniPC_Rotate
               {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
-        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {1, 2}, New cv.Mat, dst2, 2, histSize, ranges)
-        dst2 = dst2.ConvertScaleAbs(255)
+        Dim histSize() = {input.Height, input.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {1, 2}, New cv.Mat, histogram, 2, histSize, ranges)
+        dst2(mini.rect) = histogram.ConvertScaleAbs(255)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class MiniPC_FindPeak
+    Inherits VBparent
+    Dim peak As MiniPC_Rotate
+    Public Sub New()
+        initParent()
+        peak = New MiniPC_Rotate
+        task.desc = "Find a peak value in the side view histograms"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        peak.mini.Run()
+        peak.src = peak.mini.dst2
+
+        Dim minval As Double, maxval As Double
+        Dim minLoc As cv.Point, maxloc As cv.Point
+        Dim maxPeak = Single.MinValue
+        Dim locPeak As cv.Point
+        Dim bestYRotate As Integer
+        For i = -90 To 90
+            task.yRotateSlider.Value = i
+            peak.Run()
+            Dim r = peak.mini.rect
+            peak.histogram.MinMaxLoc(minval, maxval, minLoc, maxloc)
+            Dim mean = peak.dst2(r).Mean()
+            Console.WriteLine("Angle = " + CStr(i) + " peak val = " + CStr(maxval) + " mean val = " + CStr(mean.Item(0)))
+            If maxval > maxPeak Then
+                maxPeak = maxval
+                locPeak = maxloc
+                bestYRotate = i
+            End If
+        Next
+
+        task.yRotateSlider.Value = bestYRotate
+        peak.Run()
+        dst1 = peak.dst1
+        dst2 = peak.dst2
     End Sub
 End Class

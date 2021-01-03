@@ -213,10 +213,20 @@ End Class
 Public Class Blur_TopoMap
     Inherits VBparent
     Dim gradient As Gradient_CartToPolar
+    Dim addw As AddWeighted_Basics
+    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
 
-        gradient = New Gradient_CartToPolar()
+        palette = New Palette_Basics
+        Dim magma = findRadio("Magma")
+        magma.Checked = True
+
+        addw = New AddWeighted_Basics
+        Dim weightSlider = findSlider("Weight")
+        weightSlider.Value = 15
+
+        gradient = New Gradient_CartToPolar
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -231,8 +241,11 @@ Public Class Blur_TopoMap
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static savePercent As Single
         Static nextPercent As Single
-        If savePercent <> sliders.trackbar(0).Value Then
-            savePercent = sliders.trackbar(0).Value
+        Static reductionSlider = findSlider("Reduction Factor")
+        Static frameSlider = findSlider("Frame Count Cycle")
+        Static percentSlider = findSlider("Percent of Blurring")
+        If savePercent <> percentSlider.Value Then
+            savePercent = percentSlider.Value
             nextPercent = savePercent
         End If
 
@@ -247,11 +260,19 @@ Public Class Blur_TopoMap
         dst2 = dst2.Normalize(255)
         dst2 = dst2.ConvertScaleAbs(255)
 
-        dst2 = dst2 / sliders.trackbar(1).Value
-        dst2 *= sliders.trackbar(1).Value
+        dst2 = (dst2 * 1 / reductionSlider.Value).tomat
+        dst2 = (dst2 * reductionSlider.Value).toMat
 
-        label2 = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(sliders.trackbar(1).Value)
-        If ocvb.frameCount Mod sliders.trackbar(2).Value = 0 Then nextPercent -= 1
+        palette.src = dst2
+        palette.Run()
+
+        addw.src = task.color
+        addw.src2 = palette.dst1
+        addw.Run()
+        dst2 = addw.dst1
+
+        label2 = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)
+        If ocvb.frameCount Mod frameSlider.Value = 0 Then nextPercent -= 1
         If nextPercent <= 0 Then nextPercent = savePercent
     End Sub
 End Class
