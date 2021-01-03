@@ -362,7 +362,7 @@ Public Class StructuredDepth_SliceXPlot
         Dim minLoc As cv.Point, maxLoc As cv.Point
         multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
-        dst2.Circle(New cv.Point(col, maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Dim filterZ = (dst2.Height - maxLoc.Y) / dst2.Height * ocvb.maxZ
 
         Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U, 255)
@@ -662,7 +662,7 @@ Public Class StructuredDepth_SliceVStable
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
-        dst2 = top2D.dst2
+        dst2 = top2D.dst1
         Dim split = task.pointCloud.Split()
 
         Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
@@ -684,9 +684,5 @@ Public Class StructuredDepth_SliceVStable
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
-
-        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
