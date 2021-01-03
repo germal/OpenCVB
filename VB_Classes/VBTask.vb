@@ -25,7 +25,7 @@ Module Algorithm_Module
 End Module
 Public Class ActiveTask : Implements IDisposable
     Dim algoList As New algorithmList
-    Dim algorithmObject As Object
+    Public algorithmObject As Object
 
     Public color As cv.Mat
     Public RGBDepth As cv.Mat
@@ -34,6 +34,7 @@ Public Class ActiveTask : Implements IDisposable
     Public depth16 As cv.Mat
     Public leftView As cv.Mat
     Public rightView As cv.Mat
+    Public viewOptions As Object
 
     ' add any global option algorithms here
     Public inrange As Object
@@ -169,7 +170,7 @@ Public Class ActiveTask : Implements IDisposable
             aOptions.Show()
             inrange = algoList.createAlgorithm("OptionsCommon_Depth")
         End If
-        Dim viewOpts = algoList.createAlgorithm("OptionsCommon_Histogram")
+        viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +

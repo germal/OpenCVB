@@ -63,22 +63,24 @@ End Class
 
 Public Class OptionsCommon_Histogram
     Inherits VBparent
+    Dim sideFrustrumSlider As Windows.Forms.TrackBar
+    Dim topFrustrumSlider As Windows.Forms.TrackBar
+    Dim cameraYSlider As Windows.Forms.TrackBar
+    Dim cameraXSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
-            sliders.setupTrackBar(1, "TopView Frustrum adjustment", 1, 200, 57)
-            sliders.setupTrackBar(2, "SideCameraPoint adjustment", -100, 100, 0)
-            sliders.setupTrackBar(3, "TopCameraPoint adjustment", -10, 10, 0)
-        End If
+        sliders.Setup(caller)
+        sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
+        sliders.setupTrackBar(1, "TopView Frustrum adjustment", 1, 200, 57)
+        sliders.setupTrackBar(2, "SideCameraPoint adjustment", -100, 100, 0)
+        sliders.setupTrackBar(3, "TopCameraPoint adjustment", -10, 10, 0)
 
-        Dim sideFrustrumSlider = findSlider("SideView Frustrum adjustment")
-        Dim topFrustrumSlider = findSlider("TopView Frustrum adjustment")
-        Dim cameraYSlider = findSlider("SideCameraPoint adjustment")
-        Dim cameraXSlider = findSlider("TopCameraPoint adjustment")
+        sideFrustrumSlider = findSlider("SideView Frustrum adjustment")
+        topFrustrumSlider = findSlider("TopView Frustrum adjustment")
+        cameraYSlider = findSlider("SideCameraPoint adjustment")
+        cameraXSlider = findSlider("TopCameraPoint adjustment")
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
@@ -128,13 +130,24 @@ Public Class OptionsCommon_Histogram
         ocvb.topFrustrumAdjust = ocvb.maxZ * topFrustrumSlider.Value / 100 / 2
         ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
         ocvb.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
-
+        sliders.Hide()
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        ocvb.trueText("This algorithm was created only to share the sliders used for the side views." + vbCrLf +
-                      "Each camera setting was carefully set to reflect the specification for each camera.")
+        ocvb.sideFrustrumAdjust = ocvb.maxZ * sideFrustrumSlider.Value / 100 / 2
+        ocvb.topFrustrumAdjust = ocvb.maxZ * topFrustrumSlider.Value / 100 / 2
+        ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
+        ocvb.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
+
+        If sliders.Visible = False Then
+            ocvb.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
+                          "Without these tuning parameters the side and top views would not be correct." + vbCrLf +
+                          "To see how these adjustments work and to add a new camera, " + vbCrLf +
+                          "use the Histogram_TopView2D or Histogram_SideView2D algorithms." + vbCrLf +
+                          "For new cameras, make the adjustments needed, note the value, and update " + vbCrLf +
+                          "the Select statement in the constructor for OptionsCommon_Histogram.")
+        End If
     End Sub
 End Class
