@@ -429,7 +429,7 @@ Public Class PointCloud_Kalman_TopView
 
         topView.Run()
 
-        Static sliderHistThreshold = findSlider("Top/Side View Histogram threshold")
+        Static sliderHistThreshold = findSlider("Top and Side Views Histogram threshold")
         flood.src = topView.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run()
 
@@ -479,7 +479,7 @@ Public Class PointCloud_Kalman_SideView
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.Run()
 
-        Static sliderHistThreshold = findSlider("Top/Side View Histogram threshold")
+        Static sliderHistThreshold = findSlider("Top and Side Views Histogram threshold")
         flood.src = sideView.histOutput.ConvertScaleAbs(255)
         flood.Run()
 
@@ -592,7 +592,7 @@ Public Class PointCloud_FrustrumTop
         frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
 
-        Dim histSlider = findSlider("Top/Side View Histogram threshold")
+        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
         histSlider.Value = 0
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
@@ -636,7 +636,7 @@ Public Class PointCloud_FrustrumSide
         frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
 
-        Dim histSlider = findSlider("Top/Side View Histogram threshold")
+        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
         histSlider.Value = 0
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
@@ -679,7 +679,7 @@ End Class
 '        initParent()
 
 '        topView = New Histogram_TopView2D()
-'        Dim histSlider = findSlider("Top/Side View Histogram threshold")
+'        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
 '        histSlider.Value = 20
 
 '        kTopView = New PointCloud_Kalman_TopView()
@@ -736,7 +736,7 @@ End Class
 '        kSideView = New PointCloud_Kalman_SideView()
 '        sideView = New Histogram_SideView2D()
 
-'        Dim histSlider = findSlider("Top/Side View Histogram threshold")
+'        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
 '        histSlider.Value = 20
 
 '        label1 = "side view AFTER align/threshold using gravity vector"
@@ -1132,7 +1132,7 @@ Public Class PointCloud_Singletons
         topView = New Histogram_TopView2D()
         topView.resizeHistOutput = False
         inrange = New Depth_InRange()
-        Dim histThreshold = findSlider("Top/Side View Histogram threshold")
+        Dim histThreshold = findSlider("Top and Side Views Histogram threshold")
         histThreshold.Value = 1
 
         label1 = "Top down view before inrange sampling"
@@ -1173,20 +1173,17 @@ End Class
 
 Public Class PointCloud_ReducedSideView
     Inherits VBparent
-    Dim viewOpts As Histogram_ViewOptions
     Dim gCloud As Depth_PointCloud_IMU
     Dim reduction As Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
         initParent()
-        viewOpts = New Histogram_ViewOptions
         gCloud = New Depth_PointCloud_IMU
         reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        viewOpts.Run()
 
         gCloud.Run()
 
@@ -1198,11 +1195,11 @@ Public Class PointCloud_ReducedSideView
         split(2) *= 0.001
         cv.Cv2.Merge(split, task.pointCloud)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        Dim tmp = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
 
@@ -1217,20 +1214,17 @@ End Class
 
 Public Class PointCloud_ReducedTopView
     Inherits VBparent
-    Dim viewOpts As Histogram_ViewOptions
     Dim gCloud As Depth_PointCloud_IMU
     Dim reduction As Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
         initParent()
-        viewOpts = New Histogram_ViewOptions
         gCloud = New Depth_PointCloud_IMU
         reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        viewOpts.Run()
 
         gCloud.Run()
 
@@ -1242,12 +1236,12 @@ Public Class PointCloud_ReducedTopView
         split(2) *= 0.001
         cv.Cv2.Merge(split, task.pointCloud)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-viewOpts.topFrustrumAdjust, viewOpts.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
     End Sub
 End Class
@@ -1625,7 +1619,7 @@ Public Class PointCloud_BackProjectTopView
         Dim minVal = minSlider.value
 
         dst1 = src
-        Dim xRange = 2 * view.measureTop.topView.viewOpts.topFrustrumAdjust
+        Dim xRange = 2 * ocvb.topFrustrumAdjust
         Dim histogram = view.measureTop.topView.histOutput.Flip(cv.FlipMode.X)
         Dim mat = New cv.Mat() {task.pointCloud}
         Dim bins() = {2, 0}
@@ -1635,8 +1629,8 @@ Public Class PointCloud_BackProjectTopView
                 Dim minDepth As Single = 1000 * ocvb.maxZ * CSng(dst2.Height - (r.Y + r.Height)) / dst2.Height
                 If minDepth >= 2 Then
                     Dim maxDepth As Single = 1000 * ocvb.maxZ * (dst2.Height - r.Y) / dst2.Height
-                    Dim leftX = -view.measureTop.topView.viewOpts.topFrustrumAdjust ' r.X / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
-                    Dim rightX = view.measureTop.topView.viewOpts.topFrustrumAdjust ' (r.X + r.Width) / dst2.Width * xRange - view.measureTop.topView.viewOpts.topFrustrumAdjust
+                    Dim leftX = -ocvb.topFrustrumAdjust ' r.X / dst2.Width * xRange - ocvb.topFrustrumAdjust
+                    Dim rightX = ocvb.topFrustrumAdjust ' (r.X + r.Width) / dst2.Width * xRange - ocvb.topFrustrumAdjust
                     Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
                     ' Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
                     Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

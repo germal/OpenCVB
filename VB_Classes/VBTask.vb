@@ -167,8 +167,9 @@ Public Class ActiveTask : Implements IDisposable
         Else
             aOptions = New OptionsAll
             aOptions.Show()
-            inrange = algoList.createAlgorithm("Options_Common")
+            inrange = algoList.createAlgorithm("OptionsCommon_Depth")
         End If
+        Dim viewOpts = algoList.createAlgorithm("OptionsCommon_Histogram")
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +

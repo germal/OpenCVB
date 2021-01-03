@@ -16,6 +16,8 @@ Public Class VBocvb
     Public vecColors(255) As cv.Vec3b
     Public topCameraPoint As cv.Point
     Public sideCameraPoint As cv.Point
+    Public topFrustrumAdjust As Single
+    Public sideFrustrumAdjust As Single
     Public fontSize As Single
     Public dotSize As Integer
     Public lineSize As Integer

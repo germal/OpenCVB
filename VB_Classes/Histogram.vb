@@ -771,7 +771,6 @@ Public Class Histogram_TopData
     Public histOutput As New cv.Mat
     Public meterMin As Single
     Public meterMax As Single
-    Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
     Dim IntelBug As Boolean
     Public resizeHistOutput As Boolean = True
@@ -805,7 +804,7 @@ Public Class Histogram_TopData
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
+        Static histThresholdSlider = findSlider("Top and Side Views Histogram threshold")
         dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         label1 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
@@ -825,7 +824,6 @@ Public Class Histogram_SideData
     Public histOutput As New cv.Mat
     Public meterMin As Single
     Public meterMax As Single
-    Public cameraLoc As Integer
     Dim kalman As Kalman_Basics
     Public resizeHistOutput As Boolean = True
     Public Sub New()
@@ -839,7 +837,6 @@ Public Class Histogram_SideData
         kalman = New Kalman_Basics()
         gCloud = New Depth_PointCloud_IMU()
 
-        label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
     Public Sub Run()
@@ -856,8 +853,8 @@ Public Class Histogram_SideData
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
-        dst1 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Static histThresholdSlider = findSlider("Top and Side Views Histogram threshold")
+        dst1 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary)
         label1 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
@@ -879,7 +876,7 @@ Public Class Histogram_SmoothTopView2D
 
         cmat = New PointCloud_ColorizeTop
         topView = New Histogram_TopView2D
-        topView.viewOpts.histThresholdSlider.Value = 1
+        task.yRotateSlider.Value = 1
 
         stable = New Motion_StableDepthRectangleUpdate
 
@@ -888,7 +885,6 @@ Public Class Histogram_SmoothTopView2D
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        topView.viewOpts.Run()
         topView.gCloud.Run()
 
         Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
@@ -900,13 +896,13 @@ Public Class Histogram_SmoothTopView2D
 
         stable.Run()
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-topView.viewOpts.topFrustrumAdjust, topView.viewOpts.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If topView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
-        dst1 = topView.histOutput.Threshold(topView.viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1 = topView.histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -928,106 +924,6 @@ End Class
 
 
 
-Public Class Histogram_ViewOptions
-    Inherits VBparent
-    Public topFrustrumAdjust As Single
-    Public sideFrustrumAdjust As Single
-    Public sideCameraPoint As cv.Point
-    Public topCameraPoint As cv.Point
-
-    Dim sideFrustrumSlider As Windows.Forms.TrackBar
-    Dim topFrustrumSlider As Windows.Forms.TrackBar
-    Dim cameraYSlider As Windows.Forms.TrackBar
-    Dim cameraXSlider As Windows.Forms.TrackBar
-    Public histThresholdSlider As Windows.Forms.TrackBar
-    Public Sub New()
-        initParent()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
-            sliders.setupTrackBar(1, "TopView Frustrum adjustment", 1, 200, 57)
-            sliders.setupTrackBar(2, "SideCameraPoint adjustment", -100, 100, 0)
-            sliders.setupTrackBar(3, "TopCameraPoint adjustment", -10, 10, 0)
-        End If
-
-        sideFrustrumSlider = findSlider("SideView Frustrum adjustment")
-        topFrustrumSlider = findSlider("TopView Frustrum adjustment")
-        cameraYSlider = findSlider("SideCameraPoint adjustment")
-        cameraXSlider = findSlider("TopCameraPoint adjustment")
-        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
-
-        ' The specification for each camera spells out the FOV angle
-        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
-        Select Case ocvb.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                sideFrustrumSlider.Value = 58
-                topFrustrumSlider.Value = 180
-                cameraXSlider.Value = 0
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -2)
-            Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-                sideFrustrumSlider.Value = 53
-                topFrustrumSlider.Value = 162
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
-                cameraYSlider.Value = -3
-            Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
-                sideFrustrumSlider.Value = 50
-                topFrustrumSlider.Value = 105
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 3, -8, -3)
-            Case VB_Classes.ActiveTask.algParms.camNames.D435i
-                If src.Width = 640 Then
-                    sideFrustrumSlider.Value = 75
-                    topFrustrumSlider.Value = 101
-                    cameraXSlider.Value = 0
-                    cameraYSlider.Value = 0
-                Else
-                    sideFrustrumSlider.Value = 57
-                    topFrustrumSlider.Value = 175
-                    cameraXSlider.Value = 0
-                    cameraYSlider.Value = 0
-                End If
-            Case VB_Classes.ActiveTask.algParms.camNames.D455
-                If src.Width = 640 Then
-                    sideFrustrumSlider.Value = 86
-                    topFrustrumSlider.Value = 113
-                    cameraXSlider.Value = 1
-                    cameraYSlider.Value = -1
-                Else
-                    sideFrustrumSlider.Value = 58
-                    topFrustrumSlider.Value = 184
-                    cameraXSlider.Value = 0
-                    cameraYSlider.Value = -3
-                End If
-        End Select
-
-        task.desc = "The options for the side view are shared with this algorithm"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        sideFrustrumAdjust = ocvb.maxZ * sideFrustrumSlider.Value / 100 / 2
-        topFrustrumAdjust = ocvb.maxZ * topFrustrumSlider.Value / 100 / 2
-        ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
-        ocvb.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
-
-        If standalone Or task.intermediateReview = caller Then
-            ocvb.trueText("This algorithm was created only to share the sliders used for the side views." + vbCrLf +
-                          "Each camera setting was carefully set to reflect the specification for each camera.")
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
 Public Class Histogram_SmoothSideView2D
     Inherits VBparent
     Public sideView As Histogram_SideView2D
@@ -1038,7 +934,7 @@ Public Class Histogram_SmoothSideView2D
 
         cmat = New PointCloud_ColorizeSide
         sideView = New Histogram_SideView2D
-        sideView.viewOpts.histThresholdSlider.Value = 1
+        task.yRotateSlider.Value = 1
 
         stable = New Motion_StableDepthRectangleUpdate
 
@@ -1047,7 +943,6 @@ Public Class Histogram_SmoothSideView2D
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideView.viewOpts.Run()
         sideView.gCloud.Run()
 
         Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
@@ -1059,12 +954,12 @@ Public Class Histogram_SmoothSideView2D
 
         stable.Run()
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-sideView.viewOpts.sideFrustrumAdjust, sideView.viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If sideView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
-        Dim tmp = sideView.histOutput.Threshold(sideView.viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Dim tmp = sideView.histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1392,12 +1287,9 @@ Public Class Histogram_TopView2D
     Public histOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Public cmat As PointCloud_ColorizeTop
-    Public viewOpts As Histogram_ViewOptions
     Public resizeHistOutput As Boolean = True
     Public Sub New()
         initParent()
-
-        viewOpts = New Histogram_ViewOptions
 
         cmat = New PointCloud_ColorizeTop
         gCloud = New Depth_PointCloud_IMU
@@ -1409,15 +1301,14 @@ Public Class Histogram_TopView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         gCloud.Run()
-        viewOpts.Run()
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-viewOpts.topFrustrumAdjust, viewOpts.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        histOutput = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        histOutput = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
@@ -1439,7 +1330,6 @@ End Class
 
 Public Class Histogram_SideView2D
     Inherits VBparent
-    Public viewOpts As Histogram_ViewOptions
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public cmat As PointCloud_ColorizeSide
@@ -1448,11 +1338,9 @@ Public Class Histogram_SideView2D
     Public Sub New()
         initParent()
 
-        viewOpts = New Histogram_ViewOptions
-
         cmat = New PointCloud_ColorizeSide
         gCloud = New Depth_PointCloud_IMU
-        If standalone Or task.intermediateReview = caller Then viewOpts.histThresholdSlider.Value = 1
+        If standalone Or task.intermediateReview = caller Then task.yRotateSlider.Value = 1
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
@@ -1461,14 +1349,13 @@ Public Class Histogram_SideView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         gCloud.Run()
-        viewOpts.Run()
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-viewOpts.sideFrustrumAdjust, viewOpts.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Dim tmp = histOutput.Threshold(viewOpts.histThresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Dim tmp = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         If standalone Or task.intermediateReview = caller Then

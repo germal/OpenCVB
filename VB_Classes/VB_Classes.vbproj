@@ -108,7 +108,7 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="MiniPC.vb" />
-    <Compile Include="Options_Common.vb" />
+    <Compile Include="OptionsCommon.vb" />
     <Compile Include="PhotoShop.vb" />
     <Compile Include="Rectangle.vb" />
     <Compile Include="Fibonacci.vb" />

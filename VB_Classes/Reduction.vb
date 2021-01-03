@@ -248,7 +248,7 @@ Public Class Reduction_Lines
         topView = New Histogram_TopView2D()
         reduction = New Reduction_PointCloud()
 
-        Dim histSlider = findSlider("Top/Side View Histogram threshold")
+        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
         histSlider.Value = 20
         lDetect = New LineDetector_Basics()
 

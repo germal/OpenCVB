@@ -9,7 +9,7 @@ Public Class StructuredDepth_Floor
         kalman = New Kalman_VB_Basics()
 
         structD = New StructuredDepth_SliceH()
-        structD.histThresholdSlider.Value = 10 ' some cameras can show data below ground level...
+        task.binSlider.Value = 10 ' some cameras can show data below ground level...
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
         task.desc = "Find the floor plane"
@@ -33,7 +33,7 @@ Public Class StructuredDepth_Floor
         ' it settles down quicker...
         If ocvb.frameCount > 30 Then yCoordinate = kalman.kAverage
 
-        floorYplane = structD.side2D.meterMax * (yCoordinate - structD.side2D.cameraLoc) / (dst2.Height - structD.side2D.cameraLoc)
+        floorYplane = structD.side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
 
         structD.offsetSlider.Value = If(yCoordinate >= 0, yCoordinate, dst2.Height)
 
@@ -120,8 +120,8 @@ Public Class StructuredDepth_MultiSliceH
 
         maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = side2D.meterMin * (side2D.cameraLoc - yCoordinate) / side2D.cameraLoc
-            If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)
+            Dim planeY = side2D.meterMin * (ocvb.sideCameraPoint.Y - yCoordinate) / ocvb.sideCameraPoint.Y
+            If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = Split(1).Clone
@@ -172,8 +172,8 @@ Public Class StructuredDepth_MultiSliceV
 
         Dim maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
-            If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
+            Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
+            If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = split(0).Clone
@@ -230,8 +230,8 @@ Public Class StructuredDepth_MultiSlice
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
-            If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
+            Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
+            If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = split(0).Clone
@@ -241,8 +241,8 @@ Public Class StructuredDepth_MultiSlice
         Next
 
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = side2D.meterMin * (side2D.cameraLoc - yCoordinate) / side2D.cameraLoc
-            If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)
+            Dim planeY = side2D.meterMin * (ocvb.sideCameraPoint.Y - yCoordinate) / ocvb.sideCameraPoint.Y
+            If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = Split(1).Clone
@@ -503,7 +503,6 @@ Public Class StructuredDepth_SliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
     Dim inrange As Depth_InRange
-    Public histThresholdSlider As Windows.Forms.TrackBar
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
@@ -520,7 +519,6 @@ Public Class StructuredDepth_SliceH
             sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
         End If
 
-        histThresholdSlider = findSlider("Top/Side View Histogram threshold")
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
 
@@ -530,14 +528,15 @@ Public Class StructuredDepth_SliceH
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
-        dst2 = side2D.dst2
+
+        Static histThresholdSlider = findSlider("Top and Side Views Histogram threshold")
         Dim depthShadow = task.inrange.noDepthMask
         Dim Split = task.pointCloud.Split()
 
         Dim yCoordinate = CInt(offsetSlider.Value)
 
-        Dim planeY = side2D.meterMin * (side2D.cameraLoc - yCoordinate) / side2D.cameraLoc
-        If yCoordinate > side2D.cameraLoc Then planeY = side2D.meterMax * (yCoordinate - side2D.cameraLoc) / (dst2.Height - side2D.cameraLoc)
+        Dim planeY = side2D.meterMin * (ocvb.sideCameraPoint.Y - yCoordinate) / ocvb.sideCameraPoint.Y
+        If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
 
         Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -555,11 +554,11 @@ Public Class StructuredDepth_SliceH
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
 
-        dst2 = dst2.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2 = side2D.dst1.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(New cv.Point(0, side2D.cameraLoc), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         yPlaneOffset = If(offsetSlider.Value < dst2.Height - cushion, CInt(offsetSlider.Value), dst2.Height - cushion - 1)
+        dst2.Circle(New cv.Point(0, ocvb.sideCameraPoint.Y), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)
     End Sub
 End Class
@@ -594,12 +593,11 @@ Public Class StructuredDepth_SliceV
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
-        dst2 = top2D.dst2
 
         Dim split = task.pointCloud.Split()
 
-        Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
-        If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
+        Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
+        If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
 
         Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -618,10 +616,10 @@ Public Class StructuredDepth_SliceV
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
 
-        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2 = top2D.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(New cv.Point(top2D.cameraLoc, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(New cv.Point(ocvb.topCameraPoint.X, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Dim offset = CInt(offsetSlider.Value)
         dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
@@ -667,8 +665,8 @@ Public Class StructuredDepth_SliceVStable
         dst2 = top2D.dst2
         Dim split = task.pointCloud.Split()
 
-        Dim planeX = top2D.meterMin * (top2D.cameraLoc - xCoordinate) / top2D.cameraLoc
-        If xCoordinate > top2D.cameraLoc Then planeX = top2D.meterMax * (xCoordinate - top2D.cameraLoc) / (dst2.Width - top2D.cameraLoc)
+        Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
+        If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
 
         Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -690,8 +688,5 @@ Public Class StructuredDepth_SliceVStable
         dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(New cv.Point(top2D.cameraLoc, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Dim offset = CInt(offsetSlider.Value)
-        dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
 End Class

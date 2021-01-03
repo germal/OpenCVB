@@ -1722,16 +1722,14 @@ Public Class Depth_PointCloud_IMU
 
         Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Dim angleY = angleYslider.value
-        If angleY <> 0 Then
-            '[cos(a) 0 -sin(a)]
-            '[0      1       0]
-            '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
-            cy = Math.Cos(angleY * cv.Cv2.PI / 180)
-            sy = Math.Sin(angleY * cv.Cv2.PI / 180)
-            gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
-                  {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
-                  {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
-        End If
+        '[cos(a) 0 -sin(a)]
+        '[0      1       0]
+        '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
+        cy = Math.Cos(angleY * cv.Cv2.PI / 180)
+        sy = Math.Sin(angleY * cv.Cv2.PI / 180)
+        gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
+              {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
+              {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
 
         gMatrix = gM
         If xCheckbox.Checked Or zCheckbox.Checked Then
