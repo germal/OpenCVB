@@ -214,8 +214,6 @@ Public Class StructuredDepth_MultiSlice
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         top2D.Run()
         side2D.Run()
-        ' dst2 = top2D.dst2
-        split = task.pointCloud.Split()
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
@@ -357,15 +355,15 @@ Public Class StructuredDepth_SliceXPlot
         Dim col = CInt(offsetSlider.value)
 
         Dim cushion = cushionSlider.Value
-        Dim rect = New cv.Rect(col, 0, cushion, dst2.Height - 1)
+        Dim rect = New cv.Rect(col, 0, If(col + cushion >= dst2.Width, dst2.Width - col, cushion), dst2.Height - 1)
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
         dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Dim filterZ = (dst2.Height - maxLoc.Y) / dst2.Height * ocvb.maxZ
+        Dim filterZ = maxLoc.Y / dst2.Height * ocvb.maxZ
 
-        Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U, 255)
+        Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U)
         If filterZ > 0 Then
             multi.inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
             multi.inrange.maxVal = filterZ + 0.05
