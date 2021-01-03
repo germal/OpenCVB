@@ -47,18 +47,19 @@ Public Class FitEllipse_Basics_CPP
             Dim angle = output.Get(Of Single)(0)
             Dim center As New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
             Dim size As New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
-            box = New cv.RotatedRect(center, size, angle)
-            dst1.Ellipse(box, cv.Scalar.Yellow, 6, cv.LineTypes.AntiAlias)
+            If Single.IsNaN(size.Width) = False And Single.IsNaN(size.Height) Then
+                box = New cv.RotatedRect(center, size, angle)
+                dst1.Ellipse(box, cv.Scalar.Yellow, 6, cv.LineTypes.AntiAlias)
 
-            FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), area.srcPoints.Count - 1, dstHandle.AddrOfPinnedObject)
-            dstHandle.Free()
+                FitEllipse_Direct(srcHandle.AddrOfPinnedObject(), area.srcPoints.Count - 1, dstHandle.AddrOfPinnedObject)
+                dstHandle.Free()
 
-            angle = output.Get(Of Single)(0)
-            center = New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
-            size = New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
-            box = New cv.RotatedRect(center, size, angle)
-            dst1.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
-
+                angle = output.Get(Of Single)(0)
+                center = New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
+                size = New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
+                box = New cv.RotatedRect(center, size, angle)
+                dst1.Ellipse(box, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+            End If
             ' draw the input dots on top of everything...
             For i = 0 To area.srcPoints.Count - 1
                 dst1.Circle(area.srcPoints(i), 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
