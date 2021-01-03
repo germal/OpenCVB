@@ -27,18 +27,20 @@ Public Class Motion_Basics
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()
 
-        contours.src = dst2
-        contours.Run()
+        If standalone Or task.intermediateReview = caller Then
+            contours.src = dst2
+            contours.Run()
 
-        rectList.Clear()
-        For Each c In contours.contours
-            rectList.Add(cv.Cv2.BoundingRect(c))
-        Next
+            rectList.Clear()
+            For Each c In contours.contours
+                rectList.Add(cv.Cv2.BoundingRect(c))
+            Next
 
-        dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src.Clone)
-        For i = 0 To rectList.Count - 1
-            dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
-        Next
+            dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src.Clone)
+            For i = 0 To rectList.Count - 1
+                dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
+            Next
+        End If
     End Sub
 End Class
 

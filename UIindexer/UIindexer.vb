@@ -103,12 +103,12 @@ Module IndexMain
                     If classname.EndsWith("_PS.py") Then PYStreamNames.Add(classname, classname)
                     If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)
                     If classname.EndsWith("_CPP") Then CPPnames.Add(classname, classname)
-                    If classname.EndsWith("_CS") Then CSnames.Add(classname, classname)
                     If classname.StartsWith("OpenGL") Then OpenGLnames.Add(classname, classname)
                     If classname.StartsWith("OpenCVGL") Then OpenGLnames.Add(classname, classname)
                     Continue While
                 End If
                 If classname <> "" Then
+                    If line.Contains("CS_Classes.") And CSnames.ContainsKey(classname) = False Then CSnames.Add(classname, classname)
                     If line.Contains("New OpenGL") And classname.StartsWith("OpenGL") = False And classname.StartsWith("OpenCVGL") = False Then OpenGLnames.Add(classname, classname)
                     For i = 0 To apiList.Count - 1
                         Dim index = InStr(lcaseLine, apiListLCase(i))

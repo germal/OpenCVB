@@ -354,31 +354,91 @@ Public Class Reduction_XYZ
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
 
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
-            radio.check(0).Text = "Slice point cloud in X direction"
-            radio.check(1).Text = "Slice point cloud in Y direction"
-            radio.check(2).Text = "Slice point cloud in Z direction"
-            radio.check(2).Checked = True
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Slice point cloud in X direction"
+            check.Box(1).Text = "Slice point cloud in Y direction"
+            check.Box(2).Text = "Slice point cloud in Z direction"
+            check.Box(2).Checked = True
         End If
 
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xRadio = findRadio("Slice point cloud in X direction")
-        Static yRadio = findRadio("Slice point cloud in Y direction")
         Dim split() = task.pointCloud.Split()
 
-        Dim index As Integer
-        If xRadio.checked Then index = 0
-        If yRadio.checked Then index = 1 Else index = 2
-        split(index) *= 1000 ' convert to mm's
-        split(index).ConvertTo(reduction.src, cv.MatType.CV_32S)
-        reduction.Run()
-        reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-        split(index) = dst1 / 1000
+        For i = 0 To 3 - 1
+            If check.Box(i).Checked Then
+                split(i) += 10 ' make all values positive.
+                split(i) *= 1000
+                split(i).ConvertTo(reduction.src, cv.MatType.CV_32S)
+                reduction.Run()
+                reduction.dst1.ConvertTo(split(i), cv.MatType.CV_32F)
+                split(i) *= 0.001
+                split(i) -= 10 ' make all values positive.
+            End If
+        Next
+
+        cv.Cv2.Merge(split, task.pointCloud)
+        ocvb.trueText("Task.PointCloud has been reduced")
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Reduction_XYZStable
+    Inherits VBparent
+    Public stable(3 - 1) As Motion_StableDepth
+    Dim reduction As Reduction_Basics
+    Public Sub New()
+        initParent()
+        For i = 0 To stable.Count - 1
+            stable(i) = New Motion_StableDepth
+        Next
+
+        reduction = New Reduction_Basics()
+        Dim bitwiseRadio = findRadio("Use bitwise reduction")
+        Dim simpleRadio = findRadio("Use simple reduction")
+        bitwiseRadio.Checked = True
+        simpleRadio.Enabled = False
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Slice point cloud in X direction"
+            check.Box(1).Text = "Slice point cloud in Y direction"
+            check.Box(2).Text = "Slice point cloud in Z direction"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+            check.Box(2).Checked = True
+        End If
+
+        task.desc = "Use reduction to slice the point cloud in 3 dimensions"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim split() = task.pointCloud.Split()
+
+        For i = 0 To 3 - 1
+            If check.Box(i).Checked Then
+                Dim tmp As cv.Mat = split(i) + 10 ' make all values positive.
+                tmp *= 1000
+                stable(i).src = tmp.Clone
+                stable(i).Run()
+                If stable(i).resetAll Then tmp.ConvertTo(reduction.src, cv.MatType.CV_32S) Else stable(i).dst1.ConvertTo(reduction.src, cv.MatType.CV_32S)
+                If i = 0 Then dst1 = stable(i).dst1
+                If i = 1 Then dst2 = stable(i).dst1
+                reduction.Run()
+                reduction.dst1.ConvertTo(tmp, cv.MatType.CV_32F)
+                tmp *= 0.001
+                split(i) = tmp - 10
+            End If
+        Next
+
         cv.Cv2.Merge(split, task.pointCloud)
     End Sub
 End Class

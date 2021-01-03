@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Sift_Basics_CS
+Public Class Sift_Basics
     Inherits VBparent
     Dim siftCS As New CS_SiftBasics
     Dim fisheye As FishEye_Rectified
@@ -24,7 +24,7 @@ Public Class Sift_Basics_CS
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim doubleSize As New cv.Mat(task.leftView.Rows, task.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
         siftCS.Run(task.leftView, task.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
@@ -39,11 +39,11 @@ End Class
 
 
 
-Public Class Sift_Basics_CS_MT
+Public Class Sift_Basics_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Dim siftCS As New CS_SiftBasics
-    Dim siftBasics As Sift_Basics_CS
+    Dim siftBasics As Sift_Basics
     Dim fisheye As FishEye_Rectified
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
@@ -59,14 +59,14 @@ Public Class Sift_Basics_CS_MT
 
         grid.Run()
 
-        siftBasics = New Sift_Basics_CS()
+        siftBasics = New Sift_Basics
         numPointSlider = findSlider("Points to Match")
         numPointSlider.Value = 1
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim leftView As cv.Mat
         Dim rightView As cv.Mat
 

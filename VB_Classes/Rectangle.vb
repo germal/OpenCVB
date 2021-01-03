@@ -20,13 +20,15 @@ Public Class Rectangle_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles")
+        Static countSlider = findSlider("Rectangle Count")
         Static saveType = typeCheckBox.Checked
         If ocvb.frameCount Mod updateFrequency = 0 Or saveType <> typeCheckBox.checked Then
             saveType = typeCheckBox.checked
             dst1.SetTo(cv.Scalar.Black)
             rectangles.Clear()
             rotatedRectangles.Clear()
-            For i = 0 To sliders.trackbar(0).Value - 1
+            Dim rCount = countSlider.Value
+            For i = 0 To rCount - 1
                 ' Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim nPoint = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
                 Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
@@ -35,7 +37,7 @@ Public Class Rectangle_Basics
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
 
                 Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
-                If check.Box(0).Checked Then
+                If typeCheckBox.Checked Then
                     Dim r = New cv.RotatedRect(nPoint, eSize, angle)
                     drawRotatedRectangle(r, dst1, nextColor)
                     rotatedRectangles.Add(r)

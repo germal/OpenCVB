@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class Blur_Gaussian_CS
+Public Class Blur_Gaussian
     Inherits VBparent
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Dim blur As Blur_Basics
@@ -39,13 +39,13 @@ Public Class Blur_Gaussian_CS
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             CS_BlurGaussian.Run(src, dst1, kernelSize)
-            If standalone or task.intermediateReview = caller Then CS_BlurGaussian.Run(task.RGBDepth, dst2, kernelSize)
+            If standalone Or task.intermediateReview = caller Then CS_BlurGaussian.Run(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
         End If

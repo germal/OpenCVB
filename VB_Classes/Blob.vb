@@ -1,4 +1,65 @@
 Imports cv = OpenCvSharp
+Public Class Blob_Basics
+    Inherits VBparent
+    Dim blob As Blob_Input
+    Dim blobDetector As New CS_Classes.Blob_Basics
+    Public Sub New()
+        initParent()
+        blob = New Blob_Input()
+        blob.updateFrequency = 1 ' it is pretty fast but sloppy...
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 5)
+            check.Box(0).Text = "FilterByArea"
+            check.Box(1).Text = "FilterByCircularity"
+            check.Box(2).Text = "FilterByConvexity"
+            check.Box(3).Text = "FilterByInertia"
+            check.Box(4).Text = "FilterByColor"
+            check.Box(4).Checked = True ' filter by color...
+        End If
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "min Threshold", 0, 255, 100)
+            sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
+            sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
+        End If
+        task.desc = "Test C# Blob Detector."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim blobParams = New cv.SimpleBlobDetector.Params
+        blobParams.FilterByArea = check.Box(0).Checked
+        blobParams.FilterByCircularity = check.Box(1).Checked
+        blobParams.FilterByConvexity = check.Box(2).Checked
+        blobParams.FilterByInertia = check.Box(3).Checked
+        blobParams.FilterByColor = check.Box(4).Checked
+
+        blobParams.MaxArea = 100
+        blobParams.MinArea = 0.001
+
+        blobParams.MinThreshold = sliders.trackbar(0).Value
+        blobParams.MaxThreshold = sliders.trackbar(1).Value
+        blobParams.ThresholdStep = sliders.trackbar(2).Value
+
+        blobParams.MinDistBetweenBlobs = 10
+        blobParams.MinRepeatability = 1
+
+        blob.src = src
+        blob.Run()
+        dst1 = blob.dst1
+        dst2 = dst1.EmptyClone
+
+        ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
+        blobDetector.Run(dst1, dst2, blobParams)
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Blob_Input
     Inherits VBparent
     Dim rectangles As Rectangle_Rotated
@@ -31,7 +92,7 @@ Public Class Blob_Input
 
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
-        task.desc = "Test simple Blob Detector."
+        task.desc = "Generate data to test Blob Detector."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -57,66 +118,6 @@ Public Class Blob_Input
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Blob_Detector_CS
-    Inherits VBparent
-    Dim blob As Blob_Input
-    Dim blobDetector As New CS_Classes.Blob_Basics
-    Public Sub New()
-        initParent()
-        blob = New Blob_Input()
-        blob.updateFrequency = 1 ' it is pretty fast but sloppy...
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 5)
-            check.Box(0).Text = "FilterByArea"
-            check.Box(1).Text = "FilterByCircularity"
-            check.Box(2).Text = "FilterByConvexity"
-            check.Box(3).Text = "FilterByInertia"
-            check.Box(4).Text = "FilterByColor"
-            check.Box(4).Checked = True ' filter by color...
-        End If
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "min Threshold", 0, 255, 100)
-            sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
-            sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
-        End If
-        label1 = "Blob_Detector_CS Input"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim blobParams = New cv.SimpleBlobDetector.Params
-        blobParams.FilterByArea = check.Box(0).Checked
-        blobParams.FilterByCircularity = check.Box(1).Checked
-        blobParams.FilterByConvexity = check.Box(2).Checked
-        blobParams.FilterByInertia = check.Box(3).Checked
-        blobParams.FilterByColor = check.Box(4).Checked
-
-        blobParams.MaxArea = 100
-        blobParams.MinArea = 0.001
-
-        blobParams.MinThreshold = sliders.trackbar(0).Value
-        blobParams.MaxThreshold = sliders.trackbar(1).Value
-        blobParams.ThresholdStep = sliders.trackbar(2).Value
-
-        blobParams.MinDistBetweenBlobs = 10
-        blobParams.MinRepeatability = 1
-
-        blob.src = src
-        blob.Run()
-        dst1 = blob.dst1
-        dst2 = dst1.EmptyClone
-
-        ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
-        blobDetector.Start(dst1, dst2, blobParams)
-    End Sub
-End Class
 
 
 

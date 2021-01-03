@@ -307,12 +307,12 @@ End Class
 
 Public Class Benford_Primes
     Inherits VBparent
-    Dim sieve As Sieve_Basics
+    Dim sieve As Sieve_BasicsVB
     Dim benford As Benford_Basics
     Public Sub New()
         initParent()
-        benford = New Benford_Basics()
-        sieve = New Sieve_Basics()
+        benford = New Benford_Basics
+        sieve = New Sieve_BasicsVB
         Dim countSlider = findSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
         task.desc = "Apply Benford to a list of primes"

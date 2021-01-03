@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
+    <Compile Include="MiniPC.vb" />
     <Compile Include="Options_Common.vb" />
     <Compile Include="PhotoShop.vb" />
     <Compile Include="Rectangle.vb" />
@@ -123,6 +124,7 @@
     <Compile Include="ParticleFilter.vb" />
     <Compile Include="ProCon.vb" />
     <Compile Include="Sieve.vb" />
+    <Compile Include="SkiaSharp.vb" />
     <Compile Include="SLR.vb" />
     <Compile Include="StructuredDepth.vb" />
     <Compile Include="Texture.vb" />
@@ -534,6 +536,9 @@
     </PackageReference>
     <PackageReference Include="OpenCvSharp4.Windows">
       <Version>4.5.1.20201229</Version>
+    </PackageReference>
+    <PackageReference Include="SkiaSharp">
+      <Version>2.80.3-preview.18</Version>
     </PackageReference>
     <PackageReference Include="System.Buffers">
       <Version>4.5.1</Version>

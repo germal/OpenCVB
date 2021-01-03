@@ -176,8 +176,10 @@ Public Class PointCloud_ColorizeSide
                                        (markerRight.Y - cam.Y) * Math.Cos(ocvb.angleZ) + (markerRight.X - cam.X) * Math.Sin(ocvb.angleZ) + cam.Y)
         End If
 
-        dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        If standalone = False Then
+            dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        End If
 
         ' draw the arc enclosing the camera FOV
         Dim startAngle = (180 - ocvb.vFov) / 2
@@ -186,13 +188,15 @@ Public Class PointCloud_ColorizeSide
         Dim fovTop = New cv.Point(dst1.Width, cam.Y - y)
         Dim fovBot = New cv.Point(dst1.Width, cam.Y + y)
 
-        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst1.Line(cam, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst1.Line(cam, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        If standalone = False Then
+            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Line(cam, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(cam, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        End If
 
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
         cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
@@ -273,14 +277,16 @@ Public Class PointCloud_ColorizeTop
         Dim fovRight = New cv.Point(ocvb.topCameraPoint.X + x, 0)
         Dim fovLeft = New cv.Point(ocvb.topCameraPoint.X - x, fovRight.Y)
 
-        dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-        dst1.Line(ocvb.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        If standalone = False Then
+            dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Line(ocvb.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-        dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        End If
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
@@ -605,7 +611,7 @@ Public Class PointCloud_FrustrumTop
         task.pointCloud = frustrum.xyzDepth.xyzFrame
         topView.Run()
 
-        cmat.src = topView.dst1 '.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
+        cmat.src = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cmat.Run()
         dst1 = cmat.dst1
     End Sub
@@ -649,7 +655,7 @@ Public Class PointCloud_FrustrumSide
         task.pointCloud = frustrum.xyzDepth.xyzFrame
         sideView.Run()
 
-        cmat.src = sideView.dst1
+        cmat.src = sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cmat.Run()
         dst1 = cmat.dst1
     End Sub

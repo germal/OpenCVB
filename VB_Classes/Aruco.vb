@@ -29,7 +29,7 @@ End Class
 
 
 
-Public Class Aruco_CS
+Public Class Aruco_Test
     Inherits VBparent
     Dim aruco As New CS_Classes.Aruco_Detect
     Public Sub New()
@@ -39,7 +39,7 @@ Public Class Aruco_CS
         task.desc = "Testing the Aruco marker detection in C#"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)
         dst1 = aruco.detectedMarkers.Resize(src.Size())

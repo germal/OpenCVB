@@ -124,7 +124,7 @@ End Class
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_Manual
+Public Class OilPaint_ManualVB
     Inherits VBparent
     Public Sub New()
         initParent()
@@ -137,7 +137,7 @@ Public Class OilPaint_Manual
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
 
@@ -148,12 +148,12 @@ Public Class OilPaint_Manual
         Dim result1 = color.Clone()
         For y = filtersize To roi.Height - filtersize - 1
             For x = filtersize To roi.Width - filtersize - 1
-                Dim intensitybins(levels) As integer
-                Dim bluebin(levels) As integer
-                Dim greenbin(levels) As integer
-                Dim redbin(levels) As integer
-                Dim maxIntensity As integer = 0
-                Dim maxIndex As integer = 0
+                Dim intensitybins(levels) As Integer
+                Dim bluebin(levels) As Integer
+                Dim greenbin(levels) As Integer
+                Dim redbin(levels) As Integer
+                Dim maxIntensity As Integer = 0
+                Dim maxIndex As Integer = 0
                 Dim vec As cv.Vec3b = Nothing
                 For yy = y - filtersize To y + filtersize - 1
                     For xx = x - filtersize To x + filtersize - 1
@@ -184,7 +184,7 @@ End Class
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_Manual_CS
+Public Class OilPaint_Manual
     Inherits VBparent
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New()
@@ -201,14 +201,14 @@ Public Class OilPaint_Manual_CS
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = task.drawRect
         src.CopyTo(dst1)
         oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.trackbar(1).Value)
         dst2 = src.EmptyClone.SetTo(0)
-        Dim factor As integer = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
+        Dim factor As Integer = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
         cv.Cv2.Resize(dst1(roi), dst2(New cv.Rect(0, 0, s.Width, s.Height)), s)
     End Sub
@@ -220,13 +220,13 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Cartoon
     Inherits VBparent
-    Dim oil As OilPaint_Manual_CS
+    Dim oil As OilPaint_Manual
     Dim laplacian As Edges_Laplacian
     Public Sub New()
         initParent()
         laplacian = New Edges_Laplacian()
 
-        oil = New OilPaint_Manual_CS()
+        oil = New OilPaint_Manual
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
 
         task.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"

@@ -51,7 +51,8 @@ Public Class Resize_Percentage
         task.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)
         Dim resizePercent = sliders.trackbar(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)

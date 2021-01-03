@@ -6,7 +6,7 @@ namespace CS_Classes
     {
         public void New() { }
 
-        public void Start(cv.Mat input, cv.Mat output, cv.SimpleBlobDetector.Params detectorParams)
+        public void Run(cv.Mat input, cv.Mat output, cv.SimpleBlobDetector.Params detectorParams)
         {
             var binaryImage = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);
             cv.Cv2.Threshold(binaryImage, binaryImage, thresh: 100, maxval: 255, type: cv.ThresholdTypes.Binary);

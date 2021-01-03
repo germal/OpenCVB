@@ -788,7 +788,6 @@ Public Class Histogram_TopData
         gCloud = New Depth_PointCloud_IMU()
         If VB_Classes.ActiveTask.algParms.camNames.D455 = ocvb.parms.cameraName Then IntelBug = True
 
-        label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
 
@@ -805,18 +804,10 @@ Public Class Histogram_TopData
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
-        histOutput = histOutput.Flip(cv.FlipMode.X)
 
         Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
-        dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        cameraLoc = CInt(dst1.Width * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
-
-        dst1.Line(New cv.Point(cameraLoc, dst2.Height), New cv.Point(cameraLoc, 0), cv.Scalar.Yellow, 1)
-        label1 = "Camera level is " + CStr(cameraLoc) + " rows from the left (in yellow)"
-        label2 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00")
+        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        label1 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 
@@ -866,15 +857,8 @@ Public Class Histogram_SideData
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         Static histThresholdSlider = findSlider("Top/Side View Histogram threshold")
-        dst2 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        dst2.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        cameraLoc = CInt(dst1.Height * Math.Abs(meterMin) / Math.Abs(meterMax - meterMin))
-
-        dst1.Circle(New cv.Point(0, cameraLoc), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        label1 = "Camera dot below at " + CStr(cameraLoc) + " rows from the top"
-        label2 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00")
+        dst1 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        label1 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
 ' https://github.com/TheAlgorithms/C-Sharp/blob/master/Algorithms/Other/SieveOfEratosthenes.cs'
-Public Class Sieve_Basics
+Public Class Sieve_BasicsVB
     Inherits VBparent
     Public primes As New List(Of Integer)
     Public Sub New()
@@ -26,7 +26,7 @@ Public Class Sieve_Basics
         Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, ""))
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim count = sliders.trackbar(0).Value
         Dim nextEntry As Integer = 2
         Dim output = New List(Of Integer)
@@ -50,17 +50,17 @@ End Class
 
 
 
-Public Class Sieve_Basics_CS
+Public Class Sieve_Basics
     Inherits VBparent
-    Dim printer As Sieve_Basics
+    Dim printer As Sieve_BasicsVB
     Dim sieve As New CS_Classes.Sieve
     Public Sub New()
         initParent()
-        printer = New Sieve_Basics()
+        printer = New Sieve_BasicsVB
         task.desc = "Implement the Sieve of Eratothenes in C#"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static countSlider = findSlider("Count of desired primes")
         ocvb.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))
     End Sub

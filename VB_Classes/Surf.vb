@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Basics_CS
+Public Class Surf_Basics
     Inherits VBparent
     Public CS_SurfBasics As New CS_SurfBasics
     Dim fisheye As FishEye_Rectified
@@ -28,7 +28,7 @@ Public Class Surf_Basics_CS
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         srcLeft = task.leftView
         srcRight = task.rightView
         Dim doubleSize As New cv.Mat
@@ -47,20 +47,20 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Basics
+Public Class Surf_BasicsVB
     Inherits VBparent
-    Dim surf As Surf_Basics_CS
+    Dim surf As Surf_Basics
     Dim fisheye As FishEye_Rectified
     Public Sub New()
         initParent()
         fisheye = New FishEye_Rectified()
 
-        surf = New Surf_Basics_CS()
+        surf = New Surf_Basics()
 
         task.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         surf.src = src
         surf.Run()
         dst1 = surf.dst1
@@ -75,10 +75,10 @@ End Class
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_DrawMatchManual_CS
     Inherits VBparent
-    Dim surf As Surf_Basics_CS
+    Dim surf As Surf_Basics
     Public Sub New()
         initParent()
-        surf = New Surf_Basics_CS()
+        surf = New Surf_Basics()
         surf.CS_SurfBasics.drawPoints = False
 
         If findfrm(caller + " Slider Options") Is Nothing Then
