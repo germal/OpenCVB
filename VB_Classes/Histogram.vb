@@ -804,8 +804,7 @@ Public Class Histogram_TopData
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Static histThresholdSlider = findSlider("Top and Side Views Histogram threshold")
-        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         label1 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
@@ -853,8 +852,7 @@ Public Class Histogram_SideData
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Static histThresholdSlider = findSlider("Top and Side Views Histogram threshold")
-        dst1 = histOutput.Threshold(histThresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        dst1 = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         label1 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
@@ -887,10 +885,9 @@ Public Class Histogram_SmoothTopView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         topView.gCloud.Run()
 
-        Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static saveYRotate As Integer
-        If saveYRotate <> yRotateSlider.value Then
-            saveYRotate = yRotateSlider.value
+        If saveYRotate <> task.yRotateSlider.Value Then
+            saveYRotate = task.yRotateSlider.Value
             stable.myResetAll = True
         End If
 
@@ -902,7 +899,7 @@ Public Class Histogram_SmoothTopView2D
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
-        dst1 = topView.histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1 = topView.histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -945,10 +942,9 @@ Public Class Histogram_SmoothSideView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.gCloud.Run()
 
-        Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static saveYRotate As Integer
-        If saveYRotate <> yRotateSlider.value Then
-            saveYRotate = yRotateSlider.value
+        If saveYRotate <> task.yRotateSlider.Value Then
+            saveYRotate = task.yRotateSlider.Value
             stable.myResetAll = True
         End If
 
@@ -959,7 +955,7 @@ Public Class Histogram_SmoothSideView2D
         If sideView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
-        Dim tmp = sideView.histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        Dim tmp = sideView.histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1310,7 +1306,7 @@ Public Class Histogram_TopView2D
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        histOutput = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary)
+        histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
@@ -1359,8 +1355,8 @@ Public Class Histogram_SideView2D
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Dim tmp = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         If standalone Or task.intermediateReview = caller Then
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

@@ -33,7 +33,6 @@ Public Class VBocvb
     Public angleZ As Single  ' rotation angle in radians around z-axis to align with gravity
     Public cz As Single
     Public sz As Single
-    Public gMat As cv.Mat
 
     Public intermediateObject As VBparent
 

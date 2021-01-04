@@ -9,7 +9,7 @@ Public Class StructuredDepth_Floor
         kalman = New Kalman_VB_Basics()
 
         structD = New StructuredDepth_SliceH()
-        task.binSlider.Value = 10 ' some cameras can show data below ground level...
+        task.thresholdSlider.Value = 10 ' some cameras can show data below ground level...
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
         task.desc = "Find the floor plane"
@@ -527,7 +527,6 @@ Public Class StructuredDepth_SliceH
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
 
-        Static histThresholdSlider = findSlider("Top and Side Views Histogram threshold")
         Dim depthShadow = task.inrange.noDepthMask
         Dim Split = task.pointCloud.Split()
 

@@ -103,6 +103,7 @@ Public Class Plot_OverTime
     Public offChartCount As Integer
     Public lastXdelta As New List(Of cv.Scalar)
     Public topBottomPad As Integer
+    Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Dim myStopWatch As Stopwatch
     Public Sub New()
         initParent()
@@ -147,7 +148,7 @@ Public Class Plot_OverTime
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
         Static resetCheck = findCheckBox("Reset the plot scale")
-        If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount) Or resetCheck.Checked Then
+        If ((offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount) Or resetCheck.Checked) And controlScale = False Then
             resetCheck.Checked = False
             dst1.SetTo(0)
             maxScale = Integer.MinValue

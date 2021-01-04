@@ -17,7 +17,7 @@ Public Class OptionsCommon_Depth
         sliders.setupTrackBar(3, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
         task.minRangeSlider = sliders.trackbar(0) ' one of the few places we can be certain there is only one...
         task.maxRangeSlider = sliders.trackbar(1)
-        task.binSlider = sliders.trackbar(2)
+        task.thresholdSlider = sliders.trackbar(2)
         task.yRotateSlider = sliders.trackbar(3)
 
         label1 = "Depth values that are in-range"
@@ -30,7 +30,7 @@ Public Class OptionsCommon_Depth
         minVal = task.minRangeSlider.Value
         maxVal = task.maxRangeSlider.Value
         ocvb.maxZ = maxVal / 1000
-        bins = task.binSlider.Value
+        bins = task.thresholdSlider.Value
         If minVal >= maxVal Then maxVal = minVal + 1
 
         Static saveMaxVal As Integer
@@ -52,6 +52,7 @@ Public Class OptionsCommon_Depth
         cv.Cv2.InRange(task.depth32f, minVal, maxVal, depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
         dst1 = task.depth32f.SetTo(0, noDepthMask)
+        task.pointCloud.SetTo(0, noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
     End Sub
 End Class
 

@@ -429,8 +429,7 @@ Public Class PointCloud_Kalman_TopView
 
         topView.Run()
 
-        Static sliderHistThreshold = findSlider("Top and Side Views Histogram threshold")
-        flood.src = topView.histOutput.Threshold(sliderHistThreshold.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = topView.histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run()
 
         If flood.dst1.Channels = 3 Then pTrack.src = flood.dst1 Else pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -479,7 +478,6 @@ Public Class PointCloud_Kalman_SideView
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.Run()
 
-        Static sliderHistThreshold = findSlider("Top and Side Views Histogram threshold")
         flood.src = sideView.histOutput.ConvertScaleAbs(255)
         flood.Run()
 
@@ -592,8 +590,7 @@ Public Class PointCloud_FrustrumTop
         frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
 
-        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
-        histSlider.Value = 0
+        task.thresholdSlider.Value = 0
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
@@ -636,8 +633,7 @@ Public Class PointCloud_FrustrumSide
         frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
 
-        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
-        histSlider.Value = 0
+        task.thresholdSlider.Value = 0
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
@@ -679,8 +675,7 @@ End Class
 '        initParent()
 
 '        topView = New Histogram_TopView2D()
-'        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
-'        histSlider.Value = 20
+'        task.thresholdSlider.Value = 20
 
 '        kTopView = New PointCloud_Kalman_TopView()
 '        cmat = New PointCloud_Colorize()
@@ -736,8 +731,7 @@ End Class
 '        kSideView = New PointCloud_Kalman_SideView()
 '        sideView = New Histogram_SideView2D()
 
-'        Dim histSlider = findSlider("Top and Side Views Histogram threshold")
-'        histSlider.Value = 20
+'        task.thresholdSlider.Value = 20
 
 '        label1 = "side view AFTER align/threshold using gravity vector"
 '        If standalone or task.intermediateReview = caller Then label2 = "side view BEFORE align/threshold using gravity vector"
@@ -1132,8 +1126,7 @@ Public Class PointCloud_Singletons
         topView = New Histogram_TopView2D()
         topView.resizeHistOutput = False
         inrange = New Depth_InRange()
-        Dim histThreshold = findSlider("Top and Side Views Histogram threshold")
-        histThreshold.Value = 1
+        task.thresholdSlider.Value = 1
 
         label1 = "Top down view before inrange sampling"
         label2 = "Histogram after filtering for single-only histogram bins"
@@ -1199,10 +1192,8 @@ Public Class PointCloud_ReducedSideView
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        Dim tmp = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary)
-        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-
+        histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
     End Sub
 End Class
 
@@ -1241,7 +1232,7 @@ Public Class PointCloud_ReducedTopView
         cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(task.yRotateSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
     End Sub
 End Class

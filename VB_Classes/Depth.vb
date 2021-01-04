@@ -1663,104 +1663,6 @@ End Class
 
 
 
-' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
-' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloud_IMU
-    Inherits VBparent
-    Public Mask As New cv.Mat
-    Public imu As IMU_GVector
-    Public gMatrix(,) As Single
-    Dim mats As Mat_4to1
-    Dim cmat As PointCloud_ColorizeSide
-    Public Sub New()
-        initParent()
-
-        cmat = New PointCloud_ColorizeSide
-        mats = New Mat_4to1
-        imu = New IMU_GVector
-
-        label2 = "Depth values after rotation"
-        task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-
-        If standalone Or task.intermediateReview = caller Then
-            label1 = "Original depth, absDiff, absdiff thresholded "
-            Dim split = task.pointCloud.Split()
-            dst1 = split(2)
-            mats.mat(0) = split(2).ConvertScaleAbs(255)
-        End If
-
-        imu.Run()
-        Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
-        '[cos(a) -sin(a)    0]
-        '[sin(a)  cos(a)    0]
-        '[0       0         1] rotate the point cloud around
-        '  the x-axis.
-        If xCheckbox.Checked Then
-            cz = Math.Cos(ocvb.angleZ)
-            sz = Math.Sin(ocvb.angleZ)
-        End If
-
-        '[1       0         0      ] rotate the point cloud around the z-axis.
-        '[0       cos(a)    -sin(a)]
-        '[0       sin(a)    cos(a) ]
-        If zCheckbox.Checked Then
-            cx = Math.Cos(ocvb.angleX)
-            sx = Math.Sin(ocvb.angleX)
-        End If
-
-        '[cx -sx    0]  [1  0   0 ] 
-        '[sx  cx    0]  [0  cz -sz]
-        '[0   0     1]  [0  sz  cz]
-        Dim gM(,) As Single = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
-                               {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
-                               {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
-
-        Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
-        Dim angleY = angleYslider.value
-        '[cos(a) 0 -sin(a)]
-        '[0      1       0]
-        '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
-        cy = Math.Cos(angleY * cv.Cv2.PI / 180)
-        sy = Math.Sin(angleY * cv.Cv2.PI / 180)
-        gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
-              {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
-              {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
-
-        gMatrix = gM
-        If xCheckbox.Checked Or zCheckbox.Checked Then
-            ocvb.gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
-            Dim gInput = task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols)
-            Dim gOutput = (gInput * ocvb.gMat).ToMat
-            task.pointCloud = gOutput.Reshape(3, task.pointCloud.Rows)
-        Else
-            task.pointCloud = task.pointCloud.Clone
-        End If
-
-        If standalone Or task.intermediateReview = caller Then
-            Dim split = task.pointCloud.Split()
-            dst2 = split(2)
-            Dim tmp As New cv.Mat
-            cv.Cv2.Absdiff(dst1, dst2, tmp)
-            mats.mat(1) = tmp.ConvertScaleAbs(255)
-            mats.mat(2) = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-            mats.Run()
-            dst1 = mats.dst1
-        End If
-        ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -1931,5 +1833,104 @@ Public Class Depth_PunchBlob
             showWarningInfo -= 1
             ocvb.trueText("Too many contours!  Reduce the Max Depth.", 10, 130, 3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
+' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
+Public Class Depth_PointCloud_IMU
+    Inherits VBparent
+    Public Mask As New cv.Mat
+    Public imu As IMU_GVector
+    Public gMatrix(,) As Single
+    Dim mats As Mat_4to1
+    Dim cmat As PointCloud_ColorizeSide
+    Public Sub New()
+        initParent()
+
+        cmat = New PointCloud_ColorizeSide
+        mats = New Mat_4to1
+        imu = New IMU_GVector
+
+        label2 = "Depth values after rotation"
+        task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+
+        If standalone Or task.intermediateReview = caller Then
+            label1 = "Original depth, absDiff, absdiff thresholded "
+            Dim split = task.pointCloud.Split()
+            dst1 = split(2)
+            mats.mat(0) = split(2).ConvertScaleAbs(255)
+        End If
+
+        imu.Run()
+        Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
+        '[cos(a) -sin(a)    0]
+        '[sin(a)  cos(a)    0]
+        '[0       0         1] rotate the point cloud around
+        '  the x-axis.
+        If xCheckbox.Checked Then
+            cz = Math.Cos(ocvb.angleZ)
+            sz = Math.Sin(ocvb.angleZ)
+        End If
+
+        '[1       0         0      ] rotate the point cloud around the z-axis.
+        '[0       cos(a)    -sin(a)]
+        '[0       sin(a)    cos(a) ]
+        If zCheckbox.Checked Then
+            cx = Math.Cos(ocvb.angleX)
+            sx = Math.Sin(ocvb.angleX)
+        End If
+
+        '[cx -sx    0]  [1  0   0 ] 
+        '[sx  cx    0]  [0  cz -sz]
+        '[0   0     1]  [0  sz  cz]
+        Dim gM(,) As Single = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                               {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
+                               {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
+
+        Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+        Dim angleY = angleYslider.value
+        '[cos(a) 0 -sin(a)]
+        '[0      1       0]
+        '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
+        cy = Math.Cos(angleY * cv.Cv2.PI / 180)
+        sy = Math.Sin(angleY * cv.Cv2.PI / 180)
+        gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
+              {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
+              {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
+
+        gMatrix = gM
+        If xCheckbox.Checked Or zCheckbox.Checked Then
+            Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
+            Dim gInput = task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols)
+            Dim gOutput = (gInput * gMat).ToMat
+            task.pointCloud = gOutput.Reshape(3, task.pointCloud.Rows)
+        Else
+            task.pointCloud = task.pointCloud.Clone
+        End If
+
+        If standalone Or task.intermediateReview = caller Then
+            Dim split = task.pointCloud.Split()
+            dst2 = split(2)
+            Dim tmp As New cv.Mat
+            cv.Cv2.Absdiff(dst1, dst2, tmp)
+            mats.mat(1) = tmp.ConvertScaleAbs(255)
+            mats.mat(2) = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+            mats.Run()
+            dst1 = mats.dst1
+        End If
+        ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ
     End Sub
 End Class

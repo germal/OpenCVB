@@ -42,7 +42,7 @@ Public Class ActiveTask : Implements IDisposable
     Public depthOptionsChanged As Boolean
     Public minRangeSlider As Windows.Forms.TrackBar
     Public maxRangeSlider As Windows.Forms.TrackBar
-    Public binSlider As Windows.Forms.TrackBar
+    Public thresholdSlider As Windows.Forms.TrackBar
     Public yRotateSlider As Windows.Forms.TrackBar
 
     Public mouseClickFlag As Boolean

@@ -19,6 +19,7 @@ Public Class MiniPC_Basics
         resize.Run()
 
         Dim split = resize.dst1.Split()
+        split(2).SetTo(0, task.inrange.nodepthMask.resize(split(2).Size))
         rect = New cv.Rect(0, 0, resize.dst1.Width, resize.dst1.Height)
         If rect.Height < dst1.Height / 2 Then rect.Y = dst1.Height / 4 ' move it below the dst1 caption
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -40,6 +41,7 @@ Public Class MiniPC_Rotate
     Inherits VBparent
     Public mini As MiniPC_Basics
     Public histogram As New cv.Mat
+    Public angleY As Integer
     Public Sub New()
         initParent()
         mini = New MiniPC_Basics
@@ -53,15 +55,14 @@ Public Class MiniPC_Rotate
         If standalone Then
             mini.Run()
             input = mini.dst2 ' the task.pointcloud
-            dst1 = mini.dst1.Clone
+            Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+            angleY = angleYslider.value
         End If
 
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
         Dim gM(,) As Single = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
                                {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                                {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
-        Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
-        Dim angleY = angleYslider.value
         '[cos(a) 0 -sin(a)]
         '[0      1       0]
         '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
@@ -71,10 +72,18 @@ Public Class MiniPC_Rotate
               {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
               {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gM)
+        Dim gInput = input.Reshape(1, input.Rows * input.Cols)
+        Dim gOutput = (gInput * gMat).ToMat
+        input = gOutput.Reshape(3, input.Rows)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(1, ocvb.maxZ)}
         Dim histSize() = {input.Height, input.Width}
         cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {1, 2}, New cv.Mat, histogram, 2, histSize, ranges)
+        histogram = histogram.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+
         dst2(mini.rect) = histogram.ConvertScaleAbs(255)
+        dst1(mini.rect) = input.ConvertScaleAbs(255)
     End Sub
 End Class
 
@@ -84,11 +93,22 @@ End Class
 
 
 
-Public Class MiniPC_FindPeak
+Public Class MiniPC_RotateAngle
     Inherits VBparent
     Dim peak As MiniPC_Rotate
+    Dim mats As Mat_4to1
+    Public plot As Plot_OverTime
+    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
+
+        palette = New Palette_Basics
+        plot = New Plot_OverTime()
+        plot.controlScale = True ' we are controlling the scale...
+        plot.maxScale = 300
+        plot.minScale = 0
+
+        mats = New Mat_4to1
         peak = New MiniPC_Rotate
         task.desc = "Find a peak value in the side view histograms"
     End Sub
@@ -98,28 +118,46 @@ Public Class MiniPC_FindPeak
         peak.mini.Run()
         peak.src = peak.mini.dst2
 
-        Dim minval As Double, maxval As Double
-        Dim minLoc As cv.Point, maxloc As cv.Point
-        Dim maxPeak = Single.MinValue
-        Dim locPeak As cv.Point
-        Dim bestYRotate As Integer
-        For i = -90 To 90
-            task.yRotateSlider.Value = i
-            peak.Run()
-            Dim r = peak.mini.rect
-            peak.histogram.MinMaxLoc(minval, maxval, minLoc, maxloc)
-            Dim mean = peak.dst2(r).Mean()
-            Console.WriteLine("Angle = " + CStr(i) + " peak val = " + CStr(maxval) + " mean val = " + CStr(mean.Item(0)))
-            If maxval > maxPeak Then
-                maxPeak = maxval
-                locPeak = maxloc
-                bestYRotate = i
-            End If
-        Next
+        Dim sz = New cv.Size(peak.mini.rect.Width, peak.mini.rect.Height)
+        Static maxValues As New cv.Mat(sz, cv.MatType.CV_32F, 0)
+        Static maxIndex As New cv.Mat(sz, cv.MatType.CV_32F, 0)
+        Dim r = peak.mini.rect
 
-        task.yRotateSlider.Value = bestYRotate
+        Dim prevMaxValues = maxValues.Clone
         peak.Run()
-        dst1 = peak.dst1
-        dst2 = peak.dst2
+        peak.angleY += 1
+        If peak.angleY > 90 Then
+            peak.angleY = -90
+            maxValues.SetTo(0)
+            maxIndex.SetTo(0)
+        End If
+
+        cv.Cv2.Max(maxValues, peak.histogram, maxValues)
+
+        Dim mask As New cv.Mat
+        cv.Cv2.Absdiff(maxValues, prevMaxValues, mask)
+        mask = mask.ConvertScaleAbs(255)
+        maxIndex.SetTo(peak.angleY, mask)
+        mats.mat(2) = mask
+
+        Dim minVal As Double, maxVal As Double
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+
+        label2 = "Blue is mean*100, red is maxVal/100, green mask count"
+
+        Dim showPlot As Boolean = False
+        If showPlot Then
+            plot.plotData = New cv.Scalar(peak.histogram.Mean().Item(0) * 100, mask.CountNonZero(), maxVal / 100)
+            plot.Run()
+            dst2 = plot.dst1
+        Else
+            dst2 = maxIndex
+        End If
+
+        mats.mat(0) = peak.dst1(peak.mini.rect)
+        mats.mat(1) = peak.dst2(peak.mini.rect)
+        mats.Run()
+        dst1 = mats.dst1
     End Sub
 End Class
