@@ -10,15 +10,19 @@ Public Class OptionsCommon_Depth
         initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
         standalone = False
-        sliders.Setup(caller)
+        sliders.Setup(caller, 6)
         sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
         sliders.setupTrackBar(2, "Top and Side Views Histogram threshold", 0, 200, 10)
-        sliders.setupTrackBar(3, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(3, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(4, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(5, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
         task.minRangeSlider = sliders.trackbar(0) ' one of the few places we can be certain there is only one...
         task.maxRangeSlider = sliders.trackbar(1)
         task.thresholdSlider = sliders.trackbar(2)
-        task.yRotateSlider = sliders.trackbar(3)
+        task.xRotateSlider = sliders.trackbar(3)
+        task.yRotateSlider = sliders.trackbar(4)
+        task.zRotateSlider = sliders.trackbar(5)
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"

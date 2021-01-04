@@ -60,18 +60,18 @@ End Module
 
 
 
-
+' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class OpticalFlow_DenseOptions
     Inherits VBparent
 
     Public pyrScale As Single
-    Public levels As integer
-    Public winSize As integer
-    Public iterations As integer
+    Public levels As Integer
+    Public winSize As Integer
+    Public iterations As Integer
     Public polyN As Single
     Public polySigma As Single
     Public OpticalFlowFlags As cv.OpticalFlowFlags
-    Public outputScaling As integer
+    Public outputScaling As Integer
     Public Sub New()
         initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -97,7 +97,7 @@ Public Class OpticalFlow_DenseOptions
         task.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
         levels = sliders.trackbar(1).Value
         winSize = sliders.trackbar(2).Value
@@ -122,7 +122,7 @@ End Class
 
 
 
-
+'https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class OpticalFlow_DenseBasics
     Inherits VBparent
     Dim flow As OpticalFlow_DenseOptions
@@ -218,7 +218,7 @@ End Class
 
 
 
-
+' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class OpticalFlow_Sparse
     Inherits VBparent
 

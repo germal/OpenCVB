@@ -1849,21 +1849,19 @@ Public Class Depth_PointCloud_IMU
     Inherits VBparent
     Public Mask As New cv.Mat
     Public imu As IMU_GVector
-    Public cmat As PointCloud_ColorizeSide
     Public gMatrix(,) As Single
     Public Sub New()
         initParent()
 
-        cmat = New PointCloud_ColorizeSide
         imu = New IMU_GVector
 
-        label1 = "dst2 contains the pointcloud - 32-bit depth below"
+        label1 = "dst1 = 32-bit depth, dst2 = modified point cloud"
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
 
         dst1 = task.depth32f
 

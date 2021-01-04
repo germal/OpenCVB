@@ -106,17 +106,6 @@ Public Class PointCloud_ColorizeSide
     Public Sub New()
         initParent()
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
-            check.Box(0).Text = "Rotate pointcloud around X-axis using angleZ of the gravity vector"
-            check.Box(1).Text = "Rotate pointcloud around Z-axis using angleX of the gravity vector"
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-
-        xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
-
         palette = New Palette_Gradient()
         palette.color1 = cv.Scalar.Yellow
         palette.color2 = cv.Scalar.Blue
@@ -154,7 +143,7 @@ Public Class PointCloud_ColorizeSide
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        If zCheckbox.checked Then
+        If task.xRotateSlider.Value <> 0 Then
             Dim offset = Math.Sin(ocvb.angleX) * marker.Y
             If ocvb.angleX > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
@@ -165,7 +154,7 @@ Public Class PointCloud_ColorizeSide
             End If
         End If
 
-        If xCheckbox.checked Then
+        If task.zRotateSlider.Value <> 0 Then
             markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
             markerLeft = New cv.Point(markerLeft.X * Math.Cos(ocvb.angleZ) - markerLeft.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
                                       markerLeft.Y * Math.Cos(ocvb.angleZ) + markerLeft.X * Math.Sin(ocvb.angleZ))
@@ -215,13 +204,10 @@ End Class
 Public Class PointCloud_ColorizeTop
     Inherits VBparent
     Dim palette As Palette_Gradient
-    Dim cmat As PointCloud_ColorizeSide
     Dim arcSize As Integer
     Public xCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         initParent()
-        cmat = New PointCloud_ColorizeSide
-        xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
 
         palette = New Palette_Gradient()
         palette.color1 = cv.Scalar.Yellow
@@ -259,7 +245,7 @@ Public Class PointCloud_ColorizeTop
         Dim markerLeft = New cv.Point(cam.X - topLen, dst1.Height - marker.Y)
         Dim markerRight = New cv.Point(cam.X + topLen, dst1.Height - marker.Y)
 
-        If xCheckbox.checked Then
+        If task.zRotateSlider.Value <> 0 Then
             Dim offset = Math.Sin(ocvb.angleZ) * topLen
             If ocvb.angleZ > 0 Then
                 markerLeft.X = markerLeft.X - offset
@@ -592,8 +578,8 @@ Public Class PointCloud_FrustrumTop
 
         task.thresholdSlider.Value = 0
 
-        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleX")
+        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         xCheckbox.Checked = False
         zCheckbox.Checked = False
 
@@ -635,8 +621,8 @@ Public Class PointCloud_FrustrumSide
 
         task.thresholdSlider.Value = 0
 
-        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
-        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
+        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
+        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         xCheckbox.Checked = False
         zCheckbox.Checked = False
 

@@ -444,6 +444,15 @@ Public Class IMU_GVector
         initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(6 - 1)
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Rotate pointcloud around X-axis using gravity vector angleZ"
+            check.Box(1).Text = "Rotate pointcloud around Z-axis using gravity vector angleX"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run()
@@ -455,6 +464,14 @@ Public Class IMU_GVector
         ocvb.angleX = Math.Atan2(gy, gx) + cv.Cv2.PI / 2
         ocvb.angleY = Math.Atan2(gx, gy)
         ocvb.angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
+        If xCheckbox.checked = False Then ocvb.angleZ = 0
+        task.zRotateSlider.Value = CInt(ocvb.angleZ * 57.2958)
+
+        If zCheckbox.checked = False Then ocvb.angleX = 0
+        task.xRotateSlider.Value = CInt(ocvb.angleX * 57.2958)
 
         kalman.kInput = {gx, gy, gz, ocvb.angleX, ocvb.angleY, ocvb.angleZ}
 
