@@ -80,9 +80,8 @@ Public Class MiniPC_Rotate
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(1, ocvb.maxZ)}
         Dim histSize() = {input.Height, input.Width}
         cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {1, 2}, New cv.Mat, histogram, 2, histSize, ranges)
-        histogram = histogram.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
 
-        dst2(mini.rect) = histogram.ConvertScaleAbs(255)
+        dst2(mini.rect) = histogram.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         dst1(mini.rect) = input.ConvertScaleAbs(255)
     End Sub
 End Class
@@ -98,19 +97,78 @@ Public Class MiniPC_RotateAngle
     Dim peak As MiniPC_Rotate
     Dim mats As Mat_4to1
     Public plot As Plot_OverTime
-    Dim palette As Palette_Basics
+    Dim resetCheck As Windows.Forms.CheckBox
     Public Sub New()
         initParent()
 
-        palette = New Palette_Basics
         plot = New Plot_OverTime()
         plot.controlScale = True ' we are controlling the scale...
-        plot.maxScale = 300
+        plot.maxScale = 100
         plot.minScale = 0
+        resetCheck = findCheckBox("Reset the plot scale")
+        resetCheck.Checked = False
 
         mats = New Mat_4to1
         peak = New MiniPC_Rotate
+        peak.angleY = -90
+
+        label1 = "peak dst1, peak dst2, changed mask, maxvalues history"
+        label2 = "Blue is mean*100, red is maxVal/100, green mask count"
         task.desc = "Find a peak value in the side view histograms"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If src.Type <> cv.MatType.CV_32FC3 Then
+            peak.mini.Run()
+            peak.src = peak.mini.dst2
+        Else
+            peak.src = src
+        End If
+
+        Dim r = peak.mini.rect
+        Dim sz = New cv.Size(r.Width, r.Height)
+        peak.Run()
+        peak.angleY += 1
+        If peak.angleY > 90 Then peak.angleY = -90
+
+        Dim minVal As Double, maxVal As Double
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+
+        Dim mean = peak.histogram.Mean().Item(0) * 100
+        Dim mask = peak.histogram.Threshold(mean, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        mats.mat(2) = mask
+
+        If plot.maxScale < maxVal Then resetCheck.Checked = True
+        plot.plotData = New cv.Scalar(maxVal) 'mean, mask.CountNonZero(), maxVal)
+        plot.Run()
+        dst2 = plot.dst1
+        mats.mat(3) = peak.histogram.ConvertScaleAbs(255)
+
+        mats.mat(0) = peak.dst1(peak.mini.rect)
+        mats.mat(1) = peak.dst2(peak.mini.rect)
+        mats.Run()
+        dst1 = mats.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class MiniPC_RotateSinglePass
+    Inherits VBparent
+    Dim peak As MiniPC_Rotate
+    Public Sub New()
+        initParent()
+        peak = New MiniPC_Rotate
+        peak.angleY = -90
+        task.desc = "Same operation as MiniPC_RotateAngle but in a single pass."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -118,46 +176,27 @@ Public Class MiniPC_RotateAngle
         peak.mini.Run()
         peak.src = peak.mini.dst2
 
-        Dim sz = New cv.Size(peak.mini.rect.Width, peak.mini.rect.Height)
-        Static maxValues As New cv.Mat(sz, cv.MatType.CV_32F, 0)
-        Static maxIndex As New cv.Mat(sz, cv.MatType.CV_32F, 0)
         Dim r = peak.mini.rect
-
-        Dim prevMaxValues = maxValues.Clone
-        peak.Run()
-        peak.angleY += 1
-        If peak.angleY > 90 Then
-            peak.angleY = -90
-            maxValues.SetTo(0)
-            maxIndex.SetTo(0)
-        End If
-
-        cv.Cv2.Max(maxValues, peak.histogram, maxValues)
-
-        Dim mask As New cv.Mat
-        cv.Cv2.Absdiff(maxValues, prevMaxValues, mask)
-        mask = mask.ConvertScaleAbs(255)
-        maxIndex.SetTo(peak.angleY, mask)
-        mats.mat(2) = mask
-
+        Dim sz = New cv.Size(r.Width, r.Height)
+        Dim maxHist = Single.MinValue
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
-        peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-
-        label2 = "Blue is mean*100, red is maxVal/100, green mask count"
-
-        Dim showPlot As Boolean = False
-        If showPlot Then
-            plot.plotData = New cv.Scalar(peak.histogram.Mean().Item(0) * 100, mask.CountNonZero(), maxVal / 100)
-            plot.Run()
-            dst2 = plot.dst1
-        Else
-            dst2 = maxIndex
-        End If
-
-        mats.mat(0) = peak.dst1(peak.mini.rect)
-        mats.mat(1) = peak.dst2(peak.mini.rect)
-        mats.Run()
-        dst1 = mats.dst1
+        Dim bestAngle As Integer
+        Dim bestLoc As cv.Point
+        For i = -90 To 90
+            peak.Run()
+            peak.angleY = i
+            peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+            Console.WriteLine("Angle = " + CStr(i) + " max val = " + CStr(maxVal))
+            If maxVal > maxHist Then
+                maxHist = maxVal
+                bestAngle = i
+                bestLoc = maxLoc
+            End If
+        Next
+        peak.Run()
+        peak.angleY = bestAngle
+        dst1 = peak.dst1
+        dst2 = peak.dst2
     End Sub
 End Class
