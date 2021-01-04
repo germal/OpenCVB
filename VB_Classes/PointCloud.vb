@@ -1474,7 +1474,7 @@ Public Class PointCloud_BothViews
             Dim instructions = "Click any centroid to get details"
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
-            If cmatSide.xCheckbox.checked Or cmatSide.zCheckbox.checked Then
+            If task.xRotateSlider.Value <> 0 Or task.zRotateSlider.Value <> 0 Then
                 levelCheck.Run()
                 If levelCheck.cameraLevel Then
                     accMsg1 = "Distances are good - camera is level"
