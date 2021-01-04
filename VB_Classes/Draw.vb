@@ -481,13 +481,10 @@ End Class
 Public Class Draw_Frustrum
     Inherits VBparent
     Public xyzDepth As Depth_WorldXYZ_MT
-    Dim gCloud As Depth_PointCloud_IMU
     Public Sub New()
         initParent()
         xyzDepth = New Depth_WorldXYZ_MT()
         xyzDepth.depthUnitsMeters = True
-
-        If standalone = False Then gCloud = New Depth_PointCloud_IMU
 
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub

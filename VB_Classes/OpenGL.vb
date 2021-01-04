@@ -161,6 +161,7 @@ End Module
 Public Class OpenGL_Options
     Inherits VBparent
     Public OpenGL As OpenGL_Basics
+    Public pointCloudInput As cv.Mat
     Public Sub New()
         initParent()
         OpenGL = New OpenGL_Basics()
@@ -190,7 +191,8 @@ Public Class OpenGL_Options
         OpenGL.scaleXYZ.Item2 = sliders.trackbar(13).Value
 
         OpenGL.src = src
-        OpenGL.pointCloudInput = task.pointCloud
+        OpenGL.pointCloudInput = pointCloudInput
+        If OpenGL.pointCloudInput Is Nothing Then OpenGL.pointCloudInput = task.pointCloud
         OpenGL.Run()
     End Sub
 End Class
@@ -201,6 +203,7 @@ End Class
 Public Class OpenGL_Callbacks
     Inherits VBparent
     Public ogl As OpenGL_Basics
+    Public pointCloudInput As cv.Mat
     Public Sub New()
         initParent()
         ogl = New OpenGL_Basics()
@@ -210,7 +213,8 @@ Public Class OpenGL_Callbacks
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         ogl.src = src
-        ogl.pointCloudInput = task.pointCloud
+        If standalone Then pointCloudInput = task.pointCloud
+        ogl.pointCloudInput = pointCloudInput
         ogl.Run()
     End Sub
 End Class
@@ -390,7 +394,7 @@ Public Class OpenGL_GravityTransform
         gCloud.src = task.pointCloud
         gCloud.Run()
 
-        ogl.pointCloudInput = task.pointCloud
+        ogl.pointCloudInput = gCloud.dst2
         ogl.src = src
         ogl.Run()
     End Sub
@@ -534,7 +538,7 @@ Public Class OpenGL_DepthSliceH
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(slices.maskPlane, mask)
 
-        ogl.pointCloudInput = task.pointCloud.Clone
+        ogl.pointCloudInput = slices.side2D.gCloud.dst2.Clone
         ogl.pointCloudInput.SetTo(0, mask)
         ogl.src = New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
         ogl.Run()
@@ -597,11 +601,11 @@ Public Class OpenGL_StabilizedDepth
         If stable.src.Type <> cv.MatType.CV_32F Then stable.src = split(2) * 1000
 
         stable.Run()
-        dst1 = stable.dst1
-        dst2 = stable.dst2
+        dst1 = stable.dst2
 
         split(2) = stable.dst2 * 0.001
-        cv.Cv2.Merge(split, task.pointCloud)
+        cv.Cv2.Merge(split, dst2)
+        ogl.pointCloudInput = dst2
         ogl.src = task.color
         ogl.Run()
     End Sub
@@ -633,7 +637,7 @@ Public Class OpenGL_StableDepthMouse
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
 
-        task.pointCloud = pcValid.stableCloud
+        ogl.pointCloudInput = pcValid.stableCloud
         ogl.src = task.color
         ogl.Run()
     End Sub
@@ -661,10 +665,10 @@ Public Class OpenGL_SmoothSurfaces
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         smooth.Run()
-        dst1 = smooth.dst1
-        dst2 = smooth.dst2
+        dst1 = smooth.dst2
 
-        smooth.pcValid.stableCloud.CopyTo(task.pointCloud, smooth.dst2)
+        smooth.pcValid.stableCloud.CopyTo(dst2, smooth.dst2)
+        ogl.pointCloudInput = dst2
         ogl.src = task.color
         ogl.Run()
     End Sub
@@ -689,10 +693,10 @@ Public Class OpenGL_Stable
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        stable.Run() ' Updates Task.pointcloud
+        stable.Run()
         dst1 = stable.dst1
-        dst2 = stable.dst2
 
+        ogl.pointCloudInput = stable.dst2
         ogl.src = task.color
         ogl.Run()
 
@@ -802,9 +806,10 @@ Public Class OpenGL_ReducedSideView
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        reduced.Run() ' Updates Task.pointcloud
+        reduced.Run()
         dst1 = reduced.dst1
 
+        ogl.pointCloudInput = reduced.dst2
         ogl.src = task.color
         ogl.Run()
 

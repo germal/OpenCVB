@@ -1849,17 +1849,15 @@ Public Class Depth_PointCloud_IMU
     Inherits VBparent
     Public Mask As New cv.Mat
     Public imu As IMU_GVector
+    Public cmat As PointCloud_ColorizeSide
     Public gMatrix(,) As Single
-    Dim mats As Mat_4to1
-    Dim cmat As PointCloud_ColorizeSide
     Public Sub New()
         initParent()
 
         cmat = New PointCloud_ColorizeSide
-        mats = New Mat_4to1
         imu = New IMU_GVector
 
-        label2 = "Depth values after rotation"
+        label1 = "dst2 contains the pointcloud - 32-bit depth below"
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run()
@@ -1867,12 +1865,7 @@ Public Class Depth_PointCloud_IMU
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
 
-        If standalone Or task.intermediateReview = caller Then
-            label1 = "Original depth, absDiff, absdiff thresholded "
-            Dim split = task.pointCloud.Split()
-            dst1 = split(2)
-            mats.mat(0) = split(2).ConvertScaleAbs(255)
-        End If
+        dst1 = task.depth32f
 
         imu.Run()
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
@@ -1912,25 +1905,15 @@ Public Class Depth_PointCloud_IMU
               {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
 
         gMatrix = gM
-        If xCheckbox.Checked Or zCheckbox.Checked Then
+        If xCheckbox.Checked Or zCheckbox.Checked Or angleY <> 0 Then
             Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
             Dim gInput = task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols)
             Dim gOutput = (gInput * gMat).ToMat
-            task.pointCloud = gOutput.Reshape(3, task.pointCloud.Rows)
+            dst2 = gOutput.Reshape(3, task.pointCloud.Rows)
         Else
-            task.pointCloud = task.pointCloud.Clone
+            dst2 = task.pointCloud.Clone
         End If
 
-        If standalone Or task.intermediateReview = caller Then
-            Dim split = task.pointCloud.Split()
-            dst2 = split(2)
-            Dim tmp As New cv.Mat
-            cv.Cv2.Absdiff(dst1, dst2, tmp)
-            mats.mat(1) = tmp.ConvertScaleAbs(255)
-            mats.mat(2) = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-            mats.Run()
-            dst1 = mats.dst1
-        End If
         ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ
     End Sub
 End Class

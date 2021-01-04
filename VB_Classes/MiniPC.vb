@@ -15,7 +15,7 @@ Public Class MiniPC_Basics
 
         gCloud.Run()
 
-        resize.src = task.pointCloud
+        resize.src = gCloud.dst2
         resize.Run()
 
         Dim split = resize.dst1.Split()
@@ -45,7 +45,10 @@ Public Class MiniPC_Rotate
     Public Sub New()
         initParent()
         mini = New MiniPC_Basics
-        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.thresholdSlider.Value = 1
+
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        label2 = "Side view after resize percentage"
         task.desc = "Create a histogram for the mini point cloud"
     End Sub
     Public Sub Run()
@@ -77,12 +80,16 @@ Public Class MiniPC_Rotate
         Dim gOutput = (gInput * gMat).ToMat
         input = gOutput.Reshape(3, input.Rows)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(1, ocvb.maxZ)}
+        Dim split = input.Split()
+        Dim mask = split(2).Threshold(task.minRangeSlider.Value / 1000, 255, cv.ThresholdTypes.BinaryInv)
+        input.SetTo(0, mask.ConvertScaleAbs(255)) ' remove zero depth pixels with non-zero x and y.
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {input.Height, input.Width}
         cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {1, 2}, New cv.Mat, histogram, 2, histSize, ranges)
 
-        dst2(mini.rect) = histogram.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-        dst1(mini.rect) = input.ConvertScaleAbs(255)
+        dst1(mini.rect) = histogram.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        dst2(mini.rect) = input.ConvertScaleAbs(255)
     End Sub
 End Class
 
@@ -103,14 +110,14 @@ Public Class MiniPC_RotateAngle
 
         plot = New Plot_OverTime()
         plot.controlScale = True ' we are controlling the scale...
-        plot.maxScale = 100
+        plot.maxScale = 1
         plot.minScale = 0
         resetCheck = findCheckBox("Reset the plot scale")
         resetCheck.Checked = False
 
         mats = New Mat_4to1
         peak = New MiniPC_Rotate
-        peak.angleY = -90
+        peak.angleY = -45
 
         label1 = "peak dst1, peak dst2, changed mask, maxvalues history"
         label2 = "Blue is mean*100, red is maxVal/100, green mask count"
@@ -130,7 +137,7 @@ Public Class MiniPC_RotateAngle
         Dim sz = New cv.Size(r.Width, r.Height)
         peak.Run()
         peak.angleY += 1
-        If peak.angleY > 90 Then peak.angleY = -90
+        If peak.angleY > 45 Then peak.angleY = -45
 
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
@@ -140,8 +147,12 @@ Public Class MiniPC_RotateAngle
         Dim mask = peak.histogram.Threshold(mean, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         mats.mat(2) = mask
 
-        If plot.maxScale < maxVal Then resetCheck.Checked = True
-        plot.plotData = New cv.Scalar(maxVal) 'mean, mask.CountNonZero(), maxVal)
+        Dim metric = maxVal 'mean, mask.CountNonZero(), maxVal)
+        If plot.maxScale < metric Then
+            plot.maxScale = metric + 0.1 * metric
+            resetCheck.Checked = True
+        End If
+        plot.plotData = New cv.Scalar(metric)
         plot.Run()
         dst2 = plot.dst1
         mats.mat(3) = peak.histogram.ConvertScaleAbs(255)

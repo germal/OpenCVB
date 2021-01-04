@@ -248,8 +248,7 @@ Public Class Motion_StableDepthRectangleUpdate
             stableCloud = task.pointCloud
         End If
         dst1 = extrema.dst1
-        dst2 = extrema.dst2
-        task.pointCloud = stableCloud
+        dst2 = stableCloud
     End Sub
 End Class
 
@@ -288,7 +287,7 @@ Public Class Motion_StablePointCloud
             splitPC(2) = (stable.dst1 * 0.001).ToMat
             split(0).CopyTo(splitPC(0), dst2)
             split(1).CopyTo(splitPC(1), dst2)
-            cv.Cv2.Merge(splitPC, task.pointCloud)
+            cv.Cv2.Merge(splitPC, dst2)
         End If
     End Sub
 End Class

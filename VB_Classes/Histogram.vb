@@ -802,7 +802,7 @@ Public Class Histogram_TopData
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         label1 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00") + " x and y scales differ!"
@@ -850,7 +850,7 @@ Public Class Histogram_SideData
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         label1 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00") + " x and y scales differ!"
@@ -1289,21 +1289,21 @@ Public Class Histogram_TopView2D
 
         cmat = New PointCloud_ColorizeTop
         gCloud = New Depth_PointCloud_IMU
-        task.viewOptions.sliders.show()
+        If standalone Then task.viewOptions.sliders.show()
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        task.viewOptions.run()
+        If standalone Then task.viewOptions.run()
 
-        gCloud.Run()
+        gCloud.Run() ' when displaying both top and side views, the gcloud run has already been done.
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
         histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -1339,21 +1339,21 @@ Public Class Histogram_SideView2D
         cmat = New PointCloud_ColorizeSide
         gCloud = New Depth_PointCloud_IMU
         If standalone Or task.intermediateReview = caller Then task.yRotateSlider.Value = 1
-        task.viewOptions.sliders.show()
+        If standalone Then task.viewOptions.sliders.show()
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        task.viewOptions.run()
+        If standalone Then task.viewOptions.run()
 
         gCloud.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)

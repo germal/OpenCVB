@@ -1180,17 +1180,17 @@ Public Class PointCloud_ReducedSideView
 
         gCloud.Run()
 
-        Dim split = task.pointCloud.Split()
+        Dim split = gCloud.dst2.Split()
         reduction.src = split(2) * 1000
         reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
         reduction.dst1.ConvertTo(split(2), cv.MatType.CV_32F)
         split(2) *= 0.001
-        cv.Cv2.Merge(split, task.pointCloud)
+        cv.Cv2.Merge(split, dst2)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
@@ -1219,17 +1219,17 @@ Public Class PointCloud_ReducedTopView
 
         gCloud.Run()
 
-        Dim split = task.pointCloud.Split()
+        Dim split = gCloud.dst2.Split()
         reduction.src = split(2) * 1000
         reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
         reduction.dst1.ConvertTo(split(2), cv.MatType.CV_32F)
         split(2) *= 0.001
-        cv.Cv2.Merge(split, task.pointCloud)
+        cv.Cv2.Merge(split, dst2)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
         dst1 = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)

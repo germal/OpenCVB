@@ -263,6 +263,7 @@ Public Class Replay_OpenGL
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         replay.Run()
+        ogl.pointCloudInput = task.pointCloud
         ogl.src = task.color
         ogl.Run()
     End Sub
