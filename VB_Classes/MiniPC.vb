@@ -198,7 +198,6 @@ Public Class MiniPC_RotateSinglePass
             peak.Run()
             peak.angleY = i
             peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-            Console.WriteLine("Angle = " + CStr(i) + " max val = " + CStr(maxVal))
             If maxVal > maxHist Then
                 maxHist = maxVal
                 bestAngle = i
