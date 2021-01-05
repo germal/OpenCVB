@@ -446,9 +446,10 @@ Public Class IMU_GVector
         ReDim kalman.kInput(6 - 1)
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+            check.Setup(caller, 3)
             check.Box(0).Text = "Rotate pointcloud around X-axis using gravity vector angleZ"
             check.Box(1).Text = "Rotate pointcloud around Z-axis using gravity vector angleX"
+            check.Box(2).Text = "Initialize the X- and Z-axis sliders with gravity but allow manual after initialization"
             check.Box(0).Checked = True
             check.Box(1).Checked = True
         End If
@@ -467,11 +468,16 @@ Public Class IMU_GVector
 
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
-        If xCheckbox.checked = False Then ocvb.angleZ = 0
-        task.zRotateSlider.Value = CInt(ocvb.angleZ * 57.2958)
-
-        If zCheckbox.checked = False Then ocvb.angleX = 0
-        task.xRotateSlider.Value = CInt(ocvb.angleX * 57.2958)
+        Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
+        If manualCheckbox.checked Then
+            If ocvb.frameCount < 30 Then task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958) Else ocvb.angleZ = task.xRotateSlider.Value / 57.2958
+            If ocvb.frameCount < 30 Then task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958) Else ocvb.angleX = task.zRotateSlider.Value / 57.2958
+        Else
+            If xCheckbox.checked = False Then ocvb.angleZ = 0
+            If zCheckbox.checked = False Then ocvb.angleX = 0
+            task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958)
+            task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958)
+        End If
 
         kalman.kInput = {gx, gy, gz, ocvb.angleX, ocvb.angleY, ocvb.angleZ}
 
