@@ -1,5 +1,5 @@
-[**![Code style:
-black**](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![GitHub](https://img.shields.io/github/license/bobdavies2000/OpenCVB)
+======================================================================
 
 Recent Changes - 12/12/2020
 ===========================
