@@ -118,14 +118,14 @@ End Class
 
 Public Class Rectangle_Concentration
     Inherits VBparent
-    Dim topSide As Histogram_Concentration
+    Dim topSide As Histogram_ViewConcentration
     Dim rMotionSide As Rectangle_Motion
     Dim rMotionTop As Rectangle_Motion
     Public Sub New()
         initParent()
         rMotionTop = New Rectangle_Motion
         rMotionSide = New Rectangle_Motion
-        topSide = New Histogram_Concentration
+        topSide = New Histogram_ViewConcentration
 
         label1 = "Identified objects in the Side View"
         label2 = "Identified objects in the Top View"

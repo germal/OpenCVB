@@ -295,7 +295,7 @@ Public Class Histogram_Depth
         initParent()
         plotHist = New Plot_Histogram()
 
-        inrange = New Depth_InRange()
+        inrange = New Depth_InRange
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
@@ -342,7 +342,7 @@ Public Class Histogram_2D_XZ_YZ
     Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        xyz = New Mat_ImageXYZ_MT()
+        xyz = New Mat_ImageXYZ_MT
 
         task.maxRangeSlider.Value = 1500 ' up to x meters away
 
@@ -974,13 +974,13 @@ Public Class Histogram_SmoothConcentration
     Inherits VBparent
     Public sideview As Histogram_SmoothSideView2D
     Public topview As Histogram_SmoothTopView2D
-    Dim concent As Histogram_Concentration
+    Dim concent As Histogram_ViewConcentration
     Public Sub New()
         initParent()
 
         sideview = New Histogram_SmoothSideView2D
         topview = New Histogram_SmoothTopView2D
-        concent = New Histogram_Concentration
+        concent = New Histogram_ViewConcentration
 
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
     End Sub
@@ -1337,7 +1337,7 @@ End Class
 
 
 
-Public Class Histogram_Concentration
+Public Class Histogram_ViewConcentration
     Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
@@ -1417,18 +1417,21 @@ End Class
 
 
 
-Public Class Histogram_ConcentrationObjects
+Public Class Histogram_ViewObjects
     Inherits VBparent
-    Dim histC As Histogram_Concentration
+    Public histC As Histogram_ViewConcentration
     Dim flood As FloodFill_Basics
     Dim minSizeSlider As Windows.Forms.TrackBar
     Dim loDiffSlider As Windows.Forms.TrackBar
     Dim hiDiffSlider As Windows.Forms.TrackBar
     Dim stepSlider As Windows.Forms.TrackBar
+    Public side2D As New List(Of cv.Rect)
+    Public top2D As New List(Of cv.Rect)
     Public Sub New()
         initParent()
+
         flood = New FloodFill_Basics
-        histC = New Histogram_Concentration
+        histC = New Histogram_ViewConcentration
 
         minSizeSlider = findSlider("FloodFill Minimum Size")
         loDiffSlider = findSlider("FloodFill LoDiff")
@@ -1453,28 +1456,102 @@ Public Class Histogram_ConcentrationObjects
 
         flood.src = dst1
         flood.Run()
-        dst1 = flood.dst1.Clone
+        dst1 = flood.dst1.Clone.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim side3D As New List(Of cv.Vec6f)
-        Dim side2D As New List(Of cv.Rect)
-        Dim pc = histC.sideview.gCloud.dst2
+        Dim offset = If(src.Width = 1280, 10, 16)
+        Dim w = dst1.Width
+        Dim h = dst1.Height
+        Dim minZ As Single, maxZ As Single
+        side2D.Clear()
+
         For Each r In flood.rects
             side2D.Add(r)
             dst1.Rectangle(r, cv.Scalar.White, 1)
-            Dim cloud = pc(r)
-            Dim p1 = cloud.Get(Of cv.Vec3f)(0, 0, 0)
-            Dim p2 = cloud.Get(Of cv.Vec3f)(cloud.Rows - 1, cloud.Cols - 1, 0)
-            side3D.Add(New cv.Vec6f(p1.Item0, p1.Item1, p1.Item2, p2.Item0, p2.Item1, p2.Item2))
+            minZ = ocvb.maxZ * r.X / w
+            maxZ = ocvb.maxZ * (r.X + r.Width) / w
+            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
         Next
         label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
 
         flood.src = dst2
         flood.Run()
-        dst2 = flood.dst1
+        dst2 = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
+        top2D.Clear()
         For Each r In flood.rects
+            top2D.Add(r)
             dst2.Rectangle(r, cv.Scalar.White, 1)
+            minZ = ocvb.maxZ * (h - r.Y - r.Height) / h
+            maxZ = ocvb.maxZ * (h - r.Y) / h
+            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
         Next
-        label2 = CStr(flood.rects.Count) + " objects were identified in the top view"
+
+        label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Histogram_ViewIntersections
+    Inherits VBparent
+    Dim histCO As Histogram_ViewObjects
+    Public Sub New()
+        initParent()
+        histCO = New Histogram_ViewObjects
+        label1 = "Yellow is largest intersection.  dst2 = point cloud"
+        task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        histCO.Run()
+        dst1 = histCO.dst2
+
+        Dim offset = If(src.Width = 1280, 10, 16)
+        Dim w = dst1.Width
+        Dim h = dst1.Height
+        Dim minZ As Single, maxZ As Single
+        Dim rIntersect As New List(Of cv.Rect)
+        Dim yRange As New List(Of cv.Vec2f)
+        For Each r In histCO.side2D
+            minZ = ocvb.maxZ * r.X / dst1.Width
+            maxZ = ocvb.maxZ * (r.X + r.Width) / dst1.Width
+            Dim newRect = New cv.Rect(0, h - h * minZ / ocvb.maxZ - r.Width, w, r.Width)
+            For Each r2 In histCO.top2D
+                Dim rNext = r2.Intersect(newRect)
+                If rNext.Width > 0 And rNext.Height > 0 Then
+                    rIntersect.Add(rNext)
+                    yRange.Add(New cv.Vec2f(minZ, maxZ))
+                End If
+            Next
+        Next
+
+        Dim maxSize As Single = Single.MinValue
+        Dim maxIndex As Integer
+        For i = 0 To rIntersect.Count - 1
+            Dim r = rIntersect(i)
+            If maxSize < r.Width * r.Height Then
+                maxSize = r.Width * r.Height
+                maxIndex = i
+            End If
+        Next
+
+        dst1.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
+        minZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
+        maxZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y) / h
+        ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
+
+        Dim pc = histCO.histC.sideview.gCloud.dst2
+        Dim split = pc.Split()
+        Dim mask As New cv.Mat
+        cv.Cv2.InRange(split(2), minZ, maxZ, mask)
+        cv.Cv2.BitwiseNot(mask, mask)
+        split(2).SetTo(0, mask)
+
+        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
