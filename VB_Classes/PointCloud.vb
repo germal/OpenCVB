@@ -578,7 +578,7 @@ Public Class PointCloud_FrustrumTop
 
         task.thresholdSlider.Value = 0
 
-        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleX")
+        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         xCheckbox.Checked = False
         zCheckbox.Checked = False
