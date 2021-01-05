@@ -1455,8 +1455,26 @@ Public Class Histogram_ConcentrationObjects
         flood.Run()
         dst1 = flood.dst1.Clone
 
+        Dim side3D As New List(Of cv.Vec6f)
+        Dim side2D As New List(Of cv.Rect)
+        Dim pc = histC.sideview.gCloud.dst2
+        For Each r In flood.rects
+            side2D.Add(r)
+            dst1.Rectangle(r, cv.Scalar.White, 1)
+            Dim cloud = pc(r)
+            Dim p1 = cloud.Get(Of cv.Vec3f)(0, 0, 0)
+            Dim p2 = cloud.Get(Of cv.Vec3f)(cloud.Rows - 1, cloud.Cols - 1, 0)
+            side3D.Add(New cv.Vec6f(p1.Item0, p1.Item1, p1.Item2, p2.Item0, p2.Item1, p2.Item2))
+        Next
+        label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
+
         flood.src = dst2
         flood.Run()
         dst2 = flood.dst1
+
+        For Each r In flood.rects
+            dst2.Rectangle(r, cv.Scalar.White, 1)
+        Next
+        label2 = CStr(flood.rects.Count) + " objects were identified in the top view"
     End Sub
 End Class
