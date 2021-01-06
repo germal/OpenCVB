@@ -435,9 +435,7 @@ Public Class Reduction_XYZStable
                 tmp *= 1000
                 stable(i).src = tmp.SetTo(0, task.inrange.nodepthmask)
                 stable(i).Run()
-                If stable(i).extrema.resetAll = False Then tmp = stable(i).dst2
-
-                tmp.ConvertTo(reduction.src, cv.MatType.CV_32S)
+                stable(i).dst2.ConvertTo(reduction.src, cv.MatType.CV_32S)
                 If i = 0 Then dst1 = stable(i).dst1
                 reduction.Run()
                 reduction.dst1.ConvertTo(tmp, cv.MatType.CV_32F)

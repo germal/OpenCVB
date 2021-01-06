@@ -228,9 +228,9 @@ Public Class VBparent : Implements IDisposable
     Private Function MakeSureImage8uC3(ByVal input As cv.Mat) As cv.Mat
         Dim outMat = dst1
         If input.Type = cv.MatType.CV_32F Then
-            ' it must be a 1 channel 32f image so convert it to 8-bit and let it get converted to RGB below
             outMat = input.Normalize(0, 255, cv.NormTypes.MinMax)
             outMat.ConvertTo(outMat, cv.MatType.CV_8UC1)
+            outMat = outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         ElseIf input.Type = cv.MatType.CV_32FC3 Then
             Dim split = input.Split()
             split(0) = split(0).ConvertScaleAbs(255)

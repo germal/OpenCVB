@@ -213,26 +213,23 @@ Public Class Motion_StableDepthRectangleUpdate
     Public Sub New()
         initParent()
         extrema = New Depth_Smooth
-        label2 = "dst2 = stable pointcloud"
+        label2 = "dst2 = depth in 32-bit format in mm's"
         task.desc = "Provide only a validated point cloud - one which has consistent depth data."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim input = src
-        If input.Type <> cv.MatType.CV_32F Then
-            Dim split = task.pointCloud.Split
-            input = split(2)
-        End If
+        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
-        extrema.src = input * 1000
+        extrema.src = input
         extrema.Run()
 
-        If extrema.resetAll Or initialReset Or task.depthOptionsChanged Then
+        If extrema.resetAll Or initialReset Then
             initialReset = False
             dst2 = input
         Else
-            input.CopyTo(dst2, extrema.dMin.updateMask)
+            dst2 = extrema.dst2
         End If
         dst1 = extrema.dst1
     End Sub

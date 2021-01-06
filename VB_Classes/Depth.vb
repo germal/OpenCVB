@@ -1517,13 +1517,11 @@ Public Class Depth_SmoothMin
     Public stableMin As cv.Mat
     Public rgbMotion As Rectangle_Motion
     Dim colorize As Depth_ColorizerFastFade_CPP
-    Public lowQuality As Depth_LowQualityMask
     Public resetAll As Boolean
     Public updateMask As cv.Mat
     Public Sub New()
         initParent()
 
-        lowQuality = New Depth_LowQualityMask
         stable = New IMU_IscameraStable
         colorize = New Depth_ColorizerFastFade_CPP
         rgbMotion = New Rectangle_Motion
@@ -1541,7 +1539,6 @@ Public Class Depth_SmoothMin
 
         stable.Run()
 
-        lowQuality.Run()
         rgbMotion.src = task.color
         rgbMotion.Run()
         dst2 = rgbMotion.motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1549,15 +1546,13 @@ Public Class Depth_SmoothMin
         Static motionThreshold = findSlider("Single frame motion threshold")
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         If stable.cameraStable = False Or rgbMotion.motion.changedPixels > motionThreshold.value Or stableMin Is Nothing Or
-            rgbMotion.motion.cumulativePixels > cumulativeThreshold.value Then
+            rgbMotion.motion.cumulativePixels > cumulativeThreshold.value Or task.depthOptionsChanged Then
 
             resetAll = True
             stableMin = input.Clone
-            stableMin.SetTo(0, lowQuality.dst2)
             rgbMotion.motion.cumulativePixels = 0
         Else
             resetAll = False
-            stableMin.SetTo(0, lowQuality.dst2)
 
             updateMask = rgbMotion.motion.dst2
             For Each r In rgbMotion.mOverlap.enclosingRects
@@ -1609,7 +1604,6 @@ Public Class Depth_SmoothMax
 
         If dMin.resetAll Then
             stableMax = input
-            stableMax.SetTo(0, dMin.lowQuality.dst2)
         Else
             Dim zeroMask As New cv.Mat
             cv.Cv2.InRange(dMin.stableMin, 0, 0, zeroMask)
@@ -1833,6 +1827,27 @@ Public Class Depth_PunchBlob
             showWarningInfo -= 1
             ocvb.trueText("Too many contours!  Reduce the Max Depth.", 10, 130, 3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_TestMinFunction
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.desc = "Test min function with depth data"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If ocvb.frameCount Mod 300 = 0 Then dst2 = task.depth32f.Clone
+        cv.Cv2.Min(dst2, task.depth32f, dst2)
+        dst1 = task.depth32f
     End Sub
 End Class
 

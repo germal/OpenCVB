@@ -279,7 +279,6 @@ Public Class OpenCVB
         End If
         If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
             cameraRefresh = False
-            'SyncLock bufferLock ' avoid copying while it might be updating
             If camera.color IsNot Nothing Then
                 If camera.color.width > 0 Then
                     Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
@@ -292,7 +291,6 @@ Public Class OpenCVB
                     End Try
                 End If
             End If
-            'End SyncLock
         End If
         ' draw any TrueType font data on the image 
         Dim maxline = 21
