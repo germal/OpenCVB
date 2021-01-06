@@ -209,38 +209,33 @@ End Class
 Public Class Motion_StableDepthRectangleUpdate
     Inherits VBparent
     Public extrema As Depth_Smooth
-    Public stableCloud As cv.Mat
-    Public split() As cv.Mat
     Public myResetAll As Boolean
     Public Sub New()
         initParent()
 
-        stableCloud = task.pointCloud
         extrema = New Depth_Smooth
         task.desc = "Provide only a validated point cloud - one which has consistent depth data."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim input = src
+        Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
-        split = input.Split
+        Dim split = input.Split
 
         extrema.src = split(2) * 1000
         extrema.Run()
 
-        ' if many pixels changed, then resetAll was triggered.  Leave task.pointcloud alone...
         Static saveYRotate As Integer
-        If extrema.resetAll Or myResetAll Or saveYRotate <> task.yRotateSlider.Value Then
+        If extrema.resetAll Or myResetAll Or saveYRotate <> task.yRotateSlider.Value Or dst2.Type <> cv.MatType.CV_32FC3 Then
             saveYRotate = task.yRotateSlider.Value
             myResetAll = False
             extrema.resetAll = False
-            stableCloud = task.pointCloud.Clone
+            dst2 = input
         Else
-            'input.CopyTo(stableCloud, extrema.dMin.updateMask)
+            input.CopyTo(dst2, extrema.dMin.updateMask)
         End If
         dst1 = extrema.dst1
-        dst2 = stableCloud
     End Sub
 End Class
 
@@ -265,9 +260,10 @@ Public Class Motion_StablePointCloud
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim split = task.pointCloud.Split()
+        Dim input = src.Clone
+        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
+        Dim split = input.Split()
         stable.src = split(2) * 1000
-
         stable.Run()
 
         dst1 = stable.dst1

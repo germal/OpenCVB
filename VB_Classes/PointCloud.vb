@@ -588,10 +588,9 @@ Public Class PointCloud_FrustrumTop
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        frustrum.Run()
-        dst2 = frustrum.dst1.Resize(src.Size)
 
-        task.pointCloud = frustrum.xyzDepth.xyzFrame
+        frustrum.Run()
+        task.pointCloud = frustrum.dst2
         topView.Run()
 
         cmat.src = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -631,10 +630,9 @@ Public Class PointCloud_FrustrumSide
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        frustrum.Run()
-        dst2 = frustrum.dst1.Resize(src.Size)
 
-        task.pointCloud = frustrum.xyzDepth.xyzFrame
+        frustrum.Run()
+        sideView.src = frustrum.dst2
         sideView.Run()
 
         cmat.src = sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

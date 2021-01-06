@@ -568,7 +568,7 @@ Public Class OpenGL_StableDepth
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         pcValid.Run()
-        task.pointCloud = pcValid.stableCloud
+        task.pointCloud = pcValid.dst2
         ogl.src = task.color
         ogl.Run()
     End Sub
@@ -637,7 +637,7 @@ Public Class OpenGL_StableDepthMouse
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
 
-        ogl.pointCloudInput = pcValid.stableCloud
+        ogl.pointCloudInput = pcValid.dst2
         ogl.src = task.color
         ogl.Run()
     End Sub
@@ -667,7 +667,7 @@ Public Class OpenGL_SmoothSurfaces
         smooth.Run()
         dst1 = smooth.dst2
 
-        smooth.pcValid.stableCloud.CopyTo(dst2, smooth.dst2)
+        smooth.pcValid.dst2.CopyTo(dst2, smooth.dst2)
         ogl.pointCloudInput = dst2
         ogl.src = task.color
         ogl.Run()

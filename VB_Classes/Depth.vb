@@ -1298,11 +1298,10 @@ End Class
 
 Public Class Depth_WorldXYZ
     Inherits VBparent
-    Public xyzFrame As cv.Mat
     Public depthUnitsMeters = False
     Public Sub New()
         initParent()
-        xyzFrame = New cv.Mat(src.Size(), cv.MatType.CV_32FC3)
+        label2 = "dst2 = pointcloud"
         task.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
     End Sub
     Public Sub Run()
@@ -1311,19 +1310,17 @@ Public Class Depth_WorldXYZ
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
         If depthUnitsMeters = False Then input = (input * 0.001).ToMat
         Dim xy As New cv.Point3f
-        For xy.Y = 0 To xyzFrame.Height - 1
-            For xy.X = 0 To xyzFrame.Width - 1
+        dst2 = New cv.Mat(task.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
+        For xy.Y = 0 To dst2.Height - 1
+            For xy.X = 0 To dst2.Width - 1
                 xy.Z = input.Get(Of Single)(xy.Y, xy.X)
                 If xy.Z <> 0 Then
                     Dim xyz = getWorldCoordinates(xy)
-                    xyzFrame.Set(Of cv.Point3f)(xy.Y, xy.X, xyz)
+                    dst2.Set(Of cv.Point3f)(xy.Y, xy.X, xyz)
                 End If
             Next
         Next
         If standalone Or task.intermediateReview = caller Then ocvb.trueText("OpenGL data prepared.")
-    End Sub
-    Public Sub Close()
-        xyzFrame.Dispose()
     End Sub
 End Class
 
@@ -1335,11 +1332,11 @@ End Class
 Public Class Depth_WorldXYZ_MT
     Inherits VBparent
     Dim grid As Thread_Grid
-    Public xyzFrame As cv.Mat
     Public depthUnitsMeters = False
     Public Sub New()
         initParent()
         grid = New Thread_Grid
+        label2 = "dst2 = pointcloud"
         task.desc = "Create OpenGL point cloud from depth data (slow)"
     End Sub
     Public Sub Run()
@@ -1349,7 +1346,7 @@ Public Class Depth_WorldXYZ_MT
         grid.src = input
         grid.Run()
 
-        xyzFrame = New cv.Mat(task.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
+        dst2 = New cv.Mat(task.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
         If depthUnitsMeters = False Then input = (input * 0.001).ToMat
         Dim multX = task.pointCloud.Width / input.Width
         Dim multY = task.pointCloud.Height / input.Height
@@ -1363,7 +1360,7 @@ Public Class Depth_WorldXYZ_MT
                           xy.Z = input.Get(Of Single)(y, x)
                           If xy.Z <> 0 Then
                               Dim xyz = getWorldCoordinates(xy)
-                              xyzFrame.Set(Of cv.Point3f)(y, x, xyz)
+                              dst2.Set(Of cv.Point3f)(y, x, xyz)
                           End If
                       Next
                   Next
@@ -1693,7 +1690,7 @@ Public Class Depth_SmoothSurfaces
         pcValid.Run()
         Dim mask = pcValid.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        Dim split = pcValid.stableCloud.Split()
+        Dim split = pcValid.dst2.Split()
         Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
         Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
 
@@ -1866,7 +1863,8 @@ Public Class Depth_PointCloud_IMU
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
 
-        dst1 = task.depth32f
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud.Clone
 
         imu.Run()
         Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
@@ -1908,12 +1906,12 @@ Public Class Depth_PointCloud_IMU
         gMatrix = gM
         If xCheckbox.Checked Or zCheckbox.Checked Or angleY <> 0 Then
             Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
-            Dim gInput = task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols)
+            Dim gInput = input.Reshape(1, input.Rows * input.Cols)
             Dim gOutput = (gInput * gMat).ToMat
-            dst2 = gOutput.Reshape(3, task.pointCloud.Rows)
+            dst2 = gOutput.Reshape(3, input.Rows)
             label2 = "dst2 = pointcloud after rotation"
         Else
-            dst2 = task.pointCloud.Clone
+            dst2 = input.Clone
             label2 = "dst2 = pointcloud without rotation"
         End If
 

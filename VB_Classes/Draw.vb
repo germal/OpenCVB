@@ -496,8 +496,9 @@ Public Class Draw_Frustrum
         For i = 0 To task.pointCloud.Height / 2
             dst1.Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
         Next
-        xyzDepth.src = dst1.Resize(task.pointCloud.Size)
+        xyzDepth.src = dst1
         xyzDepth.Run()
+        dst2 = xyzDepth.dst2
     End Sub
 End Class
 

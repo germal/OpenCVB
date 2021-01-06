@@ -895,7 +895,6 @@ Public Class Histogram_SmoothTopView2D
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        If topView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
@@ -940,13 +939,10 @@ Public Class Histogram_SmoothSideView2D
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        If sideView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
         dst1 = sideView.histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-        cv.Cv2.ImShow("sideview.gcloud.dst2", sideView.gCloud.dst2)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cmat.src = dst2
@@ -1210,6 +1206,8 @@ Public Class Histogram_TopView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then task.viewOptions.run()
 
+        gCloud.src = src
+        If gCloud.src.Type <> cv.MatType.CV_32FC3 Then gCloud.src = task.pointCloud.Clone
         gCloud.Run() ' when displaying both top and side views, the gcloud run has already been done.
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
@@ -1260,6 +1258,8 @@ Public Class Histogram_SideView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone Then task.viewOptions.run()
 
+        gCloud.src = src
+        If gCloud.src.Type <> cv.MatType.CV_32FC3 Then gCloud.src = task.pointCloud.Clone
         gCloud.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
