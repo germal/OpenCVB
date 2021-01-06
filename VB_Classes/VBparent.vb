@@ -230,6 +230,12 @@ Public Class VBparent : Implements IDisposable
             ' it must be a 1 channel 32f image so convert it to 8-bit and let it get converted to RGB below
             input = input.Normalize(0, 255, cv.NormTypes.MinMax)
             input.ConvertTo(input, cv.MatType.CV_8UC1)
+        ElseIf input.Type = cv.MatType.CV_32FC3 Then
+            Dim split = input.Split()
+            split(0) = split(0).ConvertScaleAbs(255)
+            split(1) = split(1).ConvertScaleAbs(255)
+            split(2) = split(2).ConvertScaleAbs(255)
+            cv.Cv2.Merge(split, input)
         End If
         If input.Channels = 1 And input.Type = cv.MatType.CV_8UC1 Then
             input = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

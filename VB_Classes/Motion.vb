@@ -6,13 +6,16 @@ Public Class Motion_Basics
     Dim contours As Contours_Basics
     Public rectList As New List(Of cv.Rect)
     Public changedPixels As Integer
+    Public cumulativePixels As Integer
     Public Sub New()
         initParent()
         contours = New Contours_Basics()
         diff = New Diff_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Total motion threshold to resync", 1, 100000, If(task.color.Width = 1280, 20000, 10000)) ' used only externally...
+            sliders.setupTrackBar(0, "Single frame motion threshold", 1, 100000, If(task.color.Width = 1280, 20000, 1000)) ' used only externally...
+            sliders.setupTrackBar(1, "Cumulative motion threshold", 1, 100000, If(task.color.Width = 1280, 50000, 25000)) ' used only externally...
+            sliders.setupTrackBar(2, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much camera motion is reasonable?
         End If
 
         label2 = "Mask of pixel differences "
@@ -26,6 +29,7 @@ Public Class Motion_Basics
         diff.Run()
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()
+        cumulativePixels += changedPixels
 
         If standalone Or task.intermediateReview = caller Then
             contours.src = dst2
@@ -36,7 +40,7 @@ Public Class Motion_Basics
                 rectList.Add(cv.Cv2.BoundingRect(c))
             Next
 
-            dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src.Clone)
+            dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src)
             For i = 0 To rectList.Count - 1
                 dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
             Next
@@ -58,6 +62,7 @@ Public Class Motion_WithBlurDilate
     Dim contours As Contours_Basics
     Public rectList As New List(Of cv.Rect)
     Public changedPixels As Integer
+    Public cumulativePixels As Integer
     Public Sub New()
         initParent()
         contours = New Contours_Basics()
@@ -96,6 +101,7 @@ Public Class Motion_WithBlurDilate
         diff.Run()
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()
+        cumulativePixels += changedPixels
 
         dilate.src = dst2
         dilate.Run()
@@ -132,16 +138,10 @@ Public Class Motion_StableDepth
     Public yaw As Single ' in radians.
     Public roll As Single ' in radians.
     Public cameraStable As Boolean
-    Public cumulativeChanges As Integer
     Public externalReset As Boolean
     Public Sub New()
         initParent()
         motion = New Motion_Basics
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much camera motion is reasonable?
-            sliders.setupTrackBar(1, "Image change threshold for single image", 1, 5000, 3000) ' how much motion is reasonable in a single image?
-        End If
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
@@ -165,8 +165,8 @@ Public Class Motion_StableDepth
         roll = task.IMU_AngularVelocity.Z
 
         Static cameraMotionThreshold = findSlider("Camera Motion threshold in radians X100")
-        Static resyncThreshold = findSlider("Total motion threshold to resync")
-        Static pixelThreshold = findSlider("Image change threshold for single image")
+        Static cumulativeThreshold = findSlider("Cumulative motion threshold")
+        Static pixelThreshold = findSlider("Single frame motion threshold")
 
         cameraStable = If(cameraMotionThreshold.Value / 100 < Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll), False, True)
 
@@ -174,12 +174,11 @@ Public Class Motion_StableDepth
         motion.Run()
         dst2 = motion.dst2
 
-        cumulativeChanges += motion.changedPixels
-        If cameraStable = False Or cumulativeChanges > resyncThreshold.value Or motion.changedPixels > pixelThreshold.value Or task.depthOptionsChanged Or externalReset Then
+        If cameraStable = False Or motion.cumulativePixels > cumulativeThreshold.value Or motion.changedPixels > pixelThreshold.value Or task.depthOptionsChanged Or externalReset Then
             resetAll = True
             externalReset = False
             dst1 = input
-            cumulativeChanges = 0
+            motion.cumulativePixels = 0
         Else
             resetAll = False
             input.CopyTo(dst1, dst2)
@@ -215,10 +214,6 @@ Public Class Motion_StableDepthRectangleUpdate
     Public myResetAll As Boolean
     Public Sub New()
         initParent()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Only preserve the Z depth data (unchecked will preserve X, Y, and Z)"
-        End If
 
         stableCloud = task.pointCloud
         extrema = New Depth_Smooth
@@ -227,25 +222,22 @@ Public Class Motion_StableDepthRectangleUpdate
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        split = task.pointCloud.Split
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
+        split = input.Split
 
-        extrema.src = src
-        If extrema.src.Type <> cv.MatType.CV_32F Then extrema.src = split(2) * 1000
-
+        extrema.src = split(2) * 1000
         extrema.Run()
 
         ' if many pixels changed, then resetAll was triggered.  Leave task.pointcloud alone...
-        If extrema.resetAll = False And myResetAll = False Then
-            Static zCheck = findCheckBox("Only preserve the Z depth data (unchecked will preserve X, Y, and Z)")
-            If zCheck.checked Then
-                split(2) = extrema.dst2 * 0.001
-                cv.Cv2.Merge(split, stableCloud)
-            Else
-                task.pointCloud.CopyTo(stableCloud, extrema.dMin.updateMask)
-            End If
-        Else
+        Static saveYRotate As Integer
+        If extrema.resetAll Or myResetAll Or saveYRotate <> task.yRotateSlider.Value Then
+            saveYRotate = task.yRotateSlider.Value
             myResetAll = False
-            stableCloud = task.pointCloud
+            extrema.resetAll = False
+            stableCloud = task.pointCloud.Clone
+        Else
+            'input.CopyTo(stableCloud, extrema.dMin.updateMask)
         End If
         dst1 = extrema.dst1
         dst2 = stableCloud

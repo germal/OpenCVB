@@ -1031,7 +1031,6 @@ Public Class Depth_Edges
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        cv.Cv2.ImShow("src", src)
         edges.src = src
         edges.Run()
         dst1 = edges.dst2
@@ -1550,11 +1549,15 @@ Public Class Depth_SmoothMin
         rgbMotion.Run()
         dst2 = rgbMotion.motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Static motionThreshold = findSlider("Total motion threshold to resync")
-        If stable.cameraStable = False Or rgbMotion.motion.changedPixels > motionThreshold.value Or stableMin Is Nothing Then
+        Static motionThreshold = findSlider("Single frame motion threshold")
+        Static cumulativeThreshold = findSlider("Cumulative motion threshold")
+        If stable.cameraStable = False Or rgbMotion.motion.changedPixels > motionThreshold.value Or stableMin Is Nothing Or
+            rgbMotion.motion.cumulativePixels > cumulativeThreshold.value Then
+
             resetAll = True
             stableMin = input.Clone
             stableMin.SetTo(0, lowQuality.dst2)
+            rgbMotion.motion.cumulativePixels = 0
         Else
             resetAll = False
             stableMin.SetTo(0, lowQuality.dst2)
@@ -1908,8 +1911,10 @@ Public Class Depth_PointCloud_IMU
             Dim gInput = task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols)
             Dim gOutput = (gInput * gMat).ToMat
             dst2 = gOutput.Reshape(3, task.pointCloud.Rows)
+            label2 = "dst2 = pointcloud after rotation"
         Else
             dst2 = task.pointCloud.Clone
+            label2 = "dst2 = pointcloud without rotation"
         End If
 
         ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ

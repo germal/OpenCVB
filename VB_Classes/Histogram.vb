@@ -874,7 +874,6 @@ Public Class Histogram_SmoothTopView2D
 
         cmat = New PointCloud_ColorizeTop
         topView = New Histogram_TopView2D
-        task.yRotateSlider.Value = 1
 
         stable = New Motion_StableDepthRectangleUpdate
 
@@ -891,29 +890,24 @@ Public Class Histogram_SmoothTopView2D
             stable.myResetAll = True
         End If
 
+        stable.src = topView.gCloud.dst2
         stable.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If topView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
         dst1 = topView.histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        If standalone Or task.intermediateReview = caller Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            cmat.src = dst2
-            cmat.Run()
-            dst2 = cmat.dst1
-        End If
+
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cmat.src = dst2
+        cmat.Run()
+        dst2 = cmat.dst1
     End Sub
 End Class
-
-
-
-
-
 
 
 
@@ -931,7 +925,6 @@ Public Class Histogram_SmoothSideView2D
 
         cmat = New PointCloud_ColorizeSide
         sideView = New Histogram_SideView2D
-        task.yRotateSlider.Value = 1
 
         stable = New Motion_StableDepthRectangleUpdate
 
@@ -942,21 +935,18 @@ Public Class Histogram_SmoothSideView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.gCloud.Run()
 
-        Static saveYRotate As Integer
-        If saveYRotate <> task.yRotateSlider.Value Then
-            saveYRotate = task.yRotateSlider.Value
-            stable.myResetAll = True
-        End If
-
+        stable.src = sideView.gCloud.dst2
         stable.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If sideView.resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {task.pointCloud}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
-        Dim tmp = sideView.histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
-        tmp.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst1 = sideView.histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+
+        cv.Cv2.ImShow("sideview.gcloud.dst2", sideView.gCloud.dst2)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cmat.src = dst2
@@ -970,17 +960,19 @@ End Class
 
 
 
+
+
 Public Class Histogram_SmoothConcentration
     Inherits VBparent
     Public sideview As Histogram_SmoothSideView2D
     Public topview As Histogram_SmoothTopView2D
-    Dim concent As Histogram_ViewConcentration
+    Dim concent As Histogram_ViewConcentrations
     Public Sub New()
         initParent()
 
         sideview = New Histogram_SmoothSideView2D
         topview = New Histogram_SmoothTopView2D
-        concent = New Histogram_ViewConcentration
+        concent = New Histogram_ViewConcentrations
 
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
     End Sub
@@ -998,6 +990,8 @@ Public Class Histogram_SmoothConcentration
         dst2 = concent.palette.dst1.Clone
     End Sub
 End Class
+
+
 
 
 
@@ -1337,7 +1331,7 @@ End Class
 
 
 
-Public Class Histogram_ViewConcentration
+Public Class Histogram_ViewConcentrations
     Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
@@ -1419,7 +1413,7 @@ End Class
 
 Public Class Histogram_ViewObjects
     Inherits VBparent
-    Public histC As Histogram_ViewConcentration
+    Public histC As Histogram_ViewConcentrations
     Dim flood As FloodFill_Basics
     Dim minSizeSlider As Windows.Forms.TrackBar
     Dim loDiffSlider As Windows.Forms.TrackBar
@@ -1431,7 +1425,7 @@ Public Class Histogram_ViewObjects
         initParent()
 
         flood = New FloodFill_Basics
-        histC = New Histogram_ViewConcentration
+        histC = New Histogram_ViewConcentrations
 
         minSizeSlider = findSlider("FloodFill Minimum Size")
         loDiffSlider = findSlider("FloodFill LoDiff")

@@ -116,42 +116,6 @@ End Class
 
 
 
-Public Class Rectangle_Concentration
-    Inherits VBparent
-    Dim topSide As Histogram_ViewConcentration
-    Dim rMotionSide As Rectangle_Motion
-    Dim rMotionTop As Rectangle_Motion
-    Public Sub New()
-        initParent()
-        rMotionTop = New Rectangle_Motion
-        rMotionSide = New Rectangle_Motion
-        topSide = New Histogram_ViewConcentration
-
-        label1 = "Identified objects in the Side View"
-        label2 = "Identified objects in the Top View"
-        task.desc = "Isolate rectanguler regions around connected components"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        topSide.Run()
-
-        rMotionSide.src = topSide.dst1
-        rMotionSide.Run()
-        dst1 = rMotionSide.dst2
-
-        rMotionTop.src = topSide.dst2
-        rMotionTop.Run()
-        dst2 = rMotionTop.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Rectangle_Overlap
     Inherits VBparent
     Public rect1 As cv.Rect
