@@ -166,12 +166,9 @@ Public Class ActiveTask : Implements IDisposable
 
         buildColors()
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
-        If algName.EndsWith(".py") And algName.EndsWith("_PS.py") = False Then
-        Else
-            aOptions = New OptionsAll
-            aOptions.Show()
-            inrange = algoList.createAlgorithm("OptionsCommon_Depth")
-        End If
+        aOptions = New OptionsAll
+        aOptions.Show()
+        inrange = algoList.createAlgorithm("OptionsCommon_Depth")
         viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
         algorithmObject = algoList.createAlgorithm(algName)
         If algorithmObject Is Nothing Then

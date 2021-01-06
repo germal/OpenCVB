@@ -214,7 +214,7 @@ Public Class Motion_StableDepthRectangleUpdate
         initParent()
         extrema = New Depth_Smooth
         label2 = "dst2 = depth in 32-bit format in mm's"
-        task.desc = "Provide only a validated point cloud - one which has consistent depth data."
+        task.desc = "Use motion in RGB to determine when to update a 32-bit format input - depth X, Y, and Z."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
