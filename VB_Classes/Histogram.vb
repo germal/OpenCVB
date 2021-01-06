@@ -884,12 +884,6 @@ Public Class Histogram_SmoothTopView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         topView.gCloud.Run()
 
-        Static saveYRotate As Integer
-        If saveYRotate <> task.yRotateSlider.Value Then
-            saveYRotate = task.yRotateSlider.Value
-            stable.myResetAll = True
-        End If
-
         stable.src = topView.gCloud.dst2
         stable.Run()
 

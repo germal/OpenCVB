@@ -321,7 +321,7 @@ Public Class OpenGL_Draw3D
         ogl.sliders.trackbar(9).Value = -180
         ogl.sliders.trackbar(6).Value = 16
         ogl.sliders.trackbar(10).Value = -30
-        task.pointCloud = New cv.Mat ' we are not using the point cloud when displaying data.
+        ogl.pointCloudInput = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
@@ -568,7 +568,7 @@ Public Class OpenGL_StableDepth
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         pcValid.Run()
-        task.pointCloud = pcValid.dst2
+        ogl.pointCloudInput = pcValid.dst2
         ogl.src = task.color
         ogl.Run()
     End Sub
@@ -715,9 +715,9 @@ Public Class OpenGL_ReducedXYZStable
     Public ogl As OpenGL_Basics
     Public Sub New()
         initParent()
-        reduction = New Reduction_XYZStable()
 
-        ogl = New OpenGL_Basics()
+        reduction = New Reduction_XYZStable
+        ogl = New OpenGL_Basics
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
@@ -727,7 +727,7 @@ Public Class OpenGL_ReducedXYZStable
         dst1 = reduction.dst1
         dst2 = reduction.dst2
 
-        ogl.pointCloudInput = task.pointCloud
+        ogl.pointCloudInput = reduction.dst2
         ogl.src = src
         ogl.Run()
     End Sub
@@ -743,17 +743,19 @@ Public Class OpenGL_ReducedXYZ
     Public ogl As OpenGL_Basics
     Public Sub New()
         initParent()
-        reduction = New Reduction_XYZ()
+        reduction = New Reduction_XYZ
 
-        ogl = New OpenGL_Basics()
+        ogl = New OpenGL_Basics
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.Run()
+        dst1 = reduction.dst1
+        dst2 = reduction.dst2
 
-        ogl.pointCloudInput = task.pointCloud
+        ogl.pointCloudInput = reduction.dst2
         ogl.src = src
         ogl.Run()
     End Sub
@@ -770,7 +772,7 @@ Public Class OpenGL_Reduced
     Public ogl As OpenGL_Basics
     Public Sub New()
         initParent()
-        reduction = New Reduction_PointCloud()
+        reduction = New Reduction_PointCloud
 
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
@@ -780,8 +782,9 @@ Public Class OpenGL_Reduced
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.Run()
         dst1 = reduction.dst1
+        dst2 = reduction.dst2
 
-        ogl.pointCloudInput = task.pointCloud
+        ogl.pointCloudInput = reduction.dst2
         ogl.src = src
         ogl.Run()
     End Sub

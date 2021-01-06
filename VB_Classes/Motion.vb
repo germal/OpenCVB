@@ -209,28 +209,27 @@ End Class
 Public Class Motion_StableDepthRectangleUpdate
     Inherits VBparent
     Public extrema As Depth_Smooth
-    Public myResetAll As Boolean
+    Dim initialReset = True
     Public Sub New()
         initParent()
-
         extrema = New Depth_Smooth
+        label2 = "dst2 = stable pointcloud"
         task.desc = "Provide only a validated point cloud - one which has consistent depth data."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim input = src.Clone
-        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
-        Dim split = input.Split
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then
+            Dim split = task.pointCloud.Split
+            input = split(2)
+        End If
 
-        extrema.src = split(2) * 1000
+        extrema.src = input * 1000
         extrema.Run()
 
-        Static saveYRotate As Integer
-        If extrema.resetAll Or myResetAll Or saveYRotate <> task.yRotateSlider.Value Or dst2.Type <> cv.MatType.CV_32FC3 Then
-            saveYRotate = task.yRotateSlider.Value
-            myResetAll = False
-            extrema.resetAll = False
+        If extrema.resetAll Or initialReset Or task.depthOptionsChanged Then
+            initialReset = False
             dst2 = input
         Else
             input.CopyTo(dst2, extrema.dMin.updateMask)

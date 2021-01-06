@@ -590,7 +590,7 @@ Public Class PointCloud_FrustrumTop
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         frustrum.Run()
-        task.pointCloud = frustrum.dst2
+        topView.src = frustrum.dst2
         topView.Run()
 
         cmat.src = topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

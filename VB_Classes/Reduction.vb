@@ -324,19 +324,21 @@ Public Class Reduction_PointCloud
         initParent()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
+        label1 = "dst1 = reduced depth, dst2 = reduced pointcloud"
         task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim split() = task.pointCloud.Split()
-        split(2) *= 1000 ' convert to mm's
+
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+
+        Dim split() = src.Split()
+        split(2) *= 1000
         split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
-        reduction.dst1.ConvertTo(dst2, cv.MatType.CV_32F)
-        dst1 = dst2.Resize(task.pointCloud.Size)
+        reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
         split(2) = dst1 / 1000
-        cv.Cv2.Merge(split, task.pointCloud)
-        dst1 = dst1.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
 
@@ -365,7 +367,9 @@ Public Class Reduction_XYZ
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim split() = task.pointCloud.Split()
+
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        Dim split() = src.Split()
 
         For i = 0 To 3 - 1
             If check.Box(i).Checked Then
@@ -379,8 +383,8 @@ Public Class Reduction_XYZ
             End If
         Next
 
-        cv.Cv2.Merge(split, task.pointCloud)
-        ocvb.trueText("Task.PointCloud has been reduced")
+        cv.Cv2.Merge(split, dst2)
+        ocvb.trueText("Task.PointCloud has been reduced and is in dst2")
     End Sub
 End Class
 
@@ -392,12 +396,12 @@ End Class
 
 Public Class Reduction_XYZStable
     Inherits VBparent
-    Public stable(3 - 1) As Motion_StableDepth
+    Public stable(3 - 1) As Motion_StableDepthRectangleUpdate
     Dim reduction As Reduction_Basics
     Public Sub New()
         initParent()
         For i = 0 To stable.Count - 1
-            stable(i) = New Motion_StableDepth
+            stable(i) = New Motion_StableDepthRectangleUpdate
         Next
 
         reduction = New Reduction_Basics()
@@ -416,21 +420,25 @@ Public Class Reduction_XYZStable
             check.Box(2).Checked = True
         End If
 
+        label1 = "x-coordinates of the pointcloud"
+        label1 = "dst2 = new pointcloud"
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         Dim split() = task.pointCloud.Split()
 
         For i = 0 To 3 - 1
             If check.Box(i).Checked Then
                 Dim tmp As cv.Mat = split(i) + 10 ' make all values positive.
                 tmp *= 1000
-                stable(i).src = tmp.Clone
+                stable(i).src = tmp.SetTo(0, task.inrange.nodepthmask)
                 stable(i).Run()
-                If stable(i).resetAll Then tmp.ConvertTo(reduction.src, cv.MatType.CV_32S) Else stable(i).dst1.ConvertTo(reduction.src, cv.MatType.CV_32S)
+                If stable(i).extrema.resetAll = False Then tmp = stable(i).dst2
+
+                tmp.ConvertTo(reduction.src, cv.MatType.CV_32S)
                 If i = 0 Then dst1 = stable(i).dst1
-                If i = 1 Then dst2 = stable(i).dst1
                 reduction.Run()
                 reduction.dst1.ConvertTo(tmp, cv.MatType.CV_32F)
                 tmp *= 0.001
@@ -438,6 +446,6 @@ Public Class Reduction_XYZStable
             End If
         Next
 
-        cv.Cv2.Merge(split, task.pointCloud)
+        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
