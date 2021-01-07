@@ -1,5 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Threading
+
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics_CPP
     Inherits VBparent
@@ -129,27 +131,36 @@ Public Class BGSubtract_Basics_MT
             sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         End If
 
-        label2 = "Only Motion Added"
         task.desc = "Detect Motion in the color image"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = src.EmptyClone.SetTo(0)
-        If ocvb.frameCount = 0 Then dst2 = src.Clone()
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = input.EmptyClone.SetTo(0)
+        If ocvb.frameCount = 0 Then dst2 = input.Clone()
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         dst1.SetTo(0)
+        Dim updateCount As Integer
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(src(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-            If correlation.Get(Of Single)(0, 0) < CCthreshold Then src(roi).CopyTo(dst2(roi))
-            src(roi).CopyTo(dst1(roi))
+            cv.Cv2.MatchTemplate(input(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                Interlocked.Increment(updateCount)
+                input(roi).CopyTo(dst2(roi))
+            End If
+            input(roi).CopyTo(dst1(roi))
         End Sub)
+        label1 = "Motion added to dst2 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
+        label2 = CStr(grid.roiList.Count - updateCount) + " segments had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
     End Sub
 End Class
+
+
+
 
 
 
@@ -160,7 +171,7 @@ Public Class BGSubtract_Depth_MT
         initParent()
         bgsub = New BGSubtract_Basics_MT()
         task.desc = "Detect Motion in the depth image - needs more work"
-        label1 = "Depth data input"
+        label1 = "Depth data src"
         label2 = "Accumulated depth image"
     End Sub
     Public Sub Run()
@@ -219,9 +230,10 @@ Public Class BGSubtract_MOG2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("MOG Learn Rate")
-        MOG2.Apply(src, dst1, learnRateSlider.Value / 1000)
+        MOG2.Apply(input, dst1, learnRateSlider.Value / 1000)
     End Sub
 End Class
 
@@ -276,7 +288,7 @@ Public Class BGSubtract_MOG_RGBDepth
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
         label1 = "Unstable depth"
-        label1 = "Unstable color"
+        label2 = "Unstable color"
         task.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Sub Run()
@@ -286,8 +298,9 @@ Public Class BGSubtract_MOG_RGBDepth
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(src, src, learnRateSlider.Value / 1000)
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        MOGRGB.Apply(input, dst2, learnRateSlider.Value / 1000)
     End Sub
 End Class
 

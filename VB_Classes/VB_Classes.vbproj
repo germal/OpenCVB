@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
+    <Compile Include="BestOf.vb" />
     <Compile Include="MiniPC.vb" />
     <Compile Include="OptionsCommon.vb" />
     <Compile Include="PhotoShop.vb" />

@@ -148,6 +148,13 @@ Public Class Mat_4to1
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use one Mat for up to 4 images"
     End Sub
+    Public Sub defaultMats()
+        mat1 = task.color
+        mat2 = task.RGBDepth
+        mat3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mat4 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mat = {mat1, mat2, mat3, mat4}
+    End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
@@ -155,13 +162,8 @@ Public Class Mat_4to1
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone or task.intermediateReview = caller Then
-            mat1 = src
-            mat2 = task.RGBDepth
-            mat3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            mat4 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            mat = {mat1, mat2, mat3, mat4}
-        End If
+        If standalone Or task.intermediateReview = caller Then defaultMats()
+
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
             If tmp.Channels <> dst1.Channels Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -187,20 +189,20 @@ Public Class Mat_2to1
     Inherits VBparent
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
-    Public mat() = {mat1, mat2}
+    Public mat() As cv.Mat = {mat1, mat2}
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New()
         initParent()
         mat1 = New cv.Mat(New cv.Size(src.Rows, src.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
-        dst1 = dst2
 
         label1 = ""
         task.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         Static nSize = New cv.Size(src.Width, src.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -457,5 +459,75 @@ Public Class Mat_Inverse
         End If
 
         flow.Run()
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Mat_4Click
+    Inherits VBparent
+    Dim mats As Mat_4to1
+    Public mat() As cv.Mat
+    Public Sub New()
+        initParent()
+        mats = New Mat_4to1
+        mat = mats.mat
+
+        label2 = "Click a quadrant in dst1 to snapshot it in dst2"
+        task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Or task.intermediateReview = caller Then mats.defaultMats 
+        mats.Run()
+        dst1 = mats.dst1
+
+        ' click in dst1 to display the quadrant in dst2
+        If task.mouseClickFlag And task.mousePicTag = 2 Then
+            If task.mouseClickPoint.X < dst1.Width / 2 Then
+                If task.mouseClickPoint.Y < dst1.Height / 2 Then dst2 = mats.mat(0) Else dst2 = mats.mat(2)
+            Else
+                If task.mouseClickPoint.Y < dst2.Height / 2 Then dst2 = mats.mat(1) Else dst2 = mats.mat(3)
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Mat_2Click
+    Inherits VBparent
+    Dim mats As Mat_2to1
+    Public mat() As cv.Mat
+    Public Sub New()
+        initParent()
+        mats = New Mat_2to1
+        mat = mats.mat
+        task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then
+            mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
+        End If
+        mats.Run()
+        dst1 = mats.dst1
+
+        ' click in dst1 to display the quadrant in dst2
+        If task.mouseClickFlag And task.mousePicTag = 2 Then
+            If task.mouseClickPoint.Y < dst1.Height / 2 Then dst2 = mats.mat(0) Else dst2 = mats.mat(1)
+        End If
     End Sub
 End Class

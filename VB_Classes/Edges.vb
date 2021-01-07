@@ -461,8 +461,111 @@ Public Class Edges_DCTinput
         dct.src = src
         dct.Run()
         edges.src = src.SetTo(cv.Scalar.White, dct.dst1)
-        cv.Cv2.ImShow("edges.src", edges.src)
         edges.Run()
         dst2 = edges.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_BinarizedCanny
+    Inherits VBparent
+    Dim edges As Edges_Basics
+    Dim binarize As Binarize_Recurse
+    Dim mats As Mat_4Click
+    Public Sub New()
+        initParent()
+        mats = New Mat_4Click
+        binarize = New Binarize_Recurse
+        edges = New Edges_Basics
+        label1 = "Edges between halves, lightest, darkest, and the combo"
+        task.desc = "Collect edges from binarized images"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        binarize.src = src
+        binarize.Run()
+
+        edges.src = binarize.mats.mat(0) ' the light and dark halves
+        edges.Run()
+        mats.mat(0) = edges.dst1.Clone
+        mats.mat(3) = edges.dst1.Clone
+
+        edges.src = binarize.mats.mat(1) ' the lightest of the light half
+        edges.Run()
+        mats.mat(1) = edges.dst1.Clone
+        cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
+
+        edges.src = binarize.mats.mat(3) ' the darkest of the dark half
+        edges.Run()
+        mats.mat(2) = edges.dst1.Clone
+        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
+
+        mats.Run()
+        dst1 = mats.dst1
+        If mats.dst2.Channels = 3 Then
+            label2 = "Combo of first 3 below.  Click quadrants in dst1."
+            dst2 = mats.mat(3)
+        Else
+            dst2 = mats.dst2
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_BinarizedSobel
+    Inherits VBparent
+    Dim edges As Edges_Sobel
+    Dim binarize As Binarize_Recurse
+    Dim mats As Mat_4Click
+    Public Sub New()
+        initParent()
+        mats = New Mat_4Click
+        binarize = New Binarize_Recurse
+        edges = New Edges_Sobel
+        label1 = "Edges between halves, lightest, darkest, and the combo"
+        task.desc = "Collect Sobel edges from binarized images"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        binarize.src = src
+        binarize.Run()
+
+        edges.src = binarize.mats.mat(0) ' the light and dark halves
+        edges.Run()
+        mats.mat(0) = edges.dst1.Clone
+        mats.mat(3) = edges.dst1.Clone
+
+        edges.src = binarize.mats.mat(1) ' the lightest of the light half
+        edges.Run()
+        mats.mat(1) = edges.dst1.Clone
+        cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
+
+        edges.src = binarize.mats.mat(3) ' the darkest of the dark half
+        edges.Run()
+        mats.mat(2) = edges.dst1.Clone
+        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
+
+        mats.Run()
+        dst1 = mats.dst1
+        If mats.dst2.Channels = 3 Then
+            label2 = "Combo of first 3 below.  Click quadrants in dst1."
+            dst2 = mats.mat(3)
+        Else
+            dst2 = mats.dst2
+        End If
     End Sub
 End Class

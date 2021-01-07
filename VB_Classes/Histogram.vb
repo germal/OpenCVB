@@ -952,41 +952,6 @@ End Class
 
 
 
-Public Class Histogram_SmoothConcentration
-    Inherits VBparent
-    Public sideview As Histogram_SmoothSideView2D
-    Public topview As Histogram_SmoothTopView2D
-    Dim concent As Histogram_ViewConcentrations
-    Public Sub New()
-        initParent()
-
-        sideview = New Histogram_SmoothSideView2D
-        topview = New Histogram_SmoothTopView2D
-        concent = New Histogram_ViewConcentrations
-
-        task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideview.Run()
-        dst1 = sideview.dst1
-        Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
-        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst1 = concent.palette.dst1.Clone
-
-        topview.Run()
-        dst2 = topview.dst1
-        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst2 = concent.palette.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Histogram_DepthClusters
     Inherits VBparent
     Public valleys As Histogram_DepthValleys
@@ -1402,88 +1367,6 @@ End Class
 
 
 
-
-
-
-Public Class Histogram_ViewObjects
-    Inherits VBparent
-    Public histC As Histogram_ViewConcentrations
-    Dim flood As FloodFill_Basics
-    Dim minSizeSlider As Windows.Forms.TrackBar
-    Dim loDiffSlider As Windows.Forms.TrackBar
-    Dim hiDiffSlider As Windows.Forms.TrackBar
-    Dim stepSlider As Windows.Forms.TrackBar
-    Public side2D As New List(Of cv.Rect)
-    Public top2D As New List(Of cv.Rect)
-    Public Sub New()
-        initParent()
-
-        flood = New FloodFill_Basics
-        histC = New Histogram_ViewConcentrations
-
-        minSizeSlider = findSlider("FloodFill Minimum Size")
-        loDiffSlider = findSlider("FloodFill LoDiff")
-        hiDiffSlider = findSlider("FloodFill HiDiff")
-        stepSlider = findSlider("Step Size")
-        loDiffSlider.Value = 250
-        hiDiffSlider.Value = 255
-
-        Dim dotSlider = findSlider("Dot size")
-        stepSlider.Value = dotSlider.Value
-        minSizeSlider.Value = dotSlider.Value * dotSlider.Value
-
-        task.desc = "Use the histogram concentrations to identify objects in the field of view"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        histC.Run()
-
-        dst1 = histC.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst2 = histC.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        flood.src = dst1
-        flood.Run()
-        dst1 = flood.dst1.Clone.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        Dim offset = If(src.Width = 1280, 10, 16)
-        Dim w = dst1.Width
-        Dim h = dst1.Height
-        Dim minZ As Single, maxZ As Single
-        side2D.Clear()
-
-        For Each r In flood.rects
-            side2D.Add(r)
-            dst1.Rectangle(r, cv.Scalar.White, 1)
-            minZ = ocvb.maxZ * r.X / w
-            maxZ = ocvb.maxZ * (r.X + r.Width) / w
-            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
-        Next
-        label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
-
-        flood.src = dst2
-        flood.Run()
-        dst2 = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        top2D.Clear()
-        For Each r In flood.rects
-            top2D.Add(r)
-            dst2.Rectangle(r, cv.Scalar.White, 1)
-            minZ = ocvb.maxZ * (h - r.Y - r.Height) / h
-            maxZ = ocvb.maxZ * (h - r.Y) / h
-            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
-        Next
-
-        label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Histogram_ViewIntersections
     Inherits VBparent
     Dim histCO As Histogram_ViewObjects
@@ -1541,5 +1424,124 @@ Public Class Histogram_ViewIntersections
         split(2).SetTo(0, mask)
 
         cv.Cv2.Merge(split, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Histogram_SmoothConcentration
+    Inherits VBparent
+    Public sideview As Histogram_SmoothSideView2D
+    Public topview As Histogram_SmoothTopView2D
+    Dim concent As Histogram_ViewConcentrations
+    Public Sub New()
+        initParent()
+
+        sideview = New Histogram_SmoothSideView2D
+        topview = New Histogram_SmoothTopView2D
+        concent = New Histogram_ViewConcentrations
+
+        task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sideview.Run()
+        dst1 = sideview.dst1
+        Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
+        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst1 = concent.palette.dst1.Clone
+
+        topview.Run()
+        dst2 = topview.dst1
+        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst2 = concent.palette.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_ViewObjects
+    Inherits VBparent
+    Public histC As Histogram_ViewConcentrations
+    Dim flood As FloodFill_Image
+    Dim minSizeSlider As Windows.Forms.TrackBar
+    Dim loDiffSlider As Windows.Forms.TrackBar
+    Dim hiDiffSlider As Windows.Forms.TrackBar
+    Dim stepSlider As Windows.Forms.TrackBar
+    Public side2D As New List(Of cv.Rect)
+    Public top2D As New List(Of cv.Rect)
+    Public Sub New()
+        initParent()
+
+        flood = New FloodFill_Image
+        histC = New Histogram_ViewConcentrations
+
+        minSizeSlider = findSlider("FloodFill Minimum Size")
+        loDiffSlider = findSlider("FloodFill LoDiff")
+        hiDiffSlider = findSlider("FloodFill HiDiff")
+        stepSlider = findSlider("Step Size")
+        loDiffSlider.Value = 250
+        hiDiffSlider.Value = 255
+
+        Dim dotSlider = findSlider("Dot size")
+        stepSlider.Value = dotSlider.Value
+        minSizeSlider.Value = dotSlider.Value * dotSlider.Value
+
+        task.desc = "Use the histogram concentrations to identify objects in the field of view"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        histC.Run()
+
+        dst1 = histC.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = histC.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        flood.src = dst1
+        flood.Run()
+        dst1 = flood.dst1.Clone.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        Dim offset = If(src.Width = 1280, 10, 16)
+        Dim w = dst1.Width
+        Dim h = dst1.Height
+        Dim minZ As Single, maxZ As Single
+        side2D.Clear()
+
+        For Each r In flood.rects
+            side2D.Add(r)
+            dst1.Rectangle(r, cv.Scalar.White, 1)
+            minZ = ocvb.maxZ * r.X / w
+            maxZ = ocvb.maxZ * (r.X + r.Width) / w
+            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
+        Next
+        label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
+
+        flood.src = dst2
+        flood.Run()
+        dst2 = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        top2D.Clear()
+        For Each r In flood.rects
+            top2D.Add(r)
+            dst2.Rectangle(r, cv.Scalar.White, 1)
+            minZ = ocvb.maxZ * (h - r.Y - r.Height) / h
+            maxZ = ocvb.maxZ * (h - r.Y) / h
+            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
+        Next
+
+        label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
     End Sub
 End Class
