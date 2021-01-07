@@ -22,9 +22,12 @@ Public Class Edges_Basics
         Dim threshold1 As Integer = sliders.trackbar(0).Value
         Dim threshold2 As Integer = sliders.trackbar(1).Value
         Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = src.Canny(threshold1, threshold2, aperture, False)
-        dst2 = src.Canny(threshold1, threshold2, aperture, True)
+
+        Dim input = src
+        If input.Channels = 3 Then input = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        dst1 = input.Canny(threshold1, threshold2, aperture, False)
+        dst2 = input.Canny(threshold1, threshold2, aperture, True)
     End Sub
 End Class
 
@@ -398,5 +401,68 @@ Public Class Edges_Sobel
         grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
         Dim abs_grayY = grayY.ConvertScaleAbs()
         cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edges_Palette
+    Inherits VBparent
+    Dim edges As Edges_Basics
+    Dim palette As Palette_Basics
+    Public Sub New()
+        initParent()
+        edges = New Edges_Basics
+        palette = New Palette_Basics
+        task.desc = "Use palette to help canny find more edges"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst1.Clone
+
+        palette.src = src
+        palette.Run()
+        edges.src = palette.dst1
+        edges.Run()
+        dst2 = edges.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_DCTinput
+    Inherits VBparent
+    Dim edges As Edges_Basics
+    Dim dct As DCT_FeatureLess
+    Public Sub New()
+        initParent()
+        edges = New Edges_Basics
+        dct = New DCT_FeatureLess
+        task.desc = "Use the featureless regions to enhance the edge detection"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst1.Clone
+
+        dct.src = src
+        dct.Run()
+        edges.src = src.SetTo(cv.Scalar.White, dct.dst1)
+        cv.Cv2.ImShow("edges.src", edges.src)
+        edges.Run()
+        dst2 = edges.dst1
     End Sub
 End Class

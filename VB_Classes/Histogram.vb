@@ -868,14 +868,14 @@ Public Class Histogram_SmoothTopView2D
     Inherits VBparent
     Public topView As Histogram_TopView2D
     Dim cmat As PointCloud_ColorizeTop
-    Dim stable As Motion_StableDepthRectangleUpdate
+    Dim stable As Motion_StablePointCloud
     Public Sub New()
         initParent()
 
         cmat = New PointCloud_ColorizeTop
         topView = New Histogram_TopView2D
 
-        stable = New Motion_StableDepthRectangleUpdate
+        stable = New Motion_StablePointCloud
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
@@ -912,14 +912,14 @@ Public Class Histogram_SmoothSideView2D
     Inherits VBparent
     Public sideView As Histogram_SideView2D
     Dim cmat As PointCloud_ColorizeSide
-    Dim stable As Motion_StableDepthRectangleUpdate
+    Dim stable As Motion_StablePointCloud
     Public Sub New()
         initParent()
 
         cmat = New PointCloud_ColorizeSide
         sideView = New Histogram_SideView2D
 
-        stable = New Motion_StableDepthRectangleUpdate
+        stable = New Motion_StablePointCloud
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"
