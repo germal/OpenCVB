@@ -246,7 +246,7 @@ Public Class Reduction_Lines
         cmatTop = New PointCloud_ColorizeTop
         sideView = New Histogram_SideView2D()
         topView = New Histogram_TopView2D()
-        reduction = New Reduction_PointCloud()
+        reduction = New Reduction_PointCloud
 
         task.thresholdSlider.Value = 20
         lDetect = New LineDetector_Basics()
@@ -330,14 +330,15 @@ Public Class Reduction_PointCloud
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
+        Dim split() = input.Split()
 
-        Dim split() = src.Split()
         split(2) *= 1000
         split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
         reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-        split(2) = dst1 / 1000
+        split(2) = dst1 * 0.001
         cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
@@ -360,7 +361,9 @@ Public Class Reduction_XYZ
             check.Box(0).Text = "Slice point cloud in X direction"
             check.Box(1).Text = "Slice point cloud in Y direction"
             check.Box(2).Text = "Slice point cloud in Z direction"
-            check.Box(2).Checked = True
+            'check.Box(0).Checked = True
+            'check.Box(1).Checked = True
+            'check.Box(2).Checked = True
         End If
 
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
@@ -368,82 +371,23 @@ Public Class Reduction_XYZ
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        Dim split() = src.Split()
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
+        Dim split() = input.Split()
 
         For i = 0 To 3 - 1
             If check.Box(i).Checked Then
-                split(i) += 10 ' make all values positive.
+                split(i) += 10
                 split(i) *= 1000
                 split(i).ConvertTo(reduction.src, cv.MatType.CV_32S)
                 reduction.Run()
                 reduction.dst1.ConvertTo(split(i), cv.MatType.CV_32F)
                 split(i) *= 0.001
-                split(i) -= 10 ' make all values positive.
+                split(i) -= 10
             End If
         Next
 
         cv.Cv2.Merge(split, dst2)
         ocvb.trueText("Task.PointCloud has been reduced and is in dst2")
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Reduction_XYZStable
-    Inherits VBparent
-    Public stable(3 - 1) As Motion_StableDepthRectangleUpdate
-    Dim reduction As Reduction_Basics
-    Public Sub New()
-        initParent()
-        For i = 0 To stable.Count - 1
-            stable(i) = New Motion_StableDepthRectangleUpdate
-        Next
-
-        reduction = New Reduction_Basics()
-        Dim bitwiseRadio = findRadio("Use bitwise reduction")
-        Dim simpleRadio = findRadio("Use simple reduction")
-        bitwiseRadio.Checked = True
-        simpleRadio.Enabled = False
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
-            check.Box(0).Text = "Slice point cloud in X direction"
-            check.Box(1).Text = "Slice point cloud in Y direction"
-            check.Box(2).Text = "Slice point cloud in Z direction"
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-            check.Box(2).Checked = True
-        End If
-
-        label1 = "x-coordinates of the pointcloud"
-        label1 = "dst2 = new pointcloud"
-        task.desc = "Use reduction to slice the point cloud in 3 dimensions"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim split() = task.pointCloud.Split()
-
-        For i = 0 To 3 - 1
-            If check.Box(i).Checked Then
-                Dim tmp As cv.Mat = split(i) + 10 ' make all values positive.
-                tmp *= 1000
-                stable(i).src = tmp.SetTo(0, task.inrange.nodepthmask)
-                stable(i).Run()
-                stable(i).dst2.ConvertTo(reduction.src, cv.MatType.CV_32S)
-                If i = 0 Then dst1 = stable(i).dst1
-                reduction.Run()
-                reduction.dst1.ConvertTo(tmp, cv.MatType.CV_32F)
-                tmp *= 0.001
-                split(i) = tmp - 10
-            End If
-        Next
-
-        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class

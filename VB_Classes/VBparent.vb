@@ -226,7 +226,7 @@ Public Class VBparent : Implements IDisposable
         Next
     End Sub
     Private Function MakeSureImage8uC3(ByVal input As cv.Mat) As cv.Mat
-        Dim outMat = dst1
+        Dim outMat = input
         If input.Type = cv.MatType.CV_32F Then
             outMat = input.Normalize(0, 255, cv.NormTypes.MinMax)
             outMat.ConvertTo(outMat, cv.MatType.CV_8UC1)

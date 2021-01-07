@@ -709,34 +709,6 @@ End Class
 
 
 
-Public Class OpenGL_ReducedXYZStable
-    Inherits VBparent
-    Dim reduction As Reduction_XYZStable
-    Public ogl As OpenGL_Basics
-    Public Sub New()
-        initParent()
-
-        reduction = New Reduction_XYZStable
-        ogl = New OpenGL_Basics
-        ogl.OpenGLTitle = "OpenGL_Callbacks"
-        task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        reduction.Run()
-        dst1 = reduction.dst1
-        dst2 = reduction.dst2
-
-        ogl.pointCloudInput = reduction.dst2
-        ogl.src = src
-        ogl.Run()
-    End Sub
-End Class
-
-
-
-
-
 Public Class OpenGL_ReducedXYZ
     Inherits VBparent
     Dim reduction As Reduction_XYZ
@@ -752,7 +724,6 @@ Public Class OpenGL_ReducedXYZ
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.Run()
-        dst1 = reduction.dst1
         dst2 = reduction.dst2
 
         ogl.pointCloudInput = reduction.dst2

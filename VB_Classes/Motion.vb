@@ -228,6 +228,7 @@ Public Class Motion_StableDepthRectangleUpdate
         If extrema.resetAll Or initialReset Then
             initialReset = False
             dst2 = input
+            Console.WriteLine("refresh...")
         Else
             dst2 = extrema.dst2
         End If
