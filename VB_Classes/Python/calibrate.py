@@ -50,6 +50,9 @@ def main():
     pattern_points[:, :2] = np.indices(pattern_size).T.reshape(-1, 2)
     pattern_points *= square_size
 
+    # show something to indicate things are working.
+    cv.imshow("first image - working on the series...", cv.imread(img_names[0], cv.IMREAD_GRAYSCALE))
+
     obj_points = []
     img_points = []
     h, w = cv.imread(img_names[0], cv.IMREAD_GRAYSCALE).shape[:2]  # TODO: use imquery call to retrieve results
@@ -122,7 +125,7 @@ def main():
 
         # crop and save the image
         x, y, w, h = roi
-        dst1 = dst[y:y+h, x:x+w]
+        dst1 = dst1[y:y+h, x:x+w]
 
         #print('Undistorted image written to: %s' % outfile)
         #cv.imwrite(outfile, dst1)

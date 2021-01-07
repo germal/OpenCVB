@@ -1,87 +1,134 @@
 '''
-This sample demonstrates SEEDS Superpixels segmentation
-Use [space] to toggle output mode
-Usage:
-  seeds.py [<video source>]
+camera calibration for distorted images with chess board samples
+reads distorted images, calculates the calibration and write undistorted images
+
+usage:
+    calibrate.py [--debug <output path>] [--square_size] [<image mask>]
+
+default values:
+    --debug:    ./output/
+    --square_size: 1.0
+    <image mask> defaults to ../data/left*.jpg
 '''
 
 import numpy as np
 import cv2 as cv
 
-# relative module
-import video
+# local modules
+from common import splitfn
+title_window = 'Calibrate.py'
 
-# built-in module
-import sys
+# built-in modules
+import os
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
+
+def main():
+    import sys
+    import getopt
+    from glob import glob
+
+    args, img_mask = getopt.getopt(sys.argv[1:], '', ['debug=', 'square_size=', 'threads='])
+    args = dict(args)
+    args.setdefault('--debug', '../../Data/output/')
+    args.setdefault('--square_size', 1.0)
+    args.setdefault('--threads', 4)
+    if not img_mask:
+        img_mask = '../../Data/left??.jpg'  # default
+    else:
+        img_mask = img_mask[0]
+
+    img_names = glob(img_mask)
+    debug_dir = args.get('--debug')
+    if debug_dir and not os.path.isdir(debug_dir):
+        os.mkdir(debug_dir)
+    square_size = float(args.get('--square_size'))
+
+    pattern_size = (9, 6)
+    pattern_points = np.zeros((np.prod(pattern_size), 3), np.float32)
+    pattern_points[:, :2] = np.indices(pattern_size).T.reshape(-1, 2)
+    pattern_points *= square_size
+
+    obj_points = []
+    img_points = []
+    h, w = cv.imread(img_names[0], cv.IMREAD_GRAYSCALE).shape[:2]  # TODO: use imquery call to retrieve results
+
+    def processImage(fn):
+        print('processing %s... ' % fn)
+        img = cv.imread(fn, 0)
+        if img is None:
+            print("Failed to load", fn)
+            return None
+
+        assert w == img.shape[1] and h == img.shape[0], ("size: %d x %d ... " % (img.shape[1], img.shape[0]))
+        found, corners = cv.findChessboardCorners(img, pattern_size)
+        if found:
+            term = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_COUNT, 30, 0.1)
+            cv.cornerSubPix(img, corners, (5, 5), (-1, -1), term)
+
+        if debug_dir:
+            vis = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+            cv.drawChessboardCorners(vis, pattern_size, corners, found)
+            _path, name, _ext = splitfn(fn)
+            outfile = os.path.join(debug_dir, name + '_chess.png')
+            #cv.imwrite(outfile, vis)
+
+        if not found:
+            print('chessboard not found')
+            return None
+
+        print('           %s... OK' % fn)
+        return (corners.reshape(-1, 2), pattern_points)
+
+    threads_num = int(args.get('--threads'))
+    if threads_num <= 1:
+        chessboards = [processImage(fn) for fn in img_names]
+    else:
+        print("Run with %d threads..." % threads_num)
+        from multiprocessing.dummy import Pool as ThreadPool
+        pool = ThreadPool(threads_num)
+        chessboards = pool.map(processImage, img_names)
+
+    chessboards = [x for x in chessboards if x is not None]
+    for (corners, pattern_points) in chessboards:
+        img_points.append(corners)
+        obj_points.append(pattern_points)
+
+    # calculate camera distortion
+    rms, camera_matrix, dist_coefs, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, (w, h), None, None)
+
+    print("\nRMS:", rms)
+    print("camera matrix:\n", camera_matrix)
+    print("distortion coefficients: ", dist_coefs.ravel())
+    cv.waitKey(10000)
+
+    # undistort the image with the calibration
+    print('')
+    for fn in img_names if debug_dir else []:
+        path, name, ext = splitfn(fn)
+        img_found = os.path.join(debug_dir, name + '_chess.png')
+        outfile = os.path.join(debug_dir, name + '_undistorted.png')
+
+        img = cv.imread(img_found)
+        if img is None:
+            continue
+
+        cv.imshow(img_found, img)
+        h, w = img.shape[:2]
+        newcameramtx, roi = cv.getOptimalNewCameraMatrix(camera_matrix, dist_coefs, (w, h), 1, (w, h))
+
+        dst1 = cv.undistort(img, camera_matrix, dist_coefs, None, newcameramtx)
+
+        # crop and save the image
+        x, y, w, h = roi
+        dst1 = dst1[y:y+h, x:x+w]
+
+        #print('Undistorted image written to: %s' % outfile)
+        #cv.imwrite(outfile, dst1)
 
 
 if __name__ == '__main__':
-    print (__doc__)
-
-    try:
-        fn = sys.argv[1]
-    except:
-        fn = 0
-
-    def nothing(*arg):
-        pass
-
-    cv.namedWindow('SEEDS')
-    cv.createTrackbar('Number of Superpixels', 'SEEDS', 400, 1000, nothing)
-    cv.createTrackbar('Iterations', 'SEEDS', 4, 12, nothing)
-
-    seeds = None
-    display_mode = 0
-    num_superpixels = 400
-    prior = 2
-    num_levels = 4
-    num_histogram_bins = 5
-
-    cap = video.create_capture(fn)
-    while True:
-        flag, img = cap.read()
-        converted_img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
-        height,width,channels = converted_img.shape
-        num_superpixels_new = cv.getTrackbarPos('Number of Superpixels', 'SEEDS')
-        num_iterations = cv.getTrackbarPos('Iterations', 'SEEDS')
-
-        if not seeds or num_superpixels_new != num_superpixels:
-            num_superpixels = num_superpixels_new
-            seeds = cv.ximgproc.createSuperpixelSEEDS(width, height, channels,
-                    num_superpixels, num_levels, prior, num_histogram_bins)
-            color_img = np.zeros((height,width,3), np.uint8)
-            color_img[:] = (0, 0, 255)
-
-        seeds.iterate(converted_img, num_iterations)
-
-        # retrieve the segmentation result
-        labels = seeds.getLabels()
-
-
-        # labels output: use the last x bits to determine the color
-        num_label_bits = 2
-        labels &= (1<<num_label_bits)-1
-        labels *= 1<<(16-num_label_bits)
-
-
-        mask = seeds.getLabelContourMask(False)
-
-        # stitch foreground & background together
-        mask_inv = cv.bitwise_not(mask)
-        result_bg = cv.bitwise_and(img, img, mask=mask_inv)
-        result_fg = cv.bitwise_and(color_img, color_img, mask=mask)
-        result = cv.add(result_bg, result_fg)
-
-        if display_mode == 0:
-            cv.imshow('SEEDS', result)
-        elif display_mode == 1:
-            cv.imshow('SEEDS', mask)
-        else:
-            cv.imshow('SEEDS', labels)
-
-        ch = cv.waitKey(1)
-        if ch == 27:
-            break
-        elif ch & 0xff == ord(' '):
-            display_mode = (display_mode + 1) % 3
-    cv.destroyAllWindows()
+    print(__doc__)
+    main()
+    Mbox('Calibrate.py', 'Calibration complete...', 1)
