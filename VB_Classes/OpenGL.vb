@@ -554,12 +554,12 @@ End Class
 
 Public Class OpenGL_StableDepth
     Inherits VBparent
-    Dim pcValid As Motion_StableDepthRectangleUpdate
+    Dim pcValid As Motion_StablePointCloud
     Public ogl As OpenGL_Options
     Public Sub New()
         initParent()
 
-        pcValid = New Motion_StableDepthRectangleUpdate
+        pcValid = New Motion_StablePointCloud
         ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
@@ -568,6 +568,8 @@ Public Class OpenGL_StableDepth
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         pcValid.Run()
+        dst1 = pcValid.dst1
+        dst2 = pcValid.dst2
         ogl.pointCloudInput = pcValid.dst2
         ogl.src = task.color
         ogl.Run()
@@ -579,7 +581,7 @@ End Class
 
 
 
-Public Class OpenGL_StabilizedDepth
+Public Class OpenGL_AverageDepth
     Inherits VBparent
     Dim stable As Depth_SmoothMean
     Public ogl As OpenGL_Callbacks
@@ -620,14 +622,15 @@ End Class
 
 Public Class OpenGL_StableDepthMouse
     Inherits VBparent
-    Dim pcValid As Motion_StableDepthRectangleUpdate
+    Dim pcValid As Motion_StablePointCloud
     Public ogl As OpenGL_Callbacks
     Public Sub New()
         initParent()
 
-        pcValid = New Motion_StableDepthRectangleUpdate
+        pcValid = New Motion_StablePointCloud
         ogl = New OpenGL_Callbacks
 
+        label2 = "dst2 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run()

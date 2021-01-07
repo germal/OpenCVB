@@ -1657,75 +1657,6 @@ End Class
 
 
 
-
-
-
-Public Class Depth_SmoothSurfaces
-    Inherits VBparent
-    Public pcValid As Motion_StableDepthRectangleUpdate
-    Dim histX As Histogram_KalmanSmoothed
-    Dim histY As Histogram_KalmanSmoothed
-    Dim mats As Mat_4to1
-    Public Sub New()
-        initParent()
-
-        mats = New Mat_4to1
-        histX = New Histogram_KalmanSmoothed
-        histY = New Histogram_KalmanSmoothed
-        pcValid = New Motion_StableDepthRectangleUpdate
-
-        label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
-        label2 = "Likely smooth surfaces"
-        task.desc = "Find planes using the pointcloud X and Y differences"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        pcValid.Run()
-        Dim mask = pcValid.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-
-        Dim split = pcValid.dst2.Split()
-        Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
-        Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
-
-        Dim r1 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height - 1)
-        Dim r2 = New cv.Rect(1, 1, dst1.Width - 1, dst1.Height - 1)
-
-        cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
-        cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1))
-
-        xDiff.SetTo(0, mask)
-        yDiff.SetTo(0, mask)
-
-        histX.src = xDiff.ConvertScaleAbs(255)
-        histX.Run()
-        mats.mat(0) = histX.dst1
-
-        histY.src = yDiff.ConvertScaleAbs(255)
-        histY.Run()
-        mats.mat(1) = histY.dst1
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(1, 2)}
-        Dim mat() As cv.Mat = {histX.src}
-        Dim bins() = {0}
-        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(2), ranges)
-
-        mat(0) = histY.src
-        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(3), ranges)
-
-        mats.Run()
-        dst1 = mats.dst1
-
-        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Depth_PunchDecreasing
     Inherits VBparent
     Public Increasing As Boolean
@@ -1830,6 +1761,72 @@ Public Class Depth_PunchBlob
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Depth_SmoothSurfaces
+    Inherits VBparent
+    Public pcValid As Motion_StablePointCloud
+    Dim histX As Histogram_KalmanSmoothed
+    Dim histY As Histogram_KalmanSmoothed
+    Dim mats As Mat_4to1
+    Public Sub New()
+        initParent()
+
+        mats = New Mat_4to1
+        histX = New Histogram_KalmanSmoothed
+        histY = New Histogram_KalmanSmoothed
+        pcValid = New Motion_StablePointCloud
+
+        label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
+        label2 = "Likely smooth surfaces"
+        task.desc = "Find planes using the pointcloud X and Y differences"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        pcValid.Run()
+        Dim mask = pcValid.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+
+        Dim split = pcValid.dst2.Split()
+        Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
+        Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
+
+        Dim r1 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height - 1)
+        Dim r2 = New cv.Rect(1, 1, dst1.Width - 1, dst1.Height - 1)
+
+        cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
+        cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1))
+
+        xDiff.SetTo(0, mask)
+        yDiff.SetTo(0, mask)
+
+        histX.src = xDiff.ConvertScaleAbs(255)
+        histX.Run()
+        mats.mat(0) = histX.dst1
+
+        histY.src = yDiff.ConvertScaleAbs(255)
+        histY.Run()
+        mats.mat(1) = histY.dst1
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(1, 2)}
+        Dim mat() As cv.Mat = {histX.src}
+        Dim bins() = {0}
+        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(2), ranges)
+
+        mat(0) = histY.src
+        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(3), ranges)
+
+        mats.Run()
+        dst1 = mats.dst1
+
+        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), dst2)
+    End Sub
+End Class
 
 
 

@@ -268,6 +268,7 @@ Public Class Motion_StablePointCloud
         label2 = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
         If stable.resetAll Then
             splitPC = split
+            dst2 = input
         Else
             splitPC(2) = (stable.dst1 * 0.001).ToMat
             split(0).CopyTo(splitPC(0), dst2)

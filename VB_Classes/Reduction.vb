@@ -361,9 +361,9 @@ Public Class Reduction_XYZ
             check.Box(0).Text = "Slice point cloud in X direction"
             check.Box(1).Text = "Slice point cloud in Y direction"
             check.Box(2).Text = "Slice point cloud in Z direction"
-            'check.Box(0).Checked = True
-            'check.Box(1).Checked = True
-            'check.Box(2).Checked = True
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+            check.Box(2).Checked = True
         End If
 
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
