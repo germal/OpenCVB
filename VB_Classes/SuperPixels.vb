@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 
 Module SuperPixel_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_Open(width As integer, height As integer, num_superpixels As integer, num_levels As integer, prior As integer) As IntPtr
+    Public Function SuperPixel_Open(width As Integer, height As Integer, num_superpixels As Integer, num_levels As Integer, prior As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub SuperPixel_Close(spPtr As IntPtr)
@@ -50,22 +50,24 @@ Public Class SuperPixel_Basics_CPP
             spPtr = SuperPixel_Open(src.Width, src.Height, numSuperPixels, numIterations, prior)
         End If
 
-        Dim srcData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim input = src
+        If input.Channels = 1 Then input = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim srcData(input.Total * input.ElemSize - 1) As Byte
+        Marshal.Copy(input.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim imagePtr = SuperPixel_Run(spPtr, handleSrc.AddrOfPinnedObject())
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            dst1 = src
-            wireGrid = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+            dst1 = input
+            wireGrid = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC1, imagePtr)
             dst1.SetTo(gridColor, wireGrid)
         End If
 
-        Dim labelData(src.Total * 4 - 1) As Byte ' labels are 32-bit integers.
+        Dim labelData(input.Total * 4 - 1) As Byte ' labels are 32-bit integers.
         Dim labelPtr = SuperPixel_GetLabels(spPtr)
         Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
-        Dim labels = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32S, labelData)
+        Dim labels = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_32S, labelData)
         If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
         labels.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
