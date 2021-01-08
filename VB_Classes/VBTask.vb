@@ -22,7 +22,108 @@ Module Algorithm_Module
         b = a
         a = temp
     End Sub
+    Public Function findfrm(title As String) As Windows.Forms.Form
+        For Each frm In Application.OpenForms
+            If frm.text = title Then Return frm
+        Next
+        Return Nothing
+    End Function
+    Public Function findCheckBox(opt As String) As CheckBox
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" CheckBox Options") Then
+                        For j = 0 To frm.Box.length - 1
+                            If frm.Box(j).text.contains(opt) Then Return frm.Box(j)
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findCheckBox failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                MsgBox("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Exit While
+            End If
+        End While
+        Return Nothing
+    End Function
+    Public Function findRadio(opt As String) As RadioButton
+        While 1
+            Try
+                For Each frm In Application.OpenForms
+                    If frm.text.endswith(" Radio Options") Then
+                        For j = 0 To frm.check.length - 1
+                            If frm.check(j).text.contains(opt) Then Return frm.check(j)
+                        Next
+                    End If
+                Next
+            Catch ex As Exception
+                Console.WriteLine("findRadio failed.  The application list of forms changed while iterating.  Not critical.")
+            End Try
+            Application.DoEvents()
+            Static retryCount As Integer
+            retryCount += 1
+            If retryCount >= 5 Then
+                MsgBox("A findRadio was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Exit While
+            End If
+        End While
+        Return Nothing
+    End Function
+    Public Sub hideForm(title As String)
+        If aOptions.optionsTitle.Contains(title) Then
+            For i = 0 To aOptions.optionsTitle.Count - 1
+                If aOptions.optionsTitle(i) = title Then
+                    aOptions.optionsTitle.RemoveAt(i)
+                    Exit For
+                End If
+            Next
+        End If
+        aOptions.hiddenOptions.Add(title)
+    End Sub
+    Public Function findSlider(opt As String) As TrackBar
+        Try
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" Slider Options") Then
+                    For j = 0 To frm.trackbar.length - 1
+                        If frm.sLabels(j).text.contains(opt) Then Return frm.trackbar(j)
+                    Next
+                End If
+            Next
+        Catch ex As Exception
+            Console.WriteLine("findSlider failed.  The application list of forms changed while iterating.  Not critical.")
+        End Try
+        MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+
+        Return Nothing
+    End Function
+
+    Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
+    Public Const QUAD1 = 1
+    Public Const QUAD2 = 2
+    Public Const QUAD3 = 3
+
+    Public Sub setQuadrant()
+        If task.mouseClickFlag Then
+            Dim pt = task.mouseClickPoint
+            If pt.Y < task.color.Height / 2 Then
+                If pt.X < task.color.Width / 2 Then ocvb.quadrantIndex = QUAD0 Else ocvb.quadrantIndex = QUAD1
+            Else
+                If pt.X < task.color.Width / 2 Then ocvb.quadrantIndex = QUAD2 Else ocvb.quadrantIndex = QUAD3
+            End If
+        End If
+    End Sub
 End Module
+
+
+
+
+
+
 Public Class ActiveTask : Implements IDisposable
     Dim algoList As New algorithmList
     Public algorithmObject As Object

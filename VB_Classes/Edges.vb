@@ -483,6 +483,7 @@ Public Class Edges_BinarizedCanny
         mats = New Mat_4Click
         binarize = New Binarize_Recurse
         edges = New Edges_Basics
+        ocvb.quadrantIndex = QUAD3
         label1 = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect edges from binarized images"
     End Sub
@@ -535,6 +536,7 @@ Public Class Edges_BinarizedSobel
         mats = New Mat_4Click
         binarize = New Binarize_Recurse
         edges = New Edges_Sobel
+        ocvb.quadrantIndex = QUAD3
         label1 = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect Sobel edges from binarized images"
     End Sub

@@ -25,12 +25,6 @@ Module GetRotationMatrix
         Next
         Return warpFlag
     End Function
-    Public Function findfrm(title As String) As Windows.Forms.Form
-        For Each frm In Application.OpenForms
-            If frm.text = title Then Return frm
-        Next
-        Return Nothing
-    End Function
 End Module
 
 

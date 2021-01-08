@@ -501,10 +501,8 @@ Public Class FloodFill_Click
     Inherits VBparent
     Dim edges As Edges_BinarizedSobel
     Dim flood As FloodFill_Basics
-    Dim dilate As DilateErode_Basics
     Public Sub New()
         initParent()
-        dilate = New DilateErode_Basics
         edges = New Edges_BinarizedSobel
         flood = New FloodFill_Basics
         flood.pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
@@ -524,10 +522,7 @@ Public Class FloodFill_Click
         dst1 = edges.dst2
 
         If flood.pt.X Or flood.pt.Y Then
-            dilate.src = edges.dst2.Clone
-            dilate.Run()
-
-            flood.src = dilate.dst1
+            flood.src = edges.dst2
             flood.Run()
             dst1.CopyTo(dst2)
             If flood.maskSize > 0 Then dst2.SetTo(255, flood.dst2)
@@ -540,7 +535,7 @@ End Class
 
 
 
-Public Class FloodFill_Basics
+Public Class FloodFill_BasicsOld
     Inherits VBparent
     Public maskSize As Integer
     Public rect As cv.Rect
@@ -575,7 +570,6 @@ Public Class FloodFill_Basics
         Static stepSlider = findSlider("Step Size")
         Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
         Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
-        Dim stepSize = stepSlider.Value
 
         Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
@@ -588,6 +582,47 @@ Public Class FloodFill_Basics
             Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
             label2 = CStr(maskSize) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_Basics
+    Inherits VBparent
+    Public maskSize As Integer
+    Public rect As cv.Rect
+    Public centroid As cv.Point2f
+    Public initialMask As New cv.Mat
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public pt As cv.Point ' this is the floodfill point
+    Public Sub New()
+        initParent()
+        Dim kernelSlider = findSlider("Sobel kernel Size")
+        kernelSlider.Value = 5
+        label1 = "Input image to floodfill"
+        label2 = "Resulting mask from floodfill"
+        task.desc = "Use floodfill at a single location in a grayscale image."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim gray = src.Clone()
+        dst1 = gray
+
+        If standalone Then pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
+
+        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
+        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+
+        Dim zero = New cv.Scalar(0)
+        Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, zero, zero, floodFlag Or (255 << 8))
+        dst2 = maskPlus(maskRect).Clone
+        maskSize = count
+        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+        label2 = CStr(maskSize) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
     End Sub
 End Class
 

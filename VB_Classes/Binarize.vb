@@ -285,6 +285,14 @@ Public Class Binarize_Simple
         initParent()
         mask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
         blur = New Blur_Basics()
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Use Blur algorithm"
+            check.Box(0).Checked = True
+        End If
+
+
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run()
@@ -301,9 +309,14 @@ Public Class Binarize_Simple
             meanScalar = cv.Cv2.Mean(input)
         End If
 
-        blur.src = input
-        blur.Run()
-        dst1 = blur.dst1.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
+        Static blurCheck = findCheckBox("Use Blur algorithm")
+        If blurCheck.checked Then
+            blur.src = input
+            blur.Run()
+            dst1 = blur.dst1.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
+        Else
+            dst1 = input.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
+        End If
     End Sub
 End Class
 
@@ -320,6 +333,7 @@ Public Class Binarize_Recurse
         initParent()
         binarize = New Binarize_Simple
         mats = New Mat_4Click
+        ocvb.quadrantIndex = QUAD3
         label1 = "Lighter half, lightest, darker half, darkest"
         task.desc = "Binarize an image twice using masks"
     End Sub

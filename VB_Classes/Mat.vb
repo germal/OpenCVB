@@ -484,18 +484,12 @@ Public Class Mat_4Click
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Or task.intermediateReview = caller Then mats.defaultMats 
+        If standalone Or task.intermediateReview = caller Then mats.defaultMats
         mats.Run()
         dst1 = mats.dst1
 
-        ' click in dst1 to display the quadrant in dst2
-        If task.mouseClickFlag And task.mousePicTag = 2 Then
-            If task.mouseClickPoint.X < dst1.Width / 2 Then
-                If task.mouseClickPoint.Y < dst1.Height / 2 Then dst2 = mats.mat(0) Else dst2 = mats.mat(2)
-            Else
-                If task.mouseClickPoint.Y < dst2.Height / 2 Then dst2 = mats.mat(1) Else dst2 = mats.mat(3)
-            End If
-        End If
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
+        dst2 = mats.mat(ocvb.quadrantIndex)
     End Sub
 End Class
 
