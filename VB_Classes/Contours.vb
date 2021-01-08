@@ -22,7 +22,6 @@ Public Class Contours_Basics
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
 
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
@@ -96,6 +95,8 @@ End Class
 
 
 
+
+
 Public Class Contours_FindandDraw
     Inherits VBparent
     Dim rotatedRect As Rectangle_Rotated
@@ -125,6 +126,9 @@ Public Class Contours_FindandDraw
         cv.Cv2.DrawContours(dst2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
+
+
+
 
 
 
@@ -299,5 +303,44 @@ Public Class Contours_Prediction
         Next
         dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), origin, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
         label1 = "There were " + CStr(outline.contours.Count) + " points in this contour"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class Contours_Binarized
+    Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
+    Public Sub New()
+        initParent()
+        edges = New Edges_BinarizedSobel
+
+        label1 = "Edges before finding small contours"
+        label2 = "Edges after highlighting small contours"
+        task.desc = "Find contours in the Edges after binarized"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst1.Clone
+
+        Dim contours As cv.Point()()
+        contours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+
+        For i = 0 To contours.Length - 1
+            Dim minRect = cv.Cv2.MinAreaRect(contours(i))
+            Dim area = minRect.Size.Width * minRect.Size.Height
+            If area < 1000 Then drawRotatedRectangle(minRect, dst2, cv.Scalar.Gray)
+        Next
     End Sub
 End Class

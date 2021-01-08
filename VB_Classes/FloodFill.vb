@@ -519,10 +519,10 @@ Public Class FloodFill_Click
 
         edges.src = src
         edges.Run()
-        dst1 = edges.dst2
+        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         If flood.pt.X Or flood.pt.Y Then
-            flood.src = edges.dst2
+            flood.src = dst1.Clone
             flood.Run()
             dst1.CopyTo(dst2)
             If flood.maskSize > 0 Then dst2.SetTo(255, flood.dst2)
@@ -565,8 +565,8 @@ Public Class FloodFill_Basics
             pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
             edges.src = src
             edges.Run()
-            dst1 = edges.mats.dst1
-            dst2 = edges.mats.dst2
+            dst1 = edges.mats.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst1.Clone
         Else
             Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
             Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)

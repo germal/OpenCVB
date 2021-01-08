@@ -44,3 +44,50 @@ End Class
 
 
 
+
+Public Class BestOf_Contours
+    Inherits VBparent
+    Dim contours As Contours_Binarized
+    Public Sub New()
+        initParent()
+        contours = New Contours_Binarized
+        task.desc = "Best example of how to use contours"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        contours.src = src
+        contours.Run()
+        dst1 = contours.dst1
+        dst2 = contours.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BestOf_Blobs
+    Inherits VBparent
+    Dim blobs As Blob_DepthClusters
+    Public Sub New()
+        initParent()
+        blobs = New Blob_DepthClusters
+        task.desc = "Best example of using depth to identify blobs"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        blobs.src = src
+        blobs.Run()
+        dst1 = blobs.dst1
+        dst2 = blobs.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+

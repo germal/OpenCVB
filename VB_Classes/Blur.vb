@@ -181,7 +181,7 @@ Public Class Blur_PlusHistogram
         blur = New Blur_Bilateral()
         myhist = New Histogram_EqualizeGray()
 
-        label1 = "Use Blur slider to see impact on histograms"
+        label1 = "Use Blur slider to see impact on histogram peak values"
         label2 = "Top is before equalize, Bottom is after Equalize"
         task.desc = "Compound algorithms Blur and Histogram"
     End Sub
