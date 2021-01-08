@@ -535,60 +535,6 @@ End Class
 
 
 
-Public Class FloodFill_BasicsOld
-    Inherits VBparent
-    Public maskSize As Integer
-    Public rect As cv.Rect
-    Public centroid As cv.Point2f
-    Public initialMask As New cv.Mat
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public pt As cv.Point ' this is the floodfill point
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
-            sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
-            sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
-            sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
-        End If
-        label1 = "Input image to floodfill"
-        label2 = "Resulting mask from floodfill"
-        task.desc = "Use floodfill at a single location in a grayscale image."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim gray = src.Clone()
-        dst1 = gray
-
-        If standalone Then pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
-
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        Static loDiffSlider = findSlider("FloodFill LoDiff")
-        Static hiDiffSlider = findSlider("FloodFill HiDiff")
-        Static stepSlider = findSlider("Step Size")
-        Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
-        Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
-
-        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
-        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-
-        If gray.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-            Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
-            dst2 = maskPlus(maskRect).Clone
-            maskSize = count
-            Dim m = cv.Cv2.Moments(maskPlus(rect), True)
-            Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-            label2 = CStr(maskSize) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class FloodFill_Basics
     Inherits VBparent
     Public maskSize As Integer
