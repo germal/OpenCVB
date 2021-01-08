@@ -530,13 +530,19 @@ Public Class Edges_BinarizedSobel
     Inherits VBparent
     Dim edges As Edges_Sobel
     Dim binarize As Binarize_Recurse
-    Dim mats As Mat_4Click
+    Public mats As Mat_4Click
     Public Sub New()
         initParent()
         mats = New Mat_4Click
+
         binarize = New Binarize_Recurse
+
         edges = New Edges_Sobel
         ocvb.quadrantIndex = QUAD3
+
+        Dim kernelSlider = findSlider("Sobel kernel Size")
+        kernelSlider.Value = 5
+
         label1 = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect Sobel edges from binarized images"
     End Sub

@@ -593,16 +593,20 @@ Public Class FloodFill_Basics
     Inherits VBparent
     Public maskSize As Integer
     Public rect As cv.Rect
+    Dim edges As Edges_BinarizedSobel
     Public centroid As cv.Point2f
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public pt As cv.Point ' this is the floodfill point
     Public Sub New()
         initParent()
-        Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.Value = 5
+        If standalone Then
+            edges = New Edges_BinarizedSobel
+            label2 = "FloodFill_Basics standalone just shows the edges"
+        Else
+            label2 = "Resulting mask from floodfill"
+        End If
         label1 = "Input image to floodfill"
-        label2 = "Resulting mask from floodfill"
         task.desc = "Use floodfill at a single location in a grayscale image."
     End Sub
     Public Sub Run()
@@ -611,18 +615,24 @@ Public Class FloodFill_Basics
         Dim gray = src.Clone()
         dst1 = gray
 
-        If standalone Then pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
+        If standalone Then
+            pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
+            edges.src = src
+            edges.Run()
+            dst1 = edges.mats.dst1
+            dst2 = edges.mats.dst2
+        Else
+            Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
+            Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
 
-        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
-        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-
-        Dim zero = New cv.Scalar(0)
-        Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, zero, zero, floodFlag Or (255 << 8))
-        dst2 = maskPlus(maskRect).Clone
-        maskSize = count
-        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
-        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-        label2 = CStr(maskSize) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
+            Dim zero = New cv.Scalar(0)
+            Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, zero, zero, floodFlag Or (255 << 8))
+            dst2 = maskPlus(maskRect).Clone
+            maskSize = count
+            Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+            Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+            label2 = CStr(maskSize) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
+        End If
     End Sub
 End Class
 

@@ -292,7 +292,6 @@ Public Class Binarize_Simple
             check.Box(0).Checked = True
         End If
 
-
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run()
