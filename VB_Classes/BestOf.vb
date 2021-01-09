@@ -91,3 +91,26 @@ End Class
 
 
 
+Public Class BestOf_CComp
+    Inherits VBparent
+    Dim ccomp As CComp_Binarized
+    Public Sub New()
+        initParent()
+        ccomp = New CComp_Binarized
+        task.desc = "Best example of using the connected components feature"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        ccomp.src = src
+        ccomp.Run()
+        dst1 = ccomp.dst1
+        dst2 = ccomp.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+

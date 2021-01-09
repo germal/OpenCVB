@@ -21,7 +21,6 @@ Public Class Binarize_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static blurKernelSlider = findSlider("Blur Kernel Size")
         meanScalar = cv.Cv2.Mean(src, mask)
 
         Dim input = src

@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_Basics
     Inherits VBparent
@@ -28,7 +27,7 @@ Public Class CComp_Basics
 
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
-    Private Function renderBlobs( minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
+    Private Function renderBlobs(minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
             If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
@@ -42,7 +41,7 @@ Public Class CComp_Basics
             Dim m = cv.Cv2.Moments(nextMask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
-            If standalone or task.intermediateReview = caller Then dst1(blob.Rect).SetTo(ocvb.scalarColors(count), (dst2)(blob.Rect))
+            If standalone Then dst1(blob.Rect).SetTo(ocvb.scalarColors(count), (dst2)(blob.Rect))
             count += 1
         Next
         Return count
@@ -77,7 +76,7 @@ Public Class CComp_Basics
         connectedComponents.renderblobs(mats.mat(3))
 
         count += renderBlobs(minSize, mats.mat(1), maxSize)
-        If standalone or task.intermediateReview = caller Then
+        If standalone Then
             For i = 0 To centroids.Count - 1
                 dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
                 dst1.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
@@ -558,6 +557,93 @@ Public Class CComp_Shapes
         dst2 = mat.Resize(dst2.Size())
     End Sub
 End Class
+
+
+
+
+
+
+'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
+Public Class CComp_Simple
+    Inherits VBparent
+    Public connectedComponents As Object
+    Public rects As New List(Of cv.Rect)
+    Public centroids As New List(Of cv.Point2f)
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
+            sliders.setupTrackBar(1, "CComp Max Area", 0, src.Width * src.Height / 2, src.Width * src.Height / 4)
+            sliders.setupTrackBar(2, "CComp threshold", 0, 255, 50)
+        End If
+
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        task.desc = "Draw bounding boxes around RGB binarized connected Components"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        rects.Clear()
+        centroids.Clear()
+
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static thresholdSlider = findSlider("CComp threshold")
+        dst1 = input.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
+
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst1)
+        connectedComponents.renderblobs(dst2)
+
+        Static minSizeSlider = findSlider("CComp Min Area")
+        Static maxSizeSlider = findSlider("CComp Max Area")
+        Dim minSize = minSizeSlider.value
+        Dim maxSize = maxSizeSlider.value
+
+        Dim count As Integer = 0
+        For Each blob In connectedComponents.Blobs
+            If blob.Area < minSize Or blob.Area > maxSize Then Continue For
+            Dim rect = blob.Rect
+
+            Dim m = cv.Cv2.Moments(dst1(rect), True)
+            If m.M00 = 0 Then Continue For ' avoid divide by zero...
+            rects.Add(rect)
+            centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
+            count += 1
+        Next
+
+        label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class CComp_Binarized
+    Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
+    Dim ccomp As CComp_Simple
+    Public Sub New()
+        initParent()
+        ccomp = New CComp_Simple
+        edges = New Edges_BinarizedSobel
+        task.desc = "Find connected components using an image with binarized edges"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst2
+
+        ccomp.src = dst1
+        ccomp.Run()
+        dst2 = ccomp.dst2
+    End Sub
+End Class
+
 
 
 

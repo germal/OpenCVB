@@ -571,9 +571,9 @@ Public Class Edges_BinarizedSobel
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
             label2 = "Combo of first 3 below.  Click quadrants in dst1."
-            dst2 = mats.mat(3)
+            dst2 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Else
-            dst2 = mats.dst2
+            dst2 = mats.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
 End Class
