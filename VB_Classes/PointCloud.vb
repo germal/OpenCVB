@@ -47,6 +47,12 @@ Module PointCloud
             Return -1
         End Function
     End Class
+    Public Class CompareMaskSize : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
     Public Class compareAllowIdenticalIntegerInverted : Implements IComparer(Of Integer)
         Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
             ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)

@@ -334,7 +334,7 @@ Public Class Binarize_Recurse
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         binarize.src = gray
         binarize.mask = New cv.Mat

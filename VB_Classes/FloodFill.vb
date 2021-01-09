@@ -39,7 +39,8 @@ Public Class FloodFill_8bit
         dst1.SetTo(0)
         palette.dst1.CopyTo(dst1, allRegionMask)
 
-        label2 = CStr(basics.masks.Count) + " regions > " + CStr(basics.minFloodSize) + " pixels"
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If standalone Or task.intermediateReview = caller Then dst2 = palette.gradMap.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
@@ -170,8 +171,9 @@ Public Class FloodFill_CComp
     Public Sub New()
         initParent()
 
-        ccomp = New CComp_Basics()
-        range = New FloodFill_RelativeRange()
+        ccomp = New CComp_Basics
+        range = New FloodFill_RelativeRange
+
         label1 = "Input to Floodfill "
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
@@ -186,7 +188,7 @@ Public Class FloodFill_CComp
         dst1 = range.dst1
         dst2 = range.dst2
         label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.rects.Count) + " were more than " +
-                      CStr(range.fBasics.sliders.trackbar(0).Value) + " pixels"
+                 CStr(range.fBasics.sliders.trackbar(0).Value) + " pixels"
     End Sub
 End Class
 
@@ -485,102 +487,13 @@ Public Class FloodFill_Top16
             End If
         Next
         If check.Box(0).Checked Then dst1 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label1 = CStr(flood.masks.Count) + " regions > " + CStr(flood.minFloodSize) + " pixels"
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        label1 = CStr(flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
 
 
 
-
-
-
-
-
-
-Public Class FloodFill_Click
-    Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
-    Dim flood As FloodFill_Basics
-    Public Sub New()
-        initParent()
-        edges = New Edges_BinarizedSobel
-        flood = New FloodFill_Basics
-        flood.pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
-        label2 = "Click anywhere to floodfill that area"
-        task.desc = "FloodFill where the mouse clicks"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        If task.mouseClickFlag Then
-            flood.pt = task.mouseClickPoint
-            task.mouseClickFlag = False ' preempt any other uses
-        End If
-
-        edges.src = src
-        edges.Run()
-        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        If flood.pt.X Or flood.pt.Y Then
-            flood.src = dst1.Clone
-            flood.Run()
-            dst1.CopyTo(dst2)
-            If flood.maskSize > 0 Then dst2.SetTo(255, flood.dst2)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class FloodFill_Basics
-    Inherits VBparent
-    Public maskSize As Integer
-    Public rect As cv.Rect
-    Dim edges As Edges_BinarizedSobel
-    Public centroid As cv.Point2f
-    Public initialMask As New cv.Mat
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public pt As cv.Point ' this is the floodfill point
-    Public Sub New()
-        initParent()
-        If standalone Then
-            edges = New Edges_BinarizedSobel
-            label2 = "FloodFill_Basics standalone just shows the edges"
-        Else
-            label2 = "Resulting mask from floodfill"
-        End If
-        label1 = "Input image to floodfill"
-        task.desc = "Use floodfill at a single location in a grayscale image."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim gray = src.Clone()
-        dst1 = gray
-
-        If standalone Then
-            pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
-            edges.src = src
-            edges.Run()
-            dst1 = edges.mats.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            dst2 = dst1.Clone
-        Else
-            Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
-            Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-
-            Dim zero = New cv.Scalar(0)
-            Dim count = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, zero, zero, floodFlag Or (255 << 8))
-            dst2 = maskPlus(maskRect).Clone
-            maskSize = count
-            Dim m = cv.Cv2.Moments(maskPlus(rect), True)
-            Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-            label2 = CStr(maskSize) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
-        End If
-    End Sub
-End Class
 
 
 
@@ -597,13 +510,6 @@ Public Class FloodFill_Image
 
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public minFloodSize As Integer
-    Public Class CompareMaskSize : Implements IComparer(Of Integer)
-        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
-            If a <= b Then Return 1
-            Return -1
-        End Function
-    End Class
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -622,16 +528,17 @@ Public Class FloodFill_Image
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")
         Static stepSlider = findSlider("Step Size")
-        minFloodSize = minSizeSlider.Value
+        Dim minFloodSize = minSizeSlider.Value
         Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
         Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
         Dim stepSize = stepSlider.Value
 
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = src
-        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = input
+        Dim maskPlus = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-        initialMask = src.EmptyClone().SetTo(0)
+        initialMask = input.EmptyClone().SetTo(0)
 
         masks.Clear()
         maskSizes.Clear()
@@ -643,7 +550,7 @@ Public Class FloodFill_Image
         maskPlus.SetTo(0)
         Dim ignoreMasks = initialMask.Clone()
 
-        Dim gray = src.Clone()
+        Dim gray = input.Clone()
         For y = 0 To gray.Height - 1 Step stepSize
             For x = 0 To gray.Width - 1 Step stepSize
                 If gray.Get(Of Byte)(y, x) > 0 Then
@@ -673,5 +580,181 @@ Public Class FloodFill_Image
             dst2.SetTo(ocvb.scalarColors(i Mod 255), masks(maskIndex))
         Next
         label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class FloodFill_Click
+    Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
+    Dim flood As FloodFill_Point
+    Public Sub New()
+        initParent()
+        edges = New Edges_BinarizedSobel
+        flood = New FloodFill_Point
+        flood.pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
+        label2 = "Click anywhere to floodfill that area"
+        task.desc = "FloodFill where the mouse clicks"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If task.mouseClickFlag Then
+            flood.pt = task.mouseClickPoint
+            task.mouseClickFlag = False ' preempt any other uses
+        End If
+
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        If flood.pt.X Or flood.pt.Y Then
+            flood.src = dst1.Clone
+            flood.Run()
+            dst1.CopyTo(dst2)
+            If flood.pixelCount > 0 Then dst2.SetTo(255, flood.dst2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FloodFill_Point
+    Inherits VBparent
+    Public pixelCount As Integer
+    Public rect As cv.Rect
+    Dim edges As Edges_BinarizedSobel
+    Public centroid As cv.Point2f
+    Public initialMask As New cv.Mat
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public pt As cv.Point ' this is the floodfill point
+    Public Sub New()
+        initParent()
+        If standalone Then
+            edges = New Edges_BinarizedSobel
+            label2 = "FloodFill_Point standalone just shows the edges"
+        Else
+            label2 = "Resulting mask from floodfill"
+        End If
+        label1 = "Input image to floodfill"
+        task.desc = "Use floodfill at a single location in a grayscale image."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim gray = src.Clone()
+        dst1 = gray
+
+        If standalone Then
+            pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
+            edges.src = src
+            edges.Run()
+            dst1 = edges.mats.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst1.Clone
+        Else
+            Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
+            Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+
+            Dim zero = New cv.Scalar(0)
+            pixelCount = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, zero, zero, floodFlag Or (255 << 8))
+            dst2 = maskPlus(maskRect).Clone
+            pixelCount = pixelCount
+            Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+            centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+            label2 = CStr(pixelCount) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class FloodFill_FullImage
+    Inherits VBparent
+    Dim flood As FloodFill_Point
+    Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+    Public rects As New List(Of cv.Rect)
+    Public edges As Edges_BinarizedSobel
+    Public masks As New List(Of cv.Mat)
+    Public centroids As New List(Of cv.Point2f)
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public initialMask As New cv.Mat
+    Dim palette As Palette_Basics
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics
+        edges = New Edges_BinarizedSobel
+        flood = New FloodFill_Point
+
+        Dim paletteRadio = findRadio("Random - use slider to adjust")
+        paletteRadio.Checked = True
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FloodFill Full Image Step Size", 1, src.Cols / 2, 50)
+        End If
+
+        task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static stepSlider = findSlider("Step Size")
+        Dim stepSize = stepSlider.Value
+
+        masks.Clear()
+        maskSizes.Clear()
+        rects.Clear()
+        centroids.Clear()
+
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static zero As New cv.Scalar(0)
+        Static maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+        task.mouseClickFlag = False
+
+        edges.src = input
+        edges.Run()
+        dst1 = edges.dst2
+
+        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
+        Dim rect As cv.Rect
+        Dim pt As cv.Point
+        For y = 0 To dst1.Height - 1 Step stepSize
+            For x = 0 To dst1.Width - 1 Step stepSize
+                If dst1.Get(Of Byte)(y, x) = 0 Then
+                    pt.X = x
+                    pt.Y = y
+                    Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, masks.Count + 1, rect, zero, zero, floodFlag Or (255 << 8))
+
+                    If rect.Width And rect.Height Then
+                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+
+                        maskSizes.Add(pixelCount, masks.Count)
+                        masks.Add(maskPlus(maskRect))
+                        rects.Add(rect)
+                        centroids.Add(centroid)
+                    End If
+                End If
+            Next
+        Next
+
+        palette.src = dst1
+        palette.Run()
+        dst2 = palette.dst1
     End Sub
 End Class

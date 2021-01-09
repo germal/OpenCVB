@@ -346,7 +346,7 @@ Public Class Palette_BuildGradientColorMap
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 30, 5)
+            sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 250, 50)
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
