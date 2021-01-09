@@ -3,18 +3,21 @@ Imports System.IO
 
 
 
-
 Public Class GeneticDrawing_Options
     Inherits VBparent
     Public stageTotal = 100
     Public Sub New()
         initParent()
+        Windows.Forms.Application.DoEvents()
+
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)
             check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
             check.Box(1).Text = "Restart the algorithm with the current settings"
             check.Box(1).Checked = True
         End If
+
+        Windows.Forms.Application.DoEvents()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -258,7 +261,7 @@ Public Class GeneticDrawing_Color
     Public Sub New()
         initParent()
 
-        If standalone Then options = New GeneticDrawing_Options()
+        If standalone Then options = New GeneticDrawing_Options
 
         gDraw(0) = New GeneticDrawing_Basics()
         gDraw(1) = New GeneticDrawing_Basics()
@@ -304,7 +307,7 @@ Public Class GeneticDrawing_Photo
     Dim options As GeneticDrawing_Options
     Public Sub New()
         initParent()
-        options = New GeneticDrawing_Options()
+        options = New GeneticDrawing_Options
 
         task.openFileDialogRequested = True
         task.openFileInitialDirectory = ocvb.parms.homeDir + "Data/"
