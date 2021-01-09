@@ -67,7 +67,7 @@ Public Class GeneticDrawing_Basics
     Public Sub New()
         initParent()
 
-        If standalone Then options = New GeneticDrawing_Options()
+        options = New GeneticDrawing_Options()
 
         gradient = New Gradient_CartToPolar()
         For i = 0 To brushes.Count - 1
@@ -174,7 +174,7 @@ Public Class GeneticDrawing_Basics
             generation = 0
             stage = 0
 
-            If standalone or task.intermediateReview = caller Then
+            If standalone Or task.intermediateReview = caller Then
                 src = If(snapCheck.Checked, src.Clone, cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
             snapCheck.Checked = False
@@ -257,11 +257,8 @@ End Class
 Public Class GeneticDrawing_Color
     Inherits VBparent
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
-    Dim options As GeneticDrawing_Options
     Public Sub New()
         initParent()
-
-        If standalone Then options = New GeneticDrawing_Options
 
         gDraw(0) = New GeneticDrawing_Basics()
         gDraw(1) = New GeneticDrawing_Basics()
@@ -304,10 +301,8 @@ Public Class GeneticDrawing_Photo
     Inherits VBparent
     Dim gDraw As GeneticDrawing_Color
     Dim inputFileName As String
-    Dim options As GeneticDrawing_Options
     Public Sub New()
         initParent()
-        options = New GeneticDrawing_Options
 
         task.openFileDialogRequested = True
         task.openFileInitialDirectory = ocvb.parms.homeDir + "Data/"
