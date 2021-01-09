@@ -262,7 +262,7 @@ Public Class Motion_StablePointCloud
         dst1 = stable.dst1
         dst2 = stable.dst2
         label2 = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
-        If stable.motion.resetAll Then
+        If stable.motion.resetAll Or splitPC Is Nothing Then
             splitPC = split
             dst2 = input
         Else

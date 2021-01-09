@@ -660,7 +660,6 @@ Public Class FloodFill_Point
             edges.src = src
             edges.Run()
             dst1 = edges.mats.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            dst2 = dst1.Clone
         Else
             Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
             Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
@@ -782,6 +781,10 @@ Public Class FloodFill_FullImage
         palette.Run()
         dst2 = palette.dst1
         label2 = "Checked " + CStr(testCount) + " points and used floodfill on " + CStr(floodCount)
+
+        Dim tmp = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        Dim missed = tmp.CountNonZero()
+        label1 = "Missed pixels = " + CStr(missed) + " or " + Format(missed / (src.Width * src.Height), "#0%") + " of the total"
 
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In points

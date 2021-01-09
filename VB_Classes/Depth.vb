@@ -1558,7 +1558,6 @@ Public Class Depth_SmoothMin
             cv.Cv2.Min(input, stableMin, stableMin)
         End If
 
-
         colorize.src = stableMin
         colorize.Run()
         dst1 = colorize.dst1
