@@ -685,35 +685,42 @@ End Class
 
 Public Class FloodFill_FullImage
     Inherits VBparent
-    Dim flood As FloodFill_Point
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
     Public edges As Edges_BinarizedSobel
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public initialMask As New cv.Mat
+    Dim initialMask As New cv.Mat
+    Public points As New List(Of cv.Point)
     Dim palette As Palette_Basics
+    Public motion As Motion_Basics
     Public Sub New()
         initParent()
         palette = New Palette_Basics
+        motion = New Motion_Basics
         edges = New Edges_BinarizedSobel
-        flood = New FloodFill_Point
-
-        Dim paletteRadio = findRadio("Random - use slider to adjust")
-        paletteRadio.Checked = True
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "FloodFill Full Image Step Size", 1, src.Cols / 2, 50)
+            sliders.setupTrackBar(0, "FloodFill Step Size", 1, src.Cols / 2, 50)
+            sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
         End If
 
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static stepSlider = findSlider("Step Size")
+        Static stepSlider = findSlider("FloodFill Step Size")
         Dim stepSize = stepSlider.Value
+
+        motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        motion.Run()
+        dst2 = motion.dst2
+
+        ' this prevents use of any other palette control - to investigate why this is use comment these lines and switch among palettes - everything becomes mush.
+        Static paletteRadio = findRadio("Random - use slider to adjust")
+        paletteRadio.Checked = True
 
         masks.Clear()
         maskSizes.Clear()
@@ -733,12 +740,28 @@ Public Class FloodFill_FullImage
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim rect As cv.Rect
         Dim pt As cv.Point
-        For y = 0 To dst1.Height - 1 Step stepSize
-            For x = 0 To dst1.Width - 1 Step stepSize
-                If dst1.Get(Of Byte)(y, x) = 0 Then
-                    pt.X = x
-                    pt.Y = y
-                    Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, masks.Count + 1, rect, zero, zero, floodFlag Or (255 << 8))
+        Dim testCount As Integer
+        Dim floodCount As Integer
+        points.Clear()
+
+        Static fillSlider = findSlider("FloodFill point distance from edge")
+        Dim fill = fillSlider.value
+        Dim inputRect As New cv.Rect(0, 0, fill, fill)
+        Static lastFrame = dst1.Clone
+        For y = fill To dst1.Height - fill - 1 Step stepSize
+            For x = fill To dst1.Width - fill - 1 Step stepSize
+                testCount += 1
+                inputRect.X = x
+                inputRect.Y = y
+                Dim edgeCount = dst1(inputRect).CountNonZero
+                If edgeCount = 0 Then
+                    floodCount += 1
+                    pt.X = x + fill / 2
+                    pt.Y = y + fill / 2
+                    points.Add(pt)
+                    Dim colorIndex = lastFrame.Get(Of Byte)(pt.Y, pt.X)
+                    If ocvb.frameCount = 0 Or motion.resetAll Then colorIndex = masks.Count + 1
+                    Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(colorIndex), rect, zero, zero, floodFlag Or (255 << 8))
 
                     If rect.Width And rect.Height Then
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
@@ -753,8 +776,17 @@ Public Class FloodFill_FullImage
             Next
         Next
 
+        motion.resetAll = False
+        lastFrame = dst1
         palette.src = dst1
         palette.Run()
         dst2 = palette.dst1
+        label2 = "Checked " + CStr(testCount) + " points and used floodfill on " + CStr(floodCount)
+
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each pt In points
+            dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
 End Class
+

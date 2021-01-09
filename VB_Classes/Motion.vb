@@ -7,8 +7,11 @@ Public Class Motion_Basics
     Public rectList As New List(Of cv.Rect)
     Public changedPixels As Integer
     Public cumulativePixels As Integer
+    Public resetAll As Boolean
+    Dim imu As IMU_IscameraStable
     Public Sub New()
         initParent()
+        imu = New IMU_IscameraStable
         contours = New Contours_Basics()
         diff = New Diff_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -24,27 +27,38 @@ Public Class Motion_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src.Clone
+        Dim input = src
+        If input.Channels = 3 Then dst1 = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = input.Clone
+
+        imu.Run()
+
+        Static cumulativeThreshold = findSlider("Cumulative motion threshold")
+        Static pixelThreshold = findSlider("Single frame motion threshold")
+
         diff.src = dst1
         diff.Run()
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()
         cumulativePixels += changedPixels
 
-        If standalone Or task.intermediateReview = caller Then
-            contours.src = dst2
-            contours.Run()
-
-            rectList.Clear()
-            For Each c In contours.contours
-                rectList.Add(cv.Cv2.BoundingRect(c))
-            Next
-
-            dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src)
-            For i = 0 To rectList.Count - 1
-                dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
-            Next
+        resetAll = imu.cameraStable = False Or cumulativePixels > cumulativeThreshold.value Or changedPixels > pixelThreshold.value Or task.depthOptionsChanged
+        If resetAll Then
+            cumulativePixels = 0
+            task.depthOptionsChanged = False
         End If
+
+        contours.src = dst2
+        contours.Run()
+
+        rectList.Clear()
+        For Each c In contours.contours
+            rectList.Add(cv.Cv2.BoundingRect(c))
+        Next
+
+        dst1 = If(input.Channels = 1, input.CvtColor(cv.ColorConversionCodes.GRAY2BGR), input)
+        For i = 0 To rectList.Count - 1
+            dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
+        Next
     End Sub
 End Class
 
@@ -133,11 +147,6 @@ End Class
 Public Class Motion_StableDepth
     Inherits VBparent
     Public motion As Motion_Basics
-    Public resetAll As Boolean
-    Public pitch As Single ' in radians.
-    Public yaw As Single ' in radians.
-    Public roll As Single ' in radians.
-    Public cameraStable As Boolean
     Public externalReset As Boolean
     Public Sub New()
         initParent()
@@ -160,27 +169,14 @@ Public Class Motion_StableDepth
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
-        pitch = task.IMU_AngularVelocity.X
-        yaw = task.IMU_AngularVelocity.Y
-        roll = task.IMU_AngularVelocity.Z
-
-        Static cameraMotionThreshold = findSlider("Camera Motion threshold in radians X100")
-        Static cumulativeThreshold = findSlider("Cumulative motion threshold")
-        Static pixelThreshold = findSlider("Single frame motion threshold")
-
-        cameraStable = If(cameraMotionThreshold.Value / 100 < Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll), False, True)
-
         motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motion.Run()
         dst2 = motion.dst2
 
-        If cameraStable = False Or motion.cumulativePixels > cumulativeThreshold.value Or motion.changedPixels > pixelThreshold.value Or task.depthOptionsChanged Or externalReset Then
-            resetAll = True
+        If motion.resetAll Or externalReset Then
             externalReset = False
             dst1 = input
-            motion.cumulativePixels = 0
         Else
-            resetAll = False
             input.CopyTo(dst1, dst2)
 
             Static useNone = findRadio("Use unchanged depth input")
@@ -266,7 +262,7 @@ Public Class Motion_StablePointCloud
         dst1 = stable.dst1
         dst2 = stable.dst2
         label2 = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
-        If stable.resetAll Then
+        If stable.motion.resetAll Then
             splitPC = split
             dst2 = input
         Else

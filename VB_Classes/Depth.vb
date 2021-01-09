@@ -1486,13 +1486,13 @@ Public Class Depth_Smooth
                     dMax.Run()
                     dst2 = dMax.stableMax
                     dst1 = dMax.dst1
-                    resetAll = dMax.dMin.resetAll
+                    resetAll = dMax.dMin.motion.resetAll
                 Case 1
                     dMin.src = input
                     dMin.Run()
                     dst2 = dMin.stableMin
                     dst1 = dMin.dst1
-                    resetAll = dMin.resetAll
+                    resetAll = dMin.motion.resetAll
                 Case 2
                     dst2 = task.depth32f
                     colorize.src = dst2
@@ -1513,18 +1513,17 @@ End Class
 
 Public Class Depth_SmoothMin
     Inherits VBparent
-    Public stable As IMU_IscameraStable
     Public stableMin As cv.Mat
-    Public rgbMotion As Rectangle_Motion
+    Public motion As Motion_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
-    Public resetAll As Boolean
+    Public mOverlap As Rectangle_MultiOverlap
     Public updateMask As cv.Mat
     Public Sub New()
         initParent()
 
-        stable = New IMU_IscameraStable
+        mOverlap = New Rectangle_MultiOverlap
         colorize = New Depth_ColorizerFastFade_CPP
-        rgbMotion = New Rectangle_Motion
+        motion = New Motion_Basics
         updateMask = New cv.Mat(src.Size, cv.MatType.CV_8U)
 
         label1 = "InRange depth with zero/low quality depth removed."
@@ -1537,36 +1536,29 @@ Public Class Depth_SmoothMin
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
 
-        stable.Run()
-
-        rgbMotion.src = task.color
-        rgbMotion.Run()
-        dst2 = rgbMotion.motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        motion.Run()
+        dst2 = motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Static motionThreshold = findSlider("Single frame motion threshold")
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
-        If stable.cameraStable = False Or rgbMotion.motion.changedPixels > motionThreshold.value Or stableMin Is Nothing Or
-            rgbMotion.motion.cumulativePixels > cumulativeThreshold.value Or task.depthOptionsChanged Then
-
-            resetAll = True
+        If motion.resetAll Or stableMin Is Nothing Then
             stableMin = input.Clone
-            rgbMotion.motion.cumulativePixels = 0
+            If motion.rectList.Count > 0 Then
+                mOverlap.inputRects = New List(Of cv.Rect)(motion.rectList)
+                mOverlap.Run()
+
+                If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                For Each r In mOverlap.enclosingRects
+                    dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+                Next
+            End If
         Else
-            resetAll = False
-
-            updateMask = rgbMotion.motion.dst2
-            For Each r In rgbMotion.mOverlap.enclosingRects
-                r.Inflate(If(r.X - 50 > 0 And r.X + r.Width + 50 < src.Width, 50, 0), If(r.Y - 50 > 0 And r.Y + r.Height + 50 < src.Height, 50, 0))
-                updateMask.Rectangle(r, 255, -1)
-            Next
-            input.CopyTo(stableMin, updateMask)
-            For Each r In rgbMotion.mOverlap.enclosingRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-            Next
-            rgbMotion.mOverlap.enclosingRects.Clear()
-
+            updateMask = motion.dst2
             cv.Cv2.Min(input, stableMin, stableMin)
         End If
+
+
         colorize.src = stableMin
         colorize.Run()
         dst1 = colorize.dst1
@@ -1602,7 +1594,7 @@ Public Class Depth_SmoothMax
         dMin.src = input.Clone
         dMin.Run()
 
-        If dMin.resetAll Then
+        If dMin.motion.resetAll Or stableMax Is Nothing Then
             stableMax = input
         Else
             Dim zeroMask As New cv.Mat

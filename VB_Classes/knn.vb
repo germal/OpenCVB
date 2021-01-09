@@ -954,3 +954,48 @@ Public Class KNN_PointTracker
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class KNN_Learn
+    Inherits VBparent
+    Public trainingPoints As New List(Of cv.Point2f)
+    Public knn As cv.ML.KNearest
+    Public Sub New()
+        initParent()
+        knn = cv.ML.KNearest.Create()
+        task.desc = "Learn from a set of training points.  The calling user can then use FindNearest on the knn"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1.SetTo(cv.Scalar.Black)
+
+        If standalone Then
+            ocvb.trueText("Database is ready for queries.  Use it with code like this " + vbCrLf + vbCrLf +
+                          "public learn as KNN_Learn" + vbCrLf + "learn = new KNN_Learn" + vbCrLf +
+                          "Dim neighbors As New cv.Mat" + vbCrLf + "Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {pt.x, pt.y})" + vbCrLf +
+                          "learn.knn.FindNearest(queries, 1, neighbors)" + vbCrLf + vbCrLf + "And neighbors will have nearest point." + vbCrLf +
+                          "See KNN_Learn for code to cut and paste...")
+
+            ' cut and paste this code into any new algorithm to use KNN_Learn
+            '''''''''' Dim learn As KNN_Learn
+            '''''''''' learn = New KNN_Learn
+            '''''''''' Dim neighbors As New cv.Mat
+            '''''''''' Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {)
+            '''''''''' learn.knn.FindNearest(queries, 1, neighbors)
+        End If
+
+        If trainingPoints.Count = 0 Then Exit Sub
+        Dim trainData = New cv.Mat(trainingPoints.Count, 2, cv.MatType.CV_32F, trainingPoints.ToArray)
+
+        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
+        For i = 0 To trainData.Rows - 1
+            response.Set(Of Integer)(i, 0, i)
+        Next
+        knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+    End Sub
+End Class
