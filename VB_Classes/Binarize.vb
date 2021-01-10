@@ -335,6 +335,8 @@ Public Class Binarize_Recurse
 
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+
         binarize.src = gray
         binarize.mask = New cv.Mat
         binarize.run()
@@ -353,7 +355,7 @@ Public Class Binarize_Recurse
 
         mats.Run()
         dst1 = mats.dst1
-        dst2 = mats.dst2
+        dst2 = mats.mat(quadrantIndex)
         label2 = mats.label2
     End Sub
 End Class

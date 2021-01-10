@@ -153,6 +153,13 @@ Module IndexMain
 
         Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmMapToOpenCV.txt")
         sw.WriteLine("<All>")
+
+        sw.Write("<All but Python>")
+        For i = 0 To nonPYnames.Count - 1
+            sw.Write("," + nonPYnames.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
+
         sw.WriteLine("<All using recorded data>")
 
         sw.Write("<C++>")
@@ -178,12 +185,6 @@ Module IndexMain
         sw.Write("<Multi-Threaded Algorithms>")
         For i = 0 To MTnames.Count - 1
             sw.Write("," + MTnames.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
-
-        sw.Write("<non-Python>")
-        For i = 0 To nonPYnames.Count - 1
-            sw.Write("," + nonPYnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
 

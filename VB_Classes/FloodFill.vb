@@ -652,20 +652,19 @@ Public Class FloodFill_Point
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim gray = src.Clone()
-        dst1 = gray
-
+        dst1 = src.Clone()
         If standalone Then
             pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
             edges.src = src
             edges.Run()
             dst1 = edges.mats.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = edges.mats.mat(quadrantIndex).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Else
             Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
             Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
 
             Dim zero = New cv.Scalar(0)
-            pixelCount = cv.Cv2.FloodFill(gray, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, zero, zero, floodFlag Or (255 << 8))
+            pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, New cv.Point(CInt(pt.X), CInt(pt.Y)), cv.Scalar.White, rect, zero, zero, floodFlag Or (255 << 8))
             dst2 = maskPlus(maskRect).Clone
             pixelCount = pixelCount
             Dim m = cv.Cv2.Moments(maskPlus(rect), True)

@@ -547,6 +547,8 @@ Public Class Edges_BinarizedSobel
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+
         binarize.src = src
         binarize.Run()
 
@@ -571,10 +573,9 @@ Public Class Edges_BinarizedSobel
             label2 = "Combo of first 3 below.  Click quadrants in dst1."
             dst2 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Else
-            dst2 = mats.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = mats.mat(quadrantIndex)
         End If
     End Sub
-
 End Class
 
 

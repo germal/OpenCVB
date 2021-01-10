@@ -473,40 +473,6 @@ End Class
 
 
 
-Public Class KNN_PointPresent
-    Inherits VBparent
-    Dim knn As KNN_DepthClusters
-    Dim flow As Font_FlowText
-    Public Sub New()
-        initParent()
-
-        flow = New Font_FlowText()
-        flow.dst = RESULT2
-        knn = New KNN_DepthClusters()
-
-        task.desc = "Determine if a point is present or not on the basis of the previous x frames"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        knn.src = src
-        knn.Run()
-        dst1 = knn.dst2
-
-        Dim presentStr As String = ""
-        For i = 0 To knn.pTrack.kalman.Count - 1
-            presentStr += CStr(i) + ", "
-        Next
-        If Len(presentStr) Then presentStr = Mid(presentStr, 1, Len(presentStr) - 1) ' Trim comma...
-        flow.msgs.Add(presentStr)
-        flow.Run()
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class KNN_SmoothAverage
     Inherits VBparent
     Dim knn As KNN_DepthClusters

@@ -13,7 +13,7 @@ Public Class OptionsCommon_Depth
         sliders.Setup(caller, 6)
         sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
-        sliders.setupTrackBar(2, "Top and Side Views Histogram threshold", 0, 200, 10)
+        sliders.setupTrackBar(2, "Top and Side Views Histogram threshold", 0, 200, 2)
         sliders.setupTrackBar(3, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
         sliders.setupTrackBar(4, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
         sliders.setupTrackBar(5, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
