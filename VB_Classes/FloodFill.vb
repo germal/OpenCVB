@@ -711,11 +711,21 @@ Public Class FloodFill_FullImage
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static stepSlider = findSlider("FloodFill Step Size")
+        Static fillSlider = findSlider("FloodFill point distance from edge")
+        Dim fill = fillSlider.value
         Dim stepSize = stepSlider.Value
+
+        Static saveStepSize As Integer
+        Static saveFillDistance As Integer
+        Dim resetColors As Boolean
+        If saveStepSize <> stepSize Or saveFillDistance <> fill Then
+            resetColors = True
+            saveStepSize = stepSize
+            saveFillDistance = fill
+        End If
 
         motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motion.Run()
-        dst2 = motion.dst2
 
         ' this prevents use of any other palette control - to investigate why this is use comment these lines and switch among palettes - everything becomes mush.
         Static paletteRadio = findRadio("Random - use slider to adjust")
@@ -734,7 +744,7 @@ Public Class FloodFill_FullImage
 
         edges.src = input
         edges.Run()
-        dst1 = edges.dst2
+        dst1 = edges.dst2.Clone
 
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim rect As cv.Rect
@@ -743,8 +753,6 @@ Public Class FloodFill_FullImage
         Dim floodCount As Integer
         points.Clear()
 
-        Static fillSlider = findSlider("FloodFill point distance from edge")
-        Dim fill = fillSlider.value
         Dim inputRect As New cv.Rect(0, 0, fill, fill)
         Static lastFrame = dst1.Clone
         For y = fill To dst1.Height - fill - 1 Step stepSize
@@ -759,7 +767,7 @@ Public Class FloodFill_FullImage
                     pt.Y = y + fill / 2
                     points.Add(pt)
                     Dim colorIndex = lastFrame.Get(Of Byte)(pt.Y, pt.X)
-                    If ocvb.frameCount = 0 Or motion.resetAll Then colorIndex = masks.Count + 1
+                    If resetColors Or motion.resetAll Or colorIndex = 0 Then colorIndex = (masks.Count + 1) Mod 255
                     Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(colorIndex), rect, zero, zero, floodFlag Or (255 << 8))
 
                     If rect.Width And rect.Height Then
@@ -776,17 +784,17 @@ Public Class FloodFill_FullImage
         Next
 
         motion.resetAll = False
-        lastFrame = dst1
+        lastFrame = dst1.Clone
         palette.src = dst1
         palette.Run()
         dst2 = palette.dst1
-        label2 = "Checked " + CStr(testCount) + " points and used floodfill on " + CStr(floodCount)
+        label2 = "Checked " + CStr(testCount) + " and " + CStr(floodCount) + " were used by floodfill"
 
         Dim tmp = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         Dim missed = tmp.CountNonZero()
         label1 = "Missed pixels = " + CStr(missed) + " or " + Format(missed / (src.Width * src.Height), "#0%") + " of the total"
 
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In points
             dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next

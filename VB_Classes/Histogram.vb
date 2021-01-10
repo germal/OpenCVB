@@ -1338,10 +1338,8 @@ Public Class Histogram_ViewConcentrations
             Dim pt = pts.ElementAt(i).Value
             dst.Rectangle(New cv.Rect(pt.X - dotsize, pt.Y - dotsize, dotsize * 2, dotsize * 2), 128, -1)
         Next
-        If standalone Or task.intermediateReview = caller Then
-            palette.src = dst
-            palette.Run()
-        End If
+        palette.src = dst
+        palette.Run()
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
         Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function

@@ -114,3 +114,27 @@ End Class
 
 
 
+
+Public Class BestOf_FloodFill
+    Inherits VBparent
+    Dim flood As FloodFill_FullImage
+    Public Sub New()
+        initParent()
+        flood = New FloodFill_FullImage
+        task.desc = "Best example of using the FloodFill feature"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        flood.src = src
+        flood.Run()
+        dst1 = flood.dst1
+        dst2 = flood.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
