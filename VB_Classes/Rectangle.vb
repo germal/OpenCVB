@@ -277,6 +277,7 @@ Public Class Rectangle_Motion
             For Each r In mOverlap.enclosingRects
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
+            dst2.Rectangle(motion.allRect, cv.Scalar.Red, 2)
         End If
     End Sub
 End Class
@@ -297,20 +298,24 @@ Public Class Rectangle_MotionDepth
         motion = New Motion_Basics
         mOverlap = New Rectangle_MultiOverlap
         label1 = "Rectangles from contours of motion (unconsolidated)"
-        label2 = "Consolidated Enclosing Rectangles"
+        label2 = "Pixel differences from motion (everything!)"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the depth image."
     End Sub
-
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static lastDepth = task.depth32f
         cv.Cv2.Min(task.depth32f, lastDepth, motion.src)
 
-        ' motion.Run()
-        colorize.src = motion.src.Clone
+        motion.Run()
+        dst2 = motion.dst2
+        If motion.resetAll Then
+            lastDepth = task.depth32f
+            colorize.src = task.depth32f
+        Else
+            colorize.src = motion.src.Clone
+            lastDepth = motion.src
+        End If
         colorize.Run()
         dst1 = colorize.dst1
-
-        lastDepth = motion.src.Clone
     End Sub
 End Class

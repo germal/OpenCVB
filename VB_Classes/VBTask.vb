@@ -101,22 +101,6 @@ Module Algorithm_Module
 
         Return Nothing
     End Function
-
-    Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
-    Public Const QUAD1 = 1
-    Public Const QUAD2 = 2
-    Public Const QUAD3 = 3
-
-    Public Sub setQuadrant()
-        If task.mouseClickFlag Then
-            Dim pt = task.mouseClickPoint
-            If pt.Y < task.color.Height / 2 Then
-                If pt.X < task.color.Width / 2 Then ocvb.quadrantIndex = QUAD0 Else ocvb.quadrantIndex = QUAD1
-            Else
-                If pt.X < task.color.Width / 2 Then ocvb.quadrantIndex = QUAD2 Else ocvb.quadrantIndex = QUAD3
-            End If
-        End If
-    End Sub
 End Module
 
 

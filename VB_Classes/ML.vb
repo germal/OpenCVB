@@ -269,8 +269,8 @@ Public Class ML_DepthFromColor
         mats.Run()
         dst1 = mats.dst1
         label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
-        dst2 = mats.mat(ocvb.quadrantIndex)
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        dst2 = mats.mat(quadrantIndex)
     End Sub
 End Class
 

@@ -542,7 +542,7 @@ Public Class PhotoShop_Brightness
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Brightness Value", 0, 150, 100)
+            sliders.setupTrackBar(0, "Brightness Value", 0, 255, 100)
         End If
 
         label1 = "RGB straight to HSV"

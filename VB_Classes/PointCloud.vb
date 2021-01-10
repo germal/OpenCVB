@@ -519,7 +519,7 @@ Public Class PointCloud_BackProject
         If task.mouseClickFlag Then
             ' lower left image is the mat_4to1
             If task.mousePicTag = 2 Then
-                If task.mouseClickFlag Then setQuadrant()
+                If task.mouseClickFlag Then setMyActiveMat()
                 task.mouseClickFlag = False ' absorb the mouse click here only
             End If
         End If
@@ -531,7 +531,7 @@ Public Class PointCloud_BackProject
         mats.mat(3) = both.backMatMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         mats.Run()
         dst1 = mats.dst1
-        dst2 = mats.mat(ocvb.quadrantIndex)
+        dst2 = mats.mat(quadrantIndex)
         label2 = both.detailText
     End Sub
 End Class
@@ -1495,15 +1495,14 @@ Public Class PointCloud_BothViews
         End If
 
         Static minDepth As Single, maxDepth As Single
-        Dim activeView = ocvb.quadrantIndex
         vwTop = topPixel.viewObjects
         vwSide = sidePixel.viewObjects
         Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
         Dim minIndex As Integer
         Dim detailPoint As cv.Point
         Dim vw As New SortedList(Of Single, viewObject)
-        Dim topActive = If(standalone, True, (activeView = QUAD0 Or activeView = QUAD2))
-        Dim sideActive = If(standalone, True, (activeView = QUAD1 Or activeView = QUAD3))
+        Dim topActive = If(standalone, True, (quadrantIndex = QUAD0 Or quadrantIndex = QUAD2))
+        Dim sideActive = If(standalone, True, (quadrantIndex = QUAD1 Or quadrantIndex = QUAD3))
 
         Dim widthInfo As String = ""
         If vwTop.Count And topActive Then

@@ -483,7 +483,6 @@ Public Class Edges_BinarizedCanny
         mats = New Mat_4Click
         binarize = New Binarize_Recurse
         edges = New Edges_Basics
-        ocvb.quadrantIndex = QUAD3
         label1 = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect edges from binarized images"
     End Sub
@@ -538,7 +537,6 @@ Public Class Edges_BinarizedSobel
         binarize = New Binarize_Recurse
 
         edges = New Edges_Sobel
-        ocvb.quadrantIndex = QUAD3
 
         Dim kernelSlider = findSlider("Sobel kernel Size")
         kernelSlider.Value = 5
@@ -575,5 +573,69 @@ Public Class Edges_BinarizedSobel
         Else
             dst2 = mats.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End If
+    End Sub
+
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_BinarizedBrightness
+    Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
+    Dim bright As PhotoShop_Brightness
+    Public Sub New()
+        initParent()
+
+        edges = New Edges_BinarizedSobel
+        bright = New PhotoShop_Brightness
+
+        task.desc = "Visualize the impact of brightness on Edges_BinarizeSobel"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        bright.src = src
+        bright.Run()
+        dst1 = bright.dst2
+
+        edges.src = bright.dst2
+        edges.Run()
+        dst2 = edges.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edges_BinarizedReduction
+    Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
+    Dim reduction As Reduction_Basics
+    Public Sub New()
+        initParent()
+
+        edges = New Edges_BinarizedSobel
+        reduction = New Reduction_Basics
+
+        task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        reduction.src = src
+        reduction.Run()
+        dst1 = reduction.dst1
+
+        edges.src = dst1
+        edges.Run()
+        dst2 = edges.dst2
     End Sub
 End Class

@@ -156,7 +156,7 @@ Public Class Mat_4to1
         mat = {mat1, mat2, mat3, mat4}
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
@@ -174,7 +174,6 @@ Public Class Mat_4to1
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, 2)
             dst1.Line(New cv.Point(dst1.Width / 2, 0), New cv.Point(dst1.Width / 2, dst1.Height), cv.Scalar.White, 2)
         End If
-        dst2 = mat(ocvb.quadrantIndex)
     End Sub
 End Class
 
@@ -488,8 +487,8 @@ Public Class Mat_4Click
         mats.Run()
         dst1 = mats.dst1
 
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
-        dst2 = mats.mat(ocvb.quadrantIndex)
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        dst2 = mats.mat(quadrantIndex)
     End Sub
 End Class
 

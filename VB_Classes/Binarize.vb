@@ -327,7 +327,6 @@ Public Class Binarize_Recurse
         initParent()
         binarize = New Binarize_Simple
         mats = New Mat_4Click
-        ocvb.quadrantIndex = QUAD3
         label1 = "Lighter half, lightest, darker half, darkest"
         task.desc = "Binarize an image twice using masks"
     End Sub

@@ -694,11 +694,17 @@ Public Class FloodFill_FullImage
     Public points As New List(Of cv.Point)
     Dim palette As Palette_Basics
     Public motion As Motion_Basics
+    Public mats As Mat_4Click
     Public Sub New()
         initParent()
+
+        mats = New Mat_4Click
         palette = New Palette_Basics
         motion = New Motion_Basics
         edges = New Edges_BinarizedSobel
+
+        Dim paletteRadio = findRadio("Random - use slider to adjust")
+        paletteRadio.Checked = True
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -724,12 +730,12 @@ Public Class FloodFill_FullImage
             saveFillDistance = fill
         End If
 
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+
         motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motion.Run()
-
-        ' this prevents use of any other palette control - to investigate why this is use comment these lines and switch among palettes - everything becomes mush.
-        Static paletteRadio = findRadio("Random - use slider to adjust")
-        paletteRadio.Checked = True
+        mats.mat(0) = motion.dst1
+        If motion.allRect.Width And motion.allRect.Height Then mats.mat(0).Rectangle(motion.allRect, cv.Scalar.Yellow, 2)
 
         masks.Clear()
         maskSizes.Clear()
@@ -740,7 +746,6 @@ Public Class FloodFill_FullImage
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static zero As New cv.Scalar(0)
         Static maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
-        task.mouseClickFlag = False
 
         edges.src = input
         edges.Run()
@@ -755,6 +760,7 @@ Public Class FloodFill_FullImage
 
         Dim inputRect As New cv.Rect(0, 0, fill, fill)
         Static lastFrame = dst1.Clone
+        If motion.allRect.Width And motion.allRect.Height Then lastFrame(motion.allRect).setto(0) ' pickup previous frame colors only where there is no motion 
         For y = fill To dst1.Height - fill - 1 Step stepSize
             For x = fill To dst1.Width - fill - 1 Step stepSize
                 testCount += 1
@@ -765,12 +771,12 @@ Public Class FloodFill_FullImage
                     floodCount += 1
                     pt.X = x + fill / 2
                     pt.Y = y + fill / 2
-                    points.Add(pt)
                     Dim colorIndex = lastFrame.Get(Of Byte)(pt.Y, pt.X)
-                    If resetColors Or motion.resetAll Or colorIndex = 0 Then colorIndex = (masks.Count + 1) Mod 255
+                    If resetColors Or motion.resetAll Or colorIndex = 0 Then colorIndex = (255 - masks.Count - 1) Mod 255
                     Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(colorIndex), rect, zero, zero, floodFlag Or (255 << 8))
 
                     If rect.Width And rect.Height Then
+                        points.Add(pt)
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
 
@@ -787,17 +793,24 @@ Public Class FloodFill_FullImage
         lastFrame = dst1.Clone
         palette.src = dst1
         palette.Run()
-        dst2 = palette.dst1
-        label2 = "Checked " + CStr(testCount) + " and " + CStr(floodCount) + " were used by floodfill"
+        mats.mat(3) = palette.dst1
+        mats.mat(3).SetTo(0, edges.dst2)
+        label2 = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
 
-        Dim tmp = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        Dim missed = tmp.CountNonZero()
+        mats.mat(1) = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        Dim missed = mats.mat(1).CountNonZero()
+        mats.mat(1).SetTo(255, edges.dst2)
         label1 = "Missed pixels = " + CStr(missed) + " or " + Format(missed / (src.Width * src.Height), "#0%") + " of the total"
 
         dst1 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In points
             dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next
+        mats.mat(2) = dst1
+
+        mats.Run()
+        dst1 = mats.dst1
+        dst2 = mats.mat(quadrantIndex)
     End Sub
 End Class
 

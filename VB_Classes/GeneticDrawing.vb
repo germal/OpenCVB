@@ -76,8 +76,6 @@ Public Class GeneticDrawing_Basics
 
         mats = New Mat_4to1()
 
-        ocvb.quadrantIndex = QUAD3
-
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"
         task.desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
@@ -242,8 +240,8 @@ Public Class GeneticDrawing_Basics
         mats.Run()
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
-        dst2 = mats.mat(ocvb.quadrantIndex)
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        dst2 = mats.mat(quadrantIndex)
     End Sub
 End Class
 

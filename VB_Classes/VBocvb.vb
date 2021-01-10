@@ -2,7 +2,6 @@
 
 Public Class VBocvb
     Public frameCount As Integer = 0
-    Public quadrantIndex As Integer = 0
     Public parms As ActiveTask.algParms
     Public defaultRect As cv.Rect
 

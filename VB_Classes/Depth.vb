@@ -1544,15 +1544,7 @@ Public Class Depth_SmoothMin
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         If motion.resetAll Or stableMin Is Nothing Then
             stableMin = input.Clone
-            If motion.rectList.Count > 0 Then
-                mOverlap.inputRects = New List(Of cv.Rect)(motion.rectList)
-                mOverlap.Run()
-
-                If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                For Each r In mOverlap.enclosingRects
-                    dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-                Next
-            End If
+            If motion.rectList.Count > 0 Then dst2.Rectangle(motion.allRect, cv.Scalar.Yellow, 2)
         Else
             updateMask = motion.dst2
             cv.Cv2.Min(input, stableMin, stableMin)

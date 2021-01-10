@@ -39,6 +39,7 @@ Public Class VBparent : Implements IDisposable
     Public algorithm As Object
     Public caller As String
     Public desc As String
+    Public quadrantIndex As Integer = QUAD3
     Dim callStack = ""
     Public Sub initParent()
         If task.callTrace.Count = 0 Then
@@ -55,7 +56,7 @@ Public Class VBparent : Implements IDisposable
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame()
-        If standalone or task.intermediateReview = caller Then src = task.color
+        If standalone Or task.intermediateReview = caller Then src = task.color
         If src.Width <> dst1.Width Or src.Width <> dst2.Width Then
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
@@ -167,5 +168,22 @@ Public Class VBparent : Implements IDisposable
         radio.Dispose()
         radio1.Dispose()
         combo.Dispose()
+    End Sub
+
+    Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.
+    Public Const QUAD1 = 1
+    Public Const QUAD2 = 2
+    Public Const QUAD3 = 3
+
+    Public Sub setMyActiveMat()
+        If task.mouseClickFlag Then
+            Dim pt = task.mouseClickPoint
+            If pt.Y < task.color.Height / 2 Then
+                If pt.X < task.color.Width / 2 Then quadrantIndex = QUAD0 Else quadrantIndex = QUAD1
+            Else
+                If pt.X < task.color.Width / 2 Then quadrantIndex = QUAD2 Else quadrantIndex = QUAD3
+            End If
+            task.mouseClickFlag = False
+        End If
     End Sub
 End Class

@@ -58,8 +58,8 @@ Public Class Pixel_GetSet
 
         mats.Run()
         dst1 = mats.dst1
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setQuadrant()
-        dst2 = mats.mat(ocvb.quadrantIndex)
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        dst2 = mats.mat(quadrantIndex)
     End Sub
 End Class
 
