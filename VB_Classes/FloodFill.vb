@@ -687,13 +687,14 @@ Public Class FloodFill_FullImage
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
-    Public points As New List(Of cv.Point)
+    Public floodPoints As New List(Of cv.Point)
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public edges As Edges_BinarizedSobel
     Dim initialMask As New cv.Mat
     Dim palette As Palette_Basics
     Public motion As Motion_Basics
     Public mats As Mat_4Click
+    Public missingSegments As cv.Mat
     Public Sub New()
         initParent()
 
@@ -707,8 +708,9 @@ Public Class FloodFill_FullImage
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "FloodFill Step Size", 1, src.Cols / 2, 50)
+            sliders.setupTrackBar(0, "FloodFill Step Size", 1, src.Cols / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
+            sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)
         End If
 
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
@@ -755,9 +757,10 @@ Public Class FloodFill_FullImage
         Dim pt As cv.Point
         Dim testCount As Integer
         Dim floodCount As Integer
-        points.Clear()
+        floodPoints.Clear()
 
         Dim inputRect As New cv.Rect(0, 0, fill, fill)
+        Dim depthThreshold = fill * fill / 2
         Static lastFrame = dst1.Clone
         If motion.allRect.Width And motion.allRect.Height Then lastFrame(motion.allRect).setto(0) ' pickup previous frame colors only where there is no motion 
         For y = fill To dst1.Height - fill - 1 Step stepSize
@@ -766,7 +769,8 @@ Public Class FloodFill_FullImage
                 inputRect.X = x
                 inputRect.Y = y
                 Dim edgeCount = dst1(inputRect).CountNonZero
-                If edgeCount = 0 Then
+                Dim depthCount = task.depth32f(inputRect).CountNonZero
+                If edgeCount = 0 And depthCount > depthThreshold Then
                     floodCount += 1
                     pt.X = x + fill / 2
                     pt.Y = y + fill / 2
@@ -775,7 +779,7 @@ Public Class FloodFill_FullImage
                     Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(colorIndex), rect, zero, zero, floodFlag Or (255 << 8))
 
                     If rect.Width And rect.Height Then
-                        points.Add(pt)
+                        floodPoints.Add(pt)
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
 
@@ -793,16 +797,19 @@ Public Class FloodFill_FullImage
         palette.src = dst1
         palette.Run()
         mats.mat(3) = palette.dst1
-        mats.mat(3).SetTo(0, edges.dst2)
+        mats.mat(3).SetTo(0, mats.mat(1)) ' show the pixels that are not assigned (missing)
         label2 = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
 
         mats.mat(1) = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        missingSegments = mats.mat(1).Clone
         Dim missed = mats.mat(1).CountNonZero()
         mats.mat(1).SetTo(255, edges.dst2)
-        label1 = "Missed pixels = " + CStr(missed) + " or " + Format(missed / (src.Width * src.Height), "#0%") + " of the total"
+        Dim segmentedCount = src.Width * src.Height - missed
+        Dim percentRGB = Format(segmentedCount / (src.Width * src.Height), "#0%")
+        label1 = "Segmented pixels = " + Format(segmentedCount, "###,###") + " or " + percentRGB + " of total pixels"
 
         dst1 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For Each pt In points
+        For Each pt In floodPoints
             dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next
         mats.mat(2) = dst1

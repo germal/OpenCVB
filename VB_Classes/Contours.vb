@@ -109,7 +109,7 @@ Public Class Contours_FindandDraw
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         rotatedRect.src = src
         rotatedRect.Run()
         dst1 = rotatedRect.dst1
@@ -117,13 +117,14 @@ Public Class Contours_FindandDraw
         Dim tmp As New cv.Mat
         img.ConvertTo(tmp, cv.MatType.CV_32SC1)
         Dim contours0 = cv.Cv2.FindContoursAsArray(tmp, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
-        Dim contours(contours0.Length - 1)() As cv.Point
+        Dim contours As New List(Of cv.Point())
+        dst2.SetTo(0)
         For j = 0 To contours0.Length - 1
-            contours(j) = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
+            Dim nextContour = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
+            If nextContour.Length > 2 Then contours.Add(nextContour)
         Next
 
-        dst2.SetTo(0)
-        cv.Cv2.DrawContours(dst2, contours, 0, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
+        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 

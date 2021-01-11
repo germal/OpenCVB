@@ -47,10 +47,10 @@ End Class
 
 Public Class BestOf_Contours
     Inherits VBparent
-    Dim contours As Contours_Binarized
+    Dim contours As Contours_FindandDraw
     Public Sub New()
         initParent()
-        contours = New Contours_Binarized
+        contours = New Contours_FindandDraw
         task.desc = "Best example of how to use contours"
     End Sub
     Public Sub Run()
