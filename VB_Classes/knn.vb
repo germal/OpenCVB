@@ -833,10 +833,10 @@ Public Class KNN_PointTracker
         initParent()
         If standalone Then topView = New PointCloud_Kalman_TopView()
 
-        drawRC = New Draw_ViewObjects()
+        drawRC = New Draw_ViewObjects
 
-        kalmanOptions = New Kalman_Basics()
-        knn = New KNN_1_to_1()
+        kalmanOptions = New Kalman_Basics
+        knn = New KNN_1_to_1
         allocateKalman(16) ' allocate some kalman objects
 
         If findfrm(caller + " Slider Options") Is Nothing Then

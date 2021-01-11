@@ -685,12 +685,12 @@ Public Class FloodFill_FullImage
     Inherits VBparent
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
-    Public edges As Edges_BinarizedSobel
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Dim initialMask As New cv.Mat
     Public points As New List(Of cv.Point)
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Public edges As Edges_BinarizedSobel
+    Dim initialMask As New cv.Mat
     Dim palette As Palette_Basics
     Public motion As Motion_Basics
     Public mats As Mat_4Click
@@ -780,7 +780,7 @@ Public Class FloodFill_FullImage
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
 
                         maskSizes.Add(pixelCount, masks.Count)
-                        masks.Add(maskPlus(maskRect))
+                        masks.Add(maskPlus(maskRect)(rect))
                         rects.Add(rect)
                         centroids.Add(centroid)
                     End If

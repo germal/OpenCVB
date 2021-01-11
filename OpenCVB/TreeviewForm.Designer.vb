@@ -71,7 +71,7 @@ Partial Class TreeviewForm
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(738, 170)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(699, 93)
         Me.TableLayoutPanel1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
@@ -106,7 +106,7 @@ Partial Class TreeviewForm
         Me.AcceptButton = Me.OK_Button
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(943, 212)
+        Me.ClientSize = New System.Drawing.Size(943, 194)
         Me.Controls.Add(Me.ReviewDST)
         Me.Controls.Add(Me.ReviewStandalone)
         Me.Controls.Add(Me.Label1)

@@ -138,3 +138,47 @@ End Class
 
 
 
+
+Public Class BestOf_KNN
+    Inherits VBparent
+    Dim myTopView As PointCloud_Kalman_TopView
+    Public Sub New()
+        initParent()
+        myTopView = New PointCloud_Kalman_TopView
+        task.desc = "Best example of using KNN to track objects"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        myTopView.src = task.pointCloud
+        myTopView.Run()
+        dst1 = myTopView.dst1
+
+        myTopView.topView.cmat.src = dst1.Clone
+        myTopView.topView.cmat.Run()
+        dst2 = myTopView.topView.cmat.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BestOf_Kalman
+    Inherits VBparent
+    Dim knnKalman As BestOf_KNN
+    Public Sub New()
+        initParent()
+        knnKalman = New BestOf_KNN
+        task.desc = "Best example of using Kalman to calm the points in the point tracker"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        knnKalman.Run()
+        dst1 = knnKalman.dst1
+        dst2 = knnKalman.dst2
+    End Sub
+End Class

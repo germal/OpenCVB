@@ -600,7 +600,7 @@ Public Class Kalman_VB
             sliders.setupTrackBar(7, "Simulated Bias", -100, 100, 0)
             sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
         End If
-        label1 = "Use first slider below to test algorithm"
+        label1 = "Use first slider in the options to test the algorithm.  The other sliders in the options visualize the impact."
         task.desc = "A native VB Kalman filter"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
