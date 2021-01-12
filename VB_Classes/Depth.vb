@@ -1511,140 +1511,6 @@ End Class
 
 
 
-Public Class Depth_SmoothMin
-    Inherits VBparent
-    Public stableMin As cv.Mat
-    Public motion As Motion_Basics
-    Dim colorize As Depth_ColorizerFastFade_CPP
-    Public updateMask As cv.Mat
-    Public Sub New()
-        initParent()
-
-        colorize = New Depth_ColorizerFastFade_CPP
-        motion = New Motion_Basics
-        updateMask = New cv.Mat(src.Size, cv.MatType.CV_8U)
-
-        label1 = "InRange depth with zero/low quality depth removed."
-        label2 = "Motion in the RGB image. Depth updated in rectangle."
-        task.desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
-
-        motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        motion.Run()
-        dst2 = If(motion.dst2.Channels = 1, motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst2.Clone)
-
-        Static motionThreshold = findSlider("Single frame motion threshold")
-        Static cumulativeThreshold = findSlider("Cumulative motion threshold")
-        If motion.resetAll Or stableMin Is Nothing Then
-            stableMin = input.Clone
-
-            If motion.uRect.inputRects.Count > 0 Then
-                If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                For Each r In motion.uRect.inputRects
-                    dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-                Next
-                dst2.Rectangle(motion.uRect.allRect, cv.Scalar.Red, 2)
-            End If
-        Else
-            updateMask = motion.dst2
-            cv.Cv2.Min(input, stableMin, stableMin)
-        End If
-
-        colorize.src = stableMin
-        colorize.Run()
-        dst1 = colorize.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Depth_SmoothMax
-    Inherits VBparent
-    Public dMin As Depth_SmoothMin
-    Dim colorize As Depth_ColorizerFastFade_CPP
-    Public stableMax As cv.Mat
-    Public Sub New()
-        initParent()
-
-        colorize = New Depth_ColorizerFastFade_CPP
-        dMin = New Depth_SmoothMin
-
-        label1 = "InRange depth with zero/low quality depth removed."
-        label2 = "32-bit format StableMax"
-        task.desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
-
-        dMin.src = input.Clone
-        dMin.Run()
-
-        If dMin.motion.resetAll Or stableMax Is Nothing Then
-            stableMax = input
-        Else
-            Dim zeroMask As New cv.Mat
-            cv.Cv2.InRange(dMin.stableMin, 0, 0, zeroMask)
-            cv.Cv2.Max(input, stableMax, stableMax) ' max does not seem to do what it should!  
-            stableMax.SetTo(0, zeroMask)
-        End If
-
-        colorize.src = stableMax
-        colorize.Run()
-        dst1 = colorize.dst1
-        dst2 = stableMax
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Depth_SmoothAverage
-    Inherits VBparent
-    Dim dMin As Depth_SmoothMin
-    Dim dMax As Depth_SmoothMax
-    Dim colorize As Depth_ColorizerFastFade_CPP
-    Public Sub New()
-        initParent()
-
-        colorize = New Depth_ColorizerFastFade_CPP
-        dMin = New Depth_SmoothMin
-        dMax = New Depth_SmoothMax
-
-        label1 = "InRange average depth (zero/low quality depth removed)"
-        label2 = "32-bit format average stable depth"
-        task.desc = "To reduce z-Jitter, use the average depth value at each pixel as long as the camera is stable"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        dMax.src = task.depth32f
-        dMax.Run()
-        dst1 = dMax.dMin.dst1
-
-        cv.Cv2.AddWeighted(dMax.dMin.stableMin, 0.5, dMax.stableMax, 0.5, 0, dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Depth_PunchDecreasing
     Inherits VBparent
     Public Increasing As Boolean
@@ -1921,5 +1787,140 @@ Public Class Depth_PointCloud_IMU
         End If
 
         ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_SmoothAverage
+    Inherits VBparent
+    Dim dMin As Depth_SmoothMin
+    Dim dMax As Depth_SmoothMax
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public Sub New()
+        initParent()
+
+        colorize = New Depth_ColorizerFastFade_CPP
+        dMin = New Depth_SmoothMin
+        dMax = New Depth_SmoothMax
+
+        label1 = "InRange average depth (low quality depth removed)"
+        label2 = "32-bit format average stable depth"
+        task.desc = "To reduce z-Jitter, use the average depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        dMax.src = task.depth32f
+        dMax.Run()
+        dst1 = dMax.dMin.dst1
+
+        cv.Cv2.AddWeighted(dMax.dMin.stableMin, 0.5, dMax.stableMax, 0.5, 0, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_SmoothMin
+    Inherits VBparent
+    Public stableMin As cv.Mat
+    Public motion As Motion_Basics
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public Sub New()
+        initParent()
+
+        colorize = New Depth_ColorizerFastFade_CPP
+        motion = New Motion_Basics
+
+        label1 = "InRange depth with low quality depth removed."
+        label2 = "Motion in the RGB image. Depth updated in rectangle."
+        task.desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
+
+        motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        motion.Run()
+        dst2 = If(motion.dst2.Channels = 1, motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst2.Clone)
+
+        Static motionThreshold = findSlider("Single frame motion threshold")
+        Static cumulativeThreshold = findSlider("Cumulative motion threshold")
+        If motion.resetAll Or stableMin Is Nothing Then
+            stableMin = input.Clone
+        Else
+            Dim rect = motion.uRect.allRect
+            If rect.Width And rect.Height Then input(rect).CopyTo(stableMin(rect))
+            cv.Cv2.Min(input, stableMin, stableMin)
+        End If
+
+        If motion.uRect.inputRects.Count > 0 Then
+            If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For Each r In motion.uRect.inputRects
+                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+            Next
+            dst2.Rectangle(motion.uRect.allRect, cv.Scalar.Red, 2)
+        End If
+
+        colorize.src = stableMin
+        colorize.Run()
+        dst1 = colorize.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_SmoothMax
+    Inherits VBparent
+    Public dMin As Depth_SmoothMin
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public stableMax As cv.Mat
+    Public Sub New()
+        initParent()
+
+        colorize = New Depth_ColorizerFastFade_CPP
+        dMin = New Depth_SmoothMin
+
+        label1 = "InRange depth with low quality depth removed."
+        label2 = "32-bit format StableMax"
+        task.desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
+
+        dMin.src = input.Clone
+        dMin.Run()
+
+        If dMin.motion.resetAll Or stableMax Is Nothing Then
+            stableMax = input.Clone
+        Else
+            Dim rect = dMin.motion.uRect.allRect
+            If rect.Width And rect.Height Then input(rect).CopyTo(stableMax(rect))
+            cv.Cv2.Max(input, stableMax, stableMax)
+
+            Dim zeroMask As New cv.Mat
+            dMin.stableMin.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertTo(zeroMask, cv.MatType.CV_8U)
+            stableMax.SetTo(0, zeroMask)
+        End If
+
+        colorize.src = stableMax
+        colorize.Run()
+        dst1 = colorize.dst1
+        dst2 = stableMax
     End Sub
 End Class

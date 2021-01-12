@@ -18,7 +18,7 @@ Public Class Motion_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Single frame motion threshold", 1, 100000, If(task.color.Width = 1280, 20000, 1000)) ' used only externally...
-            sliders.setupTrackBar(1, "Cumulative motion threshold", 1, 100000, If(task.color.Width = 1280, 50000, 25000)) ' used only externally...
+            sliders.setupTrackBar(1, "Cumulative motion threshold", 1, src.Total, If(task.color.Width = 1280, 200000, 100000)) ' used only externally...
             sliders.setupTrackBar(2, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much camera motion is reasonable?
         End If
 
@@ -55,6 +55,7 @@ Public Class Motion_Basics
         contours.Run()
 
         uRect.inputRects.Clear()
+        uRect.allRect = New cv.Rect
         If contours.contours.Count Then
             For Each c In contours.contours
                 Dim r = cv.Cv2.BoundingRect(c)
