@@ -1542,7 +1542,14 @@ Public Class Depth_SmoothMin
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         If motion.resetAll Or stableMin Is Nothing Then
             stableMin = input.Clone
-            If motion.rectList.Count > 0 Then dst2.Rectangle(motion.allRect, cv.Scalar.Yellow, 2)
+
+            If motion.uRect.inputRects.Count > 0 Then
+                If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                For Each r In motion.uRect.inputRects
+                    dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+                Next
+                dst2.Rectangle(motion.uRect.allRect, cv.Scalar.Red, 2)
+            End If
         Else
             updateMask = motion.dst2
             cv.Cv2.Min(input, stableMin, stableMin)

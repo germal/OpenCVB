@@ -736,7 +736,6 @@ Public Class FloodFill_FullImage
         motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motion.Run()
         mats.mat(0) = motion.dst1
-        If motion.allRect.Width And motion.allRect.Height Then mats.mat(0).Rectangle(motion.allRect, cv.Scalar.Yellow, 2)
 
         masks.Clear()
         maskSizes.Clear()
@@ -762,7 +761,14 @@ Public Class FloodFill_FullImage
         Dim inputRect As New cv.Rect(0, 0, fill, fill)
         Dim depthThreshold = fill * fill / 2
         Static lastFrame = dst1.Clone
-        If motion.allRect.Width And motion.allRect.Height Then lastFrame(motion.allRect).setto(0) ' pickup previous frame colors only where there is no motion 
+        If motion.uRect.inputRects.Count > 0 Then
+            If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For Each r In motion.uRect.inputRects
+                mats.mat(0).Rectangle(r, cv.Scalar.Yellow, 2)
+                lastFrame(r).setto(0)
+            Next
+            dst2.Rectangle(motion.uRect.allRect, cv.Scalar.Red, 2)
+        End If
         For y = fill To dst1.Height - fill - 1 Step stepSize
             For x = fill To dst1.Width - fill - 1 Step stepSize
                 testCount += 1

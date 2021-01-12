@@ -4,14 +4,14 @@ Public Class Motion_Basics
     Inherits VBparent
     Dim diff As Diff_Basics
     Dim contours As Contours_Basics
-    Public rectList As New List(Of cv.Rect)
+    Public uRect As Rectangle_Union
     Public changedPixels As Integer
     Public cumulativePixels As Integer
     Public resetAll As Boolean
-    Public allRect As cv.Rect ' a rectangle covering all the contour rectangles.
     Dim imu As IMU_IscameraStable
     Public Sub New()
         initParent()
+        uRect = New Rectangle_Union
         contours = New Contours_Basics()
         imu = New IMU_IscameraStable
         diff = New Diff_Basics()
@@ -21,6 +21,9 @@ Public Class Motion_Basics
             sliders.setupTrackBar(1, "Cumulative motion threshold", 1, 100000, If(task.color.Width = 1280, 50000, 25000)) ' used only externally...
             sliders.setupTrackBar(2, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much camera motion is reasonable?
         End If
+
+        Dim minSlider = findSlider("Contour minimum area")
+        minSlider.Value = 10
 
         label2 = "Mask of pixel differences "
         task.desc = "Detect contours in the motion data and the resulting rectangles"
@@ -51,33 +54,30 @@ Public Class Motion_Basics
         contours.src = dst2
         contours.Run()
 
-        rectList.Clear()
-        allRect = New cv.Rect
+        uRect.inputRects.Clear()
         If contours.contours.Count Then
             For Each c In contours.contours
                 Dim r = cv.Cv2.BoundingRect(c)
                 If r.X < 0 Then r.X = 0
                 If r.Y < 0 Then r.Y = 0
-                If allRect.Width > 0 And allRect.Height > 0 Then
-                    allRect = r.Union(allRect)
-                    If allRect.X + allRect.Width >= dst1.Width Then allRect.Width = dst1.Width - allRect.X
-                    If allRect.Height >= dst1.Height Then allRect.Height = dst1.Height - allRect.Y
-                Else
-                    allRect = r
-                End If
-                rectList.Add(r)
+                If r.X + r.Width > dst1.Width Then r.Width = dst1.Width - r.X
+                If r.Y + r.Height > dst1.Height Then r.Height = dst1.Height - r.Y
+                uRect.inputRects.Add(r)
             Next
-            If allRect.X + allRect.Width >= dst1.Width Then allRect.Width = dst1.Width - allRect.X
-            If allRect.Y + allRect.Height >= dst1.Height Then allRect.Height = dst1.Height - allRect.Y
-        End If
+            uRect.Run()
 
-        dst1 = If(input.Channels = 1, input.CvtColor(cv.ColorConversionCodes.GRAY2BGR), input)
-        For i = 0 To rectList.Count - 1
-            dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
-        Next
-        dst1.Rectangle(allRect, cv.Scalar.Red, 2)
+            dst1 = If(input.Channels = 1, input.CvtColor(cv.ColorConversionCodes.GRAY2BGR), input)
+            If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For Each r In uRect.inputRects
+                dst1.Rectangle(r, cv.Scalar.Yellow, 2)
+            Next
+            dst1.Rectangle(uRect.allRect, cv.Scalar.Red, 2)
+            dst2.Rectangle(uRect.allRect, cv.Scalar.Red, 2)
+        End If
     End Sub
 End Class
+
+
 
 
 

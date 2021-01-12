@@ -181,29 +181,16 @@ Public Class Rectangle_Motion
         initParent()
         motion = New Motion_Basics
         mOverlap = New Rectangle_Intersection
-        label1 = "Rectangles from contours of motion (unconsolidated)"
-        label2 = "Consolidated Enclosing Rectangles"
+        label1 = "Yellow is pixel motion.  Red is all pixel motion"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
     End Sub
 
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst2 = src.Clone
 
         motion.src = src
         motion.Run()
         dst1 = motion.dst1.Clone
-
-        If motion.rectList.Count > 0 Then
-            mOverlap.inputRects = New List(Of cv.Rect)(motion.rectList)
-            mOverlap.Run()
-
-            If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For Each r In mOverlap.enclosingRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-            Next
-            dst2.Rectangle(motion.allRect, cv.Scalar.Red, 2)
-        End If
     End Sub
 End Class
 
@@ -261,7 +248,7 @@ Public Class Rectangle_Intersection
     Public Sub New()
         initParent()
 
-        task.desc = "Test if any number of rectangles overlap"
+        task.desc = "Test if any number of rectangles overlap."
     End Sub
     Private Function findEnclosingRect(rects As List(Of cv.Rect)) As cv.Rect
         Dim enclosing = rects(0)

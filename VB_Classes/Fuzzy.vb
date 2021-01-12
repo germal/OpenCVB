@@ -13,7 +13,7 @@ Public Class Fuzzy_Basics
         initParent()
 
         options = New Contours_Basics()
-        options.rotatedRect.rect.sliders.Visible = False
+
         Dim floodRadio = findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
 
