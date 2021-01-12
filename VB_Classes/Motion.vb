@@ -178,7 +178,7 @@ Public Class Motion_StableDepth
         End If
 
         label1 = "32-bit format of the stable depth"
-        label2 = "8-bit format of the motion mask"
+        label2 = "Motion mask"
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
     End Sub
     Public Sub Run()
@@ -194,6 +194,7 @@ Public Class Motion_StableDepth
             externalReset = False
             dst1 = input
         Else
+            If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             input.CopyTo(dst1, dst2)
 
             Static useNone = findRadio("Use unchanged depth input")
