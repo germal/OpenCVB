@@ -1536,7 +1536,7 @@ Public Class Depth_SmoothMin
 
         motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motion.Run()
-        dst2 = motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = If(motion.dst2.Channels = 1, motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst2.Clone)
 
         Static motionThreshold = findSlider("Single frame motion threshold")
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
