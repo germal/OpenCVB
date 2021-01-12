@@ -12,8 +12,8 @@ Public Class Motion_Basics
     Dim imu As IMU_IscameraStable
     Public Sub New()
         initParent()
-        imu = New IMU_IscameraStable
         contours = New Contours_Basics()
+        imu = New IMU_IscameraStable
         diff = New Diff_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

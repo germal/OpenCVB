@@ -698,9 +698,9 @@ Public Class FloodFill_FullImage
     Public Sub New()
         initParent()
 
+        motion = New Motion_Basics
         mats = New Mat_4Click
         palette = New Palette_Basics
-        motion = New Motion_Basics
         edges = New Edges_BinarizedSobel
 
         Dim paletteRadio = findRadio("Random - use slider to adjust")

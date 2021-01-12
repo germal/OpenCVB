@@ -115,14 +115,7 @@ Public Class ImageSeg_MissingSegments
         For i = 0 To contours0.Length - 1
             Dim nextContour = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
 
-            If nextContour.Length >= maxLen Then
-                contours.Add(nextContour)
-            Else
-                Dim w = If(nextContour(0).X + 5 >= dst2.Width, dst2.Width - nextContour(0).X, 5)
-                Dim h = If(nextContour(0).Y + 5 >= dst2.Height, dst2.Height - nextContour(0).Y, 5)
-                Dim r As New cv.Rect(nextContour(0).X, nextContour(0).Y, w, h)
-                If r.X >= 0 And r.Y >= 0 And w > 0 And h > 0 Then dst2(r).SetTo(0)
-            End If
+            If nextContour.Length >= maxLen Then contours.Add(nextContour)
         Next
         cv.Cv2.DrawContours(dst2, contours.ToArray, -1, 128, -1, cv.LineTypes.AntiAlias)
         label2 = CStr(contours.Count) + " contours were found "
@@ -151,5 +144,38 @@ Public Class ImageSeg_Unstable
         iSeg.Run()
         dst1 = iSeg.dst1
 
+        Static lastFrame = dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class ImageSeg_CentroidTracker
+    Inherits VBparent
+    Public iSeg As ImageSeg_Basics
+    Public pTrack As KNN_PointTracker
+    Public Sub New()
+        initParent()
+        iSeg = New ImageSeg_Basics
+        pTrack = New KNN_PointTracker
+        task.desc = "Track the centroids that are found consistently from frame to frame."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        iSeg.src = src
+        iSeg.Run()
+        dst1 = iSeg.dst1
+
+        If iSeg.flood.dst1.Channels = 3 Then pTrack.src = iSeg.flood.dst1 Else pTrack.src = iSeg.flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        pTrack.queryPoints = New List(Of cv.Point2f)(iSeg.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(iSeg.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(iSeg.masks)
+        pTrack.Run()
+        dst2 = pTrack.dst1
     End Sub
 End Class

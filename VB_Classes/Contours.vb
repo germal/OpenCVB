@@ -27,7 +27,6 @@ Public Class Contours_Basics
             sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
         End If
 
-        rotatedRect = New Rectangle_Rotated
         task.desc = "Demo options on FindContours."
         label2 = "FindContours output"
     End Sub
@@ -52,6 +51,7 @@ Public Class Contours_Basics
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         setOptions()
         If standalone or task.intermediateReview = caller Then
+            If rotatedRect Is Nothing Then rotatedRect = New Rectangle_Rotated
             Dim imageInput As New cv.Mat
             rotatedRect.src = src
             rotatedRect.Run()
@@ -93,40 +93,6 @@ Public Class Contours_Basics
     End Sub
 End Class
 
-
-
-
-
-Public Class Contours_FindandDraw
-    Inherits VBparent
-    Dim rotatedRect As Rectangle_Rotated
-    Public Sub New()
-        initParent()
-        rotatedRect = New Rectangle_Rotated()
-        rotatedRect.rect.sliders.trackbar(0).Value = 5
-        label1 = "FindandDraw input"
-        label2 = "FindandDraw output"
-        task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        rotatedRect.src = src
-        rotatedRect.Run()
-        dst1 = rotatedRect.dst1
-        Dim img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        Dim tmp As New cv.Mat
-        img.ConvertTo(tmp, cv.MatType.CV_32SC1)
-        Dim contours0 = cv.Cv2.FindContoursAsArray(tmp, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
-        Dim contours As New List(Of cv.Point())
-        dst2.SetTo(0)
-        For j = 0 To contours0.Length - 1
-            Dim nextContour = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
-            If nextContour.Length > 2 Then contours.Add(nextContour)
-        Next
-
-        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
-    End Sub
-End Class
 
 
 
@@ -343,5 +309,58 @@ Public Class Contours_Binarized
             Dim area = minRect.Size.Width * minRect.Size.Height
             If area < 1000 Then drawRotatedRectangle(minRect, dst2, cv.Scalar.Gray)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contours_FindandDraw
+    Inherits VBparent
+    Dim rotatedRect As Rectangle_Rotated
+    Public Sub New()
+        initParent()
+        rotatedRect = New Rectangle_Rotated()
+        rotatedRect.rect.sliders.trackbar(0).Value = 5
+        label1 = "FindandDraw input"
+        label2 = "FindandDraw output"
+        task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        rotatedRect.src = src
+        rotatedRect.Run()
+        dst1 = rotatedRect.dst1
+        Dim img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim tmp As New cv.Mat
+        img.ConvertTo(tmp, cv.MatType.CV_32SC1)
+        Dim contours0 = cv.Cv2.FindContoursAsArray(tmp, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
+        Dim contours As New List(Of cv.Point())
+        dst2.SetTo(0)
+        For j = 0 To contours0.Length - 1
+            Dim nextContour = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
+            If nextContour.Length > 2 Then contours.Add(nextContour)
+        Next
+
+        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Contours_Union
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.desc = "Combine all the contours over a max value into a rectangle"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
     End Sub
 End Class

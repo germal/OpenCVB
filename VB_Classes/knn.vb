@@ -910,6 +910,8 @@ Public Class KNN_PointTracker
             If queryMasks.Count > 0 Then dst1.SetTo(0)
             Dim inputRect = New cv.Rect
             drawRC.viewObjects.Clear()
+            Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
+            Dim useDrawRC = drawRCCheck.checked = False
             For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
                 inputRect = New cv.Rect(kalman(i).kInput(2), kalman(i).kInput(3), kalman(i).kInput(4), kalman(i).kInput(5))
                 Dim pt1 = knn.basics.knnQT.trainingPoints(i)
@@ -954,13 +956,15 @@ Public Class KNN_PointTracker
 
                         vo.LayoutColor = (i + 5) Mod 255
                         If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(matchIndex)
-                        drawRC.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
+                        If useDrawRC Then drawRC.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
                     End If
                 End If
             Next
 
-            drawRC.Run()
-            dst1 = drawRC.dst1
+            If useDrawRC Then
+                drawRC.Run()
+                dst1 = drawRC.dst1
+            End If
         End If
     End Sub
 End Class

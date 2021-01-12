@@ -1516,12 +1516,10 @@ Public Class Depth_SmoothMin
     Public stableMin As cv.Mat
     Public motion As Motion_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
-    Public mOverlap As Rectangle_MultiOverlap
     Public updateMask As cv.Mat
     Public Sub New()
         initParent()
 
-        mOverlap = New Rectangle_MultiOverlap
         colorize = New Depth_ColorizerFastFade_CPP
         motion = New Motion_Basics
         updateMask = New cv.Mat(src.Size, cv.MatType.CV_8U)

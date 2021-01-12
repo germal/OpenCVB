@@ -433,8 +433,9 @@ Public Class Draw_ViewObjects
 
         palette = New Palette_Basics()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+            check.Setup(caller, 2)
             check.Box(0).Text = "Draw rectangle and centroid for each mask"
+            check.Box(1).Text = "Caller will handle any drawing required"
             check.Box(0).Checked = True
         End If
         task.desc = "Draw rectangles and centroids"
