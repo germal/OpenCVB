@@ -325,3 +325,33 @@ Public Class Motion_StableDepthColorized
         dst2 = colorize.dst1
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Motion_DepthShadow
+    Inherits VBparent
+    Dim motion As Motion_Basics
+    Dim dMin As Depth_SmoothMin
+    Public Sub New()
+        initParent()
+        motion = New Motion_Basics
+        dMin = New Depth_SmoothMin
+        task.desc = "Use the motion in the depth shadow to enhance Motion_Basics use of RGB"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        task.inrange.nodepthMask.convertto(dMin.src, cv.MatType.CV_32F)
+        dMin.Run()
+        dst2 = dMin.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        motion.src = dst2
+        motion.Run()
+        dst1 = motion.dst2
+    End Sub
+End Class
