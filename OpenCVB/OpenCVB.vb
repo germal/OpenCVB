@@ -1248,11 +1248,8 @@ Public Class OpenCVB
                 SyncLock TTtextData
                     algorithmRefresh = True
                     imgResult = task.result.Clone()
-                    TTtextData.Clear()
                     If task.TTtextData.Count Then
-                        For i = 0 To task.TTtextData.Count - 1
-                            TTtextData.Add(task.TTtextData(i)) ' pull over any truetype text data so paint can access it.
-                        Next
+                        TTtextData = New List(Of VB_Classes.TTtext)(task.TTtextData)
                         task.TTtextData.Clear()
                     End If
                 End SyncLock
