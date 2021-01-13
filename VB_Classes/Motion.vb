@@ -341,6 +341,13 @@ Public Class Motion_DepthShadow
         initParent()
         motion = New Motion_Basics
         dMin = New Depth_SmoothMin
+
+        Dim minSlider = findSlider("Contour minimum area")
+        minSlider.Value = 100
+        Dim cumSlider = findSlider("Cumulative motion threshold")
+        cumSlider.Value = 2000
+
+        label1 = "Motion of the depth shadow"
         task.desc = "Use the motion in the depth shadow to enhance Motion_Basics use of RGB"
     End Sub
     Public Sub Run()
@@ -353,5 +360,8 @@ Public Class Motion_DepthShadow
         motion.src = dst2
         motion.Run()
         dst1 = motion.dst2
+
+        Dim tmp = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        label2 = "Shadow that is consistently present. " + CStr(tmp.CountNonZero) + " pixels"
     End Sub
 End Class
