@@ -851,39 +851,6 @@ End Class
 
 
 
-Public Class Depth_SmoothMean
-    Inherits VBparent
-    Public stable As Depth_NotMissing
-    Public mean As Mean_Basics
-    Public colorize As Depth_Colorizer_CPP
-    Public Sub New()
-        initParent()
-
-        mean = New Mean_Basics()
-        colorize = New Depth_Colorizer_CPP()
-        stable = New Depth_NotMissing()
-
-        label2 = "32-bit format depth data"
-        task.desc = "Use the mask of stable depth (using RGBDepth) to stabilize the depth at any individual point."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        stable.src = src
-        stable.Run()
-
-        mean.src = task.depth32f
-        mean.src.SetTo(0, stable.dst1)
-        mean.Run()
-        dst2 = mean.dst1.Threshold(256 * 256 - 1, 256 * 256 - 1, cv.ThresholdTypes.Trunc)
-        colorize.src = dst2
-        colorize.Run()
-        dst1 = colorize.dst1
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -1439,76 +1406,6 @@ End Class
 
 
 
-Public Class Depth_Smooth
-    Inherits VBparent
-    Dim colorize As Depth_ColorizerFastFade_CPP
-    Public dMin As Depth_SmoothMin
-    Public dMax As Depth_SmoothMax
-    Public resetAll As Boolean
-    Public Sub New()
-        initParent()
-        colorize = New Depth_ColorizerFastFade_CPP
-        dMin = New Depth_SmoothMin
-        dMax = New Depth_SmoothMax
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
-            radio.check(0).Text = "Use farthest distance"
-            radio.check(1).Text = "Use closest distance"
-            radio.check(2).Text = "Use unchanged depth input"
-            radio.check(1).Checked = True
-        End If
-
-        label1 = "Depth map colorized"
-        label2 = "32-bit StableDepth"
-        task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
-
-        Dim radioVal As Integer
-        Static frm As OptionsRadioButtons = findfrm("Depth_Smooth Radio Options")
-        For radioVal = 0 To frm.check.Count - 1
-            If frm.check(radioVal).Checked Then Exit For
-        Next
-
-        Static saveRadioVal = -1
-        If radioVal <> saveRadioVal Then
-            saveRadioVal = radioVal
-            dst2 = task.depth32f
-            resetAll = True
-        Else
-            Select Case saveRadioVal
-                Case 0
-                    dMax.src = input
-                    dMax.Run()
-                    dst2 = dMax.stableMax
-                    dst1 = dMax.dst1
-                    resetAll = dMax.dMin.motion.resetAll
-                Case 1
-                    dMin.src = input
-                    dMin.Run()
-                    dst2 = dMin.stableMin
-                    dst1 = dMin.dst1
-                    resetAll = dMin.motion.resetAll
-                Case 2
-                    dst2 = task.depth32f
-                    colorize.src = dst2
-                    colorize.Run()
-                    dst1 = colorize.dst1
-                    resetAll = True
-            End Select
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Depth_PunchDecreasing
@@ -1900,18 +1797,17 @@ Public Class Depth_SmoothMax
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
+        dMin.src = src
+        If dMin.src.Type <> cv.MatType.CV_32FC1 Then dMin.src = task.depth32f
 
-        dMin.src = input.Clone
         dMin.Run()
 
         If dMin.motion.resetAll Or stableMax Is Nothing Then
-            stableMax = input.Clone
+            stableMax = dMin.src.Clone
         Else
             Dim rect = dMin.motion.uRect.allRect
-            If rect.Width And rect.Height Then input(rect).CopyTo(stableMax(rect))
-            cv.Cv2.Max(input, stableMax, stableMax)
+            If rect.Width And rect.Height Then dMin.src(rect).CopyTo(stableMax(rect))
+            cv.Cv2.Max(dMin.src, stableMax, stableMax)
 
             Dim zeroMask As New cv.Mat
             dMin.stableMin.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertTo(zeroMask, cv.MatType.CV_8U)
@@ -1922,5 +1818,150 @@ Public Class Depth_SmoothMax
         colorize.Run()
         dst1 = colorize.dst1
         dst2 = stableMax
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Depth_Averaging
+    Inherits VBparent
+    Public avg As Math_ImageAverage
+    Public colorize As Depth_Colorizer_CPP
+    Public Sub New()
+        initParent()
+
+        avg = New Math_ImageAverage()
+        colorize = New Depth_Colorizer_CPP()
+
+        label2 = "32-bit format depth data"
+        task.desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        avg.src = src
+        If avg.src.Type <> cv.MatType.CV_32F Then avg.src = task.depth32f
+        avg.Run()
+
+        dst2 = avg.dst1
+        colorize.src = dst2
+        colorize.Run()
+        dst1 = colorize.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_SmoothMinMax
+    Inherits VBparent
+    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public dMin As Depth_SmoothMin
+    Public dMax As Depth_SmoothMax
+    Public resetAll As Boolean
+    Public Sub New()
+        initParent()
+        colorize = New Depth_ColorizerFastFade_CPP
+        dMin = New Depth_SmoothMin
+        dMax = New Depth_SmoothMax
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Use farthest distance"
+            radio.check(1).Text = "Use closest distance"
+            radio.check(2).Text = "Use unchanged depth input"
+            radio.check(1).Checked = True
+        End If
+
+        label1 = "Depth map colorized"
+        label2 = "32-bit StableDepth"
+        task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
+
+        Dim radioVal As Integer
+        Static frm As OptionsRadioButtons = findfrm("Depth_SmoothMinMax Radio Options")
+        For radioVal = 0 To frm.check.Count - 1
+            If frm.check(radioVal).Checked Then Exit For
+        Next
+
+        Static saveRadioVal = -1
+        If radioVal <> saveRadioVal Then
+            saveRadioVal = radioVal
+            dst2 = task.depth32f
+            resetAll = True
+        Else
+            Select Case saveRadioVal
+                Case 0
+                    dMax.src = input
+                    dMax.Run()
+                    dst2 = dMax.stableMax
+                    dst1 = dMax.dst1
+                    resetAll = dMax.dMin.motion.resetAll
+                Case 1
+                    dMin.src = input
+                    dMin.Run()
+                    dst2 = dMin.stableMin
+                    dst1 = dMin.dst1
+                    resetAll = dMin.motion.resetAll
+                Case 2
+                    dst2 = task.depth32f
+                    colorize.src = dst2
+                    colorize.Run()
+                    dst1 = colorize.dst1
+                    resetAll = True
+            End Select
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_AveragingStable
+    Inherits VBparent
+    Dim dAvg As Depth_Averaging
+    Dim extrema As Depth_SmoothMinMax
+    Public Sub New()
+        initParent()
+        dAvg = New Depth_Averaging
+        extrema = New Depth_SmoothMinMax
+        Dim minMaxRadio = findRadio("Use farthest distance")
+        minMaxRadio.Checked = True
+        task.desc = "Use Depth_SmoothMax to remove the artifacts from the Depth_Averaging"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        extrema.src = src
+        If extrema.src.Type <> cv.MatType.CV_32F Then extrema.src = task.depth32f
+        extrema.Run()
+
+        Static noAvgRadio = findRadio("Use unchanged depth input")
+        If noAvgRadio.checked = False Then
+            dAvg.src = extrema.dst2
+            dAvg.Run()
+            dst1 = dAvg.dst1
+            dst2 = dAvg.dst2
+        Else
+            dst1 = extrema.dst1
+            dst2 = extrema.dst2
+        End If
     End Sub
 End Class

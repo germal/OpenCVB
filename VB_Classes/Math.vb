@@ -151,3 +151,42 @@ Public Class Math_RGBCorrelation
     End Sub
 End Class
 
+
+
+
+
+Public Class Math_ImageAverage
+    Inherits VBparent
+    Dim images As New List(Of cv.Mat)
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Average - number of input images", 1, 100, 10)
+        End If
+        task.desc = "Create an image that is the mean of x number of previous images."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static avgSlider = findSlider("Average - number of input images")
+        Static saveImageCount = avgSlider.Value
+        If avgSlider.Value <> saveImageCount Then
+            saveImageCount = avgSlider.Value
+            images.Clear()
+        End If
+        Dim nextImage As New cv.Mat
+        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(nextImage, cv.MatType.CV_32F) Else nextImage = src
+        cv.Cv2.Multiply(nextImage, cv.Scalar.All(1 / saveImageCount), nextImage)
+        images.Add(nextImage.Clone())
+
+        nextImage.SetTo(0)
+        For Each img In images
+            nextImage += img
+        Next
+        If images.Count > saveImageCount Then images.RemoveAt(0)
+        If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst1, src.Type) Else dst1 = nextImage
+        label1 = "Average image over previous " + CStr(avgSlider.value) + " images"
+    End Sub
+End Class
+

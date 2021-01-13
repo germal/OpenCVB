@@ -31,15 +31,14 @@ Public Class Motion_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim input = src
-        If input.Channels = 3 Then dst1 = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = input.Clone
+        diff.src = src
+        If diff.src.Channels = 3 Then diff.src = diff.src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else diff.src = diff.src.Clone
 
         imu.Run()
 
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         Static pixelThreshold = findSlider("Single frame motion threshold")
 
-        diff.src = dst1
         diff.Run()
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()
@@ -56,18 +55,18 @@ Public Class Motion_Basics
 
         uRect.inputRects.Clear()
         uRect.allRect = New cv.Rect
+        dst1 = diff.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If contours.contours.Count Then
             For Each c In contours.contours
                 Dim r = cv.Cv2.BoundingRect(c)
                 If r.X < 0 Then r.X = 0
                 If r.Y < 0 Then r.Y = 0
-                If r.X + r.Width > dst1.Width Then r.Width = dst1.Width - r.X
-                If r.Y + r.Height > dst1.Height Then r.Height = dst1.Height - r.Y
+                If r.X + r.Width > dst2.Width Then r.Width = dst2.Width - r.X
+                If r.Y + r.Height > dst2.Height Then r.Height = dst2.Height - r.Y
                 uRect.inputRects.Add(r)
             Next
             uRect.Run()
 
-            dst1 = If(input.Channels = 1, input.CvtColor(cv.ColorConversionCodes.GRAY2BGR), input)
             If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each r In uRect.inputRects
                 dst1.Rectangle(r, cv.Scalar.Yellow, 2)
@@ -223,11 +222,11 @@ End Class
 
 Public Class Motion_StableDepthRectangleUpdate
     Inherits VBparent
-    Public extrema As Depth_Smooth
+    Public extrema As Depth_SmoothMinMax
     Dim initialReset = True
     Public Sub New()
         initParent()
-        extrema = New Depth_Smooth
+        extrema = New Depth_SmoothMinMax
         label2 = "dst2 = depth in 32-bit format in mm's"
         task.desc = "Use motion in RGB to determine when to update a 32-bit format input - depth X, Y, and Z."
     End Sub

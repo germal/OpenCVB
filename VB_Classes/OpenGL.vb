@@ -583,12 +583,12 @@ End Class
 
 Public Class OpenGL_AverageDepth
     Inherits VBparent
-    Dim stable As Depth_SmoothMean
+    Dim stable As Depth_AveragingStable
     Public ogl As OpenGL_Callbacks
     Public Sub New()
         initParent()
 
-        stable = New Depth_SmoothMean
+        stable = New Depth_AveragingStable
         ogl = New OpenGL_Callbacks
 
         label2 = "32-bit format stabilized depth data"
