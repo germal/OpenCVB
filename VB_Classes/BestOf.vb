@@ -182,3 +182,27 @@ Public Class BestOf_Kalman
         dst2 = knnKalman.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class BestOf_MotionDetection
+    Inherits VBparent
+    Dim motion As Motion_Basics
+    Public Sub New()
+        initParent()
+        motion = New Motion_Basics
+        task.desc = "Best example of detecting motion and isolating in the image."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        motion.src = src
+        motion.Run()
+        dst1 = motion.dst1
+        dst2 = motion.dst2
+    End Sub
+End Class

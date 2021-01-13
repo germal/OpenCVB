@@ -26,7 +26,7 @@ Module Python_Module
     End Function
 
     Public Function StartPython( arguments As String) As Boolean
-        If checkPythonPackage("numpy") = False Or checkPythonPackage("cv2") = False Then Return False
+        If checkPythonPackage("cv2") = False Then Return False
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
         ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it

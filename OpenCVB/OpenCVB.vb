@@ -865,7 +865,7 @@ Public Class OpenCVB
         Static lastCameraFrame As Integer
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
-        If AvailableAlgorithms.Text.StartsWith("OpenGL") = False And lastAlgorithmFrame < 2 Then Me.Activate()
+        If AvailableAlgorithms.Text.StartsWith("OpenGL") = False And lastAlgorithmFrame < 2 And saveAlgorithmName <> "" Then Me.Activate()
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
