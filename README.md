@@ -1,23 +1,33 @@
-![GitHub](https://img.shields.io/github/license/bobdavies2000/OpenCVB)
-======================================================================
+https://img.shields.io/github/license/bobdavies2000/OpenCVB
+===========================================================
 
-Recent Changes - 12/12/2020
-===========================
+Recent Changes - 1/12/2021
+==========================
 
--   Over 800 algorithms – almost all less than a page of code.
+-   Over 870 algorithms – almost all less than a page of code.
 
--   Depth updates are guided by motion – produces more stable 3D images. See
-    Depth_SmoothMin algorithm.
+-   The new “Best Of” module contains the best example of common techniques.
+    Need an example of contours, look in the BestOf.vb first.
 
--   Recently used algorithms are listed in the menus.
+-   OpenCV’s new Oak-D camera has arrived. Some python scripts were added for
+    users that have installed it.
 
--   More snippets to help adding options to existing algorithms.
+    -   <https://docs.luxonis.com/en/latest/pages/api/> - to get the official
+        support.
 
--   Algorithm options are now collected in a single form – easier usage on
-    laptops or smaller screens.
+-   Motion detection is easier to use with an “AllRect” cv.rect that encompass
+    all RGB changes.
 
--   Intel Realsense cameras are supported in native 640x480 modes (as well as
-    1280x720.)
+-   Image segmentation is more stable and consistent from frame to frame. See
+    ImageSeg.vb.
+
+-   OptionsCommon.vb defines options common to all algorithms.
+
+-   StructuredDepth shows promise as a path to exploiting structured light
+    technology.
+
+-   PythonDebug project is now integrated into the OpenCVB.sln. Python debugging
+    is easier.
 
 Introduction
 ============
@@ -26,8 +36,8 @@ There is no better documentation of an algorithm than a working example. Now
 imagine over 800 OpenCV examples in a single app where each algorithm is less
 than a page of code and is in a familiar language – C++, C\#, Python, or VB.Net.
 And each algorithm is *just the algorithm* without the baggage from a user
-interface. And each algorithm is reusable by other algorithms to build
-variations and combinations. That is what "OpenCVB" provides.
+interface. Each algorithm is reusable. New algorithms can reuse existing
+algorithms to build variations and combinations.
 
 In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
@@ -1142,3 +1152,21 @@ Recent Changes 9/15/2020:
     algorithms. A tree view was built to display the hierarchy.
 
 -   There are now over 750 algorithms implemented.
+
+Recent Changes - 12/12/2020
+===========================
+
+-   Over 800 algorithms – almost all less than a page of code.
+
+-   Depth updates are guided by motion – produces more stable 3D images. See
+    Depth_SmoothMin algorithm.
+
+-   Recently used algorithms are listed in the menus.
+
+-   More snippets to help adding options to existing algorithms.
+
+-   Algorithm options are now collected in a single form – easier usage on
+    laptops or smaller screens.
+
+-   Intel Realsense cameras are supported in native 640x480 modes (as well as
+    1280x720.)
