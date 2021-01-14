@@ -63,10 +63,10 @@ Public Class VBocvb
     End Sub
     Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, x, y, picTag)
-        task.TTtextData.Add(str)
+        task.ttTextData.Add(str)
     End Sub
     Public Sub trueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, pt.X, pt.Y, picTag)
-        task.TTtextData.Add(str)
+        task.ttTextData.Add(str)
     End Sub
 End Class

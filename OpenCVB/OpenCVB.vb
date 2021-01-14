@@ -62,7 +62,7 @@ Public Class OpenCVB
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
-    Dim TTtextData As List(Of VB_Classes.TTtext)
+    Dim ttTextData As List(Of VB_Classes.TTtext)
 
     Dim openFileDialogRequested As Boolean
     Dim openFileinitialStartSetting As Boolean
@@ -294,14 +294,15 @@ Public Class OpenCVB
         End If
         ' draw any TrueType font data on the image 
         Dim maxline = 21
-        SyncLock TTtextData
+        SyncLock ttTextData
             Try
                 Dim ratio = camPic(2).Width / imgResult.Width
-                If pic.Tag = 2 Then
-                    For i = 0 To TTtextData.Count - 1
-                        Dim tt = TTtextData(i)
+                If pic.Tag = 2 Or pic.Tag = 3 Then
+                    Dim ttText = New List(Of VB_Classes.TTtext)(ttTextData)
+                    For i = 0 To ttText.Count - 1
+                        Dim tt = ttText(i)
                         If tt IsNot Nothing Then
-                            If TTtextData(i).picTag = 3 Then
+                            If ttText(i).picTag = 3 Then
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
                                              tt.x * ratio + camPic(0).Width, tt.y * ratio)
                             Else
@@ -510,7 +511,7 @@ Public Class OpenCVB
             Me.Height = defaultHeight
         End If
 
-        TTtextData = New List(Of VB_Classes.TTtext)
+        ttTextData = New List(Of VB_Classes.TTtext)
 
         For i = 0 To camPic.Length - 1
             If camPic(i) Is Nothing Then camPic(i) = New PictureBox()
@@ -1117,7 +1118,7 @@ Public Class OpenCVB
                 drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
             End If
 
-            TTtextData.Clear()
+            ttTextData.Clear()
 
             BothFirstAndLastReady = False
             frameCount = 0 ' restart the count...
@@ -1245,14 +1246,18 @@ Public Class OpenCVB
                 picLabels(3) = task.label2
 
                 ' share the results of the algorithm task.
-                SyncLock TTtextData
-                    algorithmRefresh = True
-                    imgResult = task.result.Clone()
-                    If task.TTtextData.Count Then
-                        TTtextData = New List(Of VB_Classes.TTtext)(task.TTtextData)
-                        task.TTtextData.Clear()
+                SyncLock ttTextData
+                    If task.ttTextData.Count Then
+                        ttTextData = New List(Of VB_Classes.TTtext)(task.ttTextData)
+                        task.ttTextData.Clear()
                     End If
                 End SyncLock
+
+                SyncLock imgResult
+                    imgResult = task.result.Clone()
+                    algorithmRefresh = True
+                End SyncLock
+
                 If Me.IsDisposed Then Exit While
             Catch ex As Exception
                 Console.WriteLine("Error in AlgorithmTask: " + ex.Message)

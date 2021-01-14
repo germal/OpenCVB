@@ -171,7 +171,7 @@ Public Class ActiveTask : Implements IDisposable
 
     Public transformationMatrix() As Single
 
-    Public TTtextData As New List(Of TTtext)
+    Public ttTextData As New List(Of TTtext)
     Public callTrace As New List(Of String)
 
     Public Structure Extrinsics_VB
