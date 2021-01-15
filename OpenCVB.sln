@@ -72,8 +72,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_FloorPlane", "OpenGL
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PythonDebug", "VB_Classes\Python\PythonDebug.pyproj", "{04F094AF-642D-4B23-8C46-0198AD9EB478}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kinfu_example", "KinFu\kinfu_example.vcxproj", "{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -292,14 +290,6 @@ Global
 		{04F094AF-642D-4B23-8C46-0198AD9EB478}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04F094AF-642D-4B23-8C46-0198AD9EB478}.Release|x64.ActiveCfg = Release|Any CPU
 		{04F094AF-642D-4B23-8C46-0198AD9EB478}.Release|x86.ActiveCfg = Release|Any CPU
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Debug|x64.ActiveCfg = Debug|x64
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Debug|x64.Build.0 = Debug|x64
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Debug|x86.ActiveCfg = Debug|x64
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Release|Any CPU.ActiveCfg = Release|x64
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Release|x64.ActiveCfg = Release|x64
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Release|x64.Build.0 = Release|x64
-		{AE82EE82-2782-474F-98A9-06CFC7A3BB4D}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
