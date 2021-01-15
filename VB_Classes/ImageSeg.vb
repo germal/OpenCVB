@@ -32,6 +32,11 @@ Public Class ImageSeg_Basics
         addw.src2 = src
         addw.Run()
         dst2 = addw.dst1
+
+        For Each pt In floodPoints
+            dst1.Circle(pt, ocvb.dotSize - 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
+
         label2 = addw.label1.Replace("depth", "ImageSeg")
     End Sub
 End Class
@@ -132,19 +137,40 @@ End Class
 Public Class ImageSeg_Unstable
     Inherits VBparent
     Dim iSeg As ImageSeg_Basics
+    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         iSeg = New ImageSeg_Basics
+        palette = New Palette_Basics
+
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "A segment is considered present after this many appearances", 1, 40, 20)
+        End If
+
         task.desc = "Find the unstable segments and remove them"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static segSlider = findSlider("A segment is considered present after this many appearances")
+        Dim refreshCount = segSlider.value
 
         iSeg.src = src
         iSeg.Run()
         dst1 = iSeg.dst1
 
-        Static lastFrame = dst1
+        Dim tmp = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static previousFrame = tmp
+
+        If ocvb.frameCount Mod refreshCount = 0 Then previousFrame = tmp
+        cv.Cv2.Min(tmp, previousFrame, dst2)
+        previousFrame = dst2
+
+        palette.src = dst2
+        palette.Run()
+        dst2 = palette.dst1
+        dst2.SetTo(0, iSeg.flood.mats.mat(1))
     End Sub
 End Class
 
@@ -162,6 +188,10 @@ Public Class ImageSeg_CentroidTracker
         initParent()
         iSeg = New ImageSeg_Basics
         pTrack = New KNN_PointTracker
+        Dim drawCheckbox = findCheckBox("Caller will handle any drawing required")
+        drawCheckbox.Checked = True
+
+        label1 = "Output of ImageSeg_Basics"
         task.desc = "Track the centroids that are found consistently from frame to frame."
     End Sub
     Public Sub Run()
@@ -175,7 +205,18 @@ Public Class ImageSeg_CentroidTracker
         pTrack.queryPoints = New List(Of cv.Point2f)(iSeg.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(iSeg.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(iSeg.masks)
+        pTrack.floodPoints = New List(Of cv.Point)(iSeg.floodPoints)
         pTrack.Run()
-        dst2 = pTrack.dst1
+        dst2 = dst1.Clone
+        For Each vo In pTrack.drawRC.viewObjects
+            dst2.Circle(vo.Value.centroid, ocvb.dotSize + 1, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(vo.Value.centroid, ocvb.dotSize - 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            dst2.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        Next
+
+        For Each pt In pTrack.floodPoints
+            dst2.Circle(pt, ocvb.dotSize - 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        Next
+        label2 = "Centroid " + CStr(pTrack.drawRC.viewObjects.Count) + " blue, floodPoint " + CStr(pTrack.floodPoints.Count) + " yellow"
     End Sub
 End Class

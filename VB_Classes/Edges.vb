@@ -640,3 +640,35 @@ Public Class Edges_BinarizedReduction
         dst2 = edges.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Edges_Depth
+    Inherits VBparent
+    Dim dMax As Depth_SmoothMax
+    Dim sobel As Edges_Sobel
+    Public Sub New()
+        initParent()
+        dMax = New Depth_SmoothMax
+        sobel = New Edges_Sobel
+        Dim kernelSlider = findSlider("Sobel kernel Size")
+        kernelSlider.Value = 14
+        task.desc = "Use Depth_SmoothMax to find edges in Depth"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        dMax.src = task.depth32f
+        dMax.Run()
+        dst1 = dMax.dst1
+
+        sobel.src = dMax.dst2
+        sobel.Run()
+        dst2 = sobel.dst1
+    End Sub
+End Class

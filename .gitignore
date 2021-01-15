@@ -350,3 +350,5 @@ Data/AlgorithmList.txt
 UI_Generator/AlgorithmList.vb
 VB_Classes/Python/model_compiler/downloads/*
 VB_Classes/Python/resources/nn/
+KinFu/
+vtk-8.2.0/

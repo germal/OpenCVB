@@ -1790,6 +1790,12 @@ Public Class Depth_SmoothMax
         colorize = New Depth_ColorizerFastFade_CPP
         dMin = New Depth_SmoothMin
 
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Use SmoothMin to find zero depth pixels"
+        End If
+
         label1 = "InRange depth with low quality depth removed."
         label2 = "32-bit format StableMax"
         task.desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
@@ -1809,9 +1815,12 @@ Public Class Depth_SmoothMax
             If rect.Width And rect.Height Then dMin.src(rect).CopyTo(stableMax(rect))
             cv.Cv2.Max(dMin.src, stableMax, stableMax)
 
-            Dim zeroMask As New cv.Mat
-            dMin.stableMin.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertTo(zeroMask, cv.MatType.CV_8U)
-            stableMax.SetTo(0, zeroMask)
+            Static dMinCheck = findCheckBox("Use SmoothMin to find zero depth pixels")
+            If dMinCheck.checked Then
+                Dim zeroMask As New cv.Mat
+                dMin.stableMin.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertTo(zeroMask, cv.MatType.CV_8U)
+                stableMax.SetTo(0, zeroMask)
+            End If
         End If
 
         colorize.src = stableMax
@@ -1963,5 +1972,52 @@ Public Class Depth_AveragingStable
             dst1 = extrema.dst1
             dst2 = extrema.dst2
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_Fusion
+    Inherits VBparent
+    Dim dMax As Depth_SmoothMax
+    Public Sub New()
+        initParent()
+        dMax = New Depth_SmoothMax
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of frames to fuse", 1, 300, 5)
+        End If
+
+        task.desc = "Fuse the depth from the previous x frames."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
+
+        Static fuseSlider = findSlider("Number of frames to fuse")
+        Dim fuseCount = fuseSlider.value
+
+        Static saveFuseCount = fuseCount
+        Static fuseFrames As New List(Of cv.Mat)
+        If saveFuseCount <> fuseCount Then
+            fuseFrames = New List(Of cv.Mat)
+            saveFuseCount = fuseCount
+        End If
+
+        fuseFrames.Add(input.Clone)
+        If fuseFrames.Count > fuseCount Then fuseFrames.RemoveAt(0)
+
+        dst1 = fuseFrames(0).Clone
+        For i = 1 To fuseFrames.Count - 1
+            cv.Cv2.Max(fuseFrames(i), dst1, dst1)
+        Next
     End Sub
 End Class

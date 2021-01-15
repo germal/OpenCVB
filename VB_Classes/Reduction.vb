@@ -59,41 +59,6 @@ End Class
 
 
 
-
-
-
-Public Class Reduction_Edges
-    Inherits VBparent
-    Dim edges As Edges_Laplacian
-    Dim reduction As Reduction_Basics
-    Public Sub New()
-        initParent()
-
-        edges = New Edges_Laplacian()
-        reduction = New Reduction_Basics()
-        reduction.radio.check(0).Checked = True
-
-        task.desc = "Get the edges after reducing the image."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        reduction.src = src
-        reduction.Run()
-        dst1 = reduction.dst1.Clone
-
-        Dim reductionRequested = False
-        If reduction.radio.check(0).Checked Or reduction.radio.check(1).Checked Then reductionRequested = True
-        label1 = If(reductionRequested, "Reduced image", "Original image")
-        label2 = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
-        edges.src = dst1
-        edges.Run()
-        dst2 = edges.dst1
-    End Sub
-End Class
-
-
-
-
 Public Class Reduction_Floodfill
     Inherits VBparent
     Public flood As FloodFill_Image
@@ -190,39 +155,6 @@ Public Class Reduction_KNN_ColorAndDepth
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Reduction_Depth
-    Inherits VBparent
-    Dim reduction As Reduction_Basics
-    Dim colorizer As Depth_Colorizer_CPP
-    Public reducedDepth32F As New cv.Mat
-    Public Sub New()
-        initParent()
-        reduction = New Reduction_Basics()
-        reduction.radio.check(0).Checked = True
-        colorizer = New Depth_Colorizer_CPP()
-        task.desc = "Use reduction to smooth depth data"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If src.Type = cv.MatType.CV_32S Then
-            reduction.src = src
-        Else
-            src = task.depth32f
-            src.ConvertTo(reduction.src, cv.MatType.CV_32S)
-        End If
-        reduction.Run()
-        reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
-        colorizer.src = reducedDepth32F
-        colorizer.Run()
-        dst1 = colorizer.dst1
-        label1 = reduction.label1
-    End Sub
-End Class
 
 
 
@@ -389,5 +321,118 @@ Public Class Reduction_XYZ
 
         cv.Cv2.Merge(split, dst2)
         ocvb.trueText("Task.PointCloud has been reduced and is in dst2")
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Reduction_Edges
+    Inherits VBparent
+    Dim edges As Edges_Laplacian
+    Dim reduction As Reduction_Basics
+    Public Sub New()
+        initParent()
+
+        edges = New Edges_Laplacian()
+        reduction = New Reduction_Basics()
+        reduction.radio.check(0).Checked = True
+
+        task.desc = "Get the edges after reducing the image."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        reduction.src = src
+        reduction.Run()
+        dst1 = reduction.dst1.Clone
+
+        Dim reductionRequested = False
+        If reduction.radio.check(0).Checked Or reduction.radio.check(1).Checked Then reductionRequested = True
+        label1 = If(reductionRequested, "Reduced image", "Original image")
+        label2 = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
+        edges.src = dst1
+        edges.Run()
+        dst2 = edges.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Reduction_Depth
+    Inherits VBparent
+    Dim reduction As Reduction_Basics
+    Dim colorizer As Depth_Colorizer_CPP
+    Public reducedDepth32F As New cv.Mat
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
+        reduction.radio.check(0).Checked = True
+        colorizer = New Depth_Colorizer_CPP()
+        task.desc = "Use reduction to smooth depth data"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If src.Type = cv.MatType.CV_32S Then
+            reduction.src = src
+        Else
+            src = task.depth32f
+            src.ConvertTo(reduction.src, cv.MatType.CV_32S)
+        End If
+        reduction.Run()
+        reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
+        colorizer.src = reducedDepth32F
+        colorizer.Run()
+        dst1 = colorizer.dst1
+        label1 = reduction.label1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Reduction_DepthMax
+    Inherits VBparent
+    Dim reduction As Reduction_Basics
+    Dim colorizer As Depth_Colorizer_CPP
+    Dim dMax As Depth_SmoothMax
+    Public reducedDepth32F As New cv.Mat
+    Public Sub New()
+        initParent()
+        reduction = New Reduction_Basics()
+        reduction.radio.check(0).Checked = True
+        colorizer = New Depth_Colorizer_CPP()
+        dMax = New Depth_SmoothMax
+        task.desc = "Use reduction to isolate depth in 1 meter increments"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        dMax.src = src
+        If dMax.src.Type <> cv.MatType.CV_32F Then dMax.src = task.depth32f
+        dMax.Run()
+        dst1 = dMax.dst2
+
+        dst1.ConvertTo(reduction.src, cv.MatType.CV_32S)
+        reduction.Run()
+        reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
+
+        colorizer.src = reducedDepth32F
+        colorizer.Run()
+        dst2 = colorizer.dst1
     End Sub
 End Class

@@ -809,7 +809,7 @@ Public Structure viewObject
     Dim rectFront As cv.Rect ' this becomes the front view after processing.
     Dim rectInHist As cv.Rect ' this rectangle describe the object in the histogram (side or top view.)
     Dim LayoutColor As cv.Scalar
-    Dim contourMat As cv.Mat
+    Dim floodPoint As cv.Point
     Dim mask As cv.Mat
 End Structure
 
@@ -827,7 +827,7 @@ Public Class KNN_PointTracker
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
-    Public queryContourMats As New List(Of cv.Mat) ' the points for the contours in a cv.mat
+    Public floodPoints As New List(Of cv.Point)
     Public drawRC As Draw_ViewObjects
     Public Sub New()
         initParent()
@@ -955,8 +955,8 @@ Public Class KNN_PointTracker
                         End If
 
                         vo.LayoutColor = (i + 5) Mod 255
-                        If queryContourMats.Count > 0 Then vo.contourMat = queryContourMats(matchIndex)
-                        If useDrawRC Then drawRC.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
+                        If floodPoints.Count > 0 Then vo.floodPoint = floodPoints(matchIndex)
+                        drawRC.viewObjects.Add(inputRect.Width * inputRect.Height, vo)
                     End If
                 End If
             Next
