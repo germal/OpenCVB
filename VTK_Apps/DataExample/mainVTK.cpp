@@ -1,4 +1,4 @@
-//#define WITH_VTK
+#define WITH_VTK
 #include "VTK_Data.h"
 #ifdef WITH_VTK
 
@@ -35,6 +35,7 @@ public:
 		int planeSize = (int)histogram.step1(0);
 		int cols = (int)histogram.step1(1);
 		int rows = (int)planeSize / cols;
+
 		int planes = (int)histogram.total() / planeSize;
 		fen3D->removeAllWidgets();
 		fen3D->showWidget("Axis", cv::viz::WCoordinateSystem(10));
@@ -86,7 +87,6 @@ public:
 
 int main(int argc, char **argv)
 {
-#ifdef WITH_VTK
 	windowTitle << "OpenCVB VTK_Data Cloud"; // this will create the window title.
 	if (initializeNamedPipeAndMemMap(argc, argv) != 0) return -1;
 
@@ -106,9 +106,5 @@ int main(int argc, char **argv)
 		v->DrawHistogram3D();
 		if (ackBuffers()) break;
 	}
-#else
-	std::string msg = "VTK is not installed.  See instructions in the Readme.md to enable VTK.";
-	MessageBoxA(0, msg.c_str(), "OpenCVB", MB_OK);
-#endif
 	return 0;
 }

@@ -66,9 +66,12 @@ int initializeNamedPipeAndMemMap(int argc, char * argv[])
 	TCHAR szName[] = TEXT("OpenCVBControl");
 	hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, MemMapBufferSize, szName);
 
-	sharedMem = (double *)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, MemMapBufferSize);
-	dataBufferSize = (int)sharedMem[3];
-	dataBuffer = (float *)malloc(dataBufferSize);
+	if (hMapFile != 0)
+	{
+		sharedMem = (double*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, MemMapBufferSize);
+		if (sharedMem) if (sharedMem[3] != 0) dataBufferSize = (int)sharedMem[3];
+		dataBuffer = (float*)malloc(dataBufferSize);
+	}
 	return 0;
 }
 
@@ -108,7 +111,7 @@ void readPipeAndMemMap()
 	}
 
 	DWORD dwRead;
-	if (rgbBufferSize >  0)  ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
+	if (rgbBufferSize >  0) ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
 	if (dataBufferSize > 0) ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
 }
 
