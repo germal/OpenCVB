@@ -1,6 +1,3 @@
-https://img.shields.io/github/license/bobdavies2000/OpenCVB
-===========================================================
-
 Recent Changes - 1/12/2021
 ==========================
 
