@@ -83,6 +83,7 @@ Public Class OpenCVB
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Public intermediateReview As String
+    Dim VTK_Present As Boolean
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -199,6 +200,12 @@ Public Class OpenCVB
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
+        Dim vizDir = New DirectoryInfo(HomeDir.FullName + "OpenCV\Build\bin\Debug\")
+        Dim vizFiles = vizDir.GetFiles("opencv_viz*")
+        If vizFiles.Count > 0 Then VTK_Present = True
+        If VTK_Present Then updatePath("c:/Program Files/VTK/bin/", "VTK directory needed for VTK examples")
+
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
@@ -1062,6 +1069,7 @@ Public Class OpenCVB
         parms.intrinsicsRight = camera.intrinsicsRight_VB
         parms.extrinsics = camera.Extrinsics_VB
         parms.homeDir = HomeDir.FullName
+        parms.VTK_Present = VTK_Present
 
         PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
 

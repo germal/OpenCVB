@@ -6,13 +6,14 @@ Imports System.IO
 
 Module VTK_Common
     Public Sub vtkInstructions()
-        ocvb.trueText("VTK support is disabled. " + vbCrLf + "Enable VTK with the following steps:" + vbCrLf + vbCrLf +
-                      "Step 1) Run 'PrepareVTK.bat' in <OpenCVB_Home>" + vbCrLf +
-                      "Step 2) Build VTK for both Debug and Release" + vbCrLf +
-                      "Step 3) Build OpenCV for both Debug and Release" + vbCrLf +
-                      "Step 4) Edit mainVTK.cpp (project VTKDataExample) and modify the first line", 10, 125)
+        ocvb.trueText("VTK support is disabled. " + vbCrLf + "Instructions to enable VTK are in the Readme.md for OpenCVB")
     End Sub
 End Module
+
+
+
+
+
 Public Class VTK_Basics
     Inherits VBparent
     Dim pipeName As String ' this is name of pipe to the VTK task.  It is dynamic and increments.
@@ -24,9 +25,9 @@ Public Class VTK_Basics
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapbufferSize As integer
     Dim memMapFile As MemoryMappedFile
-    Public memMapSysData(6) As Double ' allow space for 10 user data values
-    Public memMapUserData(10) As Double ' allow space for 10 user data values
-    Public memMapValues(49) As Double ' more than needed - room for growth
+    Public memMapSysData(10) As Double ' allow space for 10 user data values
+    Public memMapUserData(memMapSysData.Length) As Double ' allow space for 10 user data values
+    Public memMapValues(memMapSysData.Length + memMapUserData.Length) As Double
     Public usingDepthAndRGB As Boolean = True ' if false, we are using plotData, not depth32f.
     Public pointSize As integer = 1
     Public rgbInput As New cv.Mat
@@ -37,8 +38,7 @@ Public Class VTK_Basics
     Public roll As Single = 0
     Public zNear As Single = 0
     Public zFar As Single = 10.0
-    Public vtkTitle As String = "VTK_Data"
-    Public vtkPresent As Boolean
+    Public vtkTitle As String = "VTKDataExample"
     Public Sub New()
         initParent()
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
@@ -52,7 +52,7 @@ Public Class VTK_Basics
                                          dataInput.Width, dataInput.Height, rgbInput.Total * rgbInput.ElemSize)
         Next
 
-        For i = memMapSysData.Length To memMapValues.Length - 1
+        For i = memMapSysData.Length To memMapSysData.Length + memMapUserData.Length - 1
             memMapValues(i) = memMapUserData(i - memMapSysData.Length)
         Next
     End Sub
@@ -76,7 +76,7 @@ Public Class VTK_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If vtkPresent = False Then
+        If ocvb.parms.VTK_Present = False Then
             vtkInstructions()
             Exit Sub
         End If
@@ -127,8 +127,10 @@ Public Class VTK_Histogram3D
     Dim vtk As VTK_Basics
     Dim mats As Mat_4to1
     Dim random As Random_NormalDist
+    Dim rPoints As Random_Points
     Public Sub New()
         initParent()
+        rPoints = New Random_Points
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Random Number Stdev", 0, 255, 10)
@@ -148,7 +150,7 @@ Public Class VTK_Histogram3D
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If vtk.vtkPresent = False Then
+        If ocvb.parms.VTK_Present = False Then
             vtkInstructions()
             Exit Sub
         End If

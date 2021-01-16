@@ -613,6 +613,36 @@ objective is to show and understand the intermediate stages of the different
 algorithms that comprise the current one that is running. All output will show
 up in OpenCVB’s main form in the bottom 2 images.
 
+VTK Support 
+============
+
+It is fairly complicated to get VTK (the Visualization Took Kit) working with
+OpenCV. Download and build VTK (which takes a long time.) When VTK is built, it
+must be installed before it can be accessed by OpenCV:
+
+-   In the VTK.sln file, click on the INSTALL project and from the Visual Studio
+    menu, select “Build Install”.
+
+    -   This will install VTK in your c:/Program Files/VTK directory
+
+-   Run cmake-gui in the OpenCVB/opencv directory
+
+    -   Search for VTK and check the WITH_VTK checkbox and specify
+        VTK_DIR=c:/Program Files/VTK
+
+-   Run Configure/Generate and then build the OpenCV project
+
+-   Validate that VTK was correctly installed by looking at the
+    OpenCVb/opencv/Build/Bin/Debug
+
+    -   And make sure that the opencv_viz\* dll’s are present
+
+-   In OpenCVB’s VTKDataExample, open the mainVTK.cpp file and uncomment the
+    first line “\#define WITH_VTK”
+
+    -   Rebuild OpenCVB and it should be ready to run the VTK algorithms (they
+        start with “VTK”)
+
 Release vs. Beta
 ================
 
