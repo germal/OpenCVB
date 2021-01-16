@@ -1,4 +1,4 @@
-#define WITH_VTK
+//#define WITH_VTK
 #include "VTK_Data.h"
 #ifdef WITH_VTK
 
