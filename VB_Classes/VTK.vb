@@ -67,7 +67,7 @@ Public Class VTK_Basics
         hglobal = Marshal.AllocHGlobal(memMapbufferSize)
         memMapFile = MemoryMappedFile.CreateOrOpen("OpenCVBControl", memMapbufferSize)
         memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
-        pipe.WaitForConnection()
+        If standalone = False Then pipe.WaitForConnection()
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -77,14 +77,12 @@ Public Class VTK_Basics
             Exit Sub
         End If
 
-        If ocvb.frameCount = 0 Then startVTKWindow()
-
         If standalone Then
-            vtkHist.Run()
-            dst1 = vtkHist.dst1
-            dst2 = vtkHist.dst2
+            ocvb.trueText("VTK_Basics is used by any VTK algorithm but has no output by itself.")
             Exit Sub
         End If
+
+        If ocvb.frameCount = 0 Then startVTKWindow()
 
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If ocvb.frameCount <> 0 Then

@@ -1,5 +1,4 @@
-//#define WITH_VTK
-#include "VTK_Data.h"
+#include "../VTK.h"
 #ifdef WITH_VTK
 
 #ifdef _DEBUG
@@ -87,8 +86,8 @@ public:
 
 int main(int argc, char **argv)
 {
+#ifdef WITH_VTK
 	windowTitle << "OpenCVB VTK_Data Cloud"; // this will create the window title.
-#ifdef VTK
 	if (initializeNamedPipeAndMemMap(argc, argv) != 0) return -1;
 
 	vtkHist *v = new vtkHist();

@@ -6,12 +6,16 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
+Imports System.Runtime.InteropServices
 Module opencv_module
     Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public delegateLock As New Mutex(True, "delegateLock")
     Public callTraceLock As New Mutex(True, "callTraceLock")
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraThreadLock As New Mutex(True, "CameraThreadLock")
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function VTKPresentTest() As Integer
+    End Function
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -200,13 +204,15 @@ Public Class OpenCVB
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
         Dim vizDir = New DirectoryInfo(HomeDir.FullName + "OpenCV\Build\bin\Debug\")
         Dim vizFiles = vizDir.GetFiles("opencv_viz*")
         If vizFiles.Count > 0 Then VTK_Present = True
         If VTK_Present Then updatePath("c:/Program Files/VTK/bin/", "VTK directory needed for VTK examples")
+        ' Check that the VTK apps are built with "WITH_VTK" as well.
+        If VTKPresentTest() = 0 Then VTK_Present = False ' "WITH_VTK" has not been set in VTK.h
 
-        updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption

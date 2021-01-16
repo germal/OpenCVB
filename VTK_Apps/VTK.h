@@ -1,3 +1,6 @@
+//#define WITH_VTK
+#ifdef WITH_VTK
+#ifndef NO_EXPAND_VTK
 #define NOMINMAX
 #include <stdio.h>
 #include <chrono>
@@ -126,3 +129,5 @@ int ackBuffers()
 	}
 	return 0;
 }
+#endif 
+#endif

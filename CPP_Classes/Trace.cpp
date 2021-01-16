@@ -38,12 +38,27 @@ void Trace_OpenCV_Close(Trace_OpenCV *Trace_OpenCVPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *Trace_OpenCV_Run(Trace_OpenCV *Trace_OpenCVPtr, int *rgbPtr, int rows, int cols, int channels)
+int* Trace_OpenCV_Run(Trace_OpenCV * Trace_OpenCVPtr, int* rgbPtr, int rows, int cols, int channels)
 {
 	CV_TRACE_REGION_NEXT("process");
 	Trace_OpenCVPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
 	Trace_OpenCVPtr->Run();
 
 	CV_TRACE_REGION("read"); // we are off to read the next frame...
-	return (int *) Trace_OpenCVPtr->processed.data; // return this C++ allocated data to managed code
+	return (int*)Trace_OpenCVPtr->processed.data; // return this C++ allocated data to managed code
 }
+
+
+
+#define NO_EXPAND_VTK
+#include "../VTK_Apps/VTK.h"
+extern "C" __declspec(dllexport)
+int VTKPresentTest()
+{
+#ifdef WITH_VTK
+	return 1;
+#else
+	return 0;
+#endif
+}
+

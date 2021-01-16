@@ -162,7 +162,7 @@
     <ClCompile Include="mainVTK.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="VTK_Data.h" />
+    <ClInclude Include="..\VTK.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
