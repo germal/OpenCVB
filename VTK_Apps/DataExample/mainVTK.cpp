@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 		if (ackBuffers()) break;
 	}
 #else
-	std::string msg = "VTK is not installed.  To enable VTK: Run 'PrepareVTK.bat' in < OpenCVB_Home>, Build VTK for both Debug and Release, Build OpenCV for both Debug and Release, then edit 'mainVTK.cpp' (project VTKDataExample), and modify the first line.";
+	std::string msg = "VTK is not installed.  To enable VTK: Instructions in the Readme.md.";
 	MessageBoxA(0, msg.c_str(), "OpenCVB", MB_OK);
 #endif
 	return 0;
