@@ -88,6 +88,7 @@ public:
 int main(int argc, char **argv)
 {
 	windowTitle << "OpenCVB VTK_Data Cloud"; // this will create the window title.
+#ifdef VTK
 	if (initializeNamedPipeAndMemMap(argc, argv) != 0) return -1;
 
 	vtkHist *v = new vtkHist();
@@ -106,5 +107,6 @@ int main(int argc, char **argv)
 		v->DrawHistogram3D();
 		if (ackBuffers()) break;
 	}
+#endif
 	return 0;
 }
