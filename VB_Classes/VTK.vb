@@ -67,6 +67,7 @@ Public Class VTK_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.parms.VTK_Present = False Then Exit Sub
 
         If standalone Then
             ocvb.trueText("VTK_Basics is used by any VTK algorithm but has no output by itself.")
@@ -132,6 +133,7 @@ Public Class VTK_Histogram3D
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.parms.VTK_Present = False Then Exit Sub
 
         Static lastStdev As Integer = -1
         Static binSlider = findSlider("Hist 3D bins")

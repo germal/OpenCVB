@@ -1,4 +1,4 @@
-#define WITH_VTK
+//#define WITH_VTK
 #ifdef WITH_VTK
 
 #ifndef NO_EXPAND_VTK
