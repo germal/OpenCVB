@@ -3,17 +3,6 @@ Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.IO
-
-Module VTK_Common
-    Public Sub vtkInstructions()
-        ocvb.trueText("VTK support is disabled. " + vbCrLf + "Instructions to enable VTK are in the Readme.md for OpenCVB")
-    End Sub
-End Module
-
-
-
-
-
 Public Class VTK_Basics
     Inherits VBparent
     Dim pipeName As String ' this is name of pipe to the VTK task.  It is dynamic and increments.
@@ -23,13 +12,13 @@ Public Class VTK_Basics
     Dim rgbBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
     Dim dataBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
     Dim memMapWriter As MemoryMappedViewAccessor
-    Dim memMapbufferSize As integer
+    Dim memMapbufferSize As Integer
     Dim memMapFile As MemoryMappedFile
     Public memMapSysData(10) As Double ' allow space for 10 user data values
     Public memMapUserData(memMapSysData.Length) As Double ' allow space for 10 user data values
     Public memMapValues(memMapSysData.Length + memMapUserData.Length) As Double
     Public usingDepthAndRGB As Boolean = True ' if false, we are using plotData, not depth32f.
-    Public pointSize As integer = 1
+    Public pointSize As Integer = 1
     Public rgbInput As New cv.Mat
     Public dataInput As New cv.Mat
     Public FOV As Single = 60
@@ -39,6 +28,9 @@ Public Class VTK_Basics
     Public zNear As Single = 0
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTKDataExample"
+    Public Sub vtkInstructions()
+        ocvb.trueText("VTK support is disabled. " + vbCrLf + "Instructions to enable VTK are in the Readme.md for OpenCVB")
+    End Sub
     Public Sub New()
         initParent()
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
@@ -75,7 +67,7 @@ Public Class VTK_Basics
         pipe.WaitForConnection()
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.parms.VTK_Present = False Then
             vtkInstructions()
             Exit Sub
@@ -151,7 +143,7 @@ Public Class VTK_Histogram3D
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.parms.VTK_Present = False Then
-            vtkInstructions()
+            vtk.vtkInstructions()
             Exit Sub
         End If
 

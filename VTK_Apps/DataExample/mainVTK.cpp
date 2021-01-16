@@ -1,6 +1,13 @@
 //#define WITH_VTK
 #include "VTK_Data.h"
 #ifdef WITH_VTK
+
+#ifdef _DEBUG
+#pragma comment(lib, "..\\..\\opencv\\build\\lib\\debug\\opencv_viz451d.lib")
+#else
+#pragma comment(lib, "..\\..\\opencv\\build\\lib\\debug\\opencv_viz451.lib")
+#endif
+
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
@@ -100,7 +107,7 @@ int main(int argc, char **argv)
 		if (ackBuffers()) break;
 	}
 #else
-	std::string msg = "VTK is not installed.  To enable VTK: Instructions in the Readme.md.";
+	std::string msg = "VTK is not installed.  See instructions in the Readme.md to enable VTK.";
 	MessageBoxA(0, msg.c_str(), "OpenCVB", MB_OK);
 #endif
 	return 0;
