@@ -17,10 +17,9 @@ Public Class VTK_Basics
     Public memMapSysData(6) As Double ' allow space for 10 user data values
     Public memMapUserData(memMapSysData.Length) As Double ' allow space for 10 user data values
     Public memMapValues(memMapSysData.Length + memMapUserData.Length) As Double
-    Public usingDepthAndRGB As Boolean = True ' if false, we are using plotData, not depth32f.
     Public pointSize As Integer = 1
     Public rgbInput As New cv.Mat
-    Public dataInput As cv.Mat
+    Public dataInput As New cv.Mat
     Public FOV As Single = 60
     Public yaw As Single = 0
     Public pitch As Single = 0
@@ -29,9 +28,6 @@ Public Class VTK_Basics
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTKDataExample"
     Dim vtkHist As VTK_Histogram3D
-    Public Sub vtkInstructions()
-        ocvb.trueText("VTK support is disabled. " + vbCrLf + "Instructions to enable VTK are in the Readme.md for OpenCVB")
-    End Sub
     Public Sub New()
         initParent()
 
@@ -72,11 +68,6 @@ Public Class VTK_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If ocvb.parms.VTK_Present = False Then
-            vtkInstructions()
-            Exit Sub
-        End If
-
         If standalone Then
             ocvb.trueText("VTK_Basics is used by any VTK algorithm but has no output by itself.")
             Exit Sub
@@ -90,11 +81,6 @@ Public Class VTK_Basics
             If bytesRead = 0 Then
                 ocvb.trueText("The VTK process appears to have stopped.", 20, 100)
             End If
-        End If
-
-        If usingDepthAndRGB Then
-            rgbInput = src.Clone()
-            dataInput = task.depth32f
         End If
 
         If rgbBuffer.Length <= rgbInput.Total * rgbInput.ElemSize Then MsgBox("Stopping VTK.  rgbInput Buffer > buffer limit.")
@@ -130,42 +116,26 @@ End Class
 Public Class VTK_Histogram3D
     Inherits VBparent
     Dim vtk As VTK_Basics
-    Dim mats As Mat_4to1
-    Dim random As Random_NormalDist
-    Dim rPoints As Random_Points
     Public Sub New()
         initParent()
 
-        rPoints = New Random_Points
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Random Number Stdev", 1, 255, 10)
-            sliders.setupTrackBar(1, "Hist 3D bins", 1, 30, 10)
-            sliders.setupTrackBar(2, "Hist 3D bin Threshold X1m", 10, 100, 20)
+            sliders.setupTrackBar(0, "Hist 3D bins", 1, 30, 10)
+            sliders.setupTrackBar(1, "Hist 3D bin Threshold X1m", 1, 100, 1)
         End If
-
-        mats = New Mat_4to1()
-
-        label1 = "Input to VTK plot"
-        label2 = "Input to VTK plot"
 
         vtk = New VTK_Basics
-        vtk.usingDepthAndRGB = False
 
-        random = New Random_NormalDist
-        task.desc = "Create a test pattern and send it to VTK for 3D display."
+        label1 = "VTK Histogram 3D input"
+        task.desc = "Plot a histogram of the depth in 3D"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.VTK_Present = False Then
-            vtk.vtkInstructions()
-            Exit Sub
-        End If
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Static lastStdev As Integer = -1
         Static binSlider = findSlider("Hist 3D bins")
         Static threshSlider = findSlider("Hist 3D bin Threshold X1m")
-        Static stdevSlider = findSlider("Random Number Stdev")
         vtk.memMapUserData(2) = 0 ' assume no need to recompute 3D histogram.
         If vtk.memMapUserData(0) <> binSlider.value Or vtk.memMapUserData(1) <> threshSlider.value / 1000000 Then
             vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.
@@ -173,29 +143,9 @@ Public Class VTK_Histogram3D
 
         vtk.memMapUserData(0) = binSlider.Value
         vtk.memMapUserData(1) = threshSlider.Value / 1000000
+        dst1 = task.color
 
-        If lastStdev <> stdevSlider.Value Then
-            Static randomSlider = findSlider("Random Pixel Count")
-            For i = 0 To 3
-                randomSlider.Value = Choose(i + 1, 25, 187, 25, 25)
-                randomSlider.Value = Choose(i + 1, 127, 127, 65, 65)
-                randomSlider.Value = Choose(i + 1, 180, 180, 180, 244)
-                randomSlider.Value = stdevSlider.Value
-                random.src = src
-                random.Run()
-                mats.mat(i) = random.dst1
-            Next
-            lastStdev = stdevSlider.Value
-            vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.
-        End If
-
-        mats.Run()
-        dst1 = mats.dst1
-        dst2 = task.depth32f
-
-        vtk.rgbInput = mats.dst1
-        vtk.dataInput = task.depth32f
-        vtk.src = src
+        vtk.rgbInput = task.color
         vtk.Run()
     End Sub
 End Class

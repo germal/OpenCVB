@@ -251,6 +251,7 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.defaultRect = _defaultRect
 
         buildColors()
+        ocvb.algName = algName
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
         aOptions = New OptionsAll
         aOptions.Show()
@@ -292,6 +293,9 @@ Public Class ActiveTask : Implements IDisposable
 
             ' run any global options algorithms here.
             If inrange IsNot Nothing Then inrange.Run()
+            If ocvb.parms.VTK_Present = False And ocvb.algName.StartsWith("VTK") Then
+                ocvb.trueText("VTK support is disabled. " + vbCrLf + "Instructions to enable VTK are in the Readme.md for OpenCVB")
+            End If
             algorithmObject.NextFrame()
             label1 = ocvb.label1
             label2 = ocvb.label2

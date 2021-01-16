@@ -1,7 +1,9 @@
-//#define WITH_VTK
+#define WITH_VTK
 #ifdef WITH_VTK
+
 #ifndef NO_EXPAND_VTK
 #define NOMINMAX
+
 #include <stdio.h>
 #include <chrono>
 #include <vector>
@@ -13,6 +15,11 @@
 #include <thread>
 #include <tchar.h>
 #include <string>
+
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+
 static HANDLE pipe;
 static int MemMapBufferSize;
 static double *sharedMem; 
@@ -30,6 +37,8 @@ static std::ostringstream windowTitle;
 static int lastFrame = 0;
 static int rgbWidth;
 static int rgbHeight;
+cv::Mat src;
+cv::Mat data32f;
 #define USER_DATA_LENGTH (10)
 static double UserData[USER_DATA_LENGTH];
 
@@ -101,6 +110,7 @@ void readPipeAndMemMap()
 	dataWidth = (int)sharedMem[4];
 	dataHeight = (int)sharedMem[5];
 
+	printf("data width = %d  data height = %d rgb width = %d rgb height = %d\n", dataWidth, dataHeight, rgbWidth, rgbHeight);
 	if ((int)sharedMem[6] != rgbBufferSize)
 	{
 		free(rgbBuffer);
@@ -114,8 +124,18 @@ void readPipeAndMemMap()
 	}
 
 	DWORD dwRead;
-	if (rgbBufferSize >  0) ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
-	if (dataBufferSize > 0) ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
+	if (rgbBufferSize > 0)
+	{
+		BOOL rc = ReadFile(pipe, rgbBuffer, rgbBufferSize, &dwRead, NULL);
+		if (!rc) MessageBox(0, L"RGB buffer could not be read - see ReadFile in VTK.H", L"OpenCVB", MB_OK);
+		src = cv::Mat(rgbHeight, rgbWidth, CV_8UC3, rgbBuffer);
+	}
+	if (dataBufferSize > 0)
+	{
+		BOOL rc = ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
+		if (!rc) MessageBox(0, L"Data buffer could not be read - see ReadFile in VTK.H", L"OpenCVB", MB_OK);
+		data32f = cv::Mat(dataHeight, dataWidth, CV_32F, dataBuffer);
+	}
 }
 
 int ackBuffers()

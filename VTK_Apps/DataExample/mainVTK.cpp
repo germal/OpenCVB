@@ -7,9 +7,6 @@
 #pragma comment(lib, "..\\..\\opencv\\build\\lib\\debug\\opencv_viz451.lib")
 #endif
 
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui.hpp>
 #include <iostream>
 
 using namespace std;
@@ -98,10 +95,9 @@ int main(int argc, char **argv)
 		{
 			v->bins = (int)UserData[0];
 			v->threshold = UserData[1];
-			cv::Mat src(rgbHeight, rgbWidth, CV_8UC3, rgbBuffer);
-			v->Run(src);
 		}
 
+		v->Run(src);
 		v->fen3D->spinOnce(1);
 		v->DrawHistogram3D();
 		if (ackBuffers()) break;
