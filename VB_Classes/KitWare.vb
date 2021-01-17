@@ -11,9 +11,9 @@ Public Class KitWare_DistancePointToLine
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim lineP0() As Double = {0.0, 0.0, 0.0}
-        Dim lineP1() As Double = {2.0, 0.0, 0.0}
-        Dim p0() As Double = {1.0, 0, 0}
+        Dim lineP0() As Double = {5.0, 2.0, 1.0}
+        Dim lineP1() As Double = {2.0, -1.0, 6.0}
+        Dim p0() As Double = {1.0, -1, 0}
         Dim p1() As Double = {1.0, 2.0, 0}
 
         Dim pP0 = Marshal.AllocHGlobal(Marshal.SizeOf(Of Double) * 3)
@@ -38,6 +38,11 @@ Public Class KitWare_DistancePointToLine
 
         dist1 = vtkLine.DistanceToLine(pP1, pLineP0, pLineP1, parametricCoord, pClosest)
         Marshal.Copy(pClosest, closest, 0, closest.Length)
+
+        ocvb.trueText("This Kitware example will run but that says nothing about the values produced." + vbCrLf +
+                      "More work needs to be done to validate that the Kitware code is properly installed." + vbCrLf +
+                      "The instructions to install the C++ VTK interface are in the Readme.md for OpenCVB." + vbCrLf +
+                      "See the VTKDataExample to see how to use the VTK C++ libraries.")
 
         Marshal.FreeHGlobal(pP0)
         Marshal.FreeHGlobal(pP1)
