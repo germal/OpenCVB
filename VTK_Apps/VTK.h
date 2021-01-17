@@ -29,8 +29,6 @@ static float *dataBuffer;
 static int rgbBufferSize;
 static unsigned char *rgbBuffer;
 static HANDLE hMapFile; 
-static int windowWidth;
-static int windowHeight;
 static int dataWidth;
 static int dataHeight;
 static std::ostringstream windowTitle;
@@ -56,18 +54,16 @@ std::wstring s2ws(const std::string& s)
 
 int initializeNamedPipeAndMemMap(int argc, char * argv[])
 {
-	if (argc != 5)
+	if (argc != 3)
 	{
-		MessageBox(0, L"Incorrect number of parameters.  There should be 5: <program> <width> <height> <MemMapBufferSize> <pipeName>", L"OpenCVB", MB_OK);
+		MessageBox(0, L"Incorrect number of parameters.  There should be 3: <program> <memMapBufferSize> <pipeName>", L"OpenCVB", MB_OK);
 		MessageBox(0, L"Use OpenCVB as the startup project in Visual Studio", L"OpenCVB", MB_OK);
 		return -1;
 	}
 
-	windowWidth = std::stoi(argv[1]);
-	windowHeight = std::stoi(argv[2]);
-	MemMapBufferSize = std::stoi(argv[3]);
+	MemMapBufferSize = std::stoi(argv[1]); 
+	std::string pipeName(argv[2]);
 	printf("MemMapBufferSize = %d\n", MemMapBufferSize);
-	std::string pipeName(argv[4]);
 
 	// setup named pipe interface
 	std::string pipePrefix("\\\\.\\pipe\\");
@@ -81,8 +77,6 @@ int initializeNamedPipeAndMemMap(int argc, char * argv[])
 	if (hMapFile != 0)
 	{
 		sharedMem = (double*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, MemMapBufferSize);
-		if (sharedMem) if (sharedMem[3] != 0) dataBufferSize = (int)sharedMem[3];
-		dataBuffer = (float*)malloc(dataBufferSize);
 	}
 	return 0;
 }
@@ -90,33 +84,37 @@ int initializeNamedPipeAndMemMap(int argc, char * argv[])
 void readPipeAndMemMap()
 {
 	int skipCount = 0;
+	printf("start test1\n");
 	while (1)
 	{
 		if ((int)sharedMem[0] != lastFrame) break;
 		if (++skipCount > 100) break; // process the current image again to enable getting a closeWindow request (if one comes.)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
+	printf("test1\n");
 	lastFrame = (int)sharedMem[0];
 	rgbWidth = (int)sharedMem[1];
 	rgbHeight = (int)sharedMem[2];
+	printf("test2\n");
 
-	if ((int)sharedMem[3] != dataBufferSize)
+	if ((int)sharedMem[3] != rgbBufferSize)
 	{
-		dataBufferSize = (int)sharedMem[3];
-		free(dataBuffer);
-		dataBuffer = (float *)malloc(dataBufferSize);
+		rgbBufferSize = (int)sharedMem[3];
+		free(rgbBuffer);
+		rgbBuffer = (unsigned char *)malloc(rgbBufferSize);
 	}
 
 	dataWidth = (int)sharedMem[4];
 	dataHeight = (int)sharedMem[5];
 
-	printf("data width = %d  data height = %d rgb width = %d rgb height = %d\n", dataWidth, dataHeight, rgbWidth, rgbHeight);
-	if ((int)sharedMem[6] != rgbBufferSize)
+	if ((int)sharedMem[6] != dataBufferSize)
 	{
-		free(rgbBuffer);
-		rgbBufferSize = (int)sharedMem[6];
-		rgbBuffer = (unsigned char *)malloc(rgbBufferSize);
+		free(dataBuffer);
+		dataBufferSize = (int)sharedMem[6];
+		dataBuffer = (float *)malloc(dataBufferSize);
 	}
+
+	printf("frame = %d, rgb width = %d, rgb height = %d, data Width = %d, data height = %d", lastFrame, rgbWidth, rgbHeight, dataWidth, dataHeight);
 
 	for (int i = 0; i < USER_DATA_LENGTH; ++i)
 	{

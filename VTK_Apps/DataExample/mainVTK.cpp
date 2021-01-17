@@ -64,14 +64,14 @@ public:
 		fen3D = cv::makePtr<cv::viz::Viz3d>("3D Histogram");
 	}
 
-	void Run(cv::Mat src)
+	void Run(cv::Mat input)
 	{
 		float hRange[] = { 0, 256 };
 		const float* range[] = { hRange, hRange,hRange };
 		int hBins[] = { bins, bins, bins };
 		int channel[] = { 2, 1, 0 };
-		cv::calcHist(&src, 1, channel, cv::Mat(), histogram, 3, hBins, range, true, false);
-		cv::normalize(histogram, histogram, 100.0f / src.total(), 0, cv::NORM_MINMAX, -1, cv::Mat());
+		cv::calcHist(&input, 1, channel, cv::Mat(), histogram, 3, hBins, range, true, false);
+		cv::normalize(histogram, histogram, 100.0f / input.total(), 0, cv::NORM_MINMAX, -1, cv::Mat());
 		cv::minMaxIdx(histogram, NULL, &maxH, NULL, NULL);
 
 		fen3D = cv::makePtr<cv::viz::Viz3d>("3D Histogram");
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 			v->threshold = UserData[1];
 		}
 
-		v->Run(src);
+		if (rgbWidth) v->Run(src); else v->Run(data32f);
 		v->fen3D->spinOnce(1);
 		v->DrawHistogram3D();
 		if (ackBuffers()) break;

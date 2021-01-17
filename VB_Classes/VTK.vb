@@ -9,8 +9,8 @@ Public Class VTK_Basics
     Dim startInfo As New ProcessStartInfo
     Dim hglobal As IntPtr
     Dim pipe As NamedPipeServerStream
-    Dim rgbBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
-    Dim dataBuffer(2048 * 4096 - 1) As Byte ' set a very large buffer so we don't have to redim
+    Dim rgbBuffer(0) As Byte
+    Dim dataBuffer(0) As Byte
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapbufferSize As Integer
     Dim memMapFile As MemoryMappedFile
@@ -27,11 +27,9 @@ Public Class VTK_Basics
     Public zNear As Single = 0
     Public zFar As Single = 10.0
     Public vtkTitle As String = "VTKDataExample"
-    Dim vtkHist As VTK_Histogram3D
     Public Sub New()
         initParent()
 
-        If standalone Then vtkHist = New VTK_Histogram3D
         Dim fileinfo As New FileInfo(vtkTitle + ".exe")
         task.desc = "Create VTK window and update it with images"
     End Sub
@@ -39,8 +37,8 @@ Public Class VTK_Basics
         ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapSysData.Length - 1
             ' only change this if you are changing the data in the VTK C++ code at the same time...
-            memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Width, src.Height, dataInput.Total * dataInput.ElemSize,
-                                         dataInput.Width, dataInput.Height, rgbInput.Total * rgbInput.ElemSize)
+            memMapValues(i) = Choose(i + 1, ocvb.frameCount, rgbInput.Width, rgbInput.Height, rgbInput.Total * rgbInput.ElemSize,
+                                         dataInput.Width, dataInput.Height, dataInput.Total * dataInput.ElemSize)
         Next
 
         For i = memMapSysData.Length To memMapSysData.Length + memMapUserData.Length - 1
@@ -56,7 +54,7 @@ Public Class VTK_Basics
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * (memMapValues.Length - 1)
 
         startInfo.FileName = vtkTitle + ".exe"
-        startInfo.Arguments = CStr(src.Height) + " " + CStr(src.Width) + " " + CStr(memMapbufferSize) + " " + pipeName
+        startInfo.Arguments = CStr(memMapbufferSize) + " " + pipeName
         If ocvb.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
 
@@ -84,8 +82,8 @@ Public Class VTK_Basics
             End If
         End If
 
-        If rgbBuffer.Length <= rgbInput.Total * rgbInput.ElemSize Then MsgBox("Stopping VTK.  rgbInput Buffer > buffer limit.")
-        If dataBuffer.Length <= dataInput.Total * dataInput.ElemSize Then MsgBox("Stopping VTK.  Vertices > buffer limit.")
+        If rgbBuffer.Length <> rgbInput.Total * rgbInput.ElemSize Then ReDim rgbBuffer(rgbInput.Total * rgbInput.ElemSize - 1)
+        If dataBuffer.Length <> dataInput.Total * dataInput.ElemSize Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
         memMapUpdate()
 
         Marshal.Copy(memMapValues, 0, hglobal, memMapValues.Length - 1)
@@ -114,7 +112,7 @@ End Class
 
 
 
-Public Class VTK_Histogram3D
+Public Class VTK_Histogram3Drgb
     Inherits VBparent
     Dim vtk As VTK_Basics
     Public Sub New()
@@ -129,13 +127,12 @@ Public Class VTK_Histogram3D
         vtk = New VTK_Basics
 
         label1 = "VTK Histogram 3D input"
-        task.desc = "Plot a histogram of the depth in 3D"
+        task.desc = "Plot a histogram of the RGB data in 3D"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.parms.VTK_Present = False Then Exit Sub
 
-        Static lastStdev As Integer = -1
         Static binSlider = findSlider("Hist 3D bins")
         Static threshSlider = findSlider("Hist 3D bin Threshold X1m")
         vtk.memMapUserData(2) = 0 ' assume no need to recompute 3D histogram.
@@ -148,6 +145,48 @@ Public Class VTK_Histogram3D
         dst1 = task.color
 
         vtk.rgbInput = task.color
+        vtk.Run()
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class VTK_Histogram3DpointCloud
+    Inherits VBparent
+    Dim vtk As VTK_Basics
+    Dim vtkHist As VTK_Histogram3Drgb
+    Public Sub New()
+        initParent()
+
+        vtk = New VTK_Basics
+        vtkHist = New VTK_Histogram3Drgb
+
+        label1 = "VTK Histogram 3D input"
+        task.desc = "Plot a histogram of the point cloud in 3D"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.parms.VTK_Present = False Then Exit Sub
+
+        Static binSlider = findSlider("Hist 3D bins")
+        Static threshSlider = findSlider("Hist 3D bin Threshold X1m")
+        vtk.memMapUserData(2) = 0 ' assume no need to recompute 3D histogram.
+        If vtk.memMapUserData(0) <> binSlider.value Or vtk.memMapUserData(1) <> threshSlider.value / 1000000 Then
+            vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.
+        End If
+
+        vtk.memMapUserData(0) = binSlider.Value
+        vtk.memMapUserData(1) = threshSlider.Value / 1000000
+        dst1 = task.pointCloud
+
+        vtk.rgbInput = New cv.Mat
+        vtk.dataInput = task.pointCloud
         vtk.Run()
     End Sub
 End Class
