@@ -205,6 +205,7 @@ Public Class OpenCVB
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+        updatePath(HomeDir.FullName + "Kitware\", "Libraries to support the kitware .Net interface")
 
         Dim vizDir = New DirectoryInfo(HomeDir.FullName + "OpenCV\Build\bin\Debug\")
         Dim vizFiles = vizDir.GetFiles("opencv_viz*")
