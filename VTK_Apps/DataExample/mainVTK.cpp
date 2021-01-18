@@ -97,7 +97,8 @@ int main(int argc, char **argv)
 			v->threshold = UserData[1];
 		}
 
-		if (rgbWidth) v->Run(src); else v->Run(data32f);
+		if (rgbWidth) v->Run(src); else  v->Run(data32f);
+
 		v->fen3D->spinOnce(1);
 		v->DrawHistogram3D();
 		if (ackBuffers()) break;

@@ -122,6 +122,7 @@ Public Class VTK_Histogram3Drgb
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Hist 3D bins", 1, 30, 10)
             sliders.setupTrackBar(1, "Hist 3D bin Threshold X1m", 1, 100, 1)
+            sliders.setupTrackBar(2, "Multiply input to modify scale", 1, 1000, 1)
         End If
 
         vtk = New VTK_Basics
@@ -161,11 +162,19 @@ Public Class VTK_Histogram3DpointCloud
     Inherits VBparent
     Dim vtk As VTK_Basics
     Dim vtkHist As VTK_Histogram3Drgb
+    Dim binSlider As Windows.Forms.TrackBar
+    Dim threshSlider As Windows.Forms.TrackBar
+    Dim scaleSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
 
         vtk = New VTK_Basics
         vtkHist = New VTK_Histogram3Drgb
+        scaleSlider = findSlider("Multiply input to modify scale")
+        threshSlider = findSlider("Hist 3D bin Threshold X1m")
+        binSlider = findSlider("Hist 3D bins")
+        scaleSlider.Value = 150
+        binSlider.Value = 20
 
         label1 = "VTK Histogram 3D input"
         task.desc = "Plot a histogram of the point cloud in 3D"
@@ -174,8 +183,6 @@ Public Class VTK_Histogram3DpointCloud
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If ocvb.parms.VTK_Present = False Then Exit Sub
 
-        Static binSlider = findSlider("Hist 3D bins")
-        Static threshSlider = findSlider("Hist 3D bin Threshold X1m")
         vtk.memMapUserData(2) = 0 ' assume no need to recompute 3D histogram.
         If vtk.memMapUserData(0) <> binSlider.value Or vtk.memMapUserData(1) <> threshSlider.value / 1000000 Then
             vtk.memMapUserData(2) = 1 ' trigger a recompute of the 3D histogram.
@@ -186,7 +193,7 @@ Public Class VTK_Histogram3DpointCloud
         dst1 = task.pointCloud
 
         vtk.rgbInput = New cv.Mat
-        vtk.dataInput = task.pointCloud
+        vtk.dataInput = (task.pointCloud * scaleSlider.value).tomat
         vtk.Run()
     End Sub
 End Class

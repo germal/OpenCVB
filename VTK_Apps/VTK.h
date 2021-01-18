@@ -84,18 +84,15 @@ int initializeNamedPipeAndMemMap(int argc, char * argv[])
 void readPipeAndMemMap()
 {
 	int skipCount = 0;
-	printf("start test1\n");
 	while (1)
 	{
 		if ((int)sharedMem[0] != lastFrame) break;
 		if (++skipCount > 100) break; // process the current image again to enable getting a closeWindow request (if one comes.)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
-	printf("test1\n");
 	lastFrame = (int)sharedMem[0];
 	rgbWidth = (int)sharedMem[1];
 	rgbHeight = (int)sharedMem[2];
-	printf("test2\n");
 
 	if ((int)sharedMem[3] != rgbBufferSize)
 	{
@@ -114,7 +111,7 @@ void readPipeAndMemMap()
 		dataBuffer = (float *)malloc(dataBufferSize);
 	}
 
-	printf("frame = %d, rgb width = %d, rgb height = %d, data Width = %d, data height = %d", lastFrame, rgbWidth, rgbHeight, dataWidth, dataHeight);
+	//printf("frame = %d, rgb width = %d, rgb height = %d, data Width = %d, data height = %d\n", lastFrame, rgbWidth, rgbHeight, dataWidth, dataHeight);
 
 	for (int i = 0; i < USER_DATA_LENGTH; ++i)
 	{
@@ -132,7 +129,7 @@ void readPipeAndMemMap()
 	{
 		BOOL rc = ReadFile(pipe, dataBuffer, dataBufferSize, &dwRead, NULL);
 		if (!rc) MessageBox(0, L"Data buffer could not be read - see ReadFile in VTK.H", L"OpenCVB", MB_OK);
-		data32f = cv::Mat(dataHeight, dataWidth, CV_32F, dataBuffer);
+		data32f = cv::Mat(dataHeight, dataWidth, CV_32FC3, dataBuffer);
 	}
 }
 
