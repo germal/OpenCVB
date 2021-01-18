@@ -613,20 +613,15 @@ up in OpenCVB’s main form in the bottom 2 images.
 VTK Support
 ===========
 
-It is fairly complicated to get VTK (the Visualization Took Kit) working with
-OpenCV. To get VTK working, download and build VTK (which takes a long time.)
-When VTK is built, it must be installed before it can be accessed by OpenCV.
-Here’s how to do that:
+It takes some time to get VTK (the Visualization Took Kit) working with OpenCV.
+To do so, download and build VTK and when complete, it should be installed in
+c:/Program Files/VTK. Then follow these instructions:
 
--   In the VTK.sln file, click on the INSTALL project and from the Visual Studio
-    menu, select “Build Install”.
+-   Run the “Support/PrepareVTK.bat” file to download and prepare the VTK
+    directory.
 
-    -   This will install VTK in “c:/Program Files/VTK”
-
--   Run cmake-gui in the OpenCVB/opencv directory
-
-    -   Search for VTK and check the WITH_VTK checkbox and specify
-        VTK_DIR=c:/Program Files/VTK
+    -   Visual Studio will open the VTK.sln file. Select Build/Batch Build and
+        “Select All” to build VTK
 
 -   Run Configure/Generate and then build the OpenCV project
 
