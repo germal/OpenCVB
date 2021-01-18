@@ -290,7 +290,7 @@ Public Class Stabilizer_Simple
 
         For i = 0 To saveTemplate.Length - 1
             match.sample = saveTemplate(i)
-            match.searchArea = dst1(searchArea(i))
+            match.searchMat = dst1(searchArea(i))
             match.Run()
 
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
@@ -299,7 +299,7 @@ Public Class Stabilizer_Simple
 
             Dim pt = If(i < 2, New cv.Point(searchArea(i).X, searchArea(i).Y + cSize + cOffset * 2), New cv.Point(searchArea(i).X, searchArea(i).Y - cOffset))
             dst1.Rectangle(New cv.Rect(pt.X, pt.Y, searchArea(i).Width, cOffset), cv.Scalar.Black, -1)
-            ocvb.trueText("motion " + CStr(corners(i).X - maxLoc.X - searchArea(i).X) + "," + CStr(corners(i).Y - maxLoc.Y - searchArea(i).Y), pt.X, pt.Y)
+            ocvb.trueText("motion " + CStr(-(corners(i).X - maxLoc.X - searchArea(i).X)) + "," + CStr(-(corners(i).Y - maxLoc.Y - searchArea(i).Y)), pt.X, pt.Y)
         Next
 
         For i = 0 To corners.Length - 1
