@@ -131,6 +131,7 @@ Public Class ActiveTask : Implements IDisposable
     Public xRotateSlider As Windows.Forms.TrackBar
     Public yRotateSlider As Windows.Forms.TrackBar
     Public zRotateSlider As Windows.Forms.TrackBar
+    Public fuseSlider As Windows.Forms.TrackBar
 
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point

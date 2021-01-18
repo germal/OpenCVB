@@ -570,7 +570,7 @@ Public Class Edges_BinarizedSobel
         mats.Run()
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
-            label2 = "Combo of first 3 below.  Click quadrants in dst1."
+            label2 = "Bitwise or of images 1-3 at left.  Click dst1."
             dst2 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Else
             dst2 = mats.mat(quadrantIndex)

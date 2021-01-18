@@ -2,10 +2,11 @@ Imports cv = OpenCvSharp
 Public Class MatchTemplate_Basics
     Inherits VBparent
     Dim flow As Font_FlowText
-    Public sample1 As cv.Mat
-    Public sample2 As cv.Mat
+    Public sample As cv.Mat
+    Public searchArea As cv.Mat
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
+    Public correlation As Single
     Public matchOption As cv.TemplateMatchModes
     Public Sub New()
         initParent()
@@ -31,10 +32,10 @@ Public Class MatchTemplate_Basics
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
-            sample1 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
-            sample2 = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
-            cv.Cv2.Randn(sample1, 100, 25)
-            cv.Cv2.Randn(sample2, 0, 25)
+            sample = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
+            searchArea = New cv.Mat(New cv.Size(sliders.trackbar(0).Value, 1), cv.MatType.CV_32FC1)
+            cv.Cv2.Randn(sample, 100, 25)
+            cv.Cv2.Randn(searchArea, 0, 25)
         End If
 
         matchOption = cv.TemplateMatchModes.CCoeffNormed
@@ -47,12 +48,12 @@ Public Class MatchTemplate_Basics
                 Exit For
             End If
         Next
-        cv.Cv2.MatchTemplate(sample1, sample2, correlationMat, matchOption)
-        Dim correlation = correlationMat.Get(Of Single)(0, 0)
+        cv.Cv2.MatchTemplate(sample, searchArea, correlationMat, matchOption)
+        correlation = correlationMat.Get(Of Single)(0, 0)
         label1 = "Correlation = " + Format(correlation, "#,##0.000")
         If standalone or task.intermediateReview = caller Then
             dst1.SetTo(0)
-            label1 = matchText + " for " + CStr(sample1.Cols) + " samples = " + Format(correlation, "#,##0.00")
+            label1 = matchText + " for " + CStr(sample.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
             flow.Run()
         End If
@@ -80,8 +81,8 @@ Public Class MatchTemplate_RowCorrelation
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
-        corr.sample1 = src.Row(line1)
-        corr.sample2 = src.Row(line2 + 1)
+        corr.sample = src.Row(line1)
+        corr.searchArea = src.Row(line2 + 1)
         corr.Run()
         Dim correlation = corr.correlationMat.Get(Of Single)(0, 0)
         flow.msgs.Add(corr.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
@@ -116,7 +117,7 @@ Public Class MatchTemplate_DrawRect
         radio.Setup(caller, 6)
         Static frm = findfrm("MatchTemplate_DrawRect Radio Options")
         For i = 0 To frm.check.length - 1
-            frm.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "TM CCORR", "TM CCORR NORMED", "TM COEFF", "TM COEFF NORMED")
+            frm.check(i).Text = Choose(i + 1, "SQDIFF", "SQDIFF NORMED", "Template Match CCORR", "Template Match CCORR NORMED", "Template Match COEFF", "Template Match COEFF NORMED")
         Next
         radio.check(5).Checked = True
         If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match

@@ -1362,7 +1362,7 @@ Public Class Depth_InRange
         Dim max = If(minVal <> 0, maxVal, task.maxRangeSlider.Value)
         If min >= max Then max = min + 1
         depth32f = src
-        If depth32f.Type <> cv.MatType.CV_32FC1 Then task.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
+        If depth32f.Type <> cv.MatType.CV_32FC1 Then depth32f = task.depth32f
         cv.Cv2.InRange(depth32f, min, max, depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
         dst1 = depth32f.Clone.SetTo(0, noDepthMask)
@@ -2019,5 +2019,30 @@ Public Class Depth_Fusion
         For i = 1 To fuseFrames.Count - 1
             cv.Cv2.Max(fuseFrames(i), dst1, dst1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Depth_Dilate
+    Inherits VBparent
+    Dim dilate As DilateErode_Basics
+    Public Sub New()
+        initParent()
+        dilate = New DilateErode_Basics
+        task.desc = "Dilate the depth data to fill holes."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        dilate.src = task.depth32f
+        dilate.Run()
+        dst1 = dilate.dst1
     End Sub
 End Class

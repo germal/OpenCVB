@@ -6,7 +6,7 @@ Public Class DilateErode_Basics
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 5)
+            sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 3)
             sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
         End If
         task.desc = "Dilate and Erode the RGB and Depth image."

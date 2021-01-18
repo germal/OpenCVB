@@ -130,18 +130,18 @@ Public Class Math_RGBCorrelation
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split = src.Split()
-        corr.sample1 = split(0)
-        corr.sample2 = split(1)
+        corr.sample = split(0)
+        corr.searchArea = split(1)
         corr.Run()
         Dim blueGreenCorrelation = "Blue-Green " + corr.label1
 
-        corr.sample1 = split(2)
-        corr.sample2 = split(1)
+        corr.sample = split(2)
+        corr.searchArea = split(1)
         corr.Run()
         Dim redGreenCorrelation = "Red-Green " + corr.label1
 
-        corr.sample1 = split(2)
-        corr.sample2 = split(0)
+        corr.sample = split(2)
+        corr.searchArea = split(0)
         corr.Run()
         Dim redBlueCorrelation = "Red-Blue " + corr.label1
 

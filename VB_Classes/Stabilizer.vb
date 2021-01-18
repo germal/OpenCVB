@@ -245,3 +245,66 @@ Public Class Stabilizer_SideBySide
 End Class
 
 
+
+
+
+
+
+
+Public Class Stabilizer_Simple
+    Inherits VBparent
+    Dim match As MatchTemplate_Basics
+    Dim corners(4 - 1) As cv.Rect
+    Dim searchArea(corners.Length - 1) As cv.Rect
+    Const cSize = 100
+    Const cOffset = 20
+    Dim saveTemplate(corners.Length - 1) As cv.Mat
+    Public Sub New()
+        initParent()
+        corners(0) = New cv.Rect(cOffset, cOffset, cSize, cSize)
+        corners(1) = New cv.Rect(src.Width - cSize - cOffset, cOffset, cSize, cSize)
+        corners(2) = New cv.Rect(src.Width - cSize - cOffset, src.Height - cSize - cOffset, cSize, cSize)
+        corners(3) = New cv.Rect(cOffset, src.Height - cSize - cOffset, cSize, cSize)
+
+        Dim sSize = cOffset * 2 + cSize
+        searchArea(0) = New cv.Rect(0, 0, sSize, sSize)
+        searchArea(1) = New cv.Rect(src.Width - sSize, 0, sSize, sSize)
+        searchArea(2) = New cv.Rect(src.Width - sSize, src.Height - sSize, sSize, sSize)
+        searchArea(3) = New cv.Rect(0, src.Height - sSize, sSize, sSize)
+
+        match = New MatchTemplate_Basics
+        task.desc = "Stabilize the image using the corners of the image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_8UC1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = input
+
+        If ocvb.frameCount = 0 Then
+            For i = 0 To saveTemplate.Length - 1
+                saveTemplate(i) = input(corners(i)).Clone
+            Next
+        End If
+
+        For i = 0 To saveTemplate.Length - 1
+            match.sample = saveTemplate(i)
+            match.searchArea = dst1(searchArea(i))
+            match.Run()
+
+            Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
+            match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+            saveTemplate(i) = dst1(corners(i)).Clone
+
+            Dim pt = If(i < 2, New cv.Point(searchArea(i).X, searchArea(i).Y + cSize + cOffset * 2), New cv.Point(searchArea(i).X, searchArea(i).Y - cOffset))
+            dst1.Rectangle(New cv.Rect(pt.X, pt.Y, searchArea(i).Width, cOffset), cv.Scalar.Black, -1)
+            ocvb.trueText("motion " + CStr(corners(i).X - maxLoc.X - searchArea(i).X) + "," + CStr(corners(i).Y - maxLoc.Y - searchArea(i).Y), pt.X, pt.Y)
+        Next
+
+        For i = 0 To corners.Length - 1
+            dst1.Rectangle(corners(i), cv.Scalar.White, 1)
+            dst1.Rectangle(searchArea(i), cv.Scalar.White, 1)
+        Next
+    End Sub
+End Class
