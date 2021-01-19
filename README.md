@@ -620,10 +620,20 @@ c:/Program Files/VTK. Then follow these instructions:
 -   Run the “Support/PrepareVTK.bat” file to download and prepare the VTK
     directory.
 
-    -   Visual Studio will open the VTK.sln file. Select Build/Batch Build and
+    -   Visual Studio will open the VTK.sln file. Select “Build/Batch Build” and
         “Select All” to build VTK
 
--   Run Configure/Generate and then build the OpenCV project
+-   Close Visual Studio and run Visual Studio as Administrator, click on the
+    INSTALL Project and select Build
+
+    -   Upon completion of the Build Install, c:\\Program Files\\VTK should
+        contain VTK.
+
+-   Open CMake for OpenCV and run Configure/Generate and then build the OpenCV
+    project
+
+    -   Make sure that the VTK_DIR points to where VTK was installed
+        (c:\\Program Files\\VTK)
 
 -   Validate that VTK was correctly installed by looking at the
     OpenCVB/opencv/Build/Bin/Debug
