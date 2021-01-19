@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+Imports System.Threading
 Public Class MatchTemplate_Basics
     Inherits VBparent
     Dim flow As Font_FlowText
@@ -32,7 +33,7 @@ Public Class MatchTemplate_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static sampleSlider = findSlider("Sample Size")
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             sample = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
             searchMat = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(sample, 100, 25)
@@ -52,7 +53,7 @@ Public Class MatchTemplate_Basics
         cv.Cv2.MatchTemplate(sample, searchMat, correlationMat, matchOption)
         correlation = correlationMat.Get(Of Single)(0, 0)
         label1 = "Correlation = " + Format(correlation, "#,##0.000")
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             dst1.SetTo(0)
             label1 = matchText + " for " + CStr(sample.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
@@ -187,3 +188,48 @@ End Class
 
 
 
+
+
+
+
+
+Public Class MatchTemplate_Movement
+    Inherits VBparent
+    Dim grid As Thread_Grid
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 970)
+        End If
+
+        task.desc = "Detect Motion in the color image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        grid.Run()
+        dst1 = src.Clone
+        If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        If ocvb.frameCount = 0 Then dst2 = dst1.Clone()
+        Static correlationSlider = findSlider("Correlation Threshold")
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        Dim updateCount As Integer
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Sub(roi)
+            Dim correlation As New cv.Mat
+            cv.Cv2.MatchTemplate(dst1(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                Interlocked.Increment(updateCount)
+                dst1(roi).CopyTo(dst2(roi))
+            Else
+                dst1(roi).SetTo(0)
+            End If
+        End Sub)
+        dst1.SetTo(255, grid.gridMask)
+        label1 = CStr(updateCount) + " segments (of " + CStr(grid.roiList.Count) + ") that were updated"
+        label2 = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
+    End Sub
+End Class

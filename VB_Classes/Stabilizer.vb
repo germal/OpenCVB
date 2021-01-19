@@ -272,6 +272,11 @@ Public Class Stabilizer_Gray
         searchArea(2) = New cv.Rect(src.Width - sSize, src.Height - sSize, sSize, sSize)
         searchArea(3) = New cv.Rect(0, src.Height - sSize, sSize, sSize)
 
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Stabilizer Correlation Threshold X1000", 0, 1000, 980)
+        End If
+
         match = New MatchTemplate_Basics
         task.desc = "Stabilize the image using the corners of the image"
     End Sub
@@ -297,9 +302,12 @@ Public Class Stabilizer_Gray
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
             saveTemplate(i) = dst1(corners(i)).Clone
 
+            Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
+            Dim msg = "motion " + CStr(corners(i).X - maxLoc.X - searchArea(i).X) + "," + CStr(corners(i).Y - maxLoc.Y - searchArea(i).Y) + " corr=" + Format(maxVal, "#0.00")
+            If maxVal < thresholdSlider.value / thresholdSlider.maximum Then msg = " corr=" + Format(maxVal, "#0.00")
             Dim pt = If(i < 2, New cv.Point(searchArea(i).X, searchArea(i).Y + cSize + cOffset * 2), New cv.Point(searchArea(i).X, searchArea(i).Y - cOffset))
             dst1.Rectangle(New cv.Rect(pt.X, pt.Y, searchArea(i).Width, cOffset), cv.Scalar.Black, -1)
-            ocvb.trueText("motion " + CStr(-(corners(i).X - maxLoc.X - searchArea(i).X)) + "," + CStr(-(corners(i).Y - maxLoc.Y - searchArea(i).Y)), pt.X, pt.Y)
+            ocvb.trueText(msg, pt.X, pt.Y)
         Next
 
         For i = 0 To corners.Length - 1

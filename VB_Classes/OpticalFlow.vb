@@ -173,7 +173,7 @@ Public Class OpticalFlow_DenseBasics_MT
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 1000)
+            sliders.setupTrackBar(0, "OpticalFlow Correlation Threshold", 0, 1000, 1000)
         End If
 
         task.desc = "MultiThread dense optical flow algorithm  "
@@ -186,7 +186,8 @@ Public Class OpticalFlow_DenseBasics_MT
             grid.Run()
             flow.Run()
 
-            Dim CCthreshold = CSng(sliders.trackbar(0).Value / sliders.trackbar(0).Maximum)
+            Static thresholdSlider = findSlider("OpticalFlow Correlation Threshold")
+            Dim CCthreshold = CSng(thresholdSlider.Value / thresholdSlider.Maximum)
             Parallel.For(0, grid.borderList.Count,
             Sub(i)
                 Dim broi = grid.borderList(i)
