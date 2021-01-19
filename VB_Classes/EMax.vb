@@ -211,7 +211,7 @@ Public Class EMax_Centroids
 
         emaxCPP.Run()
 
-            flood.src = emaxCPP.dst2.Clone
+        flood.src = emaxCPP.dst2.Clone
         flood.Run()
         dst1 = flood.dst2
 

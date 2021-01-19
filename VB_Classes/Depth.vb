@@ -738,7 +738,6 @@ Public Class Depth_LocalMinMax_Kalman_MT
 
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(grid.roiList.Count * 4 - 1)
-        hideForm("Thread_Grid Slider Options") ' it doesn't work to change the thread count.  
 
         label1 = "Red is min distance, blue is max distance"
         task.desc = "Find minimum depth in each segment."

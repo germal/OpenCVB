@@ -147,7 +147,6 @@ Public Class Annealing_CPP_MT
     Public Sub New()
         initParent()
         random = New Random_Points()
-        hideForm("Random_Points Slider Options")
 
         mats = New Mat_4to1()
 
