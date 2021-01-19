@@ -73,7 +73,6 @@ Public Class MatchTemplate_RowCorrelation
         flow = New Font_FlowText()
 
         corr = New MatchTemplate_Basics()
-        hideForm("MatchTemplate_Basics Slider Options")
 
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
