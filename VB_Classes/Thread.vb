@@ -43,23 +43,29 @@ Public Class Thread_Grid
         Static lastHeight As Integer
         Static lastBorder As Integer
 
-        Dim borderSize = sliders.trackbar(2).Value
-        If lastWidth <> sliders.trackbar(0).Value Or lastHeight <> sliders.trackbar(1).Value Or lastBorder <> borderSize Then
+        Static widthSlider = findSlider("ThreadGrid Width")
+        Static heightSlider = findSlider("ThreadGrid Height")
+        Static borderSlider = findSlider("ThreadGrid Border")
+
+        Dim borderSize = borderSlider.Value
+        Dim gWidth = widthSlider.Value
+        Dim gHeight = heightSlider.value
+        If lastWidth <> gWidth Or lastHeight <> gHeight Or lastBorder <> borderSize Then
             roiList.Clear()
             borderList.Clear()
 
             gridMask.SetTo(0)
             incompleteRegions = 0
-            For y = 0 To src.Height - 1 Step sliders.trackbar(1).Value
-                For x = 0 To src.Width - 1 Step sliders.trackbar(0).Value
-                    Dim roi = New cv.Rect(x, y, sliders.trackbar(0).Value, sliders.trackbar(1).Value)
+            For y = 0 To src.Height - 1 Step gHeight
+                For x = 0 To src.Width - 1 Step gWidth
+                    Dim roi = New cv.Rect(x, y, gWidth, gHeight)
                     If x + roi.Width >= src.Width Then roi.Width = src.Width - x
                     If y + roi.Height >= src.Height Then roi.Height = src.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
                         roiList.Add(roi)
-                        If roi.Width <> sliders.trackbar(0).Value Or roi.Height <> sliders.trackbar(1).Value Then incompleteRegions += 1
+                        If roi.Width <> gWidth Or roi.Height <> gHeight Then incompleteRegions += 1
                     End If
                 Next
                 drawGrid(roiList)
@@ -86,8 +92,8 @@ Public Class Thread_Grid
 
             If standalone Or task.intermediateReview = caller Then drawGrid(borderList)
 
-            lastWidth = sliders.trackbar(0).Value
-            lastHeight = sliders.trackbar(1).Value
+            lastWidth = gWidth
+            lastHeight = gHeight
             lastBorder = borderSize
         End If
 

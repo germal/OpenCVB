@@ -251,7 +251,7 @@ End Class
 
 
 
-Public Class Stabilizer_Simple
+Public Class Stabilizer_Gray
     Inherits VBparent
     Dim match As MatchTemplate_Basics
     Dim corners(4 - 1) As cv.Rect
