@@ -614,10 +614,13 @@ VTK Support
 ===========
 
 It takes some time to get VTK (the Visualization Took Kit) working with OpenCV.
-To do so, download and build VTK and when complete, it should be installed in
-c:/Program Files/VTK. Then follow these instructions:
+These instructions to install VTK are here:
 
--   Run the “Support/PrepareVTK.bat” file to download and prepare the VTK
+<https://vtk.org/Wiki/VTK/Configure_and_Build>
+
+Some notes on preparing VTK for use with OpenCV and OpenCVB:
+
+-   Run OpenCVB’s “Support/PrepareVTK.bat” file to download and prepare the VTK
     directory.
 
     -   Visual Studio will open the VTK.sln file. Select “Build/Batch Build” and
@@ -643,8 +646,8 @@ c:/Program Files/VTK. Then follow these instructions:
 -   In OpenCVB’s VTKDataExample, open the VTK.h file and uncomment the first
     line “\#define WITH_VTK”
 
-    -   Rebuild OpenCVB and it should be ready to run the VTK algorithms (they
-        all start with “VTK”)
+    -   Rebuild OpenCVB and the VTK algorithms will run (they all start with
+        “VTK”)
 
 Release vs. Beta
 ================
