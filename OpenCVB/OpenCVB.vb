@@ -275,8 +275,11 @@ Public Class OpenCVB
         g.DrawImage(pic.Image, 0, 0)
         If drawRect.Width > 0 And drawRect.Height > 0 Then
             g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            If pic.Tag = 2 Then
+                g.DrawRectangle(myPen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
+            End If
         End If
-        If algorithmRefresh And (pic.Tag = 2) Then
+            If algorithmRefresh And (pic.Tag = 2) Then
             algorithmRefresh = False
             SyncLock imgResult
                 Try
@@ -809,7 +812,11 @@ Public Class OpenCVB
                 mouseMovePoint.Y = e.Y
                 If mouseMovePoint.X < 0 Then mouseMovePoint.X = 0
                 If mouseMovePoint.Y < 0 Then mouseMovePoint.Y = 0
-                drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
+                If e.X < camPic(0).Width Then
+                    drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
+                Else
+                    drawRect.X = Math.Min(mouseDownPoint.X - camPic(0).Width, mouseMovePoint.X - camPic(0).Width)
+                End If
                 drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                 drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
