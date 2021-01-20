@@ -1789,7 +1789,6 @@ Public Class Depth_SmoothMax
         colorize = New Depth_ColorizerFastFade_CPP
         dMin = New Depth_SmoothMin
 
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Use SmoothMin to find zero depth pixels"

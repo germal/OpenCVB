@@ -152,6 +152,9 @@ End Class
 
 
 
+
+
+
 Public Class MatchTemplate_BestEntropy_MT
     Inherits VBparent
     Dim entropy As Entropy_Highest_MT
@@ -213,22 +216,29 @@ Public Class MatchTemplate_Movement
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If ocvb.frameCount = 0 Then dst2 = dst1.Clone()
+        Static lastFrame As cv.Mat = dst1.Clone()
+        Dim saveFrame As cv.Mat = dst1.Clone
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         Dim updateCount As Integer
+        Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(dst1(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(dst1(roi), lastFrame(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
             If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                 Interlocked.Increment(updateCount)
-                dst1(roi).CopyTo(dst2(roi))
+                cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), New cv.Point(roi.X + 2, roi.Y + 10), cv.HersheyFonts.HersheyComplex, ocvb.fontSize / 3, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Else
+                mask(roi).SetTo(255)
                 dst1(roi).SetTo(0)
             End If
         End Sub)
+        cv.Cv2.ImShow("mask", mask)
         dst1.SetTo(255, grid.gridMask)
+        dst2.SetTo(0)
+        saveFrame.CopyTo(dst2, mask)
+        lastFrame = saveFrame
         label1 = CStr(updateCount) + " segments (of " + CStr(grid.roiList.Count) + ") that were updated"
         label2 = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
     End Sub

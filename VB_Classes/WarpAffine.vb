@@ -90,28 +90,30 @@ End Class
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics
     Inherits VBparent
+    Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
         initParent()
+        rotateOptions = New GetRotationMatrix2D_Options
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Angle", 0, 360, 10)
         End If
-        SetInterpolationRadioButtons(caller, radio, "WarpAffine")
 
         task.desc = "Use WarpAffine to transform input images."
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static frm = findfrm("WarpAffine_Basics Radio Options")
-        Dim warpFlag = getInterpolationRadioButtons(radio, frm)
+
+        rotateOptions.Run()
 
         Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)
         Dim angle = sliders.trackbar(0).Value
         Dim rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
-        cv.Cv2.WarpAffine(src, dst1, rotationMatrix, src.Size(), warpFlag)
+        cv.Cv2.WarpAffine(src, dst1, rotationMatrix, src.Size(), rotateOptions.warpFlag)
         angle *= -1
         rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
-        cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, src.Size(), warpFlag)
+        cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, src.Size(), rotateOptions.warpFlag)
         label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
         label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub

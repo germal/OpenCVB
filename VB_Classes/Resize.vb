@@ -2,12 +2,14 @@ Imports cv = OpenCvSharp
 Public Class Resize_Basics
     Inherits VBparent
     Public newSize As cv.Size
+    Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
         initParent()
-        SetInterpolationRadioButtons(caller, radio, "Resize")
+        rotateOptions = New GetRotationMatrix2D_Options
+
         ' warp is not allowed in resize
-        radio.check(5).Enabled = False
-        radio.check(6).Enabled = False
+        rotateOptions.radio.check(5).Enabled = False
+        rotateOptions.radio.check(6).Enabled = False
 
         task.desc = "Resize with different options and compare them"
         label1 = "Rectangle highlight above resized"
@@ -16,16 +18,18 @@ Public Class Resize_Basics
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static frm = findfrm("Resize_Basics Radio Options")
-        Dim resizeFlag = getInterpolationRadioButtons(radio, frm)
-        If standalone or task.intermediateReview = caller Then
+
+        rotateOptions.Run()
+
+        If standalone Or task.intermediateReview = caller Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
             If task.drawRect.Width <> 0 Then roi = task.drawRect
 
-            dst1 = src(roi).Resize(dst1.Size(), 0, 0, resizeFlag)
+            dst1 = src(roi).Resize(dst1.Size(), 0, 0, rotateOptions.warpFlag)
             dst2 = (src(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) - dst1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             src.Rectangle(roi, cv.Scalar.White, 2)
         Else
-            dst1 = src.Resize(newSize, 0, 0, resizeFlag)
+            dst1 = src.Resize(newSize, 0, 0, rotateOptions.warpFlag)
         End If
     End Sub
 End Class

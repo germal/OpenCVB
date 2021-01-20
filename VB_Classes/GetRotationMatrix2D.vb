@@ -1,31 +1,38 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
-Module GetRotationMatrix
-    Public Sub SetInterpolationRadioButtons(caller As String, radio As OptionsRadioButtons, radioName As String)
+Public Class GetRotationMatrix2D_Options
+    Inherits VBparent
+    Public warpFlag As cv.InterpolationFlags
+    Public Sub New()
+        initParent()
+
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 7)
-            radio.check(0).Text = radioName + " with Area"
-            radio.check(1).Text = radioName + " with Cubic flag"
-            radio.check(2).Text = radioName + " with Lanczos4"
-            radio.check(3).Text = radioName + " with Linear"
-            radio.check(4).Text = radioName + " with Nearest"
-            radio.check(5).Text = radioName + " with WarpFillOutliers"
-            radio.check(6).Text = radioName + " with WarpInverseMap"
+            radio.check(0).Text = "Area"
+            radio.check(1).Text = "Cubic flag"
+            radio.check(2).Text = "Lanczos4"
+            radio.check(3).Text = "Linear"
+            radio.check(4).Text = "Nearest"
+            radio.check(5).Text = "WarpFillOutliers"
+            radio.check(6).Text = "WarpInverseMap"
             radio.check(3).Checked = True
         End If
+
+        task.desc = "Run to get the warpflag based on the current options"
     End Sub
-    Public Function getInterpolationRadioButtons(radio As OptionsRadioButtons, frm As Object) As cv.InterpolationFlags
-        Dim warpFlag As cv.InterpolationFlags
-        For i = 0 To frm.check.length - 1
-            If frm.check(i).Checked Then
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        For i = 0 To radio.check.Length - 1
+            If radio.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
                                     cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
                 Exit For
             End If
         Next
-        Return warpFlag
-    End Function
-End Module
+    End Sub
+End Class
+
+
 
 
 
@@ -37,26 +44,26 @@ Public Class GetRotationMatrix2D_Basics
     Inherits VBparent
     Public M As cv.Mat
     Public Mflip As cv.Mat
-    Public warpFlag As integer
+    Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
         initParent()
+        rotateOptions = New GetRotationMatrix2D_Options
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "GetRotationMatrix2D Angle", 0, 360, 24)
+            sliders.setupTrackBar(0, "GetRotation Matrix2D Angle (deg)", 0, 360, 24)
         End If
-        SetInterpolationRadioButtons(caller, radio, "Rotation2D")
 
         task.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static frm = findfrm("GetRotationMatrix2D_Basics Radio Options")
-        warpFlag = getInterpolationRadioButtons(radio, frm)
 
+        rotateOptions.Run()
         Dim angle = sliders.trackbar(0).Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
-        dst1 = src.WarpAffine(M, src.Size(), warpFlag)
-        If warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)
+        dst1 = src.WarpAffine(M, src.Size(), rotateOptions.warpFlag)
+        If rotateOptions.warpFlag = cv.InterpolationFlags.WarpInverseMap Then Mflip = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), -angle, 1)
     End Sub
 End Class
 
@@ -93,7 +100,7 @@ Public Class GetRotationMatrix2D_Box
         Dim srcPoints = New cv.Mat(1, 4, cv.MatType.CV_32FC2, boxPoints)
         Dim dstpoints As New cv.Mat
 
-        If rotation.warpFlag <> cv.InterpolationFlags.WarpInverseMap Then
+        If rotation.rotateOptions.warpFlag <> cv.InterpolationFlags.WarpInverseMap Then
             cv.Cv2.Transform(srcPoints, dstpoints, rotation.M)
         Else
             cv.Cv2.Transform(srcPoints, dstpoints, rotation.Mflip)

@@ -103,10 +103,11 @@ End Class
 
 Public Class Palette_LinearPolar
     Inherits VBparent
+    Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
         initParent()
         task.desc = "Use LinearPolar to create gradient image"
-        SetInterpolationRadioButtons(caller, radio, "LinearPolar")
+        rotateOptions = New GetRotationMatrix2D_Options
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -120,14 +121,17 @@ Public Class Palette_LinearPolar
             Dim c = i * 255 / dst1.Rows
             dst1.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
+
+        rotateOptions.Run()
+
         Static frm = findfrm("Palette_LinearPolar Radio Options")
-        Dim iFlag = getInterpolationRadioButtons(radio, frm)
         Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
-        Dim radius = sliders.trackbar(0).Value ' msRNG.next(0, dst1.Cols)
+        Static radiusSlider = findSlider("LinearPolar radius")
+        Dim radius = radiusSlider.Value ' msRNG.next(0, dst1.Cols)
         dst2.SetTo(0)
-        If iFlag = cv.InterpolationFlags.WarpInverseMap Then sliders.trackbar(0).Value = sliders.trackbar(0).Maximum
-        cv.Cv2.LinearPolar(dst1, dst1, pt, radius, iFlag)
-        cv.Cv2.LinearPolar(src, dst2, pt, radius, iFlag)
+        If rotateOptions.warpFlag = cv.InterpolationFlags.WarpInverseMap Then radiusSlider.Value = radiusSlider.Maximum
+        cv.Cv2.LinearPolar(dst1, dst1, pt, radius, rotateOptions.warpFlag)
+        cv.Cv2.LinearPolar(src, dst2, pt, radius, rotateOptions.warpFlag)
     End Sub
 End Class
 
