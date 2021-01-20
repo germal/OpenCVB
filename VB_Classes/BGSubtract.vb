@@ -64,7 +64,7 @@ Public Class BGSubtract_MotionDetect_MT
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
+            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 980)
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 6)
@@ -96,7 +96,7 @@ Public Class BGSubtract_MotionDetect_MT
         Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
-        Static correlationSlider = findSlider("Correlation Threshold")
+        Static correlationSlider = findSlider("Correlation Threshold X1000")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         dst1.SetTo(0)
         For i = 0 To threadCount - 1

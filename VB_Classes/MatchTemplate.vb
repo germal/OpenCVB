@@ -199,39 +199,58 @@ End Class
 Public Class MatchTemplate_Movement
     Inherits VBparent
     Dim grid As Thread_Grid
+    Public mask As cv.Mat
     Public Sub New()
         initParent()
         grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 970)
+            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 970)
+            sliders.setupTrackBar(1, "Stdev Threshold", 0, 100, 10)
         End If
 
-        task.desc = "Detect Motion in the color image"
+        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        dst2 = mask.Clone
+        task.desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim font = cv.HersheyFonts.HersheyComplex
+        Dim fsize = ocvb.fontSize / 3
+
         grid.Run()
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
+        Static stdevSlider = findSlider("Stdev Threshold")
+        Dim stdevThreshold = CSng(stdevSlider.Value)
+
+        Static correlationSlider = findSlider("Correlation Threshold X1000")
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+
         Static lastFrame As cv.Mat = dst1.Clone()
         Dim saveFrame As cv.Mat = dst1.Clone
-        Static correlationSlider = findSlider("Correlation Threshold")
-        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         Dim updateCount As Integer
-        Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        mask.SetTo(0)
+
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
-            Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(dst1(roi), lastFrame(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-            If correlation.Get(Of Single)(0, 0) < CCthreshold Then
-                Interlocked.Increment(updateCount)
-                cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), New cv.Point(roi.X + 2, roi.Y + 10), cv.HersheyFonts.HersheyComplex, ocvb.fontSize / 3, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Dim mean As Single = 0, stdev As Single = 0
+            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
+            If stdev > stdevThreshold Then
+                Dim correlation As New cv.Mat
+                cv.Cv2.MatchTemplate(dst1(roi), lastFrame(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                    Interlocked.Increment(updateCount)
+                    Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
+                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                Else
+                    mask(roi).SetTo(255)
+                    dst1(roi).SetTo(0)
+                End If
             Else
-                mask(roi).SetTo(255)
-                dst1(roi).SetTo(0)
+                Interlocked.Increment(updateCount)
             End If
         End Sub)
         dst1.SetTo(255, grid.gridMask)
@@ -239,7 +258,7 @@ Public Class MatchTemplate_Movement
         saveFrame.CopyTo(dst2, mask)
         lastFrame = saveFrame
         Dim corrPercent = Format(correlationSlider.value / 1000, "0.0%") + " correlation"
-        label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + corrPercent
+        label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " with < " + corrPercent + " or low stdev"
         label2 = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + corrPercent
     End Sub
 End Class

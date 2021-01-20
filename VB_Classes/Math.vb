@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+Imports System.Threading
 Public Class Math_Subtract
     Inherits VBparent
     Public Sub New()
@@ -13,7 +14,7 @@ Public Class Math_Subtract
         task.desc = "Invert the image colors using subtract"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         tmp.SetTo(New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value))
         cv.Cv2.Subtract(tmp, src, dst1)
@@ -190,3 +191,69 @@ Public Class Math_ImageAverage
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Math_Stdev
+    Inherits VBparent
+    Dim grid As Thread_Grid
+    Public mask As cv.Mat
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Stdev Threshold", 0, 100, 20)
+        End If
+
+        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        task.desc = "Compute the standard deviation in each segment"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim updateCount As Integer
+        mask.SetTo(0)
+        Dim font = cv.HersheyFonts.HersheyComplex
+        Dim fsize = ocvb.fontSize / 3
+
+        grid.Run()
+
+        dst1 = src.Clone
+        If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static stdevSlider = findSlider("Stdev Threshold")
+        Dim stdevThreshold = CSng(stdevSlider.Value)
+
+        Static lastFrame As cv.Mat = dst1.Clone()
+        Dim saveFrame As cv.Mat = dst1.Clone
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Sub(roi)
+            Dim mean As Single = 0, stdev As Single = 0
+            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
+            If stdev < stdevThreshold Then
+                Interlocked.Increment(updateCount)
+                cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(roi.X + 2, roi.Y + 10), font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Else
+                mask(roi).SetTo(255)
+                dst1(roi).SetTo(0)
+            End If
+        End Sub)
+        dst1.SetTo(255, grid.gridMask)
+        dst2.SetTo(0)
+        saveFrame.CopyTo(dst2, mask)
+        lastFrame = saveFrame
+        Dim stdevPercent = " stdev " + Format(stdevSlider.value, "0.0")
+        label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + stdevPercent
+        label2 = CStr(grid.roiList.Count - updateCount) + " out of " + CStr(grid.roiList.Count) + " had stdev > " + Format(stdevSlider.value, "0.0")
+    End Sub
+End Class

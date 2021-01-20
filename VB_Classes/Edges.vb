@@ -672,3 +672,116 @@ Public Class Edges_Depth
         dst2 = sobel.dst1
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class Edges_FeaturesOnly
+    Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
+    Dim featLess As Featureless_Basics
+    Public Sub New()
+        initParent()
+        edges = New Edges_BinarizedSobel
+        featLess = New Featureless_Basics
+        label1 = "Output of Edges_BinarizedSobel"
+        label2 = "dst1 with featureless areas removed."
+        task.desc = "Removing the featureless regions after a binarized sobel"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).Clone
+
+        featLess.src = src
+        featLess.Run()
+        dst2 = dst1.Clone
+        dst2.SetTo(0, featLess.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Edges_Consistent
+    Inherits VBparent
+    Dim edges As Edges_FeaturesOnly
+    Public Sub New()
+        initParent()
+        edges = New Edges_FeaturesOnly
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Edges present n frames", 1, 30, 10)
+        End If
+
+        task.desc = "Edges that are consistent for x number of frames"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static nFrameSlider = findSlider("Edges present n frames")
+        Dim nFrames = nFrameSlider.value
+
+        Static saveFrameCount = nFrames
+        Static saveFrames As New List(Of cv.Mat)
+        If saveFrameCount <> nFrames Then
+            saveFrames = New List(Of cv.Mat)
+            saveFrameCount = nFrames
+        End If
+
+        edges.src = src
+        edges.Run()
+
+        saveFrames.Add(edges.dst2.Clone)
+        If saveFrames.Count > nFrames Then saveFrames.RemoveAt(0)
+
+        dst1 = saveFrames(0)
+        For i = 1 To saveFrames.Count - 1
+            cv.Cv2.BitwiseAnd(saveFrames(i), dst1, dst1)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_Stdev
+    Inherits VBparent
+    Dim std As Math_Stdev
+    Dim edges As Edges_BinarizedSobel
+    Public Sub New()
+        initParent()
+        edges = New Edges_BinarizedSobel
+        std = New Math_Stdev
+
+        task.desc = "Edges where stdev is above a threshold"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        std.src = src
+        std.Run()
+
+        edges.src = std.dst2
+        edges.Run()
+        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
