@@ -88,6 +88,7 @@ Public Class OpenCVB
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Public intermediateReview As String
     Dim VTK_Present As Boolean
+    Dim meActivateNeeded As Boolean
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -887,7 +888,12 @@ Public Class OpenCVB
         Static lastCameraFrame As Integer
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
-        'If AvailableAlgorithms.Text.StartsWith("OpenGL") = False And lastAlgorithmFrame < 2 And saveAlgorithmName <> "" Then Me.Activate()
+        If AvailableAlgorithms.Text.StartsWith("OpenGL") Then meActivateNeeded = False
+        If AvailableAlgorithms.Text.StartsWith("VTK") Then meActivateNeeded = False
+        If meActivateNeeded Then
+            Me.Activate()
+            meActivateNeeded = False
+        End If
         If TreeViewDialog IsNot Nothing Then
             If TreeViewDialog.TreeView1.IsDisposed Then TreeButton.CheckState = CheckState.Unchecked
         End If
@@ -923,6 +929,25 @@ Public Class OpenCVB
         Dim details = " Display at " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + ", Working Res. = " + resolutionDesc
         picLabels(0) = "RGB:" + details
         picLabels(1) = "Depth:" + details
+    End Sub
+    Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
+        SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
+        stopCameraThread = True
+        saveAlgorithmName = ""
+        If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
+        textDesc = ""
+        saveLayout()
+        Application.DoEvents()
+    End Sub
+    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
+        MsgBox("The objective is to solve many small computer vision problems" + vbCrLf +
+               "and do so in a way that enables any of the solutions " + vbCrLf +
+               "to be reused. The result is a toolkit for solving " + vbCrLf +
+               "ever bigger and more difficult problems. The " + vbCrLf +
+               "philosophy behind this approach is that human vision " + vbCrLf +
+               "is not computationally intensive but is built " + vbCrLf +
+               "on many almost trivial algorithms working together.  " + vbCrLf + vbCrLf +
+               "Fall 2020 Fremont CA")
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Exit_Click(sender, e)
@@ -1160,25 +1185,6 @@ Public Class OpenCVB
             If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
     End Sub
-    Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
-        SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
-        stopCameraThread = True
-        saveAlgorithmName = ""
-        If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
-        textDesc = ""
-        saveLayout()
-        Application.DoEvents()
-    End Sub
-    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
-        MsgBox("The objective is to solve many small computer vision problems" + vbCrLf +
-               "and do so in a way that enables any of the solutions " + vbCrLf +
-               "to be reused. The result is a toolkit for solving " + vbCrLf +
-               "ever bigger and more difficult problems. The " + vbCrLf +
-               "philosophy behind this approach is that human vision " + vbCrLf +
-               "is not computationally intensive but is built " + vbCrLf +
-               "on many almost trivial algorithms working together.  " + vbCrLf + vbCrLf +
-               "Fall 2020 Fremont CA")
-    End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
             While 1
@@ -1263,6 +1269,8 @@ Public Class OpenCVB
                     openFileDialogName = task.openFileDialogName
                     openfileDialogTitle = task.openFileDialogTitle
                 End If
+
+                If frameCount = 0 Then meActivateNeeded = True
 
                 picLabels(2) = task.label1
                 picLabels(3) = task.label2

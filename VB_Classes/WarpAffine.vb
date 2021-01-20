@@ -87,6 +87,10 @@ End Class
 
 
 
+
+
+
+
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics
     Inherits VBparent
@@ -118,6 +122,9 @@ Public Class WarpAffine_Basics
         label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
 End Class
+
+
+
 
 
 

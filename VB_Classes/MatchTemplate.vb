@@ -234,12 +234,12 @@ Public Class MatchTemplate_Movement
                 dst1(roi).SetTo(0)
             End If
         End Sub)
-        cv.Cv2.ImShow("mask", mask)
         dst1.SetTo(255, grid.gridMask)
         dst2.SetTo(0)
         saveFrame.CopyTo(dst2, mask)
         lastFrame = saveFrame
-        label1 = CStr(updateCount) + " segments (of " + CStr(grid.roiList.Count) + ") that were updated"
-        label2 = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
+        Dim corrPercent = Format(correlationSlider.value / 1000, "0.0%") + " correlation"
+        label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + corrPercent
+        label2 = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + corrPercent
     End Sub
 End Class

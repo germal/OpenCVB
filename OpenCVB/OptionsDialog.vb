@@ -124,7 +124,6 @@ Public Class OptionsDialog
         TestEnableNumPy()
     End Sub
     Private Sub OptionsDialog_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        Me.Hide()
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
     End Sub
     Private Sub SelectPythonFile_Click(sender As Object, e As EventArgs) Handles SelectPythonFile.Click

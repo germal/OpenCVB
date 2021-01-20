@@ -274,7 +274,7 @@ Public Class Stabilizer_Gray
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Stabilizer Correlation Threshold X1000", 0, 1000, 980)
+            sliders.setupTrackBar(0, "Stabilizer Correlation Threshold X1000", 0, 1000, 970)
         End If
 
         match = New MatchTemplate_Basics
