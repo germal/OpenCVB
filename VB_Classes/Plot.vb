@@ -4,11 +4,11 @@ Imports System.Text.RegularExpressions
 Public Class Plot_Basics
     Inherits VBparent
     Dim plot As Plot_Basics_CPP
-    Dim hist As Histogram_Basics
+    Dim hist As Histogram_Graph
     Public plotCount As Integer = 3
     Public Sub New()
         initParent()
-        hist = New Histogram_Basics()
+        hist = New Histogram_Graph()
         hist.plotRequested = True
 
         plot = New Plot_Basics_CPP()

@@ -154,12 +154,12 @@ End Class
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class PhotoShop_WhiteBalance
     Inherits VBparent
-    Dim hist As Histogram_Basics
+    Dim hist As Histogram_Graph
     Dim whiteCPP As PhotoShop_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New()
         initParent()
-        hist = New Histogram_Basics()
+        hist = New Histogram_Graph()
         hist.plotRequested = True
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
@@ -264,16 +264,16 @@ End Class
 Public Class PhotoShop_PlotHist
     Inherits VBparent
     Dim white As PhotoShop_ChangeMask
-    Public hist1 As Histogram_KalmanSmoothed
-    Public hist2 As Histogram_KalmanSmoothed
+    Public hist1 As Histogram_Basics
+    Public hist2 As Histogram_Basics
     Dim mat2to1 As Mat_2to1
     Public Sub New()
         initParent()
         white = New PhotoShop_ChangeMask()
 
-        hist1 = New Histogram_KalmanSmoothed
-        hist2 = New Histogram_KalmanSmoothed
-        hideForm("Histogram_KalmanSmoothed Slider Options")
+        hist1 = New Histogram_Basics
+        hist2 = New Histogram_Basics
+        hideForm("Histogram_Basics Slider Options")
         mat2to1 = New Mat_2to1()
 
         task.desc = "Plot the histogram of the before and after white balancing"

@@ -3,20 +3,23 @@ Imports cv = OpenCvSharp
 Public Class Entropy_Basics
     Inherits VBparent
     Dim flow As Font_FlowText
-    Dim hist As Histogram_Basics
     Dim simple = New Entropy_Simple
     Public entropy As Single
     Public Sub New()
         initParent()
         flow = New Font_FlowText()
 
-        hist = New Histogram_Basics()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of Bins", 0, 100, 50)
+        End If
 
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        simple.bins = hist.sliders.trackbar(0).Value
+        Static binSlider = findSlider("Number of Bins")
+        simple.bins = binSlider.Value
         simple.run(src)
         entropy = 0
         Dim entropyChannels As String = ""
@@ -40,7 +43,6 @@ End Class
 Public Class Entropy_Highest_MT
     Inherits VBparent
     Dim entropies(0) As Entropy_Simple
-    Dim hist As Histogram_Basics
     Public grid As Thread_Grid
     Public bestContrast As cv.Rect
     Public Sub New()
@@ -51,8 +53,6 @@ Public Class Entropy_Highest_MT
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 80
-
-        hist = New Histogram_Basics()
 
         label1 = "Highest entropy marked with red rectangle"
         task.desc = "Find the highest entropy section of the color image."

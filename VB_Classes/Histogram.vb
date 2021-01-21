@@ -1,8 +1,88 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class Histogram_Basics
+    Inherits VBparent
+    Public mask As New cv.Mat
+
+    Public histogram As New cv.Mat
+    Public kalman As Kalman_Basics
+    Public plotHist As Plot_Histogram
+    Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
+    Public Sub New()
+        initParent()
+        plotHist = New Plot_Histogram()
+        plotHist.minRange = 0
+
+        kalman = New Kalman_Basics()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
+        End If
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Remove the zero histogram value"
+            check.Box(0).Checked = False
+        End If
+
+        label2 = "Histogram - x=bins/y=count"
+        task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static splitIndex = -1
+        Static colorName As String
+        If standalone Or task.intermediateReview = caller Then
+            Dim split() = src.Split()
+            If ocvb.frameCount Mod 100 = 0 Then
+                splitIndex += 1
+                If splitIndex > 2 Then splitIndex = 0
+            End If
+            src = split(splitIndex)
+            colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
+        Else
+            If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        End If
+        Static histBinSlider = findSlider("Histogram Bins")
+        plotHist.bins = histBinSlider.Value
+        Dim histSize() = {plotHist.bins}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
+
+        Dim dimensions() = New Integer() {plotHist.bins}
+        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
+
+        Static zeroCheck = findCheckBox("Remove the zero histogram value")
+        If zeroCheck.checked Then histogram.Set(Of Single)(0, 0, 0)
+
+        label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
+
+        ReDim kalman.kInput(plotHist.bins - 1)
+        For i = 0 To plotHist.bins - 1
+            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
+        Next
+        kalman.Run()
+        For i = 0 To plotHist.bins - 1
+            histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
+        Next
+
+        plotHist.hist = histogram
+        If standalone Or task.intermediateReview = caller Then plotHist.backColor = splitColors(splitIndex)
+        plotHist.src = src
+        plotHist.Run()
+        dst1 = plotHist.dst1
+        label1 = colorName + " input to histogram"
+    End Sub
+End Class
+
+
+
+
+
+
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
-Public Class Histogram_Basics
+Public Class Histogram_Graph
     Inherits VBparent
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
@@ -139,7 +219,7 @@ End Module
 
 Public Class Histogram_NormalizeGray
     Inherits VBparent
-    Public histogram As Histogram_KalmanSmoothed
+    Public histogram As Histogram_Basics
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -147,7 +227,7 @@ Public Class Histogram_NormalizeGray
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
-        histogram = New Histogram_KalmanSmoothed
+        histogram = New Histogram_Basics
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -202,87 +282,6 @@ Public Class Histogram_2D_HueSaturation
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Histogram_KalmanSmoothed
-    Inherits VBparent
-    Public mask As New cv.Mat
-
-    Public histogram As New cv.Mat
-    Public kalman As Kalman_Basics
-    Public plotHist As Plot_Histogram
-    Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-    Public Sub New()
-        initParent()
-        plotHist = New Plot_Histogram()
-        plotHist.minRange = 0
-
-        kalman = New Kalman_Basics()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
-        End If
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Remove the zero histogram value"
-            check.Box(0).Checked = False
-        End If
-
-        label2 = "Histogram - x=bins/y=count"
-        task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static splitIndex = -1
-        Static colorName As String
-        If standalone Or task.intermediateReview = caller Then
-            Dim split() = src.Split()
-            If ocvb.frameCount Mod 100 = 0 Then
-                splitIndex += 1
-                If splitIndex > 2 Then splitIndex = 0
-            End If
-            src = split(splitIndex)
-            colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
-        Else
-            If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
-        Static histBinSlider = findSlider("Histogram Bins")
-        plotHist.bins = histBinSlider.Value
-        Dim histSize() = {plotHist.bins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
-
-        Dim dimensions() = New Integer() {plotHist.bins}
-        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
-
-        Static zeroCheck = findCheckBox("Remove the zero histogram value")
-        If zeroCheck.checked Then histogram.Set(Of Single)(0, 0, 0)
-
-        label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
-
-        ReDim kalman.kInput(plotHist.bins - 1)
-        For i = 0 To plotHist.bins - 1
-            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
-        Next
-        kalman.Run()
-        For i = 0 To plotHist.bins - 1
-            histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
-        Next
-
-        plotHist.hist = histogram
-        If standalone Or task.intermediateReview = caller Then plotHist.backColor = splitColors(splitIndex)
-        plotHist.src = src
-        plotHist.Run()
-        dst1 = plotHist.dst1
-        label1 = colorName + " input to histogram"
-    End Sub
-End Class
 
 
 
@@ -389,15 +388,15 @@ End Class
 ' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeColor
     Inherits VBparent
-    Public kalmanEq As Histogram_KalmanSmoothed
-    Public kalman As Histogram_KalmanSmoothed
+    Public kalmanEq As Histogram_Basics
+    Public kalman As Histogram_Basics
     Dim mats As Mat_2to1
     Public displayHist As Boolean = False
     Public channel = 2
     Public Sub New()
         initParent()
-        kalmanEq = New Histogram_KalmanSmoothed
-        kalman = New Histogram_KalmanSmoothed
+        kalmanEq = New Histogram_Basics
+        kalman = New Histogram_Basics
 
         Static binSlider = findSlider("Histogram Bins")
         binSlider.Value = 40
@@ -446,13 +445,13 @@ End Class
 'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeGray
     Inherits VBparent
-    Public histogramEq As Histogram_KalmanSmoothed
-    Public histogram As Histogram_KalmanSmoothed
+    Public histogramEq As Histogram_Basics
+    Public histogram As Histogram_Basics
     Public Sub New()
         initParent()
-        histogramEq = New Histogram_KalmanSmoothed
+        histogramEq = New Histogram_Basics
 
-        histogram = New Histogram_KalmanSmoothed
+        histogram = New Histogram_Basics
 
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
@@ -561,7 +560,7 @@ End Class
 
 Public Class Histogram_ColorsAndGray
     Inherits VBparent
-    Dim histogram As Histogram_KalmanSmoothed
+    Dim histogram As Histogram_Basics
     Dim mats As Mat_4to1
     Public Sub New()
         initParent()
@@ -572,7 +571,7 @@ Public Class Histogram_ColorsAndGray
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
-        histogram = New Histogram_KalmanSmoothed
+        histogram = New Histogram_Basics
         histogram.kalman.check.Box(0).Checked = False
         histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.trackbar(0).Value = 40
@@ -616,11 +615,11 @@ End Class
 
 Public Class Histogram_BackProjectionPeak
     Inherits VBparent
-    Dim hist As Histogram_KalmanSmoothed
+    Dim hist As Histogram_Basics
     Public Sub New()
         initParent()
 
-        hist = New Histogram_KalmanSmoothed
+        hist = New Histogram_Basics
         hist.kalman.check.Box(0).Checked = False
 
         task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
@@ -1248,12 +1247,12 @@ End Class
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjectionGrayscale
     Inherits VBparent
-    Dim hist As Histogram_KalmanSmoothed
+    Dim hist As Histogram_Basics
     Public histIndex As Integer
     Public binSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        hist = New Histogram_KalmanSmoothed
+        hist = New Histogram_Basics
         binSlider = findSlider("Histogram Bins")
         binSlider.Value = 10
 
@@ -1356,41 +1355,6 @@ End Class
 
 
 
-Public Class Histogram_SmoothConcentration
-    Inherits VBparent
-    Public sideview As Histogram_SmoothSideView2D
-    Public topview As Histogram_SmoothTopView2D
-    Dim concent As Histogram_ViewConcentrations
-    Public Sub New()
-        initParent()
-
-        sideview = New Histogram_SmoothSideView2D
-        topview = New Histogram_SmoothTopView2D
-        concent = New Histogram_ViewConcentrations
-
-        task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideview.Run()
-        dst1 = sideview.dst1
-        Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
-        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst1 = concent.palette.dst1.Clone
-
-        topview.Run()
-        dst2 = topview.dst1
-        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst2 = concent.palette.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -1475,8 +1439,43 @@ End Class
 
 
 
+Public Class Histogram_SmoothConcentration
+    Inherits VBparent
+    Public sideview As Histogram_SmoothSideView2D
+    Public topview As Histogram_SmoothTopView2D
+    Dim concent As Histogram_ViewConcentrationsTopX
+    Public Sub New()
+        initParent()
 
-Public Class Histogram_ViewConcentrations
+        sideview = New Histogram_SmoothSideView2D
+        topview = New Histogram_SmoothTopView2D
+        concent = New Histogram_ViewConcentrationsTopX
+
+        task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sideview.Run()
+        dst1 = sideview.dst1
+        Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
+        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst1 = concent.palette.dst1.Clone
+
+        topview.Run()
+        dst2 = topview.dst1
+        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        dst2 = concent.palette.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Histogram_ViewConcentrationsTopX
     Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
@@ -1492,27 +1491,27 @@ Public Class Histogram_ViewConcentrations
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
-            sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
+            sliders.setupTrackBar(1, "Resize Factor x100", 1, 100, 10)
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
             sliders.setupTrackBar(3, "Dot size", 1, 100, If(src.Width = 1280, 20, 10))
         End If
-        task.desc = "Highlight the histogram projections where concentrations are highest"
+        task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
-        Static concentrationSlider = findSlider("Concentration Factor x100")
-        Dim concentrationFactor = concentrationSlider.Value / 100
+        Static ResizeSlider = findSlider("Resize Factor x100")
+        Dim resizeFactor = ResizeSlider.Value / 100
 
         Static cThresholdSlider = findSlider("Concentration Threshold")
         Dim concentrationThreshold = cThresholdSlider.Value
 
-        Dim minPixel = CInt(concentrationFactor * task.minRangeSlider.Value * ocvb.pixelsPerMeter / 1000)
+        Dim minPixel = CInt(resizeFactor * task.minRangeSlider.Value * ocvb.pixelsPerMeter / 1000)
 
-        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
+        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * resizeFactor), CInt(histOutput.Height * resizeFactor)))
         Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
         For y = 0 To tmp.Height - 1
             For x = minPixel To tmp.Width - 1
                 Dim val = tmp.Get(Of Single)(y, x)
-                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / concentrationFactor), CInt(y / concentrationFactor)))
+                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / resizeFactor), CInt(y / resizeFactor)))
             Next
         Next
 
@@ -1541,5 +1540,53 @@ Public Class Histogram_ViewConcentrations
         dst2 = topview.dst1
         label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         If standalone Or task.intermediateReview = caller Then dst2 = palette.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Histogram_ViewConcentrations
+    Inherits VBparent
+    Public sideview As Histogram_SideView2D
+    Public topview As Histogram_TopView2D
+    Public palette As Palette_Basics
+    Public Sub New()
+        initParent()
+
+        palette = New Palette_Basics
+
+        sideview = New Histogram_SideView2D
+        topview = New Histogram_TopView2D
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Show top percent X100", 1, 100, 10)
+        End If
+        task.desc = "Highlight the histogram projections where concentrations are highest"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sideview.Run()
+
+        Dim minVal As Double, maxVal As Double
+        cv.Cv2.MinMaxLoc(sideview.histOutput, minVal, maxVal)
+
+
+
+        'dst1 = sideview.dst1
+        'Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
+        'label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        'If standalone Or task.intermediateReview = caller Then dst1 = palette.dst1.Clone
+
+        'topview.Run()
+        'dst2 = topview.dst1
+        'label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        'If standalone Or task.intermediateReview = caller Then dst2 = palette.dst1.Clone
     End Sub
 End Class

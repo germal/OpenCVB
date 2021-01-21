@@ -1521,15 +1521,15 @@ End Class
 Public Class Depth_SmoothSurfaces
     Inherits VBparent
     Public pcValid As Motion_StablePointCloud
-    Dim histX As Histogram_KalmanSmoothed
-    Dim histY As Histogram_KalmanSmoothed
+    Dim histX As Histogram_Basics
+    Dim histY As Histogram_Basics
     Dim mats As Mat_4to1
     Public Sub New()
         initParent()
 
         mats = New Mat_4to1
-        histX = New Histogram_KalmanSmoothed
-        histY = New Histogram_KalmanSmoothed
+        histX = New Histogram_Basics
+        histY = New Histogram_Basics
         pcValid = New Motion_StablePointCloud
 
         label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
