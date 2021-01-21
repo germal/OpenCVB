@@ -88,6 +88,7 @@ End Class
 
 Public Class Transform_SortReshape
     Inherits VBparent
+    Public sortVector As cv.Mat
     Public Sub New()
         initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -104,8 +105,8 @@ Public Class Transform_SortReshape
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
         Dim tmp = src.Reshape(1, src.Rows * src.Cols)
-        Dim sorted = tmp.Sort(sortOption + cv.SortFlags.EveryColumn)
-        dst1 = sorted.Reshape(1, src.Rows)
+        sortVector = tmp.Sort(sortOption + cv.SortFlags.EveryColumn)
+        dst1 = sortVector.Reshape(1, src.Rows)
     End Sub
 End Class
 

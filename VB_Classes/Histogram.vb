@@ -2,8 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Histogram_Basics
     Inherits VBparent
-    Public mask As New cv.Mat
-
     Public histogram As New cv.Mat
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
@@ -17,7 +15,7 @@ Public Class Histogram_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 1, 255, 50)
+            sliders.setupTrackBar(0, "Histogram Bins", 1, 1000, 50)
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -41,34 +39,39 @@ Public Class Histogram_Basics
             End If
             src = split(splitIndex)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
-        Else
-            If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
+
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
         Static histBinSlider = findSlider("Histogram Bins")
         plotHist.bins = histBinSlider.Value
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
         Dim dimensions() = New Integer() {plotHist.bins}
-        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
 
         Static zeroCheck = findCheckBox("Remove the zero histogram value")
         If zeroCheck.checked Then histogram.Set(Of Single)(0, 0, 0)
 
         label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
-        ReDim kalman.kInput(plotHist.bins - 1)
-        For i = 0 To plotHist.bins - 1
-            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
-        Next
-        kalman.Run()
-        For i = 0 To plotHist.bins - 1
-            histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
-        Next
+        Static kalmanCheck = findCheckBox("Turn Kalman filtering on")
+        If kalmanCheck.checked Then
+            ReDim kalman.kInput(plotHist.bins - 1)
+            For i = 0 To plotHist.bins - 1
+                kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
+            Next
+            kalman.Run()
+            For i = 0 To plotHist.bins - 1
+                histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
+            Next
+        End If
 
         plotHist.hist = histogram
         If standalone Or task.intermediateReview = caller Then plotHist.backColor = splitColors(splitIndex)
-        plotHist.src = src
+        plotHist.src = input
         plotHist.Run()
         dst1 = plotHist.dst1
         label1 = colorName + " input to histogram"
@@ -627,7 +630,9 @@ Public Class Histogram_BackProjectionPeak
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        hist.src = src
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.src = input
         hist.Run()
         dst2 = hist.dst1
 
@@ -640,7 +645,7 @@ Public Class Histogram_BackProjectionPeak
         Dim pixelMin = CInt((histindex) * barRange)
         Dim pixelMax = CInt((histindex + 1) * barRange)
 
-        Dim mask = hist.src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim mask = input.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -1197,6 +1202,7 @@ Public Class Histogram_SideView2D
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
+    Public originaHistOutput As New cv.Mat
     Public cmat As PointCloud_ColorizeSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
@@ -1222,9 +1228,9 @@ Public Class Histogram_SideView2D
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, originaHistOutput, 2, histSize, ranges)
 
-        histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        histOutput = originaHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         If standalone Or task.intermediateReview = caller Then
@@ -1361,7 +1367,7 @@ End Class
 
 Public Class Histogram_ViewObjects
     Inherits VBparent
-    Public histC As Histogram_ViewConcentrations
+    Public histC As Histogram_ViewConcentrationsTopX
     Dim flood As FloodFill_Image
     Dim minSizeSlider As Windows.Forms.TrackBar
     Dim loDiffSlider As Windows.Forms.TrackBar
@@ -1373,7 +1379,7 @@ Public Class Histogram_ViewObjects
         initParent()
 
         flood = New FloodFill_Image
-        histC = New Histogram_ViewConcentrations
+        histC = New Histogram_ViewConcentrationsTopX
 
         minSizeSlider = findSlider("FloodFill Minimum Size")
         loDiffSlider = findSlider("FloodFill LoDiff")
@@ -1555,38 +1561,49 @@ Public Class Histogram_ViewConcentrations
     Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
-    Public palette As Palette_Basics
+    Dim hist As Histogram_Basics
+    Dim sort As Transform_SortReshape
     Public Sub New()
         initParent()
 
-        palette = New Palette_Basics
+        sort = New Transform_SortReshape
+        Dim descendCheck = findRadio("Descending")
+        descendCheck.Checked = True
 
+        hist = New Histogram_Basics
         sideview = New Histogram_SideView2D
         topview = New Histogram_TopView2D
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Show top percent X100", 1, 100, 10)
+            sliders.setupTrackBar(1, "Percent range to use as threshold", 1, 100, 90)
         End If
-        task.desc = "Highlight the histogram projections where concentrations are highest"
+        task.desc = "Highlight the top X percent of histogram concentrations"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideview.Run()
+        dst1 = sideview.dst1
 
-        Dim minVal As Double, maxVal As Double
-        cv.Cv2.MinMaxLoc(sideview.histOutput, minVal, maxVal)
+        Dim origHist = sideview.originaHistOutput
 
+        sort.src = origHist
+        sort.Run()
 
+        Static histBinSlider = findSlider("Histogram Bins")
+        Dim maxBins = sort.dst1.Get(Of Single)(0, 1)
 
-        'dst1 = sideview.dst1
-        'Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
-        'label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        'If standalone Or task.intermediateReview = caller Then dst1 = palette.dst1.Clone
+        Static percentSlider = findSlider("Percent range to use as threshold")
+        Dim threshold = maxBins - maxBins * percentSlider.value / 100
+        dst2 = origHist.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        ' Dim rect = New cv.Rect(0, 1, 1, CInt(sort.dst1.Total * percentSlider.value / percentSlider.maximum))
+        'histBinSlider.value = If(maxBins < histBinSlider.maximum, maxBins, histBinSlider.maximum)
 
-        'topview.Run()
-        'dst2 = topview.dst1
-        'label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        'If standalone Or task.intermediateReview = caller Then dst2 = palette.dst1.Clone
+        'hist.plotHist.minRange = sort.sortVector(rect).Get(Of Single)(0, rect.Height)
+        'hist.plotHist.maxRange = maxBins
+        'hist.src = sort.sortVector(rect)
+        'hist.Run()
+        'dst2 = hist.dst1
     End Sub
 End Class
