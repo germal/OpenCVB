@@ -1289,81 +1289,6 @@ End Class
 
 
 
-Public Class Histogram_ViewConcentrations
-    Inherits VBparent
-    Public sideview As Histogram_SideView2D
-    Public topview As Histogram_TopView2D
-    Public palette As Palette_Basics
-    Public Sub New()
-        initParent()
-
-        palette = New Palette_Basics
-
-        sideview = New Histogram_SideView2D
-        topview = New Histogram_TopView2D
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
-            sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
-            sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
-            sliders.setupTrackBar(3, "Dot size", 1, 100, If(src.Width = 1280, 20, 10))
-        End If
-        task.desc = "Highlight the histogram projections where concentrations are highest"
-    End Sub
-    Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
-        Static concentrationSlider = findSlider("Concentration Factor x100")
-        Dim concentrationFactor = concentrationSlider.Value / 100
-
-        Static cThresholdSlider = findSlider("Concentration Threshold")
-        Dim concentrationThreshold = cThresholdSlider.Value
-
-        Dim minPixel = CInt(concentrationFactor * task.minRangeSlider.Value * ocvb.pixelsPerMeter / 1000)
-
-        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
-        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For y = 0 To tmp.Height - 1
-            For x = minPixel To tmp.Width - 1
-                Dim val = tmp.Get(Of Single)(y, x)
-                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / concentrationFactor), CInt(y / concentrationFactor)))
-            Next
-        Next
-
-        Static topXslider = findSlider("Display the top x highlights")
-        Static dotSlider = findSlider("Dot size")
-        Dim topX = topXslider.value
-        Dim dotsize = dotSlider.value
-        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
-            Dim pt = pts.ElementAt(i).Value
-            dst.Rectangle(New cv.Rect(pt.X - dotsize, pt.Y - dotsize, dotsize * 2, dotsize * 2), 128, -1)
-        Next
-        palette.src = dst
-        palette.Run()
-        Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
-        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
-    End Function
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideview.Run()
-        dst1 = sideview.dst1
-        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
-        label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        If standalone Or task.intermediateReview = caller Then dst1 = palette.dst1.Clone
-
-        topview.Run()
-        dst2 = topview.dst1
-        label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        If standalone Or task.intermediateReview = caller Then dst2 = palette.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Histogram_ViewIntersections
     Inherits VBparent
     Dim histCO As Histogram_ViewObjects
@@ -1540,5 +1465,81 @@ Public Class Histogram_ViewObjects
         Next
 
         label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Histogram_ViewConcentrations
+    Inherits VBparent
+    Public sideview As Histogram_SideView2D
+    Public topview As Histogram_TopView2D
+    Public palette As Palette_Basics
+    Public Sub New()
+        initParent()
+
+        palette = New Palette_Basics
+
+        sideview = New Histogram_SideView2D
+        topview = New Histogram_TopView2D
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
+            sliders.setupTrackBar(1, "Concentration Factor x100", 1, 100, 10)
+            sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
+            sliders.setupTrackBar(3, "Dot size", 1, 100, If(src.Width = 1280, 20, 10))
+        End If
+        task.desc = "Highlight the histogram projections where concentrations are highest"
+    End Sub
+    Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
+        Static concentrationSlider = findSlider("Concentration Factor x100")
+        Dim concentrationFactor = concentrationSlider.Value / 100
+
+        Static cThresholdSlider = findSlider("Concentration Threshold")
+        Dim concentrationThreshold = cThresholdSlider.Value
+
+        Dim minPixel = CInt(concentrationFactor * task.minRangeSlider.Value * ocvb.pixelsPerMeter / 1000)
+
+        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * concentrationFactor), CInt(histOutput.Height * concentrationFactor)))
+        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        For y = 0 To tmp.Height - 1
+            For x = minPixel To tmp.Width - 1
+                Dim val = tmp.Get(Of Single)(y, x)
+                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / concentrationFactor), CInt(y / concentrationFactor)))
+            Next
+        Next
+
+        Static topXslider = findSlider("Display the top x highlights")
+        Static dotSlider = findSlider("Dot size")
+        Dim topX = topXslider.value
+        Dim dotsize = dotSlider.value
+        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
+            Dim pt = pts.ElementAt(i).Value
+            dst.Rectangle(New cv.Rect(pt.X - dotsize, pt.Y - dotsize, dotsize * 2, dotsize * 2), 128, -1)
+        Next
+        palette.src = dst
+        palette.Run()
+        Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
+        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
+    End Function
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        sideview.Run()
+        dst1 = sideview.dst1
+        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
+        label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        If standalone Or task.intermediateReview = caller Then dst1 = palette.dst1.Clone
+
+        topview.Run()
+        dst2 = topview.dst1
+        label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        If standalone Or task.intermediateReview = caller Then dst2 = palette.dst1.Clone
     End Sub
 End Class

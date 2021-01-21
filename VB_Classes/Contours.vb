@@ -298,7 +298,7 @@ Public Class Contours_Binarized
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         edges.src = src
         edges.Run()
-        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = edges.dst2
         dst2 = dst1.Clone
 
         Dim contours As cv.Point()()

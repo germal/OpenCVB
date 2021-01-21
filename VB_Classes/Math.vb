@@ -242,7 +242,9 @@ Public Class Math_Stdev
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             If stdev < stdevThreshold Then
                 Interlocked.Increment(updateCount)
-                cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(roi.X + 2, roi.Y + 10), font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
+                cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Else
                 mask(roi).SetTo(255)
                 dst1(roi).SetTo(0)

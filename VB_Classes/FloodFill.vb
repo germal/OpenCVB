@@ -613,7 +613,7 @@ Public Class FloodFill_Click
 
         edges.src = src
         edges.Run()
-        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = edges.dst2
 
         If flood.pt.X Or flood.pt.Y Then
             flood.src = dst1.Clone
@@ -657,8 +657,8 @@ Public Class FloodFill_Point
             pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
             edges.src = src
             edges.Run()
-            dst1 = edges.mats.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            dst2 = edges.mats.mat(quadrantIndex).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst1 = edges.mats.dst1
+            dst2 = edges.mats.mat(quadrantIndex)
         Else
             Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
             Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
@@ -715,12 +715,13 @@ Public Class FloodFill_FullImage
             sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)
         End If
 
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Use filter to remove low stdev areas"
         End If
 
+        Dim paletteSlider = findSlider("Number of color transitions (Used only with Random)")
+        paletteSlider.Value = 180 ' insures every region will be a significantly different color
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
     End Sub
     Public Sub Run()

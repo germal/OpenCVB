@@ -494,17 +494,17 @@ Public Class Edges_BinarizedCanny
 
         edges.src = binarize.mats.mat(0) ' the light and dark halves
         edges.Run()
-        mats.mat(0) = edges.dst1.Clone
-        mats.mat(3) = edges.dst1.Clone
+        mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         edges.src = binarize.mats.mat(1) ' the lightest of the light half
         edges.Run()
-        mats.mat(1) = edges.dst1.Clone
+        mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
 
         edges.src = binarize.mats.mat(3) ' the darkest of the dark half
         edges.Run()
-        mats.mat(2) = edges.dst1.Clone
+        mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
         mats.Run()
@@ -554,17 +554,17 @@ Public Class Edges_BinarizedSobel
 
         edges.src = binarize.mats.mat(0) ' the light and dark halves
         edges.Run()
-        mats.mat(0) = edges.dst1.Clone
-        mats.mat(3) = edges.dst1.Clone
+        mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         edges.src = binarize.mats.mat(1) ' the lightest of the light half
         edges.Run()
-        mats.mat(1) = edges.dst1.Clone
+        mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
 
         edges.src = binarize.mats.mat(3) ' the darkest of the dark half
         edges.Run()
-        mats.mat(2) = edges.dst1.Clone
+        mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
         mats.Run()
@@ -699,7 +699,7 @@ Public Class Edges_FeaturesOnly
         task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
         edges.src = src
         edges.Run()
-        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).Clone
+        dst1 = edges.dst2
 
         featLess.src = src
         featLess.Run()
@@ -782,6 +782,76 @@ Public Class Edges_Stdev
 
         edges.src = std.dst2
         edges.Run()
-        dst1 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = edges.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_BlackSquare
+    Inherits VBparent
+    Dim std As Math_Stdev
+    Dim edges As Edges_BinarizedSobel
+    Dim addW As AddWeighted_Basics
+    Public Sub New()
+        initParent()
+        addW = New AddWeighted_Basics
+        edges = New Edges_BinarizedSobel
+        std = New Math_Stdev
+        task.desc = "Visualize the impact of Sobel on a black square"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        std.src = src
+        std.Run()
+
+        edges.src = std.dst2
+        edges.Run()
+        dst1 = edges.dst2
+
+        addW.src = dst1
+        addW.src2 = std.dst2
+        addW.Run()
+        dst2 = addW.dst1
+
+        'Dim mask = std.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        'dst2 = dst1.Clone.SetTo(0, mask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edges_Combo
+    Inherits VBparent
+    Dim edges1 As Edges_BinarizedCanny
+    Dim edges2 As Edges_BinarizedSobel
+    Public Sub New()
+        initParent()
+        edges1 = New Edges_BinarizedCanny
+        edges2 = New Edges_BinarizedSobel
+
+        label1 = "Sobel = red, Canny = yellow - they are identical"
+        task.desc = "Combine the results of binarized canny and sobel"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        edges1.src = src
+        edges1.Run()
+
+        edges2.src = src
+        edges2.Run()
+
+        dst1 = task.color
+        dst1.SetTo(cv.Scalar.Red, edges2.dst2)
+        dst1.SetTo(cv.Scalar.Yellow, edges1.dst2)
     End Sub
 End Class

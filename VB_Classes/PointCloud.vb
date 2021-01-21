@@ -1575,11 +1575,13 @@ End Class
 Public Class PointCloud_BackProjectTopView
     Inherits VBparent
     Dim view As PointCloud_ObjectsTop
+    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         view = New PointCloud_ObjectsTop
         view.colorizeNeeded = True
 
+        palette = New Palette_Basics
         label1 = "Back projection of objects identified in the top view"
         label2 = "Objects identified in the top view"
         task.desc = "Display only the top view of the depth data and backproject the histogram onto the RGB image."
@@ -1593,35 +1595,39 @@ Public Class PointCloud_BackProjectTopView
         For Each obj In view.viewObjects
             rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
         Next
+        Dim colorBump = CInt(255 / rectList.Count)
 
         Static minSlider = findSlider("InRange Min Depth (mm)")
         If ocvb.frameCount = 0 Then minSlider.Value = 1
         Dim minVal = minSlider.value
 
+        Dim split = view.measureTop.topView.gCloud.dst2.Split()
+        Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst1 = src
-        Dim xRange = 2 * ocvb.topFrustrumAdjust
-        Dim histogram = view.measureTop.topView.histOutput.Flip(cv.FlipMode.X)
-        Dim mat = New cv.Mat() {task.pointCloud}
-        Dim bins() = {2, 0}
         For i = 0 To rectList.Count - 1
             Dim r = rectList.ElementAt(i).Value
             If r.Width > 0 And r.Height > 0 Then
-                Dim minDepth As Single = 1000 * ocvb.maxZ * CSng(dst2.Height - (r.Y + r.Height)) / dst2.Height
-                If minDepth >= 2 Then
-                    Dim maxDepth As Single = 1000 * ocvb.maxZ * (dst2.Height - r.Y) / dst2.Height
-                    Dim leftX = -ocvb.topFrustrumAdjust ' r.X / dst2.Width * xRange - ocvb.topFrustrumAdjust
-                    Dim rightX = ocvb.topFrustrumAdjust ' (r.X + r.Width) / dst2.Width * xRange - ocvb.topFrustrumAdjust
-                    Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
-                    ' Dim ranges() = New cv.Rangef() {New cv.Rangef(minVal / 1000, ocvb.maxZ), New cv.Rangef(leftX, rightX)}
-                    Dim mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-                    Dim histTmp As New cv.Mat(histogram.Size, cv.MatType.CV_32F, 0)
-                    histogram(r).CopyTo(histTmp(r))
-                    cv.Cv2.CalcBackProject(mat, bins, histogram, mask, ranges)
-                    dst1.SetTo(255, mask.ConvertScaleAbs(255))
-                    Exit For
-                End If
+                Dim minDepth = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height
+                Dim maxDepth = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height
+
+                Dim minWidth = ocvb.maxZ * r.X / dst2.Width - ocvb.sideFrustrumAdjust
+                Dim maxWidth = ocvb.maxZ * (r.X + r.Width) / dst2.Width - ocvb.sideFrustrumAdjust
+
+                Dim mask32f = New cv.Mat
+
+                cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
+                Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+                cv.Cv2.InRange(split(0), minWidth, maxWidth, mask32f)
+                Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                cv.Cv2.BitwiseAnd(mask, hMask, mask)
+
+                colorMask.SetTo((i * colorBump) Mod 255, mask)
             End If
         Next
+        palette.src = colorMask
+        palette.Run()
+        dst1 = palette.dst1
     End Sub
 End Class
 
@@ -1636,8 +1642,11 @@ Public Class PointCloud_BackProjectSideView
     Inherits VBparent
     Dim view As PointCloud_ObjectsSide
     Dim cmatSide As PointCloud_ColorizeSide
+    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
+        palette = New Palette_Basics
+
         view = New PointCloud_ObjectsSide
         cmatSide = New PointCloud_ColorizeSide
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
@@ -1648,5 +1657,42 @@ Public Class PointCloud_BackProjectSideView
         cmatSide.src = view.dst1
         cmatSide.Run()
         dst2 = cmatSide.dst1
+
+        Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
+        For Each obj In view.viewObjects
+            rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
+        Next
+        Dim colorBump = CInt(255 / rectList.Count)
+
+        Static minSlider = findSlider("InRange Min Depth (mm)")
+        Dim minVal = minSlider.value
+
+        Dim split = view.measureSide.sideView.gCloud.dst2.Split()
+        Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = src
+        For i = 0 To rectList.Count - 1
+            Dim r = rectList.ElementAt(i).Value
+            If r.Width > 0 And r.Height > 0 Then
+                Dim minDepth = ocvb.maxZ * r.X / dst2.Width
+                Dim maxDepth = ocvb.maxZ * (r.X + r.Width) / dst2.Width
+
+                Dim minHeight = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height - ocvb.sideFrustrumAdjust
+                Dim maxHeight = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height - ocvb.sideFrustrumAdjust
+
+                Dim mask32f = New cv.Mat
+
+                cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
+                Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+                cv.Cv2.InRange(split(1), minHeight, maxHeight, mask32f)
+                Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                cv.Cv2.BitwiseAnd(mask, hMask, mask)
+
+                colorMask.SetTo((i * colorBump) Mod 255, mask)
+            End If
+        Next
+        palette.src = colorMask
+        palette.Run()
+        dst1 = palette.dst1
     End Sub
 End Class

@@ -22,3 +22,35 @@ Public Class AddWeighted_Basics
 End Class
 
 
+
+
+
+
+
+Public Class AddWeighted_Edges
+    Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
+    Dim addw As AddWeighted_Basics
+    Public Sub New()
+        initParent()
+        edges = New Edges_BinarizedSobel
+        addw = New AddWeighted_Basics
+        Dim weightSlider = findSlider("Weight")
+        weightSlider.Value = 75
+        task.desc = "Add in the edges separating light and dark to the color image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst2
+
+        addw.src = task.color
+        addw.src2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        addw.Run()
+        dst2 = addw.dst1
+    End Sub
+End Class
+
+

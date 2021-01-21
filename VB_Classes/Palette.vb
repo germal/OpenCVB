@@ -50,6 +50,7 @@ Public Class Palette_Basics
         End If
         If saveColorMap <> colormap Then
             saveColorMap = colormap
+            gradMap.changeColorMap = True
             Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
             ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
@@ -346,16 +347,12 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits VBparent
     Public gradientColorMap As New cv.Mat
+    Public changeColorMap As Boolean
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 250, 50)
-        End If
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Reset the random gradient color map"
+            sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 255, 150)
         End If
 
         label2 = "Generated colormap"
@@ -364,12 +361,9 @@ Public Class Palette_BuildGradientColorMap
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static transitionSlider = findSlider("Number of color transitions (Used only with Random)")
-        Static tranSetting = transitionSlider.value
-        Static resetCheck = findCheckBox("Reset the random gradient color map")
-        Static changeColorMap As Boolean = True
-        If changeColorMap <> resetCheck.checked Or tranSetting <> transitionSlider.value Then
+        Static tranSetting As Integer = -1
+        If tranSetting <> transitionSlider.value Or changeColorMap Then
             changeColorMap = False
-            resetCheck.checked = False
             tranSetting = transitionSlider.value
 
             Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -385,7 +379,7 @@ Public Class Palette_BuildGradientColorMap
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
             dst1 = Palette_Custom_Apply(src, gradientColorMap)
-            If standalone or task.intermediateReview = caller Then dst2 = gradientColorMap
+            If standalone Or task.intermediateReview = caller Then dst2 = gradientColorMap
         End If
     End Sub
 End Class
