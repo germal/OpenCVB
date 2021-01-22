@@ -47,12 +47,14 @@ End Class
 
 Public Class TView_FloodFill
     Inherits VBparent
-    Public flood As FloodFill_Basics
+    Public floodSide As FloodFill_Basics
+    Public floodTop As FloodFill_Basics
     Public tView As TView_Basics
     Public Sub New()
         initParent()
 
-        flood = New FloodFill_Basics
+        floodSide = New FloodFill_Basics
+        floodTop = New FloodFill_Basics
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
         tView = New TView_Basics
@@ -90,12 +92,54 @@ Public Class TView_FloodFill
         fuseSide.Add(tView.dst1.Clone)
         fuseTop.Add(tView.dst2.Clone)
 
-        flood.src = dst1
-        flood.Run()
-        dst1 = flood.dst1.Clone
+        floodSide.src = dst1
+        floodSide.Run()
+        dst1 = floodSide.dst1
 
-        flood.src = dst2
-        flood.Run()
-        dst2 = flood.dst1
+        floodTop.src = dst2
+        floodTop.Run()
+        dst2 = floodTop.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class TView_Tracker
+    Inherits VBparent
+    Public knn As KNN_Learn
+    Dim tview As TView_FloodFill
+    Public queryPoints As New List(Of cv.Point2f)
+    Public responses As New List(Of cv.Point2f)
+    Public Sub New()
+        initParent()
+        If standalone Then tview = New TView_FloodFill
+        knn = New KNN_Learn
+
+        task.desc = "Use KNN to track the query points"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim neighbors As New cv.Mat
+
+        tview.Run()
+        dst1 = tview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = tview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        For i = 0 To tview.floodTop.centroids.Count - 1
+            dst1.Circle(tview.floodTop.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
+            dst1.Circle(tview.floodTop.floodPoints(i), ocvb.dotSize, cv.Scalar.Red, -1)
+        Next
+        For i = 0 To tview.floodSide.centroids.Count - 1
+            dst2.Circle(tview.floodSide.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
+            dst2.Circle(tview.floodSide.floodPoints(i), ocvb.dotSize, cv.Scalar.Red, -1)
+        Next
+
+        queryPoints = New List(Of cv.Point2f)(tview.floodTop.centroids)
+        Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, queryPoints.ToArray)
     End Sub
 End Class
