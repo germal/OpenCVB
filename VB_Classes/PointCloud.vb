@@ -120,9 +120,6 @@ Public Class PointCloud_ColorizeSide
 
         palette.Run()
         dst1 = palette.dst1
-        dst2 = dst1.Clone
-        Dim rect = New cv.Rect((src.Width - src.Height) / 2, 0, dst1.Height, dst1.Height)
-        cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
 
         label1 = "Colorize mask for side view"
         task.desc = "Create the colorized mat used for side projections"
@@ -191,11 +188,11 @@ Public Class PointCloud_ColorizeSide
 
             dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
             dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        End If
 
-        Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
-        cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
+            Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
+            cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
                        cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        End If
     End Sub
 End Class
 
@@ -223,9 +220,6 @@ Public Class PointCloud_ColorizeTop
 
         palette.Run()
         dst1 = palette.dst1
-        dst2 = dst1.Clone
-        Dim rect = New cv.Rect((src.Width - src.Height) / 2, 0, dst1.Height, dst1.Height)
-        cv.Cv2.Rotate(dst1(rect), dst2(rect), cv.RotateFlags.Rotate90Clockwise)
 
         label1 = "Colorize mask for top down view"
         task.desc = "Create the colorize the mat for a topdown projections"
@@ -278,12 +272,12 @@ Public Class PointCloud_ColorizeTop
             dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
             dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        End If
 
-        Dim shift = (src.Width - src.Height) / 2
-        Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
-        cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        dst1.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Dim shift = (src.Width - src.Height) / 2
+            Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
+            cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        End If
     End Sub
 End Class
 
@@ -543,12 +537,10 @@ End Class
 
 Public Class PointCloud_HistBothViews
     Inherits VBparent
-    Dim topView As Histogram_TopView2D
-    Dim sideView As Histogram_SideView2D
+    Dim views As Histogram_ViewConcentrations
     Public Sub New()
         initParent()
-        topView = New Histogram_TopView2D()
-        sideView = New Histogram_SideView2D()
+        views = New Histogram_ViewConcentrations
 
         label1 = "Histogram Top View"
         label2 = "Histogram Side View"
@@ -556,11 +548,9 @@ Public Class PointCloud_HistBothViews
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        topView.Run()
-        dst1 = topView.dst1
-
-        sideView.Run()
-        dst2 = sideView.dst1
+        views.Run()
+        dst1 = views.dst1
+        dst2 = views.dst2
     End Sub
 End Class
 

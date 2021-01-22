@@ -1563,48 +1563,33 @@ Public Class Histogram_ViewConcentrations
     Public sideView As Histogram_SideView2D
     Public topView As Histogram_TopView2D
     Dim hist As Histogram_Basics
-    Dim sort As Transform_SortReshape
     Public Sub New()
         initParent()
 
-        sort = New Transform_SortReshape
-        Dim descendCheck = findRadio("Descending")
-        descendCheck.Checked = True
-
         hist = New Histogram_Basics
-        sideview = New Histogram_SideView2D
-        topview = New Histogram_TopView2D
+        sideView = New Histogram_SideView2D
+        topView = New Histogram_TopView2D
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Show top percent X100", 1, 100, 10)
-            sliders.setupTrackBar(1, "Top percent range to use", 1, 100, 5)
+            sliders.setupTrackBar(0, "Show counts > X", 0, 300, 10)
         End If
-        label1 = "Top View highest concentration"
-        label2 = "Side View highest concentration"
         task.desc = "Highlight the top X percent of histogram concentrations"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static histBinSlider = findSlider("Histogram Bins")
-        Static percentSlider = findSlider("Top percent range to use")
+        Static countSlider = findSlider("Show counts > X")
 
         sideView.Run()
 
-        sort.src = sideView.originaHistOutput
-        sort.Run()
-
-        Dim maxBins = sort.dst1.Get(Of Single)(0, 1)
-        Dim threshold = maxBins * percentSlider.value / 100
-        dst2 = sideView.originaHistOutput.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        Dim sideOrig = sideView.originaHistOutput.CountNonZero()
+        dst2 = sideView.originaHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
 
         topView.Run()
 
-        sort.src = topView.originaHistOutput
-        sort.Run()
+        dst1 = topView.originaHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
 
-        maxBins = sort.dst1.Get(Of Single)(0, 1)
-        threshold = maxBins * percentSlider.value / 100
-        dst1 = topView.originaHistOutput.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        label1 = "TopView showing all histogram entries > " + CStr(countSlider.value)
+        label2 = "SideView showing all histogram entries > " + CStr(countSlider.value)
     End Sub
 End Class
