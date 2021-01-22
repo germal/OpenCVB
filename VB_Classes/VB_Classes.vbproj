@@ -131,6 +131,7 @@
     <Compile Include="SLR.vb" />
     <Compile Include="StructuredDepth.vb" />
     <Compile Include="Texture.vb" />
+    <Compile Include="TView.vb" />
     <Compile Include="VBocvb.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />
     <Compile Include="AlphaChannel.vb" />

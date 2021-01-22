@@ -535,29 +535,6 @@ End Class
 
 
 
-Public Class PointCloud_HistBothViews
-    Inherits VBparent
-    Dim views As Histogram_ViewConcentrations
-    Public Sub New()
-        initParent()
-        views = New Histogram_ViewConcentrations
-
-        label1 = "Histogram Top View"
-        label2 = "Histogram Side View"
-        task.desc = "Show the histogram for both the side and top views"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        views.Run()
-        dst1 = views.dst1
-        dst2 = views.dst2
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class PointCloud_FrustrumTop

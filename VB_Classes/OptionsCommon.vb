@@ -60,7 +60,7 @@ Public Class OptionsCommon_Depth
         Static saveFuseCount = fuseCount
         Static fuseFrames As New List(Of cv.Mat)
         If saveFuseCount <> fuseCount Then
-            fuseFrames = New List(Of cv.Mat)
+            fuseFrames.clear()
             saveFuseCount = fuseCount
         End If
 

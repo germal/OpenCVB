@@ -1151,7 +1151,7 @@ Public Class Histogram_TopView2D
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public originaHistOutput As New cv.Mat
+    Public originalHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Public cmat As PointCloud_ColorizeTop
     Public resizeHistOutput As Boolean = True
@@ -1176,10 +1176,10 @@ Public Class Histogram_TopView2D
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, originaHistOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
-        originaHistOutput = originaHistOutput.Flip(cv.FlipMode.X)
-        histOutput = originaHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        originalHistOutput = originalHistOutput.Flip(cv.FlipMode.X)
+        histOutput = originalHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
@@ -1203,7 +1203,7 @@ Public Class Histogram_SideView2D
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Public originaHistOutput As New cv.Mat
+    Public originalHistOutput As New cv.Mat
     Public cmat As PointCloud_ColorizeSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
@@ -1229,9 +1229,9 @@ Public Class Histogram_SideView2D
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, originaHistOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
-        histOutput = originaHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        histOutput = originalHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         If standalone Or task.intermediateReview = caller Then
@@ -1558,38 +1558,3 @@ End Class
 
 
 
-Public Class Histogram_ViewConcentrations
-    Inherits VBparent
-    Public sideView As Histogram_SideView2D
-    Public topView As Histogram_TopView2D
-    Dim hist As Histogram_Basics
-    Public Sub New()
-        initParent()
-
-        hist = New Histogram_Basics
-        sideView = New Histogram_SideView2D
-        topView = New Histogram_TopView2D
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Show counts > X", 0, 300, 10)
-        End If
-        task.desc = "Highlight the top X percent of histogram concentrations"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static countSlider = findSlider("Show counts > X")
-
-        sideView.Run()
-
-        Dim sideOrig = sideView.originaHistOutput.CountNonZero()
-        dst2 = sideView.originaHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-
-        topView.Run()
-
-        dst1 = topView.originaHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-
-        label1 = "TopView showing all histogram entries > " + CStr(countSlider.value)
-        label2 = "SideView showing all histogram entries > " + CStr(countSlider.value)
-    End Sub
-End Class
