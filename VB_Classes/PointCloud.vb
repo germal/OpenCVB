@@ -1595,39 +1595,43 @@ Public Class PointCloud_BackProjectTopView
         For Each obj In view.viewObjects
             rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
         Next
-        Dim colorBump = CInt(255 / rectList.Count)
+        If rectList.Count > 0 Then
+            Dim colorBump = CInt(255 / rectList.Count)
 
-        Static minSlider = findSlider("InRange Min Depth (mm)")
-        If ocvb.frameCount = 0 Then minSlider.Value = 1
-        Dim minVal = minSlider.value
+            Static minSlider = findSlider("InRange Min Depth (mm)")
+            If ocvb.frameCount = 0 Then minSlider.Value = 1
+            Dim minVal = minSlider.value
 
-        Dim split = view.measureTop.topView.gCloud.dst2.Split()
-        Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst1 = src
-        For i = 0 To rectList.Count - 1
-            Dim r = rectList.ElementAt(i).Value
-            If r.Width > 0 And r.Height > 0 Then
-                Dim minDepth = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height
-                Dim maxDepth = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height
+            Dim split = view.measureTop.topView.gCloud.dst2.Split()
+            Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = src
+            For i = 0 To rectList.Count - 1
+                Dim r = rectList.ElementAt(i).Value
+                If r.Width > 0 And r.Height > 0 Then
+                    Dim minDepth = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height
+                    Dim maxDepth = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height
 
-                Dim minWidth = ocvb.maxZ * r.X / dst2.Width - ocvb.sideFrustrumAdjust
-                Dim maxWidth = ocvb.maxZ * (r.X + r.Width) / dst2.Width - ocvb.sideFrustrumAdjust
+                    Dim minWidth = ocvb.maxZ * r.X / dst2.Width - ocvb.sideFrustrumAdjust
+                    Dim maxWidth = ocvb.maxZ * (r.X + r.Width) / dst2.Width - ocvb.sideFrustrumAdjust
 
-                Dim mask32f = New cv.Mat
+                    Dim mask32f = New cv.Mat
 
-                cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
-                Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                    cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
+                    Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-                cv.Cv2.InRange(split(0), minWidth, maxWidth, mask32f)
-                Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
-                cv.Cv2.BitwiseAnd(mask, hMask, mask)
+                    cv.Cv2.InRange(split(0), minWidth, maxWidth, mask32f)
+                    Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                    cv.Cv2.BitwiseAnd(mask, hMask, mask)
 
-                colorMask.SetTo((i * colorBump) Mod 255, mask)
-            End If
-        Next
-        palette.src = colorMask
-        palette.Run()
-        dst1 = palette.dst1
+                    colorMask.SetTo((i * colorBump) Mod 255, mask)
+                End If
+            Next
+            palette.src = colorMask
+            palette.Run()
+            dst1 = palette.dst1
+        Else
+            ocvb.trueText("No objects found")
+        End If
     End Sub
 End Class
 
@@ -1662,37 +1666,42 @@ Public Class PointCloud_BackProjectSideView
         For Each obj In view.viewObjects
             rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
         Next
-        Dim colorBump = CInt(255 / rectList.Count)
 
-        Static minSlider = findSlider("InRange Min Depth (mm)")
-        Dim minVal = minSlider.value
+        If rectList.Count > 0 Then
+            Dim colorBump = CInt(255 / rectList.Count)
 
-        Dim split = view.measureSide.sideView.gCloud.dst2.Split()
-        Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst1 = src
-        For i = 0 To rectList.Count - 1
-            Dim r = rectList.ElementAt(i).Value
-            If r.Width > 0 And r.Height > 0 Then
-                Dim minDepth = ocvb.maxZ * r.X / dst2.Width
-                Dim maxDepth = ocvb.maxZ * (r.X + r.Width) / dst2.Width
+            Static minSlider = findSlider("InRange Min Depth (mm)")
+            Dim minVal = minSlider.value
 
-                Dim minHeight = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height - ocvb.sideFrustrumAdjust
-                Dim maxHeight = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height - ocvb.sideFrustrumAdjust
+            Dim split = view.measureSide.sideView.gCloud.dst2.Split()
+            Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = src
+            For i = 0 To rectList.Count - 1
+                Dim r = rectList.ElementAt(i).Value
+                If r.Width > 0 And r.Height > 0 Then
+                    Dim minDepth = ocvb.maxZ * r.X / dst2.Width
+                    Dim maxDepth = ocvb.maxZ * (r.X + r.Width) / dst2.Width
 
-                Dim mask32f = New cv.Mat
+                    Dim minHeight = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height - ocvb.sideFrustrumAdjust
+                    Dim maxHeight = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height - ocvb.sideFrustrumAdjust
 
-                cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
-                Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                    Dim mask32f = New cv.Mat
 
-                cv.Cv2.InRange(split(1), minHeight, maxHeight, mask32f)
-                Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
-                cv.Cv2.BitwiseAnd(mask, hMask, mask)
+                    cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
+                    Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-                colorMask.SetTo((i * colorBump) Mod 255, mask)
-            End If
-        Next
-        palette.src = colorMask
-        palette.Run()
-        dst1 = palette.dst1
+                    cv.Cv2.InRange(split(1), minHeight, maxHeight, mask32f)
+                    Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                    cv.Cv2.BitwiseAnd(mask, hMask, mask)
+
+                    colorMask.SetTo((i * colorBump) Mod 255, mask)
+                End If
+            Next
+            palette.src = colorMask
+            palette.Run()
+            dst1 = palette.dst1
+        Else
+            ocvb.trueText("No objects found")
+        End If
     End Sub
 End Class

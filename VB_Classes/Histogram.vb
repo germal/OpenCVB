@@ -1151,6 +1151,7 @@ Public Class Histogram_TopView2D
     Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
+    Public originaHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Public cmat As PointCloud_ColorizeTop
     Public resizeHistOutput As Boolean = True
@@ -1175,10 +1176,10 @@ Public Class Histogram_TopView2D
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, originaHistOutput, 2, histSize, ranges)
 
-        histOutput = histOutput.Flip(cv.FlipMode.X)
-        histOutput = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+        originaHistOutput = originaHistOutput.Flip(cv.FlipMode.X)
+        histOutput = originaHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
@@ -1559,8 +1560,8 @@ End Class
 
 Public Class Histogram_ViewConcentrations
     Inherits VBparent
-    Public sideview As Histogram_SideView2D
-    Public topview As Histogram_TopView2D
+    Public sideView As Histogram_SideView2D
+    Public topView As Histogram_TopView2D
     Dim hist As Histogram_Basics
     Dim sort As Transform_SortReshape
     Public Sub New()
@@ -1577,33 +1578,33 @@ Public Class Histogram_ViewConcentrations
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Show top percent X100", 1, 100, 10)
-            sliders.setupTrackBar(1, "Percent range to use as threshold", 1, 100, 90)
+            sliders.setupTrackBar(1, "Top percent range to use", 1, 100, 5)
         End If
+        label1 = "Top View highest concentration"
+        label2 = "Side View highest concentration"
         task.desc = "Highlight the top X percent of histogram concentrations"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        sideview.Run()
-        dst1 = sideview.dst1
+        Static histBinSlider = findSlider("Histogram Bins")
+        Static percentSlider = findSlider("Top percent range to use")
 
-        Dim origHist = sideview.originaHistOutput
+        sideView.Run()
 
-        sort.src = origHist
+        sort.src = sideView.originaHistOutput
         sort.Run()
 
-        Static histBinSlider = findSlider("Histogram Bins")
         Dim maxBins = sort.dst1.Get(Of Single)(0, 1)
+        Dim threshold = maxBins * percentSlider.value / 100
+        dst2 = sideView.originaHistOutput.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
 
-        Static percentSlider = findSlider("Percent range to use as threshold")
-        Dim threshold = maxBins - maxBins * percentSlider.value / 100
-        dst2 = origHist.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-        ' Dim rect = New cv.Rect(0, 1, 1, CInt(sort.dst1.Total * percentSlider.value / percentSlider.maximum))
-        'histBinSlider.value = If(maxBins < histBinSlider.maximum, maxBins, histBinSlider.maximum)
+        topView.Run()
 
-        'hist.plotHist.minRange = sort.sortVector(rect).Get(Of Single)(0, rect.Height)
-        'hist.plotHist.maxRange = maxBins
-        'hist.src = sort.sortVector(rect)
-        'hist.Run()
-        'dst2 = hist.dst1
+        sort.src = topView.originaHistOutput
+        sort.Run()
+
+        maxBins = sort.dst1.Get(Of Single)(0, 1)
+        threshold = maxBins * percentSlider.value / 100
+        dst1 = topView.originaHistOutput.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
     End Sub
 End Class
