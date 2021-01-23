@@ -253,7 +253,7 @@ Public Class ActiveTask : Implements IDisposable
 
         buildColors()
         ocvb.algName = algName
-        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\Python\" + algName
+        ocvb.pythonTaskName = ocvb.parms.homeDir + "Python\" + algName
         aOptions = New OptionsAll
         aOptions.Show()
         inrange = algoList.createAlgorithm("OptionsCommon_Depth")
