@@ -254,13 +254,14 @@ Public Class ActiveTask : Implements IDisposable
         buildColors()
         ocvb.algName = algName
         ocvb.pythonTaskName = ocvb.parms.homeDir + "Python\" + algName
-        If algName.EndsWith(".py") = False Then
-            aOptions = New OptionsAll
-            aOptions.Show()
-            inrange = algoList.createAlgorithm("OptionsCommon_Depth")
-            viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
-        End If
+
+        aOptions = New OptionsAll
+        If algName.EndsWith(".py") = False Then aOptions.Show()
+        inrange = algoList.createAlgorithm("OptionsCommon_Depth")
+        viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+
         algorithmObject = algoList.createAlgorithm(algName)
+
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Problem likely originated with the UIindexer.")

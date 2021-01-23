@@ -10,6 +10,7 @@ Public Class OptionsCommon_Depth
         initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
         standalone = False
+
         sliders.Setup(caller, 6)
         sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
@@ -18,6 +19,7 @@ Public Class OptionsCommon_Depth
         sliders.setupTrackBar(4, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
         sliders.setupTrackBar(5, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
         'sliders.setupTrackBar(6, "Number of depth frames to fuse (eliminates noise)", 1, 10, 2)
+
         task.minRangeSlider = sliders.trackbar(0) ' one of the few places we can be certain there is only one...
         task.maxRangeSlider = sliders.trackbar(1)
         task.thresholdSlider = sliders.trackbar(2)
@@ -100,10 +102,10 @@ Public Class OptionsCommon_Histogram
         sliders.setupTrackBar(2, "SideCameraPoint adjustment", -100, 100, 0)
         sliders.setupTrackBar(3, "TopCameraPoint adjustment", -10, 10, 0)
 
-        sideFrustrumSlider = findSlider("SideView Frustrum adjustment")
-        topFrustrumSlider = findSlider("TopView Frustrum adjustment")
-        cameraYSlider = findSlider("SideCameraPoint adjustment")
-        cameraXSlider = findSlider("TopCameraPoint adjustment")
+        sideFrustrumSlider = sliders.trackbar(0) ' findSlider("SideView Frustrum adjustment")
+        topFrustrumSlider = sliders.trackbar(1) 'findSlider("TopView Frustrum adjustment")
+        cameraYSlider = sliders.trackbar(2) ' findSlider("SideCameraPoint adjustment")
+        cameraXSlider = sliders.trackbar(3) 'findSlider("TopCameraPoint adjustment")
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
