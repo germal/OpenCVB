@@ -20,9 +20,10 @@ def PyStreamRun(OpenCVCode, scriptName):
     if MemMapLength == 0:
         MemMapLength = 400 # these values have been generously padded (on both sides) but if they grow...
         args.pipeName = 'OpenCVBImages0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
-        ocvb = os.getcwd() + '\\..\\..\\bin\Debug\OpenCVB.exe'
+        ocvb = os.getcwd() + '/../../bin/Debug/OpenCVB.exe'
         if os.path.exists(ocvb):
-            pid = os.spawnv(os.P_NOWAIT, ocvb, scriptName) # OpenCVB.exe will be run with this .py script
+            tupleArg = (' ', scriptName)
+            pid = os.spawnv(os.P_NOWAIT, ocvb, tupleArg) # OpenCVB.exe will be run with this .py script
 
     pipeName = '\\\\.\\pipe\\' + args.pipeName
     while True:
