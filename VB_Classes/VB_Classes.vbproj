@@ -378,6 +378,49 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="Python\consts\__pycache__\resource_paths.cpython-37.pyc" />
+    <None Include="Python\consts\__pycache__\resource_paths.cpython-39.pyc" />
+    <None Include="Python\consts\__pycache__\__init__.cpython-37.pyc" />
+    <None Include="Python\consts\__pycache__\__init__.cpython-39.pyc" />
+    <None Include="Python\data\deformed.xyz" />
+    <None Include="Python\data\original.xyz" />
+    <None Include="Python\depthai_helpers\__pycache__\age_gender_recognition_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\arg_manager.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\arg_manager.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\calibration_utils.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\cli_utils.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\cli_utils.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\config_manager.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\config_manager.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\deeplabv3p_person.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\emotion_recognition_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\landmarks_recognition_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\mobilenet_ssd_handler.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\mobilenet_ssd_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\object_tracker_handler.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\object_tracker_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\openpose2_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\openpose_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\tiny_yolo_v3_handler.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\utils.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\utils.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\version_check.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\version_check.cpython-39.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\__init__.cpython-37.pyc" />
+    <None Include="Python\depthai_helpers\__pycache__\__init__.cpython-39.pyc" />
+    <None Include="Python\models\mobilenet-ssd.blob" />
+    <None Include="Python\PythonDebug.pyproj" />
+    <None Include="Python\svm_scores.npz" />
+    <None Include="Python\__pycache__\common.cpython-37.pyc" />
+    <None Include="Python\__pycache__\digits.cpython-37.pyc" />
+    <None Include="Python\__pycache__\find_obj.cpython-37.pyc" />
+    <None Include="Python\__pycache__\gaussian_mix.cpython-37.pyc" />
+    <None Include="Python\__pycache__\projector_3d.cpython-37.pyc" />
+    <None Include="Python\__pycache__\PyStream.cpython-37.pyc" />
+    <None Include="Python\__pycache__\PyStream.cpython-39.pyc" />
+    <None Include="Python\__pycache__\TinyEKF.cpython-37.pyc" />
+    <None Include="Python\__pycache__\TrackerPlane_PS.cpython-37.pyc" />
+    <None Include="Python\__pycache__\transformations.cpython-37.pyc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CS_Classes\CS_Classes.csproj">
@@ -386,7 +429,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AddWeighted.py" />
+    <Content Include="AddWeightedTest.py" />
+    <Content Include="AddWeighted_Trackbar_PS.py" />
+    <Content Include="BGSubtract.py" />
     <Content Include="PhotoShop_60sTV.py" />
     <Content Include="PhotoShop_brightness.py" />
     <Content Include="Coherence.py" />
@@ -429,7 +474,6 @@
     <Content Include="OpticalFlow_PS.py" />
     <Content Include="TextDetect_ExtremalRegion.py" />
     <Content Include="Edges_Deriche.py" />
-    <Content Include="AddWeighted_Trackbar_PS.py" />
     <Content Include="Histogram_Color_PS.py" />
     <Content Include="Gabor_Filter.py" />
     <Content Include="GradientDescent.py" />
@@ -442,7 +486,6 @@
     <Content Include="PythonPackages.py" />
     <Content Include="PhotoShop_Contrast_Example1.py" />
     <Content Include="Draw_Basic.py" />
-    <Content Include="BGSubtract.py" />
     <Content Include="Polyline_Browse.py" />
     <Content Include="Histogram_BackProject_Demo1.py" />
     <Content Include="Histogram_BackProject_Demo2.py" />
@@ -568,6 +611,9 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>5.0.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Python\.vs\PythonDebug\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

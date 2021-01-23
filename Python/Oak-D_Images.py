@@ -20,6 +20,7 @@ cam_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
 xout_left = pipeline.createXLinkOut()
 xout_left.setStreamName('left')
 cam_left.out.link(xout_left.input)
+
 xout_right = pipeline.createXLinkOut()
 xout_right.setStreamName('right')
 cam_right.out.link(xout_right.input)
@@ -36,6 +37,12 @@ xout_rgb = pipeline.createXLinkOut()
 xout_rgb.setStreamName("rgb")
 cam_rgb.preview.link(xout_rgb.input)
 
+# Create a node that will produce the depth map
+depth = pipeline.createStereoDepth()
+depth.setConfidenceThreshold(200)
+cam_left.out.link(depth.left)
+cam_right.out.link(depth.right)
+
 # Pipeline defined, now the device is assigned and pipeline is started
 device = dai.Device(pipeline)
 device.startPipeline()
@@ -43,13 +50,19 @@ device.startPipeline()
 # Output queues will be used to get the grayscale frames from the outputs defined above
 q_left = device.getOutputQueue(name="left", maxSize=4, blocking=False)
 q_right = device.getOutputQueue(name="right", maxSize=4, blocking=False)
-q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
+q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
+q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
 
 frame_left = None
 frame_right = None
+frame = None
 
 while True:
     in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
+    #in_depth = q_rgb.get()
+    ## data is originally represented as a flat 1D array, it needs to be converted into HxW form
+    #frame = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
+    #frame = np.ascontiguousarray(frame)
 
     # instead of get (blocking) used tryGet (nonblocking) which will return the available data or None otherwise
     in_left = q_left.tryGet()
@@ -71,12 +84,16 @@ while True:
     frame_rgb = np.ascontiguousarray(frame_rgb)
     # frame is transformed and ready to be shown
     cv2.imshow("rgb", frame_rgb)
+    
+    if frame is not None:
+        cv2.imshow("disparity", frame)
 
     # show the frames if available
     if frame_left is not None:
         cv2.imshow("left", frame_left)
     if frame_right is not None:
         cv2.imshow("right", frame_right)
+
 
     if cv2.waitKey(1) == ord('q'):
         break
