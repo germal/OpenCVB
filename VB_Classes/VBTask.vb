@@ -253,7 +253,7 @@ Public Class ActiveTask : Implements IDisposable
 
         buildColors()
         ocvb.algName = algName
-        ocvb.pythonTaskName = ocvb.parms.homeDir + "Python\" + algName
+        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\" + algName
 
         aOptions = New OptionsAll
         If algName.EndsWith(".py") = False Then aOptions.Show()

@@ -2,11 +2,11 @@
 Imports System.Text.RegularExpressions
 Module UI_GeneratorMain
     Sub Main()
-        Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../vb_classes")
+        Dim VBcodeDir As New DirectoryInfo(CurDir() + "/../../vb_classes/")
         Dim fileNames As New List(Of String)
         Dim fileEntries As String() = Directory.GetFiles(VBcodeDir.FullName)
 
-        Dim pythonAppDir As New IO.DirectoryInfo(VBcodeDir.FullName + "/../Python/")
+        Dim pythonAppDir As New IO.DirectoryInfo(VBcodeDir.FullName)
 
         ' we only want to review the python files that are included in the VB_Classes Project.  Other Python files may be support modules or just experiments.
         Dim projFile As New FileInfo(VBcodeDir.FullName + "/VB_Classes.vbproj")
@@ -19,7 +19,7 @@ Module UI_GeneratorMain
                     line = Mid(line, startName + Len("Include="""))
                     Dim endName = InStr(line, """")
                     line = Mid(line, 1, endName - 1)
-                    Dim pyFilename = New FileInfo(VBcodeDir.FullName + "/../Python/" + line)
+                    Dim pyFilename = New FileInfo(VBcodeDir.FullName + "/" + line)
                     fileNames.Add(pyFilename.FullName)
                 End If
             End If
