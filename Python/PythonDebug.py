@@ -1,99 +1,50 @@
-#!/usr/bin/env python3
-
-import cv2
-import depthai as dai
 import numpy as np
+import cv2 as cv
+import sys, getopt
 
-# Start defining a pipeline
-pipeline = dai.Pipeline()
+# local modules
+from common import clock, draw_str
+title_window = 'Facedetect_PS.py'
 
-# Define a source - two mono (grayscale) cameras
-cam_left = pipeline.createMonoCamera()
-cam_left.setBoardSocket(dai.CameraBoardSocket.LEFT)
-cam_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+def detect(img, cascade):
+    rects = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=10, minSize=(20, 20),
+                                     flags=cv.CASCADE_SCALE_IMAGE)
+    if len(rects) == 0:
+        return []
+    rects[:,2:] += rects[:,:2]
+    return rects
 
-cam_right = pipeline.createMonoCamera()
-cam_right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
-cam_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+def draw_rects(img, rects, color):
+    for x1, y1, x2, y2 in rects:
+        cv.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
-# Create outputs
-xout_left = pipeline.createXLinkOut()
-xout_left.setStreamName('left')
-cam_left.out.link(xout_left.input)
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
+    global cascade, nested
+    gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
+    gray = cv.equalizeHist(gray)
 
-xout_right = pipeline.createXLinkOut()
-xout_right.setStreamName('right')
-cam_right.out.link(xout_right.input)
+    t = clock()
+    rects = detect(gray, cascade)
+    vis = imgRGB.copy()
+    draw_rects(vis, rects, (0, 255, 0))
+    if not nested.empty():
+        for x1, y1, x2, y2 in rects:
+            roi = gray[y1:y2, x1:x2]
+            vis_roi = vis[y1:y2, x1:x2]
+            subrects = detect(roi.copy(), nested)
+            draw_rects(vis_roi, subrects, (255, 0, 0))
+    dt = clock() - t
 
-# Define a source - color camera
-cam_rgb = pipeline.createColorCamera()
-cam_rgb.setPreviewSize(1280, 720)
-cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
-cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-cam_rgb.setInterleaved(False)
+    draw_str(vis, (20, 20), 'time: %.1f ms' % (dt*1000))
+    cv.imshow('facedetect', vis)
 
-# Create output
-xout_rgb = pipeline.createXLinkOut()
-xout_rgb.setStreamName("rgb")
-cam_rgb.preview.link(xout_rgb.input)
+if __name__ == '__main__':
+    print('This example works only occasionally!  Same face model in C# works ok when face is vertical.')
+    cascade_fn = "../opencv/data/haarcascades/haarcascade_frontalface_default.xml"
+    nested_fn  = "../opencv/data/haarcascades/haarcascade_eye.xml"
 
-# Create a node that will produce the depth map
-depth = pipeline.createStereoDepth()
-depth.setConfidenceThreshold(200)
-cam_left.out.link(depth.left)
-cam_right.out.link(depth.right)
+    cascade = cv.CascadeClassifier(cv.samples.findFile(cascade_fn))
+    nested = cv.CascadeClassifier(cv.samples.findFile(nested_fn))
 
-# Pipeline defined, now the device is assigned and pipeline is started
-device = dai.Device(pipeline)
-device.startPipeline()
-
-# Output queues will be used to get the grayscale frames from the outputs defined above
-q_left = device.getOutputQueue(name="left", maxSize=4, blocking=False)
-q_right = device.getOutputQueue(name="right", maxSize=4, blocking=False)
-q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
-q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
-
-frame_left = None
-frame_right = None
-frame = None
-
-while True:
-    in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
-    #in_depth = q_rgb.get()
-    ## data is originally represented as a flat 1D array, it needs to be converted into HxW form
-    #frame = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
-    #frame = np.ascontiguousarray(frame)
-
-    # instead of get (blocking) used tryGet (nonblocking) which will return the available data or None otherwise
-    in_left = q_left.tryGet()
-    in_right = q_right.tryGet()
-
-    if in_left is not None:
-        # if the data from the left camera is available, transform the 1D data into a frame
-        frame_left = in_left.getData().reshape((in_left.getHeight(), in_left.getWidth())).astype(np.uint8)
-        frame_left = np.ascontiguousarray(frame_left)
-
-    if in_right is not None:
-        # if the data from the right camera is available, transform the 1D data into a frame
-        frame_right = in_right.getData().reshape((in_right.getHeight(), in_right.getWidth())).astype(np.uint8)
-        frame_right = np.ascontiguousarray(frame_right)
-
-    # data is originally represented as a flat 1D array, it needs to be converted into HxWxC form
-    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
-    frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
-    frame_rgb = np.ascontiguousarray(frame_rgb)
-    # frame is transformed and ready to be shown
-    cv2.imshow("rgb", frame_rgb)
-    
-    if frame is not None:
-        cv2.imshow("disparity", frame)
-
-    # show the frames if available
-    if frame_left is not None:
-        cv2.imshow("left", frame_left)
-    if frame_right is not None:
-        cv2.imshow("right", frame_right)
-
-
-    if cv2.waitKey(1) == ord('q'):
-        break
+    from PyStream import PyStreamRun
+    PyStreamRun(OpenCVCode, 'Facedetect_PS.py')

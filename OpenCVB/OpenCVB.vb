@@ -106,9 +106,11 @@ Public Class OpenCVB
             End If
             SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
             externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
+            HomeDir = New DirectoryInfo(CurDir() + "\..\")
+        Else
+            HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
         End If
 
-        HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
         setupRecentList()
 
         ' Camera DLL's are built in Release mode even when configured for Debug (performance while debugging an algorithm is much better).  
@@ -128,7 +130,7 @@ Public Class OpenCVB
             End If
         Next
 
-        Dim DebugDir = HomeDir.FullName + "\bin\Debug\"
+        Dim DebugDir = HomeDir.FullName + "bin\Debug\"
         updatePath(DebugDir, "Debug Version of any camera DLL's.")
 
         Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
@@ -609,7 +611,7 @@ Public Class OpenCVB
     End Sub
     Private Sub loadAlgorithmComboBoxes()
         ' we always need the number of lines from the algorithmList.txt file (and it is not always read when working with a subset of algorithms.)
-        Dim AlgorithmListFileInfo = New FileInfo("../../Data/AlgorithmList.txt")
+        Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
         If AlgorithmListFileInfo.Exists = False Then
             MsgBox("The AlgorithmList.txt file is missing.  It should be in " + AlgorithmListFileInfo.FullName + "  Look at UI_Generator project.")
             End
@@ -624,7 +626,7 @@ Public Class OpenCVB
         End While
         sr.Close()
 
-        Dim AlgorithmMapFileInfo = New FileInfo("../../Data/AlgorithmMapToOpenCV.txt")
+        Dim AlgorithmMapFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmMapToOpenCV.txt")
         If AlgorithmMapFileInfo.Exists = False Then
             MsgBox("The AlgorithmMapToOpenCV.txt file is missing.  Look at Index Project that creates the mapping of algorithms to OpenCV keywords.")
             End
@@ -645,7 +647,7 @@ Public Class OpenCVB
     End Sub
     Private Sub OpenCVkeyword_SelectedIndexChanged(sender As Object, e As EventArgs) Handles OpenCVkeyword.SelectedIndexChanged
         If OpenCVkeyword.Text = "<All>" Or OpenCVkeyword.Text = "<All using recorded data>" Then
-            Dim AlgorithmListFileInfo = New FileInfo("../../Data/AlgorithmList.txt")
+            Dim AlgorithmListFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmList.txt")
             Dim sr = New StreamReader(AlgorithmListFileInfo.FullName)
 
             Dim infoLine = sr.ReadLine
@@ -848,20 +850,20 @@ Public Class OpenCVB
             PausePlayButton.Text = "Pause"
             pauseAlgorithmThread = False
             If saveTestAllState Then testAllButton_Click(sender, e)
-            PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
+            PausePlayButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
         Else
             PausePlayButton.Text = "Run"
             pauseAlgorithmThread = True
             saveTestAllState = TestAllTimer.Enabled
             If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
-            PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButtonRun.png")
+            PausePlayButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/PauseButtonRun.png")
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         If TestAllButton.Text = "Test All" Then
             AlgorithmTestCount = 0
             TestAllButton.Text = "Stop Test"
-            TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/StopTest.png")
+            TestAllButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
             If logActive Then logAlgorithms = New StreamWriter("C:\Temp\logAlgorithms.csv")
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
@@ -870,7 +872,7 @@ Public Class OpenCVB
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
             If logActive Then logAlgorithms.Close()
-            TestAllButton.Image = Image.FromFile("../../OpenCVB/Data/testall.png")
+            TestAllButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/testall.png")
         End If
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -1111,7 +1113,7 @@ Public Class OpenCVB
         parms.homeDir = HomeDir.FullName
         parms.VTK_Present = VTK_Present
 
-        PausePlayButton.Image = Image.FromFile("../../OpenCVB/Data/PauseButton.png")
+        PausePlayButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
 
         Dim imgSize = New cv.Size(CInt(resolutionXY.Width * 2), CInt(resolutionXY.Height))
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)

@@ -40,8 +40,8 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 
 if __name__ == '__main__':
     print('This example works only occasionally!  Same face model in C# works ok when face is vertical.')
-    cascade_fn = "../../opencv/data/haarcascades/haarcascade_frontalface_default.xml"
-    nested_fn  = "../../opencv/data/haarcascades/haarcascade_eye.xml"
+    cascade_fn = "../opencv/data/haarcascades/haarcascade_frontalface_default.xml"
+    nested_fn  = "../opencv/data/haarcascades/haarcascade_eye.xml"
 
     cascade = cv.CascadeClassifier(cv.samples.findFile(cascade_fn))
     nested = cv.CascadeClassifier(cv.samples.findFile(nested_fn))

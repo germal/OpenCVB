@@ -432,6 +432,7 @@
     <Content Include="AddWeightedTest.py" />
     <Content Include="AddWeighted_Trackbar_PS.py" />
     <Content Include="BGSubtract.py" />
+    <Content Include="Facedetect_PS.py" />
     <Content Include="PhotoShop_60sTV.py" />
     <Content Include="PhotoShop_brightness.py" />
     <Content Include="Coherence.py" />
@@ -469,7 +470,6 @@
     <Content Include="OpticalFlow2_PS.py" />
     <Content Include="Tracker_MOSSE_PS.py" />
     <Content Include="SVM_Digits_PS.py" />
-    <Content Include="Facedetect_PS.py" />
     <Content Include="Laplacian_PyramidFilter_PS.py" />
     <Content Include="OpticalFlow_PS.py" />
     <Content Include="TextDetect_ExtremalRegion.py" />
