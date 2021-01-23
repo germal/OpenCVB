@@ -40,7 +40,7 @@ def coherence_filter(img, sigma = 11, str_sigma = 11, blend = 0.5, iter_n = 4):
 
 def main():
     import sys
-    src = cv.imread('../../Data/baboon.jpg')
+    src = cv.imread('../Data/baboon.jpg')
 
     def update():
         sigma = cv.getTrackbarPos('sigma', 'control')*2+1

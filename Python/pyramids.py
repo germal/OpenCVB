@@ -11,7 +11,7 @@ def main(argv):
     * [ESC] -> Close program
     """)
     ## [load]
-    filename = argv[0] if len(argv) > 0 else '../../Data/chicky_512.png'
+    filename = argv[0] if len(argv) > 0 else '../Data/chicky_512.png'
 
     # Load the image
     src = cv.imread(cv.samples.findFile(filename))

@@ -10,14 +10,14 @@ scenename = "rs1_normals"
 detector = cv.ppf_match_3d_PPF3DDetector(0.025, 0.05)
 
 print('Loading model...')
-pc = cv.ppf_match_3d.loadPLYSimple("../../Data/%s.ply" % modelname, 1)
+pc = cv.ppf_match_3d.loadPLYSimple("../Data/%s.ply" % modelname, 1)
 
 
 print('Training...')
 detector.trainModel(pc)
 
 print('Loading scene...')
-pcTest = cv.ppf_match_3d.loadPLYSimple("../../Data/%s.ply" % scenename, 1)
+pcTest = cv.ppf_match_3d.loadPLYSimple("../Data/%s.ply" % scenename, 1)
 
 Mbox("Done", 'ICP matching is known to fail so halting...  Needs investigation...', 1)
 

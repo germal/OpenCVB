@@ -78,5 +78,5 @@ if __name__ == '__main__':
     try:
         fn = sys.argv[1]
     except:
-        fn = '../../Data/fruits.jpg'
+        fn = '../Data/fruits.jpg'
     App(cv.samples.findFile(fn)).run()

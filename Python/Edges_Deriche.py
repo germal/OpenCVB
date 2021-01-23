@@ -43,7 +43,7 @@ class Filtrage:
         self.alpha=x
     def run(self):
         # Load the source image
-        self.filename = "../../Data/corridor.jpg"
+        self.filename = "../Data/corridor.jpg"
         self.img=cv.imread(self.filename,cv.IMREAD_GRAYSCALE)
         if self.img is None:
             print ('cannot read file')

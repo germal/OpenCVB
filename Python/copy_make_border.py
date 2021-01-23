@@ -15,7 +15,7 @@ def main(argv):
     window_name = "copyMakeBorder Demo"
     ## [variables]
     ## [load]
-    imageName = argv[0] if len(argv) > 0 else '../../Data/lena.jpg'
+    imageName = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
 
     # Loads an image
     src = cv.imread(cv.samples.findFile(imageName), cv.IMREAD_COLOR)

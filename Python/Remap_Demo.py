@@ -30,10 +30,10 @@ def update_map(ind, map_x, map_y):
             map_y[:,j] = [map_y.shape[0]-y for y in range(map_y.shape[0])]
 
 parser = argparse.ArgumentParser(description='Code for Remapping tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='../../Data/chicky_512.png')
+parser.add_argument('--input', help='Path to input image.', default='../Data/chicky_512.png')
 args = parser.parse_args()
 
-src = cv.imread("../../Data/starry_night.jpg")
+src = cv.imread("../Data/starry_night.jpg")
 
 map_x = np.zeros((src.shape[0], src.shape[1]), dtype=np.float32)
 map_y = np.zeros((src.shape[0], src.shape[1]), dtype=np.float32)

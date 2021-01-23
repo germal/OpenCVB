@@ -151,7 +151,7 @@ def main():
     args, dummy = getopt.getopt(sys.argv[1:], '', ['model=', 'data=', 'load=', 'save='])
     args = dict(args)
     args.setdefault('--model', 'svm')
-    args.setdefault('--data', '../../Data/letter-recognition.data')
+    args.setdefault('--data', '../Data/letter-recognition.data')
 
     datafile = cv.samples.findFile(args['--data'])
 

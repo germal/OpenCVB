@@ -1,22 +1,34 @@
 import cv2 as cv
 
-alpha_slider_max = 100
-title_window = 'AddWeighted_Trackbar_PS.py - Linear Blend'
-saveAlpha = 50
-    
-def on_trackbar(val):
-    global saveAlpha # force the callback to reference the global variable.
-    saveAlpha = val 
+alpha = 0.5
+ 
+try:
+    raw_input          # Python 2
+except NameError:
+    raw_input = input  # Python 3
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
-    alpha = saveAlpha / alpha_slider_max
-    beta = ( 1.0 - alpha )
-    dst1 = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
-    cv.imshow(title_window, dst1)
-
-cv.namedWindow(title_window)
-trackbar_name = 'Alpha'
-cv.createTrackbar(trackbar_name, title_window , saveAlpha, alpha_slider_max, on_trackbar)
-on_trackbar(saveAlpha)
-from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'AddWeighted_Trackbar_PS.py')
+print(''' Simple Linear Blender
+-----------------------
+#* Enter alpha [0.0-1.0]: ''')
+input_alpha = 0.5 #float(raw_input().strip())
+if 0 <= alpha <= 1:
+    alpha = input_alpha
+# [load]
+src1 = cv.imread(cv.samples.findFile('../Data/LinuxLogo.jpg'))
+src2 = cv.imread(cv.samples.findFile('../Data/WindowsLogo.jpg'))
+# [load]
+if src1 is None:
+    print("Error loading src1")
+    exit(-1)
+elif src2 is None:
+    print("Error loading src2")
+    exit(-1)
+# [blend_images]
+beta = (1.0 - alpha)
+dst = cv.addWeighted(src1, alpha, src2, beta, 0.0)
+# [blend_images]
+# [display]
+cv.imshow('dst', dst)
+cv.waitKey()
+# [display]
+cv.destroyAllWindows()

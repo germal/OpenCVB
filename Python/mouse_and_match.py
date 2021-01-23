@@ -52,7 +52,7 @@ class App():
 
     def run(self):
         parser = argparse.ArgumentParser(description='Demonstrate mouse interaction with images')
-        parser.add_argument("-i","--input", default='../../Data/', help="Input directory.")
+        parser.add_argument("-i","--input", default='../Data/', help="Input directory.")
         args = parser.parse_args()
         path = args.input
 

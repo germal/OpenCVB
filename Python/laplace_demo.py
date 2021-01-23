@@ -15,7 +15,7 @@ def main(argv):
     # [variables]
 
     # [load]
-    imageName = argv[0] if len(argv) > 0 else '../../Data/lena.jpg'
+    imageName = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
 
     src = cv.imread(cv.samples.findFile(imageName), cv.IMREAD_COLOR) # Load an image
 

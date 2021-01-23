@@ -16,7 +16,7 @@ def main(argv):
 
     print_help()
 
-    filename = argv[0] if len(argv) > 0 else '../../Data/lena.jpg'
+    filename = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
 
     I = cv.imread(cv.samples.findFile(filename), cv.IMREAD_GRAYSCALE)
     if I is None:

@@ -16,7 +16,7 @@ def main(argv):
     cv.namedWindow(title_window, cv.WINDOW_AUTOSIZE)
 
     # Load the source image
-    imageName = argv[0] if len(argv) > 0 else '../../Data/lena.jpg'
+    imageName = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
 
     global src
     src = cv.imread(cv.samples.findFile(imageName))

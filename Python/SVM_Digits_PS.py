@@ -78,7 +78,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 
 
 if __name__ == '__main__':
-    classifier_fn = '../../Data/digits_svm.dat'
+    classifier_fn = '../Data/digits_svm.dat'
     if not os.path.exists(classifier_fn):
         print('"%s" not found, run digits.py first' % classifier_fn)
         exit

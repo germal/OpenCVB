@@ -5,7 +5,7 @@ title_window = 'Hough_example2.py'
 
 def main(argv):
     ## [load]
-    default_file = '../../Data/smarties.png'
+    default_file = '../Data/smarties.png'
     filename = argv[0] if len(argv) > 0 else default_file
 
     # Loads an image

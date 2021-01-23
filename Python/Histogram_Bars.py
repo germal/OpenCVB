@@ -5,7 +5,7 @@ title_window = 'Histogram_Bars.py'
 
 ## [Load image]
 parser = argparse.ArgumentParser(description='Code for Histogram Calculation tutorial.')
-parser.add_argument('--input', help='Path to input image.', default='../../Data/lena.jpg')
+parser.add_argument('--input', help='Path to input image.', default='../Data/lena.jpg')
 args = parser.parse_args()
 
 src = cv.imread(cv.samples.findFile(args.input))

@@ -13,8 +13,8 @@ max_Trackbar = 5
 def main(argv):
     global img
     global templ
-    img = cv.imread("../../Data/Messi5.jpg", cv.IMREAD_COLOR)
-    templ = cv.imread("../../Data/Messi1.jpg", cv.IMREAD_COLOR)
+    img = cv.imread("../Data/Messi5.jpg", cv.IMREAD_COLOR)
+    templ = cv.imread("../Data/Messi1.jpg", cv.IMREAD_COLOR)
 
     if (len(sys.argv) > 3):
         global use_mask

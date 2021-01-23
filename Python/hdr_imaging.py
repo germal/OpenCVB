@@ -18,7 +18,7 @@ def loadExposureSeq(path):
 
 print("Working on the HDR image.  (takes a few seconds.)")
 ## [Load images and exposure times]
-images, times = loadExposureSeq('../../Data')
+images, times = loadExposureSeq('../Data')
 ## [Load images and exposure times]
 
 ## [Estimate camera response]

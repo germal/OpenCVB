@@ -130,7 +130,7 @@ class DNA:
         self.imgAngles = img_gradient[1]
         
         #OTHER
-        self.brushes = self.preload_brushes('../../Data/GeneticDrawingBrushes/', self.maxBrushNumber)
+        self.brushes = self.preload_brushes('../Data/GeneticDrawingBrushes/', self.maxBrushNumber)
         self.sampling_mask = sampling_mask
         
         #CACHE
@@ -336,11 +336,11 @@ class DNA:
 
 if __name__ == '__main__':
     #load the example image and set the generator for 100 stages with 20 generations each
-    gen = GeneticDrawing('../../Data/GeneticDrawingExample.jpg', seed=time.time())
+    gen = GeneticDrawing('../Data/GeneticDrawingExample.jpg', seed=time.time())
     out = gen.generate(100, 20)
     
     #load a custom mask and set a smaller brush size for finer details
-    gen.sampling_mask = cv2.cvtColor(cv2.imread("../../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)
+    gen.sampling_mask = cv2.cvtColor(cv2.imread("../Data/GeneticDrawingMask.jpg"), cv2.COLOR_BGR2GRAY)
     gen.brushesRange = [[0.05, 0.1], [0.1, 0.2]]
     #keep drawing on top of our previous result
     out = gen.generate(40, 30)

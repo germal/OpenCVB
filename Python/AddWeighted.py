@@ -14,8 +14,8 @@ input_alpha = 0.5 #float(raw_input().strip())
 if 0 <= alpha <= 1:
     alpha = input_alpha
 # [load]
-src1 = cv.imread(cv.samples.findFile('../../Data/LinuxLogo.jpg'))
-src2 = cv.imread(cv.samples.findFile('../../Data/WindowsLogo.jpg'))
+src1 = cv.imread(cv.samples.findFile('../Data/LinuxLogo.jpg'))
+src2 = cv.imread(cv.samples.findFile('../Data/WindowsLogo.jpg'))
 # [load]
 if src1 is None:
     print("Error loading src1")

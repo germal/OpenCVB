@@ -48,7 +48,7 @@ def sharpen(my_image):
 ## [basic_method]
 
 def main(argv):
-    filename = '../../Data/lena.jpg'
+    filename = '../Data/lena.jpg'
 
     img_codec = cv.IMREAD_COLOR
     if argv:

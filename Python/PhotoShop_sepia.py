@@ -17,5 +17,5 @@ def sepia(img):
     cv2.destroyAllWindows()
     
 if __name__ == "__main__":
-    img = cv2.imread("../../Data/image.jpg")
+    img = cv2.imread("../Data/image.jpg")
     sepia(img)

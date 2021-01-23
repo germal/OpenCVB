@@ -33,7 +33,7 @@ from common import clock, mosaic
 
 SZ = 20 # size of each digit is SZ x SZ
 CLASS_N = 10
-DIGITS_FN = '../../Data/digits.png'
+DIGITS_FN = '../Data/digits.png'
 
 def split2d(img, cell_size, flatten=True):
     h, w = img.shape[:2]
