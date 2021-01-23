@@ -888,6 +888,7 @@ Public Class OpenCVB
         Static lastCameraFrame As Integer
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
         If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
+        If AvailableAlgorithms.Text.Contains(".py") Then meActivateNeeded = False
         If AvailableAlgorithms.Text.StartsWith("OpenGL") Then meActivateNeeded = False
         If AvailableAlgorithms.Text.StartsWith("VTK") Then meActivateNeeded = False
         If meActivateNeeded Then
