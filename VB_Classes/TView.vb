@@ -3,6 +3,7 @@ Public Class TView_Basics
     Inherits VBparent
     Public sideView As Histogram_SideView2D
     Public topView As Histogram_TopView2D
+    Public split() As cv.Mat
     Dim hist As Histogram_Basics
     Public Sub New()
         initParent()
@@ -22,6 +23,8 @@ Public Class TView_Basics
         Static countSlider = findSlider("Show counts > X")
 
         sideView.Run()
+
+        split = sideView.gCloud.dst2.Split()
 
         Dim sideOrig = sideView.originalHistOutput.CountNonZero()
         dst2 = sideView.originalHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
@@ -49,7 +52,7 @@ Public Class TView_FloodFill
     Inherits VBparent
     Public floodSide As FloodFill_Basics
     Public floodTop As FloodFill_Basics
-    Public tView As TView_Basics
+    Public tBasics As TView_Basics
     Public Sub New()
         initParent()
 
@@ -57,7 +60,7 @@ Public Class TView_FloodFill
         floodTop = New FloodFill_Basics
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
-        tView = New TView_Basics
+        tBasics = New TView_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -69,9 +72,9 @@ Public Class TView_FloodFill
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        tView.Run()
-        dst1 = tView.dst1.Clone
-        dst2 = tView.dst2.Clone
+        tBasics.Run()
+        dst1 = tBasics.dst1.Clone
+        dst2 = tBasics.dst2.Clone
 
         Static fuseSlider = findSlider("Fuse X frames")
         Static saveFuseCount = -1
@@ -89,8 +92,8 @@ Public Class TView_FloodFill
             cv.Cv2.Max(fuseSide(i), dst1, dst1)
             cv.Cv2.Max(fuseTop(i), dst2, dst2)
         Next
-        fuseSide.Add(tView.dst1.Clone)
-        fuseTop.Add(tView.dst2.Clone)
+        fuseSide.Add(tBasics.dst1.Clone)
+        fuseTop.Add(tBasics.dst2.Clone)
 
         floodTop.src = dst1
         floodTop.Run()
@@ -112,12 +115,12 @@ End Class
 Public Class TView_Centroids
     Inherits VBparent
     Public knn As KNN_Basics
-    Dim tview As TView_FloodFill
+    Dim tflood As TView_FloodFill
     Public queryPoints As New List(Of cv.Point2f)
     Public responses As New List(Of cv.Point2f)
     Public Sub New()
         initParent()
-        tview = New TView_FloodFill
+        tflood = New TView_FloodFill
         knn = New KNN_Basics
 
         label1 = "Top view with centroids in yellow"
@@ -127,30 +130,30 @@ Public Class TView_Centroids
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        tview.Run()
-        dst1 = tview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = tview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        tflood.Run()
+        dst1 = tflood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = tflood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        For i = 0 To tview.floodTop.centroids.Count - 1
-            dst1.Circle(tview.floodTop.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
+        For i = 0 To tflood.floodTop.centroids.Count - 1
+            dst1.Circle(tflood.floodTop.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
         Next
-        For i = 0 To tview.floodSide.centroids.Count - 1
-            dst2.Circle(tview.floodSide.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
+        For i = 0 To tflood.floodSide.centroids.Count - 1
+            dst2.Circle(tflood.floodSide.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
         Next
 
-        Static saveTopQueries = New List(Of cv.Point2f)(tview.floodTop.centroids)
+        Static saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
         knn.knnQT.trainingPoints = saveTopQueries
-        knn.knnQT.queryPoints = New List(Of cv.Point2f)(tview.floodTop.centroids)
+        knn.knnQT.queryPoints = New List(Of cv.Point2f)(tflood.floodTop.centroids)
         knn.Run()
         For i = 0 To knn.neighbors.Rows - 1
-            Dim qPoint = tview.floodTop.centroids(i)
+            Dim qPoint = tflood.floodTop.centroids(i)
             cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
             Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
             Dim cpt = New cv.Point(CInt(pt.x), CInt(pt.y))
             dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
         Next
 
-        saveTopQueries = New List(Of cv.Point2f)(tview.floodTop.centroids)
+        saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
     End Sub
 End Class
 
@@ -164,12 +167,12 @@ End Class
 Public Class TView_Rectangles
     Inherits VBparent
     Dim mOverLap As Rectangle_MultiOverlap
-    Dim tview As TView_FloodFill
+    Public tflood As TView_FloodFill
     Public Sub New()
         initParent()
 
         mOverLap = New Rectangle_MultiOverlap
-        tview = New TView_FloodFill
+        tflood = New TView_FloodFill
 
         label1 = "Top view with rectangles in yellow"
         label2 = "Side view with rectangles in yellow"
@@ -178,20 +181,128 @@ Public Class TView_Rectangles
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        tview.Run()
-        dst1 = tview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = tview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        tflood.Run()
+        dst1 = tflood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = tflood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        mOverLap.inputRects = New List(Of cv.Rect)(tview.floodTop.rects)
+        mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodTop.rects)
         mOverLap.Run()
         For i = 0 To mOverLap.outputRects.Count - 1
             dst1.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
         Next
 
-        mOverLap.inputRects = New List(Of cv.Rect)(tview.floodSide.rects)
+        mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodSide.rects)
         mOverLap.Run()
         For i = 0 To mOverLap.outputRects.Count - 1
             dst2.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class TView_Colorized
+    Inherits VBparent
+    Dim tView As TView_Rectangles
+    Dim cmatSide As PointCloud_ColorizeSide
+    Dim cmatTop As PointCloud_ColorizeTop
+    Dim mats As Mat_4Click
+    Public Sub New()
+        initParent()
+        mats = New Mat_4Click
+        cmatSide = New PointCloud_ColorizeSide
+        cmatTop = New PointCloud_ColorizeTop
+        tView = New TView_Rectangles
+        label2 = "Click a quadrant in dst1 to show it in dst2 "
+        task.desc = "Colorize the back and side views"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        tView.Run()
+        mats.mat(0) = tView.dst1.Clone
+        mats.mat(1) = tView.dst2.Clone
+
+        cmatTop.src = tView.dst1
+        cmatTop.Run()
+        mats.mat(2) = cmatTop.dst1
+
+        cmatSide.src = tView.dst2
+        cmatSide.Run()
+        mats.mat(3) = cmatSide.dst1
+
+        mats.Run()
+        dst1 = mats.dst1
+        dst2 = mats.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class TView_BackProjectTop
+    Inherits VBparent
+    Dim tFlood As TView_FloodFill
+    Dim palette As Palette_Basics
+    Public Sub New()
+        initParent()
+        tFlood = New TView_FloodFill
+        palette = New Palette_Basics
+        task.desc = "Backproject the side and top views into the image view"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        tFlood.Run()
+        dst2 = tFlood.dst1
+
+        Dim rectlist = tFlood.floodTop.rects
+
+        If rectlist.Count > 0 Then
+            Dim colorBump = CInt(255 / rectlist.Count)
+
+            Static minSlider = findSlider("InRange Min Depth (mm)")
+            Dim minVal = minSlider.value
+
+            Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst1 = src
+            For i = 0 To rectlist.Count - 1
+                Dim r = rectlist(i)
+                If r.Width > 0 And r.Height > 0 Then
+                    Dim minDepth = ocvb.maxZ * r.X / dst2.Width
+                    Dim maxDepth = ocvb.maxZ * (r.X + r.Width) / dst2.Width
+
+                    Dim minHeight = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height - ocvb.sideFrustrumAdjust
+                    Dim maxHeight = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height - ocvb.sideFrustrumAdjust
+
+                    Dim mask32f = New cv.Mat
+
+                    cv.Cv2.InRange(tFlood.tBasics.split(2), minDepth, maxDepth, mask32f)
+                    Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+                    cv.Cv2.InRange(tFlood.tBasics.split(1), minHeight, maxHeight, mask32f)
+                    Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                    cv.Cv2.BitwiseAnd(mask, hMask, mask)
+
+                    colorMask.SetTo((i * colorBump) Mod 255, mask)
+                End If
+            Next
+            palette.src = colorMask
+            palette.Run()
+            dst1 = palette.dst1
+        Else
+            ocvb.trueText("No objects found")
+        End If
     End Sub
 End Class
