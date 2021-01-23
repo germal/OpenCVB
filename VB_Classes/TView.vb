@@ -92,13 +92,13 @@ Public Class TView_FloodFill
         fuseSide.Add(tView.dst1.Clone)
         fuseTop.Add(tView.dst2.Clone)
 
-        floodSide.src = dst1
-        floodSide.Run()
-        dst1 = floodSide.dst1
-
-        floodTop.src = dst2
+        floodTop.src = dst1
         floodTop.Run()
-        dst2 = floodTop.dst1
+        dst1 = floodTop.dst1
+
+        floodSide.src = dst2
+        floodSide.Run()
+        dst2 = floodSide.dst1
     End Sub
 End Class
 
@@ -109,22 +109,23 @@ End Class
 
 
 
-Public Class TView_Tracker
+Public Class TView_Centroids
     Inherits VBparent
-    Public knn As KNN_Learn
+    Public knn As KNN_Basics
     Dim tview As TView_FloodFill
     Public queryPoints As New List(Of cv.Point2f)
     Public responses As New List(Of cv.Point2f)
     Public Sub New()
         initParent()
-        If standalone Then tview = New TView_FloodFill
-        knn = New KNN_Learn
+        tview = New TView_FloodFill
+        knn = New KNN_Basics
 
+        label1 = "Top view with centroids in yellow"
+        label2 = "Side view with centroids in yellow"
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim neighbors As New cv.Mat
 
         tview.Run()
         dst1 = tview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -132,14 +133,65 @@ Public Class TView_Tracker
 
         For i = 0 To tview.floodTop.centroids.Count - 1
             dst1.Circle(tview.floodTop.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
-            dst1.Circle(tview.floodTop.floodPoints(i), ocvb.dotSize, cv.Scalar.Red, -1)
         Next
         For i = 0 To tview.floodSide.centroids.Count - 1
             dst2.Circle(tview.floodSide.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
-            dst2.Circle(tview.floodSide.floodPoints(i), ocvb.dotSize, cv.Scalar.Red, -1)
         Next
 
-        queryPoints = New List(Of cv.Point2f)(tview.floodTop.centroids)
-        Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, queryPoints.ToArray)
+        Static saveTopQueries = New List(Of cv.Point2f)(tview.floodTop.centroids)
+        knn.knnQT.trainingPoints = saveTopQueries
+        knn.knnQT.queryPoints = New List(Of cv.Point2f)(tview.floodTop.centroids)
+        knn.Run()
+        For i = 0 To knn.neighbors.Rows - 1
+            Dim qPoint = tview.floodTop.centroids(i)
+            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
+            Dim cpt = New cv.Point(CInt(pt.x), CInt(pt.y))
+            dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        Next
+
+        saveTopQueries = New List(Of cv.Point2f)(tview.floodTop.centroids)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class TView_Rectangles
+    Inherits VBparent
+    Dim mOverLap As Rectangle_MultiOverlap
+    Dim tview As TView_FloodFill
+    Public Sub New()
+        initParent()
+
+        mOverLap = New Rectangle_MultiOverlap
+        tview = New TView_FloodFill
+
+        label1 = "Top view with rectangles in yellow"
+        label2 = "Side view with rectangles in yellow"
+        task.desc = "Use KNN to track the query points"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        tview.Run()
+        dst1 = tview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = tview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        mOverLap.inputRects = New List(Of cv.Rect)(tview.floodTop.rects)
+        mOverLap.Run()
+        For i = 0 To mOverLap.outputRects.Count - 1
+            dst1.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
+        Next
+
+        mOverLap.inputRects = New List(Of cv.Rect)(tview.floodSide.rects)
+        mOverLap.Run()
+        For i = 0 To mOverLap.outputRects.Count - 1
+            dst2.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
+        Next
     End Sub
 End Class

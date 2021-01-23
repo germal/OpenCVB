@@ -155,6 +155,7 @@ Public Class Rectangle_Overlap
             rect2 = draw.rectangles(1)
         End If
 
+        enclosingRect = New cv.Rect
         If rect1.IntersectsWith(rect2) Then
             enclosingRect = rect1.Union(rect2)
             dst2.Rectangle(enclosingRect, cv.Scalar.White, 4)
@@ -367,5 +368,66 @@ Public Class Rectangle_Union
         If allRect.X + allRect.Width >= dst1.Width Then allRect.Width = dst1.Width - allRect.X
         If allRect.Y + allRect.Height >= dst1.Height Then allRect.Height = dst1.Height - allRect.Y
         dst1.Rectangle(allRect, cv.Scalar.Red, 2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Rectangle_MultiOverlap
+    Inherits VBparent
+    Public inputRects As New List(Of cv.Rect)
+    Public outputRects As New List(Of cv.Rect)
+    Public Sub New()
+        initParent()
+        task.desc = "Given a group of rectangles, merge all the rectangles that overlap"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then
+            Static draw = New Rectangle_Basics
+            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles (unchecked will draw rectangles)")
+            rotatedCheck.Enabled = False
+
+            Static countSlider = findSlider("Rectangle Count")
+            countSlider.Value = msRNG.Next(2, 10)
+
+            label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
+
+            draw.Run()
+            dst1 = draw.dst1
+            inputRects = draw.rectangles
+        End If
+
+        Do
+            Dim unionAdded = False
+            For i = 0 To inputRects.Count - 1
+                Dim r1 = inputRects(i)
+                Dim rectCount = inputRects.Count
+                For j = i + 1 To inputRects.Count - 1
+                    Dim r2 = inputRects(j)
+                    If r1.IntersectsWith(r2) Then
+                        inputRects.RemoveAt(j)
+                        inputRects.RemoveAt(i)
+                        inputRects.Add(r1.Union(r2))
+                        unionAdded = True
+                        Exit For
+                    End If
+                Next
+                If rectCount <> inputRects.Count Then Exit For
+            Next
+            If unionAdded = False Then Exit Do
+        Loop
+        outputRects = inputRects
+        If standalone Then
+            For Each r In outputRects
+                dst1.Rectangle(r, cv.Scalar.Yellow, 2)
+            Next
+        End If
     End Sub
 End Class

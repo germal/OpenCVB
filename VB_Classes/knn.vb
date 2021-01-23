@@ -785,6 +785,7 @@ Public Class KNN_Learn
             '''''''''' learn = New KNN_Learn
             '''''''''' Dim neighbors As New cv.Mat
             '''''''''' Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {)
+            '''''''''' knn.run()
             '''''''''' learn.knn.FindNearest(queries, 1, neighbors)
         End If
 
