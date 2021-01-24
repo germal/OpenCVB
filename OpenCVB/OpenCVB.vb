@@ -481,7 +481,6 @@ Public Class OpenCVB
             Name = CType(info("Caption"), String) ' Get the name of the device.'
             ' toss the uninteresting names so we can find the cameras.
             If Name Is Nothing Then Continue For
-
             If firstCall = 0 Then
                 ' why do this?  So enumeration can tell us about the cameras present in a short list.
                 If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or

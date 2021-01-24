@@ -1,23 +1,8 @@
-from pathlib import Path
-
 import cv2
 import depthai as dai
 import numpy as np
-import subprocess
 
 pipeline = dai.Pipeline()
-
-cam = pipeline.createColorCamera()
-cam.setBoardSocket(dai.CameraBoardSocket.RGB)
-cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-
-#videoEncoder = pipeline.createVideoEncoder()
-#videoEncoder.setDefaultProfilePreset(1920, 1080, 30, dai.VideoEncoderProperties.Profile.H265_MAIN)
-#cam.video.link(videoEncoder.input)
-
-#videoOut = pipeline.createXLinkOut()
-#videoOut.setStreamName('h265')
-#videoEncoder.bitstream.link(videoOut.input)
 
 left = pipeline.createMonoCamera()
 left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
@@ -35,8 +20,12 @@ depth.setRectifyEdgeFillColor(0) # Black, to better see the cutout
 left.out.link(depth.left)
 right.out.link(depth.right)
 
-detection_nn = pipeline.createNeuralNetwork()
-detection_nn.setBlobPath(str((Path(__file__).parent / Path('models/mobilenet-ssd.blob')).resolve().absolute()))
+# Define a source - color camera
+cam_rgb = pipeline.createColorCamera()
+cam_rgb.setPreviewSize(1280, 720)
+cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
+cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+cam_rgb.setInterleaved(False)
 
 xout_depth = pipeline.createXLinkOut()
 xout_depth.setStreamName("depth")
@@ -47,56 +36,35 @@ xout_left.setStreamName("rect_left")
 depth.rectifiedLeft.link(xout_left.input)
 
 xout_right = pipeline.createXLinkOut()
-xout_right.setStreamName('right')
+xout_right.setStreamName('rect_right')
 depth.rectifiedRight.link(xout_right.input)
 
-#manip = pipeline.createImageManip()
-#manip.setResize(300, 300)
-## The NN model expects BGR input. By default ImageManip output type would be same as input (gray in this case)
-#manip.setFrameType(dai.RawImgFrame.Type.BGR888p)
-#depth.rectifiedLeft.link(manip.inputImage)
-#manip.out.link(detection_nn.input)
-
-#xout_manip = pipeline.createXLinkOut()
-#xout_manip.setStreamName("manip")
-#manip.out.link(xout_manip.input)
-
-#xout_nn = pipeline.createXLinkOut()
-#xout_nn.setStreamName("nn")
-#detection_nn.out.link(xout_nn.input)
+# Create output
+xout_rgb = pipeline.createXLinkOut()
+xout_rgb.setStreamName("rgb")
+cam_rgb.preview.link(xout_rgb.input)
 
 device = dai.Device(pipeline)
 device.startPipeline()
 
 q_left = device.getOutputQueue(name="rect_left", maxSize=8, blocking=False)
 q_right = device.getOutputQueue(name="rect_right", maxSize=8, blocking=False)
-#q_manip = device.getOutputQueue(name="manip", maxSize=8, blocking=False)
 q_depth = device.getOutputQueue(name="depth", maxSize=8, blocking=False)
-#q_nn = device.getOutputQueue(name="nn", maxSize=8, blocking=False)
-#q_rgb_enc = device.getOutputQueue(name="h265", maxSize=30, blocking=True)
+q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
 
 frame_left = None
 frame_right = None
 frame_manip = None
 frame_depth = None
-bboxes = []
-
 
 def frame_norm(frame, bbox):
     return (np.clip(np.array(bbox), 0, 1) * np.array([*frame.shape[:2], *frame.shape[:2]])[::-1]).astype(int)
 
-#videoFile = open('video.h265','wb')
-
 while True:
+    in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
     in_left = q_left.tryGet()
     in_right = q_right.tryGet()
-    #in_manip = q_manip.tryGet()
-    #in_nn = q_nn.tryGet()
     in_depth = q_depth.tryGet()
-    #in_rgb_enc = q_rgb_enc.tryGet()
-
-    #if in_rgb_enc is not None: 
-    #    in_rgb_enc.getData().tofile(videoFile)
 
     if in_left is not None:
         shape = (in_left.getHeight(), in_left.getWidth())
@@ -107,17 +75,6 @@ while True:
         shape = (in_right.getHeight(), in_right.getWidth())
         frame_right = in_right.getData().reshape(shape).astype(np.uint8)
         frame_right = np.ascontiguousarray(frame_right)
-
-    #if in_manip is not None:
-    #    shape = (3, in_manip.getHeight(), in_manip.getWidth())
-    #    frame_manip = in_manip.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
-    #    frame_manip = np.ascontiguousarray(frame_manip)
-
-    #if in_nn is not None:
-    #    bboxes = np.array(in_nn.getFirstLayerFp16())
-    #    bboxes = bboxes[:np.where(bboxes == -1)[0][0]]
-    #    bboxes = bboxes.reshape((bboxes.size // 7, 7))
-    #    bboxes = bboxes[bboxes[:, 2] > 0.5][:, 3:7]
 
     if in_depth is not None:
         frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
@@ -130,20 +87,15 @@ while True:
     if frame_right is not None:
         cv2.imshow("rectif_right", frame_right)
 
-    if frame_manip is not None:
-        for raw_bbox in bboxes:
-            bbox = frame_norm(frame_manip, raw_bbox)
-            cv2.rectangle(frame_manip, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 2)
-        cv2.imshow("manip", frame_manip)
-
     if frame_depth is not None:
         cv2.imshow("depth", frame_depth)
 
+    # data is originally represented as a flat 1D array, it needs to be converted into HxWxC form
+    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
+    frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
+    frame_rgb = np.ascontiguousarray(frame_rgb)
+    # frame is transformed and ready to be shown
+    cv2.imshow("rgb", frame_rgb)
+
     if cv2.waitKey(1) == ord('q'):
         break
-
-#videoFile.close()
-
-#print("Converting stream file (.h265) into a video file (.mp4)...")
-#subprocess.check_call("ffmpeg -framerate 30 -i video.h265 -c copy video.mp4".split())
-#print("Conversion successful, check video.mp4")

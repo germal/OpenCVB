@@ -1,50 +1,101 @@
+import cv2
+import depthai as dai
 import numpy as np
-import cv2 as cv
-import sys, getopt
 
-# local modules
-from common import clock, draw_str
-title_window = 'Facedetect_PS.py'
+pipeline = dai.Pipeline()
 
-def detect(img, cascade):
-    rects = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=10, minSize=(20, 20),
-                                     flags=cv.CASCADE_SCALE_IMAGE)
-    if len(rects) == 0:
-        return []
-    rects[:,2:] += rects[:,:2]
-    return rects
+left = pipeline.createMonoCamera()
+left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+left.setBoardSocket(dai.CameraBoardSocket.LEFT)
 
-def draw_rects(img, rects, color):
-    for x1, y1, x2, y2 in rects:
-        cv.rectangle(img, (x1, y1), (x2, y2), color, 2)
+right = pipeline.createMonoCamera()
+right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
-    global cascade, nested
-    gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
-    gray = cv.equalizeHist(gray)
+depth = pipeline.createStereoDepth()
+depth.setConfidenceThreshold(200)
+# Note: the rectified streams are horizontally mirrored by default
+depth.setOutputRectified(True)
+depth.setRectifyEdgeFillColor(0) # Black, to better see the cutout
+left.out.link(depth.left)
+right.out.link(depth.right)
 
-    t = clock()
-    rects = detect(gray, cascade)
-    vis = imgRGB.copy()
-    draw_rects(vis, rects, (0, 255, 0))
-    if not nested.empty():
-        for x1, y1, x2, y2 in rects:
-            roi = gray[y1:y2, x1:x2]
-            vis_roi = vis[y1:y2, x1:x2]
-            subrects = detect(roi.copy(), nested)
-            draw_rects(vis_roi, subrects, (255, 0, 0))
-    dt = clock() - t
+# Define a source - color camera
+cam_rgb = pipeline.createColorCamera()
+cam_rgb.setPreviewSize(1280, 720)
+cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
+cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+cam_rgb.setInterleaved(False)
 
-    draw_str(vis, (20, 20), 'time: %.1f ms' % (dt*1000))
-    cv.imshow('facedetect', vis)
+xout_depth = pipeline.createXLinkOut()
+xout_depth.setStreamName("depth")
+depth.disparity.link(xout_depth.input)
 
-if __name__ == '__main__':
-    print('This example works only occasionally!  Same face model in C# works ok when face is vertical.')
-    cascade_fn = "../opencv/data/haarcascades/haarcascade_frontalface_default.xml"
-    nested_fn  = "../opencv/data/haarcascades/haarcascade_eye.xml"
+xout_left = pipeline.createXLinkOut()
+xout_left.setStreamName("rect_left")
+depth.rectifiedLeft.link(xout_left.input)
 
-    cascade = cv.CascadeClassifier(cv.samples.findFile(cascade_fn))
-    nested = cv.CascadeClassifier(cv.samples.findFile(nested_fn))
+xout_right = pipeline.createXLinkOut()
+xout_right.setStreamName('rect_right')
+depth.rectifiedRight.link(xout_right.input)
 
-    from PyStream import PyStreamRun
-    PyStreamRun(OpenCVCode, 'Facedetect_PS.py')
+# Create output
+xout_rgb = pipeline.createXLinkOut()
+xout_rgb.setStreamName("rgb")
+cam_rgb.preview.link(xout_rgb.input)
+
+device = dai.Device(pipeline)
+device.startPipeline()
+
+q_left = device.getOutputQueue(name="rect_left", maxSize=8, blocking=False)
+q_right = device.getOutputQueue(name="rect_right", maxSize=8, blocking=False)
+q_depth = device.getOutputQueue(name="depth", maxSize=8, blocking=False)
+q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
+
+frame_left = None
+frame_right = None
+frame_manip = None
+frame_depth = None
+
+def frame_norm(frame, bbox):
+    return (np.clip(np.array(bbox), 0, 1) * np.array([*frame.shape[:2], *frame.shape[:2]])[::-1]).astype(int)
+
+while True:
+    in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
+    in_left = q_left.tryGet()
+    in_right = q_right.tryGet()
+    in_depth = q_depth.tryGet()
+
+    if in_left is not None:
+        shape = (in_left.getHeight(), in_left.getWidth())
+        frame_left = in_left.getData().reshape(shape).astype(np.uint8)
+        frame_left = np.ascontiguousarray(frame_left)
+
+    if in_right is not None:
+        shape = (in_right.getHeight(), in_right.getWidth())
+        frame_right = in_right.getData().reshape(shape).astype(np.uint8)
+        frame_right = np.ascontiguousarray(frame_right)
+
+    if in_depth is not None:
+        frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
+        frame_depth = np.ascontiguousarray(frame_depth)
+        frame_depth = cv2.applyColorMap(frame_depth, cv2.COLORMAP_JET)
+
+    if frame_left is not None:
+        cv2.imshow("rectif_left", frame_left)
+
+    if frame_right is not None:
+        cv2.imshow("rectif_right", frame_right)
+
+    if frame_depth is not None:
+        cv2.imshow("depth", frame_depth)
+
+    # data is originally represented as a flat 1D array, it needs to be converted into HxWxC form
+    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
+    frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
+    frame_rgb = np.ascontiguousarray(frame_rgb)
+    # frame is transformed and ready to be shown
+    cv2.imshow("rgb", frame_rgb)
+
+    if cv2.waitKey(1) == ord('q'):
+        break
