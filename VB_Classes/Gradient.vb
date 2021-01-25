@@ -47,8 +47,8 @@ Public Class Gradient_Depth
         Dim angle = New cv.Mat
         Dim x32f As New cv.Mat
         Dim y32f As New cv.Mat
-        sobel.dst1.ConvertTo(x32f, cv.MatType.CV_32F)
-        sobel.dst2.ConvertTo(y32f, cv.MatType.CV_32F)
+        sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
+        sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(dst2, cv.MatType.CV_8UC1)
@@ -116,8 +116,8 @@ Public Class Gradient_CartToPolar
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run()
 
-        basics.sobel.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-        basics.sobel.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
+        basics.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
+        basics.sobel.grayX.ConvertTo(dst2, cv.MatType.CV_32F)
 
         cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
         magnitude = magnitude.Normalize()
