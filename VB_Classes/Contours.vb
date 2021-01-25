@@ -345,8 +345,6 @@ Public Class Contours_Binarized
         initParent()
         edges = New Edges_BinarizedSobel
 
-        label1 = "Edges before finding small contours"
-        label2 = "Edges after highlighting small contours"
         task.desc = "Find contours in the Edges after binarized"
     End Sub
     Public Sub Run()

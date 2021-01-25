@@ -19,8 +19,8 @@ Public Class Gradient_Basics
         Dim angle = New cv.Mat
         Dim x32f As New cv.Mat
         Dim y32f As New cv.Mat
-        sobel.dst1.ConvertTo(x32f, cv.MatType.CV_32F)
-        sobel.dst2.ConvertTo(y32f, cv.MatType.CV_32F)
+        sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
+        sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
         cv.Cv2.Phase(x32f, y32f, angle)
         Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
         gray.ConvertTo(dst2, cv.MatType.CV_8UC1)
