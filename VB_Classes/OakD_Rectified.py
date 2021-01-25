@@ -79,7 +79,7 @@ while True:
     if in_depth is not None:
         frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
         frame_depth = np.ascontiguousarray(frame_depth)
-        frame_depth = cv2.applyColorMap(frame_depth, cv2.COLORMAP_JET)
+        frame_depth = cv2.applyColorMap(frame_depth, cv2.COLORMAP_HSV)
 
     if frame_left is not None:
         cv2.imshow("rectif_left", frame_left)

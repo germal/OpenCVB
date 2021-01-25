@@ -390,8 +390,8 @@
     <Content Include="AddWeighted_Trackbar_PS.py" />
     <Content Include="BGSubtract.py" />
     <Content Include="Facedetect_PS.py" />
-    <Content Include="Oak-D_Images.py" />
-    <Content Include="Oak-D_Rectified.py" />
+    <Content Include="OakD_Images.py" />
+    <Content Include="OakD_Rectified.py" />
     <Content Include="PhotoShop_60sTV.py" />
     <Content Include="PhotoShop_brightness.py" />
     <Content Include="Coherence.py" />

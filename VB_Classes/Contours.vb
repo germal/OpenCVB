@@ -27,8 +27,8 @@ Public Class Contours_Basics
             sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
         End If
 
+        label2 = "Contours_Basics with centroid in red"
         task.desc = "Demo options on FindContours."
-        label2 = "FindContours output"
     End Sub
     Public Sub setOptions()
         Static frm = findfrm("Contours_Basics Retrieval Mode Radio Options")
@@ -50,19 +50,27 @@ Public Class Contours_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         setOptions()
-        If standalone or task.intermediateReview = caller Then
-            If rotatedRect Is Nothing Then rotatedRect = New Rectangle_Rotated
-            Dim imageInput As New cv.Mat
-            rotatedRect.src = src
-            rotatedRect.Run()
-            imageInput = rotatedRect.dst1
-            If imageInput.Channels = 3 Then
-                dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
-            Else
-                dst1 = imageInput.ConvertScaleAbs(255)
-            End If
+        Static dontchange As Boolean
+        If task.mouseClickFlag And dontchange Then
+            dontchange = False
         Else
-            If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
+            If task.mouseClickFlag Then dontchange = True
+        End If
+        If dontchange = False Then
+            If standalone Or task.intermediateReview = caller Then
+                If rotatedRect Is Nothing Then rotatedRect = New Rectangle_Rotated
+                Dim imageInput As New cv.Mat
+                rotatedRect.src = src
+                rotatedRect.Run()
+                imageInput = rotatedRect.dst1
+                If imageInput.Channels = 3 Then
+                    dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+                Else
+                    dst1 = imageInput.ConvertScaleAbs(255)
+                End If
+            Else
+                If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
+            End If
         End If
 
         Dim contours0 As cv.Point()()
@@ -79,17 +87,27 @@ Public Class Contours_Basics
         Dim minArea = areaSlider.value
 
         contours.Clear()
-        For i = 0 To contours0.Length - 1
-            If cv.Cv2.ContourArea(contours0(i)) > minArea Then contours.Add(cv.Cv2.ApproxPolyDP(contours0(i), 3, True))
-        Next
-
         dst2.SetTo(0)
-        Dim cnt = contours.ToArray
+        Dim cnt = contours0.ToArray
         If retrievalMode = cv.RetrievalModes.FloodFill Then
             cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Else
-            cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
         End If
+
+        For i = 0 To contours0.Length - 1 Step 2
+            Dim m = cv.Cv2.Moments(contours0(i), False)
+            Dim pt = New cv.Point(m.M10 / m.M00, m.M01 / m.M00)
+
+            Dim area = cv.Cv2.ContourArea(contours0(i))
+            If area > minArea Then
+                contours.Add(cv.Cv2.ApproxPolyDP(contours0(i), 3, True))
+                dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst2, Format(area / 1000, "#0") + "k pixels", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+            Else
+                cv.Cv2.PutText(dst2, "too small", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+            End If
+        Next
     End Sub
 End Class
 
@@ -280,42 +298,6 @@ End Class
 
 
 
-
-
-
-Public Class Contours_Binarized
-    Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
-    Public Sub New()
-        initParent()
-        edges = New Edges_BinarizedSobel
-
-        label1 = "Edges before finding small contours"
-        label2 = "Edges after highlighting small contours"
-        task.desc = "Find contours in the Edges after binarized"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        edges.src = src
-        edges.Run()
-        dst1 = edges.dst2
-        dst2 = dst1.Clone
-
-        Dim contours As cv.Point()()
-        contours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-
-        For i = 0 To contours.Length - 1
-            Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-            Dim area = minRect.Size.Width * minRect.Size.Height
-            If area < 1000 Then drawRotatedRectangle(minRect, dst2, cv.Scalar.Gray)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 Public Class Contours_FindandDraw
     Inherits VBparent
     Dim rotatedRect As Rectangle_Rotated
@@ -354,13 +336,33 @@ End Class
 
 
 
-Public Class Contours_Union
+
+
+Public Class Contours_Binarized
     Inherits VBparent
+    Dim edges As Edges_BinarizedSobel
     Public Sub New()
         initParent()
-        task.desc = "Combine all the contours over a max value into a rectangle"
+        edges = New Edges_BinarizedSobel
+
+        label1 = "Edges before finding small contours"
+        label2 = "Edges after highlighting small contours"
+        task.desc = "Find contours in the Edges after binarized"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        edges.src = src
+        edges.Run()
+        dst1 = edges.dst2
+        dst2 = dst1.Clone
+
+        Dim contours As cv.Point()()
+        contours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+
+        For i = 0 To contours.Length - 1
+            Dim minRect = cv.Cv2.MinAreaRect(contours(i))
+            Dim area = minRect.Size.Width * minRect.Size.Height
+            If area < 1000 Then drawRotatedRectangle(minRect, dst2, cv.Scalar.Gray)
+        Next
     End Sub
 End Class

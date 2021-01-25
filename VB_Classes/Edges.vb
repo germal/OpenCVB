@@ -224,33 +224,6 @@ End Class
 
 
 
-Public Class Edges_LeftView
-    Inherits VBparent
-    Dim red As LeftRightView_Basics
-    Dim sobel As Edges_Sobel
-    Public Sub New()
-        initParent()
-        red = New LeftRightView_Basics()
-        sobel = New Edges_Sobel()
-        sobel.sliders.trackbar(0).Value = 5
-
-        task.desc = "Find the edges in the LeftViewimages."
-        label1 = "Edges in Left Image"
-        label2 = "Edges in Right Image (except on Kinect)"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        red.Run()
-        Dim leftView = red.dst1
-        sobel.src = red.dst2
-        sobel.Run()
-        dst2 = sobel.dst1.Clone()
-
-        sobel.src = leftView
-        sobel.Run()
-        dst1 = sobel.dst1
-    End Sub
-End Class
 
 
 
@@ -371,38 +344,6 @@ Public Class Edges_Deriche_CPP
     End Sub
 End Class
 
-
-
-
-
-
-
-'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_Sobel
-    Inherits VBparent
-    Public grayX As cv.Mat
-    Public grayY As cv.Mat
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
-        End If
-        task.desc = "Show Sobel edge detection with varying kernel sizes"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static ksizeSlider = findSlider("Sobel kernel Size")
-        Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
-        dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
-        Dim abs_grayX = grayX.ConvertScaleAbs()
-        grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
-        Dim abs_grayY = grayY.ConvertScaleAbs()
-        cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst1)
-    End Sub
-End Class
 
 
 
@@ -853,5 +794,137 @@ Public Class Edges_Combo
         dst1 = task.color
         dst1.SetTo(cv.Scalar.Red, edges2.dst2)
         dst1.SetTo(cv.Scalar.Yellow, edges1.dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edges_SobelLR
+    Inherits VBparent
+    Dim red As LeftRightView_Basics
+    Dim sobel As Edges_Sobel
+    Public Sub New()
+        initParent()
+        red = New LeftRightView_Basics()
+        sobel = New Edges_Sobel()
+        sobel.sliders.trackbar(0).Value = 5
+
+        task.desc = "Find the edges in the LeftViewimages."
+        label1 = "Edges in Left Image"
+        label2 = "Edges in Right Image (except on Kinect)"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        red.Run()
+        Dim leftView = red.dst1
+        sobel.src = red.dst2
+        sobel.Run()
+        dst2 = sobel.dst1.Clone()
+
+        sobel.src = leftView
+        sobel.Run()
+        dst1 = sobel.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edges_Sobel
+    Inherits VBparent
+    Public grayX As cv.Mat
+    Public grayY As cv.Mat
+    Public horizontalOnly As Boolean
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
+            sliders.setupTrackBar(1, "Threshold for Sobel results", 0, 254, 200)
+        End If
+        task.desc = "Show Sobel edge detection with varying kernel sizes"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static ksizeSlider = findSlider("Sobel kernel Size")
+        Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
+        dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
+        If horizontalOnly = False Then
+            Dim abs_grayX = grayX.ConvertScaleAbs()
+            grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
+            Dim abs_grayY = grayY.ConvertScaleAbs()
+            cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst1)
+        Else
+            dst1 = grayX.ConvertScaleAbs()
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edges_SobelHorizontal
+    Inherits VBparent
+    Dim edges As Edges_Sobel
+    Public Sub New()
+        initParent()
+        edges = New Edges_Sobel
+        edges.horizontalOnly = True
+        task.desc = "Find edges with Sobel only in the horizontal direction"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        edges.src = src
+        edges.Run()
+
+        Static thresholdSlider = findSlider("Threshold for Sobel results")
+        dst1 = edges.dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_SobelLRHorizontal
+    Inherits VBparent
+    Dim red As LeftRightView_Basics
+    Dim edges As Edges_SobelHorizontal
+    Public Sub New()
+        initParent()
+        edges = New Edges_SobelHorizontal
+        red = New LeftRightView_Basics
+        label1 = "Horizontal Sobel - Left View"
+        label1 = "Horizontal Sobel - Right View"
+        task.desc = "Isolate just the vertical edges in the left and right views."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        red.Run()
+
+        edges.src = red.dst2
+        edges.Run()
+        dst2 = edges.dst1.Clone
+
+        edges.src = red.dst1
+        edges.Run()
+        dst1 = edges.dst1.Clone
     End Sub
 End Class
