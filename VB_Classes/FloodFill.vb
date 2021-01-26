@@ -210,7 +210,7 @@ Public Class FloodFill_Top16_MT
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
         grid.Run()
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             For y = roi.Y To roi.Y + roi.Height - 1
                 For x = roi.X To roi.X + roi.Width - 1
@@ -252,7 +252,7 @@ Public Class FloodFill_Color_MT
         Dim vec255 = New cv.Vec3b(255, 255, 255)
         Dim vec0 = New cv.Vec3b(0, 0, 0)
         Dim regionCount As Integer = 0
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             For y = roi.Y To roi.Y + roi.Height - 1
                 For x = roi.X To roi.X + roi.Width - 1

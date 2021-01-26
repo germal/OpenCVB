@@ -113,7 +113,7 @@ Public Class Plane_Detect
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst1)
 
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim depthROI = task.depth32f(roi)
 
@@ -186,7 +186,7 @@ Public Class Plane_DetectDebug
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst1)
 
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim depthROI = task.depth32f(roi)
 

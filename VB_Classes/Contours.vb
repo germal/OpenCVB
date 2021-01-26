@@ -393,6 +393,7 @@ Public Class Contours_Binarized
             Dim lPoints = New List(Of List(Of cv.Point))
             lPoints.Add(cntList.ElementAt(i).Value.ToList)
             cv.Cv2.DrawContours(CType(dst2, cv.InputOutputArray), lPoints, 0, ocvb.scalarColors(i Mod 255), -1)
+            Dim c = ocvb.scalarColors(i Mod 255)
         Next
 
         'palette.src = gray

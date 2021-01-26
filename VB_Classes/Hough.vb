@@ -159,7 +159,7 @@ Public Class Hough_Lines_MT
         Dim thetaIn = sliders.trackbar(1).Value / 1000
         Dim threshold = sliders.trackbar(2).Value
 
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then

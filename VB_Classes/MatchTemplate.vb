@@ -234,7 +234,7 @@ Public Class MatchTemplate_Movement
         Dim updateCount As Integer
         mask.SetTo(0)
 
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim mean As Single = 0, stdev As Single = 0
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)

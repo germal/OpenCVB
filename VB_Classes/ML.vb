@@ -80,7 +80,7 @@ Public Class ML_FillRGBDepth_MT
         shadow.Run()
         grid.Run()
         Dim minLearnCount = 5
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
             Sub(roi)
                 task.depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.dst2(roi), task.depth32f(roi), src(roi), minLearnCount)
             End Sub)
@@ -169,7 +169,7 @@ Public Class ML_DepthFromColor_MT
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim predictedRegions As Integer
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
             Sub(roi)
                 Dim maskCount = roi.Width * roi.Height - mask(roi).CountNonZero()
                 If maskCount > 10 Then
@@ -417,7 +417,7 @@ Public Class ML_EdgeDepth_MT
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim predictedRegions As integer
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
             Sub(roi)
                 Dim maskCount = mask(roi).CountNonZero()
                 If maskCount = 0 Then ' if no bad pixels, then learn and predict

@@ -143,7 +143,7 @@ Public Class BGSubtract_Basics_MT
         Static correlationSlider = findSlider("Correlation Threshold X1000")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         Dim updateCount As Integer
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
             cv.Cv2.MatchTemplate(dst1(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)

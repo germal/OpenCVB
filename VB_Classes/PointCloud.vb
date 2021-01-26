@@ -366,7 +366,7 @@ Public Class PointCloud_Raw
         dst1 = src.EmptyClone.SetTo(cv.Scalar.White)
         dst2 = dst1.Clone()
         Dim black = New cv.Vec3b(0, 0, 0)
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
              Sub(roi)
                  For y = roi.Y To roi.Y + roi.Height - 1
                      For x = roi.X To roi.X + roi.Width - 1

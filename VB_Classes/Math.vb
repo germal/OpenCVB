@@ -236,7 +236,7 @@ Public Class Math_Stdev
 
         Static lastFrame As cv.Mat = dst1.Clone()
         Dim saveFrame As cv.Mat = dst1.Clone
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim mean As Single = 0, stdev As Single = 0
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)

@@ -416,7 +416,7 @@ Public Class kMeans_Color_MT
         End If
         grid.Run()
         Dim clusterCount = sliders.trackbar(0).Value
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim zeroDepth = task.depth32f(roi).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
             Dim color = src(roi).Clone()
@@ -510,7 +510,7 @@ Public Class kMeans_ColorDepth_MT
         grid.Run()
 
         Dim clusterCount = sliders.trackbar(0).Value
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
        Sub(roi)
            Dim rgb32f As New cv.Mat
            src(roi).ConvertTo(rgb32f, cv.MatType.CV_32FC3)

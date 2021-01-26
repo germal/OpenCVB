@@ -256,7 +256,7 @@ Public Class Mat_ImageXYZ_MT
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
           Sub(roi)
               xyzPlanes(2)(roi) = task.depth32f(roi)
           End Sub)

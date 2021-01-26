@@ -77,7 +77,7 @@ Public Class Sift_Basics_MT
         Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
 
         Dim numFeatures = numPointSlider.Value
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim left = leftView(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
             Dim right = rightView(roi).Clone()

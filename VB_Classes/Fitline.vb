@@ -72,7 +72,7 @@ Public Class Fitline_3DBasics_MT
 
         Dim lines As New List(Of cv.Line3D)
         Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
-        Parallel.ForEach(Of cv.Rect)(hlines.grid.roiList,
+        Parallel.ForEach(hlines.grid.roiList,
         Sub(roi)
             Dim depth = task.depth32f(roi)
             Dim fMask = mask(roi)

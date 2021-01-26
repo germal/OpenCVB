@@ -603,7 +603,7 @@ Public Class Depth_ColorizerVB_MT
 
         Dim maxHist = histogram(histSize - 1)
         If maxHist > 0 Then
-            Parallel.ForEach(Of cv.Rect)(grid.roiList,
+            Parallel.ForEach(grid.roiList,
            Sub(roi)
                Dim depth = src(roi)
                Dim rgbdata(src.Total) As cv.Vec3b
@@ -649,7 +649,7 @@ Public Class Depth_Colorizer_MT
         Dim farColor = New Single() {1, 0, 0}
 
         Dim range = task.inrange.maxval - task.inrange.minval
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
          Sub(roi)
              Dim depth = src(roi)
              Dim stride = depth.Width * 3
@@ -1111,13 +1111,13 @@ End Class
 Public Class Depth_NoiseRemovalMask
     Inherits VBparent
     Public noise As Depth_TooClose
-    Public flood As FloodFill_8bit
+    Public flood As FloodFill_8Bit
     Dim padSlider As System.Windows.Forms.TrackBar
     Public depth32fNoiseRemoved As New cv.Mat
     Public noiseMask As cv.Mat
     Public Sub New()
         initParent()
-        flood = New FloodFill_8bit()
+        flood = New FloodFill_8Bit()
         noise = New Depth_TooClose()
         padSlider = findSlider("Amount of depth padded to minimum depth (mm)")
         hideForm("Palette_BuildGradientColorMap Slider Options")
@@ -1316,7 +1316,7 @@ Public Class Depth_WorldXYZ_MT
         If depthUnitsMeters = False Then input = (input * 0.001).ToMat
         Dim multX = task.pointCloud.Width / input.Width
         Dim multY = task.pointCloud.Height / input.Height
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
               Sub(roi)
                   Dim xy As New cv.Point3f
                   For y = roi.Y To roi.Y + roi.Height - 1

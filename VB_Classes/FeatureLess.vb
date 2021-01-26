@@ -41,7 +41,7 @@ Public Class Featureless_Basics
 
         src.CopyTo(dst1)
         Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then mask(roi).SetTo(255)

@@ -466,66 +466,6 @@ End Class
 
 
 
-Public Class Edges_BinarizedSobel
-    Inherits VBparent
-    Dim edges As Edges_Sobel
-    Dim binarize As Binarize_Recurse
-    Public mats As Mat_4Click
-    Public Sub New()
-        initParent()
-        mats = New Mat_4Click
-
-        binarize = New Binarize_Recurse
-
-        edges = New Edges_Sobel
-
-        Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.Value = 5
-
-        label1 = "Edges between halves, lightest, darkest, and the combo"
-        task.desc = "Collect Sobel edges from binarized images"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-
-        binarize.src = src
-        binarize.Run()
-
-        edges.src = binarize.mats.mat(0) ' the light and dark halves
-        edges.Run()
-        mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        edges.src = binarize.mats.mat(1) ' the lightest of the light half
-        edges.Run()
-        mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
-
-        edges.src = binarize.mats.mat(3) ' the darkest of the dark half
-        edges.Run()
-        mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
-
-        mats.Run()
-        dst1 = mats.dst1
-        If mats.dst2.Channels = 3 Then
-            label2 = "Bitwise or of images 1-3 at left.  Click dst1."
-            dst2 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
-        Else
-            dst2 = mats.mat(quadrantIndex)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Edges_BinarizedBrightness
     Inherits VBparent
     Dim edges As Edges_BinarizedSobel
@@ -902,29 +842,151 @@ End Class
 
 
 
-Public Class Edges_SobelLRHorizontal
+Public Class Edges_SobelLRBinarized
     Inherits VBparent
     Dim red As LeftRightView_Basics
-    Dim edges As Edges_SobelHorizontal
+    Dim edges As Edges_BinarizedSobel
+    Dim addw As AddWeighted_Basics
     Public Sub New()
         initParent()
-        edges = New Edges_SobelHorizontal
+        addw = New AddWeighted_Basics
+        Dim weightSlider = findSlider("Weight")
+        weightSlider.Value = 75
+        edges = New Edges_BinarizedSobel
         red = New LeftRightView_Basics
+        Dim brightSlider = findSlider("brightness")
+        brightSlider.Value = 1
+
         label1 = "Horizontal Sobel - Left View"
-        label1 = "Horizontal Sobel - Right View"
-        task.desc = "Isolate just the vertical edges in the left and right views."
+        label2 = "Horizontal Sobel - Right View"
+        task.desc = "Isolate edges in the left and right views."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
+        If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
         red.Run()
 
         edges.src = red.dst2
         edges.Run()
-        dst2 = edges.dst1.Clone
+        addw.src = red.dst2
+        addw.src2 = edges.dst2
+        addw.Run()
+        dst2 = addw.dst1.Clone
 
         edges.src = red.dst1
         edges.Run()
-        dst1 = edges.dst1.Clone
+        addw.src = red.dst1
+        addw.src2 = edges.dst2.Clone
+        addw.Run()
+        dst1 = addw.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_BinarizedSobel
+    Inherits VBparent
+    Dim edges As Edges_Sobel
+    Dim binarize As Binarize_Recurse
+    Public mats As Mat_4Click
+    Public Sub New()
+        initParent()
+        mats = New Mat_4Click
+
+        binarize = New Binarize_Recurse
+
+        edges = New Edges_Sobel
+
+        Dim kernelSlider = findSlider("Sobel kernel Size")
+        kernelSlider.Value = 5
+
+        label1 = "Edges between halves, lightest, darkest, and the combo"
+        task.desc = "Collect Sobel edges from binarized images"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+
+        binarize.src = src
+        binarize.Run()
+
+        edges.src = binarize.mats.mat(0) ' the light and dark halves
+        edges.Run()
+        mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        edges.src = binarize.mats.mat(1) ' the lightest of the light half
+        edges.Run()
+        mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
+
+        edges.src = binarize.mats.mat(3) ' the darkest of the dark half
+        edges.Run()
+        mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
+
+        mats.Run()
+        dst1 = mats.dst1
+        If mats.dst2.Channels = 3 Then
+            label2 = "Bitwise or of images 1-3 at left.  Click dst1."
+            dst2 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        Else
+            dst2 = mats.mat(quadrantIndex)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Edges_Matching
+    Inherits VBparent
+    Dim lrViews As Edges_SobelLRBinarized
+    Dim grid As Thread_Grid
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid
+        lrViews = New Edges_SobelLRBinarized
+        task.desc = "Match edges in the left and right views to determine distance"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        grid.Run()
+
+        lrViews.Run()
+        dst1 = lrViews.dst1
+        dst2 = lrViews.dst2
+
+        Parallel.ForEach(grid.roiList,
+        Sub(roi)
+            'Dim correlations(32) As Single
+            'For i = 0 To correlations.Length - 1
+            '    ' cv.Cv2.MatchTemplate(dst1(roi), dst1(roi), correlationMat, matchOption)
+            'Next
+            'Dim mean As Single = 0, stdev As Single = 0
+            'cv.Cv2.MeanStdDev(task.depth32f(roi), mean, stdev, mask(roi))
+            'meanSeries.Set(Of Single)(i, meanIndex, mean)
+            'If ocvb.frameCount >= meanCount - 1 Then
+            '    cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
+            '    meanValues.Set(Of Single)(i, 0, mean)
+            '    stdValues.Set(Of Single)(i, 0, stdev)
+            'End If
+        End Sub)
+
+        dst1.SetTo(255, grid.gridMask)
+        dst2.SetTo(255, grid.gridMask)
     End Sub
 End Class
