@@ -1490,10 +1490,10 @@ Public Class Depth_PunchBlob
         Static lastContoursCount As Integer
         Static punchCount As Integer
         Static showMessage As Integer
-        If contours.contours.Count > 0 Then showMessage = 30
+        If contours.contourlist.Count > 0 Then showMessage = 30
 
         If showMessage = 30 And lastContoursCount = 0 Then punchCount += 1
-        lastContoursCount = contours.contours.Count
+        lastContoursCount = contours.contourlist.Count
         label2 = CStr(punchCount) + " Punches Thrown"
 
         If showMessage Then
@@ -1502,7 +1502,7 @@ Public Class Depth_PunchBlob
         End If
 
         Static showWarningInfo As Integer
-        If contours.contours.Count > 3 Then showWarningInfo = 100
+        If contours.contourlist.Count > 3 Then showWarningInfo = 100
 
         If showWarningInfo Then
             showWarningInfo -= 1

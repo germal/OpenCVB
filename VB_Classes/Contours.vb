@@ -4,7 +4,10 @@ Public Class Contours_Basics
     Public rotatedRect As Rectangle_Rotated
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
-    Public contours As New List(Of cv.Point())
+    Public contourlist As New List(Of cv.Point())
+    Public centroids As New List(Of cv.Point)
+    Public sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
+    Public contours0 As cv.Point()()
     Public Sub New()
         initParent()
         radio.Setup(caller + " Retrieval Mode", 5)
@@ -25,6 +28,7 @@ Public Class Contours_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
+            sliders.setupTrackBar(1, "Contour epsilon (arc length percent)", 0, 100, 3)
         End If
 
         label2 = "Contours_Basics with centroid in red"
@@ -73,7 +77,6 @@ Public Class Contours_Basics
             End If
         End If
 
-        Dim contours0 As cv.Point()()
         If retrievalMode = cv.RetrievalModes.FloodFill Then
             Dim img32sc1 As New cv.Mat
             dst1.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
@@ -84,30 +87,47 @@ Public Class Contours_Basics
         End If
 
         Static areaSlider = findSlider("Contour minimum area")
+        Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Dim minArea = areaSlider.value
-
-        contours.Clear()
-        dst2.SetTo(0)
-        Dim cnt = contours0.ToArray
-        If retrievalMode = cv.RetrievalModes.FloodFill Then
-            cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        Else
-            cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
-        End If
-
-        For i = 0 To contours0.Length - 1 Step 2
-            Dim m = cv.Cv2.Moments(contours0(i), False)
-            Dim pt = New cv.Point(m.M10 / m.M00, m.M01 / m.M00)
-
-            Dim area = cv.Cv2.ContourArea(contours0(i))
-            If area > minArea Then
-                contours.Add(cv.Cv2.ApproxPolyDP(contours0(i), 3, True))
-                dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                cv.Cv2.PutText(dst2, Format(area / 1000, "#0") + "k pixels", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+        Dim epsilon = epsilonSlider.value
+        contourlist.Clear()
+        If standalone Then
+            dst2.SetTo(0)
+            Dim cnt = contours0.ToArray
+            If retrievalMode = cv.RetrievalModes.FloodFill Then
+                cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
             Else
-                cv.Cv2.PutText(dst2, "too small", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+                cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
             End If
-        Next
+
+            For i = 0 To contours0.Length - 1 Step 2
+                Dim m = cv.Cv2.Moments(contours0(i), False)
+                Dim pt = New cv.Point(m.M10 / m.M00, m.M01 / m.M00)
+
+                Dim area = cv.Cv2.ContourArea(contours0(i))
+                If area > minArea Then
+                    contourlist.Add(cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
+                    dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst2, Format(area / 1000, "#0") + "k pixels", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+                Else
+                    cv.Cv2.PutText(dst2, "too small", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+                End If
+            Next
+        Else
+            centroids.Clear()
+            sortedContours.Clear()
+
+            For i = 0 To contours0.Length - 1 Step 2
+                Dim m = cv.Cv2.Moments(contours0(i), False)
+                Dim pt = New cv.Point(m.M10 / m.M00, m.M01 / m.M00)
+                Dim area = cv.Cv2.ContourArea(contours0(i))
+                If area > minArea Then
+                    sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
+                    ' contourlist.Add(cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
+                    centroids.Add(pt)
+                End If
+            Next
+        End If
     End Sub
 End Class
 
@@ -341,9 +361,15 @@ End Class
 Public Class Contours_Binarized
     Inherits VBparent
     Dim edges As Edges_BinarizedSobel
+    Dim contours As Contours_Basics
+    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
+        palette = New Palette_Basics
+        contours = New Contours_Basics
         edges = New Edges_BinarizedSobel
+        Dim kernelSlider = findSlider("Sobel kernel Size")
+        kernelSlider.Value = 3
 
         task.desc = "Find contours in the Edges after binarized"
     End Sub
@@ -352,15 +378,31 @@ Public Class Contours_Binarized
         edges.src = src
         edges.Run()
         dst1 = edges.dst2
-        dst2 = dst1.Clone
 
-        Dim contours As cv.Point()()
-        contours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        contours.src = dst1.Clone
+        contours.Run()
 
-        For i = 0 To contours.Length - 1
-            Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-            Dim area = minRect.Size.Width * minRect.Size.Height
-            If area < 1000 Then drawRotatedRectangle(minRect, dst2, cv.Scalar.Gray)
+        Dim cntList = contours.sortedContours
+        If cntList.Count = 0 Then Exit Sub ' there were no lines?
+        Dim incr = If(cntList.Count > 255, 1, CInt(255 / cntList.Count))
+        dst2.SetTo(0)
+        For i = 0 To cntList.Count - 1
+            'Dim pt = cntList.ElementAt(0).Value(0)
+            'If pt.X < 0 Then pt.X = 0
+            'If pt.Y < 0 Then pt.Y = 0
+            Dim lPoints = New List(Of List(Of cv.Point))
+            lPoints.Add(cntList.ElementAt(i).Value.ToList)
+            cv.Cv2.DrawContours(CType(dst2, cv.InputOutputArray), lPoints, 0, ocvb.scalarColors(i Mod 255), -1)
         Next
+
+        'palette.src = gray
+        'palette.Run()
+        'dst2 = palette.dst1
+        'dst2.SetTo(0, dst1)
+
+        ' cv.Cv2.DrawContours(dst2, contours.contours0.ToArray, -1, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        'For i = 0 To contours.centroids.Count - 1
+        '    dst2.Circle(contours.centroids(i), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        'Next
     End Sub
 End Class

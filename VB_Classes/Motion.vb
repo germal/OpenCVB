@@ -56,8 +56,8 @@ Public Class Motion_Basics
         uRect.inputRects.Clear()
         uRect.allRect = New cv.Rect
         dst1 = diff.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If contours.contours.Count Then
-            For Each c In contours.contours
+        If contours.contourlist.Count Then
+            For Each c In contours.contourlist
                 Dim r = cv.Cv2.BoundingRect(c)
                 If r.X < 0 Then r.X = 0
                 If r.Y < 0 Then r.Y = 0
@@ -140,7 +140,7 @@ Public Class Motion_WithBlurDilate
         contours.src = dilate.dst1
         contours.Run()
 
-        For Each c In contours.contours
+        For Each c In contours.contourlist
             Dim r = cv.Cv2.BoundingRect(c)
             If r.X >= 0 And r.Y >= 0 And r.X + r.Width < dst1.Width And r.Y + r.Height < dst1.Height Then
                 Dim count = diff.dst2(r).CountNonZero()
