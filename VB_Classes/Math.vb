@@ -206,23 +206,37 @@ End Class
 Public Class Math_Stdev
     Inherits VBparent
     Dim grid As Thread_Grid
-    Public mask As cv.Mat
+    Public highStdevMask As cv.Mat
+    Public lowStdevMask As cv.Mat
     Public Sub New()
         initParent()
         grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Stdev Threshold", 0, 100, 20)
+            sliders.setupTrackBar(0, "Stdev Threshold", 0, 100, 10)
+        End If
+        Dim widthSlider = findSlider("ThreadGrid Width")
+        Dim heightSlider = findSlider("ThreadGrid Height")
+        widthSlider.Value = 16
+        heightSlider.Value = 16
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Show mean"
+            check.Box(1).Text = "Show Stdev"
+            check.Box(2).Text = "Show Grid Mask"
         End If
 
-        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        highStdevMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        lowStdevMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         task.desc = "Compute the standard deviation in each segment"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim updateCount As Integer
-        mask.SetTo(0)
+        lowStdevMask.SetTo(0)
+        highStdevMask.SetTo(0)
         Dim font = cv.HersheyFonts.HersheyComplex
         Dim fsize = ocvb.fontSize / 3
 
@@ -234,6 +248,10 @@ Public Class Math_Stdev
         Static stdevSlider = findSlider("Stdev Threshold")
         Dim stdevThreshold = CSng(stdevSlider.Value)
 
+        Static meanCheck = findCheckBox("Show mean")
+        Static stdevCheck = findCheckBox("Show Stdev")
+        Dim showMean = meanCheck.checked
+        Dim showStdev = stdevCheck.checked
         Static lastFrame As cv.Mat = dst1.Clone()
         Dim saveFrame As cv.Mat = dst1.Clone
         Parallel.ForEach(grid.roiList,
@@ -243,16 +261,18 @@ Public Class Math_Stdev
             If stdev < stdevThreshold Then
                 Interlocked.Increment(updateCount)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                If showMean Then cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                If showStdev Then cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                lowStdevMask(roi).SetTo(255)
             Else
-                mask(roi).SetTo(255)
+                highStdevMask(roi).SetTo(255)
                 dst1(roi).SetTo(0)
             End If
         End Sub)
-        dst1.SetTo(255, grid.gridMask)
+        Static gridCheck = findCheckBox("Show Grid Mask")
+        If gridCheck.checked Then dst1.SetTo(255, grid.gridMask)
         dst2.SetTo(0)
-        saveFrame.CopyTo(dst2, mask)
+        saveFrame.CopyTo(dst2, highStdevMask)
         lastFrame = saveFrame
         Dim stdevPercent = " stdev " + Format(stdevSlider.value, "0.0")
         label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + stdevPercent

@@ -652,7 +652,11 @@ Public Class Edges_Stdev
         initParent()
         edges = New Edges_BinarizedSobel
         std = New Math_Stdev
+        Dim kernelSlider = findSlider("Sobel kernel Size")
+        kernelSlider.value = 3
 
+        label1 = "Edges in High Stdev areas"
+        label2 = "Mask of low stdev areas"
         task.desc = "Edges where stdev is above a threshold"
     End Sub
     Public Sub Run()
@@ -661,9 +665,12 @@ Public Class Edges_Stdev
         std.src = src
         std.Run()
 
-        edges.src = std.dst2
+        edges.src = src
         edges.Run()
         dst1 = edges.dst2
+
+        dst1.SetTo(0, std.lowStdevMask)
+        dst2 = std.lowStdevMask
     End Sub
 End Class
 
