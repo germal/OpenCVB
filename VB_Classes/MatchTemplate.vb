@@ -30,16 +30,7 @@ Public Class MatchTemplate_Basics
         End If
         task.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static sampleSlider = findSlider("Sample Size")
-        If standalone Or task.intermediateReview = caller Then
-            sample = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
-            searchMat = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
-            cv.Cv2.Randn(sample, 100, 25)
-            cv.Cv2.Randn(searchMat, 0, 25)
-        End If
-
+    Public Function checkRadio() As cv.TemplateMatchModes
         matchOption = cv.TemplateMatchModes.CCoeffNormed
         Static frm = findfrm("MatchTemplate_Basics Radio Options")
         For i = 0 To frm.check.length - 1
@@ -50,6 +41,20 @@ Public Class MatchTemplate_Basics
                 Exit For
             End If
         Next
+        Return matchOption
+    End Function
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static sampleSlider = findSlider("Sample Size")
+        If standalone Or task.intermediateReview = caller Then
+            sample = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
+            searchMat = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
+            cv.Cv2.Randn(sample, 100, 25)
+            cv.Cv2.Randn(searchMat, 0, 25)
+        End If
+
+        matchOption = checkRadio()
+
         cv.Cv2.MatchTemplate(sample, searchMat, correlationMat, matchOption)
         correlation = correlationMat.Get(Of Single)(0, 0)
         label1 = "Correlation = " + Format(correlation, "#,##0.000")
@@ -199,9 +204,11 @@ End Class
 Public Class MatchTemplate_Movement
     Inherits VBparent
     Dim grid As Thread_Grid
+    Dim corr As MatchTemplate_Basics
     Public mask As cv.Mat
     Public Sub New()
         initParent()
+        corr = New MatchTemplate_Basics
         grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -234,13 +241,15 @@ Public Class MatchTemplate_Movement
         Dim updateCount As Integer
         mask.SetTo(0)
 
+        Dim matchOption = corr.checkRadio()
+
         Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim mean As Single = 0, stdev As Single = 0
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             If stdev > stdevThreshold Then
                 Dim correlation As New cv.Mat
-                cv.Cv2.MatchTemplate(dst1(roi), lastFrame(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                cv.Cv2.MatchTemplate(dst1(roi), lastFrame(roi), correlation, matchOption)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)

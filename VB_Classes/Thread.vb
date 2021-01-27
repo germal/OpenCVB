@@ -7,11 +7,14 @@ Public Class Thread_Grid
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
     Public gridMask As cv.Mat
-    Public tilesPerRow As integer
-    Public tilesPerCol As integer
-    Dim incompleteRegions As integer
-    Private Sub drawGrid(rList As List(Of cv.Rect))
-        For Each roi In rList
+    Public tilesPerRow As Integer
+    Public tilesPerCol As Integer
+    Public mouseClickROI As Integer
+    Dim incompleteRegions As Integer
+    Dim gridToRoi As New cv.Mat
+    Private Sub drawGrid()
+        For i = 0 To roiList.Count - 1
+            Dim roi = roiList(i)
             Dim p1 = New cv.Point(roi.X + roi.Width, roi.Y)
             Dim p2 = New cv.Point(roi.X + roi.Width, roi.Y + roi.Height)
             If roi.X + roi.Width <= gridMask.Width Then
@@ -21,6 +24,7 @@ Public Class Thread_Grid
                 Dim p3 = New cv.Point(roi.X, roi.Y + roi.Height)
                 gridMask.Line(p2, p3, cv.Scalar.White, 1)
             End If
+            gridToRoi.Rectangle(roi, i, -1)
         Next
     End Sub
     Public Sub New()
@@ -34,7 +38,8 @@ Public Class Thread_Grid
         End If
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
-        gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
+        gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
+        gridToRoi = New cv.Mat(src.Size(), cv.MatType.CV_32S)
         task.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run()
@@ -47,6 +52,7 @@ Public Class Thread_Grid
         Static heightSlider = findSlider("ThreadGrid Height")
         Static borderSlider = findSlider("ThreadGrid Border")
 
+        If task.mouseClickFlag Then mouseClickROI = gridToRoi.Get(Of Integer)(task.mouseClickPoint.Y, task.mouseClickPoint.X)
         Dim borderSize = borderSlider.Value
         Dim gWidth = widthSlider.Value
         Dim gHeight = heightSlider.value
@@ -68,7 +74,7 @@ Public Class Thread_Grid
                         If roi.Width <> gWidth Or roi.Height <> gHeight Then incompleteRegions += 1
                     End If
                 Next
-                drawGrid(roiList)
+                drawGrid()
             Next
 
             For Each roi In roiList
@@ -90,7 +96,7 @@ Public Class Thread_Grid
                 borderList.Add(broi)
             Next
 
-            If standalone Or task.intermediateReview = caller Then drawGrid(borderList)
+            If standalone Or task.intermediateReview = caller Then drawGrid()
 
             lastWidth = gWidth
             lastHeight = gHeight

@@ -316,7 +316,7 @@ Public Class Puzzle_Solver
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If src.Width = 640 Then
-            ocvb.trueText("This algorithm was not setup to work at 640x480.  It works only at 1270x720")
+            ocvb.trueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")
             Exit Sub
         End If
         If ocvb.frameCount = 0 Then

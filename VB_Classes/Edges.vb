@@ -951,14 +951,35 @@ End Class
 
 
 
+
 Public Class Edges_Matching
     Inherits VBparent
-    Dim lrViews As Edges_SobelLRBinarized
+    Dim match As MatchTemplate_Basics
+    Dim red As LeftRightView_Basics
     Dim grid As Thread_Grid
     Public Sub New()
         initParent()
+
+        match = New MatchTemplate_Basics
         grid = New Thread_Grid
-        lrViews = New Edges_SobelLRBinarized
+        red = New LeftRightView_Basics
+        Dim brightSlider = findSlider("brightness")
+        brightSlider.Value = 1
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Search depth in pixels", 1, 256, 256)
+            sliders.setupTrackBar(1, "Correlation threshold for display X100", 1, 100, 80)
+        End If
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Overlay thread grid"
+            check.Box(1).Text = "Highlight all grid entries above threshold"
+            check.Box(2).Text = "Clear selected highlights (if Highlight all grid entries is unchecked)"
+            check.Box(1).Checked = True
+        End If
+
         task.desc = "Match edges in the left and right views to determine distance"
     End Sub
     Public Sub Run()
@@ -966,27 +987,79 @@ Public Class Edges_Matching
 
         grid.Run()
 
-        lrViews.Run()
-        dst1 = lrViews.dst1
-        dst2 = lrViews.dst2
+        red.Run()
+        dst1 = red.dst1
+        dst2 = red.dst2
 
-        Parallel.ForEach(grid.roiList,
-        Sub(roi)
-            'Dim correlations(32) As Single
-            'For i = 0 To correlations.Length - 1
-            '    ' cv.Cv2.MatchTemplate(dst1(roi), dst1(roi), correlationMat, matchOption)
-            'Next
-            'Dim mean As Single = 0, stdev As Single = 0
-            'cv.Cv2.MeanStdDev(task.depth32f(roi), mean, stdev, mask(roi))
-            'meanSeries.Set(Of Single)(i, meanIndex, mean)
-            'If ocvb.frameCount >= meanCount - 1 Then
-            '    cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
-            '    meanValues.Set(Of Single)(i, 0, mean)
-            '    stdValues.Set(Of Single)(i, 0, stdev)
-            'End If
-        End Sub)
+        Static thresholdSlider = findSlider("Correlation threshold for display X100")
+        Static searchSlider = findSlider("Search depth in pixels")
+        Dim threshold = thresholdSlider.value / 100
+        Dim searchDepth = searchSlider.value
 
-        dst1.SetTo(255, grid.gridMask)
-        dst2.SetTo(255, grid.gridMask)
+        Dim matchOption = match.checkRadio()
+        Dim font = cv.HersheyFonts.HersheyComplex
+        Dim fsize = ocvb.fontSize / 3
+        Dim maxLocs(grid.roiList.Count - 1) As Integer
+        Dim highlights As New List(Of Integer)
+        For i = 0 To grid.roiList.Count - 1
+            Dim roi = grid.roiList(i)
+            Dim width = If(roi.X + roi.Width + searchDepth < dst1.Width, roi.Width + searchDepth, dst1.Width - roi.X - 1)
+            Dim searchROI = New cv.Rect(roi.X, roi.Y, width, roi.Height)
+            match.sample = dst2(roi)
+            match.searchMat = dst1(searchROI)
+            match.Run()
+            Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
+            match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+            maxLocs(i) = maxLoc.X
+            If maxVal > threshold Then
+                highlights.Add(i)
+                Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
+                dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            End If
+        Next
+
+        Static overlayCheck = findCheckBox("Overlay thread grid")
+        If overlayCheck.checked Then
+            dst1.SetTo(255, grid.gridMask)
+            dst2.SetTo(255, grid.gridMask)
+        End If
+
+        Static highlightCheck = findCheckBox("Highlight all grid entries above threshold")
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If highlightCheck.checked Then
+            label1 = "Matched grid segments in dst2 with disparity"
+            For Each i In highlights
+                Dim roi = grid.roiList(i)
+                dst2.Rectangle(roi, cv.Scalar.Red, 2)
+                roi.X += maxLocs(i)
+                dst1.Rectangle(roi, cv.Scalar.Red, 2)
+                Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
+                dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            Next
+        Else
+            label1 = "Click in dst2 to highlight segment in dst1"
+            Static redRects As New List(Of Integer)
+            Static clearCheck = findCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
+            If clearCheck.checked Then
+                redRects.Clear()
+                clearCheck.checked = False
+            End If
+            If grid.mouseClickROI Then
+                If redRects.Contains(grid.mouseClickROI) = False Then redRects.Add(grid.mouseClickROI)
+                For Each i In redRects
+                    Dim roi = grid.roiList(i)
+                    dst2.Rectangle(roi, cv.Scalar.Red, 2)
+                    roi.X += maxLocs(i)
+                    dst1.Rectangle(roi, cv.Scalar.Red, 2)
+                    Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
+                    dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                Next
+            End If
+        End If
+        label2 = "Grid segments > " + Format(threshold, "#0%") + " correlation coefficient"
     End Sub
 End Class
