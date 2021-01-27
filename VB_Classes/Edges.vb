@@ -991,6 +991,7 @@ Public Class Edges_Matching
         dst1 = red.dst1
         dst2 = red.dst2
 
+        Static redRects As New List(Of Integer)
         Static thresholdSlider = findSlider("Correlation threshold for display X100")
         Static searchSlider = findSlider("Search depth in pixels")
         Dim threshold = thresholdSlider.value / 100
@@ -1011,7 +1012,7 @@ Public Class Edges_Matching
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
             maxLocs(i) = maxLoc.X
-            If maxVal > threshold Then
+            If maxVal > threshold Or redrects.contains(i) Then
                 highlights.Add(i)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
@@ -1041,10 +1042,10 @@ Public Class Edges_Matching
             Next
         Else
             label1 = "Click in dst2 to highlight segment in dst1"
-            Static redRects As New List(Of Integer)
             Static clearCheck = findCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
             If clearCheck.checked Then
                 redRects.Clear()
+                grid.mouseClickROI = 0
                 clearCheck.checked = False
             End If
             If grid.mouseClickROI Then
