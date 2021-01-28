@@ -113,9 +113,10 @@ Public Class OpenCVB
 
         setupRecentList()
 
-        ' Camera DLL's are built in Release mode even when configured for Debug (performance while debugging an algorithm is much better).  
-        ' It is not likely camera interfaces will need debugging but to do so change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
-        updatePath(HomeDir.FullName + "\bin\Release\", "Release Version of camera DLL's.")
+        ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
+        ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
+        ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
+        updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
 
         ' check to make sure there are no camera dll's in the Debug directory by mistake!
         For i = 0 To 5
@@ -208,7 +209,6 @@ Public Class OpenCVB
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-        updatePath(HomeDir.FullName + "Kitware\", "Libraries to support the kitware .Net interface")
 
         Dim vizDir = New DirectoryInfo(HomeDir.FullName + "OpenCV\Build\bin\Debug\")
         Dim vizFiles = vizDir.GetFiles("opencv_viz*")
