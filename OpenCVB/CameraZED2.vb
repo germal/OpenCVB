@@ -3,10 +3,10 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2Open(width As integer, height As integer, fps As integer) As IntPtr
+    Public Function Zed2Open(width As Integer, height As Integer, fps As Integer) As IntPtr
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Zed2SerialNumber(cPtr As IntPtr) As integer
+    Public Function Zed2SerialNumber(cPtr As IntPtr) As Integer
     End Function
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Zed2intrinsicsLeft(cPtr As IntPtr) As IntPtr
