@@ -15,7 +15,7 @@ Public Class MiniPC_Basics
 
         gCloud.Run()
 
-        resize.src = gCloud.dst2
+        resize.src = gCloud.dst1
         resize.Run()
 
         Dim split = resize.dst1.Split()

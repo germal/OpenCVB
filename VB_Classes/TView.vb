@@ -24,7 +24,7 @@ Public Class TView_Basics
 
         sideView.Run()
 
-        split = sideView.gCloud.dst2.Split()
+        split = sideView.gCloud.dst1.Split()
 
         Dim sideOrig = sideView.originalHistOutput.CountNonZero()
         dst2 = sideView.originalHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)

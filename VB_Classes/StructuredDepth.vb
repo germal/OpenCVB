@@ -107,7 +107,7 @@ Public Class StructuredDepth_MultiSliceH
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
         dst2 = side2D.dst2
-        Dim Split = side2D.gCloud.dst2.Split()
+        Dim Split = side2D.gCloud.dst1.Split()
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
@@ -159,7 +159,7 @@ Public Class StructuredDepth_MultiSliceV
         top2D.Run()
         dst2 = top2D.dst2
 
-        Dim split = top2D.gCloud.dst2.Split()
+        Dim split = top2D.gCloud.dst1.Split()
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
@@ -224,7 +224,7 @@ Public Class StructuredDepth_MultiSlice
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
-        split = side2D.gCloud.dst2.Split()
+        split = side2D.gCloud.dst1.Split()
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
@@ -528,7 +528,7 @@ Public Class StructuredDepth_SliceH
         side2D.Run()
 
         Dim depthShadow = task.inrange.noDepthMask
-        Dim Split = side2D.gCloud.dst2.Split()
+        Dim Split = side2D.gCloud.dst1.Split()
 
         Dim yCoordinate = CInt(offsetSlider.Value)
 
@@ -591,7 +591,7 @@ Public Class StructuredDepth_SliceV
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
 
-        Dim split = top2D.gCloud.dst2.Split()
+        Dim split = top2D.gCloud.dst1.Split()
 
         Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
         If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
@@ -660,7 +660,7 @@ Public Class StructuredDepth_SliceVStable
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
         dst2 = top2D.dst1
-        Dim split = top2D.gCloud.dst2.Split()
+        Dim split = top2D.gCloud.dst1.Split()
 
         Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
         If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)

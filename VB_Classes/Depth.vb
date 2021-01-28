@@ -1622,7 +1622,6 @@ Public Class Depth_PointCloud_IMU
 
         imu = New IMU_GVector
 
-        label1 = "dst1 = 32-bit depth, dst2 = modified point cloud"
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run()
@@ -1675,11 +1674,11 @@ Public Class Depth_PointCloud_IMU
             Dim gMat = New cv.Mat(3, 3, cv.MatType.CV_32F, gMatrix)
             Dim gInput = input.Reshape(1, input.Rows * input.Cols)
             Dim gOutput = (gInput * gMat).ToMat
-            dst2 = gOutput.Reshape(3, input.Rows)
-            label2 = "dst2 = pointcloud after rotation"
+            dst1 = gOutput.Reshape(3, input.Rows)
+            label1 = "dst1 = pointcloud after rotation"
         Else
-            dst2 = input.Clone
-            label2 = "dst2 = pointcloud without rotation"
+            dst1 = input.Clone
+            label1 = "dst1 = pointcloud without rotation"
         End If
 
         ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ

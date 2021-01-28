@@ -1137,7 +1137,7 @@ Public Class PointCloud_ReducedSideView
 
         gCloud.Run()
 
-        Dim split = gCloud.dst2.Split()
+        Dim split = gCloud.dst1.Split()
         reduction.src = split(2) * 1000
         reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
@@ -1176,7 +1176,7 @@ Public Class PointCloud_ReducedTopView
 
         gCloud.Run()
 
-        Dim split = gCloud.dst2.Split()
+        Dim split = gCloud.dst1.Split()
         reduction.src = split(2) * 1000
         reduction.src.ConvertTo(reduction.src, cv.MatType.CV_32S)
         reduction.Run()
@@ -1569,7 +1569,7 @@ Public Class PointCloud_BackProjectTopView
             If ocvb.frameCount = 0 Then minSlider.Value = 1
             Dim minVal = minSlider.value
 
-            Dim split = view.measureTop.topView.gCloud.dst2.Split()
+            Dim split = view.measureTop.topView.gCloud.dst1.Split()
             Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             dst1 = src
             For i = 0 To rectList.Count - 1
@@ -1640,7 +1640,7 @@ Public Class PointCloud_BackProjectSideView
             Static minSlider = findSlider("InRange Min Depth (mm)")
             Dim minVal = minSlider.value
 
-            Dim split = view.measureSide.sideView.gCloud.dst2.Split()
+            Dim split = view.measureSide.sideView.gCloud.dst1.Split()
             Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             dst1 = src
             For i = 0 To rectList.Count - 1

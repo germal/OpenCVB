@@ -805,7 +805,7 @@ Public Class Histogram_TopData
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         label1 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00") + " x and y scales differ!"
@@ -853,7 +853,7 @@ Public Class Histogram_SideData
         Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
         label1 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00") + " x and y scales differ!"
@@ -887,7 +887,7 @@ Public Class Histogram_SmoothTopView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         topView.gCloud.Run()
 
-        stable.src = topView.gCloud.dst2
+        stable.src = topView.gCloud.dst1
         stable.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
@@ -931,7 +931,7 @@ Public Class Histogram_SmoothSideView2D
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sideView.gCloud.Run()
 
-        stable.src = sideView.gCloud.dst2
+        stable.src = sideView.gCloud.dst1
         stable.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
@@ -1176,7 +1176,7 @@ Public Class Histogram_TopView2D
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
         originalHistOutput = originalHistOutput.Flip(cv.FlipMode.X)
         histOutput = originalHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
@@ -1229,7 +1229,7 @@ Public Class Histogram_SideView2D
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
         histOutput = originalHistOutput.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
@@ -1344,7 +1344,7 @@ Public Class Histogram_ViewIntersections
         maxZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y) / h
         ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
 
-        Dim pc = histCO.histC.sideview.gCloud.dst2
+        Dim pc = histCO.histC.sideview.gCloud.dst1
         Dim split = pc.Split()
         Dim mask As New cv.Mat
         cv.Cv2.InRange(split(2), minZ, maxZ, mask)

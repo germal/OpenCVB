@@ -394,7 +394,7 @@ Public Class OpenGL_GravityTransform
         gCloud.src = task.pointCloud
         gCloud.Run()
 
-        ogl.pointCloudInput = gCloud.dst2
+        ogl.pointCloudInput = gCloud.dst1
         ogl.src = src
         ogl.Run()
     End Sub
@@ -538,7 +538,7 @@ Public Class OpenGL_DepthSliceH
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(slices.maskPlane, mask)
 
-        ogl.pointCloudInput = slices.side2D.gCloud.dst2.Clone
+        ogl.pointCloudInput = slices.side2D.gCloud.dst1.Clone
         ogl.pointCloudInput.SetTo(0, mask)
         ogl.src = New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
         ogl.Run()
