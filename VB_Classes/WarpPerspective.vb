@@ -29,23 +29,3 @@ Public Class WarpPerspective_Basics
 End Class
 
 
-
-
-
-
-
-Public Class WarpPerspective_3D
-    Inherits VBparent
-    Dim warp As WarpPerspective_Basics
-    Public Sub New()
-        initParent()
-        warp = New WarpPerspective_Basics()
-        task.desc = "Use WarpAffine on a 3D point cloud"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-    End Sub
-End Class
-
-

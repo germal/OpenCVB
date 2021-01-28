@@ -13,6 +13,7 @@ Public Class Binarize_Basics
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
     Dim blur As Blur_Basics
+    Public useBlur As Boolean
     Public Sub New()
         initParent()
         blur = New Blur_Basics()
@@ -26,12 +27,13 @@ Public Class Binarize_Basics
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim dimensions() = New Integer() {maxRange}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        blur.src = input
-        blur.Run()
-        cv.Cv2.CalcHist(New cv.Mat() {blur.dst1}, New Integer() {0}, mask, histogram, 1, dimensions, ranges)
-        dst1 = blur.dst1.Threshold(meanScalar(0), 255, thresholdType)
+        If useBlur Then
+            blur.src = input
+            blur.Run()
+            dst1 = blur.dst1.Threshold(meanScalar(0), 255, thresholdType)
+        Else
+            dst1 = input.Threshold(meanScalar(0), 255, thresholdType)
+        End If
     End Sub
 End Class
 
@@ -42,50 +44,53 @@ End Class
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU
     Inherits VBparent
-    Dim mats1 As Mat_4to1
-    Dim mats2 As Mat_4to1
     Dim plotHist As Plot_Histogram
     Dim binarize As Binarize_Basics
     Public Sub New()
         initParent()
         binarize = New Binarize_Basics()
-
         plotHist = New Plot_Histogram()
 
-        mats1 = New Mat_4to1()
-        mats2 = New Mat_4to1()
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "Binary"
+            radio.check(1).Text = "Binary + OTSU"
+            radio.check(2).Text = "OTSU"
+            radio.check(3).Text = "OTSU + Blur"
+            radio.check(0).Checked = True
+        End If
 
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         label2 = "Histograms correspond to images on the left"
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst2.SetTo(0)
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         binarize.meanScalar = cv.Cv2.Mean(input)
         binarize.src = input
-        Static blurkernelslider = findSlider("Blur Kernel Size")
-        Dim kernelsize = blurkernelslider.value
-        blurkernelslider.value = 0
-        For i = 0 To 4 - 1
-            binarize.thresholdType = Choose(i + 1, cv.ThresholdTypes.Binary, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu,
-                                            cv.ThresholdTypes.Otsu, cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu)
-            If i = 3 Then blurkernelslider.value = kernelsize ' only blur the last request
-            binarize.Run()
-            mats1.mat(i) = binarize.dst1.Clone()
-            plotHist.hist = binarize.histogram.Clone()
-            plotHist.Run()
-            mats2.mat(i) = plotHist.dst1.Clone()
+
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then label1 = radio.check(i).Text
         Next
 
-        mats1.Run()
-        dst1 = mats1.dst1
-        mats2.Run()
-        dst2 = mats2.dst1
+        binarize.useBlur = False
+        Select Case label1
+            Case radio.check(0).Text
+                binarize.thresholdType = cv.ThresholdTypes.Binary
+            Case radio.check(1).Text
+                binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
+            Case radio.check(2).Text
+                binarize.thresholdType = cv.ThresholdTypes.Otsu
+            Case radio.check(3).Text
+                binarize.useBlur = True
+                binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
+        End Select
+        binarize.Run()
+        dst1 = binarize.dst1
     End Sub
 End Class
 

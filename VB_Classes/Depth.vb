@@ -1596,7 +1596,7 @@ Public Class Depth_TestMinFunction
 
         Dim depth32f As New cv.Mat
         task.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
-        If ocvb.frameCount Mod 300 = 0 Then dst2 = depth32f
+        If ocvb.frameCount Mod 30 = 0 Then dst2 = depth32f
         cv.Cv2.Min(dst2, depth32f, dst2)
         dst1 = dst2.ConvertScaleAbs(180)
         dst1 += 64

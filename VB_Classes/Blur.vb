@@ -17,7 +17,7 @@ Public Class Blur_Basics
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             cv.Cv2.GaussianBlur(src, dst1, New cv.Size(kernelSize, kernelSize), 0, 0)
-            If standalone or task.intermediateReview = caller Then cv.Cv2.GaussianBlur(task.RGBDepth, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
+            If standalone Or task.intermediateReview = caller Then cv.Cv2.GaussianBlur(task.RGBDepth, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
         Else
             dst1 = src
         End If

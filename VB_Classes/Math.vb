@@ -205,9 +205,10 @@ End Class
 
 Public Class Math_Stdev
     Inherits VBparent
-    Dim grid As Thread_Grid
+    Public grid As Thread_Grid
     Public highStdevMask As cv.Mat
     Public lowStdevMask As cv.Mat
+    Public saveFrame As cv.Mat
     Public Sub New()
         initParent()
         grid = New Thread_Grid
@@ -253,10 +254,10 @@ Public Class Math_Stdev
         Dim showMean = meanCheck.checked
         Dim showStdev = stdevCheck.checked
         Static lastFrame As cv.Mat = dst1.Clone()
-        Dim saveFrame As cv.Mat = dst1.Clone
+        saveFrame = dst1.Clone
         Parallel.ForEach(grid.roiList,
         Sub(roi)
-            Dim mean As Single = 0, stdev As Single = 0
+            Dim mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             If stdev < stdevThreshold Then
                 Interlocked.Increment(updateCount)
@@ -277,5 +278,68 @@ Public Class Math_Stdev
         Dim stdevPercent = " stdev " + Format(stdevSlider.value, "0.0")
         label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + stdevPercent
         label2 = CStr(grid.roiList.Count - updateCount) + " out of " + CStr(grid.roiList.Count) + " had stdev > " + Format(stdevSlider.value, "0.0")
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Math_StdevBoundary
+    Inherits VBparent
+    Dim stdev As Math_Stdev
+    Public Sub New()
+        initParent()
+        stdev = New Math_Stdev
+        label1 = "Low stdev regions.  Gaps filled with OTSU results"
+        label2 = "High stdev segments after the first pass"
+        task.desc = "Explore how to get a better boundary on the low stdev mask"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        stdev.src = src
+        stdev.Run()
+        dst1 = stdev.dst1
+        stdev.saveFrame.CopyTo(dst2)
+
+        Static stdevSlider = findSlider("Stdev Threshold")
+        Dim stdevThreshold = CSng(stdevSlider.Value)
+
+        'Parallel.ForEach(stdev.grid.roiList, ' surprisingly it runs faster in serial mode...
+        'Sub(roi)
+        For Each roi In stdev.grid.roiList
+            If roi.X + roi.Width < dst2.Width Then
+                Dim m1 = dst1.Get(Of Byte)(roi.Y, roi.X)
+                Dim m2 = dst1.Get(Of Byte)(roi.Y, roi.X + roi.Width)
+                If m1 = 0 And m2 <> 0 Then
+                    Dim meanScalar = cv.Cv2.Mean(dst2(roi))
+                    dst2(roi).CopyTo(dst1(roi), dst2(roi).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                End If
+                If m1 > 0 And m2 = 0 Then
+                    Dim newROI = New cv.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height)
+                    Dim meanScalar = cv.Cv2.Mean(dst2(newROI))
+                    dst2(newROI).CopyTo(dst1(newROI), dst2(newROI).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                End If
+            End If
+            If roi.Y + roi.Height < dst2.Height Then
+                Dim m1 = dst1.Get(Of Byte)(roi.Y, roi.X)
+                Dim m2 = dst1.Get(Of Byte)(roi.Y + roi.Height, roi.X)
+                If m1 = 0 And m2 <> 0 Then
+                    Dim meanScalar = cv.Cv2.Mean(dst2(roi))
+                    dst2(roi).CopyTo(dst1(roi), dst2(roi).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                End If
+                If m1 > 0 And m2 = 0 Then
+                    Dim newROI = New cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height)
+                    Dim meanScalar = cv.Cv2.Mean(dst2(newROI))
+                    dst2(newROI).CopyTo(dst1(newROI), dst2(newROI).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                End If
+            End If
+            'End Sub)
+        Next
+        dst2.SetTo(0, stdev.lowStdevMask)
     End Sub
 End Class

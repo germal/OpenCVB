@@ -487,6 +487,7 @@ Public Class Draw_Frustrum
         xyzDepth = New Depth_WorldXYZ_MT()
         xyzDepth.depthUnitsMeters = True
 
+        label2 = "Frustrum data prepared for 3D display - 32FC3"
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run()

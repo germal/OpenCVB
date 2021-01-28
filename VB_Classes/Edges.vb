@@ -359,6 +359,13 @@ Public Class Edges_Palette
         initParent()
         edges = New Edges_Basics
         palette = New Palette_Basics
+        Dim randomRadio = findRadio("Random - use slider to adjust")
+        randomRadio.Checked = True
+        Dim randomSlider = findSlider("Number of color transitions (Used only with Random)")
+        randomSlider.Value = 2
+
+        label1 = "Edges found using grayscale image"
+        label2 = "Edges found after palettizing grayscale image"
         task.desc = "Use palette to help canny find more edges"
     End Sub
     Public Sub Run()
@@ -390,6 +397,8 @@ Public Class Edges_DCTinput
         initParent()
         edges = New Edges_Basics
         dct = New DCT_FeatureLess
+        label1 = "Canny edges produced from original grayscale image"
+        label2 = "Edges produced with featureless regions cleared"
         task.desc = "Use the featureless regions to enhance the edge detection"
     End Sub
     Public Sub Run()
@@ -646,12 +655,12 @@ End Class
 
 Public Class Edges_Stdev
     Inherits VBparent
-    Dim std As Math_Stdev
+    Dim stdev As Math_Stdev
     Dim edges As Edges_BinarizedSobel
     Public Sub New()
         initParent()
         edges = New Edges_BinarizedSobel
-        std = New Math_Stdev
+        stdev = New Math_Stdev
         Dim kernelSlider = findSlider("Sobel kernel Size")
         kernelSlider.value = 3
 
@@ -662,15 +671,15 @@ Public Class Edges_Stdev
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        std.src = src
-        std.Run()
+        stdev.src = src
+        stdev.Run()
 
         edges.src = src
         edges.Run()
         dst1 = edges.dst2
 
-        dst1.SetTo(0, std.lowStdevMask)
-        dst2 = std.lowStdevMask
+        dst1.SetTo(0, stdev.lowStdevMask)
+        dst2 = stdev.lowStdevMask
     End Sub
 End Class
 
@@ -914,6 +923,7 @@ Public Class Edges_BinarizedSobel
         kernelSlider.Value = 5
 
         label1 = "Edges between halves, lightest, darkest, and the combo"
+        label2 = "Click any quadrant in dst1 to enlarge it in dst2"
         task.desc = "Collect Sobel edges from binarized images"
     End Sub
     Public Sub Run()
