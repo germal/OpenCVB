@@ -23,9 +23,8 @@ Public Class Motion_Basics
         End If
 
         Dim minSlider = findSlider("Contour minimum area")
-        minSlider.Value = 10
+        minSlider.Value = 3
 
-        label2 = "Mask of pixel differences "
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
     Public Sub Run()
@@ -73,6 +72,9 @@ Public Class Motion_Basics
             Next
             dst1.Rectangle(uRect.allRect, cv.Scalar.Red, 2)
             dst2.Rectangle(uRect.allRect, cv.Scalar.Red, 2)
+            label2 = "Motion detected"
+        Else
+            label2 = "No motion detected"
         End If
     End Sub
 End Class

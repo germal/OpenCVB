@@ -123,7 +123,7 @@ Public Class Contours_Basics
                 Dim area = cv.Cv2.ContourArea(contours0(i))
                 If area > minArea Then
                     sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
-                    ' contourlist.Add(cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
+                    contourlist.Add(cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
                     centroids.Add(pt)
                 End If
             Next

@@ -1748,8 +1748,6 @@ Public Class Depth_SmoothMin
         motion.Run()
         dst2 = If(motion.dst2.Channels = 1, motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst2.Clone)
 
-        Static motionThreshold = findSlider("Single frame motion threshold")
-        Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         If motion.resetAll Or stableMin Is Nothing Then
             stableMin = input.Clone
         Else

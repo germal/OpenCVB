@@ -166,8 +166,8 @@ Public Class Gradient_StableDepth
         motionSD.Run()
         dst1 = motionSD.dst1.Clone
 
-        basics.src = motionSD.dst1.Clone
+        basics.src = dst1.Clone
         basics.Run()
-        dst2 = basics.dst2.Clone
+        dst2 = basics.dst2
     End Sub
 End Class
