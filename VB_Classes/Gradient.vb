@@ -38,7 +38,6 @@ Public Class Gradient_Depth
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ' If task.drawRect.Width > 0 Then sobel.src = task.RGBDepth(task.drawRect) Else sobel.src = task.RGBDepth.Clone()
         sobel.src = task.depth32f
         sobel.Run()
         Dim x32f As New cv.Mat, y32f As New cv.Mat
@@ -139,3 +138,36 @@ End Class
 '    End Sub
 'End Class
 #End If
+
+
+
+
+
+
+
+
+
+Public Class Gradient_StableDepth
+    Inherits VBparent
+    Dim stableD As Motion_StableDepth
+    Dim basics As Gradient_Basics
+    Public Sub New()
+        initParent()
+        stableD = New Motion_StableDepth
+        basics = New Gradient_Basics
+        label1 = "Stable depth input to Gradient"
+        label2 = "Phase component of the gradient output"
+        task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        stableD.src = src
+        stableD.Run()
+        dst1 = stableD.dst1
+
+        basics.src = stableD.dst1
+        basics.Run()
+        dst2 = basics.dst2
+    End Sub
+End Class

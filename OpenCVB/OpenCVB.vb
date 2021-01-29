@@ -38,7 +38,8 @@ Public Class OpenCVB
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Integer
     Dim DrawingRectangle As Boolean
-    Dim drawRect As New cv.Rect(0, 0, 0, 0)
+    Dim drawRect As New cv.Rect
+    Dim drawRectPic As Integer
     Dim externalPythonInvocation As Boolean
     Dim fps As Integer = 30
     Dim imgResult As New cv.Mat
@@ -741,10 +742,9 @@ Public Class OpenCVB
                 Dim pic = DirectCast(sender, PictureBox)
                 Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, imgResult)
                 drawRect = validateRect(drawRect, src.width, src.height)
-                Dim offset = 0
-                If drawRect.X > camPic(0).Width Then offset = camPic(0).Width
-                Dim srcROI = New cv.Mat
-                srcROI = src(drawRect).clone()
+                Dim offset = If(drawRectPic <> 3, 0, camPic(0).Width)
+                If drawRectPic = 3 Then drawRect.X += camPic(0).Width ' special case for dst2!
+                Dim srcROI As cv.Mat = src(drawRect).clone()
                 Dim csvName As New FileInfo(System.IO.Path.GetTempFileName() + ".csv")
                 Dim sw = New StreamWriter(csvName.FullName)
                 sw.WriteLine("Color image in BGR format - 3 columns per pixel" + vbCrLf)
@@ -814,10 +814,12 @@ Public Class OpenCVB
                 mouseMovePoint.Y = e.Y
                 If mouseMovePoint.X < 0 Then mouseMovePoint.X = 0
                 If mouseMovePoint.Y < 0 Then mouseMovePoint.Y = 0
+                drawRectPic = pic.Tag
                 If e.X < camPic(0).Width Then
                     drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
                 Else
                     drawRect.X = Math.Min(mouseDownPoint.X - camPic(0).Width, mouseMovePoint.X - camPic(0).Width)
+                    drawRectPic = 3 ' When wider than campic(0), it can only be dst2 which has no pic.tag (because campic(2) is double-wide for timing reasons.
                 End If
                 drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
