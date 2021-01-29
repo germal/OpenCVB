@@ -188,11 +188,11 @@ Public Class Motion_StableDepth
 
         motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motion.Run()
-        dst2 = motion.dst2
+        dst2 = motion.dst2.Clone
 
         If motion.resetAll Or externalReset Then
             externalReset = False
-            dst1 = input
+            dst1 = input.Clone
         Else
             If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             input.CopyTo(dst1, dst2)
@@ -207,7 +207,7 @@ Public Class Motion_StableDepth
                     dst1.SetTo(0, task.inrange.noDepthMask)
                 End If
             Else
-                input.CopyTo(dst1)
+                dst1 = input.Clone()
             End If
         End If
     End Sub

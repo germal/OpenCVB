@@ -149,11 +149,11 @@ End Class
 
 Public Class Gradient_StableDepth
     Inherits VBparent
-    Dim stableD As Motion_StableDepth
+    Dim motionSD As Motion_StableDepth
     Dim basics As Gradient_Basics
     Public Sub New()
         initParent()
-        stableD = New Motion_StableDepth
+        motionSD = New Motion_StableDepth
         basics = New Gradient_Basics
         label1 = "Stable depth input to Gradient"
         label2 = "Phase component of the gradient output"
@@ -162,12 +162,12 @@ Public Class Gradient_StableDepth
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        stableD.src = src
-        stableD.Run()
-        dst1 = stableD.dst1
+        motionSD.src = src
+        motionSD.Run()
+        dst1 = motionSD.dst1.Clone
 
-        basics.src = stableD.dst1
+        basics.src = motionSD.dst1.Clone
         basics.Run()
-        dst2 = basics.dst2
+        dst2 = basics.dst2.Clone
     End Sub
 End Class

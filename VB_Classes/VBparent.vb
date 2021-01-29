@@ -64,6 +64,8 @@ Public Class VBparent : Implements IDisposable
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run()
         If standalone And src.Width > 0 Then
+            ocvb.label1 = label1
+            ocvb.label2 = label2
             If task.intermediateReview <> "" And task.intermediateReview <> caller Then
                 If ocvb.intermediateObject Is Nothing Then
                     ocvb.trueText(task.intermediateReview + " is not active.", 10, 100)
@@ -72,8 +74,8 @@ Public Class VBparent : Implements IDisposable
                 Else
                     dst1 = ocvb.intermediateObject.dst1
                     dst2 = ocvb.intermediateObject.dst2
-                    label1 = ocvb.intermediateObject.label1
-                    label2 = ocvb.intermediateObject.label2
+                    ocvb.label1 = ocvb.intermediateObject.label1
+                    ocvb.label2 = ocvb.intermediateObject.label2
                 End If
             End If
             If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
@@ -83,8 +85,6 @@ Public Class VBparent : Implements IDisposable
             End If
             task.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
             task.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
-            ocvb.label1 = label1
-            ocvb.label2 = label2
             ocvb.frameCount += 1
         End If
     End Sub

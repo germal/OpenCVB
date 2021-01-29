@@ -999,20 +999,20 @@ End Class
 Public Class Histogram_StableDepthClusters
     Inherits VBparent
     Dim clusters As Histogram_DepthClusters
-    Dim stableD As Motion_StableDepth
+    Dim motionSD As Motion_StableDepth
     Public Sub New()
         initParent()
 
         clusters = New Histogram_DepthClusters
-        stableD = New Motion_StableDepth
+        motionSD = New Motion_StableDepth
         label1 = "Histogram of stable depth"
         label2 = "Backprojection of stable depth"
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        stableD.Run()
-        clusters.src = stableD.dst1
+        motionSD.Run()
+        clusters.src = motionSD.dst1
         clusters.Run()
         dst1 = clusters.dst1
         dst2 = clusters.dst2
