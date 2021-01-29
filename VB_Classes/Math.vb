@@ -120,35 +120,35 @@ End Class
 Public Class Math_RGBCorrelation
     Inherits VBparent
     Dim flow As Font_FlowText
-    Dim corr As MatchTemplate_Basics
+    Dim match As MatchTemplate_Basics
     Public Sub New()
         initParent()
         flow = New Font_FlowText()
 
-        corr = New MatchTemplate_Basics()
+        match = New MatchTemplate_Basics()
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split = src.Split()
-        corr.sample = split(0)
-        corr.searchMat = split(1)
-        corr.Run()
-        Dim blueGreenCorrelation = "Blue-Green " + corr.label1
+        match.sample = split(0)
+        match.searchMat = split(1)
+        match.Run()
+        Dim blueGreenCorrelation = "Blue-Green " + match.label1
 
-        corr.sample = split(2)
-        corr.searchMat = split(1)
-        corr.Run()
-        Dim redGreenCorrelation = "Red-Green " + corr.label1
+        match.sample = split(2)
+        match.searchMat = split(1)
+        match.Run()
+        Dim redGreenCorrelation = "Red-Green " + match.label1
 
-        corr.sample = split(2)
-        corr.searchMat = split(0)
-        corr.Run()
-        Dim redBlueCorrelation = "Red-Blue " + corr.label1
+        match.sample = split(2)
+        match.searchMat = split(0)
+        match.Run()
+        Dim redBlueCorrelation = "Red-Blue " + match.label1
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
         flow.Run()
-        label1 = "Log of " + corr.matchText
+        label1 = "Log of " + match.matchText
     End Sub
 End Class
 

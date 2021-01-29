@@ -9,21 +9,17 @@ Public Class Gradient_Basics
     Public Sub New()
         initParent()
         sobel = New Edges_Sobel()
-        task.desc = "Use phase to compute gradient"
         label2 = "Phase Output"
+        task.desc = "Use phase to compute gradient"
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         sobel.src = src
         sobel.Run()
-        Dim angle = New cv.Mat
-        Dim x32f As New cv.Mat
-        Dim y32f As New cv.Mat
+        Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
-        cv.Cv2.Phase(x32f, y32f, angle)
-        Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
-        gray.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        cv.Cv2.Phase(x32f, y32f, dst2)
         dst1 = sobel.dst1
     End Sub
 End Class
@@ -42,48 +38,17 @@ Public Class Gradient_Depth
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If task.drawRect.Width > 0 Then sobel.src = task.RGBDepth(task.drawRect) Else sobel.src = task.RGBDepth.Clone()
+        ' If task.drawRect.Width > 0 Then sobel.src = task.RGBDepth(task.drawRect) Else sobel.src = task.RGBDepth.Clone()
+        sobel.src = task.depth32f
         sobel.Run()
-        Dim angle = New cv.Mat
-        Dim x32f As New cv.Mat
-        Dim y32f As New cv.Mat
+        Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
-        cv.Cv2.Phase(x32f, y32f, angle)
-        Dim gray = angle.Normalize(255, 0, cv.NormTypes.MinMax)
-        gray.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        cv.Cv2.Phase(x32f, y32f, dst2)
         dst1 = sobel.dst1
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Gradient_Flatland
-    Inherits VBparent
-    Dim grade As Gradient_Basics
-    Public Sub New()
-        initParent()
-        grade = New Gradient_Basics()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Reduction Factor", 1, 64, 16)
-        End If
-        task.desc = "Reduced grayscale shows isobars in depth."
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim reductionFactor = sliders.trackbar(0).Maximum - sliders.trackbar(0).Value
-        dst1 = task.RGBDepth.Clone()
-        dst1 /= reductionFactor
-        dst1 *= reductionFactor
-        grade.src = src
-        grade.Run()
-        dst2 = grade.dst2
-    End Sub
-End Class
 
 
 

@@ -365,3 +365,88 @@ Public Class Motion_DepthShadow
         label2 = "Shadow that is consistently present. " + CStr(tmp.CountNonZero) + " pixels"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class Motion_Camera
+    Inherits VBparent
+    Dim stdev As Math_Stdev
+    Dim match As MatchTemplate_Basics
+    Public Sub New()
+        initParent()
+        match = New MatchTemplate_Basics
+        stdev = New Math_Stdev
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 950)
+            sliders.setupTrackBar(1, "Segments meeting correlation threshold", 1, 500, 70)
+        End If
+
+        Dim widthSlider = findSlider("ThreadGrid Width")
+        Dim heightSlider = findSlider("ThreadGrid Height")
+        widthSlider.Value = 32
+        heightSlider.Value = 32
+
+        task.desc = "Detect camera motion with a concensus of results from stdev and correlation coefficients"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        stdev.src = input
+        stdev.Run()
+        dst1 = input.Clone
+        dst2 = stdev.dst2
+
+        Static stdevThresholdSlider = findSlider("Stdev Threshold")
+        Dim stdevThreshold = stdevThresholdSlider.value
+        Static corrThresholdSlider = findSlider("Correlation Threshold X1000")
+        Dim correlationThreshold = corrThresholdSlider.value / 1000
+
+        Static lastFrame = input
+        Dim font = cv.HersheyFonts.HersheyComplex
+        Dim fsize = ocvb.fontSize / 3
+        Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
+        Dim mean As Double, stdDev As Double
+        Dim updateCount As Integer
+
+        Dim offsetX = stdev.grid.roiList(0).Width / 4
+        Dim offsety = stdev.grid.roiList(0).Height / 4
+
+        Dim avgX As Single, avgY As Single
+        For Each roi In stdev.grid.roiList
+            Dim newRoi = New cv.Rect(roi.X + roi.Width / 4, roi.Y + roi.Height / 4, roi.Width / 2, roi.Height / 2)
+            cv.Cv2.MeanStdDev(dst1(newRoi), mean, stdDev)
+            If stdDev > stdevThreshold Then
+                match.sample = dst1(newRoi)
+                match.searchMat = lastFrame(roi)
+                match.Run()
+                match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+                If maxVal > correlationThreshold Then
+                    updateCount += 1
+                    avgX += maxLoc.X - offsetX
+                    avgY += maxLoc.Y - offsety
+                    Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
+                    dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                    cv.Cv2.PutText(dst1, CStr(maxLoc.X - offsetX) + "," + CStr(maxLoc.Y - offsety), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                    cv.Cv2.PutText(dst2, Format(maxVal, "0.00"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                End If
+            End If
+        Next
+
+        lastFrame = input
+        label1 = "Translation = " + Format(avgX / updateCount, "#0.00") + "," + Format(avgY / updateCount, "#0.00")
+        label2 = CStr(updateCount) + " segments had correlation coefficients > " + Format(correlationThreshold, "0.00")
+        dst1.SetTo(255, stdev.grid.gridMask)
+    End Sub
+End Class

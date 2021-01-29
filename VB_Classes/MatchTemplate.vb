@@ -72,13 +72,13 @@ End Class
 
 Public Class MatchTemplate_RowCorrelation
     Inherits VBparent
-    Dim corr As MatchTemplate_Basics
+    Dim match As MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public Sub New()
         initParent()
         flow = New Font_FlowText()
 
-        corr = New MatchTemplate_Basics()
+        match = New MatchTemplate_Basics()
 
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
@@ -87,21 +87,21 @@ Public Class MatchTemplate_RowCorrelation
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
-        corr.sample = src.Row(line1)
-        corr.searchMat = src.Row(line2 + 1)
-        corr.Run()
-        Dim correlation = corr.correlationMat.Get(Of Single)(0, 0)
-        flow.msgs.Add(corr.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
+        match.sample = src.Row(line1)
+        match.searchMat = src.Row(line2 + 1)
+        match.Run()
+        Dim correlation = match.correlationMat.Get(Of Single)(0, 0)
+        flow.msgs.Add(match.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
         flow.Run()
 
         Static minCorrelation As Single
         Static maxCorrelation As Single
 
-        Static saveCorrType = corr.matchOption
-        If ocvb.frameCount = 0 Or saveCorrType <> corr.matchOption Then
+        Static saveCorrType = match.matchOption
+        If ocvb.frameCount = 0 Or saveCorrType <> match.matchOption Then
             minCorrelation = Single.PositiveInfinity
             maxCorrelation = Single.NegativeInfinity
-            saveCorrType = corr.matchOption
+            saveCorrType = match.matchOption
         End If
 
         If correlation < minCorrelation Then minCorrelation = correlation
@@ -204,11 +204,11 @@ End Class
 Public Class MatchTemplate_Movement
     Inherits VBparent
     Dim grid As Thread_Grid
-    Dim corr As MatchTemplate_Basics
+    Dim match As MatchTemplate_Basics
     Public mask As cv.Mat
     Public Sub New()
         initParent()
-        corr = New MatchTemplate_Basics
+        match = New MatchTemplate_Basics
         grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -241,7 +241,7 @@ Public Class MatchTemplate_Movement
         Dim updateCount As Integer
         mask.SetTo(0)
 
-        Dim matchOption = corr.checkRadio()
+        Dim matchOption = match.checkRadio()
 
         Parallel.ForEach(grid.roiList,
         Sub(roi)
