@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class OptionsAlphaBlend
+Partial Class AlphaChannelFrm
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -35,13 +35,13 @@ Partial Class OptionsAlphaBlend
         Me.AlphaPic.TabIndex = 0
         Me.AlphaPic.TabStop = False
         '
-        'OptionsAlphaBlend
+        'AlphaChannelFrm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1440, 997)
         Me.Controls.Add(Me.AlphaPic)
-        Me.Name = "OptionsAlphaBlend"
+        Me.Name = "AlphaChannelFrm"
         Me.Text = "OptionsAlphaBlend"
         CType(Me.AlphaPic, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)

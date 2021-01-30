@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Environment
 Imports System.Globalization
+Imports System.Drawing
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
@@ -55,8 +56,8 @@ Public Class OpenCVB
     Dim mouseDownPoint As New cv.Point
     Dim mouseMovePoint As New cv.Point
     Dim mousePoint As New cv.Point
-    Dim myBrush = New SolidBrush(System.Drawing.Color.White)
-    Dim myPen As New System.Drawing.Pen(System.Drawing.Color.White)
+    Dim myBrush = New SolidBrush(Color.White)
+    Dim myPen As New Pen(Color.White)
     Dim openCVKeywords As New List(Of String)
     Dim optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
@@ -324,10 +325,10 @@ Public Class OpenCVB
                         Dim tt = ttText(i)
                         If tt IsNot Nothing Then
                             If ttText(i).picTag = 3 Then
-                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White),
                                              tt.x * ratio + camPic(0).Width, tt.y * ratio)
                             Else
-                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.White),
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White),
                                              tt.x * ratio, tt.y * ratio)
                             End If
                             maxline -= 1
@@ -342,11 +343,11 @@ Public Class OpenCVB
             If optionsForm.ShowLabels.Checked Then
                 Dim textRect As New Rectangle(0, 0, camPic(0).Width / 2, If(resizeForDisplay = 4, 12, 20))
                 If Len(picLabels(pic.Tag)) Then g.FillRectangle(myBrush, textRect)
-                g.DrawString(picLabels(pic.Tag), optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.Black), 0, 0)
+                g.DrawString(picLabels(pic.Tag), optionsForm.fontInfo.Font, New SolidBrush(Color.Black), 0, 0)
                 If Len(picLabels(3)) Then
                     textRect = New Rectangle(camPic(0).Width, 0, camPic(0).Width / 2, If(resizeForDisplay = 4, 12, 20))
                     g.FillRectangle(myBrush, textRect)
-                    g.DrawString(picLabels(3), optionsForm.fontInfo.Font, New SolidBrush(System.Drawing.Color.Black), camPic(0).Width, 0)
+                    g.DrawString(picLabels(3), optionsForm.fontInfo.Font, New SolidBrush(Color.Black), camPic(0).Width, 0)
                 End If
             End If
         End SyncLock
@@ -579,9 +580,9 @@ Public Class OpenCVB
         camPic(1).Size = New Size(width, height)
         camPic(2).Size = New Size(width * 2, height)
 
-        camPic(0).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        camPic(1).Image = New Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
-        camPic(2).Image = New Bitmap(width * 2, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb)
+        camPic(0).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
+        camPic(1).Image = New Bitmap(width, height, Imaging.PixelFormat.Format24bppRgb)
+        camPic(2).Image = New Bitmap(width * 2, height, Imaging.PixelFormat.Format24bppRgb)
         camPic(0).Location = New Point(padX, padY)
         camPic(1).Location = New Point(camPic(0).Left + camPic(0).Width, padY)
         camPic(2).Location = New Point(padX, camPic(0).Top + camPic(0).Height)
@@ -730,56 +731,9 @@ Public Class OpenCVB
     End Sub
     Private Sub camPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
-            If e.Button = Windows.Forms.MouseButtons.Left Then
-                If DrawingRectangle Then
-                    DrawingRectangle = False
-                    GrabRectangleData = True
-                End If
-            ElseIf e.Button = Windows.Forms.MouseButtons.Right Then
-                BothFirstAndLastReady = False ' we have to see some movement after mousedown.
+            If DrawingRectangle Then
                 DrawingRectangle = False
-
-                Dim pic = DirectCast(sender, PictureBox)
-                Dim src = Choose(pic.Tag + 1, camera.Color, camera.RGBDepth, imgResult)
-                drawRect = validateRect(drawRect, src.width, src.height)
-                Dim offset = If(drawRectPic <> 3, 0, camPic(0).Width)
-                If drawRectPic = 3 Then drawRect.X += camPic(0).Width ' special case for dst2!
-                Dim srcROI As cv.Mat = src(drawRect).clone()
-                Dim csvName As New FileInfo(System.IO.Path.GetTempFileName() + ".csv")
-                Dim sw = New StreamWriter(csvName.FullName)
-                sw.WriteLine("Color image in BGR format - 3 columns per pixel" + vbCrLf)
-                sw.WriteLine(vbCrLf + "width = " + CStr(drawRect.Width) + vbCrLf + "height = " + CStr(drawRect.Height))
-                sw.Write("Row," + vbTab)
-                For i = 0 To drawRect.Width - 1
-                    sw.Write("B" + Format(drawRect.X - offset + i, "000") + "," + "G" + Format(drawRect.X - offset + i, "000") + "," + "R" + Format(drawRect.X - offset + i, "000") + ",")
-                Next
-                sw.WriteLine()
-                For y = 0 To drawRect.Height - 1
-                    sw.Write("Row " + Format(drawRect.Y + y, "000") + "," + vbTab)
-                    For x = 0 To drawRect.Width - 1
-                        Dim pt = srcROI.Get(Of cv.Vec3b)(y, x)
-                        sw.Write(CStr(pt.Item0) + "," + CStr(pt.Item1) + "," + CStr(pt.Item2) + ",")
-                    Next
-                    sw.WriteLine("")
-                Next
-                ' write the min and max values
-                sw.WriteLine(vbCrLf + vbCrLf)
-                Dim split() = srcROI.Split()
-                Dim min As Single, max As Single
-                split(0).MinMaxLoc(min, max)
-                sw.WriteLine("blu_min" + "," + CStr(min))
-                sw.WriteLine("blu_max" + "," + CStr(max))
-
-                split(1).MinMaxLoc(min, max)
-                sw.WriteLine("grn_min" + "," + CStr(min))
-                sw.WriteLine("grn_max" + "," + CStr(max))
-
-                split(2).MinMaxLoc(min, max)
-                sw.WriteLine("red_min" + "," + CStr(min))
-                sw.WriteLine("red_max" + "," + CStr(max))
-
-                sw.Close()
-                DisplayOfficeFile(csvName.DirectoryName, csvName.FullName)
+                GrabRectangleData = True
             End If
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseUp: " + ex.Message)

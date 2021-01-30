@@ -1,5 +1,30 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class Pixel_Show
+    Inherits VBparent
+    Dim viewer As Pixel_Viewer
+    Dim pixels As New PixelShow
+    Public Sub New()
+        initParent()
+        pixels.Show()
+        viewer = New Pixel_Viewer
+
+        task.desc = "Display pixels under the cursor"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static frm = findfrm("Pixel_Viewer Radio Options")
+        Dim radioIndex As Integer
+        For radioIndex = 0 To frm.check.length - 1
+            If frm.check(radioIndex).Checked Then Exit For
+        Next
+
+    End Sub
+End Class
+
+
+
 Public Class Pixel_Viewer
     Inherits VBparent
     Dim flow As Font_FlowText
@@ -73,7 +98,7 @@ Public Class Pixel_Viewer
                 If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 line += vbCrLf + " col  "
                 Dim colDup = 30
-                If drawRect.X > 1000 Then colDup -= 2
+                If drawRect.X >= 1000 Then colDup -= 2
                 For i = 0 To drawRect.Width - 1 Step 5
                     line += Format(drawRect.X + i, "#000" + StrDup(colDup, " "))
                 Next

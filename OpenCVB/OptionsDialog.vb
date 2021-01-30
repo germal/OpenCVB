@@ -112,7 +112,7 @@ Public Class OptionsDialog
 
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
-        fontInfo.Font = New Drawing.Font(DefaultFont, defaultSize)
+        fontInfo.Font = New Font(DefaultFont, defaultSize)
         fontInfo.Text = DefaultFont + " with size = " + CStr(defaultSize)
 
         Dim selectionName = GetSetting("OpenCVB", "PythonExe", "PythonExe", "")
