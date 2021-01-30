@@ -3,21 +3,23 @@ Imports System.Runtime.InteropServices
 Public Class Pixel_Viewer
     Inherits VBparent
     Public pixels As PixelViewer
+    Dim radioIndex As Integer
     Public Sub New()
         initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
         standalone = False
 
-        radio.Setup(caller, 5)
-        radio.check(0).Text = "Display pixels at the mouse location as 3-channel BGR"
-        radio.check(1).Text = "Display pixels at the mouse location as 8UC1"
-        radio.check(2).Text = "Display pixels at the mouse location as 32-bit"
-        radio.check(3).Text = "Display depth data at the mouse location as 32-bit"
-        radio.check(4).Text = "Display pointcloud data at the mouse location as 32-bit"
-        radio.check(0).Checked = True
+        radio.Setup(caller, 4)
+        radio.check(0).Text = "Display pixels at the mouse location in dst1"
+        radio.check(1).Text = "Display pixels at the mouse location in dst2"
+        radio.check(2).Text = "Display depth32f pixels at the mouse location"
+        radio.check(3).Text = "Display PointCloud pixels at the mouse location"
+        radioIndex = GetSetting("OpenCVB", "PixelViewerRadioIndex", "PixelViewerRadioIndex", 0)
+        radio.check(radioIndex).Checked = True
 
         check.Setup(caller, 1)
         check.Box(0).Text = "Open form to display image pixels for dst1"
+        check.Box(0).Checked = GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False)
 
         task.desc = "Display pixels under the cursor"
     End Sub
@@ -33,7 +35,6 @@ Public Class Pixel_Viewer
             task.pixelCheck = True
 
             Static frm = findfrm("Pixel_Viewer Radio Options")
-            Dim radioIndex As Integer
             For radioIndex = 0 To frm.check.length - 1
                 If frm.check(radioIndex).Checked Then Exit For
             Next
@@ -49,14 +50,12 @@ Public Class Pixel_Viewer
             End If
             task.drawRect = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
 
-            Static saveDrawRect = task.drawRect
+            Static saveRadioIndex = -1
+            Static saveDrawRect = New cv.Rect(0, 0, -1, -1)
+            If saveRadioIndex <> radioIndex Then saveDrawRect = New cv.Rect(0, 0, -1, -1)
             If saveDrawRect = task.drawRect Then Exit Sub
 
-            dst1 = task.algorithmObject.dst1.clone
-            dst2 = task.algorithmObject.dst2.clone
-
-            If radioIndex = 0 And dst1.Channels = 1 Then radioIndex = 1
-            If dst1.Type = cv.MatType.CV_32F Then radioIndex = 2
+            dst1 = Choose(radioIndex + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone, task.depth32f, task.pointCloud)
 
             pixels.line = ""
             Dim dw = task.drawRect
@@ -118,6 +117,7 @@ Public Class Pixel_Viewer
             End Select
             pixels.Refresh()
             saveDrawRect = task.drawRect
+            saveRadioIndex = radioIndex
         Else
             If task.pixelCheck Then
                 pixels.Close()
@@ -126,6 +126,8 @@ Public Class Pixel_Viewer
         End If
     End Sub
     Public Sub closeViewer()
+        SaveSetting("OpenCVB", "PixelViewerRadioIndex", "PixelViewerRadioIndex", radioIndex)
+        SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", task.pixelCheck)
         If task.pixelCheck Then pixels.Close()
     End Sub
 End Class
