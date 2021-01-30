@@ -496,7 +496,7 @@ Public Class Motion_FilteredRGB
             If rect.Width And rect.Height Then src(rect).CopyTo(stableRGB(rect))
         End If
 
-        dst1 = stableRGB
+        dst1 = stableRGB.Clone
     End Sub
 End Class
 

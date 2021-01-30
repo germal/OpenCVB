@@ -1117,7 +1117,7 @@ Public Class OpenCVB
             If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
 
             ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-            If task.drawRect <> New cv.Rect(0, 0, 0, 0) Then
+            If task.drawRect <> New cv.Rect Then
                 drawRect = task.drawRect
                 Dim ratio = task.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
                 drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
@@ -1202,6 +1202,7 @@ Public Class OpenCVB
 
                 task.RunAlgorithm()
 
+                drawRect = task.drawRect ' algorithm may have updated the drawrect.
                 If task.drawRectClear Then
                     drawRect = New cv.Rect
                     task.drawRect = drawRect
