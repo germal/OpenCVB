@@ -149,11 +149,11 @@ End Class
 
 Public Class Gradient_StableDepth
     Inherits VBparent
-    Dim motionSD As Motion_StableDepth
+    Dim motionSD As Motion_MinMaxDepth
     Dim basics As Gradient_Basics
     Public Sub New()
         initParent()
-        motionSD = New Motion_StableDepth
+        motionSD = New Motion_MinMaxDepth
         basics = New Gradient_Basics
         label1 = "Stable depth input to Gradient"
         label2 = "Phase component of the gradient output"

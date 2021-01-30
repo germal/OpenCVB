@@ -4,7 +4,7 @@ Imports System.Windows.Forms
 Module Algorithm_Module
     Public ocvb As VBocvb
     Public task As ActiveTask
-    Public aOptions As OptionsAll
+    Public aOptions As OptionsContainer
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public PipeTaskIndex As Integer
@@ -120,6 +120,8 @@ Public Class ActiveTask : Implements IDisposable
     Public leftView As cv.Mat
     Public rightView As cv.Mat
     Public viewOptions As Object
+    Public PixelViewer As Object
+    Public pixelCheck As Boolean
 
     ' add any global option algorithms here
     Public inrange As Object
@@ -255,10 +257,11 @@ Public Class ActiveTask : Implements IDisposable
         ocvb.algName = algName
         ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\" + algName
 
-        aOptions = New OptionsAll
+        aOptions = New OptionsContainer
         If algName.EndsWith(".py") = False Then aOptions.Show()
         inrange = algoList.createAlgorithm("OptionsCommon_Depth")
         viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+        PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
 
         algorithmObject = algoList.createAlgorithm(algName)
 

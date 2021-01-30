@@ -1,11 +1,11 @@
-﻿Imports System.Windows.Forms
+﻿Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Imports System.Drawing
-Public Class PixelShow
+Public Class PixelViewer
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         FontInfo.Font = New Font(DefaultFont, defaultSize)
-
 
     End Sub
 

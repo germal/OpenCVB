@@ -1520,7 +1520,7 @@ End Class
 
 Public Class Depth_SmoothSurfaces
     Inherits VBparent
-    Public pcValid As Motion_StablePointCloud
+    Public pcValid As Motion_MinMaxPointCloud
     Dim histX As Histogram_Basics
     Dim histY As Histogram_Basics
     Dim mats As Mat_4to1
@@ -1530,7 +1530,7 @@ Public Class Depth_SmoothSurfaces
         mats = New Mat_4to1
         histX = New Histogram_Basics
         histY = New Histogram_Basics
-        pcValid = New Motion_StablePointCloud
+        pcValid = New Motion_MinMaxPointCloud
 
         label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
         label2 = "Likely smooth surfaces"

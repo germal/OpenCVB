@@ -86,6 +86,8 @@ Public Class VBparent : Implements IDisposable
             task.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
             task.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
             ocvb.frameCount += 1
+
+            task.PixelViewer.run()
         End If
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect
@@ -168,6 +170,10 @@ Public Class VBparent : Implements IDisposable
         radio.Dispose()
         radio1.Dispose()
         combo.Dispose()
+        src.Dispose()
+        dst1.Dispose()
+        dst2.Dispose()
+        task.PixelViewer.closeViewer()
     End Sub
 
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.

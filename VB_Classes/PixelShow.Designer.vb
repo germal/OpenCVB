@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class PixelShow
+Partial Class PixelViewer
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -35,13 +35,13 @@ Partial Class PixelShow
         Me.FontInfo.Text = "Label1"
         Me.FontInfo.Visible = False
         '
-        'PixelShow
+        'PixelViewer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1707, 1147)
         Me.Controls.Add(Me.FontInfo)
-        Me.Name = "PixelShow"
+        Me.Name = "PixelViewer"
         Me.Text = "PixelShow"
         Me.ResumeLayout(False)
         Me.PerformLayout()

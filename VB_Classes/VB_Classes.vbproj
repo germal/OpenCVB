@@ -108,7 +108,6 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="BestOf.vb" />
-    <Compile Include="ImageRGB.vb" />
     <Compile Include="ImageSeg.vb" />
     <Compile Include="MiniPC.vb" />
     <Compile Include="OptionsCommon.vb" />

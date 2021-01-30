@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.ComponentModel
 Imports System.Windows.Forms
-Public Class OptionsAll
+Public Class OptionsContainer
     Public optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public offset = 30

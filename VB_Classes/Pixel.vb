@@ -1,31 +1,57 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Pixel_Show
+Public Class Pixel_Viewer
     Inherits VBparent
-    Dim viewer As Pixel_Viewer
-    Dim pixels As New PixelShow
+    Public pixels As PixelViewer
     Public Sub New()
         initParent()
-        pixels.Show()
-        viewer = New Pixel_Viewer
+        task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
+        standalone = False
+
+        radio.Setup(caller, 5)
+        radio.check(0).Text = "Display pixels at the mouse location as 3-channel BGR"
+        radio.check(1).Text = "Display pixels at the mouse location as 8UC1"
+        radio.check(2).Text = "Display pixels at the mouse location as 32-bit"
+        radio.check(3).Text = "Display depth data at the mouse location as 32-bit"
+        radio.check(4).Text = "Display pointcloud data at the mouse location as 32-bit"
+        radio.check(0).Checked = True
+
+        check.Setup(caller, 1)
+        check.Box(0).Text = "Open form to display image pixels for dst1"
 
         task.desc = "Display pixels under the cursor"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static frm = findfrm("Pixel_Viewer Radio Options")
-        Dim radioIndex As Integer
-        For radioIndex = 0 To frm.check.length - 1
-            If frm.check(radioIndex).Checked Then Exit For
-        Next
+        Static pixelCheck = findCheckBox("Open form to display image pixels for dst1")
+        If pixelCheck.Checked Then
+            If task.pixelCheck = False Then
+                pixels = New PixelViewer
+                pixels.Show()
+            End If
+            task.pixelCheck = True
 
+            Static frm = findfrm("Pixel_Viewer Radio Options")
+            Dim radioIndex As Integer
+            For radioIndex = 0 To frm.check.length - 1
+                If frm.check(radioIndex).Checked Then Exit For
+            Next
+        Else
+            If task.pixelCheck Then
+                pixels.Close()
+                task.pixelCheck = False
+            End If
+        End If
+    End Sub
+    Public Sub closeViewer()
+        If task.pixelCheck Then pixels.Close()
     End Sub
 End Class
 
 
 
-Public Class Pixel_Viewer
+Public Class Pixel_Explorer
     Inherits VBparent
     Dim flow As Font_FlowText
     Public drawRect As cv.Rect
