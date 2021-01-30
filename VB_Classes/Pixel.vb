@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Public Class Pixel_Viewer
     Inherits VBparent
     Dim flow As Font_FlowText
-    Dim pixels As Pixel_Viewer
     Public drawRect As cv.Rect
     Public Sub New()
         initParent()
@@ -15,13 +14,7 @@ Public Class Pixel_Viewer
             radio.check(2).Text = "Display data as 32-bit"
             radio.check(3).Text = "Display depth data in drawRect location"
             radio.check(4).Text = "Display pointcloud data in drawRect location"
-            radio.check(1).Checked = True
-        End If
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Run Viewer with current algorithm"
-            check.Box(0).Checked = True
+            radio.check(0).Checked = True
         End If
 
         flow = New Font_FlowText()
@@ -40,37 +33,76 @@ Public Class Pixel_Viewer
             If radio.check(radioIndex).Checked Then Exit For
         Next
 
-        Dim drSize = Choose(radioIndex + 1, 10, 20, 10, 10, 5)
+        Dim drWidth = Choose(radioIndex + 1, 7, 22, 10, 10, 5)
+        Dim drHeight = flow.maxLineCount
+        If src.Width = 1280 Then drHeight -= 4
         Static mouseLoc = New cv.Point(100, 100) ' assume 
         If task.mousePoint.X Or task.mousePoint.Y Then
-            Dim x = If(task.mousePoint.X >= drSize, CInt(task.mousePoint.X - drSize), drSize)
-            Dim y = If(task.mousePoint.Y >= drSize, task.mousePoint.Y - drSize, drSize)
+            Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), drWidth)
+            Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, drHeight)
             mouseLoc = New cv.Point(CInt(x), CInt(y))
         End If
-        drawRect = New cv.Rect(mouseLoc.x, mouseLoc.y, drSize, drSize)
+        drawRect = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
 
         label2 = radio.check(radioIndex).Text
         flow.msgs.Clear()
-        flow.msgs.Add(vbCrLf + "Row = " + CStr(drawRect.y) + " Column = " + CStr(drawRect.x) + vbCrLf)
-        Dim line As String = ""
+        Dim line As String = If(src.Width = 1280, vbCrLf + vbCrLf, "")
+        If radioIndex = 0 And dst1.Channels = 1 Then radioIndex = 1
+        If dst1.Type = cv.MatType.CV_32F Then radioIndex = 2
         Select Case radioIndex
+
             Case 0
-            Case 1
-                If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                line = " col   "
-                For i = 0 To drawRect.width - 1
-                    line += Format(drawRect.x + i, "000") + " "
+                Dim colDup = 115
+                Dim img = dst1(drawRect).Reshape(1)
+                line += " col      "
+                For i = drawRect.X To drawRect.X + drawRect.Width - 1 Step 5
+                    line += Format(i, "#000") + StrDup(colDup, " ")
                 Next
                 flow.msgs.Add(line + vbCrLf)
-                For y = drawRect.y To Math.Min(drawRect.y + drawRect.height, dst1.Height) - 1
+                For y = 0 To img.Height - 1
+                    line = "r" + CStr(drawRect.Y + y) + " "
+                    For x = 0 To img.Width - 1
+                        If x Mod 3 = 0 Then line += " "
+                        line += Format(img.Get(Of Byte)(y, x), "000") + " "
+                    Next
+                    flow.msgs.Add(line)
+                Next
+
+
+            Case 1
+                If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                line += vbCrLf + " col  "
+                Dim colDup = 30
+                If drawRect.X > 1000 Then colDup -= 2
+                For i = 0 To drawRect.Width - 1 Step 5
+                    line += Format(drawRect.X + i, "#000" + StrDup(colDup, " "))
+                Next
+                flow.msgs.Add(line + vbCrLf)
+                For y = drawRect.Y To Math.Min(drawRect.Y + drawRect.Height, dst1.Height) - 1
                     line = "r" + CStr(y) + " "
-                    For x = drawRect.x To Math.Min(drawRect.x + drawRect.width - 1, dst1.Width)
+                    For x = drawRect.X To Math.Min(drawRect.X + drawRect.Width - 1, dst1.Width)
                         line += Format(dst1.Get(Of Byte)(y, x), "000") + " "
                     Next
                     flow.msgs.Add(line)
                 Next
+
+
             Case 2
+
+
             Case 3
+                line = " col  "
+                For i = 0 To drawRect.Width - 1
+                    line += Format(drawRect.X + i, "000") + " "
+                Next
+                flow.msgs.Add(line + vbCrLf)
+                For y = drawRect.Y To Math.Min(drawRect.Y + drawRect.Height, dst1.Height) - 1
+                    line = "r" + CStr(y) + " "
+                    For x = drawRect.X To Math.Min(drawRect.X + drawRect.Width - 1, dst1.Width)
+                        line += Format(task.depth32f.Get(Of Byte)(y, x), "0000") + " "
+                    Next
+                    flow.msgs.Add(line)
+                Next
             Case 4
 
         End Select

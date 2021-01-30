@@ -2,7 +2,8 @@
 Public Class ImageRGB_Basics
     Inherits VBparent
     Public motion As Motion_Basics
-    Public stableImage As cv.Mat
+    Public stableRGB As cv.Mat
+    Public stableDepth As cv.Mat
     Dim pixel As Pixel_Viewer
     Public Sub New()
         initParent()
@@ -14,6 +15,7 @@ Public Class ImageRGB_Basics
             radio.check(2).Text = "Use original (unchanged) pixels"
             radio.check(1).Checked = True
         End If
+        pixel = New Pixel_Viewer
         label1 = "Stabilized image"
         task.desc = "Stabilize the RGB (actually BGR) image with Min/Max OpenCV API"
     End Sub
@@ -31,19 +33,21 @@ Public Class ImageRGB_Basics
             If frm.check(radioVal).Checked Then Exit For
         Next
 
-        If motion.resetAll Or stableImage Is Nothing Or radioVal = 2 Then
-            stableImage = src.Clone
+        If motion.resetAll Or stableRGB Is Nothing Or radioVal = 2 Then
+            stableRGB = src.Clone
         Else
             Dim rect = motion.uRect.allRect
             dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
-            If rect.Width And rect.Height Then src(rect).CopyTo(stableImage(rect))
-            If radioVal = 0 Then cv.Cv2.Max(src, stableImage, stableImage) Else cv.Cv2.Min(src, stableImage, stableImage)
+            If rect.Width And rect.Height Then src(rect).CopyTo(stableRGB(rect))
+            ' If radioVal = 0 Then cv.Cv2.Max(src, stableRGB, stableRGB) Else cv.Cv2.Min(src, stableRGB, stableRGB)
         End If
-        dst1 = stableImage
+
+        dst1 = stableRGB
+
+        Dim img = dst1(New cv.Rect(99, 99, 9, 22))
 
         If standalone Or task.intermediateReview = caller Then
-            If pixel Is Nothing Then pixel = New Pixel_Viewer
-            pixel.src = dst1
+            pixel.src = dst1.Clone
             pixel.Run()
             dst1 = pixel.dst1
         End If

@@ -52,8 +52,10 @@ Public Class Font_FlowText
     Inherits VBparent
     Public msgs As New List(Of String)
     Public dst As Integer = RESULT1 ' set to result2 to appear in dst2
+    Public maxLineCount = 22
     Public Sub New()
         initParent()
+        If src.Height = 480 Then maxLineCount = 26
         task.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run()
@@ -65,9 +67,10 @@ Public Class Font_FlowText
             msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.")
             msgs.Add("Then at the end of your Run method, invoke flow.Run()")
         End If
-        Static lastCount As integer
+        Static lastCount As Integer
 
         Dim maxlines = 22
+        If src.Height = 480 Then maxlines = 28
         Dim firstLine = If(msgs.Count - maxlines < 0, 0, msgs.Count - maxlines)
         Dim fullText As String = ""
         For i = firstLine To msgs.Count - 1
