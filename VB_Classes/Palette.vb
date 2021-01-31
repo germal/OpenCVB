@@ -347,7 +347,7 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits VBparent
     Public gradientColorMap As New cv.Mat
-    Public changeColorMap As Boolean
+    Public changeColorMap = True
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
