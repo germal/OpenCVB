@@ -42,7 +42,6 @@ Public Class Pixel_Viewer
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
             pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
 
-            Dim ratio = task.ratioImageToCampic
             Dim drWidth = Choose(displayType + 1, 7, 22, 10, 10, 5) * pixels.Width / 650
             Dim drHeight = pixels.Height / 17
             If src.Width = 1280 Then drHeight -= 4
@@ -83,7 +82,7 @@ Public Class Pixel_Viewer
                 dw.Height = dw.Height
             End If
 
-            Dim drawRect = New cv.Rect(CInt(dw.X / ratio), CInt(dw.Y / ratio), CInt(dw.Width / ratio), CInt(dw.Height / ratio))
+            Dim drawRect = New cv.Rect(dw.X, dw.Y, dw.Width, dw.Height)
             If saveDrawRect <> drawRect Or pixels.pixelResized Then
 
                 pixels.pixelResized = False
@@ -144,12 +143,11 @@ Public Class Pixel_Viewer
                 pixels.Refresh()
                 savedisplayType = displayType
                 saveDrawRect = drawRect
+            End If
+            If task.mousePicTag = 2 Then
+                task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
             Else
-                If task.mousePicTag = 2 Then
-                    task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.White, 1)
-                Else
-                    task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.White, 1)
-                End If
+                task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
             End If
         Else
             If task.pixelCheck Then
