@@ -20,8 +20,6 @@ Public Class Pixel_Viewer
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If check.Box(0).Checked = False Then Dim k = 0
-
         Static pixelCheck = findCheckBox("Open Pixel Viewer")
         If pixelCheck.Checked Then
             If task.pixelCheck = False Then
@@ -36,10 +34,15 @@ Public Class Pixel_Viewer
             If task.mousePicTag < 2 Then Exit Sub
             dst1 = Choose(task.mousePicTag - 2 + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone)
 
-            Dim displayType = 0 ' default is 8uc3
+            Dim displayType = -1 ' default is 8uc3
+            If dst1.Type = cv.MatType.CV_8UC3 Then displayType = 0
             If dst1.Type = cv.MatType.CV_8U Then displayType = 1
             If dst1.Type = cv.MatType.CV_32F Then displayType = 2
             If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
+            If displayType < 0 Or dst1.Channels > 4 Then
+                ocvb.trueText("The pixel Viewer does not support this cv.Mat!")
+                Exit Sub
+            End If
 
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
             pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
