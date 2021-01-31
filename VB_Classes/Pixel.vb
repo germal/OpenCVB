@@ -31,7 +31,8 @@ Public Class Pixel_Viewer
             keys.Run()
             Dim keyInput = New List(Of String)(keys.keyInput)
 
-            dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone)
+            If task.mousePicTag < 2 Then Exit Sub
+            dst1 = Choose(task.mousePicTag - 2 + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone)
 
             Dim displayType = 0 ' default is 8uc3
             If dst1.Type = cv.MatType.CV_8U Then displayType = 1
@@ -82,66 +83,74 @@ Public Class Pixel_Viewer
                 dw.Height = dw.Height
             End If
 
-            task.drawRect = New cv.Rect(CInt(dw.X / ratio), CInt(dw.Y / ratio), CInt(dw.Width / ratio), CInt(dw.Height / ratio))
-            If saveDrawRect = task.drawRect And pixels.pixelResized = False Then Exit Sub
-            pixels.pixelResized = False
+            Dim drawRect = New cv.Rect(CInt(dw.X / ratio), CInt(dw.Y / ratio), CInt(dw.Width / ratio), CInt(dw.Height / ratio))
+            If saveDrawRect <> drawRect Or pixels.pixelResized Then
 
-            Select Case displayType
+                pixels.pixelResized = False
 
-                Case 0
-                    pixels.line = " col " + If(dw.X Mod 5, "  ", "    ")
-                    Dim colDup = If(dw.X < 1000, 26, 25)
-                    For i = 0 To dw.Width - 1
-                        If (dw.X + i) Mod 5 Then pixels.line += StrDup(colDup, " ") Else pixels.line += Format(dw.X + i, "#000") + "         "
-                    Next
-                    pixels.line += vbCrLf
-                    For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
-                        pixels.line += "r" + Format(y, "000") + "   "
-                        For x = dw.X To Math.Min(dw.X + dw.Width, dst1.Width) - 1
-                            pixels.line += Format(dst1.Get(Of Byte)(y, x), "000") + " "
-                            pixels.line += Format(dst1.Get(Of Byte)(y, x + 1), "000") + " "
-                            pixels.line += Format(dst1.Get(Of Byte)(y, x + 2), "000") + "   "
+                Select Case displayType
+
+                    Case 0
+                        pixels.line = " col " + If(dw.X Mod 5, "  ", "    ")
+                        Dim colDup = If(dw.X < 1000, 26, 25)
+                        For i = 0 To dw.Width - 1
+                            If (dw.X + i) Mod 5 Then pixels.line += StrDup(colDup, " ") Else pixels.line += Format(dw.X + i, "#000") + "         "
                         Next
                         pixels.line += vbCrLf
-                    Next
+                        For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
+                            pixels.line += "r" + Format(y, "000") + "   "
+                            For x = dw.X To Math.Min(dw.X + dw.Width, dst1.Width) - 1
+                                pixels.line += Format(dst1.Get(Of Byte)(y, x), "000") + " "
+                                pixels.line += Format(dst1.Get(Of Byte)(y, x + 1), "000") + " "
+                                pixels.line += Format(dst1.Get(Of Byte)(y, x + 2), "000") + "   "
+                            Next
+                            pixels.line += vbCrLf
+                        Next
 
-                Case 1
-                    pixels.line = " col" + If(dw.X Mod 5, "        ", "     ")
-                    Dim colDup = If(dw.X < 1000, 7, 6)
-                    For i = 0 To dw.Width - 1
-                        If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "    " Else pixels.line += StrDup(colDup, " ")
-                    Next
-                    pixels.line += vbCrLf
-                    For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
-                        pixels.line += "r" + Format(y, "000") + "   "
-                        For x = dw.X To Math.Min(dw.X + dw.Width, dst1.Width) - 1
-                            pixels.line += Format(dst1.Get(Of Byte)(y, x), "000") + If(x Mod 5 = 4, "   ", " ")
+                    Case 1
+                        pixels.line = " col" + If(dw.X Mod 5, "        ", "     ")
+                        Dim colDup = If(dw.X < 1000, 7, 6)
+                        For i = 0 To dw.Width - 1
+                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "    " Else pixels.line += StrDup(colDup, " ")
                         Next
                         pixels.line += vbCrLf
-                    Next
-
-
-                Case 2
-
-
-                Case 3
-                    pixels.line = " col  "
-                    For i = 0 To dw.Width - 1
-                        pixels.line += Format(dw.X + i, "000") + " "
-                    Next
-                    pixels.line += vbCrLf
-                    For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
-                        pixels.line += "r" + CStr(y) + " "
-                        For x = dw.X To Math.Min(dw.X + dw.Width - 1, dst1.Width)
-                            pixels.line += Format(task.depth32f.Get(Of Byte)(y, x), "0000") + " "
+                        For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
+                            pixels.line += "r" + Format(y, "000") + "   "
+                            For x = dw.X To Math.Min(dw.X + dw.Width, dst1.Width) - 1
+                                pixels.line += Format(dst1.Get(Of Byte)(y, x), "000") + If(x Mod 5 = 4, "   ", " ")
+                            Next
+                            pixels.line += vbCrLf
                         Next
-                    Next
-                Case 4
 
-            End Select
-            pixels.Refresh()
-            savedisplayType = displayType
-            saveDrawRect = task.drawRect
+
+                    Case 2
+
+
+                    Case 3
+                        pixels.line = " col  "
+                        For i = 0 To dw.Width - 1
+                            pixels.line += Format(dw.X + i, "000") + " "
+                        Next
+                        pixels.line += vbCrLf
+                        For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
+                            pixels.line += "r" + CStr(y) + " "
+                            For x = dw.X To Math.Min(dw.X + dw.Width - 1, dst1.Width)
+                                pixels.line += Format(task.depth32f.Get(Of Byte)(y, x), "0000") + " "
+                            Next
+                        Next
+                    Case 4
+
+                End Select
+                pixels.Refresh()
+                savedisplayType = displayType
+                saveDrawRect = drawRect
+            Else
+                If task.mousePicTag = 2 Then
+                    task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.White, 1)
+                Else
+                    task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.White, 1)
+                End If
+            End If
         Else
             If task.pixelCheck Then
                 pixels.Close()
@@ -152,120 +161,6 @@ Public Class Pixel_Viewer
     Public Sub closeViewer()
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", task.pixelCheck)
         If task.pixelCheck And pixels IsNot Nothing Then pixels.Close()
-    End Sub
-End Class
-
-
-
-Public Class Pixel_Explorer
-    Inherits VBparent
-    Dim flow As Font_FlowText
-    Public drawRect As cv.Rect
-    Public Sub New()
-        initParent()
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 5)
-            radio.check(0).Text = "Display all 3 channels (regardless of format)"
-            radio.check(1).Text = "Display data as 8UC1"
-            radio.check(2).Text = "Display data as 32-bit"
-            radio.check(3).Text = "Display depth data in drawRect location"
-            radio.check(4).Text = "Display pointcloud data in drawRect location"
-            radio.check(0).Checked = True
-        End If
-
-        flow = New Font_FlowText()
-        flow.dst = RESULT2
-        label1 = "Move the mouse to the desired area"
-        task.desc = "View pixel data inside the drawRect area"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        dst1 = src
-        dst2.SetTo(0)
-
-        Dim radioIndex As Integer
-        For radioIndex = 0 To radio.check.Count - 1
-            If radio.check(radioIndex).Checked Then Exit For
-        Next
-
-        Dim drWidth = Choose(radioIndex + 1, 7, 22, 10, 10, 5)
-        Dim drHeight = flow.maxLineCount
-        If src.Width = 1280 Then drHeight -= 4
-        Static mouseLoc = New cv.Point(100, 100) ' assume 
-        If task.mousePoint.X Or task.mousePoint.Y Then
-            Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), drWidth)
-            Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, drHeight)
-            mouseLoc = New cv.Point(CInt(x), CInt(y))
-        End If
-        drawRect = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
-
-        label2 = radio.check(radioIndex).Text
-        flow.msgs.Clear()
-        Dim line As String = If(src.Width = 1280, vbCrLf + vbCrLf, "")
-        If radioIndex = 0 And dst1.Channels = 1 Then radioIndex = 1
-        If dst1.Type = cv.MatType.CV_32F Then radioIndex = 2
-        Select Case radioIndex
-
-            Case 0
-                Dim colDup = 115
-                Dim img = dst1(drawRect).Reshape(1)
-                line += " col      "
-                For i = drawRect.X To drawRect.X + drawRect.Width - 1 Step 5
-                    line += Format(i, "#000") + StrDup(colDup, " ")
-                Next
-                flow.msgs.Add(line + vbCrLf)
-                For y = 0 To img.Height - 1
-                    line = "r" + CStr(drawRect.Y + y) + " "
-                    For x = 0 To img.Width - 1
-                        If x Mod 3 = 0 Then line += " "
-                        line += Format(img.Get(Of Byte)(y, x), "000") + " "
-                    Next
-                    flow.msgs.Add(line)
-                Next
-
-
-            Case 1
-                If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                line += vbCrLf + " col  "
-                Dim colDup = 30
-                If drawRect.X >= 1000 Then colDup -= 2
-                For i = 0 To drawRect.Width - 1 Step 5
-                    line += Format(drawRect.X + i, "#000" + StrDup(colDup, " "))
-                Next
-                flow.msgs.Add(line + vbCrLf)
-                For y = drawRect.Y To Math.Min(drawRect.Y + drawRect.Height, dst1.Height) - 1
-                    line = "r" + CStr(y) + " "
-                    For x = drawRect.X To Math.Min(drawRect.X + drawRect.Width - 1, dst1.Width)
-                        line += Format(dst1.Get(Of Byte)(y, x), "000") + " "
-                    Next
-                    flow.msgs.Add(line)
-                Next
-
-
-            Case 2
-
-
-            Case 3
-                line = " col  "
-                For i = 0 To drawRect.Width - 1
-                    line += Format(drawRect.X + i, "000") + " "
-                Next
-                flow.msgs.Add(line + vbCrLf)
-                For y = drawRect.Y To Math.Min(drawRect.Y + drawRect.Height, dst1.Height) - 1
-                    line = "r" + CStr(y) + " "
-                    For x = drawRect.X To Math.Min(drawRect.X + drawRect.Width - 1, dst1.Width)
-                        line += Format(task.depth32f.Get(Of Byte)(y, x), "0000") + " "
-                    Next
-                    flow.msgs.Add(line)
-                Next
-            Case 4
-
-        End Select
-
-        flow.Run()
-        dst1.Rectangle(drawRect, cv.Scalar.White, 1)
     End Sub
 End Class
 
