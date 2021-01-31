@@ -360,26 +360,26 @@ Public Class Palette_BuildGradientColorMap
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static transitionSlider = findSlider("Number of color transitions (Used only with Random)")
-        Static tranSetting As Integer = -1
-        If tranSetting <> transitionSlider.value Or changeColorMap Then
+        If changeColorMap Or standalone Then
             changeColorMap = False
-            tranSetting = transitionSlider.value
 
             Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            Static saveGradCount = -1
-            Dim gradCount = transitionSlider.Value
-            Dim gradMat As New cv.Mat
-            For i = 0 To gradCount - 1
-                gradMat = colorTransition(color1, color2, src.Width)
-                color2 = color1
-                color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-            Next
-            gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
-            dst1 = Palette_Custom_Apply(src, gradientColorMap)
-            If standalone Or task.intermediateReview = caller Then dst2 = gradientColorMap
+            Static transitionSlider = findSlider("Number of color transitions (Used only with Random)")
+            Static transitionCount As Integer = -1
+            If transitionCount <> transitionSlider.value Then
+                transitionCount = transitionSlider.value
+                Dim gradMat As New cv.Mat
+                For i = 0 To transitionCount - 1
+                    gradMat = colorTransition(color1, color2, src.Width)
+                    color2 = color1
+                    color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                    If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+                Next
+                gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
+                If standalone Or task.intermediateReview = caller Then dst2 = gradientColorMap
+            End If
+            dst1 = Palette_Custom_Apply(src.Clone, gradientColorMap)
         End If
     End Sub
 End Class
@@ -540,9 +540,9 @@ Public Class Palette_ObjectColors
                 If countDepthPixels > 30 Then
                     Dim depth = task.depth32f(r).Mean(mask)
                     If blobList.ContainsKey(depth.Item(0)) = False Then
-                        If depth.Item(0) > minDepth And depth.Item(0) < maxDepth Then blobList.Add(depth.Item(0), i)
+                        If depth.Item(0) > minDepth And depth.Item(0) <maxDepth Then blobList.Add(depth.Item(0), i)
                     End If
-                End If
+        End If
             End If
         Next
 

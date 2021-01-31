@@ -146,6 +146,14 @@ Public Class Pixel_Viewer
                 savedisplayType = displayType
                 saveDrawRect = drawRect
             End If
+
+            ' some algorithms may not update their dst1 or dst2, so preserve it here.  Otherwise, the rectangle will be permanent...
+            ' It is extra work but only because the pixel viewer is active.
+            'Static saveDst1 = task.algorithmObject.dst1.clone
+            'task.algorithmObject.dst1 = saveDst1.clone
+            'Static saveDst2 = task.algorithmObject.dst2.clone
+            'task.algorithmObject.dst2 = saveDst2.Clone
+
             If task.mousePicTag = 2 Then
                 task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
             Else
