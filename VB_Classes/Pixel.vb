@@ -20,6 +20,8 @@ Public Class Pixel_Viewer
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
+        If check.Box(0).Checked = False Then Dim k = 0
+
         Static pixelCheck = findCheckBox("Open Pixel Viewer")
         If pixelCheck.Checked Then
             If task.pixelCheck = False Then
@@ -157,7 +159,9 @@ Public Class Pixel_Viewer
         End If
     End Sub
     Public Sub closeViewer()
-        SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", task.pixelCheck)
+        If check.Box(0).Checked <> GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False) Then
+            SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", task.pixelCheck)
+        End If
         If task.pixelCheck And pixels IsNot Nothing Then pixels.Close()
     End Sub
 End Class
