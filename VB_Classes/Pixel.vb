@@ -39,26 +39,38 @@ Public Class Pixel_Viewer
                 If frm.check(radioIndex).Checked Then Exit For
             Next
 
+            Dim ratio = task.ratioImageToCampic
             Dim drWidth = Choose(radioIndex + 1, 7, 22, 10, 10, 5)
             Dim drHeight = 32
             If src.Width = 1280 Then drHeight -= 4
             Static mouseLoc = New cv.Point(100, 100) ' assume 
             If task.mousePoint.X Or task.mousePoint.Y Then
-                Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), drWidth)
-                Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, drHeight)
+                Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), 0)
+                Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, 0)
                 mouseLoc = New cv.Point(CInt(x), CInt(y))
             End If
-            task.drawRect = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
 
             Static saveRadioIndex = -1
             Static saveDrawRect = New cv.Rect(0, 0, -1, -1)
             If saveRadioIndex <> radioIndex Then saveDrawRect = New cv.Rect(0, 0, -1, -1)
-            If saveDrawRect = task.drawRect Then Exit Sub
-
-            dst1 = Choose(radioIndex + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone, task.depth32f, task.pointCloud)
 
             pixels.line = ""
-            Dim dw = task.drawRect
+            Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
+            If dw.X < 0 Then dw.X = 0
+            If dw.Y < 0 Then dw.Y = 0
+            If dw.X + dw.Width > dst1.Width Then
+                dw.X = dst1.Width - dw.Width
+                dw.Width = dw.Width
+            End If
+            If dw.Y + dw.Height > dst1.Height Then
+                dw.Y = dst1.Height - dw.Height
+                dw.Height = dw.Height
+            End If
+
+            task.drawRect = New cv.Rect(CInt(dw.X / ratio), CInt(dw.Y / ratio), CInt(dw.Width / ratio), CInt(dw.Height / ratio))
+            If saveDrawRect = task.drawRect Then Exit Sub
+            dst1 = Choose(radioIndex + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone, task.depth32f, task.pointCloud)
+
             Select Case radioIndex
 
                 Case 0
@@ -116,8 +128,9 @@ Public Class Pixel_Viewer
 
             End Select
             pixels.Refresh()
-            saveDrawRect = task.drawRect
             saveRadioIndex = radioIndex
+            saveDrawRect = task.drawRect
+            dst1.Rectangle(task.drawRect, cv.Scalar.White, 1)
         Else
             If task.pixelCheck Then
                 pixels.Close()

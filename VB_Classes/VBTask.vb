@@ -171,6 +171,7 @@ Public Class ActiveTask : Implements IDisposable
     Public label2 As String
     Public desc As String
     Public intermediateReview As String
+    Public ratioImageToCampic As Single
 
     Public transformationMatrix() As Single
 

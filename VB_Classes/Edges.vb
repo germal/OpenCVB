@@ -1081,3 +1081,10 @@ Public Class Edges_Matching
         label2 = "Grid segments > " + Format(threshold, "#0%") + " correlation coefficient"
     End Sub
 End Class
+
+
+
+
+
+
+

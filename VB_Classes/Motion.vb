@@ -9,6 +9,7 @@ Public Class Motion_Basics
     Public cumulativePixels As Integer
     Public resetAll As Boolean
     Dim imu As IMU_IscameraStable
+    Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         uRect = New Rectangle_Union
@@ -22,8 +23,8 @@ Public Class Motion_Basics
             sliders.setupTrackBar(2, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much camera motion is reasonable?
         End If
 
-        Dim minSlider = findSlider("Contour minimum area")
-        minSlider.Value = 3
+        minSlider = findSlider("Contour minimum area")
+        minSlider.Value = 5
 
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
@@ -74,7 +75,7 @@ Public Class Motion_Basics
             dst2.Rectangle(uRect.allRect, cv.Scalar.Red, 2)
             label2 = "Motion detected"
         Else
-            label2 = "No motion detected"
+            label2 = "No motion detected with contours > " + CStr(minSlider.Value)
         End If
     End Sub
 End Class
@@ -537,7 +538,7 @@ Public Class Motion_FilteredDepth
             Dim rect = motion.uRect.allRect
             If motion.uRect.allRect.Width Then
                 dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
-                If rect.Width And rect.Height Then src(rect).CopyTo(stableDepth(rect))
+                If rect.Width And rect.Height Then task.depth32f(rect).CopyTo(stableDepth(rect))
             End If
         End If
 

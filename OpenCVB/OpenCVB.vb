@@ -1150,6 +1150,7 @@ Public Class OpenCVB
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then Exit While
             End While
+            Dim ratioImageToCampic = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
 
             ' bring the data into the algorithm task.
             SyncLock bufferLock
@@ -1175,13 +1176,14 @@ Public Class OpenCVB
                 task.CPU_TimeStamp = camera.CPU_TimeStamp
                 task.CPU_FrameTime = camera.CPU_FrameTime
                 task.intermediateReview = intermediateReview
+                task.ratioImageToCampic = ratioImageToCampic
                 camera.newImagesAvailable = False
             End SyncLock
 
             Try
-                Dim ratio = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
                 If GrabRectangleData Then
                     GrabRectangleData = False
+                    Dim ratio = ratioImageToCampic
                     task.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                     If task.drawRect.Width <= 2 Then task.drawRect.Width = 0 ' too small?
                     Dim w = task.color.Width
@@ -1202,7 +1204,7 @@ Public Class OpenCVB
 
                 task.RunAlgorithm()
 
-                drawRect = task.drawRect ' algorithm may have updated the drawrect.
+                drawRect = task.drawRect
                 If task.drawRectClear Then
                     drawRect = New cv.Rect
                     task.drawRect = drawRect
