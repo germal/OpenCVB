@@ -1204,6 +1204,7 @@ Public Class OpenCVB
 
                 task.RunAlgorithm()
 
+                mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
                 drawRect = task.drawRect
                 If task.drawRectClear Then
                     drawRect = New cv.Rect

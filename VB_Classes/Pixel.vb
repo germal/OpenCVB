@@ -2,23 +2,17 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Pixel_Viewer
     Inherits VBparent
-    Public pixels As PixelViewer
-    Dim radioIndex As Integer
+    Dim keys As Keyboard_Basics
+    Public pixels As PixelViewerForm
     Public Sub New()
         initParent()
+        keys = New Keyboard_Basics()
+
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
         standalone = False
 
-        radio.Setup(caller, 4)
-        radio.check(0).Text = "Display pixels at the mouse location in dst1"
-        radio.check(1).Text = "Display pixels at the mouse location in dst2"
-        radio.check(2).Text = "Display depth32f pixels at the mouse location"
-        radio.check(3).Text = "Display PointCloud pixels at the mouse location"
-        radioIndex = GetSetting("OpenCVB", "PixelViewerRadioIndex", "PixelViewerRadioIndex", 0)
-        radio.check(radioIndex).Checked = True
-
         check.Setup(caller, 1)
-        check.Box(0).Text = "Open form to display image pixels for dst1"
+        check.Box(0).Text = "Open Pixel Viewer"
         check.Box(0).Checked = GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False)
 
         task.desc = "Display pixels under the cursor"
@@ -26,36 +20,57 @@ Public Class Pixel_Viewer
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static pixelCheck = findCheckBox("Open form to display image pixels for dst1")
+        Static pixelCheck = findCheckBox("Open Pixel Viewer")
         If pixelCheck.Checked Then
             If task.pixelCheck = False Then
-                pixels = New PixelViewer
+                pixels = New PixelViewerForm
                 pixels.Show()
             End If
             task.pixelCheck = True
 
-            Static frm = findfrm("Pixel_Viewer Radio Options")
-            For radioIndex = 0 To frm.check.length - 1
-                If frm.check(radioIndex).Checked Then Exit For
-            Next
+            keys.Run()
+            Dim keyInput = New List(Of String)(keys.keyInput)
+
+            dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone)
+
+            Dim displayType = 0 ' default is 8uc3
+            If dst1.Type = cv.MatType.CV_8U Then displayType = 1
+            If dst1.Type = cv.MatType.CV_32F Then displayType = 2
+            If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
+
+            Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
+            pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
 
             Dim ratio = task.ratioImageToCampic
-            Dim drWidth = Choose(radioIndex + 1, 7, 22, 10, 10, 5)
-            Dim drHeight = 32
+            Dim drWidth = Choose(displayType + 1, 7, 22, 10, 10, 5) * pixels.Width / 650
+            Dim drHeight = pixels.Height / 17
             If src.Width = 1280 Then drHeight -= 4
             Static mouseLoc = New cv.Point(100, 100) ' assume 
             If task.mousePoint.X Or task.mousePoint.Y Then
+                For i = 0 To keyInput.Count - 1
+                    Select Case keyInput(i)
+                        Case "Down"
+                            task.mousePoint.Y += 1
+                        Case "Up"
+                            task.mousePoint.Y -= 1
+                        Case "Left"
+                            task.mousePoint.X -= 1
+                        Case "Right"
+                            task.mousePoint.X += 1
+                    End Select
+                Next
+
                 Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), 0)
                 Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, 0)
                 mouseLoc = New cv.Point(CInt(x), CInt(y))
             End If
 
-            Static saveRadioIndex = -1
+            Static savedisplayType = -1
             Static saveDrawRect = New cv.Rect(0, 0, -1, -1)
-            If saveRadioIndex <> radioIndex Then saveDrawRect = New cv.Rect(0, 0, -1, -1)
+            If savedisplayType <> displayType Then saveDrawRect = New cv.Rect(0, 0, -1, -1)
 
-            pixels.line = ""
             Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
+
             If dw.X < 0 Then dw.X = 0
             If dw.Y < 0 Then dw.Y = 0
             If dw.X + dw.Width > dst1.Width Then
@@ -68,42 +83,39 @@ Public Class Pixel_Viewer
             End If
 
             task.drawRect = New cv.Rect(CInt(dw.X / ratio), CInt(dw.Y / ratio), CInt(dw.Width / ratio), CInt(dw.Height / ratio))
-            If saveDrawRect = task.drawRect Then Exit Sub
-            dst1 = Choose(radioIndex + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone, task.depth32f, task.pointCloud)
+            If saveDrawRect = task.drawRect And pixels.pixelResized = False Then Exit Sub
+            pixels.pixelResized = False
 
-            Select Case radioIndex
+            Select Case displayType
 
                 Case 0
-                    Dim colDup = 115
-                    Dim img = dst1(dw).Reshape(1)
-                    pixels.line += " col      "
-                    For i = dw.X To dw.X + dw.Width - 1
-                        If i Mod 5 = 0 Then pixels.line += Format(i, "#000") + StrDup(colDup, " ") Else pixels.line += StrDup(CInt(colDup / 5), " ")
+                    pixels.line = " col " + If(dw.X Mod 5, "  ", "    ")
+                    Dim colDup = If(dw.X < 1000, 26, 25)
+                    For i = 0 To dw.Width - 1
+                        If (dw.X + i) Mod 5 Then pixels.line += StrDup(colDup, " ") Else pixels.line += Format(dw.X + i, "#000") + "         "
                     Next
                     pixels.line += vbCrLf
-                    For y = 0 To img.Height - 1
-                        pixels.line += "r" + CStr(dw.Y + y) + " "
-                        For x = 0 To img.Width - 1
-                            If x Mod 3 = 0 Then pixels.line += " "
-                            pixels.line += Format(img.Get(Of Byte)(y, x), "000") + " "
+                    For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
+                        pixels.line += "r" + Format(y, "000") + "   "
+                        For x = dw.X To Math.Min(dw.X + dw.Width, dst1.Width) - 1
+                            pixels.line += Format(dst1.Get(Of Byte)(y, x), "000") + " "
+                            pixels.line += Format(dst1.Get(Of Byte)(y, x + 1), "000") + " "
+                            pixels.line += Format(dst1.Get(Of Byte)(y, x + 2), "000") + "   "
                         Next
                         pixels.line += vbCrLf
                     Next
 
-
                 Case 1
-                    If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                    pixels.line += vbCrLf + " col  "
-                    Dim colDup = 30
-                    If dw.X >= 1000 Then colDup -= 2
-                    For i = 0 To dw.Width - 1 Step 5
-                        pixels.line += Format(dw.X + i, "#000" + StrDup(colDup, " "))
+                    pixels.line = " col" + If(dw.X Mod 5, "        ", "     ")
+                    Dim colDup = If(dw.X < 1000, 7, 6)
+                    For i = 0 To dw.Width - 1
+                        If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "    " Else pixels.line += StrDup(colDup, " ")
                     Next
                     pixels.line += vbCrLf
                     For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
-                        pixels.line = "r" + CStr(y) + " "
-                        For x = dw.X To Math.Min(dw.X + dw.Width - 1, dst1.Width)
-                            pixels.line += Format(dst1.Get(Of Byte)(y, x), "000") + " "
+                        pixels.line += "r" + Format(y, "000") + "   "
+                        For x = dw.X To Math.Min(dw.X + dw.Width, dst1.Width) - 1
+                            pixels.line += Format(dst1.Get(Of Byte)(y, x), "000") + If(x Mod 5 = 4, "   ", " ")
                         Next
                         pixels.line += vbCrLf
                     Next
@@ -113,7 +125,7 @@ Public Class Pixel_Viewer
 
 
                 Case 3
-                    pixels.line += " col  "
+                    pixels.line = " col  "
                     For i = 0 To dw.Width - 1
                         pixels.line += Format(dw.X + i, "000") + " "
                     Next
@@ -128,9 +140,8 @@ Public Class Pixel_Viewer
 
             End Select
             pixels.Refresh()
-            saveRadioIndex = radioIndex
+            savedisplayType = displayType
             saveDrawRect = task.drawRect
-            dst1.Rectangle(task.drawRect, cv.Scalar.White, 1)
         Else
             If task.pixelCheck Then
                 pixels.Close()
@@ -139,9 +150,8 @@ Public Class Pixel_Viewer
         End If
     End Sub
     Public Sub closeViewer()
-        SaveSetting("OpenCVB", "PixelViewerRadioIndex", "PixelViewerRadioIndex", radioIndex)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", task.pixelCheck)
-        If task.pixelCheck Then pixels.Close()
+        If task.pixelCheck And pixels IsNot Nothing Then pixels.Close()
     End Sub
 End Class
 

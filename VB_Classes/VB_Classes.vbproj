@@ -112,10 +112,10 @@
     <Compile Include="MiniPC.vb" />
     <Compile Include="OptionsCommon.vb" />
     <Compile Include="PhotoShop.vb" />
-    <Compile Include="PixelShow.Designer.vb">
-      <DependentUpon>PixelShow.vb</DependentUpon>
+    <Compile Include="PixelViewerForm.Designer.vb">
+      <DependentUpon>PixelViewerForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="PixelShow.vb">
+    <Compile Include="PixelViewerForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Rectangle.vb" />
@@ -370,8 +370,8 @@
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PixelShow.resx">
-      <DependentUpon>PixelShow.vb</DependentUpon>
+    <EmbeddedResource Include="PixelViewerForm.resx">
+      <DependentUpon>PixelViewerForm.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

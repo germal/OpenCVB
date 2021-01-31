@@ -3,8 +3,9 @@ Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.ComponentModel
 
-Public Class PixelViewer
+Public Class PixelViewerForm
     Public line As String
+    Public pixelResized As Boolean
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
@@ -19,7 +20,6 @@ Public Class PixelViewer
 
         Me.Width = GetSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", 1280)
         Me.Height = GetSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", 720)
-
     End Sub
 
     Private Sub PixelShow_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
@@ -32,5 +32,9 @@ Public Class PixelViewer
         SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
         SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
         SaveSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", Me.Height)
+    End Sub
+
+    Private Sub PixelViewerForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        pixelResized = True
     End Sub
 End Class

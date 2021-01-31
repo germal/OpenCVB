@@ -8,7 +8,6 @@ Public Class Keyboard_Basics
     Public Sub New()
         initParent()
         checkKeys.Setup(caller)
-        flow = New Font_FlowText()
         label1 = "Use the Options form to send in keystrokes"
         task.desc = "Test the keyboard interface available to all algorithms"
     End Sub
@@ -17,6 +16,7 @@ Public Class Keyboard_Basics
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
         If standalone or task.intermediateReview = caller Then
+            If flow Is Nothing Then flow = New Font_FlowText()
             Dim inputText As String = ""
             For i = 0 To keyInput.Count - 1
                 inputText += keyInput(i).ToString()
