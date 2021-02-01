@@ -249,14 +249,20 @@ Public Class Rectangle_Intersection
     Public Sub New()
         initParent()
 
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, src.Width, 400)
+        End If
+
         task.desc = "Test if any number of rectangles overlap."
     End Sub
-    Private Function findEnclosingRect(rects As List(Of cv.Rect)) As cv.Rect
+    Private Function findEnclosingRect(rects As List(Of cv.Rect), proximity As Integer) As cv.Rect
         Dim enclosing = rects(0)
         Dim newOther As New List(Of cv.Rect)
         For i = 1 To rects.Count - 1
             Dim r1 = rects(i)
-            If enclosing.IntersectsWith(r1) Then
+            If enclosing.IntersectsWith(r1) Or Math.Abs(r1.X - enclosing.X) < proximity Then
                 enclosing = enclosing.Union(r1)
             Else
                 newOther.Add(r1)
@@ -298,12 +304,14 @@ Public Class Rectangle_Intersection
             otherRects.Add(r.Value)
         Next
 
-        label2 = CStr(enclosingRects.Count) + " enclosing rectangles were found"
+        Static mergeSlider = findSlider("Merge rectangles within X pixels")
+        Dim proximity = mergeSlider.value
         enclosingRects.Clear()
         While otherRects.Count
-            Dim enclosing = findEnclosingRect(otherRects)
+            Dim enclosing = findEnclosingRect(otherRects, proximity)
             enclosingRects.Add(enclosing)
         End While
+        label2 = CStr(enclosingRects.Count) + " enclosing rectangles were found"
 
         dst2.SetTo(0)
         For Each r In enclosingRects

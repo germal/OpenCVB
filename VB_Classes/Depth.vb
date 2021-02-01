@@ -1751,17 +1751,20 @@ Public Class Depth_SmoothMin
         If motion.resetAll Or stableMin Is Nothing Then
             stableMin = input.Clone
         Else
-            Dim rect = motion.uRect.allRect
-            If rect.Width And rect.Height Then input(rect).CopyTo(stableMin(rect))
-            cv.Cv2.Min(input, stableMin, stableMin)
+            For Each rect In motion.intersect.enclosingRects
+                If rect.Width And rect.Height Then input(rect).CopyTo(stableMin(rect))
+                cv.Cv2.Min(input, stableMin, stableMin)
+            Next
         End If
 
-        If motion.uRect.inputRects.Count > 0 Then
+        If motion.intersect.inputRects.Count > 0 Then
             If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For Each r In motion.uRect.inputRects
+            For Each r In motion.intersect.inputRects
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
-            dst2.Rectangle(motion.uRect.allRect, cv.Scalar.Red, 2)
+            For Each rect In motion.intersect.enclosingRects
+                dst2.Rectangle(rect, cv.Scalar.Red, 2)
+            Next
         End If
 
         colorize.src = stableMin
@@ -1806,9 +1809,10 @@ Public Class Depth_SmoothMax
         If dMin.motion.resetAll Or stableMax Is Nothing Then
             stableMax = dMin.src.Clone
         Else
-            Dim rect = dMin.motion.uRect.allRect
-            If rect.Width And rect.Height Then dMin.src(rect).CopyTo(stableMax(rect))
-            cv.Cv2.Max(dMin.src, stableMax, stableMax)
+            For Each rect In dMin.motion.intersect.enclosingRects
+                If rect.Width And rect.Height Then dMin.src(rect).CopyTo(stableMax(rect))
+                cv.Cv2.Max(dMin.src, stableMax, stableMax)
+            Next
 
             Static dMinCheck = findCheckBox("Use SmoothMin to find zero depth pixels")
             If dMinCheck.checked Then

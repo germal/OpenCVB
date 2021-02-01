@@ -834,13 +834,15 @@ Public Class FloodFill_FullImage
         Dim inputRect As New cv.Rect(0, 0, fill, fill)
         Dim depthThreshold = fill * fill / 2
         Static lastFrame = dst1.Clone
-        If motion.uRect.inputRects.Count > 0 Then
+        If motion.intersect.inputRects.Count > 0 Then
             If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For Each r In motion.uRect.inputRects
+            For Each r In motion.intersect.inputRects
                 mats.mat(0).Rectangle(r, cv.Scalar.Yellow, 2)
                 lastFrame(r).setto(0)
             Next
-            dst2.Rectangle(motion.uRect.allRect, cv.Scalar.Red, 2)
+            For Each rect In motion.intersect.enclosingRects
+                dst2.Rectangle(rect, cv.Scalar.Red, 2)
+            Next
         End If
         For y = fill To dst1.Height - fill - 1 Step stepSize
             For x = fill To dst1.Width - fill - 1 Step stepSize

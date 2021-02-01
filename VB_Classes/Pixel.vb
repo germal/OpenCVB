@@ -87,9 +87,18 @@ Public Class Pixel_Viewer
                 dw.Height = dw.Height
             End If
 
-            Dim drawRect = New cv.Rect(dw.X, dw.Y, dw.Width, dw.Height)
-            If saveDrawRect <> drawRect Or pixels.pixelResized Then
+            Dim testChange As cv.Mat = If(dst1.Channels = 1, dst1(dw).Clone, dst1(dw).CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Dim diff As New cv.Mat
+            Static savePixels As cv.Mat = testChange
+            If savePixels.Size <> testChange.Size Or savePixels.Type <> testChange.Type Then
+                savePixels = testChange.Clone
+                saveDrawRect = New cv.Rect  ' force the refresh
+            Else
+                cv.Cv2.Absdiff(savePixels, testChange, diff)
+            End If
 
+            If saveDrawRect <> dw Or pixels.pixelResized Or diff.CountNonZero() Then
+                savePixels = testChange.Clone
                 pixels.pixelResized = False
 
                 Select Case displayType
@@ -97,8 +106,9 @@ Public Class Pixel_Viewer
                     Case 0
                         pixels.line = " col " + If(dw.X Mod 5, "  ", "    ")
                         Dim colDup = If(dw.X < 1000, 26, 25)
+                        Dim extraPad = If(dw.X < 1000, "", "  ")
                         For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 Then pixels.line += StrDup(colDup, " ") Else pixels.line += Format(dw.X + i, "#000") + "         "
+                            If (dw.X + i) Mod 5 Then pixels.line += StrDup(colDup, " ") Else pixels.line += Format(dw.X + i, "#000") + "         " + extraPad
                         Next
                         pixels.line += vbCrLf
                         For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
@@ -147,7 +157,7 @@ Public Class Pixel_Viewer
                 End Select
                 pixels.Refresh()
                 savedisplayType = displayType
-                saveDrawRect = drawRect
+                saveDrawRect = dw
             End If
 
             ' some algorithms may not update their dst1 or dst2, so preserve it here.  Otherwise, the rectangle will be permanent...

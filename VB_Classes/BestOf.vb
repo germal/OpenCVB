@@ -12,6 +12,8 @@ Public Class BestOf_Binarize
         binarize.src = src
         binarize.Run()
         dst1 = binarize.dst1
+        label1 = binarize.label1
+        label2 = binarize.label2
     End Sub
 End Class
 
@@ -35,6 +37,8 @@ Public Class BestOf_Edges
         edges.Run()
         dst1 = edges.dst1
         dst2 = edges.dst2
+        label1 = edges.label1
+        label2 = edges.label2
     End Sub
 End Class
 
@@ -59,6 +63,8 @@ Public Class BestOf_Contours
         contours.Run()
         dst1 = contours.dst1
         dst2 = contours.dst2
+        label1 = contours.label1
+        label2 = contours.label2
     End Sub
 End Class
 
@@ -82,6 +88,8 @@ Public Class BestOf_Blobs
         blobs.Run()
         dst1 = blobs.dst1
         dst2 = blobs.dst2
+        label1 = blobs.label1
+        label2 = blobs.label2
     End Sub
 End Class
 
@@ -105,6 +113,8 @@ Public Class BestOf_CComp
         ccomp.Run()
         dst1 = ccomp.dst1
         dst2 = ccomp.dst2
+        label1 = ccomp.label1
+        label2 = ccomp.label2
     End Sub
 End Class
 
@@ -129,6 +139,8 @@ Public Class BestOf_FloodFill
         flood.Run()
         dst1 = flood.dst1
         dst2 = flood.dst2
+        label1 = flood.label1
+        label2 = flood.label2
     End Sub
 End Class
 
@@ -157,6 +169,8 @@ Public Class BestOf_KNN
         myTopView.topView.cmat.src = dst1.Clone
         myTopView.topView.cmat.Run()
         dst2 = myTopView.topView.cmat.dst1
+        label1 = myTopView.topView.label1
+        label2 = myTopView.topView.label2
     End Sub
 End Class
 
@@ -180,6 +194,8 @@ Public Class BestOf_Kalman
         knnKalman.Run()
         dst1 = knnKalman.dst1
         dst2 = knnKalman.dst2
+        label1 = knnKalman.label1
+        label2 = knnKalman.label2
     End Sub
 End Class
 
@@ -204,5 +220,7 @@ Public Class BestOf_MotionDetection
         motion.Run()
         dst1 = motion.dst1
         dst2 = motion.dst2
+        label1 = motion.label1
+        label2 = motion.label2
     End Sub
 End Class

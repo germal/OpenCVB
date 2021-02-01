@@ -4,7 +4,7 @@ Public Class Motion_Basics
     Inherits VBparent
     Dim diff As Diff_Basics
     Dim contours As Contours_Basics
-    Public uRect As Rectangle_Union
+    Public intersect As Rectangle_Intersection
     Public changedPixels As Integer
     Public cumulativePixels As Integer
     Public resetAll As Boolean
@@ -12,7 +12,7 @@ Public Class Motion_Basics
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        uRect = New Rectangle_Union
+        intersect = New Rectangle_Intersection
         contours = New Contours_Basics()
         imu = New IMU_IscameraStable
         diff = New Diff_Basics()
@@ -26,6 +26,7 @@ Public Class Motion_Basics
         minSlider = findSlider("Contour minimum area")
         minSlider.Value = 5
 
+        label1 = "Enclosing rectangles are yellow in dst1 and dst2"
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
     Public Sub Run()
@@ -53,26 +54,24 @@ Public Class Motion_Basics
         contours.src = dst2
         contours.Run()
 
-        uRect.inputRects.Clear()
-        uRect.allRect = New cv.Rect
         dst1 = diff.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If contours.contourlist.Count Then
+            intersect.inputRects.Clear()
             For Each c In contours.contourlist
                 Dim r = cv.Cv2.BoundingRect(c)
                 If r.X < 0 Then r.X = 0
                 If r.Y < 0 Then r.Y = 0
                 If r.X + r.Width > dst2.Width Then r.Width = dst2.Width - r.X
                 If r.Y + r.Height > dst2.Height Then r.Height = dst2.Height - r.Y
-                uRect.inputRects.Add(r)
+                intersect.inputRects.Add(r)
             Next
-            uRect.Run()
+            intersect.Run()
 
             If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For Each r In uRect.inputRects
+            For Each r In intersect.enclosingRects
                 dst1.Rectangle(r, cv.Scalar.Yellow, 2)
+                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
-            dst1.Rectangle(uRect.allRect, cv.Scalar.Red, 2)
-            dst2.Rectangle(uRect.allRect, cv.Scalar.Red, 2)
             label2 = "Motion detected"
         Else
             label2 = "No motion detected with contours > " + CStr(minSlider.Value)
@@ -492,9 +491,10 @@ Public Class Motion_FilteredRGB
         If motion.resetAll Or stableRGB Is Nothing Or radioVal = 1 Then
             stableRGB = src.Clone
         Else
-            Dim rect = motion.uRect.allRect
-            dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
-            If rect.Width And rect.Height Then src(rect).CopyTo(stableRGB(rect))
+            For Each rect In motion.intersect.enclosingRects
+                dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
+                If rect.Width And rect.Height Then src(rect).CopyTo(stableRGB(rect))
+            Next
         End If
 
         dst1 = stableRGB.Clone
@@ -535,11 +535,10 @@ Public Class Motion_FilteredDepth
         If motion.resetAll Or stableDepth Is Nothing Or radioVal = 1 Then
             stableDepth = task.depth32f.Clone
         Else
-            Dim rect = motion.uRect.allRect
-            If motion.uRect.allRect.Width Then
+            For Each rect In motion.intersect.enclosingRects
                 dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
                 If rect.Width And rect.Height Then task.depth32f(rect).CopyTo(stableDepth(rect))
-            End If
+            Next
         End If
 
         dst1 = stableDepth

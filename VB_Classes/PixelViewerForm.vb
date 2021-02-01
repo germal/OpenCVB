@@ -26,15 +26,11 @@ Public Class PixelViewerForm
         Dim g As Graphics = e.Graphics
         g.DrawString(line, FontInfo.Font, New SolidBrush(Color.Black), 10, 10)
     End Sub
-
-    Private Sub PixelViewer_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+    Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
+        pixelResized = True
         SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
         SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
         SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
         SaveSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", Me.Height)
-    End Sub
-
-    Private Sub PixelViewerForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        pixelResized = True
     End Sub
 End Class
