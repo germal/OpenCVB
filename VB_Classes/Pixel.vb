@@ -45,11 +45,11 @@ Public Class Pixel_Viewer
             End If
 
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
-            pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
+            pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType + " - updates are no more than 1 per second"
 
             Dim drWidth = Choose(displayType + 1, 7, 22, 10, 10, 5) * pixels.Width / 650
-            Dim drHeight = pixels.Height / 17
-            If src.Width = 1280 Then drHeight -= 4
+            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1))
+            If drHeight < 20 Then drHeight = 20
             Static mouseLoc = New cv.Point(100, 100) ' assume 
             If task.mousePoint.X Or task.mousePoint.Y Then
                 For i = 0 To keyInput.Count - 1
@@ -155,7 +155,8 @@ Public Class Pixel_Viewer
                     Case 4
 
                 End Select
-                pixels.Refresh()
+
+                pixels.pixelDataChanged = True
                 savedisplayType = displayType
                 saveDrawRect = dw
             End If

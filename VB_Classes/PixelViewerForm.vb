@@ -6,6 +6,7 @@ Imports System.ComponentModel
 Public Class PixelViewerForm
     Public line As String
     Public pixelResized As Boolean
+    Public pixelDataChanged As Boolean
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
@@ -32,5 +33,10 @@ Public Class PixelViewerForm
         SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
         SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
         SaveSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", Me.Height)
+    End Sub
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        If pixelDataChanged Then Me.Refresh()
+        pixelDataChanged = False
     End Sub
 End Class

@@ -249,10 +249,9 @@ Public Class Rectangle_Intersection
     Public Sub New()
         initParent()
 
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, src.Width, 400)
+            sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, src.Width, If(src.Width = 1280, 500, 250))
         End If
 
         task.desc = "Test if any number of rectangles overlap."

@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Diff_Basics
     Inherits VBparent
+    Public lastFrame As cv.Mat
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -15,7 +16,7 @@ Public Class Diff_Basics
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static lastFrame As cv.Mat = src.Clone
+        If ocvb.frameCount = 0 Then lastFrame = src.Clone
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)

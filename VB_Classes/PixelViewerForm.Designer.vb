@@ -22,7 +22,9 @@ Partial Class PixelViewerForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.FontInfo = New System.Windows.Forms.Label()
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.SuspendLayout()
         '
         'FontInfo
@@ -34,6 +36,11 @@ Partial Class PixelViewerForm
         Me.FontInfo.TabIndex = 0
         Me.FontInfo.Text = "Label1"
         Me.FontInfo.Visible = False
+        '
+        'Timer1
+        '
+        Me.Timer1.Enabled = True
+        Me.Timer1.Interval = 1000
         '
         'PixelViewerForm
         '
@@ -48,4 +55,5 @@ Partial Class PixelViewerForm
 
     End Sub
     Friend WithEvents FontInfo As Windows.Forms.Label
+    Friend WithEvents Timer1 As Windows.Forms.Timer
 End Class
