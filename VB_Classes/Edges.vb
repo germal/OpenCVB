@@ -1088,3 +1088,44 @@ End Class
 
 
 
+
+
+Public Class Edges_MotionOverlay
+    Inherits VBparent
+    Dim diff As Diff_Basics
+    Public Sub New()
+        initParent()
+
+        diff = New Diff_Basics
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Displacement in the X direction (in pixels)", 0, 100, 7)
+            sliders.setupTrackBar(1, "Displacement in the Y direction (in pixels)", 0, 100, 11)
+        End If
+
+        label2 = "AbsDiff output of offset with original"
+        task.desc = "Find edges by displacing the current RGB image in any direction and diff it with the original."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static xSlider = findSlider("Displacement in the X direction (in pixels)")
+        Static ySlider = findSlider("Displacement in the Y direction (in pixels)")
+        Dim xDisp = xSlider.value
+        Dim yDisp = ySlider.value
+
+        Dim input As cv.Mat = src.Clone
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        diff.lastFrame = input.Clone
+        Dim rect1 = New cv.Rect(xDisp, yDisp, dst1.Width - xDisp - 1, dst1.Height - yDisp - 1)
+        Dim rect2 = New cv.Rect(0, 0, dst1.Width - xDisp - 1, dst1.Height - yDisp - 1)
+        diff.lastFrame(rect2) = input(rect1).Clone
+
+        diff.src = input
+        diff.Run()
+        dst1 = diff.dst1
+        dst2 = diff.dst2
+        label1 = "Src offset (x,y) = (" + CStr(xDisp) + "," + CStr(yDisp) + ")"
+    End Sub
+End Class

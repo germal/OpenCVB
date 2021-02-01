@@ -176,7 +176,7 @@ Public Class Motion_MinMaxDepth
             radio.check(0).Text = "Use farthest distance"
             radio.check(1).Text = "Use closest distance"
             radio.check(2).Text = "Use unchanged depth input"
-            radio.check(1).Checked = True
+            radio.check(0).Checked = True
         End If
 
         label1 = "32-bit format of the stable depth"
@@ -200,55 +200,13 @@ Public Class Motion_MinMaxDepth
             input.CopyTo(dst1, dst2)
 
             Static useNone = findRadio("Use unchanged depth input")
-            Static useMin = findRadio("Use closest distance")
             Static useMax = findRadio("Use farthest distance")
             If useNone.checked = False Then
-                If useMax.checked Then cv.Cv2.Max(input, dst1, dst1)
-                If useMin.checked Then
-                    cv.Cv2.Min(input, dst1, dst1)
-                    dst1.SetTo(0, task.inrange.noDepthMask)
-                End If
+                If useMax.checked Then cv.Cv2.Max(input, dst1, dst1) Else cv.Cv2.Min(input, dst1, dst1)
             Else
                 dst1 = input.Clone()
             End If
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Motion_MinMaxDepthRectangleUpdate
-    Inherits VBparent
-    Public extrema As Depth_SmoothMinMax
-    Dim initialReset = True
-    Public Sub New()
-        initParent()
-        extrema = New Depth_SmoothMinMax
-        label2 = "dst2 = depth in 32-bit format in mm's"
-        task.desc = "Use motion in RGB to determine when to update a 32-bit format input - depth X, Y, and Z."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
-
-        extrema.src = input
-        extrema.Run()
-
-        If extrema.resetAll Or initialReset Then
-            initialReset = False
-            dst2 = input
-            Console.WriteLine("refresh...")
-        Else
-            dst2 = extrema.dst2
-        End If
-        dst1 = extrema.dst1
     End Sub
 End Class
 
