@@ -793,3 +793,37 @@ Public Class OpenGL_ReducedSideView
         label1 = reduced.label1
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class OpenGL_MFD_PointCloud
+    Inherits VBparent
+    Dim mfd As MFD_PointCloud
+    Dim ogl As OpenGL_Callbacks
+    Public Sub New()
+        initParent()
+        mfd = New MFD_PointCloud
+        ogl = New OpenGL_Callbacks
+        task.desc = "Use the MFD_PointCloud in 3D"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        mfd.Run()
+        dst1 = mfd.dst1
+        dst2 = mfd.dst2
+
+        ogl.pointCloudInput = dst1
+        ogl.src = task.color
+        ogl.Run()
+
+        label2 = mfd.label2
+    End Sub
+End Class
+
+
+
