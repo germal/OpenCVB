@@ -16,7 +16,7 @@ Public Class Diff_Basics
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If ocvb.frameCount = 0 Then lastFrame = src.Clone
+        If lastFrame Is Nothing Then lastFrame = src.Clone
         If ocvb.frameCount > 0 Then
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
