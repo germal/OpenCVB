@@ -131,7 +131,7 @@ Public Class MFD_Sobel
         Static thresholdSlider = findSlider("Pixel threshold to zero")
         sobel.src = mfd.dst1
         sobel.Run()
-        dst1 = sobel.dst1.Threshold(thresholdSlider.value, 0, cv.ThresholdTypes.Tozero)
+        dst1 = sobel.dst1.Threshold(thresholdSlider.value, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -292,34 +292,3 @@ Public Class MFD_FloodFill
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class MFD_MatchTemplate
-    Inherits VBparent
-    Dim match As MatchTemplate_Movement
-    Dim sobel As MFD_Sobel
-    Public Sub New()
-        initParent()
-        match = New MatchTemplate_Movement
-        sobel = New MFD_Sobel
-        task.desc = "Use MFD_Sobel input to the MatchTemplate algorithm"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        sobel.src = src
-        sobel.Run()
-
-        match.src = sobel.dst1
-        match.Run()
-        dst1 = match.dst2
-        label1 = match.label2
-        dst2.SetTo(0)
-    End Sub
-End Class
