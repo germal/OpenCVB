@@ -180,8 +180,10 @@ Public Class Pixel_Viewer
             End If
 
             If task.mousePicTag = 2 Then
+                task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.Black, If(dst1.Width = 1280, 3, 2))
                 task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
             Else
+                task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.Black, If(dst1.Width = 1280, 3, 2))
                 task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
             End If
         Else
