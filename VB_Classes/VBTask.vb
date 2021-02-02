@@ -138,6 +138,7 @@ Public Class ActiveTask : Implements IDisposable
     Public mouseClickPoint As cv.Point
     Public mousePicTag As Integer ' which image was the mouse in?
     Public mousePoint As cv.Point ' trace any mouse movements using this.
+    Public mousePointUpdated As Boolean
 
     Public IMU_Barometer As Single
     Public IMU_Magnetometer As cv.Point3f

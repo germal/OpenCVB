@@ -99,7 +99,7 @@ Partial Class OpenCVB
         Me.SnapShotButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.SnapShotButton.Name = "SnapShotButton"
         Me.SnapShotButton.Size = New System.Drawing.Size(34, 53)
-        Me.SnapShotButton.Text = "Snapshot"
+        Me.SnapShotButton.ToolTipText = "Capture a snapshot of the images below and put it on the clipboard"
         '
         'TreeButton
         '
@@ -109,6 +109,7 @@ Partial Class OpenCVB
         Me.TreeButton.Name = "TreeButton"
         Me.TreeButton.Size = New System.Drawing.Size(34, 53)
         Me.TreeButton.Text = "TreeButton"
+        Me.TreeButton.ToolTipText = "Show how the algorithm was constructed with a tree view"
         '
         'PixelViewerButton
         '
@@ -117,7 +118,7 @@ Partial Class OpenCVB
         Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.PixelViewerButton.Name = "PixelViewerButton"
         Me.PixelViewerButton.Size = New System.Drawing.Size(34, 53)
-        Me.PixelViewerButton.Text = "ToolStripButton1"
+        Me.PixelViewerButton.ToolTipText = "Display pixel data when the mouse moves over dst1 or dst2 below"
         '
         'TestAllTimer
         '

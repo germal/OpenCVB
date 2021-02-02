@@ -1182,9 +1182,7 @@ Public Class OpenCVB
                 task.ratioImageToCampic = ratioImageToCampic
                 task.pixelViewerOn = pixelViewerOn
                 camera.newImagesAvailable = False
-            End SyncLock
 
-            Try
                 If GrabRectangleData Then
                     GrabRectangleData = False
                     Dim ratio = ratioImageToCampic
@@ -1205,10 +1203,12 @@ Public Class OpenCVB
                 mouseClickFlag = False
 
                 task.fileStarted = openFileStarted ' UI may have stopped play.
+            End SyncLock
 
+            Try
                 task.RunAlgorithm()
 
-                mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
+                If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
                 drawRect = task.drawRect
                 If task.drawRectClear Then
                     drawRect = New cv.Rect

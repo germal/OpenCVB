@@ -203,6 +203,7 @@ Public Class Smoothing_Contours
 		smooth.dst1 = outline.dst2
 		smooth.Run()
 		dst1 = smooth.dst1
+		If standalone Then dst2.SetTo(0)
 		label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
 	End Sub
 End Class
