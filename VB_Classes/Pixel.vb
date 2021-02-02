@@ -47,7 +47,7 @@ Public Class Pixel_Viewer
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
             pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType + " - updates are no more than 1 per second"
 
-            Dim drWidth = Choose(displayType + 1, 7, 22, 10, 10, 5) * pixels.Width / 650
+            Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * pixels.Width / 650
             Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1))
             If drHeight < 20 Then drHeight = 20
             Static mouseLoc = New cv.Point(100, 100) ' assume 
@@ -136,21 +136,39 @@ Public Class Pixel_Viewer
                             pixels.line += vbCrLf
                         Next
 
-
                     Case 2
-
-
-                    Case 3
-                        pixels.line = " col  "
+                        Dim img = dst1(dw)
+                        pixels.line = " col " + If(dw.X Mod 5, "   ", "    ")
+                        Dim colDup = If(dw.X < 1000, 14, 10)
                         For i = 0 To dw.Width - 1
-                            pixels.line += Format(dw.X + i, "000") + " "
+                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
                         Next
                         pixels.line += vbCrLf
-                        For y = dw.Y To Math.Min(dw.Y + dw.Height, dst1.Height) - 1
-                            pixels.line += "r" + CStr(y) + " "
-                            For x = dw.X To Math.Min(dw.X + dw.Width - 1, dst1.Width)
-                                pixels.line += Format(task.depth32f.Get(Of Byte)(y, x), "0000") + " "
+                        For y = 0 To img.Height - 1
+                            pixels.line += "r" + Format(y, "000") + "   "
+                            For x = 0 To img.Width - 1
+                                pixels.line += Format(img.Get(Of Single)(y, x), "0000.0") + If((dw.X + x) Mod 5 = 4, "   ", " ")
                             Next
+                            pixels.line += vbCrLf
+                        Next
+
+                    Case 3
+                        Dim img = dst1(dw)
+                        pixels.line = " col  " + If(dw.X Mod 5, "   ", "    ")
+                        Dim colDup = If(dw.X < 1000, 46, 46)
+                        For i = 0 To dw.Width - 1
+                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
+                        Next
+                        pixels.line += vbCrLf
+                        For y = 0 To img.Height - 1
+                            pixels.line += "r" + Format(y, "000") + "   "
+                            For x = 0 To img.Width - 1
+                                pixels.line += Format(img.Get(Of Single)(y, x), "+0.000;-0.000; 0.000") + " "
+                                pixels.line += Format(img.Get(Of Single)(y, x + 1), "+0.000;-0.000; 0.000") + " "
+                                pixels.line += Format(img.Get(Of Single)(y, x + 2), "+0.000;-0.000; 0.000") + "  "
+                                pixels.line += "  "
+                            Next
+                            pixels.line += vbCrLf
                         Next
                     Case 4
 
@@ -160,13 +178,6 @@ Public Class Pixel_Viewer
                 savedisplayType = displayType
                 saveDrawRect = dw
             End If
-
-            ' some algorithms may not update their dst1 or dst2, so preserve it here.  Otherwise, the rectangle will be permanent...
-            ' It is extra work but only because the pixel viewer is active.
-            'Static saveDst1 = task.algorithmObject.dst1.clone
-            'task.algorithmObject.dst1 = saveDst1.clone
-            'Static saveDst2 = task.algorithmObject.dst2.clone
-            'task.algorithmObject.dst2 = saveDst2.Clone
 
             If task.mousePicTag = 2 Then
                 task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
