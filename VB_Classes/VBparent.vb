@@ -84,7 +84,7 @@ Public Class VBparent : Implements IDisposable
                 task.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
             End If
 
-            task.PixelViewer.run()
+            task.PixelViewer.Run()
 
             task.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
             task.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
@@ -174,7 +174,7 @@ Public Class VBparent : Implements IDisposable
         src.Dispose()
         dst1.Dispose()
         dst2.Dispose()
-        task.PixelViewer.closeViewer()
+        If task.pixelViewerOn Then task.PixelViewer.closeViewer()
     End Sub
 
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.

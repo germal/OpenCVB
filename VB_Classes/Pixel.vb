@@ -6,27 +6,25 @@ Public Class Pixel_Viewer
     Public pixels As PixelViewerForm
     Public Sub New()
         initParent()
-        keys = New Keyboard_Basics()
 
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
         standalone = False
-
-        check.Setup(caller, 1)
-        check.Box(0).Text = "Open Pixel Viewer"
-        check.Box(0).Checked = GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False)
 
         task.desc = "Display pixels under the cursor"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Static pixelCheck = findCheckBox("Open Pixel Viewer")
-        If pixelCheck.Checked Then
-            If task.pixelCheck = False Then
-                pixels = New PixelViewerForm
-                pixels.Show()
+        If task.pixelViewerOn Then
+            If keys Is Nothing Then
+                keys = New Keyboard_Basics()
+                keys.checkKeys.Show()
+                keys.checkKeys.Left = 0
+                keys.checkKeys.Top = 0
+                keys.checkKeys.SendToBack()
             End If
-            task.pixelCheck = True
+            If pixels Is Nothing Then pixels = New PixelViewerForm
+            pixels.Show()
 
             keys.Run()
             Dim keyInput = New List(Of String)(keys.keyInput)
@@ -185,17 +183,16 @@ Public Class Pixel_Viewer
                 task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
             End If
         Else
-            If task.pixelCheck Then
+            If pixels IsNot Nothing Then
                 pixels.Close()
-                task.pixelCheck = False
+                keys.checkKeys.Close()
+                keys = Nothing
+                pixels = Nothing
             End If
         End If
     End Sub
     Public Sub closeViewer()
-        If check.Box(0).Checked <> GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False) Then
-            SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", task.pixelCheck)
-        End If
-        If task.pixelCheck And pixels IsNot Nothing Then pixels.Close()
+        If pixels IsNot Nothing Then pixels.Close()
     End Sub
 End Class
 

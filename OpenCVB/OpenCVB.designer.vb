@@ -30,6 +30,7 @@ Partial Class OpenCVB
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
         Me.SnapShotButton = New System.Windows.Forms.ToolStripButton()
         Me.TreeButton = New System.Windows.Forms.ToolStripButton()
+        Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
@@ -49,7 +50,7 @@ Partial Class OpenCVB
         '
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.SnapShotButton, Me.TreeButton})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.SnapShotButton, Me.TreeButton, Me.PixelViewerButton})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
@@ -109,6 +110,15 @@ Partial Class OpenCVB
         Me.TreeButton.Size = New System.Drawing.Size(34, 53)
         Me.TreeButton.Text = "TreeButton"
         '
+        'PixelViewerButton
+        '
+        Me.PixelViewerButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), System.Drawing.Image)
+        Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.PixelViewerButton.Name = "PixelViewerButton"
+        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 53)
+        Me.PixelViewerButton.Text = "ToolStripButton1"
+        '
         'TestAllTimer
         '
         Me.TestAllTimer.Interval = 5000
@@ -121,7 +131,7 @@ Partial Class OpenCVB
         '
         Me.AlgorithmDesc.AutoSize = True
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(969, 50)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1006, 50)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.Size = New System.Drawing.Size(119, 22)
         Me.AlgorithmDesc.TabIndex = 0
@@ -131,7 +141,7 @@ Partial Class OpenCVB
         '
         Me.OpenCVkeyword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.OpenCVkeyword.FormattingEnabled = True
-        Me.OpenCVkeyword.Location = New System.Drawing.Point(600, 47)
+        Me.OpenCVkeyword.Location = New System.Drawing.Point(637, 47)
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
         Me.OpenCVkeyword.Size = New System.Drawing.Size(363, 28)
         Me.OpenCVkeyword.TabIndex = 1
@@ -140,7 +150,7 @@ Partial Class OpenCVB
         '
         Me.AvailableAlgorithms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.AvailableAlgorithms.FormattingEnabled = True
-        Me.AvailableAlgorithms.Location = New System.Drawing.Point(231, 47)
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(268, 47)
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
         Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 28)
         Me.AvailableAlgorithms.TabIndex = 0
@@ -220,4 +230,5 @@ Partial Class OpenCVB
     Friend WithEvents ExitCall As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PixelViewerButton As ToolStripButton
 End Class

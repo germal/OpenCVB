@@ -91,6 +91,7 @@ Public Class OpenCVB
     Public intermediateReview As String
     Dim VTK_Present As Boolean
     Dim meActivateNeeded As Boolean
+    Dim pixelViewerOn As Boolean
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -271,7 +272,8 @@ Public Class OpenCVB
 
         TestAllTimer.Interval = optionsForm.TestAllDuration.Text * 1000
         FindPython()
-        If GetSetting("OpenCVB", "TreeButton", "TreeButton", False) Then openTree(sender, e)
+        If GetSetting("OpenCVB", "TreeButton", "TreeButton", False) Then TreeButton_Click(sender, e)
+        If GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False) Then PixelViewerButton_Click(sender, e)
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -455,21 +457,21 @@ Public Class OpenCVB
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
-    Private Sub openTree(sender As Object, e As EventArgs)
-        TreeViewDialog = New TreeviewForm
-        TreeViewDialog.updateTree()
-        TreeViewDialog.TreeviewForm_Resize(sender, e)
-        TreeViewDialog.Show()
-        TreeViewDialog.BringToFront()
-        TreeButton.Checked = True
-    End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
-        If TreeButton.Checked = False Then
-            openTree(sender, e)
+        TreeButton.Checked = Not TreeButton.Checked
+        If TreeButton.Checked Then
+            TreeViewDialog = New TreeviewForm
+            TreeViewDialog.updateTree()
+            TreeViewDialog.TreeviewForm_Resize(sender, e)
+            TreeViewDialog.Show()
+            TreeViewDialog.BringToFront()
         Else
-            TreeButton.Checked = False
             TreeViewDialog.Close()
         End If
+    End Sub
+    Private Sub PixelViewerButton_Click(sender As Object, e As EventArgs) Handles PixelViewerButton.Click
+        PixelViewerButton.Checked = Not PixelViewerButton.Checked
+        pixelViewerOn = PixelViewerButton.Checked
     End Sub
     Public Function USBenumeration(searchName As String) As Integer
         Static firstCall = 0
@@ -890,6 +892,7 @@ Public Class OpenCVB
     End Sub
     Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
+        SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
         stopCameraThread = True
         saveAlgorithmName = ""
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
@@ -1177,6 +1180,7 @@ Public Class OpenCVB
                 task.CPU_FrameTime = camera.CPU_FrameTime
                 task.intermediateReview = intermediateReview
                 task.ratioImageToCampic = ratioImageToCampic
+                task.pixelViewerOn = pixelViewerOn
                 camera.newImagesAvailable = False
             End SyncLock
 

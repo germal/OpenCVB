@@ -121,7 +121,6 @@ Public Class ActiveTask : Implements IDisposable
     Public rightView As cv.Mat
     Public viewOptions As Object
     Public PixelViewer As Object
-    Public pixelCheck As Boolean
 
     ' add any global option algorithms here
     Public inrange As Object
@@ -172,6 +171,7 @@ Public Class ActiveTask : Implements IDisposable
     Public desc As String
     Public intermediateReview As String
     Public ratioImageToCampic As Single
+    Public pixelViewerOn As Boolean
 
     Public transformationMatrix() As Single
 
@@ -210,6 +210,7 @@ Public Class ActiveTask : Implements IDisposable
         Public IMU_RotationMatrix() As Single
         Public IMU_RotationVector As cv.Point3f
         Public VTK_Present As Boolean
+        Public pixelViewerOn As Boolean
 
         Public intrinsicsLeft As intrinsics_VB
         Public intrinsicsRight As intrinsics_VB
