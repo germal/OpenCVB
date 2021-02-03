@@ -27,6 +27,7 @@ Public Class MatchTemplate_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
+            sliders.setupTrackBar(1, "Correlation Threshold X100", 1, 100, 90)
         End If
         task.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
     End Sub
@@ -119,35 +120,49 @@ Public Class MatchTemplate_DrawRect
     Public saveTemplate As cv.Mat
     Public saveRect As cv.Rect
     Dim match As MatchTemplate_Basics
+    Dim addw As AddWeighted_Basics
     Public Sub New()
         initParent()
         If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
+        addw = New AddWeighted_Basics
         match = New MatchTemplate_Basics
 
         label1 = "Probabilities (draw rectangle to test again)"
-        label2 = "White is input, Red circle centers highest probability"
         task.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
             If task.drawRect.X + task.drawRect.Width >= src.Width Then task.drawRect.Width = src.Width - task.drawRect.X
             If task.drawRect.Y + task.drawRect.Height >= src.Height Then task.drawRect.Height = src.Height - task.drawRect.Y
             saveRect = task.drawRect
             saveTemplate = src(task.drawRect).Clone()
-            task.drawRectClear = True
         End If
 
         match.sample = saveTemplate
         match.searchMat = src
         match.Run()
-        dst1 = match.correlationMat
+
+        dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
+        Dim rect = New cv.Rect(task.drawRect.Width / 2, task.drawRect.Height / 2, src.Width - task.drawRect.Width + 1, src.Height - task.drawRect.Height + 1)
+        dst1(rect) = match.correlationMat
         dst2 = src
-        dst2.Rectangle(saveRect, cv.Scalar.White, 1)
+
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
         dst1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-        dst2.Circle(maxLoc.X + saveRect.Width / 2, maxLoc.Y + saveRect.Height / 2, 20, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+
+        Static thresholdSlider = findSlider("Correlation Threshold X100")
+        Dim mask = dst1.Threshold(thresholdSlider.value / 100, 255, cv.ThresholdTypes.Binary)
+        mask.ConvertTo(mask, cv.MatType.CV_8U)
+        addw.src2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        addw.src = src
+        addw.Run()
+        dst2 = addw.dst1
+
+        dst2.Circle(maxLoc.X, maxLoc.Y, ocvb.dotSize / 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        label2 = "Red is best match, white has correlation > " + Format(thresholdSlider.value / 100, "#0%")
     End Sub
 End Class
 

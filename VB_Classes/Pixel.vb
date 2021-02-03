@@ -111,10 +111,10 @@ Public Class Pixel_Viewer
                     If maxVal < 10 Then format32f = "0.0000"
                 Else
                     maxVal = Math.Max(-minVal, maxVal)
-                    format32f = "+0.000;-0.000"
-                    If maxVal < 1000 Then format32f = "+000.0;-000.0"
-                    If maxVal < 100 Then format32f = "+00.00;-00.00"
-                    If maxVal < 10 Then format32f = "+0.000;-0.000"
+                    format32f = " 0.000;-0.000"
+                    If maxVal < 1000 Then format32f = " 000.0;-000.0"
+                    If maxVal < 100 Then format32f = " 00.00;-00.00"
+                    If maxVal < 10 Then format32f = " 0.000;-0.000"
                 End If
             End If
 
@@ -195,14 +195,16 @@ Public Class Pixel_Viewer
                 savedisplayType = displayType
                 saveDrawRect = dw
                 pixels.pixelDataChanged = True
+                'task.drawRect = dw
+                'task.drawRectUpdated = True
             End If
 
             Dim outImg As cv.Mat = If(task.mousePicTag = 2, task.algorithmObject.dst1, task.algorithmObject.dst2)
             outImg.MinMaxLoc(minVal, maxVal)
             outImg.Rectangle(saveDrawRect, cv.Scalar.All(maxVal), If(dst1.Width = 1280, 3, 2))
             outImg.Rectangle(saveDrawRect, cv.Scalar.All(minVal), If(dst1.Width = 1280, 2, 1))
-            Else
-                If pixels IsNot Nothing Then
+        Else
+            If pixels IsNot Nothing Then
                 pixels.Close()
                 keys.checkKeys.Close()
                 keys = Nothing
