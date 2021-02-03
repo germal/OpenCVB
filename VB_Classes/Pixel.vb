@@ -111,10 +111,10 @@ Public Class Pixel_Viewer
                     If maxVal < 10 Then format32f = "0.0000"
                 Else
                     maxVal = Math.Max(-minVal, maxVal)
-                    format32f = "+0.000;-0.000; 0.000"
-                    If maxVal < 1000 Then format32f = "+000.0;-000.0; 000.0"
-                    If maxVal < 100 Then format32f = "+00.00;-00.00; 00.00"
-                    If maxVal < 10 Then format32f = "+0.000;-0.000; 0.000"
+                    format32f = "+0.000;-0.000"
+                    If maxVal < 1000 Then format32f = "+000.0;-000.0"
+                    If maxVal < 100 Then format32f = "+00.00;-00.00"
+                    If maxVal < 10 Then format32f = "+0.000;-0.000"
                 End If
             End If
 

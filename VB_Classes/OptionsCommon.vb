@@ -52,11 +52,13 @@ Public Class OptionsCommon_Depth
         Else
             task.depthOptionsChanged = False
         End If
+        Try
+            ' forced resize of the depth16 - probably a mistake but avoids failure when camera is switching from 1280 to 640 and vice versa
+            If src.Width <> task.depth16.Width Then task.depth16 = task.depth16.Resize(task.color.Size)
+            task.depth16.ConvertTo(task.depth32f, cv.MatType.CV_32F)
+        Catch ex As Exception
+        End Try
 
-        ' forced resize of the depth16 - probably a mistake but avoids failure when camera is switching from 1280 to 640 and vice versa
-        If src.Width <> task.depth16.Width Then task.depth16 = task.depth16.Resize(task.color.Size)
-
-        task.depth16.ConvertTo(task.depth32f, cv.MatType.CV_32F)
 #If 0 Then
         Dim fuseCount = task.fuseSlider.Value
         Static saveFuseCount = fuseCount
