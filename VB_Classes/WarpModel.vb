@@ -1,6 +1,106 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
+' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
+Public Class WarpModel_Basics
+    Inherits VBparent
+    Public warp As WarpModel_Input
+    Dim cPtr As IntPtr
+    Public warpMatrix() As Single
+    Public src2 As New cv.Mat
+    Public warpMode As Integer
+    Public aligned As New cv.Mat
+    Public Sub New()
+        initParent()
+        cPtr = WarpModel_Open()
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "Motion_Translation (fastest)"
+            radio.check(1).Text = "Motion_Euclidean"
+            radio.check(2).Text = "Motion_Affine (very slow - Be sure to configure CPP_Classes in Release Mode)"
+            radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
+            radio.check(0).Checked = True
+        End If
+
+        warp = New WarpModel_Input()
+
+        label1 = "Src image (align to this image)"
+        label2 = "Src2 image aligned to src image"
+        task.desc = "Use FindTransformECC to align 2 images"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        warp.src = src
+        warp.Run()
+
+        Static frm = findfrm("WarpModel_Basics Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then warpMode = i
+        Next
+
+        If warp.check.Box(0).Checked Then
+            src = warp.gradient(0)
+            src2 = warp.gradient(1)
+        Else
+            src = warp.rgb(0)
+            src2 = warp.rgb(1)
+        End If
+
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Dim src2Data(src2.Total * src2.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+        Dim handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned)
+
+        Dim matPtr = WarpModel_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleSrc2.AddrOfPinnedObject(), src.Rows, src.Cols, 1, warpMode)
+
+        handleSrc.Free()
+        handleSrc2.Free()
+
+        If warpMode <> 3 Then
+            ReDim warpMatrix(2 * 3 - 1)
+        Else
+            ReDim warpMatrix(3 * 3 - 1)
+        End If
+        Marshal.Copy(matPtr, warpMatrix, 0, warpMatrix.Length)
+
+        If warpMode <> 3 Then
+            Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
+            cv.Cv2.WarpAffine(warp.rgb(1), aligned, warpMat, warp.rgb(0).Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+        Else
+            Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
+            cv.Cv2.WarpPerspective(warp.rgb(1), aligned, warpMat, warp.rgb(0).Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+        End If
+
+        Dim rect As New cv.Rect(0, 0, warp.rgb(0).Width, warp.rgb(0).Height)
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+        dst1(rect) = warp.rgb(0)
+        dst2(rect) = warp.rgb(1)
+
+        Dim outStr = "The warp matrix is:" + vbCrLf
+        For i = 0 To warpMatrix.Length - 1
+            If i Mod 3 = 0 Then outStr += vbCrLf
+            outStr += Format(warpMatrix(i), "#0.000") + vbTab
+        Next
+
+        If radio.check(2).Checked Or radio.check(3).Checked Then
+            outStr += vbCrLf + "NOTE: input resized for performance." + vbCrLf + "Results are probably distorted." + vbCrLf + "Gradients may give better results."
+        End If
+        ocvb.trueText(outStr, aligned.Width + 10, 220)
+    End Sub
+    Public Sub Close()
+        WarpModel_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
 Public Class WarpModel_Input
@@ -36,7 +136,7 @@ Public Class WarpModel_Input
         task.desc = "Import the misaligned input."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img As New cv.Mat
         Static frm = findfrm("WarpModel_Input Radio Options")
         For i = 0 To frm.check.length - 1
@@ -87,110 +187,9 @@ Module WarpModel_CPP_Module
     Public Sub WarpModel_Close(WarpModelPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function WarpModel_Run(WarpModelPtr As IntPtr, src1Ptr As IntPtr, src2Ptr As IntPtr, rows As integer, cols As integer, channels As integer, warpMode As Integer) As IntPtr
+    Public Function WarpModel_Run(WarpModelPtr As IntPtr, src1Ptr As IntPtr, src2Ptr As IntPtr, rows As Integer, cols As Integer, channels As Integer, warpMode As Integer) As IntPtr
     End Function
 End Module
-
-
-
-
-
-' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
-Public Class WarpModel_FindTransformECC_CPP
-    Inherits VBparent
-    Public warp As WarpModel_Input
-    Dim cPtr As IntPtr
-    Public warpMatrix() As Single
-    Public src1 As New cv.Mat
-    Public src2 As New cv.Mat
-    Public rgb1 As New cv.Mat
-    Public rgb2 As New cv.Mat
-    Public warpMode As Integer
-    Public aligned As New cv.Mat
-    Public Sub New()
-        initParent()
-        cPtr = WarpModel_Open()
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
-            radio.check(0).Text = "Motion_Translation (fastest)"
-            radio.check(1).Text = "Motion_Euclidean"
-            radio.check(2).Text = "Motion_Affine (very slow - Use CPP_Classes in Release Mode)"
-            radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
-            radio.check(0).Checked = True
-        End If
-
-        warp = New WarpModel_Input()
-
-        task.desc = "Use FindTransformECC to align 2 images"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        warp.src = src
-        warp.Run()
-        dst1 = warp.dst1
-
-        Static frm = findfrm("WarpModel_FindTransformECC_CPP Radio Options")
-        For i = 0 To frm.check.length - 1
-            If frm.check(i).Checked Then warpMode = i
-        Next
-
-        If warp.check.Box(0).Checked Then
-            src1 = warp.gradient(0)
-            src2 = warp.gradient(1)
-        Else
-            src1 = warp.rgb(0)
-            src2 = warp.rgb(1)
-        End If
-
-        If radio.check(2).Checked Or radio.check(3).Checked Then
-            src1 = src1.Resize(New cv.Size(src1.Width / 4, src1.Height / 4))
-            src2 = src2.Resize(New cv.Size(src2.Width / 4, src2.Height / 4))
-        End If
-
-        Dim src1Data(src1.Total * src1.ElemSize - 1) As Byte
-        Dim src2Data(src2.Total * src2.ElemSize - 1) As Byte
-        Marshal.Copy(src1.Data, src1Data, 0, src1Data.Length - 1)
-        Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length - 1)
-        Dim handleSrc1 = GCHandle.Alloc(src1Data, GCHandleType.Pinned)
-        Dim handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned)
-
-        Dim matPtr = WarpModel_Run(cPtr, handleSrc1.AddrOfPinnedObject(), handleSrc2.AddrOfPinnedObject(), src1.Rows, src1.Cols, 1, warpMode)
-
-        handleSrc1.Free()
-        handleSrc2.Free()
-
-        If warpMode <> 3 Then
-            ReDim warpMatrix(2 * 3 - 1)
-        Else
-            ReDim warpMatrix(3 * 3 - 1)
-        End If
-        Marshal.Copy(matPtr, warpMatrix, 0, warpMatrix.Length)
-
-        rgb1 = warp.rgb(0)
-        rgb2 = warp.rgb(1)
-        If warpMode <> 3 Then
-            Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpAffine(rgb2, aligned, warpMat, rgb1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
-        Else
-            Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpPerspective(rgb2, aligned, warpMat, rgb1.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
-        End If
-        Dim outStr = "The warp matrix is:" + vbCrLf
-        For i = 0 To warpMatrix.Length - 1
-            If i Mod 3 = 0 Then outStr += vbCrLf
-            outStr += Format(warpMatrix(i), "#0.000") + vbTab
-        Next
-
-        If radio.check(2).Checked Or radio.check(3).Checked Then
-            outStr += vbCrLf + "NOTE: input resized for performance." + vbCrLf + "Results are probably distorted." + vbCrLf + "Gradients may give better results."
-        End If
-        ocvb.trueText(outStr, aligned.Width + 10, 220)
-    End Sub
-    Public Sub Close()
-        WarpModel_Close(cPtr)
-    End Sub
-End Class
 
 
 
@@ -201,10 +200,10 @@ End Class
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_AlignImages
     Inherits VBparent
-    Dim ecc As WarpModel_FindTransformECC_CPP
+    Dim ecc As WarpModel_Basics
     Public Sub New()
         initParent()
-        ecc = New WarpModel_FindTransformECC_CPP()
+        ecc = New WarpModel_Basics()
 
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
@@ -213,10 +212,10 @@ Public Class WarpModel_AlignImages
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
             If ecc.warp.check.Box(0).Checked Then
-                ecc.src1 = Choose(i + 1, ecc.warp.gradient(0), ecc.warp.gradient(0))
+                ecc.src = Choose(i + 1, ecc.warp.gradient(0), ecc.warp.gradient(0))
                 ecc.src2 = Choose(i + 1, ecc.warp.gradient(1), ecc.warp.gradient(2))
             Else
-                ecc.src1 = Choose(i + 1, ecc.warp.rgb(0), ecc.warp.rgb(0))
+                ecc.src = Choose(i + 1, ecc.warp.rgb(0), ecc.warp.rgb(0))
                 ecc.src2 = Choose(i + 1, ecc.warp.rgb(1), ecc.warp.rgb(2))
             End If
             ecc.src = src
@@ -236,3 +235,29 @@ Public Class WarpModel_AlignImages
 End Class
 
 
+
+
+
+
+
+Public Class WarpModel_Image
+    Inherits VBparent
+    Dim warp As WarpModel_Basics
+    Dim sobel As Edges_Sobel
+    Public Sub New()
+        initParent()
+        sobel = New Edges_Sobel
+        warp = New WarpModel_Basics
+        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        sobel.src = src
+        sobel.Run()
+        dst1 = sobel.dst1
+
+        Static lastFrame = dst1.Clone
+        ' warp.src1 = 
+    End Sub
+End Class

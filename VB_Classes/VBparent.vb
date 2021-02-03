@@ -78,16 +78,16 @@ Public Class VBparent : Implements IDisposable
                     ocvb.label2 = ocvb.intermediateObject.label2
                 End If
             End If
-            If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
-            If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))
+            If dst1.Width <> task.color.Width Then dst1 = dst1.Resize(New cv.Size(task.color.Width, task.color.Height))
+            If dst2.Width <> task.color.Width Then dst2 = dst2.Resize(New cv.Size(task.color.Width, task.color.Height))
             If task.result.Width <> dst1.Width * 2 Or task.result.Height <> dst1.Height Then
                 task.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
             End If
 
             task.PixelViewer.Run()
 
-            task.result(New cv.Rect(0, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst1)
-            task.result(New cv.Rect(src.Width, 0, src.Width, src.Height)) = MakeSureImage8uC3(dst2)
+            task.result(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst1)
+            task.result(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
             ocvb.frameCount += 1
         End If
     End Sub

@@ -803,7 +803,7 @@ Public Class Edges_Sobel
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
-            sliders.setupTrackBar(1, "Threshold for Sobel results", 0, 254, 200)
+            sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
         End If
         task.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
@@ -822,6 +822,8 @@ Public Class Edges_Sobel
         Else
             dst1 = grayX.ConvertScaleAbs()
         End If
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        dst1 = dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -846,7 +848,7 @@ Public Class Edges_SobelHorizontal
         edges.src = src
         edges.Run()
 
-        Static thresholdSlider = findSlider("Threshold for Sobel results")
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         dst1 = edges.dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
