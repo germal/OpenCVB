@@ -4,12 +4,13 @@ Imports System.Runtime.InteropServices
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_Basics
     Inherits VBparent
-    Public warp As WarpModel_Input
+    Public warpInput As WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
     Public src2 As New cv.Mat
     Public warpMode As Integer
     Public aligned As New cv.Mat
+    Public outputRect As cv.Rect
     Public Sub New()
         initParent()
         cPtr = WarpModel_Open()
@@ -23,7 +24,10 @@ Public Class WarpModel_Basics
             radio.check(0).Checked = True
         End If
 
-        warp = New WarpModel_Input()
+        warpInput = New WarpModel_Input()
+
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
         label1 = "Src image (align to this image)"
         label2 = "Src2 image aligned to src image"
@@ -31,21 +35,23 @@ Public Class WarpModel_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        warp.src = src
-        warp.Run()
+        If standalone Then
+            warpInput.src = src
+            warpInput.Run()
+
+            If warpInput.check.Box(0).Checked Then
+                src = warpInput.gradient(0)
+                src2 = warpInput.gradient(1)
+            Else
+                src = warpInput.rgb(0)
+                src2 = warpInput.rgb(1)
+            End If
+        End If
 
         Static frm = findfrm("WarpModel_Basics Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then warpMode = i
         Next
-
-        If warp.check.Box(0).Checked Then
-            src = warp.gradient(0)
-            src2 = warp.gradient(1)
-        Else
-            src = warp.rgb(0)
-            src2 = warp.rgb(1)
-        End If
 
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Dim src2Data(src2.Total * src2.ElemSize - 1) As Byte
@@ -68,17 +74,15 @@ Public Class WarpModel_Basics
 
         If warpMode <> 3 Then
             Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpAffine(warp.rgb(1), aligned, warpMat, warp.rgb(0).Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         Else
             Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpPerspective(warp.rgb(1), aligned, warpMat, warp.rgb(0).Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
-        Dim rect As New cv.Rect(0, 0, warp.rgb(0).Width, warp.rgb(0).Height)
-        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
-        dst1(rect) = warp.rgb(0)
-        dst2(rect) = warp.rgb(1)
+        outputRect = New cv.Rect(0, 0, src.Width, src.Height)
+        dst1(outputRect) = src
+        dst2(outputRect) = src2
 
         Dim outStr = "The warp matrix is:" + vbCrLf
         For i = 0 To warpMatrix.Length - 1
@@ -151,8 +155,10 @@ Public Class WarpModel_Input
         Next
         Dim r() = {New cv.Rect(0, 0, img.Width, img.Height / 3), New cv.Rect(0, img.Height / 3, img.Width, img.Height / 3),
                    New cv.Rect(0, 2 * img.Height / 3, img.Width, img.Height / 3)}
+
+        Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         For i = 0 To r.Count - 1
-            If check.Box(0).Checked Then
+            If gradientCheck.checked Then
                 sobel.src = img(r(i))
                 sobel.Run()
                 gradient(i) = sobel.dst1.Clone()
@@ -210,20 +216,21 @@ Public Class WarpModel_AlignImages
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim aligned() = {New cv.Mat, New cv.Mat}
+        Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         For i = 0 To 1
-            If ecc.warp.check.Box(0).Checked Then
-                ecc.src = Choose(i + 1, ecc.warp.gradient(0), ecc.warp.gradient(0))
-                ecc.src2 = Choose(i + 1, ecc.warp.gradient(1), ecc.warp.gradient(2))
+            If gradientCheck.Checked Then
+                ecc.src = Choose(i + 1, ecc.warpInput.gradient(0), ecc.warpInput.gradient(0))
+                ecc.src2 = Choose(i + 1, ecc.warpInput.gradient(1), ecc.warpInput.gradient(2))
             Else
-                ecc.src = Choose(i + 1, ecc.warp.rgb(0), ecc.warp.rgb(0))
-                ecc.src2 = Choose(i + 1, ecc.warp.rgb(1), ecc.warp.rgb(2))
+                ecc.src = Choose(i + 1, ecc.warpInput.rgb(0), ecc.warpInput.rgb(0))
+                ecc.src2 = Choose(i + 1, ecc.warpInput.rgb(1), ecc.warpInput.rgb(2))
             End If
             ecc.src = src
             ecc.Run()
             aligned(i) = ecc.aligned.Clone()
         Next
 
-        Dim mergeInput() = {ecc.warp.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red
+        Dim mergeInput() = {ecc.warpInput.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
         dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
@@ -242,12 +249,19 @@ End Class
 
 Public Class WarpModel_Image
     Inherits VBparent
-    Dim warp As WarpModel_Basics
+    Public basics As WarpModel_Basics
     Dim sobel As Edges_Sobel
+    Public lastFrame As cv.Mat
     Public Sub New()
         initParent()
         sobel = New Edges_Sobel
-        warp = New WarpModel_Basics
+        basics = New WarpModel_Basics
+
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+
+        label1 = "Previous frame (align to this image)"
+        label2 = "Current frame aligned to previous frame (dst1)"
         task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous"
     End Sub
     Public Sub Run()
@@ -257,7 +271,50 @@ Public Class WarpModel_Image
         sobel.Run()
         dst1 = sobel.dst1
 
-        Static lastFrame = dst1.Clone
-        ' warp.src1 = 
+        If lastFrame Is Nothing Then lastFrame = dst1.Clone
+
+        basics.src = dst1
+        basics.src2 = lastFrame
+        basics.Run()
+        dst1(basics.outputRect) = basics.dst1(basics.outputRect)
+        dst2(basics.outputRect) = basics.dst2(basics.outputRect)
+
+        lastFrame = dst1.Clone
     End Sub
 End Class
+
+
+
+
+
+
+
+'Public Class WarpModel_Entropy
+'    Inherits VBparent
+'    Dim warp As WarpModel_Image
+'    Dim entropy As Entropy_Highest_MT
+'    Public Sub New()
+'        initParent()
+'        warp = New WarpModel_Image
+'        entropy = New Entropy_Highest_MT
+'        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+'        ' we only need to compute the max entropy every once in a while.  
+'        If ocvb.frameCount Mod 10 = 0 Then
+'            entropy.src = src
+'            entropy.Run()
+'        End If
+
+'        Dim r = entropy.eMaxRect
+'        warp.src = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+'        warp.src(r) = src(r)
+'        warp.Run()
+'        'dst1(warp.basics.outputRect) = warp.dst1(warp.basics.outputRect)
+'        'dst2(warp.basics.outputRect) = warp.dst2(warp.basics.outputRect)
+'        dst1 = warp.dst1
+'        dst2 = warp.dst2
+'    End Sub
+'End Class

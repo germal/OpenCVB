@@ -44,7 +44,7 @@ Public Class Entropy_Highest_MT
     Inherits VBparent
     Dim entropies(0) As Entropy_Simple
     Public grid As Thread_Grid
-    Public bestContrast As cv.Rect
+    Public eMaxRect As cv.Rect
     Public Sub New()
         initParent()
 
@@ -58,7 +58,7 @@ Public Class Entropy_Highest_MT
         task.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
         If entropies.Length <> grid.roiList.Count Then
@@ -77,7 +77,7 @@ Public Class Entropy_Highest_MT
 
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
-        Dim maxIndex As integer
+        Dim maxIndex As Integer
         For i = 0 To entropies.Count - 1
             If entropies(i).entropy > maxEntropy Then
                 maxEntropy = entropies(i).entropy
@@ -95,8 +95,8 @@ Public Class Entropy_Highest_MT
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        bestContrast = grid.roiList(maxIndex)
-        If standalone or task.intermediateReview = caller Then dst1.Rectangle(bestContrast, cv.Scalar.Red, 4)
+        eMaxRect = grid.roiList(maxIndex)
+        If standalone Or task.intermediateReview = caller Then dst1.Rectangle(eMaxRect, cv.Scalar.Red, 4)
         label2 = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
 End Class
@@ -120,7 +120,7 @@ Public Class Entropy_FAST
         task.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         fast.src = src
         fast.Run()
 
@@ -128,7 +128,7 @@ Public Class Entropy_FAST
         entropy.Run()
         dst1 = entropy.dst1
         dst2 = entropy.dst2
-        dst2.Rectangle(entropy.bestContrast, cv.Scalar.Red, 4)
+        dst2.Rectangle(entropy.eMaxRect, cv.Scalar.Red, 4)
     End Sub
 End Class
 

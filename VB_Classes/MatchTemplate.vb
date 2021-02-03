@@ -195,7 +195,7 @@ Public Class MatchTemplate_BestEntropy_MT
         If ocvb.frameCount Mod 30 = 0 Then
             entropy.src = src
             entropy.Run()
-            task.drawRect = entropy.bestContrast
+            task.drawRect = entropy.eMaxRect
         End If
 
         match.src = src
