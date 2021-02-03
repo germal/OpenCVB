@@ -134,9 +134,8 @@ Public Class Pixel_Viewer
                         For y = 0 To img.Height - 1
                             pixels.line += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
-                                pixels.line += Format(img.Get(Of Byte)(y, x), "000") + " "
-                                pixels.line += Format(img.Get(Of Byte)(y, x + 1), "000") + " "
-                                pixels.line += Format(img.Get(Of Byte)(y, x + 2), "000") + "   "
+                                Dim vec = img.Get(Of cv.Vec3b)(y, x)
+                                pixels.line += Format(vec.Item0, "000") + " " + Format(vec.Item1, "000") + " " + Format(vec.Item2, "000") + "   "
                             Next
                             pixels.line += vbCrLf
                         Next
@@ -182,10 +181,8 @@ Public Class Pixel_Viewer
                         For y = 0 To img.Height - 1
                             pixels.line += "r" + Format(y, "000") + "   "
                             For x = 0 To img.Width - 1
-                                pixels.line += Format(img.Get(Of Single)(y, x), format32f) + " "
-                                pixels.line += Format(img.Get(Of Single)(y, x + 1), format32f) + " "
-                                pixels.line += Format(img.Get(Of Single)(y, x + 2), format32f) + "  "
-                                pixels.line += "  "
+                                Dim vec = img.Get(Of cv.Vec3f)(y, x)
+                                pixels.line += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
                             Next
                             pixels.line += vbCrLf
                         Next

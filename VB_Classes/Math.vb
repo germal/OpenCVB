@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
+' https://answers.opencv.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
 Public Class Math_Subtract
     Inherits VBparent
     Public Sub New()
@@ -11,13 +12,17 @@ Public Class Math_Subtract
             sliders.setupTrackBar(2, "Blue", 0, 255, 255)
         End If
 
-        task.desc = "Invert the image colors using subtract"
+        task.desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-        tmp.SetTo(New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value))
-        cv.Cv2.Subtract(tmp, src, dst1)
+        Dim bgr = New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value)
+        cv.Cv2.Subtract(bgr, src, dst1) ' or dst1 = bgr - src
+        dst2 = src - bgr
+
+        Dim scalar = "(" + CStr(bgr.Item(0)) + "," + CStr(bgr.Item(1)) + "," + CStr(bgr.Item(2)) + ")"
+        label1 = "Subtract Mat from scalar " + scalar
+        label2 = "Subtract scalar " + scalar + " from Mat "
     End Sub
 End Class
 
