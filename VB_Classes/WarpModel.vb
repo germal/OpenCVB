@@ -26,9 +26,6 @@ Public Class WarpModel_Basics
 
         warpInput = New WarpModel_Input()
 
-        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
-
         label1 = "Src image (align to this image)"
         label2 = "Src2 image aligned to src image"
         task.desc = "Use FindTransformECC to align 2 images"
@@ -80,6 +77,9 @@ Public Class WarpModel_Basics
             cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+
         outputRect = New cv.Rect(0, 0, src.Width, src.Height)
         dst1(outputRect) = src
         dst2(outputRect) = src2
@@ -91,7 +91,7 @@ Public Class WarpModel_Basics
         Next
 
         If radio.check(2).Checked Or radio.check(3).Checked Then
-            outStr += vbCrLf + "NOTE: input resized for performance." + vbCrLf + "Results are probably distorted." + vbCrLf + "Gradients may give better results."
+            outStr += vbCrLf + "NOTE: Gradients may give better results."
         End If
         ocvb.trueText(outStr, aligned.Width + 10, 220)
     End Sub
@@ -211,33 +211,37 @@ Public Class WarpModel_AlignImages
         initParent()
         ecc = New WarpModel_Basics()
 
+        label1 = "Aligned image"
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim aligned() = {New cv.Mat, New cv.Mat}
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
+        If standalone Then
+            ecc.warpInput.src = src
+            ecc.warpInput.Run()
+        End If
+        Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
             If gradientCheck.Checked Then
-                ecc.src = Choose(i + 1, ecc.warpInput.gradient(0), ecc.warpInput.gradient(0))
+                ecc.src = ecc.warpInput.gradient(0)
                 ecc.src2 = Choose(i + 1, ecc.warpInput.gradient(1), ecc.warpInput.gradient(2))
             Else
-                ecc.src = Choose(i + 1, ecc.warpInput.rgb(0), ecc.warpInput.rgb(0))
+                ecc.src = ecc.warpInput.rgb(0)
                 ecc.src2 = Choose(i + 1, ecc.warpInput.rgb(1), ecc.warpInput.rgb(2))
             End If
-            ecc.src = src
             ecc.Run()
             aligned(i) = ecc.aligned.Clone()
         Next
 
-        Dim mergeInput() = {ecc.warpInput.rgb(0), aligned(1), aligned(0)} ' green and blue were aligned to the original red
+        Dim mergeInput() = {ecc.src, aligned(0), aligned(1)}
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
+        dst1.SetTo(0)
         dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
-        label1 = "Aligned image"
         ocvb.trueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
-                                              "Other than that, images look the same." + vbCrLf +
-                                              "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 100)
+                      "Other than that, images look the same." + vbCrLf +
+                      "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 40)
     End Sub
 End Class
 
