@@ -100,10 +100,27 @@ Public Class Pixel_Viewer
                 cv.Cv2.Absdiff(savePixels, testChange, diff)
             End If
 
+            Dim img = dst1(dw)
+            Dim minVal As Single = 0, maxVal As Single = 255
+            Dim format32f = "0000.0"
+            If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
+                img.MinMaxLoc(minVal, maxVal)
+                If minVal >= 0 Then
+                    If maxVal < 1000 Then format32f = "000.00"
+                    If maxVal < 100 Then format32f = "00.000"
+                    If maxVal < 10 Then format32f = "0.0000"
+                Else
+                    maxVal = Math.Max(-minVal, maxVal)
+                    format32f = "+0.000;-0.000; 0.000"
+                    If maxVal < 1000 Then format32f = "+000.0;-000.0; 000.0"
+                    If maxVal < 100 Then format32f = "+00.00;-00.00; 00.00"
+                    If maxVal < 10 Then format32f = "+0.000;-0.000; 0.000"
+                End If
+            End If
+
             If saveDrawRect <> dw Or pixels.pixelResized Or diff.CountNonZero() Then
                 savePixels = testChange.Clone
                 pixels.pixelResized = False
-                Dim img = dst1(dw)
                 Select Case displayType
 
                     Case 0
@@ -149,7 +166,7 @@ Public Class Pixel_Viewer
                         For y = 0 To img.Height - 1
                             pixels.line += "r" + Format(y, "000") + "   "
                             For x = 0 To img.Width - 1
-                                pixels.line += Format(img.Get(Of Single)(y, x), "0000.0") + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                                pixels.line += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
                             Next
                             pixels.line += vbCrLf
                         Next
@@ -161,12 +178,13 @@ Public Class Pixel_Viewer
                             If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
                         Next
                         pixels.line += vbCrLf
+                        If format32f.Substring(0, 1) = "0" Then format32f = "+" + format32f
                         For y = 0 To img.Height - 1
                             pixels.line += "r" + Format(y, "000") + "   "
                             For x = 0 To img.Width - 1
-                                pixels.line += Format(img.Get(Of Single)(y, x), "+0.000;-0.000; 0.000") + " "
-                                pixels.line += Format(img.Get(Of Single)(y, x + 1), "+0.000;-0.000; 0.000") + " "
-                                pixels.line += Format(img.Get(Of Single)(y, x + 2), "+0.000;-0.000; 0.000") + "  "
+                                pixels.line += Format(img.Get(Of Single)(y, x), format32f) + " "
+                                pixels.line += Format(img.Get(Of Single)(y, x + 1), format32f) + " "
+                                pixels.line += Format(img.Get(Of Single)(y, x + 2), format32f) + "  "
                                 pixels.line += "  "
                             Next
                             pixels.line += vbCrLf
@@ -179,15 +197,12 @@ Public Class Pixel_Viewer
                 pixels.pixelDataChanged = True
             End If
 
-            If task.mousePicTag = 2 Then
-                task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.Black, If(dst1.Width = 1280, 3, 2))
-                task.algorithmObject.dst1.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
+            Dim outImg As cv.Mat = If(task.mousePicTag = 2, task.algorithmObject.dst1, task.algorithmObject.dst2)
+            outImg.MinMaxLoc(minVal, maxVal)
+            outImg.Rectangle(saveDrawRect, cv.Scalar.All(maxVal), If(dst1.Width = 1280, 3, 2))
+            outImg.Rectangle(saveDrawRect, cv.Scalar.All(minVal), If(dst1.Width = 1280, 2, 1))
             Else
-                task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.Black, If(dst1.Width = 1280, 3, 2))
-                task.algorithmObject.dst2.Rectangle(saveDrawRect, cv.Scalar.White, If(dst1.Width = 1280, 2, 1))
-            End If
-        Else
-            If pixels IsNot Nothing Then
+                If pixels IsNot Nothing Then
                 pixels.Close()
                 keys.checkKeys.Close()
                 keys = Nothing

@@ -166,6 +166,7 @@ Public Class ActiveTask : Implements IDisposable
 
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
+    Public drawRectUpdated As Boolean
 
     Public label1 As String
     Public label2 As String
