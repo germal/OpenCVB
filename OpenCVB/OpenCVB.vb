@@ -1154,10 +1154,11 @@ Public Class OpenCVB
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 If camera.newImagesAvailable And pauseAlgorithmThread = False Then
                     Dim dataReady As Boolean = False
+                    On Error Resume Next
                     SyncLock bufferLock
-                        Try
-                            ' bring the data into the algorithm task.
-                            task.color = camera.color.Resize(resolutionXY)
+                        ' bring the data into the algorithm task.
+                        task.color = camera.color.Resize(resolutionXY)
+                        If task.color.Width > 0 Then
                             task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
                             task.leftView = camera.leftView.Resize(resolutionXY)
                             task.rightView = camera.rightView.Resize(resolutionXY)
@@ -1204,67 +1205,61 @@ Public Class OpenCVB
 
                             task.fileStarted = openFileStarted ' UI may have stopped play.
                             dataReady = True
-                        Catch ex As Exception
-                        End Try
+                        End If
                     End SyncLock
                     If dataReady Then Exit While
                 End If
             End While
 
-            Try
-                task.RunAlgorithm()
+            task.RunAlgorithm()
 
-                If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
-                If task.drawRectUpdated Then drawRect = task.drawRect
-                If task.drawRectClear Then
-                    drawRect = New cv.Rect
-                    task.drawRect = drawRect
-                    task.drawRectClear = False
+            If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
+            If task.drawRectUpdated Then drawRect = task.drawRect
+            If task.drawRectClear Then
+                drawRect = New cv.Rect
+                task.drawRect = drawRect
+                task.drawRectClear = False
+            End If
+
+            If openFileDialogName <> "" Then
+                If openFileDialogName <> task.openFileDialogName Or openFileStarted <> task.fileStarted Then
+                    task.fileStarted = openFileStarted
+                    task.openFileDialogName = openFileDialogName
                 End If
+                openfileSliderPercent = task.openFileSliderPercent
+            End If
 
-                If openFileDialogName <> "" Then
-                    If openFileDialogName <> task.openFileDialogName Or openFileStarted <> task.fileStarted Then
-                        task.fileStarted = openFileStarted
-                        task.openFileDialogName = openFileDialogName
-                    End If
-                    openfileSliderPercent = task.openFileSliderPercent
+            Static inputFile As String = "" ' task.openFileDialogName
+            If inputFile <> task.openFileDialogName Then
+                inputFile = task.openFileDialogName
+                openFileInitialDirectory = task.openFileInitialDirectory
+                openFileDialogRequested = task.openFileDialogRequested
+                openFileinitialStartSetting = True ' if the file playing changes while the algorithm is running, automatically start playing the new file.
+                openFileFilterIndex = task.openFileFilterIndex
+                openFileFilter = task.openFileFilter
+                openFileDialogName = task.openFileDialogName
+                openfileDialogTitle = task.openFileDialogTitle
+            End If
+
+            If frameCount = 0 Then meActivateNeeded = True
+
+            picLabels(2) = task.label1
+            picLabels(3) = task.label2
+
+            ' share the results of the algorithm task.
+            SyncLock ttTextData
+                If task.ttTextData.Count Then
+                    ttTextData = New List(Of VB_Classes.TTtext)(task.ttTextData)
+                    task.ttTextData.Clear()
                 End If
+            End SyncLock
 
-                Static inputFile As String = "" ' task.openFileDialogName
-                If inputFile <> task.openFileDialogName Then
-                    inputFile = task.openFileDialogName
-                    openFileInitialDirectory = task.openFileInitialDirectory
-                    openFileDialogRequested = task.openFileDialogRequested
-                    openFileinitialStartSetting = True ' if the file playing changes while the algorithm is running, automatically start playing the new file.
-                    openFileFilterIndex = task.openFileFilterIndex
-                    openFileFilter = task.openFileFilter
-                    openFileDialogName = task.openFileDialogName
-                    openfileDialogTitle = task.openFileDialogTitle
-                End If
+            SyncLock imgResult
+                imgResult = task.result.Clone()
+                algorithmRefresh = True
+            End SyncLock
 
-                If frameCount = 0 Then meActivateNeeded = True
-
-                picLabels(2) = task.label1
-                picLabels(3) = task.label2
-
-                ' share the results of the algorithm task.
-                SyncLock ttTextData
-                    If task.ttTextData.Count Then
-                        ttTextData = New List(Of VB_Classes.TTtext)(task.ttTextData)
-                        task.ttTextData.Clear()
-                    End If
-                End SyncLock
-
-                SyncLock imgResult
-                    imgResult = task.result.Clone()
-                    algorithmRefresh = True
-                End SyncLock
-
-                If Me.IsDisposed Then Exit While
-            Catch ex As Exception
-                Console.WriteLine("Error in AlgorithmTask: " + ex.Message)
-                Exit While
-            End Try
+            If Me.IsDisposed Then Exit While
 
             If frameCount Mod 100 = 0 Then
                 SyncLock callTraceLock
