@@ -14,8 +14,8 @@ class WarpModel
 private:
 public:
     int warpMode = MOTION_EUCLIDEAN;
-    double termination_eps = 1e-10;
-    int number_of_iterations = 5000;
+    double termination_eps = 1e-5;
+    int number_of_iterations = 50;
     TermCriteria criteria = TermCriteria(TermCriteria::COUNT + TermCriteria::EPS, number_of_iterations, termination_eps);
     Mat warpMatrix;
     WarpModel(){}
