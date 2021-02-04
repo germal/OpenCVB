@@ -52,4 +52,16 @@ Public Class PixelViewerForm
     Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
         mousePoint.X += 1
     End Sub
+    Private Sub PixelViewerForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        Select Case e.KeyCode
+            Case Keys.Left
+                mousePoint.X -= 1
+            Case Keys.Up
+                mousePoint.Y -= 1
+            Case Keys.Down
+                mousePoint.Y += 1
+            Case Keys.Right
+                mousePoint.X += 1
+        End Select
+    End Sub
 End Class
