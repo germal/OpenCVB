@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Pixel_Viewer
     Inherits VBparent
-    Dim keys As Keyboard_Basics
     Public pixels As PixelViewerForm
     Public Sub New()
         initParent()
@@ -16,18 +15,8 @@ Public Class Pixel_Viewer
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         If task.pixelViewerOn Then
-            If keys Is Nothing Then
-                keys = New Keyboard_Basics()
-                keys.checkKeys.Show()
-                keys.checkKeys.Left = 0
-                keys.checkKeys.Top = 0
-                keys.checkKeys.SendToBack()
-            End If
             If pixels Is Nothing Then pixels = New PixelViewerForm
             pixels.Show()
-
-            keys.Run()
-            Dim keyInput = New List(Of String)(keys.keyInput)
 
             If task.mousePicTag < 2 Then Exit Sub
             dst1 = Choose(task.mousePicTag - 2 + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone)
@@ -46,28 +35,16 @@ Public Class Pixel_Viewer
             pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType + " - updates are no more than 1 per second"
 
             Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * pixels.Width / 650
-            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1))
+            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1)) - 2
             If drHeight < 20 Then drHeight = 20
+
+            If pixels.mousePoint <> New cv.Point Then
+                task.mousePoint += pixels.mousePoint
+                task.mousePointUpdated = True
+                pixels.mousePoint = New cv.Point
+            End If
             Static mouseLoc = New cv.Point(100, 100) ' assume 
             If task.mousePoint.X Or task.mousePoint.Y Then
-                For i = 0 To keyInput.Count - 1
-                    task.mousePointUpdated = False
-                    Select Case keyInput(i)
-                        Case "Down"
-                            task.mousePoint.Y += 1
-                            task.mousePointUpdated = True
-                        Case "Up"
-                            task.mousePoint.Y -= 1
-                            task.mousePointUpdated = True
-                        Case "Left"
-                            task.mousePoint.X -= 1
-                            task.mousePointUpdated = True
-                        Case "Right"
-                            task.mousePoint.X += 1
-                            task.mousePointUpdated = True
-                    End Select
-                Next
-
                 Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), 0)
                 Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, 0)
                 mouseLoc = New cv.Point(CInt(x), CInt(y))
@@ -121,10 +98,11 @@ Public Class Pixel_Viewer
             If saveDrawRect <> dw Or pixels.pixelResized Or diff.CountNonZero() Then
                 savePixels = testChange.Clone
                 pixels.pixelResized = False
+                pixels.line = vbCrLf + vbCrLf
                 Select Case displayType
 
                     Case 0
-                        pixels.line = " col " + If(dw.X Mod 5, "  ", "    ")
+                        pixels.line += " col " + If(dw.X Mod 5, "  ", "    ")
                         Dim colDup = If(dw.X < 1000, 26, 25)
                         Dim extraPad = If(dw.X < 1000, "", "  ")
                         For i = 0 To dw.Width - 1
@@ -141,7 +119,7 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 1
-                        pixels.line = " col" + If(dw.X Mod 5, "        ", "     ")
+                        pixels.line += " col" + If(dw.X Mod 5, "        ", "     ")
                         Dim colDup = If(dw.X < 1000, 7, 6)
                         For i = 0 To dw.Width - 1
                             If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "    " Else pixels.line += StrDup(colDup, " ")
@@ -156,14 +134,14 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 2
-                        pixels.line = " col " + If(dw.X Mod 5, "   ", "    ")
+                        pixels.line += " col " + If(dw.X Mod 5, "   ", "    ")
                         Dim colDup = If(dw.X < 1000, 14, 10)
                         For i = 0 To dw.Width - 1
                             If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
                         Next
                         pixels.line += vbCrLf
                         For y = 0 To img.Height - 1
-                            pixels.line += "r" + Format(y, "000") + "   "
+                            pixels.line += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
                                 pixels.line += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
                             Next
@@ -171,7 +149,7 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 3
-                        pixels.line = " col  " + If(dw.X Mod 5, "   ", "    ")
+                        pixels.line += " col  " + If(dw.X Mod 5, "   ", "    ")
                         Dim colDup = If(dw.X < 1000, 46, 46)
                         For i = 0 To dw.Width - 1
                             If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
@@ -179,7 +157,7 @@ Public Class Pixel_Viewer
                         pixels.line += vbCrLf
                         If format32f.Substring(0, 1) = "0" Then format32f = "+" + format32f
                         For y = 0 To img.Height - 1
-                            pixels.line += "r" + Format(y, "000") + "   "
+                            pixels.line += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
                                 Dim vec = img.Get(Of cv.Vec3f)(y, x)
                                 pixels.line += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
@@ -203,8 +181,6 @@ Public Class Pixel_Viewer
         Else
             If pixels IsNot Nothing Then
                 pixels.Close()
-                keys.checkKeys.Close()
-                keys = Nothing
                 pixels = Nothing
             End If
         End If
