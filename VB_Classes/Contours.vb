@@ -90,7 +90,6 @@ Public Class Contours_Basics
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Dim minArea = areaSlider.value
         Dim epsilon = epsilonSlider.value
-        contourlist.Clear()
         If standalone Then
             dst2.SetTo(0)
             Dim cnt = contours0.ToArray
@@ -116,6 +115,7 @@ Public Class Contours_Basics
         Else
             centroids.Clear()
             sortedContours.Clear()
+            contourlist.Clear()
 
             For i = 0 To contours0.Length - 1 Step 2
                 Dim m = cv.Cv2.Moments(contours0(i), False)
@@ -360,50 +360,38 @@ End Class
 
 Public Class Contours_Binarized
     Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
-    Dim contours As Contours_Basics
-    Dim palette As Palette_Basics
+    Dim sobel As Edges_Sobel
+    Public basics As Contours_Basics
     Public Sub New()
         initParent()
-        palette = New Palette_Basics
-        contours = New Contours_Basics
-        edges = New Edges_BinarizedSobel
+
+        basics = New Contours_Basics
+        sobel = New Edges_Sobel
         Dim kernelSlider = findSlider("Sobel kernel Size")
         kernelSlider.Value = 3
 
-        task.desc = "Find contours in the Edges after binarized"
+        task.desc = "Find contours using Edges after image is binarized"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        edges.src = src
-        edges.Run()
-        dst1 = edges.dst2
+        sobel.src = src
+        sobel.Run()
+        dst1 = sobel.dst1
 
-        contours.src = dst1.Clone
-        contours.Run()
+        basics.src = dst1.Clone
+        basics.Run()
 
-        Dim cntList = contours.sortedContours
+        Dim cntList = basics.sortedContours
         If cntList.Count = 0 Then Exit Sub ' there were no lines?
         Dim incr = If(cntList.Count > 255, 1, CInt(255 / cntList.Count))
         dst2.SetTo(0)
+        Static lastFrame = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For i = 0 To cntList.Count - 1
-            'Dim pt = cntList.ElementAt(0).Value(0)
-            'If pt.X < 0 Then pt.X = 0
-            'If pt.Y < 0 Then pt.Y = 0
             Dim lPoints = New List(Of List(Of cv.Point))
             lPoints.Add(cntList.ElementAt(i).Value.ToList)
             cv.Cv2.DrawContours(CType(dst2, cv.InputOutputArray), lPoints, 0, ocvb.scalarColors(i Mod 255), -1)
-            Dim c = ocvb.scalarColors(i Mod 255)
         Next
 
-        'palette.src = gray
-        'palette.Run()
-        'dst2 = palette.dst1
-        'dst2.SetTo(0, dst1)
-
-        ' cv.Cv2.DrawContours(dst2, contours.contours0.ToArray, -1, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        'For i = 0 To contours.centroids.Count - 1
-        '    dst2.Circle(contours.centroids(i), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        'Next
+        lastFrame = dst2.Clone
     End Sub
 End Class

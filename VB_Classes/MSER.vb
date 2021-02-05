@@ -253,3 +253,46 @@ Public Class MSER_Contours
     End Sub
 End Class
 
+
+
+
+
+
+
+
+'Public Class MSER_Simple
+'    Inherits VBparent
+'    Dim overlap As Rectangle_MultiOverlap
+'    Public Sub New()
+'        initParent()
+'        overlap = New Rectangle_MultiOverlap
+'        task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with the simplest possible options"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+'        Dim input = src
+'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        Dim mser = cv.MSER.Create()
+'        Dim msers()() As cv.Point = Nothing
+'        Dim boxes() As cv.Rect = Nothing
+'        mser.DetectRegions(input, msers, boxes)
+
+'        dst1 = src.Clone
+
+'        overlap.inputRects.Clear()
+'        For i = 0 To boxes.Count - 1
+'            Dim box = boxes(i)
+'            For j = i To boxes.Count - 1
+
+'            Next
+
+'            overlap.inputRects.Add(box)
+'        Next
+'        overlap.Run()
+
+'        For Each rect In boxes ' overlap.outputRects
+'            dst1.Rectangle(rect, cv.Scalar.Yellow, 1)
+'        Next
+'    End Sub
+'End Class

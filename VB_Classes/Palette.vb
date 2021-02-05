@@ -46,6 +46,7 @@ Public Class Palette_Basics
         Static saveColorMap As Integer = -1
         If colormap = 20 Then
             saveColorMap = colormap
+            gradMap.changeColorMap = True
             gradMap.Run()
         End If
         If saveColorMap <> colormap Then
@@ -379,6 +380,7 @@ Public Class Palette_BuildGradientColorMap
                 gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
                 If standalone Or task.intermediateReview = caller Then dst2 = gradientColorMap
             End If
+            gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
             dst1 = Palette_Custom_Apply(src.Clone, gradientColorMap)
         End If
     End Sub

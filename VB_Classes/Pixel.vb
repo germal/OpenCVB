@@ -16,6 +16,7 @@ Public Class Pixel_Viewer
 
         If task.pixelViewerOn Then
             If pixels Is Nothing Then pixels = New PixelViewerForm
+            If pixels.Visible = False Then pixels = New PixelViewerForm
             pixels.Show()
 
             If task.mousePicTag < 2 Then Exit Sub
@@ -95,7 +96,10 @@ Public Class Pixel_Viewer
                 End If
             End If
 
-            If saveDrawRect <> dw Or pixels.pixelResized Or diff.CountNonZero() Then
+            ' If saveDrawRect <> dw Or pixels.pixelResized Or  Then
+            Static saveMousePoint = task.mousePoint
+            If ((saveDrawRect <> dw Or pixels.pixelResized Or pixels.updateReady) And diff.CountNonZero()) Or task.mousePoint <> saveMousePoint Then
+                pixels.updateReady = False
                 savePixels = testChange.Clone
                 pixels.pixelResized = False
                 pixels.line = vbCrLf + vbCrLf
@@ -134,9 +138,10 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 2
-                        pixels.line += " col " + If(dw.X Mod 5, "   ", "    ")
+                        pixels.line += " col " + If(dw.X Mod 5, "  ", "    ")
                         Dim colDup = If(dw.X < 1000, 14, 10)
                         For i = 0 To dw.Width - 1
+                            'pixels.line += Format(dw.X + i, "#000") + vbTab
                             If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
                         Next
                         pixels.line += vbCrLf
@@ -149,13 +154,12 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 3
-                        pixels.line += " col  " + If(dw.X Mod 5, "   ", "    ")
+                        pixels.line += " col " + If(dw.X Mod 5, "   ", "    ")
                         Dim colDup = If(dw.X < 1000, 46, 46)
                         For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
+                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "         " Else pixels.line += StrDup(colDup, " ")
                         Next
                         pixels.line += vbCrLf
-                        If format32f.Substring(0, 1) = "0" Then format32f = "+" + format32f
                         For y = 0 To img.Height - 1
                             pixels.line += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
@@ -167,11 +171,11 @@ Public Class Pixel_Viewer
                     Case 4
 
                 End Select
+                saveMousePoint = task.mousePoint
                 savedisplayType = displayType
                 saveDrawRect = dw
                 pixels.pixelDataChanged = True
-                'task.drawRect = dw
-                'task.drawRectUpdated = True
+                pixels.Refresh()
             End If
 
             Dim outImg As cv.Mat = If(task.mousePicTag = 2, task.algorithmObject.dst1, task.algorithmObject.dst2)

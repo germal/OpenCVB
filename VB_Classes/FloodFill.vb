@@ -55,6 +55,7 @@ Public Class FloodFill_Basics
 
         Dim gray = input.Clone()
         dst1.SetTo(0)
+        dst2.SetTo(0)
         For y = 0 To gray.Height - 1 Step stepSize
             For x = 0 To gray.Width - 1 Step stepSize
                 If gray.Get(Of Byte)(y, x) > 0 Then
@@ -901,3 +902,119 @@ Public Class FloodFill_FullImage
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+
+Public Class FloodFill_Step
+    Inherits VBparent
+    Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+    Public rects As New List(Of cv.Rect)
+    Public masks As New List(Of cv.Mat)
+    Public centroids As New List(Of cv.Point2f)
+    Public floodPoints As New List(Of cv.Point)
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Dim initialMask As New cv.Mat
+    Dim contours As Contours_Binarized
+    Dim edgesInput As cv.Mat
+    Dim contourInput As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
+    Public Sub New()
+        initParent()
+
+        contours = New Contours_Binarized
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "FloodFill Step Size", 1, src.Cols / 2, 15)
+            sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
+            sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)
+        End If
+
+        task.desc = "Step through the current image to floodfill using colors from the previous image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Then
+            contours.src = src
+            contours.Run()
+            contourInput = contours.basics.sortedcontours
+            dst1 = contours.dst1
+            src = contours.dst2
+        End If
+
+        Static stepSlider = findSlider("FloodFill Step Size")
+        Static fillSlider = findSlider("FloodFill point distance from edge")
+        Dim fill = fillSlider.value
+        Dim stepSize = stepSlider.Value
+
+        Static saveStepSize As Integer
+        Static saveFillDistance As Integer
+        Dim resetColors As Boolean
+        If saveStepSize <> stepSize Or saveFillDistance <> fill Then
+            resetColors = True
+            saveStepSize = stepSize
+            saveFillDistance = fill
+        End If
+
+        masks.Clear()
+        maskSizes.Clear()
+        rects.Clear()
+        centroids.Clear()
+
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static zero As New cv.Scalar(0)
+        Static maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+
+        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
+        Dim rect As cv.Rect
+        Dim pt As cv.Point
+        Dim testCount As Integer
+        Dim floodCount As Integer
+        floodPoints.Clear()
+
+        Static lastFrame As cv.Mat = src.Clone
+        dst2 = src.Clone
+        Dim inputRect As New cv.Rect(0, 0, fill, fill)
+        For y = fill To dst1.Height - fill - 1 Step stepSize
+            For x = fill To dst1.Width - fill - 1 Step stepSize
+                testCount += 1
+                inputRect.X = x
+                inputRect.Y = y
+                Dim edgeCount = dst1(inputRect).CountNonZero
+                If edgeCount = 0 Then
+                    floodCount += 1
+                    pt.X = x + fill / 2
+                    pt.Y = y + fill / 2
+                    Dim c = lastFrame.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                    If c <> New cv.Vec3b Then
+                        Dim nextColor = New cv.Scalar(c.Item0, c.Item1, c.Item2)
+                        If resetColors Or c = New cv.Vec3b Then nextColor = ocvb.scalarColors(x Mod 255)
+                        Dim pixelCount = cv.Cv2.FloodFill(dst2, maskPlus, pt, nextColor, rect, zero, zero, floodFlag Or (255 << 8))
+
+                        If rect.Width And rect.Height Then
+                            floodPoints.Add(pt)
+                            Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                            Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+
+                            maskSizes.Add(pixelCount, masks.Count)
+                            masks.Add(maskPlus(maskRect)(rect))
+                            rects.Add(rect)
+                            centroids.Add(centroid)
+
+                            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        lastFrame = src.Clone
+    End Sub
+End Class

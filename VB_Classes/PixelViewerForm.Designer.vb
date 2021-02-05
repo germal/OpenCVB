@@ -31,6 +31,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
+        Me.rtb = New System.Windows.Forms.RichTextBox()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -74,7 +75,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
         Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButton2.Text = "ToolStripButton2"
         '
         'ToolStripButton3
@@ -83,7 +84,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
         Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton3.Name = "ToolStripButton3"
-        Me.ToolStripButton3.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButton3.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButton3.Text = "ToolStripButton3"
         '
         'ToolStripButton4
@@ -92,14 +93,25 @@ Partial Class PixelViewerForm
         Me.ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
         Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton4.Name = "ToolStripButton4"
-        Me.ToolStripButton4.Size = New System.Drawing.Size(34, 33)
+        Me.ToolStripButton4.Size = New System.Drawing.Size(34, 28)
         Me.ToolStripButton4.Text = "ToolStripButton4"
+        '
+        'rtb
+        '
+        Me.rtb.Location = New System.Drawing.Point(16, 47)
+        Me.rtb.Name = "rtb"
+        Me.rtb.ReadOnly = True
+        Me.rtb.Size = New System.Drawing.Size(344, 259)
+        Me.rtb.TabIndex = 2
+        Me.rtb.Text = ""
+        Me.rtb.Visible = False
         '
         'PixelViewerForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1707, 1147)
+        Me.Controls.Add(Me.rtb)
         Me.Controls.Add(Me.ToolStrip1)
         Me.Controls.Add(Me.FontInfo)
         Me.KeyPreview = True
@@ -118,4 +130,5 @@ Partial Class PixelViewerForm
     Friend WithEvents ToolStripButton2 As Windows.Forms.ToolStripButton
     Friend WithEvents ToolStripButton3 As Windows.Forms.ToolStripButton
     Friend WithEvents ToolStripButton4 As Windows.Forms.ToolStripButton
+    Friend WithEvents rtb As Windows.Forms.RichTextBox
 End Class

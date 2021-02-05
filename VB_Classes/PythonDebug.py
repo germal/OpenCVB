@@ -1,101 +1,186 @@
-import cv2
-import depthai as dai
+'''
+===============================================================================
+Interactive Image Segmentation using GrabCut algorithm.
+
+This sample shows interactive image segmentation using grabcut algorithm.
+
+USAGE:
+    python grabcut.py <filename>
+
+README FIRST:
+    Two windows will show up, one for input and one for output.
+
+    At first, in input window, draw a rectangle around the object using
+mouse right button. Then press 'n' to segment the object (once or a few times)
+For any finer touch-ups, you can press any of the keys below and draw lines on
+the areas you want. Then again press 'n' for updating the output.
+
+Key '0' - To select areas of sure background
+Key '1' - To select areas of sure foreground
+Key '2' - To select areas of probable background
+Key '3' - To select areas of probable foreground
+
+Key 'n' - To update the segmentation
+Key 'r' - To reset the setup
+Key 's' - To save the results
+===============================================================================
+'''
 import numpy as np
+import cv2 as cv
+title_window = 'grabcut.py'
 
-pipeline = dai.Pipeline()
+import sys
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-left = pipeline.createMonoCamera()
-left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-left.setBoardSocket(dai.CameraBoardSocket.LEFT)
+class App():
+    BLUE = [255,0,0]        # rectangle color
+    RED = [0,0,255]         # PR BG
+    GREEN = [0,255,0]       # PR FG
+    BLACK = [0,0,0]         # sure BG
+    WHITE = [255,255,255]   # sure FG
 
-right = pipeline.createMonoCamera()
-right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
+    DRAW_BG = {'color' : BLACK, 'val' : 0}
+    DRAW_FG = {'color' : WHITE, 'val' : 1}
+    DRAW_PR_FG = {'color' : GREEN, 'val' : 3}
+    DRAW_PR_BG = {'color' : RED, 'val' : 2}
 
-depth = pipeline.createStereoDepth()
-depth.setConfidenceThreshold(200)
-# Note: the rectified streams are horizontally mirrored by default
-depth.setOutputRectified(True)
-depth.setRectifyEdgeFillColor(0) # Black, to better see the cutout
-left.out.link(depth.left)
-right.out.link(depth.right)
+    # setting up flags
+    rect = (0,0,1,1)
+    drawing = False         # flag for drawing curves
+    rectangle = False       # flag for drawing rect
+    rect_over = False       # flag to check if rect drawn
+    rect_or_mask = 100      # flag for selecting rect or mask mode
+    value = DRAW_FG         # drawing initialized to FG
+    thickness = 3           # brush thickness
 
-# Define a source - color camera
-cam_rgb = pipeline.createColorCamera()
-cam_rgb.setPreviewSize(1280, 720)
-cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
-cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-cam_rgb.setInterleaved(False)
+    def onmouse(self, event, x, y, flags, param):
+        # Draw Rectangle
+        if event == cv.EVENT_RBUTTONDOWN:
+            self.rectangle = True
+            self.ix, self.iy = x,y
 
-xout_depth = pipeline.createXLinkOut()
-xout_depth.setStreamName("depth")
-depth.disparity.link(xout_depth.input)
+        elif event == cv.EVENT_MOUSEMOVE:
+            if self.rectangle == True:
+                self.img = self.img2.copy()
+                cv.rectangle(self.img, (self.ix, self.iy), (x, y), self.BLUE, 2)
+                self.rect = (min(self.ix, x), min(self.iy, y), abs(self.ix - x), abs(self.iy - y))
+                self.rect_or_mask = 0
 
-xout_left = pipeline.createXLinkOut()
-xout_left.setStreamName("rect_left")
-depth.rectifiedLeft.link(xout_left.input)
+        elif event == cv.EVENT_RBUTTONUP:
+            self.rectangle = False
+            self.rect_over = True
+            cv.rectangle(self.img, (self.ix, self.iy), (x, y), self.BLUE, 2)
+            self.rect = (min(self.ix, x), min(self.iy, y), abs(self.ix - x), abs(self.iy - y))
+            self.rect_or_mask = 0
+            print(" Now press the key 'n' a few times until no further change \n")
 
-xout_right = pipeline.createXLinkOut()
-xout_right.setStreamName('rect_right')
-depth.rectifiedRight.link(xout_right.input)
+        # draw touchup curves
 
-# Create output
-xout_rgb = pipeline.createXLinkOut()
-xout_rgb.setStreamName("rgb")
-cam_rgb.preview.link(xout_rgb.input)
+        if event == cv.EVENT_LBUTTONDOWN:
+            if self.rect_over == False:
+                print("first draw rectangle \n")
+            else:
+                self.drawing = True
+                cv.circle(self.img, (x,y), self.thickness, self.value['color'], -1)
+                cv.circle(self.mask, (x,y), self.thickness, self.value['val'], -1)
 
-device = dai.Device(pipeline)
-device.startPipeline()
+        elif event == cv.EVENT_MOUSEMOVE:
+            if self.drawing == True:
+                cv.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+                cv.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
-q_left = device.getOutputQueue(name="rect_left", maxSize=8, blocking=False)
-q_right = device.getOutputQueue(name="rect_right", maxSize=8, blocking=False)
-q_depth = device.getOutputQueue(name="depth", maxSize=8, blocking=False)
-q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
+        elif event == cv.EVENT_LBUTTONUP:
+            if self.drawing == True:
+                self.drawing = False
+                cv.circle(self.img, (x, y), self.thickness, self.value['color'], -1)
+                cv.circle(self.mask, (x, y), self.thickness, self.value['val'], -1)
 
-frame_left = None
-frame_right = None
-frame_manip = None
-frame_depth = None
+    def run(self):
+        # Loading images
+        if len(sys.argv) == 2:
+            filename = sys.argv[1] # for drawing purposes
+        else:
+            print("No input image given, so loading default image, lena.jpg \n")
+            print("Correct Usage: python grabcut.py <filename> \n")
+            filename = '../Data/lena.jpg'
 
-def frame_norm(frame, bbox):
-    return (np.clip(np.array(bbox), 0, 1) * np.array([*frame.shape[:2], *frame.shape[:2]])[::-1]).astype(int)
+        self.img = cv.imread(cv.samples.findFile(filename))
+        self.img2 = self.img.copy()                               # a copy of original image
+        self.mask = np.zeros(self.img.shape[:2], dtype = np.uint8) # mask initialized to PR_BG
+        self.output = np.zeros(self.img.shape, np.uint8)           # output image to be shown
 
-while True:
-    in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
-    in_left = q_left.tryGet()
-    in_right = q_right.tryGet()
-    in_depth = q_depth.tryGet()
+        # input and output windows
+        cv.namedWindow('Original (Top) and Segmented Image')
+        cv.setMouseCallback('Original (Top) and Segmented Image', self.onmouse)
+        cv.moveWindow('Original (Top) and Segmented Image', self.img.shape[1]+10,90)
 
-    if in_left is not None:
-        shape = (in_left.getHeight(), in_left.getWidth())
-        frame_left = in_left.getData().reshape(shape).astype(np.uint8)
-        frame_left = np.ascontiguousarray(frame_left)
+        print(" Instructions: \n")
+        print(" Draw a rectangle around the object using right mouse button \n")
 
-    if in_right is not None:
-        shape = (in_right.getHeight(), in_right.getWidth())
-        frame_right = in_right.getData().reshape(shape).astype(np.uint8)
-        frame_right = np.ascontiguousarray(frame_right)
+        initialized = False
+        while(1):
+            images = np.vstack((self.img, self.output))
+            cv.imshow('Original (Top) and Segmented Image', images)
+            k = cv.waitKey(1)
 
-    if in_depth is not None:
-        frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
-        frame_depth = np.ascontiguousarray(frame_depth)
-        frame_depth = cv2.applyColorMap(frame_depth, cv2.COLORMAP_JET)
+            # key bindings
+            if k == 27:         # esc to exit
+                break
+            elif k == ord('0'): # BG drawing
+                print(" mark background regions with left mouse button \n")
+                self.value = self.DRAW_BGR
+            elif k == ord('1'): # FG drawing
+                print(" mark foreground regions with left mouse button \n")
+                self.value = self.DRAW_FG
+            elif k == ord('2'): # PR_BG drawing
+                self.value = self.DRAW_PR_BG
+            elif k == ord('3'): # PR_FG drawing
+                self.value = self.DRAW_PR_FG
+            elif k == ord('s'): # save image
+                bar = np.zeros((self.img.shape[0], 5, 3), np.uint8)
+                res = np.hstack((self.img2, bar, self.img, bar, self.output))
+                cv.imwrite('grabcut_output.png', res)
+                print(" Result saved as image \n")
+            elif k == ord('r'): # reset everything
+                print("resetting \n")
+                self.rect = (0,0,1,1)
+                self.drawing = False
+                self.rectangle = False
+                self.rect_or_mask = 100
+                self.rect_over = False
+                self.value = self.DRAW_FG
+                self.img = self.img2.copy()
+                self.mask = np.zeros(self.img.shape[:2], dtype = np.uint8) # mask initialized to PR_BG
+                self.output = np.zeros(self.img.shape, np.uint8)           # output image to be shown
+            elif k == ord('n'): # segment the image
+                print(""" For finer touchups, mark foreground and background after pressing keys 0-3
+                and again press 'n' \n""")
+                try:
+                    if (self.rect_or_mask == 0):         # grabcut with rect
+                        bgdmodel = np.zeros((1, 65), np.float64)
+                        fgdmodel = np.zeros((1, 65), np.float64)
+                        cv.grabCut(self.img2, self.mask, self.rect, bgdmodel, fgdmodel, 1, cv.GC_INIT_WITH_RECT)
+                        self.rect_or_mask = 1
+                    elif self.rect_or_mask == 1:         # grabcut with mask
+                        bgdmodel = np.zeros((1, 65), np.float64)
+                        fgdmodel = np.zeros((1, 65), np.float64)
+                        cv.grabCut(self.img2, self.mask, self.rect, bgdmodel, fgdmodel, 1, cv.GC_INIT_WITH_MASK)
+                except:
+                    import traceback
+                    traceback.print_exc()
 
-    if frame_left is not None:
-        cv2.imshow("rectif_left", frame_left)
+            mask2 = np.where((self.mask==1) + (self.mask==3), 255, 0).astype('uint8')
+            self.output = cv.bitwise_and(self.img2, self.img2, mask=mask2)
+            #if initialized == False:
+            #    initialized = True
+            #    Mbox('grabcut.py', __doc__, 1)
 
-    if frame_right is not None:
-        cv2.imshow("rectif_right", frame_right)
+        print('Donre')
 
-    if frame_depth is not None:
-        cv2.imshow("depth", frame_depth)
 
-    # data is originally represented as a flat 1D array, it needs to be converted into HxWxC form
-    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
-    frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
-    frame_rgb = np.ascontiguousarray(frame_rgb)
-    # frame is transformed and ready to be shown
-    cv2.imshow("rgb", frame_rgb)
-
-    if cv2.waitKey(1) == ord('q'):
-        break
+if __name__ == '__main__':
+    print(__doc__)
+    App().run()
+    cv.destroyAllWindows()

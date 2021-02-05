@@ -8,6 +8,7 @@ Public Class PixelViewerForm
     Public pixelResized As Boolean
     Public pixelDataChanged As Boolean
     Public mousePoint As cv.Point
+    Public updateReady As Boolean
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
@@ -22,6 +23,7 @@ Public Class PixelViewerForm
 
         Me.Width = GetSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", 1280)
         Me.Height = GetSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", 720)
+        PixelViewerForm_ResizeEnd(sender, e)
     End Sub
 
     Private Sub PixelShow_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
@@ -30,6 +32,8 @@ Public Class PixelViewerForm
     End Sub
     Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         pixelResized = True
+        rtb.Width = Me.Width - 40
+        rtb.Height = Me.Height - 80
         SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
         SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
         SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
@@ -37,8 +41,13 @@ Public Class PixelViewerForm
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If pixelDataChanged Then Me.Refresh()
-        pixelDataChanged = False
+        'If pixelDataChanged Then
+        '    'rtb.Clear()
+        '    'rtb.Text = line
+        '    Me.Refresh()
+        'End If
+        'pixelDataChanged = False
+        updateReady = True
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         mousePoint.X -= 1
