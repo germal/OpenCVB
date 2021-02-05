@@ -224,3 +224,31 @@ Public Class BestOf_MotionDetection
         label2 = motion.label2
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class BestOf_MSER
+    Inherits VBparent
+    Dim mser As MSER_Basics
+    Public Sub New()
+        initParent()
+        mser = New MSER_Basics
+        task.desc = "Best example of how to detect the main objects of interest in a scene"
+    End Sub
+    Public Sub Run()
+        mser.src = src
+        mser.Run()
+        dst1 = mser.dst1
+        dst2 = mser.dst2
+        label1 = mser.label1
+        label2 = mser.label2
+
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+    End Sub
+End Class

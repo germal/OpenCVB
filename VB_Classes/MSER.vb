@@ -57,6 +57,9 @@ Public Class MSER_Basics
         For Each rect In containers
             dst1.Rectangle(rect, cv.Scalar.Red, 3)
         Next
+
+        label1 = CStr(containers.Count) + " regions of interest located"
+        label2 = CStr(sortedBoxes.Count) + " total rectangles found with MSER"
     End Sub
 End Class
 
