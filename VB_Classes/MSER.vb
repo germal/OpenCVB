@@ -2,9 +2,78 @@ Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics
     Inherits VBparent
+    Dim sortedBoxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+    Public containers As New List(Of cv.Rect)
+    Public Sub New()
+        initParent()
+        task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with the simplest possible options"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mser = cv.MSER.Create()
+        Dim msers()() As cv.Point = Nothing
+        Dim boxes() As cv.Rect = Nothing
+        mser.DetectRegions(input, msers, boxes)
+
+        dst1 = src.Clone
+        dst2 = src.Clone
+
+        sortedBoxes.Clear()
+        For Each box In boxes
+            sortedBoxes.Add(box.Width * box.Height, box)
+        Next
+
+        Dim boxList As New List(Of cv.Rect)
+        For i = 0 To sortedBoxes.Count - 1
+            boxList.Add(sortedBoxes.ElementAt(i).Value)
+        Next
+
+        containers.Clear()
+        While 1
+            Dim box = boxList(0)
+            containers.Add(box)
+            Dim removeBoxes As New List(Of Integer)
+            removeBoxes.Add(0)
+            For i = 1 To boxList.Count - 1
+                Dim b = boxList(i)
+                Dim center = New cv.Point(CInt(b.X + b.Width / 2), CInt(b.Y + b.Height / 2))
+                If center.X >= box.X And center.X <= (box.X + box.Width) Then
+                    If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
+                        removeBoxes.Add(i)
+                        dst2.Rectangle(b, cv.Scalar.Yellow, 1)
+                    End If
+                End If
+            Next
+
+            For i = removeBoxes.Count - 1 To 0 Step -1
+                boxList.RemoveAt(removeBoxes.ElementAt(i))
+            Next
+            If boxList.Count = 0 Or boxList.Count = 0 Then Exit While
+        End While
+
+        For Each rect In containers
+            dst1.Rectangle(rect, cv.Scalar.Red, 3)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
+Public Class MSER_Options
+    Inherits VBparent
     Public zone() As cv.Rect = Nothing
     Public region()() As cv.Point = Nothing
-    Dim saveParms() As integer
+    Dim saveParms() As Integer
     Dim mser As cv.MSER
     Public Sub New()
         initParent()
@@ -32,7 +101,7 @@ Public Class MSER_Basics
         task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim delta = sliders.trackbar(0).Value
         Dim minArea = sliders.trackbar(1).Value
         Dim maxArea = sliders.trackbar(2).Value
@@ -60,21 +129,15 @@ Public Class MSER_Basics
             mser.Pass2Only = check.Box(0).Checked
         End If
 
-        src = src.Blur(New cv.Size(edgeBlurSize, edgeBlurSize))
-        If check.Box(1).Checked Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        mser.DetectRegions(src, region, zone)
+        Dim input = src.Blur(New cv.Size(edgeBlurSize, edgeBlurSize))
+        If check.Box(1).Checked Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        mser.DetectRegions(input, region, zone)
 
-        If standalone or task.intermediateReview = caller Then
-            Dim pixels As integer
-            dst1.SetTo(0)
-            For i = 0 To region.Length - 1
-                Dim nextRegion = region(i)
-                pixels += nextRegion.Length
-                For Each pt In nextRegion
-                    dst1.Set(Of cv.Vec3b)(pt.Y, pt.X, task.RGBDepth.Get(Of cv.Vec3b)(pt.Y, pt.X))
-                Next
+        If standalone Or task.intermediateReview = caller Then
+            dst1 = src.Clone
+            For Each z In zone
+                dst1.Rectangle(z, cv.Scalar.Yellow, 1)
             Next
-            label1 = CStr(region.Length) + " Regions " + Format(pixels / region.Length, "#0.0") + " pixels/region (avg)"
         End If
     End Sub
 End Class
@@ -129,7 +192,7 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_TestSynthetic
     Inherits VBparent
-    Dim mser As MSER_Basics
+    Dim mser As MSER_Options
     Dim synth As MSER_Synthetic
     Private Function testSynthetic( img As cv.Mat, pass2Only As Boolean, delta As integer) As String
         mser.check.Box(0).Checked = pass2Only
@@ -151,7 +214,7 @@ Public Class MSER_TestSynthetic
     End Function
     Public Sub New()
         initParent()
-        mser = New MSER_Basics()
+        mser = New MSER_Options()
         mser.sliders.trackbar(0).Value = 10
         mser.sliders.trackbar(1).Value = 100
         mser.sliders.trackbar(2).Value = 5000
@@ -221,10 +284,10 @@ End Class
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
 Public Class MSER_Contours
     Inherits VBparent
-    Dim mser As MSER_Basics
+    Dim mser As MSER_Options
     Public Sub New()
         initParent()
-        mser = New MSER_Basics()
+        mser = New MSER_Options()
         mser.sliders.trackbar(1).Value = 4000
         task.desc = "Use MSER but show the contours of each region."
     End Sub
@@ -253,46 +316,3 @@ Public Class MSER_Contours
     End Sub
 End Class
 
-
-
-
-
-
-
-
-'Public Class MSER_Simple
-'    Inherits VBparent
-'    Dim overlap As Rectangle_MultiOverlap
-'    Public Sub New()
-'        initParent()
-'        overlap = New Rectangle_MultiOverlap
-'        task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with the simplest possible options"
-'    End Sub
-'    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-'        Dim input = src
-'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-'        Dim mser = cv.MSER.Create()
-'        Dim msers()() As cv.Point = Nothing
-'        Dim boxes() As cv.Rect = Nothing
-'        mser.DetectRegions(input, msers, boxes)
-
-'        dst1 = src.Clone
-
-'        overlap.inputRects.Clear()
-'        For i = 0 To boxes.Count - 1
-'            Dim box = boxes(i)
-'            For j = i To boxes.Count - 1
-
-'            Next
-
-'            overlap.inputRects.Add(box)
-'        Next
-'        overlap.Run()
-
-'        For Each rect In boxes ' overlap.outputRects
-'            dst1.Rectangle(rect, cv.Scalar.Yellow, 1)
-'        Next
-'    End Sub
-'End Class
