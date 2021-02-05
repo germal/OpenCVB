@@ -36,7 +36,7 @@ Public Class Pixel_Viewer
             pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType + " - updates are no more than 1 per second"
 
             Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * pixels.Width / 650 + 3
-            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1)) + 5
+            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1))
             If drHeight < 20 Then drHeight = 20
 
             If pixels.mousePoint <> New cv.Point Then
@@ -96,7 +96,6 @@ Public Class Pixel_Viewer
                 End If
             End If
 
-            ' If saveDrawRect <> dw Or pixels.pixelResized Or  Then
             Static saveMousePoint = task.mousePoint
             If ((saveDrawRect <> dw Or pixels.pixelResized Or pixels.updateReady) And diff.CountNonZero()) Or task.mousePoint <> saveMousePoint Then
                 pixels.updateReady = False
@@ -106,13 +105,7 @@ Public Class Pixel_Viewer
                 Select Case displayType
 
                     Case 0
-                        imgText += " col " + If(dw.X Mod 5, "  ", "    ")
-                        Dim colDup = If(dw.X < 1000, 26, 25)
-                        Dim extraPad = If(dw.X < 1000, "", "  ")
-                        For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 Then imgText += StrDup(colDup, " ") Else imgText += Format(dw.X + i, "#000") + "         " + extraPad
-                        Next
-                        imgText += vbCrLf
+                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
                         For y = 0 To img.Height - 1
                             imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
@@ -123,12 +116,7 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 1
-                        imgText += " col" + If(dw.X Mod 5, "        ", "     ")
-                        Dim colDup = If(dw.X < 1000, 7, 6)
-                        For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 = 0 Then imgText += Format(dw.X + i, "#000") + "    " Else imgText += StrDup(colDup, " ")
-                        Next
-                        imgText += vbCrLf
+                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
                         For y = 0 To img.Height - 1
                             imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
@@ -138,13 +126,7 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 2
-                        imgText += " col " + If(dw.X Mod 5, "  ", "    ")
-                        Dim colDup = If(dw.X < 1000, 14, 10)
-                        For i = 0 To dw.Width - 1
-                            'imgText += Format(dw.X + i, "#000") + vbTab
-                            If (dw.X + i) Mod 5 = 0 Then imgText += Format(dw.X + i, "#000") + "   " Else imgText += StrDup(colDup, " ")
-                        Next
-                        imgText += vbCrLf
+                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
                         For y = 0 To img.Height - 1
                             imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
@@ -154,12 +136,7 @@ Public Class Pixel_Viewer
                         Next
 
                     Case 3
-                        imgText += " col " + If(dw.X Mod 5, "   ", "    ")
-                        Dim colDup = If(dw.X < 1000, 46, 46)
-                        For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 = 0 Then imgText += Format(dw.X + i, "#000") + "         " Else imgText += StrDup(colDup, " ")
-                        Next
-                        imgText += vbCrLf
+                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
                         For y = 0 To img.Height - 1
                             imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
@@ -175,7 +152,6 @@ Public Class Pixel_Viewer
                 savedisplayType = displayType
                 saveDrawRect = dw
                 pixels.rtb.Text = imgText
-                pixels.pixelDataChanged = True
                 pixels.Refresh()
             End If
 
