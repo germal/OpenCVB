@@ -4,7 +4,6 @@ Imports System.Drawing
 Imports System.ComponentModel
 
 Public Class PixelViewerForm
-    Public line As String
     Public pixelResized As Boolean
     Public pixelDataChanged As Boolean
     Public mousePoint As cv.Point
@@ -27,8 +26,8 @@ Public Class PixelViewerForm
     End Sub
 
     Private Sub PixelShow_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
-        Dim g As Graphics = e.Graphics
-        g.DrawString(line, FontInfo.Font, New SolidBrush(Color.Black), 10, 10)
+        'Dim g As Graphics = e.Graphics
+        'g.DrawString(line, FontInfo.Font, New SolidBrush(Color.Black), 10, 10)
     End Sub
     Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         pixelResized = True
@@ -41,12 +40,6 @@ Public Class PixelViewerForm
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        'If pixelDataChanged Then
-        '    'rtb.Clear()
-        '    'rtb.Text = line
-        '    Me.Refresh()
-        'End If
-        'pixelDataChanged = False
         updateReady = True
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click

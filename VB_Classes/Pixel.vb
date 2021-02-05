@@ -35,8 +35,8 @@ Public Class Pixel_Viewer
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
             pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType + " - updates are no more than 1 per second"
 
-            Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * pixels.Width / 650
-            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1)) - 2
+            Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * pixels.Width / 650 + 3
+            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1)) + 5
             If drHeight < 20 Then drHeight = 20
 
             If pixels.mousePoint <> New cv.Point Then
@@ -102,71 +102,71 @@ Public Class Pixel_Viewer
                 pixels.updateReady = False
                 savePixels = testChange.Clone
                 pixels.pixelResized = False
-                pixels.line = vbCrLf + vbCrLf
+                Dim imgText = ""
                 Select Case displayType
 
                     Case 0
-                        pixels.line += " col " + If(dw.X Mod 5, "  ", "    ")
+                        imgText += " col " + If(dw.X Mod 5, "  ", "    ")
                         Dim colDup = If(dw.X < 1000, 26, 25)
                         Dim extraPad = If(dw.X < 1000, "", "  ")
                         For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 Then pixels.line += StrDup(colDup, " ") Else pixels.line += Format(dw.X + i, "#000") + "         " + extraPad
+                            If (dw.X + i) Mod 5 Then imgText += StrDup(colDup, " ") Else imgText += Format(dw.X + i, "#000") + "         " + extraPad
                         Next
-                        pixels.line += vbCrLf
+                        imgText += vbCrLf
                         For y = 0 To img.Height - 1
-                            pixels.line += "r" + Format(dw.Y + y, "000") + "   "
+                            imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
                                 Dim vec = img.Get(Of cv.Vec3b)(y, x)
-                                pixels.line += Format(vec.Item0, "000") + " " + Format(vec.Item1, "000") + " " + Format(vec.Item2, "000") + "   "
+                                imgText += Format(vec.Item0, "000") + " " + Format(vec.Item1, "000") + " " + Format(vec.Item2, "000") + "   "
                             Next
-                            pixels.line += vbCrLf
+                            imgText += vbCrLf
                         Next
 
                     Case 1
-                        pixels.line += " col" + If(dw.X Mod 5, "        ", "     ")
+                        imgText += " col" + If(dw.X Mod 5, "        ", "     ")
                         Dim colDup = If(dw.X < 1000, 7, 6)
                         For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "    " Else pixels.line += StrDup(colDup, " ")
+                            If (dw.X + i) Mod 5 = 0 Then imgText += Format(dw.X + i, "#000") + "    " Else imgText += StrDup(colDup, " ")
                         Next
-                        pixels.line += vbCrLf
+                        imgText += vbCrLf
                         For y = 0 To img.Height - 1
-                            pixels.line += "r" + Format(dw.Y + y, "000") + "   "
+                            imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
-                                pixels.line += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                                imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
                             Next
-                            pixels.line += vbCrLf
+                            imgText += vbCrLf
                         Next
 
                     Case 2
-                        pixels.line += " col " + If(dw.X Mod 5, "  ", "    ")
+                        imgText += " col " + If(dw.X Mod 5, "  ", "    ")
                         Dim colDup = If(dw.X < 1000, 14, 10)
                         For i = 0 To dw.Width - 1
-                            'pixels.line += Format(dw.X + i, "#000") + vbTab
-                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "   " Else pixels.line += StrDup(colDup, " ")
+                            'imgText += Format(dw.X + i, "#000") + vbTab
+                            If (dw.X + i) Mod 5 = 0 Then imgText += Format(dw.X + i, "#000") + "   " Else imgText += StrDup(colDup, " ")
                         Next
-                        pixels.line += vbCrLf
+                        imgText += vbCrLf
                         For y = 0 To img.Height - 1
-                            pixels.line += "r" + Format(dw.Y + y, "000") + "   "
+                            imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
-                                pixels.line += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                                imgText += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
                             Next
-                            pixels.line += vbCrLf
+                            imgText += vbCrLf
                         Next
 
                     Case 3
-                        pixels.line += " col " + If(dw.X Mod 5, "   ", "    ")
+                        imgText += " col " + If(dw.X Mod 5, "   ", "    ")
                         Dim colDup = If(dw.X < 1000, 46, 46)
                         For i = 0 To dw.Width - 1
-                            If (dw.X + i) Mod 5 = 0 Then pixels.line += Format(dw.X + i, "#000") + "         " Else pixels.line += StrDup(colDup, " ")
+                            If (dw.X + i) Mod 5 = 0 Then imgText += Format(dw.X + i, "#000") + "         " Else imgText += StrDup(colDup, " ")
                         Next
-                        pixels.line += vbCrLf
+                        imgText += vbCrLf
                         For y = 0 To img.Height - 1
-                            pixels.line += "r" + Format(dw.Y + y, "000") + "   "
+                            imgText += "r" + Format(dw.Y + y, "000") + "   "
                             For x = 0 To img.Width - 1
                                 Dim vec = img.Get(Of cv.Vec3f)(y, x)
-                                pixels.line += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
+                                imgText += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
                             Next
-                            pixels.line += vbCrLf
+                            imgText += vbCrLf
                         Next
                     Case 4
 
@@ -174,6 +174,7 @@ Public Class Pixel_Viewer
                 saveMousePoint = task.mousePoint
                 savedisplayType = displayType
                 saveDrawRect = dw
+                pixels.rtb.Text = imgText
                 pixels.pixelDataChanged = True
                 pixels.Refresh()
             End If

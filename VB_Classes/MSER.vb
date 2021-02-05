@@ -14,9 +14,9 @@ Public Class MSER_Basics
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mser = cv.MSER.Create()
-        Dim msers()() As cv.Point = Nothing
+        Dim regions()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
-        mser.DetectRegions(input, msers, boxes)
+        mser.DetectRegions(input, regions, boxes)
 
         dst1 = src.Clone
         dst2 = src.Clone
@@ -55,10 +55,10 @@ Public Class MSER_Basics
         End While
 
         For Each rect In containers
-            dst1.Rectangle(rect, cv.Scalar.Red, 3)
+            dst1.Rectangle(rect, cv.Scalar.Yellow, 1)
         Next
 
-        label1 = CStr(containers.Count) + " regions of interest located"
+        label1 = CStr(containers.Count) + " consolidated regions of interest located"
         label2 = CStr(sortedBoxes.Count) + " total rectangles found with MSER"
     End Sub
 End Class
@@ -101,7 +101,7 @@ Public Class MSER_Options
             check.Box(1).Checked = True
         End If
         ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
-        task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image."
+        task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image using all the available options."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -150,16 +150,16 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Synthetic
+Public Class MSER_SyntheticInput
     Inherits VBparent
-    Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As integer, color() As integer, n As integer)
+    Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
             img.Rectangle(New cv.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
             p0 += New cv.Point((width(i) - width(i + 1)) / 2, (width(i) - width(i + 1)) / 2)
             img.FloodFill(p0, color(i))
         Next
     End Sub
-    Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As integer, color() As integer, n As integer)
+    Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
             img.Circle(p0, width(i) / 2, color(i), 1)
             img.FloodFill(p0, color(i))
@@ -170,7 +170,7 @@ Public Class MSER_Synthetic
         task.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -196,7 +196,7 @@ End Class
 Public Class MSER_TestSynthetic
     Inherits VBparent
     Dim mser As MSER_Options
-    Dim synth As MSER_Synthetic
+    Dim synth As MSER_SyntheticInput
     Private Function testSynthetic( img As cv.Mat, pass2Only As Boolean, delta As integer) As String
         mser.check.Box(0).Checked = pass2Only
         mser.sliders.trackbar(0).Value = delta
@@ -225,7 +225,7 @@ Public Class MSER_TestSynthetic
         mser.sliders.trackbar(4).Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
-        synth = New MSER_Synthetic()
+        synth = New MSER_SyntheticInput()
         label1 = "Input image to MSER"
         label1 = "Output image from MSER"
         task.desc = "Test MSER with the synthetic image."
@@ -259,11 +259,11 @@ Public Class MSER_CPPStyle
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim mser = cv.MSER.Create()
-        Dim msers()() As cv.Point = Nothing
+        Dim regions()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
-        mser.DetectRegions(image, msers, boxes)
+        mser.DetectRegions(image, regions, boxes)
         Dim mat = image.Clone()
-        For Each pts In msers
+        For Each pts In regions
             Dim color = cv.Scalar.RandomColor
             For Each pt In pts
                 mat.Circle(pt, 1, color)

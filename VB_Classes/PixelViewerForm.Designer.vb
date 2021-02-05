@@ -104,7 +104,6 @@ Partial Class PixelViewerForm
         Me.rtb.Size = New System.Drawing.Size(344, 259)
         Me.rtb.TabIndex = 2
         Me.rtb.Text = ""
-        Me.rtb.Visible = False
         '
         'PixelViewerForm
         '
