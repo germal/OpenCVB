@@ -24,7 +24,6 @@ Partial Class PixelViewerForm
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(PixelViewerForm))
-        Me.FontInfo = New System.Windows.Forms.Label()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
@@ -34,16 +33,6 @@ Partial Class PixelViewerForm
         Me.rtb = New System.Windows.Forms.RichTextBox()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'FontInfo
-        '
-        Me.FontInfo.AutoSize = True
-        Me.FontInfo.Location = New System.Drawing.Point(12, 9)
-        Me.FontInfo.Name = "FontInfo"
-        Me.FontInfo.Size = New System.Drawing.Size(57, 20)
-        Me.FontInfo.TabIndex = 0
-        Me.FontInfo.Text = "Label1"
-        Me.FontInfo.Visible = False
         '
         'Timer1
         '
@@ -98,7 +87,7 @@ Partial Class PixelViewerForm
         '
         'rtb
         '
-        Me.rtb.Location = New System.Drawing.Point(16, 47)
+        Me.rtb.Location = New System.Drawing.Point(16, 53)
         Me.rtb.Name = "rtb"
         Me.rtb.ReadOnly = True
         Me.rtb.Size = New System.Drawing.Size(344, 259)
@@ -113,7 +102,6 @@ Partial Class PixelViewerForm
         Me.ClientSize = New System.Drawing.Size(1707, 1147)
         Me.Controls.Add(Me.rtb)
         Me.Controls.Add(Me.ToolStrip1)
-        Me.Controls.Add(Me.FontInfo)
         Me.KeyPreview = True
         Me.Name = "PixelViewerForm"
         Me.Text = "Pixel Viewer"
@@ -123,7 +111,6 @@ Partial Class PixelViewerForm
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents FontInfo As Windows.Forms.Label
     Friend WithEvents Timer1 As Windows.Forms.Timer
     Friend WithEvents ToolStrip1 As Windows.Forms.ToolStrip
     Friend WithEvents ToolStripButton1 As Windows.Forms.ToolStripButton

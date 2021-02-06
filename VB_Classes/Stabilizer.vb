@@ -303,8 +303,8 @@ Public Class Stabilizer_Gray
             saveTemplate(i) = dst1(corners(i)).Clone
 
             Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
-            Dim msg = "motion " + CStr(corners(i).X - maxLoc.X - searchArea(i).X) + "," + CStr(corners(i).Y - maxLoc.Y - searchArea(i).Y) + " corr=" + Format(maxVal, "#0.00")
-            If maxVal < thresholdSlider.value / thresholdSlider.maximum Then msg = " corr=" + Format(maxVal, "#0.00")
+            Dim msg = "(" + CStr(corners(i).X - maxLoc.X - searchArea(i).X) + "," + CStr(corners(i).Y - maxLoc.Y - searchArea(i).Y) + ") " + Format(maxVal, "#0.00")
+            If maxVal < thresholdSlider.value / thresholdSlider.maximum Then msg = Format(maxVal, "#0.00")
             Dim pt = If(i < 2, New cv.Point(searchArea(i).X, searchArea(i).Y + cSize + cOffset * 2), New cv.Point(searchArea(i).X, searchArea(i).Y - cOffset))
             dst1.Rectangle(New cv.Rect(pt.X, pt.Y, searchArea(i).Width, cOffset), cv.Scalar.Black, -1)
             ocvb.trueText(msg, pt.X, pt.Y)

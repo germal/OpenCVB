@@ -8,10 +8,6 @@ Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public updateReady As Boolean
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
-        Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
-        FontInfo.Font = New Font(DefaultFont, defaultSize)
-
         Me.Left = GetSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
 

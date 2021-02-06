@@ -4,16 +4,21 @@ Public Class MSER_Basics
     Inherits VBparent
     Dim sortedBoxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
     Public containers As New List(Of cv.Rect)
+    Dim options As MSER_Options
+    Dim maxSlider As Windows.Forms.TrackBar
+    Dim mser = cv.MSER.Create()
     Public Sub New()
         initParent()
-        task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with the simplest possible options"
+        options = New MSER_Options
+        maxSlider = findSlider("MSER Max Area")
+        maxSlider.Value = If(src.Width = 1280, 50000, 20000)
+        task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with all default options except for maximum area"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim mser = cv.MSER.Create()
         Dim regions()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
         mser.DetectRegions(input, regions, boxes)
@@ -26,9 +31,10 @@ Public Class MSER_Basics
             sortedBoxes.Add(box.Width * box.Height, box)
         Next
 
+        Dim maxArea = maxSlider.Value
         Dim boxList As New List(Of cv.Rect)
         For i = 0 To sortedBoxes.Count - 1
-            boxList.Add(sortedBoxes.ElementAt(i).Value)
+            If sortedBoxes.ElementAt(i).Key < maxArea Then boxList.Add(sortedBoxes.ElementAt(i).Value)
         Next
 
         containers.Clear()
@@ -55,7 +61,7 @@ Public Class MSER_Basics
         End While
 
         For Each rect In containers
-            dst1.Rectangle(rect, cv.Scalar.Yellow, 1)
+            dst1.Rectangle(rect, cv.Scalar.Yellow, If(src.Width = 1280, 2, 1))
         Next
 
         label1 = CStr(containers.Count) + " consolidated regions of interest located"
