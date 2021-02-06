@@ -1987,7 +1987,7 @@ Public Class Depth_Foreground
     Public maxIndex As Integer
     Public Sub New()
         initParent()
-        task.maxRangeSlider.Value = 1000
+        task.maxRangeSlider.Value = 1500
 
         task.desc = "Use depth to find an object in the foreground.  Use InRange Min Depth to define foreground"
     End Sub
@@ -2038,7 +2038,6 @@ Public Class Depth_ForegroundHead
         initParent()
         fgnd = New Depth_Foreground
         kalman = New Kalman_Basics()
-        task.maxRangeSlider.Value = 1000
 
         label1 = "Blue is current, red is kalman, green is trusted"
         task.desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
@@ -2058,7 +2057,6 @@ Public Class Depth_ForegroundHead
             If xx < 0 Then xx = 0
             If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
             dst1 = fgnd.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
 
             kalman.kInput = {xx, yy, rectSize, rectSize}
             kalman.Run()

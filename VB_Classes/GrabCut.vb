@@ -2,48 +2,106 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
 Public Class GrabCut_Basics
     Inherits VBparent
-    Dim contours As Contours_RGB
+    Dim fgnd As Depth_Foreground
+    Public fgFineTune As cv.Mat
+    Public bgFineTune As cv.Mat
     Public Sub New()
         initParent()
-        contours = New Contours_RGB
+        fgnd = New Depth_Foreground
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Erode iterations", 1, 20, 3)
-            sliders.setupTrackBar(1, "Erode kernel size", 1, 21, 3)
-        End If
-        task.desc = "Use grabcut to isolate what is in the foreground and background.  "
+        label1 = "Foreground from depth data"
+        label2 = "Foreground after GrabCut using mask in dst1"
+        task.desc = "Use grabcut with just a foreground and background definition."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        contours.src = src
-        contours.Run()
-        dst2 = contours.dst2
-        'Dim iterations = sliders.trackbar(0).Value
-        'Dim kernelsize = sliders.trackbar(1).Value
-        'If kernelsize Mod 2 = 0 Then kernelsize += 1
-        'Dim morphShape = cv.MorphShapes.Cross
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        fgnd.src = src
+        fgnd.Run()
+        dst1 = fgnd.dst1
 
-        'Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(kernelsize, kernelsize))
-        'dst1 = dst2.Erode(element, Nothing, iterations)
+        Dim fg = dst1.Threshold(1, cv.GrabCutClasses.FGD, cv.ThresholdTypes.Binary)
+        Dim bg = dst1.Threshold(1, cv.GrabCutClasses.BGD, cv.ThresholdTypes.BinaryInv)
 
-        'Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        'Dim grayEroded = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        'Dim fg = gray.Threshold(1, cv.GrabCutClasses.FGD, cv.ThresholdTypes.Binary)
-        'Dim bg = gray.Threshold(1, cv.GrabCutClasses.BGD, cv.ThresholdTypes.BinaryInv)
-        'gray.SetTo(0, grayEroded)
-        'Dim prFG = gray.Threshold(1, cv.GrabCutClasses.PR_FGD, cv.ThresholdTypes.Binary)
+        Dim mask As New cv.Mat
+        cv.Cv2.BitwiseOr(bg, fg, mask)
 
-        'Dim mask As New cv.Mat
-        'cv.Cv2.BitwiseOr(bg, fg, mask)
-        'cv.Cv2.BitwiseOr(prFG, mask, mask)
+        If fgFineTune IsNot Nothing Then mask.SetTo(cv.GrabCutClasses.FGD, fgFineTune)
+        If bgFineTune IsNot Nothing Then mask.SetTo(cv.GrabCutClasses.BGD, bgFineTune)
 
-        'Static bgModel As New cv.Mat, fgModel As New cv.Mat
-        'Dim rect As New cv.Rect
-        'If fg.CountNonZero() > 100 And bg.CountNonZero() > 100 Then
-        '    cv.Cv2.GrabCut(src, mask, rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
-        'End If
-        'src.CopyTo(dst2, mask)
+        Static bgModel As New cv.Mat, fgModel As New cv.Mat
+        Dim rect As New cv.Rect
+        If fg.CountNonZero() > 100 And bg.CountNonZero() > 100 Then
+            cv.Cv2.GrabCut(src, mask, rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
+        End If
+        dst2.SetTo(0)
+        src.CopyTo(dst2, mask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class GrabCut_FineTune
+    Inherits VBparent
+    Dim basics As GrabCut_Basics
+    Dim mats As Mat_4to1
+    Public Sub New()
+        initParent()
+        mats = New Mat_4to1
+        basics = New GrabCut_Basics
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Selected rectangle is added to the foreground"
+            radio.check(1).Text = "Selected rectangle is added to the background"
+            radio.check(2).Text = "Clear all foreground and background fine tuning"
+            radio.check(2).Checked = True
+        End If
+
+        label1 = "Foreground Mask, fg fine tuning, bg fine tuning, blank"
+        label2 = "Grabcut results after adding fine tuning selections"
+        task.desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static clearCheck = findRadio("Clear all foreground and background fine tuning")
+        If clearCheck.checked Then
+            basics.fgFineTune = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+            basics.bgFineTune = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+        End If
+
+        Static fgFineTuning = findRadio("Selected rectangle is added to the foreground")
+        Static saveRadio = fgFineTuning.checked
+        If saveRadio <> fgFineTuning.checked Then
+            saveRadio = fgFineTuning.checked
+            task.drawRectClear = True
+            Exit Sub
+        End If
+
+        If task.drawRect.Width <> 0 Then
+            If fgFineTuning.checked Then
+                basics.fgFineTune(task.drawRect).SetTo(255)
+            Else
+                basics.bgFineTune(task.drawRect).SetTo(255)
+            End If
+        End If
+
+        basics.src = src
+        basics.Run()
+
+        mats.mat(0) = basics.dst1
+        mats.mat(1) = basics.fgFineTune
+        mats.mat(2) = basics.bgFineTune
+        mats.Run()
+        dst1 = mats.dst1
+
+        dst2 = basics.dst2
     End Sub
 End Class
 
