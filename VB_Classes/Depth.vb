@@ -91,76 +91,6 @@ End Class
 
 
 
-Public Class Depth_Foreground
-    Inherits VBparent
-    Public kalman As Kalman_Basics
-    Public trustedRect As cv.Rect
-    Public trustworthy As Boolean
-    Public Sub New()
-        initParent()
-        kalman = New Kalman_Basics()
-        task.maxRangeSlider.Value = 1500 ' just 1.5 meters or less...
-
-        label1 = "Blue is current, red is kalman, green is trusted"
-        task.desc = "Demonstrate the use of mean shift algorithm.  Use depth to find the top of the head and then meanshift to the face."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-
-        Dim tmp As cv.Mat = task.inrange.depthMask.Clone
-        ' find the largest blob and use that as the body.  Head is highest in the image.
-        Dim blobSize As New List(Of Integer)
-        Dim blobLocation As New List(Of cv.Point)
-        For y = 0 To tmp.Height - 1
-            For x = 0 To tmp.Width - 1
-                Dim nextByte = tmp.Get(Of Byte)(y, x)
-                If nextByte <> 0 Then
-                    Dim count = tmp.FloodFill(New cv.Point(x, y), 0)
-                    If count > 10 Then
-                        blobSize.Add(count)
-                        blobLocation.Add(New cv.Point(x, y))
-                    End If
-                End If
-            Next
-        Next
-        Dim maxBlob As Integer
-        Dim maxIndex = -1
-        For i = 0 To blobSize.Count - 1
-            If maxBlob < blobSize.Item(i) Then
-                maxBlob = blobSize.Item(i)
-                maxIndex = i
-            End If
-        Next
-
-        trustworthy = False
-        If maxIndex >= 0 Then
-            Dim rectSize = 50
-            If src.Width > 1000 Then rectSize = 250
-            Dim xx = blobLocation.Item(maxIndex).X - rectSize / 2
-            Dim yy = blobLocation.Item(maxIndex).Y
-            If xx < 0 Then xx = 0
-            If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
-            dst1 = task.inrange.depthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-            kalman.kInput = {xx, yy, rectSize, rectSize}
-            kalman.Run()
-            Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
-            Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
-            dst1.Rectangle(kRect, cv.Scalar.Red, 2)
-            dst1.Rectangle(nextRect, cv.Scalar.Blue, 2)
-            If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
-                trustedRect = validateRect(kRect)
-                trustworthy = True
-                dst1.Rectangle(trustedRect, cv.Scalar.Green, 5)
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Depth_FlatData
@@ -2045,3 +1975,103 @@ Public Class Depth_Dilate
         dst1 = dilate.dst1
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Depth_Foreground
+    Inherits VBparent
+    Public blobLocation As New List(Of cv.Point)
+    Public maxIndex As Integer
+    Public Sub New()
+        initParent()
+        task.maxRangeSlider.Value = 1000
+
+        task.desc = "Use depth to find an object in the foreground.  Use InRange Min Depth to define foreground"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim tmp As cv.Mat = task.inrange.depthMask.Clone
+        ' find the largest blob and use that define that to be the foreground object.
+        Dim blobSize As New List(Of Integer)
+        blobLocation.clear
+        For y = 0 To tmp.Height - 1
+            For x = 0 To tmp.Width - 1
+                Dim nextByte = tmp.Get(Of Byte)(y, x)
+                If nextByte <> 0 Then
+                    Dim count = tmp.FloodFill(New cv.Point(x, y), 0)
+                    If count > 10 Then
+                        blobSize.Add(count)
+                        blobLocation.Add(New cv.Point(x, y))
+                    End If
+                End If
+            Next
+        Next
+        Dim maxBlob As Integer
+        maxIndex = -1
+        For i = 0 To blobSize.Count - 1
+            If maxBlob < blobSize.Item(i) Then
+                maxBlob = blobSize.Item(i)
+                maxIndex = i
+            End If
+        Next
+        dst1 = task.inrange.depthMask.clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_ForegroundHead
+    Inherits VBparent
+    Dim fgnd As Depth_Foreground
+    Public kalman As Kalman_Basics
+    Public trustedRect As cv.Rect
+    Public trustworthy As Boolean
+    Public Sub New()
+        initParent()
+        fgnd = New Depth_Foreground
+        kalman = New Kalman_Basics()
+        task.maxRangeSlider.Value = 1000
+
+        label1 = "Blue is current, red is kalman, green is trusted"
+        task.desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        fgnd.src = src
+        fgnd.Run()
+
+        trustworthy = False
+        If fgnd.dst1.CountNonZero() Then
+            Dim rectSize = 50
+            If src.Width > 1000 Then rectSize = 250
+            Dim xx = fgnd.blobLocation.Item(fgnd.maxIndex).X - rectSize / 2
+            Dim yy = fgnd.blobLocation.Item(fgnd.maxIndex).Y
+            If xx < 0 Then xx = 0
+            If xx + rectSize / 2 > src.Width Then xx = src.Width - rectSize
+            dst1 = fgnd.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+
+            kalman.kInput = {xx, yy, rectSize, rectSize}
+            kalman.Run()
+            Dim nextRect = New cv.Rect(xx, yy, rectSize, rectSize)
+            Dim kRect = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
+            dst1.Rectangle(kRect, cv.Scalar.Red, 2)
+            dst1.Rectangle(nextRect, cv.Scalar.Blue, 2)
+            If Math.Abs(kRect.X - nextRect.X) < rectSize / 4 And Math.Abs(kRect.Y - nextRect.Y) < rectSize / 4 Then
+                trustedRect = validateRect(kRect)
+                trustworthy = True
+                dst1.Rectangle(trustedRect, cv.Scalar.Green, 5)
+            End If
+        End If
+    End Sub
+End Class
+

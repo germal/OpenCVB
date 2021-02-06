@@ -2,10 +2,10 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
 Public Class GrabCut_Basics
     Inherits VBparent
-    Dim contours As Contours_Depth
+    Dim contours As Contours_RGB
     Public Sub New()
         initParent()
-        contours = New Contours_Depth()
+        contours = New Contours_RGB
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

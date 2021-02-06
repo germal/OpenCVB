@@ -49,11 +49,11 @@ End Class
 Public Class MeanShift_Depth
     Inherits VBparent
     Dim ms As MeanShift_Basics
-    Dim blob As Depth_Foreground
+    Dim blob As Depth_ForegroundHead
     Public Sub New()
         initParent()
         ms = New MeanShift_Basics()
-        blob = New Depth_Foreground()
+        blob = New Depth_ForegroundHead()
         label1 = "Draw anywhere to start mean shift tracking."
         task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
     End Sub
