@@ -38,7 +38,7 @@ Public Class MSER_Basics
         Next
 
         containers.Clear()
-        While 1
+        While boxList.Count > 0
             Dim box = boxList(0)
             containers.Add(box)
             Dim removeBoxes As New List(Of Integer)
@@ -57,7 +57,6 @@ Public Class MSER_Basics
             For i = removeBoxes.Count - 1 To 0 Step -1
                 boxList.RemoveAt(removeBoxes.ElementAt(i))
             Next
-            If boxList.Count = 0 Or boxList.Count = 0 Then Exit While
         End While
 
         For Each rect In containers
