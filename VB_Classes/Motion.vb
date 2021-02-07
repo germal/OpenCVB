@@ -516,6 +516,12 @@ Public Class Motion_Camera4Corner
             sliders.setupTrackBar(0, "Stabilizer Correlation Threshold X1000", 0, 1000, 970)
         End If
 
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Display info on results"
+            check.Box(0).Checked = True
+        End If
+
         match = New MatchTemplate_Basics
         task.desc = "Stabilize the image using the corners of the image"
     End Sub
@@ -529,6 +535,9 @@ Public Class Motion_Camera4Corner
         If lastFrame Is Nothing Then lastFrame = input.Clone
         shiftX = 0
         shiftY = 0
+        updateCount = 0
+        Static shiftCheckBox = findCheckBox("Display info on results")
+        Dim showShiftInfo = shiftCheckBox.checked
         For i = 0 To corners.Length - 1
             match.searchArea = dst1(searchArea(i))
             match.template = lastFrame(corners(i)).Clone
@@ -538,16 +547,18 @@ Public Class Motion_Camera4Corner
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
             Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
-            Dim msg = "(" + CStr(shiftX) + "," + CStr(shiftY) + ") " + Format(maxVal, "#0.00")
-            If maxVal < thresholdSlider.value / thresholdSlider.maximum Then
+            If maxVal > thresholdSlider.value / thresholdSlider.maximum Then
                 updateCount += 1
-                shiftX = searchArea(i).X + maxLoc.X - corners(i).X
-                shiftY = searchArea(i).Y + maxLoc.Y - corners(i).Y
-                msg = Format(maxVal, "#0.00")
+                shiftX += searchArea(i).X + maxLoc.X - corners(i).X
+                shiftY += searchArea(i).Y + maxLoc.Y - corners(i).Y
             End If
-            Dim pt = If(i < 2, New cv.Point(searchArea(i).X, searchArea(i).Y + cSize + cOffset * 2), New cv.Point(searchArea(i).X, searchArea(i).Y - cOffset))
-            dst1.Rectangle(New cv.Rect(pt.X, pt.Y, searchArea(i).Width, cOffset), cv.Scalar.Black, -1)
-            ocvb.trueText(msg, pt.X, pt.Y)
+
+            If showShiftInfo Then
+                Dim msg = "(" + CStr(shiftX) + "," + CStr(shiftY) + ") " + Format(maxVal, "#0.00")
+                Dim pt = If(i < 2, New cv.Point(searchArea(i).X, searchArea(i).Y + cSize + cOffset * 2), New cv.Point(searchArea(i).X, searchArea(i).Y - cOffset))
+                dst1.Rectangle(New cv.Rect(pt.X, pt.Y, searchArea(i).Width, cOffset), cv.Scalar.Black, -1)
+                ocvb.trueText(msg, pt.X, pt.Y)
+            End If
         Next
 
         ' if at least 2 corners provide valid results, then the shift amounts should be accurate.
@@ -555,10 +566,12 @@ Public Class Motion_Camera4Corner
             shiftX /= updateCount
             shiftY /= updateCount
         End If
-        For i = 0 To corners.Length - 1
-            dst1.Rectangle(corners(i), cv.Scalar.White, 1)
-            dst1.Rectangle(searchArea(i), cv.Scalar.White, 1)
-        Next
+        If showShiftInfo Then
+            For i = 0 To corners.Length - 1
+                dst1.Rectangle(corners(i), cv.Scalar.White, 1)
+                dst1.Rectangle(searchArea(i), cv.Scalar.White, 1)
+            Next
+        End If
         dst2 = lastFrame - input
         lastFrame = input
     End Sub
@@ -574,6 +587,7 @@ End Class
 Public Class Motion_CameraTest
     Inherits VBparent
     Public cam As Motion_Camera4Corner
+    Public shiftedInput As cv.Mat
     Public Sub New()
         initParent()
         cam = New Motion_Camera4Corner
@@ -606,6 +620,7 @@ Public Class Motion_CameraTest
             Dim dest = New cv.Rect(x2, y2, rect.Width, rect.Height)
             cam.lastFrame(rect).CopyTo(input(dest))
         End If
+        shiftedInput = input.Clone
 
         cam.src = input.Clone
         cam.Run()
@@ -743,11 +758,11 @@ Public Class Motion_CameraRandom
         Static xSlider = findSlider("Insert X motion (in pixels)")
         Static ySlider = findSlider("Insert Y motion (in pixels)")
 
-        xSlider.value = msRNG.Next(-8, 8)
+        'xSlider.value = msRNG.Next(-8, 8)
         ySlider.value = 0 ' msRNG.Next(-8, 8)
         camTest.src = src
         camTest.Run()
-        dst1 = camTest.dst1
+        dst1 = camTest.shiftedInput
         dst2 = camTest.dst2
         label1 = camTest.label1
         label2 = camTest.label2
@@ -769,12 +784,10 @@ Public Class Motion_CameraCancel
         initParent()
         camData = New Motion_CameraRandom
         cam = New Motion_Camera4Corner
+        Dim shiftCheckBox = findCheckBox("Display info on results")
+        shiftCheckBox.Checked = False
 
-        Dim gridCheck = findCheckBox("Display results with grid mask")
-        gridCheck.Checked = False ' turn off the grid in the output
-        Dim xyValCheck = findCheckBox("Display motion offset (x,y) value")
-        xyValCheck.Checked = False
-
+        ocvb.fontSize /= 2
         label2 = "Difference of the 2 frame sent to Motion_Camera"
         task.desc = "Cancel the camera motion and center a stable image."
     End Sub
@@ -785,12 +798,13 @@ Public Class Motion_CameraCancel
         camData.Run()
         dst1 = camData.dst1.Clone
 
-        cam.src = dst1
+        cam.src = dst1.Clone
         cam.Run()
+
+        Dim temp = cam.lastFrame - dst1.Clone
+        cv.Cv2.ImShow("tmp", temp)
         label1 = cam.label1
         label2 = cam.label2
-
-        Dim fsize = ocvb.fontSize / 2
 
         Dim maxX = 8, maxY = 8
         Dim x1 = -cam.shiftX
@@ -800,8 +814,9 @@ Public Class Motion_CameraCancel
         Static xSlider = findSlider("Insert X motion (in pixels)")
         Static ySlider = findSlider("Insert Y motion (in pixels)")
 
-        Static thresholdSlider = findSlider("Segments meeting correlation threshold")
-        dst2 = src.Clone
+        Console.WriteLine("x slider = " + CStr(xSlider.value))
+
+        dst2.SetTo(0)
         x = maxX - x1
         y = maxY - y1
         Dim rect = New cv.Rect(x, y, src.Width - maxX * 2, src.Height - maxY * 2)
@@ -811,7 +826,7 @@ Public Class Motion_CameraCancel
         Else
             cam.dst1.CopyTo(dst2)
         End If
-        cv.Cv2.PutText(dst2, "expected = " + CStr(xSlider.value) + " got = " + CStr(CInt(x1)), New cv.Point(10, 40), ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst2, "expected = " + CStr(xSlider.value) + " got = " + CStr(CInt(x1)), New cv.Point(10, 40), ocvb.font, ocvb.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         dst1.Rectangle(dest, cv.Scalar.White, 1)
         dst2.Rectangle(dest, cv.Scalar.White, 1)
     End Sub
