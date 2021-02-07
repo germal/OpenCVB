@@ -204,7 +204,7 @@ Public Class IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
 
         ' there can be some errant times at startup.
-        If task.IMU_FrameTime > histogramIMU.Length Then task.IMU_FrameTime = plot.maxScale
+        If task.IMU_FrameTime >= histogramIMU.Length Then task.IMU_FrameTime = plot.maxScale
         If task.IMU_FrameTime < 0 Then task.IMU_FrameTime = 0
 
         Static imuTotalTime As Double

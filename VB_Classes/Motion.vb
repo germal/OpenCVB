@@ -395,6 +395,11 @@ Public Class Motion_CameraStabilizer
             sliders.setupTrackBar(1, "Stabilizer Correlation Threshold X1000", 0, 1000, 950)
         End If
 
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Ignore scene motion"
+        End If
+
         templateRect = New cv.Rect(src.Width / 2 - src.Width / 8, src.Height / 2 - src.Height / 8, src.Width / 4, src.Height / 4)
 
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -434,7 +439,17 @@ Public Class Motion_CameraStabilizer
 
             Dim rect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
             dst2.SetTo(0)
-            lastFrame(rect).CopyTo(dst2(rect))
+
+            Static ignoreCheck = findCheckBox("Ignore scene motion")
+            If ignoreCheck.checked Then
+
+                lastFrame(rect).CopyTo(dst2(rect))
+            Else
+                Dim x2 = If(shiftX < 0, 0, shiftX)
+                Dim y2 = If(shiftY < 0, 0, shiftY)
+                Dim srcRect = New cv.Rect(x2, y2, rect.Width, rect.Height)
+                input(srcRect).CopyTo(dst2(rect))
+            End If
             Dim nonZero = dst2.CountNonZero() / (dst2.Width * dst2.Height)
             If nonZero < (1 - lostMax) Then resetImage = True
             label2 = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), preserving " + Format(nonZero, "00%")
