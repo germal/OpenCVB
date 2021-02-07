@@ -334,325 +334,12 @@ End Class
 
 
 
-
-Public Class Motion_Camera
+Public Class Motion_CameraStabilizerRandomInput
     Inherits VBparent
-    Dim stdev As Math_Stdev
-    Dim match As MatchTemplate_Basics
-    Public lastFrame As cv.Mat
-    Public avgX As Single
-    Public avgY As Single
-    Public updateCount As Integer
-    Public Sub New()
-        initParent()
-        match = New MatchTemplate_Basics
-        stdev = New Math_Stdev
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar(1, "Segments meeting correlation threshold", 1, 500, 70)
-        End If
-
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
-            check.Box(0).Text = "Display results with grid mask"
-            check.Box(1).Text = "Display motion offset (x,y) value"
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-
-        Dim widthSlider = findSlider("ThreadGrid Width")
-        Dim heightSlider = findSlider("ThreadGrid Height")
-        widthSlider.Value = 32
-        heightSlider.Value = 32
-
-        task.desc = "Detect camera motion with a concensus of results from stdev and correlation coefficients"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        stdev.src = input
-        stdev.Run()
-        dst1 = input.Clone
-        dst2 = stdev.dst2
-
-        Static stdevThresholdSlider = findSlider("Stdev Threshold")
-        Dim stdevThreshold = stdevThresholdSlider.value
-        Static corrThresholdSlider = findSlider("Correlation Threshold X1000")
-        Dim correlationThreshold = corrThresholdSlider.value / 1000
-
-        If lastFrame Is Nothing Then lastFrame = input
-        Dim fsize = ocvb.fontSize / 4
-        Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
-        Dim mean As Double, stdDev As Double
-
-        Dim offsetX = stdev.grid.roiList(0).Width / 4
-        Dim offsety = stdev.grid.roiList(0).Height / 4
-
-        updateCount = 0
-        avgX = 0
-        avgY = 0
-        For Each roi In stdev.grid.roiList
-            Dim newRoi = New cv.Rect(roi.X + roi.Width / 4, roi.Y + roi.Height / 4, roi.Width / 2, roi.Height / 2)
-            cv.Cv2.MeanStdDev(dst1(newRoi), mean, stdDev)
-            If stdDev > stdevThreshold Then
-                match.searchArea = dst1(newRoi)
-                match.template = lastFrame(roi)
-                match.Run()
-                match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-                If maxVal > correlationThreshold Then
-                    updateCount += 1
-                    avgX += offsetX - maxLoc.X
-                    avgY += offsety - maxLoc.Y
-                    Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    Static xyValCheck = findCheckBox("Display motion offset (x,y) value")
-                    If xyValCheck.checked Then
-                        dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                        cv.Cv2.PutText(dst1, CStr(offsetX - maxLoc.X) + "," + CStr(offsety - maxLoc.Y), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                        dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                        cv.Cv2.PutText(dst2, Format(maxVal, "0.00"), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    End If
-                End If
-            End If
-        Next
-
-        If updateCount > 0 Then
-            avgX /= updateCount
-            avgY /= updateCount
-            lastFrame = input
-            label1 = "Translation = " + Format(avgX, "#0.00") + "," + Format(avgY, "#0.00")
-            label2 = CStr(updateCount) + " segments had correlation coefficients > " + Format(correlationThreshold, "0.00")
-
-            Static gridCheck = findCheckBox("Display results with grid mask")
-            If gridCheck.checked Then dst1.SetTo(255, stdev.grid.gridMask)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Motion_Camera8
-    Inherits VBparent
-    Public lastFrame As cv.Mat
     Public Sub New()
         initParent()
 
-        task.desc = "Detect camera motion with a concensus of results from stdev and correlation coefficients"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        If lastFrame Is Nothing Then lastFrame = input
-        Dim fsize = ocvb.fontSize / 4
-        Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
-
-        Dim maxX = 8, maxY = 8
-        Dim inRect = New cv.Rect(maxX, maxY, dst1.Width - maxX * 2, dst1.Height - maxY * 2)
-
-        Dim correlationMat As New cv.Mat
-        cv.Cv2.MatchTemplate(input, input(inRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-        Dim correlation = correlationMat.Get(Of Single)(0, 0)
-        label1 = "Correlation = " + Format(correlation, "#,##0.000")
-
-        correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-        dst1 = correlationMat
-
-        dst2.SetTo(0)
-        dst2.Circle(maxLoc, ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-        dst2.Circle(New cv.Point(dst2.Width / 2, dst2.Height / 2), 1, cv.Scalar.Red, -1)
-
-        lastFrame = input
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Motion_CameraTest
-    Inherits VBparent
-    Public cam As Motion_Camera4Corner
-    Public shiftedInput As cv.Mat
-    Public Sub New()
-        initParent()
-        cam = New Motion_Camera4Corner
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Insert X motion (in pixels)", -10, 10, 1)
-            sliders.setupTrackBar(1, "Insert Y motion (in pixels)", -10, 10, 0)
-        End If
-
-        label2 = "Difference of the 2 frame sent to Motion_Camera"
-        task.desc = "Test camera motion with specific image movement"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cam.lastFrame = input.Clone
-
-        Static xSlider = findSlider("Insert X motion (in pixels)")
-        Static ySlider = findSlider("Insert Y motion (in pixels)")
-        Dim x1 = xSlider.value, y1 = ySlider.value, x As Integer, y As Integer, x2 As Integer, y2 As Integer
-        If x1 <> 0 Or y1 <> 0 Then
-            If x1 < 0 Then x = Math.Abs(x1) Else x = 0
-            If y1 < 0 Then y = Math.Abs(y1) Else y = 0
-            If x1 < 0 Then x2 = 0 Else x2 = x1
-            If y1 < 0 Then y2 = 0 Else y2 = y1
-            Dim rect = New cv.Rect(x, y, src.Width - Math.Abs(x1), src.Height - Math.Abs(y1))
-            Dim dest = New cv.Rect(x2, y2, rect.Width, rect.Height)
-            cam.lastFrame(rect).CopyTo(input(dest))
-        End If
-        shiftedInput = input.Clone
-
-        cam.src = input.Clone
-        cam.Run()
-        dst1 = cam.dst1
-        dst2 = cam.dst2
-        label1 = cam.label1
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Motion_Camera4Test
-    Inherits VBparent
-    Dim match As Motion_Camera4Corner
-    Dim stdev As Math_Stdev
-    Public lastFrame As cv.Mat
-    Public avgX As Single
-    Public avgY As Single
-    Public updateCount As Integer
-    Public Sub New()
-        initParent()
-        match = New Motion_Camera4Corner
-        stdev = New Math_Stdev
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar(1, "Segments meeting correlation threshold", 1, 500, 70)
-        End If
-
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
-            check.Box(0).Text = "Display results with grid mask"
-            check.Box(1).Text = "Display motion offset (x,y) value"
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-
-        Dim widthSlider = findSlider("ThreadGrid Width")
-        Dim heightSlider = findSlider("ThreadGrid Height")
-        widthSlider.Value = 32
-        heightSlider.Value = 32
-
-        task.desc = "Detect camera motion with a concensus of results from stdev and correlation coefficients"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        'Dim input = src
-        'If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        'stdev.src = input
-        'stdev.Run()
-        'dst1 = input.Clone
-        'dst2 = stdev.dst2
-
-        'Static stdevThresholdSlider = findSlider("Stdev Threshold")
-        'Dim stdevThreshold = stdevThresholdSlider.value
-        'Static corrThresholdSlider = findSlider("Correlation Threshold X1000")
-        'Dim correlationThreshold = corrThresholdSlider.value / 1000
-
-        'If lastFrame Is Nothing Then lastFrame = input
-        'Dim fsize = ocvb.fontSize / 4
-        'Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
-        'Dim mean As Double, stdDev As Double
-
-        'Dim offsetX = stdev.grid.roiList(0).Width / 4
-        'Dim offsety = stdev.grid.roiList(0).Height / 4
-
-        'updateCount = 0
-        'avgX = 0
-        'avgY = 0
-        'For Each roi In stdev.grid.roiList
-        '    Dim newRoi = New cv.Rect(roi.X + roi.Width / 4, roi.Y + roi.Height / 4, roi.Width / 2, roi.Height / 2)
-        '    cv.Cv2.MeanStdDev(dst1(newRoi), mean, stdDev)
-        '    If stdDev > stdevThreshold Then
-        '        match.searchArea = dst1(newRoi)
-        '        match.template = lastFrame(roi)
-        '        match.Run()
-        '        match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-        '        If maxVal > correlationThreshold Then
-        '            updateCount += 1
-        '            avgX += offsetX - maxLoc.X
-        '            avgY += offsety - maxLoc.Y
-        '            Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-        '            Static xyValCheck = findCheckBox("Display motion offset (x,y) value")
-        '            If xyValCheck.checked Then
-        '                dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-        '                cv.Cv2.PutText(dst1, CStr(offsetX - maxLoc.X) + "," + CStr(offsety - maxLoc.Y), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        '                dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-        '                cv.Cv2.PutText(dst2, Format(maxVal, "0.00"), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-        '            End If
-        '        End If
-        '    End If
-        'Next
-
-        'If updateCount > 0 Then
-        '    avgX /= updateCount
-        '    avgY /= updateCount
-        '    lastFrame = input
-        '    label1 = "Translation = " + Format(avgX, "#0.00") + "," + Format(avgY, "#0.00")
-        '    label2 = CStr(updateCount) + " segments had correlation coefficients > " + Format(correlationThreshold, "0.00")
-
-        '    Static gridCheck = findCheckBox("Display results with grid mask")
-        '    If gridCheck.checked Then dst1.SetTo(255, stdev.grid.gridMask)
-        'End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Motion_CameraRandom
-    Inherits VBparent
-    Dim cam As Motion_CameraTest ' need the sliders...
-    Public Sub New()
-        initParent()
-        cam = New Motion_CameraTest
-
-        label1 = "LastFrame before shift"
+        label1 = "Current frame (before)"
         label2 = "Image after shift"
         task.desc = "Generate images that have been arbitrarily shifted"
     End Sub
@@ -662,28 +349,23 @@ Public Class Motion_CameraRandom
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static xSlider = findSlider("Insert X motion (in pixels)")
-        Static ySlider = findSlider("Insert Y motion (in pixels)")
+        Dim shiftX = msRNG.Next(-8, 8)
+        Dim shiftY = msRNG.Next(-8, 8)
 
-        xSlider.value = ocvb.frameCount Mod 10 ' msRNG.Next(-8, 8)
-        ySlider.value = 0 ' msRNG.Next(-8, 8)
+        dst1 = input.Clone
+        If shiftX <> 0 Or shiftY <> 0 Then
+            Dim x = If(shiftX < 0, Math.Abs(shiftX), 0)
+            Dim y = If(shiftY < 0, Math.Abs(shiftY), 0)
 
-        Static lastFrame = input.Clone
-        Dim x1 = xSlider.value, y1 = ySlider.value, x As Integer, y As Integer, x2 As Integer, y2 As Integer
-        If x1 <> 0 Or y1 <> 0 Then
-            If x1 < 0 Then x = Math.Abs(x1) Else x = 0
-            If y1 < 0 Then y = Math.Abs(y1) Else y = 0
-            If x1 < 0 Then x2 = 0 Else x2 = x1
-            If y1 < 0 Then y2 = 0 Else y2 = y1
-            Dim rect = New cv.Rect(x, y, src.Width - Math.Abs(x1), src.Height - Math.Abs(y1))
-            Dim dest = New cv.Rect(x2, y2, rect.Width, rect.Height)
-            lastFrame(rect).CopyTo(Input(dest))
+            Dim x2 = If(shiftX < 0, 0, shiftX)
+            Dim y2 = If(shiftY < 0, 0, shiftY)
+
+            Dim srcRect = New cv.Rect(x, y, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
+            Dim dstRect = New cv.Rect(x2, y2, srcRect.Width, srcRect.Height)
+            dst1(srcRect).CopyTo(input(dstRect))
         End If
 
-        dst1 = lastFrame
         dst2 = input
-
-        lastFrame = input
     End Sub
 End Class
 
@@ -694,155 +376,109 @@ End Class
 
 
 
-Public Class Motion_CameraCancel
+
+
+
+Public Class Motion_CameraStabilizer
     Inherits VBparent
-    Dim camData As Motion_CameraRandom
-    Dim cam As Motion_Camera4Corner
-    Public Sub New()
-        initParent()
-        camData = New Motion_CameraRandom
-        cam = New Motion_Camera4Corner
-        Dim shiftCheckBox = findCheckBox("Display info on results")
-        shiftCheckBox.Checked = False
-
-        ocvb.fontSize /= 2
-        label1 = "Input image with random motion"
-        label2 = "Output image with motion cancelled"
-        task.desc = "Cancel the camera motion and center a stable image."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        camData.src = src
-        camData.Run()
-        dst1 = camData.dst1.Clone
-
-        Static lastFrame = dst1.Clone
-        cam.src = dst1.Clone
-        cam.Run()
-
-        Dim x1 = -cam.shiftX
-        Dim y1 = -cam.shiftY
-        Dim x As Integer, y As Integer
-
-        Static xSlider = findSlider("Insert X motion (in pixels)")
-        Static ySlider = findSlider("Insert Y motion (in pixels)")
-
-        Console.WriteLine("Expected shift = " + CStr(xSlider.value) + " got " + CStr(cam.shiftX))
-
-        dst2.SetTo(0)
-
-        Dim x2 As Integer, y2 As Integer
-        If x1 <> 0 Or y1 <> 0 Then
-            If x1 < 0 Then x = Math.Abs(x1) Else x = 0
-            If y1 < 0 Then y = Math.Abs(y1) Else y = 0
-            If x1 < 0 Then x2 = 0 Else x2 = x1
-            If y1 < 0 Then y2 = 0 Else y2 = y1
-            Dim rect = New cv.Rect(x, y, src.Width - Math.Abs(x1), src.Height - Math.Abs(y1))
-            Dim dest = New cv.Rect(x2, y2, rect.Width, rect.Height)
-            lastFrame(rect).CopyTo(dst2(dest))
-        Else
-            dst1.CopyTo(dst2)
-        End If
-
-        lastFrame = dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Motion_Camera4Corner
-    Inherits VBparent
+    Dim templateRect As cv.Rect
+    Dim match As MatchTemplate_Basics
     Public shiftX As Integer
     Public shiftY As Integer
-    Public updateCount As Integer
-    Public expectedUpdateCount = 2
-    Dim match As MatchTemplate_Basics
-    Dim corners(4 - 1) As cv.Rect
-    Dim searchArea(corners.Length - 1) As cv.Rect
-    Const cSize = 100
-    Const cOffset = 20
-    Public lastFrame As cv.Mat
     Public Sub New()
         initParent()
-        corners(0) = New cv.Rect(cOffset, cOffset, cSize, cSize)
-        corners(1) = New cv.Rect(src.Width - cSize - cOffset, cOffset, cSize, cSize)
-        corners(2) = New cv.Rect(src.Width - cSize - cOffset, src.Height - cSize - cOffset, cSize, cSize)
-        corners(3) = New cv.Rect(cOffset, src.Height - cSize - cOffset, cSize, cSize)
-
-        Dim sSize = cOffset * 2 + cSize
-        searchArea(0) = New cv.Rect(0, 0, sSize, sSize)
-        searchArea(1) = New cv.Rect(src.Width - sSize, 0, sSize, sSize)
-        searchArea(2) = New cv.Rect(src.Width - sSize, src.Height - sSize, sSize, sSize)
-        searchArea(3) = New cv.Rect(0, src.Height - sSize, sSize, sSize)
+        match = New MatchTemplate_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Stabilizer Correlation Threshold X1000", 0, 1000, 970)
+            sliders.setupTrackBar(0, "Maximum percentage of lost pixels before image is reset", 0, 100, 10)
+            sliders.setupTrackBar(1, "Stabilizer Correlation Threshold X1000", 0, 1000, 950)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Display info on results"
-            check.Box(0).Checked = True
-        End If
+        templateRect = New cv.Rect(src.Width / 2 - src.Width / 8, src.Height / 2 - src.Height / 8, src.Width / 4, src.Height / 4)
 
-        match = New MatchTemplate_Basics
-        task.desc = "Stabilize the image using the corners of the image"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        label1 = "Current frame"
+        label2 = "Frame after canceled camera motion"
+        task.desc = "Stabilize motion across all frames"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
+        Static netSlider = findSlider("Maximum percentage of lost pixels before image is reset")
+        Dim lostMax = netSlider.value / 100
+
         Dim input = src
-        If input.Type <> cv.MatType.CV_8UC1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = input.Clone
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If lastFrame Is Nothing Then lastFrame = input.Clone
-        shiftX = 0
-        shiftY = 0
-        updateCount = 0
-        Static shiftCheckBox = findCheckBox("Display info on results")
-        Dim showShiftInfo = shiftCheckBox.checked
-        For i = 0 To corners.Length - 1
-            match.searchArea = dst1(searchArea(i))
-            match.template = lastFrame(corners(i)).Clone
-            match.Run()
+        Static lastFrame = input
 
-            Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
-            match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+        dst1 = input
 
-            Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
-            If maxVal > thresholdSlider.value / thresholdSlider.maximum Then
-                updateCount += 1
-                shiftX += searchArea(i).X + maxLoc.X - corners(i).X
-                shiftY += searchArea(i).Y + maxLoc.Y - corners(i).Y
-            End If
+        match.searchArea = lastFrame.clone
+        match.template = input(templateRect)
+        match.Run()
 
-            If showShiftInfo Then
-                Dim msg = "(" + CStr(shiftX) + "," + CStr(shiftY) + ") " + Format(maxVal, "#0.00")
-                Dim pt = If(i < 2, New cv.Point(searchArea(i).X, searchArea(i).Y + cSize + cOffset * 2), New cv.Point(searchArea(i).X, searchArea(i).Y - cOffset))
-                dst1.Rectangle(New cv.Rect(pt.X, pt.Y, searchArea(i).Width, cOffset), cv.Scalar.Black, -1)
-                ocvb.trueText(msg, pt.X, pt.Y)
-            End If
-        Next
+        Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
+        match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
-        ' if at least 2 corners provide valid results, then the shift amounts should be accurate.
-        If updateCount >= expectedUpdateCount Then
-            shiftX /= updateCount
-            shiftY /= updateCount
+        Dim updateCount As Integer
+        Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
+        Dim resetImage As Boolean
+        If maxVal > thresholdSlider.value / thresholdSlider.maximum Then
+            updateCount += 1
+            shiftX = templateRect.X - maxLoc.X
+            shiftY = templateRect.Y - maxLoc.Y
+            Dim x1 = If(shiftX < 0, Math.Abs(shiftX), 0)
+            Dim y1 = If(shiftY < 0, Math.Abs(shiftY), 0)
+
+            Dim rect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
+            dst2.SetTo(0)
+            lastFrame(rect).CopyTo(dst2(rect))
+            Dim nonZero = dst2.CountNonZero() / (dst2.Width * dst2.Height)
+            If nonZero < (1 - lostMax) Then resetImage = True
+            label2 = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), preserving " + Format(nonZero, "00%")
+        Else
+            resetImage = True
         End If
-        If showShiftInfo Then
-            For i = 0 To corners.Length - 1
-                dst1.Rectangle(corners(i), cv.Scalar.White, 1)
-                dst1.Rectangle(searchArea(i), cv.Scalar.White, 1)
-            Next
+        If resetImage Then
+            label2 = "Frame reinitialized"
+            input.CopyTo(lastFrame)
+            dst2 = lastFrame.clone
         End If
-        dst2 = lastFrame - input
-        lastFrame = input
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Motion_CameraStabilizerTest
+    Inherits VBparent
+    Dim random As Motion_CameraStabilizerRandomInput
+    Dim stabilizer As Motion_CameraStabilizer
+    Public Sub New()
+        initParent()
+        stabilizer = New Motion_CameraStabilizer
+        random = New Motion_CameraStabilizerRandomInput
+
+        label1 = "Unstable input to Motion_CameraStabilizer"
+        label2 = "Output of Motion_CameraStabilizer"
+        task.desc = "Test the Motion_CameraStabilizer with random movement"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        random.src = src
+        random.Run()
+
+        stabilizer.src = random.dst2.Clone
+        stabilizer.Run()
+
+        dst1 = stabilizer.dst1
+        dst2 = stabilizer.dst2
     End Sub
 End Class
