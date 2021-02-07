@@ -1017,7 +1017,6 @@ Public Class Edges_Matching
         Dim searchDepth = searchSlider.value
 
         Dim matchOption = match.checkRadio()
-        Dim font = cv.HersheyFonts.HersheyComplex
         Dim fsize = ocvb.fontSize / 3
         Dim maxLocs(grid.roiList.Count - 1) As Integer
         Dim highlights As New List(Of Integer)
@@ -1025,8 +1024,8 @@ Public Class Edges_Matching
             Dim roi = grid.roiList(i)
             Dim width = If(roi.X + roi.Width + searchDepth < dst1.Width, roi.Width + searchDepth, dst1.Width - roi.X - 1)
             Dim searchROI = New cv.Rect(roi.X, roi.Y, width, roi.Height)
-            match.sample = dst2(roi)
-            match.searchMat = dst1(searchROI)
+            match.searchArea = dst2(roi)
+            match.template = dst1(searchROI)
             match.Run()
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
@@ -1035,7 +1034,7 @@ Public Class Edges_Matching
                 highlights.Add(i)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             End If
         Next
 
@@ -1057,7 +1056,7 @@ Public Class Edges_Matching
                 dst1.Rectangle(roi, cv.Scalar.Red, 2)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         Else
             label1 = "Click in dst2 to highlight segment in dst1"
@@ -1076,7 +1075,7 @@ Public Class Edges_Matching
                     dst1.Rectangle(roi, cv.Scalar.Red, 2)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                     dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 Next
             End If
         End If

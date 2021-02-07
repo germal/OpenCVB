@@ -36,8 +36,8 @@ Public Class Annealing_Basics_CPP
             dst1.Circle(cityPositions(i), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), cv.HersheyFonts.HersheyComplex, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), cv.HersheyFonts.HersheyComplex, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), ocvb.font, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), ocvb.font, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)

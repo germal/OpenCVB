@@ -136,18 +136,18 @@ Public Class Math_RGBCorrelation
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim split = src.Split()
-        match.sample = split(0)
-        match.searchMat = split(1)
+        match.searchArea = split(0)
+        match.template = split(1)
         match.Run()
         Dim blueGreenCorrelation = "Blue-Green " + match.label1
 
-        match.sample = split(2)
-        match.searchMat = split(1)
+        match.searchArea = split(2)
+        match.template = split(1)
         match.Run()
         Dim redGreenCorrelation = "Red-Green " + match.label1
 
-        match.sample = split(2)
-        match.searchMat = split(0)
+        match.searchArea = split(2)
+        match.template = split(0)
         match.Run()
         Dim redBlueCorrelation = "Red-Blue " + match.label1
 
@@ -243,7 +243,6 @@ Public Class Math_Stdev
         Dim updateCount As Integer
         lowStdevMask.SetTo(0)
         highStdevMask.SetTo(0)
-        Dim font = cv.HersheyFonts.HersheyComplex
         Dim fsize = ocvb.fontSize / 3
 
         grid.Run()
@@ -267,8 +266,8 @@ Public Class Math_Stdev
             If stdev < stdevThreshold Then
                 Interlocked.Increment(updateCount)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If showMean Then cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                If showStdev Then cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                If showMean Then cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                If showStdev Then cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 lowStdevMask(roi).SetTo(255)
             Else
                 highStdevMask(roi).SetTo(255)

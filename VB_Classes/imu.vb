@@ -204,7 +204,7 @@ Public Class IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
 
         ' there can be some errant times at startup.
-        If task.IMU_FrameTime > plot.maxScale Then task.IMU_FrameTime = plot.maxScale
+        If task.IMU_FrameTime > histogramIMU.Length Then task.IMU_FrameTime = plot.maxScale
         If task.IMU_FrameTime < 0 Then task.IMU_FrameTime = 0
 
         Static imuTotalTime As Double
@@ -237,7 +237,7 @@ Public Class IMU_FrameTime
         Static sampledIMUFrameTime = task.IMU_FrameTime
         If ocvb.frameCount Mod 10 = 0 Then sampledIMUFrameTime = task.IMU_FrameTime
 
-        histogramIMU(CInt(task.IMU_FrameTime)) += 1
+        If task.IMU_FrameTime < histogramIMU.Length Then histogramIMU(CInt(task.IMU_FrameTime)) += 1
 
         If standalone or task.intermediateReview = caller Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +

@@ -3,8 +3,8 @@ Imports System.Threading
 Public Class MatchTemplate_Basics
     Inherits VBparent
     Dim flow As Font_FlowText
-    Public sample As cv.Mat
-    Public searchMat As cv.Mat
+    Public searchArea As cv.Mat
+    Public template As cv.Mat
     Public matchText As String = ""
     Public correlationMat As New cv.Mat
     Public correlation As Single
@@ -48,20 +48,20 @@ Public Class MatchTemplate_Basics
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static sampleSlider = findSlider("Sample Size")
         If standalone Or task.intermediateReview = caller Then
-            sample = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
-            searchMat = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
-            cv.Cv2.Randn(sample, 100, 25)
-            cv.Cv2.Randn(searchMat, 0, 25)
+            searchArea = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
+            template = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
+            cv.Cv2.Randn(searchArea, 100, 25)
+            cv.Cv2.Randn(template, 0, 25)
         End If
 
         matchOption = checkRadio()
 
-        cv.Cv2.MatchTemplate(sample, searchMat, correlationMat, matchOption)
+        cv.Cv2.MatchTemplate(searchArea, template, correlationMat, matchOption)
         correlation = correlationMat.Get(Of Single)(0, 0)
         label1 = "Correlation = " + Format(correlation, "#,##0.000")
         If standalone Or task.intermediateReview = caller Then
             dst1.SetTo(0)
-            label1 = matchText + " for " + CStr(sample.Cols) + " samples = " + Format(correlation, "#,##0.00")
+            label1 = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
             flow.Run()
         End If
@@ -88,8 +88,8 @@ Public Class MatchTemplate_RowCorrelation
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
-        match.sample = src.Row(line1)
-        match.searchMat = src.Row(line2 + 1)
+        match.searchArea = src.Row(line1)
+        match.template = src.Row(line2 + 1)
         match.Run()
         Dim correlation = match.correlationMat.Get(Of Single)(0, 0)
         flow.msgs.Add(match.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
@@ -141,8 +141,8 @@ Public Class MatchTemplate_DrawRect
             saveTemplate = src(task.drawRect).Clone()
         End If
 
-        match.sample = saveTemplate
-        match.searchMat = src
+        match.searchArea = saveTemplate
+        match.template = src
         match.Run()
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
@@ -238,7 +238,6 @@ Public Class MatchTemplate_Movement
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim font = cv.HersheyFonts.HersheyComplex
         Dim fsize = ocvb.fontSize / 3
 
         grid.Run()
@@ -268,7 +267,7 @@ Public Class MatchTemplate_Movement
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 Else
                     mask(roi).SetTo(255)
                     dst1(roi).SetTo(0)

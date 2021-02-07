@@ -17,6 +17,7 @@ Public Class VBocvb
     Public sideCameraPoint As cv.Point
     Public topFrustrumAdjust As Single
     Public sideFrustrumAdjust As Single
+    Public font As cv.HersheyFonts
     Public fontSize As Single
     Public dotSize As Integer
     Public lineSize As Integer
@@ -41,6 +42,7 @@ Public Class VBocvb
 
     Public pythonTaskName As String
     Public Sub New(_task As ActiveTask)
+        font = cv.HersheyFonts.HersheyComplex
         Select Case _task.color.Width
             Case 320
                 fontSize = _task.color.Width / _task.pointCloud.Width
