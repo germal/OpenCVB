@@ -5,6 +5,7 @@ Public Class Stabilizer_Basics
     Public shiftX As Integer
     Public shiftY As Integer
     Public templateRect As cv.Rect
+    Public searchRect As cv.Rect
     Public stableRect As cv.Rect
     Public Sub New()
         initParent()
@@ -45,7 +46,10 @@ Public Class Stabilizer_Basics
 
         Static stdevSlider = findSlider("Min stdev in correlation rect")
         If stdev > stdevSlider.value Then
-            match.searchArea = lastFrame.clone
+            Dim t = templateRect
+            Dim pad = 20
+            searchRect = New cv.Rect(t.X - pad, t.Y - pad, t.Width + pad * 2, t.Height + pad * 2)
+            match.searchArea = lastFrame(searchRect)
             match.template = input(templateRect)
             match.Run()
 
@@ -73,7 +77,7 @@ Public Class Stabilizer_Basics
                     label2 = "Lost pixels = " + Format(1 - nonZero, "00%")
                     resetImage = True
                 End If
-                label2 = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + Format(nonZero, "00%") + " preserved "
+                label2 = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + Format(nonZero, "00%") + " preserved, cc=" + Format(maxVal, "0.00")
             Else
                 label2 = "Below correlation threshold " + Format(thresholdSlider.value, "0.00") + " with " + Format(maxVal, "0.00")
                 resetImage = True
@@ -160,10 +164,10 @@ End Class
 Public Class Stabilizer_BasicsTest
     Inherits VBparent
     Dim random As Stabilizer_BasicsRandomInput
-    Dim stabilizer As Stabilizer_Basics
+    Dim stable As Stabilizer_Basics
     Public Sub New()
         initParent()
-        stabilizer = New Stabilizer_Basics
+        stable = New Stabilizer_Basics
         random = New Stabilizer_BasicsRandomInput
 
         label1 = "Unstable input to Stabilizer_Basics"
@@ -175,13 +179,13 @@ Public Class Stabilizer_BasicsTest
         random.src = src
         random.Run()
 
-        stabilizer.src = random.dst2.Clone
-        stabilizer.Run()
+        stable.src = random.dst2.Clone
+        stable.Run()
 
-        dst1 = stabilizer.dst1
-        dst2 = stabilizer.dst2
-        If standalone Then dst2.Rectangle(stabilizer.templateRect, cv.Scalar.White, 1)
-        label2 = stabilizer.label2
+        dst1 = stable.dst1
+        dst2 = stable.dst2
+        If standalone Then dst2.Rectangle(stable.templateRect, cv.Scalar.White, 1)
+        label2 = stable.label2
     End Sub
 End Class
 
@@ -296,5 +300,46 @@ Public Class Stabilizer_OpticalFlow
             Next
         End If
         inputFeat = Nothing ' show that we consumed the current set of features.
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Stabilizer_MotionDetect
+    Inherits VBparent
+    Dim motion As Motion_Basics
+    Dim stable As Stabilizer_Basics
+    Public Sub New()
+        initParent()
+        motion = New Motion_Basics
+        stable = New Stabilizer_Basics
+
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Offset of stable rectangle from each side in pixels", 0, 100, 30)
+        End If
+
+        task.desc = "Detect motiion in the stabilizer output"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        stable.src = src
+        stable.Run()
+
+        Static offsetSlider = findSlider("Offset of stable rectangle from each side in pixels")
+        Dim offset = offsetSlider.value
+        motion.src = stable.dst2(stable.templateRect)
+        motion.Run()
+        dst1 = stable.dst2
+        dst1.Rectangle(stable.templateRect, cv.Scalar.White, 1)
+        dst2 = motion.dst2
     End Sub
 End Class
