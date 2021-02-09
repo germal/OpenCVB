@@ -1,7 +1,197 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_Basics
+    Inherits VBparent
+    Dim match As MatchTemplate_Basics
+    Public shiftX As Integer
+    Public shiftY As Integer
+    Public templateRect As cv.Rect
+    Public stableRect As cv.Rect
+    Public Sub New()
+        initParent()
+        match = New MatchTemplate_Basics
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller, 5)
+            sliders.setupTrackBar(0, "Maximum percentage of lost pixels before image is reset", 0, 100, 10)
+            sliders.setupTrackBar(1, "Stabilizer Correlation Threshold X1000", 0, 1000, 950)
+            sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, src.Width - src.Width / 8, 128)
+            sliders.setupTrackBar(3, "Height of input to matchtemplate", 10, src.Height - src.Height / 8, 96)
+            sliders.setupTrackBar(4, "Min stdev in correlation rect", 1, 50, 10)
+        End If
+
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        label1 = "Current frame - rectangle input to matchTemplate"
+        task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim resetImage As Boolean
+
+        Static widthSlider = findSlider("Width of input to matchtemplate")
+        Static heightSlider = findSlider("Height of input to matchtemplate")
+        templateRect = New cv.Rect(src.Width / 2 - widthSlider.value / 2, src.Height / 2 - heightSlider.value / 2, widthSlider.value, heightSlider.value)
+
+        Static netSlider = findSlider("Maximum percentage of lost pixels before image is reset")
+        Dim lostMax = netSlider.value / 100
+
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static lastFrame = input
+        dst1 = input
+
+        Dim mean As Single, stdev As Single
+        cv.Cv2.MeanStdDev(dst1(templateRect), mean, stdev)
+
+        Static stdevSlider = findSlider("Min stdev in correlation rect")
+        If stdev > stdevSlider.value Then
+            match.searchArea = lastFrame.clone
+            match.template = input(templateRect)
+            match.Run()
+
+            Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
+            match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+
+            Dim updateCount As Integer
+            Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
+            If maxVal > thresholdSlider.value / thresholdSlider.maximum Then
+                updateCount += 1
+                shiftX = templateRect.X - maxLoc.X
+                shiftY = templateRect.Y - maxLoc.Y
+                Dim x1 = If(shiftX < 0, Math.Abs(shiftX), 0)
+                Dim y1 = If(shiftY < 0, Math.Abs(shiftY), 0)
+
+                stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
+                dst2.SetTo(0)
+
+                Dim x2 = If(shiftX < 0, 0, shiftX)
+                Dim y2 = If(shiftY < 0, 0, shiftY)
+                Dim srcRect = New cv.Rect(x2, y2, stableRect.Width, stableRect.Height)
+                input(srcRect).CopyTo(dst2(stableRect))
+                Dim nonZero = dst2.CountNonZero() / (dst2.Width * dst2.Height)
+                If nonZero < (1 - lostMax) Then
+                    label2 = "Lost pixels = " + Format(1 - nonZero, "00%")
+                    resetImage = True
+                End If
+                label2 = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + Format(nonZero, "00%") + " preserved "
+            Else
+                label2 = "Below correlation threshold " + Format(thresholdSlider.value, "0.00") + " with " + Format(maxVal, "0.00")
+                resetImage = True
+            End If
+        Else
+            label2 = "Correlation rectangle stdev is " + Format(stdev, "00") + " - too low"
+            resetImage = True
+        End If
+
+        If resetImage Then
+            input.CopyTo(lastFrame)
+            dst2 = lastFrame.clone
+        End If
+        If standalone Then dst2.Rectangle(templateRect, cv.Scalar.White, 1) ' when not standalone, caller doesn't want artificial rectangle.
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Stabilizer_BasicsRandomInput
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
+        End If
+
+        label1 = "Current frame (before)"
+        label2 = "Image after shift"
+        task.desc = "Generate images that have been arbitrarily shifted"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static rangeSlider = findSlider("Range of random motion introduced (absolute value in pixels)")
+        Dim range = rangeSlider.value
+        Dim shiftX = msRNG.Next(-range, range)
+        Dim shiftY = msRNG.Next(-range, range)
+
+        Static lastShiftX = shiftX
+        Static lastShiftY = shiftY
+        If ocvb.frameCount Mod 2 = 0 Then
+            shiftX = lastShiftX
+            shiftY = lastShiftY
+        End If
+        lastShiftX = shiftX
+        lastShiftY = shiftY
+
+        dst1 = input.Clone
+        If shiftX <> 0 Or shiftY <> 0 Then
+            Dim x = If(shiftX < 0, Math.Abs(shiftX), 0)
+            Dim y = If(shiftY < 0, Math.Abs(shiftY), 0)
+
+            Dim x2 = If(shiftX < 0, 0, shiftX)
+            Dim y2 = If(shiftY < 0, 0, shiftY)
+
+            Dim srcRect = New cv.Rect(x, y, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
+            Dim dstRect = New cv.Rect(x2, y2, srcRect.Width, srcRect.Height)
+            dst1(srcRect).CopyTo(input(dstRect))
+        End If
+
+        dst2 = input
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Stabilizer_BasicsTest
+    Inherits VBparent
+    Dim random As Stabilizer_BasicsRandomInput
+    Dim stabilizer As Stabilizer_Basics
+    Public Sub New()
+        initParent()
+        stabilizer = New Stabilizer_Basics
+        random = New Stabilizer_BasicsRandomInput
+
+        label1 = "Unstable input to Stabilizer_Basics"
+        task.desc = "Test the Stabilizer_Basics with random movement"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        random.src = src
+        random.Run()
+
+        stabilizer.src = random.dst2.Clone
+        stabilizer.Run()
+
+        dst1 = stabilizer.dst1
+        dst2 = stabilizer.dst2
+        If standalone Then dst2.Rectangle(stabilizer.templateRect, cv.Scalar.White, 1)
+        label2 = stabilizer.label2
+    End Sub
+End Class
+
+
+
+
+
+
+' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
+Public Class Stabilizer_OpticalFlow
     Inherits VBparent
     Public good As Features_GoodFeatures
     Public inputFeat As New List(Of cv.Point2f)
@@ -16,7 +206,7 @@ Public Class Stabilizer_Basics
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If ocvb.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -106,140 +296,5 @@ Public Class Stabilizer_Basics
             Next
         End If
         inputFeat = Nothing ' show that we consumed the current set of features.
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Stabilizer_BriskFeatures
-    Inherits VBparent
-    Dim brisk As BRISK_Basics
-    Dim stabilizer As Stabilizer_Basics
-    Public Sub New()
-        initParent()
-        stabilizer = New Stabilizer_Basics()
-
-        brisk = New BRISK_Basics()
-        brisk.sliders.trackbar(0).Value = 10
-
-        task.desc = "Stabilize the video stream using BRISK features (not GoodFeaturesToTrack)"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        src.CopyTo(brisk.src)
-        brisk.Run()
-        stabilizer.inputFeat = brisk.features ' supply the features to track with Optical Flow
-        stabilizer.src = src
-        stabilizer.Run()
-        dst1 = stabilizer.dst1
-        dst2 = stabilizer.dst2
-    End Sub
-End Class
-
-
-
-
-
-Public Class Stabilizer_HarrisFeatures
-    Inherits VBparent
-    Dim harris As Harris_Detector_CPP
-    Dim stabilizer As Stabilizer_Basics
-    Public Sub New()
-        initParent()
-        stabilizer = New Stabilizer_Basics()
-
-        harris = New Harris_Detector_CPP()
-
-        task.desc = "Stabilize the video stream using Harris detector features"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        harris.src = src
-        harris.Run()
-        stabilizer.inputFeat = harris.FeaturePoints ' supply the features to track with Optical Flow
-        stabilizer.src = src
-        stabilizer.Run()
-        dst1 = stabilizer.dst1
-        dst2 = stabilizer.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-Module Stabilizer_Basics_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Stabilizer_Basics_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Stabilizer_Basics_Close(sPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Stabilizer_Basics_Run(sPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer) As IntPtr
-    End Function
-End Module
-Public Class Stabilizer_Basics_CPP
-    Inherits VBparent
-    Dim srcData() As Byte
-    Dim handleSrc As GCHandle
-    Dim sPtr As IntPtr
-    Public Sub New()
-        initParent()
-        ReDim srcData(src.Total * src.ElemSize - 1)
-        sPtr = Stabilizer_Basics_Open()
-        task.desc = "Use the C++ version of code available on web.  This algorithm is not working.  Only small movements work.  Needs more work."
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ocvb.trueText("this algorithm is not stable.", 10, 100)
-        'Marshal.Copy(src.Data, srcData, 0, srcData.Length)
-        'handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        'Dim imagePtr = Stabilizer_Basics_Run(sPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
-        'handleSrc.Free() ' free the pinned memory...
-
-        'If imagePtr <> 0 Then
-        '    Dim dstData(src.Total * src.ElemSize - 1) As Byte
-        '    Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-        '    dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
-        'End If
-    End Sub
-    Public Sub Close()
-        Stabilizer_Basics_Close(sPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-Public Class Stabilizer_SideBySide
-    Inherits VBparent
-    Dim original As Stabilizer_Basics
-    Dim basics As Stabilizer_HarrisFeatures
-    Public Sub New()
-        initParent()
-        original = New Stabilizer_Basics()
-        basics = New Stabilizer_HarrisFeatures()
-        task.desc = "Run both the original and the VB.Net version of the video stabilizer.  Neither is working properly."
-        label1 = "Stabilizer_Basic (VB.Net)"
-        label2 = "Stabilizer_HarrisFeatures"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        original.src = src
-        original.Run()
-        dst1 = original.dst1
-
-        basics.src = src
-        basics.Run()
-        dst2 = basics.dst1
     End Sub
 End Class

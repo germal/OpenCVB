@@ -242,13 +242,39 @@ Public Class BestOf_MSER
         task.desc = "Best example of how to detect the main objects of interest in a scene"
     End Sub
     Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         mser.src = src
         mser.Run()
         dst1 = mser.dst1
         dst2 = mser.dst2
         label1 = mser.label1
         label2 = mser.label2
+    End Sub
+End Class
 
+
+
+
+
+
+
+Public Class BestOf_Stabilizer
+    Inherits VBparent
+    Dim stable As Stabilizer_BasicsTest
+    Public Sub New()
+        initParent()
+        stable = New Stabilizer_BasicsTest
+        task.desc = "Best example of how to stabilize the rgb image."
+    End Sub
+    Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        stable.src = src
+        stable.Run()
+        dst1 = stable.dst1
+        dst2 = stable.dst2
+        label1 = stable.label1
+        label2 = stable.label2
     End Sub
 End Class
