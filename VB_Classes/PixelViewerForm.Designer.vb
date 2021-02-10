@@ -22,9 +22,7 @@ Partial Class PixelViewerForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(PixelViewerForm))
-        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
@@ -33,11 +31,6 @@ Partial Class PixelViewerForm
         Me.rtb = New System.Windows.Forms.RichTextBox()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'Timer1
-        '
-        Me.Timer1.Enabled = True
-        Me.Timer1.Interval = 1000
         '
         'ToolStrip1
         '
@@ -111,7 +104,6 @@ Partial Class PixelViewerForm
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents Timer1 As Windows.Forms.Timer
     Friend WithEvents ToolStrip1 As Windows.Forms.ToolStrip
     Friend WithEvents ToolStripButton1 As Windows.Forms.ToolStripButton
     Friend WithEvents ToolStripButton2 As Windows.Forms.ToolStripButton

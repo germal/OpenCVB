@@ -4,9 +4,7 @@ Imports System.Drawing
 Imports System.ComponentModel
 
 Public Class PixelViewerForm
-    Public pixelResized As Boolean
     Public mousePoint As cv.Point
-    Public updateReady As Boolean
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Left = GetSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
@@ -20,16 +18,12 @@ Public Class PixelViewerForm
         PixelViewerForm_ResizeEnd(sender, e)
     End Sub
     Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        pixelResized = True
         rtb.Width = Me.Width - 40
         rtb.Height = Me.Height - 80
         SaveSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
         SaveSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
         SaveSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
         SaveSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", Me.Height)
-    End Sub
-    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        updateReady = True
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         mousePoint.X -= 1

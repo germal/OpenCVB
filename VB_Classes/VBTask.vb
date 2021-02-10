@@ -168,6 +168,8 @@ Public Class ActiveTask : Implements IDisposable
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public drawRectUpdated As Boolean
 
+    Public pixelViewerRect As cv.Rect
+
     Public label1 As String
     Public label2 As String
     Public desc As String

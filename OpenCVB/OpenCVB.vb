@@ -92,6 +92,7 @@ Public Class OpenCVB
     Dim VTK_Present As Boolean
     Dim meActivateNeeded As Boolean
     Dim pixelViewerOn As Boolean
+    Dim pixelViewerRect As cv.Rect
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -280,6 +281,12 @@ Public Class OpenCVB
         Dim pic = DirectCast(sender, PictureBox)
         g.ScaleTransform(1, 1)
         g.DrawImage(pic.Image, 0, 0)
+
+        If pixelViewerOn Then
+            If mousePicTag = pic.Tag Then
+                g.DrawRectangle(myPen, pixelViewerRect.X, pixelViewerRect.Y, pixelViewerRect.Width, pixelViewerRect.Height)
+            End If
+        End If
         If drawRect.Width > 0 And drawRect.Height > 0 Then
             g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
             If pic.Tag = 2 Then
@@ -1220,6 +1227,8 @@ Public Class OpenCVB
                 task.drawRect = drawRect
                 task.drawRectClear = False
             End If
+
+            pixelViewerRect = task.pixelViewerRect
 
             If openFileDialogName <> "" Then
                 If openFileDialogName <> task.openFileDialogName Or openFileStarted <> task.fileStarted Then

@@ -8,7 +8,6 @@ Public Class Pixel_Viewer
 
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
         standalone = False
-
         task.desc = "Display pixels under the cursor"
     End Sub
     Public Sub Run()
@@ -50,12 +49,8 @@ Public Class Pixel_Viewer
                 mouseLoc = New cv.Point(CInt(x), CInt(y))
             End If
 
-            Static savedisplayType = -1
-            Static saveDrawRect = New cv.Rect(0, 0, -1, -1)
-            If savedisplayType <> displayType Then saveDrawRect = New cv.Rect(0, 0, -1, -1)
-
+            task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
             Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
-
             If dw.X < 0 Then dw.X = 0
             If dw.Y < 0 Then dw.Y = 0
             If dw.X + dw.Width > dst1.Width Then
@@ -72,7 +67,6 @@ Public Class Pixel_Viewer
             Static savePixels As cv.Mat = testChange
             If savePixels.Size <> testChange.Size Or savePixels.Type <> testChange.Type Then
                 savePixels = testChange.Clone
-                saveDrawRect = New cv.Rect  ' force the refresh
             Else
                 cv.Cv2.Absdiff(savePixels, testChange, diff)
             End If
@@ -95,69 +89,60 @@ Public Class Pixel_Viewer
                 End If
             End If
 
-            Static saveMousePoint = task.mousePoint
-            If ((saveDrawRect <> dw Or pixels.pixelResized Or pixels.updateReady) And diff.CountNonZero()) Or task.mousePoint <> saveMousePoint Then
-                pixels.updateReady = False
-                savePixels = testChange.Clone
-                pixels.pixelResized = False
-                Dim imgText = ""
-                Select Case displayType
+            savePixels = testChange.Clone
 
-                    Case 0
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + Format(dw.Y + y, "000") + "   "
-                            For x = 0 To img.Width - 1
-                                Dim vec = img.Get(Of cv.Vec3b)(y, x)
-                                imgText += Format(vec.Item0, "000") + " " + Format(vec.Item1, "000") + " " + Format(vec.Item2, "000") + "   "
-                            Next
-                            imgText += vbCrLf
+            Dim imgText = ""
+            Select Case displayType
+
+                Case 0
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        For x = 0 To img.Width - 1
+                            Dim vec = img.Get(Of cv.Vec3b)(y, x)
+                            imgText += Format(vec.Item0, "000") + " " + Format(vec.Item1, "000") + " " + Format(vec.Item2, "000") + "   "
                         Next
+                        imgText += vbLf
+                    Next
 
-                    Case 1
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + Format(dw.Y + y, "000") + "   "
-                            For x = 0 To img.Width - 1
-                                imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
-                            Next
-                            imgText += vbCrLf
+                Case 1
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        For x = 0 To img.Width - 1
+                            imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
                         Next
+                        imgText += vbLf
+                    Next
 
-                    Case 2
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + Format(dw.Y + y, "000") + "   "
-                            For x = 0 To img.Width - 1
-                                imgText += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
-                            Next
-                            imgText += vbCrLf
+                Case 2
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        For x = 0 To img.Width - 1
+                            imgText += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
                         Next
+                        imgText += vbLf
+                    Next
 
-                    Case 3
-                        imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbCrLf
-                        For y = 0 To img.Height - 1
-                            imgText += "r" + Format(dw.Y + y, "000") + "   "
-                            For x = 0 To img.Width - 1
-                                Dim vec = img.Get(Of cv.Vec3f)(y, x)
-                                imgText += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
-                            Next
-                            imgText += vbCrLf
+                Case 3
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                    For y = 0 To img.Height - 1
+                        imgText += "r" + Format(dw.Y + y, "000") + "   "
+                        For x = 0 To img.Width - 1
+                            Dim vec = img.Get(Of cv.Vec3f)(y, x)
+                            imgText += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
                         Next
-                    Case 4
+                        imgText += vbLf
+                    Next
 
-                End Select
-                saveMousePoint = task.mousePoint
-                savedisplayType = displayType
-                saveDrawRect = dw
+            End Select
+            task.pixelViewerRect = dw
+
+            If pixels.rtb.Text <> imgText Then
                 pixels.rtb.Text = imgText
                 pixels.Refresh()
             End If
-
-            ' Dim outImg As cv.Mat = If(task.mousePicTag = 2, task.algorithmObject.dst1, task.algorithmObject.dst2)
-            dst1.MinMaxLoc(minVal, maxVal)
-            dst1.Rectangle(saveDrawRect, cv.Scalar.All(maxVal), If(dst1.Width = 1280, 3, 2))
-            dst1.Rectangle(saveDrawRect, cv.Scalar.All(minVal), If(dst1.Width = 1280, 2, 1))
         Else
             If pixels IsNot Nothing Then
                 pixels.Close()
