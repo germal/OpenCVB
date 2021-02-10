@@ -7,6 +7,7 @@ Public Class Stabilizer_Basics
     Public templateRect As cv.Rect
     Public searchRect As cv.Rect
     Public stableRect As cv.Rect
+    Dim pad = 20
     Public Sub New()
         initParent()
         match = New MatchTemplate_Basics
@@ -15,8 +16,8 @@ Public Class Stabilizer_Basics
             sliders.Setup(caller, 5)
             sliders.setupTrackBar(0, "Maximum percentage of lost pixels before image is reset", 0, 100, 10)
             sliders.setupTrackBar(1, "Stabilizer Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, src.Width - src.Width / 8, 128)
-            sliders.setupTrackBar(3, "Height of input to matchtemplate", 10, src.Height - src.Height / 8, 96)
+            sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, src.Width - pad, 128)
+            sliders.setupTrackBar(3, "Height of input to matchtemplate", 10, src.Height - pad, 96)
             sliders.setupTrackBar(4, "Min stdev in correlation rect", 1, 50, 10)
         End If
 
@@ -47,7 +48,6 @@ Public Class Stabilizer_Basics
         Static stdevSlider = findSlider("Min stdev in correlation rect")
         If stdev > stdevSlider.value Then
             Dim t = templateRect
-            Dim pad = 20
             searchRect = New cv.Rect(t.X - pad, t.Y - pad, t.Width + pad * 2, t.Height + pad * 2)
             match.searchArea = lastFrame(searchRect)
             match.template = input(templateRect)

@@ -325,3 +325,117 @@ Public Class Motion_DepthShadow
         label2 = "Shadow that is consistently present. " + CStr(tmp.CountNonZero) + " pixels"
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Motion_ThruCorrelation
+    Inherits VBparent
+    Dim grid As Thread_Grid
+    Dim addw As AddWeighted_Basics
+    Public Sub New()
+        initParent()
+        grid = New Thread_Grid
+        addw = New AddWeighted_Basics
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Correlation coefficient threshold for motion X1000", 0, 1000, 950)
+            sliders.setupTrackBar(1, "Stdev threshold for using correlation", 0, 100, 15)
+            sliders.setupTrackBar(2, "Pad size in pixels for the search area", 0, 100, 20)
+        End If
+
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.desc = "Detect motion through the correlation coefficient"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        grid.Run()
+
+        Dim input = src.Clone
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static lastFrame As cv.Mat = input.Clone
+        Static ccSlider = findSlider("Correlation coefficient threshold for motion X1000")
+        Static padSlider = findSlider("Pad size in pixels for the search area")
+        Static stdevSlider = findSlider("Stdev threshold for using correlation")
+        Dim pad = padSlider.value
+        Dim ccThreshold = ccSlider.value
+        Dim stdevThreshold = stdevSlider.value
+
+        dst2.SetTo(0)
+        Parallel.For(0, grid.roiList.Count,
+        Sub(i)
+            Dim roi = grid.roiList(i)
+            Dim correlation As New cv.Mat
+            Dim mean As Single, stdev As Single
+            cv.Cv2.MeanStdDev(input(roi), mean, stdev)
+            If stdev > stdevThreshold Then
+                cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                Dim minVal As Single, maxVal As Single
+                correlation.MinMaxLoc(minVal, maxVal)
+                If maxVal < ccThreshold / 1000 Then
+                    If i Mod grid.tilesPerRow <> 0 Then dst2(grid.roiList(i - 1)).SetTo(255)
+                    If i Mod grid.tilesPerRow < (grid.tilesPerRow - 1) Then dst2(grid.roiList(i + 1)).SetTo(255)
+                    If i > grid.tilesPerRow Then
+                        dst2(grid.roiList(i - grid.tilesPerRow)).SetTo(255)
+                        dst2(grid.roiList(i - grid.tilesPerRow - 1)).SetTo(255)
+                        dst2(grid.roiList(i - grid.tilesPerRow + 1)).SetTo(255)
+                    End If
+                    If i < (grid.roiList.Count - grid.tilesPerRow) Then
+                        dst2(grid.roiList(i + grid.tilesPerRow)).SetTo(255)
+                        dst2(grid.roiList(i + grid.tilesPerRow - 1)).SetTo(255)
+                        dst2(grid.roiList(i + grid.tilesPerRow + 1)).SetTo(255)
+                    End If
+                    dst2(roi).SetTo(255)
+                End If
+            End If
+        End Sub)
+
+        lastFrame = input.Clone
+
+        If standalone Then
+            addw.src = input
+            addw.src2 = dst2
+            addw.Run()
+            dst1 = addw.dst1
+        Else
+            dst1 = src
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Motion_CCmerge
+    Inherits VBparent
+    Dim motionCC As Motion_ThruCorrelation
+    Public Sub New()
+        initParent()
+        motionCC = New Motion_ThruCorrelation
+
+        task.desc = "Use the correlation coefficient to maintain an up-to-date image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.frameCount < 10 Then dst1 = src.Clone
+
+        motionCC.src = src
+        motionCC.Run()
+
+        Static lastFrame = src.Clone
+        If motionCC.dst2.CountNonZero() > src.Total / 2 Then
+            dst1 = src.Clone
+            lastFrame = src.Clone
+        End If
+
+        src.CopyTo(dst1, motionCC.dst2)
+        dst2 = motionCC.dst2
+    End Sub
+End Class
