@@ -279,12 +279,14 @@ Public Class OpenCVB
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
         Dim pic = DirectCast(sender, PictureBox)
+        Dim ratio = camPic(2).Width / imgResult.Width
         g.ScaleTransform(1, 1)
         g.DrawImage(pic.Image, 0, 0)
 
         If pixelViewerOn Then
             If mousePicTag = pic.Tag Then
-                g.DrawRectangle(myPen, pixelViewerRect.X, pixelViewerRect.Y, pixelViewerRect.Width, pixelViewerRect.Height)
+                g.DrawRectangle(myPen, CInt(pixelViewerRect.X * ratio), CInt(pixelViewerRect.Y * ratio),
+                                       CInt(pixelViewerRect.Width * ratio), CInt(pixelViewerRect.Height * ratio))
             End If
         End If
         If drawRect.Width > 0 And drawRect.Height > 0 Then
@@ -327,7 +329,6 @@ Public Class OpenCVB
         Dim maxline = 21
         SyncLock ttTextData
             Try
-                Dim ratio = camPic(2).Width / imgResult.Width
                 If pic.Tag = 2 Or pic.Tag = 3 Then
                     Dim ttText = New List(Of VB_Classes.TTtext)(ttTextData)
                     For i = 0 To ttText.Count - 1
