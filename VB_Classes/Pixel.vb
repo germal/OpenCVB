@@ -19,8 +19,7 @@ Public Class Pixel_Viewer
             If pixels.Visible = False Then pixels = New PixelViewerForm
             pixels.Show()
 
-            If task.mousePicTag < 2 Then Exit Sub
-            dst1 = Choose(task.mousePicTag - 2 + 1, task.algorithmObject.dst1.clone, task.algorithmObject.dst2.clone)
+            dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
 
             Dim displayType = -1 ' default is 8uc3
             If dst1.Type = cv.MatType.CV_8UC3 Then displayType = 0
@@ -155,10 +154,10 @@ Public Class Pixel_Viewer
                 pixels.Refresh()
             End If
 
-            Dim outImg As cv.Mat = If(task.mousePicTag = 2, task.algorithmObject.dst1, task.algorithmObject.dst2)
-            outImg.MinMaxLoc(minVal, maxVal)
-            outImg.Rectangle(saveDrawRect, cv.Scalar.All(maxVal), If(dst1.Width = 1280, 3, 2))
-            outImg.Rectangle(saveDrawRect, cv.Scalar.All(minVal), If(dst1.Width = 1280, 2, 1))
+            ' Dim outImg As cv.Mat = If(task.mousePicTag = 2, task.algorithmObject.dst1, task.algorithmObject.dst2)
+            dst1.MinMaxLoc(minVal, maxVal)
+            dst1.Rectangle(saveDrawRect, cv.Scalar.All(maxVal), If(dst1.Width = 1280, 3, 2))
+            dst1.Rectangle(saveDrawRect, cv.Scalar.All(minVal), If(dst1.Width = 1280, 2, 1))
         Else
             If pixels IsNot Nothing Then
                 pixels.Close()
