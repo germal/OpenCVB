@@ -8,6 +8,7 @@ Imports System.Threading
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Runtime.InteropServices
+Imports System.Management
 Module opencv_module
     Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public delegateLock As New Mutex(True, "delegateLock")
@@ -30,6 +31,7 @@ Public Class OpenCVB
     Dim cameraRS2Generic As Object ' used only to initialize D435i
     Dim cameraD435i As Object
     Dim cameraD455 As Object
+    Dim cameraOakD As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
@@ -165,6 +167,7 @@ Public Class OpenCVB
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) = USBenumeration("Movidius MyriadX")
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
@@ -202,8 +205,9 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D435i
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D455, D435i, Kinect 4 Azure, MyntEyeD 1000, or StereoLabs Zed2.")
+                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D455, D435i, OpenCV Oak-D, Kinect 4 Azure, MyntEyeD 1000, or StereoLabs Zed2.")
                 'End
             End If
         End If
@@ -453,7 +457,7 @@ Public Class OpenCVB
     Public Sub updateCamera()
         ' order is same as in optionsdialog enum
         Try
-            camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455)
+            camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
         Catch ex As Exception
             camera = cameraKinect
         End Try
@@ -485,10 +489,10 @@ Public Class OpenCVB
         Static firstCall = 0
         Dim deviceCount As Integer
         ' See if the desired device shows up in the device manager.'
-        Dim info As Management.ManagementObject
-        Dim search As System.Management.ManagementObjectSearcher
+        Dim info As ManagementObject
+        Dim search As ManagementObjectSearcher
         Dim Name As String
-        search = New System.Management.ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
+        search = New ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
         For Each info In search.Get()
             Name = CType(info("Caption"), String) ' Get the name of the device.'
             ' toss the uninteresting names so we can find the cameras.

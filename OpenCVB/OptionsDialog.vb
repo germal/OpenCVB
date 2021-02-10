@@ -9,8 +9,8 @@ Public Class OptionsDialog
 
     Public cameraIndex As Integer ' an index into the cameraRadioButton array.
 
-    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) As Integer
-    Public cameraRadioButton(VB_Classes.ActiveTask.algParms.camNames.D455) As RadioButton
+    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) As Integer
+    Public cameraRadioButton(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) As RadioButton
     Public cameraTotalCount As Integer = 0
 
     Public Const lowRes = 0
@@ -91,7 +91,7 @@ Public Class OptionsDialog
             cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
             cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
             cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "StereoLabs ZED 2 camera",
-                                               "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense D455")
+                                               "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense D455", "OpenCV Oak-D")
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
 

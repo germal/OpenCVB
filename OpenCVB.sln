@@ -72,6 +72,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VTKDataExample", "VTK_Apps\
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PythonDebug", "VB_Classes\PythonDebug.pyproj", "{04F094AF-642D-4B23-8C46-0198AD9EB478}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "USBenumeration", "USBenumeration\USBenumeration.vbproj", "{124F2F50-8158-44CA-BD97-B138D766F770}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -156,6 +158,10 @@ Global
 		{48A08027-44C0-40F5-8739-C893EE6BD7D9}.Release|x64.Build.0 = Release|x64
 		{04F094AF-642D-4B23-8C46-0198AD9EB478}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{04F094AF-642D-4B23-8C46-0198AD9EB478}.Release|x64.ActiveCfg = Release|Any CPU
+		{124F2F50-8158-44CA-BD97-B138D766F770}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{124F2F50-8158-44CA-BD97-B138D766F770}.Debug|x64.Build.0 = Debug|Any CPU
+		{124F2F50-8158-44CA-BD97-B138D766F770}.Release|x64.ActiveCfg = Release|Any CPU
+		{124F2F50-8158-44CA-BD97-B138D766F770}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

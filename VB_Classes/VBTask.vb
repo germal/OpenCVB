@@ -202,6 +202,7 @@ Public Class ActiveTask : Implements IDisposable
             MyntD1000
             D435i
             D455
+            OakDCamera
         End Enum
 
         Public PythonExe As String
