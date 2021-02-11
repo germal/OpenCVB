@@ -61,7 +61,7 @@ Public Class OpenCVB
     Dim myBrush = New SolidBrush(Color.White)
     Dim myPen As New Pen(Color.White)
     Dim openCVKeywords As New List(Of String)
-    Dim optionsForm As OptionsDialog
+    Public optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
     Dim openFileForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
@@ -469,6 +469,7 @@ Public Class OpenCVB
             optionsForm.cameraIndex = 0
         End If
         If camera.devicename = "" Then camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
+
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub

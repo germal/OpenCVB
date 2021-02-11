@@ -71,8 +71,6 @@ Public Class CameraRS2
     Public deviceNum As Integer
     Dim intrinsicsLeft As rs.Intrinsics
     Public cameraName As String
-    Dim lidarRect As New cv.Rect
-    Dim lidarWidth = 1024
     Dim depthScale As Single
     Public Sub New()
     End Sub
@@ -104,7 +102,6 @@ Public Class CameraRS2
         Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
         Extrinsics_VB.rotation = extrinsics.rotation
         Extrinsics_VB.translation = extrinsics.translation
-        lidarRect = New cv.Rect((width - lidarWidth) / 2, 0, lidarWidth, height)
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
     End Sub
