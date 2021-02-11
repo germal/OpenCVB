@@ -76,7 +76,7 @@ Public Class EMax_Basics
                     em_model.CovarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
                 End If
             Next
-            em_model.TermCriteria = New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 300, 1.0)
+            em_model.TermCriteria = New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 300, 1.0)
             em_model.TrainEM(samples, Nothing, labels, Nothing)
 
             ' now classify every image pixel based on the samples.

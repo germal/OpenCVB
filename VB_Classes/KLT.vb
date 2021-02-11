@@ -6,7 +6,7 @@ Public Class KLT_Basics
     Public status As New cv.Mat
     Public outputMat As New cv.Mat
     Public circleColor = cv.Scalar.Red
-    Dim term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
+    Dim term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then

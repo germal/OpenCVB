@@ -1,6 +1,4 @@
-Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Public Class PyStream_Basics
     Inherits VBparent
@@ -18,7 +16,7 @@ Public Class PyStream_Basics
 
         ' Was this class invoked directly?  Then just run something that works with RGB and depth...
         If ocvb.pythonTaskName Is Nothing Then
-            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python/AddWeighted_Trackbar_PS.py"
+            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/AddWeighted_Trackbar_PS.py"
         End If
 
         memMap = New Python_MemMap()

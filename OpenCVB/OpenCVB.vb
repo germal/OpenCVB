@@ -48,7 +48,7 @@ Public Class OpenCVB
     Dim imgResult As New cv.Mat
     Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
-    Dim HomeDir As DirectoryInfo
+    Public HomeDir As DirectoryInfo
 
     Dim LastX As Integer
     Dim LastY As Integer
@@ -207,10 +207,12 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present.  Connect an Intel RealSense2 series camera (D455, D435i, OpenCV Oak-D, Kinect 4 Azure, MyntEyeD 1000, or StereoLabs Zed2.")
-                'End
+                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
+                       "Connect any of these cameras: " + vbCrLf + vbCrLf + "Intel RealSense2 D455" + vbCrLf + "Intel RealSense2 D435i" + vbCrLf +
+                       "OpenCV Oak-D camera" + vbCrLf + "Microsoft Kinect 4 Azure" + vbCrLf + "MyntEyeD 1000" + vbCrLf + "StereoLabs Zed2")
             End If
         End If
+
 
         ' OpenCV needs to be in the path and the librealsense and kinect open source code needs to be in the path.
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
@@ -266,6 +268,7 @@ Public Class OpenCVB
         cameraKinect = New CameraKinect
         cameraZed2 = New CameraZED2
         cameraMyntD = New CameraMyntD
+        cameraOakD = New CameraOakD
 
         updateCamera()
 

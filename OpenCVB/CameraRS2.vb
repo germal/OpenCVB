@@ -67,16 +67,9 @@ End Structure
 Public Class CameraRS2
     Inherits Camera
 
-    Public DecimationFilter As Boolean
-    Public HoleFillingFilter As Boolean
-    Public SpatialFilter As Boolean
-    Public TemporalFilter As Boolean
-    Public ThresholdFilter As Boolean
-
     Dim ctx As New rs.Context
     Public deviceNum As Integer
     Dim intrinsicsLeft As rs.Intrinsics
-    Public pc As New rs.PointCloud
     Public cameraName As String
     Dim lidarRect As New cv.Rect
     Dim lidarWidth = 1024

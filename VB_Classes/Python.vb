@@ -70,7 +70,7 @@ Public Class Python_Run
     Dim tryCount As Integer
     Public Sub New()
         initParent()
-        If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python/PythonPackages.py"
+        If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
@@ -156,7 +156,7 @@ Public Class Python_SurfaceBlit
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
         PipeTaskIndex += 1
 
-        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python/Python_SurfaceBlit.py"
+        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
         memMap = New Python_MemMap()
 
         If ocvb.parms.externalPythonInvocation Then

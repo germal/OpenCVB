@@ -9,7 +9,7 @@ Module Algorithm_Module
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
     Public PipeTaskIndex As Integer
     Public vtkTaskIndex As Integer
-    Public term As New cv.TermCriteria(cv.CriteriaType.Eps + cv.CriteriaType.Count, 10, 1.0)
+    Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public recordedData As Replay_Play
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
