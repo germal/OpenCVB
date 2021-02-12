@@ -74,6 +74,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PythonDebug", "VB_Classes\P
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "USBenumeration", "USBenumeration\USBenumeration.vbproj", "{124F2F50-8158-44CA-BD97-B138D766F770}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lsd", "LineDetector\lsd.vcxproj", "{B974EC0D-14DD-3E39-ABEE-EA30BC21FF7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -162,6 +164,10 @@ Global
 		{124F2F50-8158-44CA-BD97-B138D766F770}.Debug|x64.Build.0 = Debug|Any CPU
 		{124F2F50-8158-44CA-BD97-B138D766F770}.Release|x64.ActiveCfg = Release|Any CPU
 		{124F2F50-8158-44CA-BD97-B138D766F770}.Release|x64.Build.0 = Release|Any CPU
+		{B974EC0D-14DD-3E39-ABEE-EA30BC21FF7B}.Debug|x64.ActiveCfg = Release|x64
+		{B974EC0D-14DD-3E39-ABEE-EA30BC21FF7B}.Debug|x64.Build.0 = Release|x64
+		{B974EC0D-14DD-3E39-ABEE-EA30BC21FF7B}.Release|x64.ActiveCfg = Release|x64
+		{B974EC0D-14DD-3E39-ABEE-EA30BC21FF7B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

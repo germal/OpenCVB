@@ -1,8 +1,3 @@
-import pygame
-from pygame.locals import *
-
-from OpenGL.GL import *
-from OpenGL.GLU import *
 from lsd_ctypes import *
 import cv2 as cv
 import numpy as np
