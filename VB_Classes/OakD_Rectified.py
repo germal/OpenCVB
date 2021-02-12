@@ -90,11 +90,9 @@ while True:
     if frame_depth is not None:
         cv2.imshow("depth", frame_depth)
 
-    # data is originally represented as a flat 1D array, it needs to be converted into HxWxC form
     shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
     frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
     frame_rgb = np.ascontiguousarray(frame_rgb)
-    # frame is transformed and ready to be shown
     cv2.imshow("rgb", frame_rgb)
 
     if cv2.waitKey(1) == ord('q'):

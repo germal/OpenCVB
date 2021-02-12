@@ -90,7 +90,7 @@ Public Class CameraRS2
     Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
         width = _width
         height = _height
-        deviceName = cameraName ' devicename is used to determine that the camera has been initialized.
+        deviceName = cameraName
         cPtr = RS2Open(width, height, deviceIndex)
         depthScale = RS2DepthScale(cPtr) * 1000
         Dim intrin = RS2intrinsicsLeft(cPtr)

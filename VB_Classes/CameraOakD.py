@@ -18,6 +18,7 @@ args = parser.parse_args()
 
 pipeName = '//./pipe/' + args.pipeName
 pipeOut = open(pipeName, 'wb')
+pipeIn = open(pipeName + 'in', 'rb')
 
 pipeline = dai.Pipeline()
 
@@ -85,25 +86,12 @@ while True:
     if in_right is None: continue 
     if in_depth is None: continue
 
-    shape = (in_right.getHeight(), in_right.getWidth())
-    a = bytearray(in_left.getData().reshape(shape).astype(np.uint8))
-    pipeOut.write(a)
-
-    a = bytearray(in_right.getData().reshape(shape).astype(np.uint8))
-    pipeOut.write(a)
-
-    #shape = (in_right.getHeight(), in_right.getWidth())
-    #frame_right = in_right.getData().reshape(shape).astype(np.uint8)
-    #frame_right = np.ascontiguousarray(frame_right)
-    #cv2.imshow("rectif_right", frame_right)
-
-    a = bytearray(in_depth.getData().reshape(shape).astype(np.uint8))
-    pipeOut.write(a)
-
     shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
-    #frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
-    #frame_rgb = np.ascontiguousarray(frame_rgb)
-    a = bytearray(in_rgb.getData().reshape(shape).astype(np.uint8))
-    #cv.imshow("rgb", frame_rgb)
+    pipeOut.write(bytearray(in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)))
 
-    pipeOut.write(a)
+    shape = (in_right.getHeight(), in_right.getWidth())
+    pipeOut.write(bytearray(in_left.getData().reshape(shape).astype(np.uint8)))
+    pipeOut.write(bytearray(in_right.getData().reshape(shape).astype(np.uint8)))
+    pipeOut.write(bytearray(in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)))
+
+    frameIndex = pipeIn.read(1)
