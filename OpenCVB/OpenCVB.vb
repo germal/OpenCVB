@@ -291,8 +291,14 @@ Public Class OpenCVB
         g.DrawImage(pic.Image, 0, 0)
 
         If pixelViewerOn Then
+            Dim picTagOk As Boolean
             If pic.Tag = 2 Then
-                If mousePicTag = 3 Then pixelViewerRect.X += camPic(0).Width / ratio
+                If mousePicTag = 3 Then
+                    pixelViewerRect.X += camPic(0).Width / ratio
+                    picTagOk = True
+                End If
+            End If
+            If mousePicTag = pic.Tag Or picTagOk Then
                 g.DrawRectangle(myPen, CInt(pixelViewerRect.X * ratio), CInt(pixelViewerRect.Y * ratio),
                                        CInt(pixelViewerRect.Width * ratio), CInt(pixelViewerRect.Height * ratio))
             End If
@@ -459,6 +465,8 @@ Public Class OpenCVB
         updateCamera()
     End Sub
     Public Sub updateCamera()
+        If camera IsNot Nothing Then camera.stopCamera()
+
         ' order is same as in optionsdialog enum
         Try
             camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
@@ -469,7 +477,7 @@ Public Class OpenCVB
             camera = cameraKinect
             optionsForm.cameraIndex = 0
         End If
-        If camera.devicename = "" Then camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
+        camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
 
         camera.pipelineclosed = False
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)

@@ -213,8 +213,11 @@ Public Class CameraZED2
         End SyncLock
     End Sub
     Public Sub stopCamera()
-        pipelineClosed = True
-        frameCount = 0
-        cPtr = 0
+        SyncLock bufferLock
+            pipelineClosed = True
+            Application.DoEvents()
+            frameCount = 0
+            cPtr = 0
+        End SyncLock
     End Sub
 End Class

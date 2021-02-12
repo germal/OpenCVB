@@ -155,9 +155,12 @@ Public Class CameraKinect
         End If
     End Sub
     Public Sub stopCamera()
-        KinectClose(cPtr)
-        pipelineClosed = True
-        frameCount = 0
-        cPtr = 0
+        SyncLock bufferLock
+            pipelineClosed = True
+            Application.DoEvents()
+            KinectClose(cPtr)
+            frameCount = 0
+            cPtr = 0
+        End SyncLock
     End Sub
 End Class

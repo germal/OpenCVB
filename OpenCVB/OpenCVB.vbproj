@@ -157,7 +157,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="PythonCam.vb" />
     <Compile Include="SnapshotRequest.Designer.vb">
       <DependentUpon>SnapshotRequest.vb</DependentUpon>
     </Compile>

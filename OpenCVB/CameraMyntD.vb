@@ -191,4 +191,12 @@ Public Class CameraMyntD
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End If
     End Sub
+    Public Sub stopCamera()
+        SyncLock bufferLock
+            pipelineClosed = True
+            Application.DoEvents()
+            frameCount = 0
+            cPtr = 0
+        End SyncLock
+    End Sub
 End Class

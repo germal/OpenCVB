@@ -42,7 +42,9 @@ Public Class CameraOakD
         height = _height
         deviceName = "Oak-D"
 
-        pipeName = "OpenCVBOakDImages"
+        Static PipeTaskIndex As Integer
+        pipeName = "OpenCVBOakDImages" + CStr(PipeTaskIndex)
+        PipeTaskIndex += 1
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.In)
 
         Dim pythonApp = New FileInfo(OpenCVB.HomeDir.FullName + "VB_Classes/CameraOakD.py")
@@ -95,8 +97,9 @@ Public Class CameraOakD
         cv.Cv2.ImShow("rgb", color)
     End Sub
     Public Sub stopCamera()
-        pipelineClosed = True
-        frameCount = 0
-        cPtr = 0
+        SyncLock bufferLock
+            pipelineClosed = True
+            frameCount = 0
+        End SyncLock
     End Sub
 End Class
