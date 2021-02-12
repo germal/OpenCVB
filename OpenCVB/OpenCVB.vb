@@ -291,7 +291,8 @@ Public Class OpenCVB
         g.DrawImage(pic.Image, 0, 0)
 
         If pixelViewerOn Then
-            If mousePicTag = pic.Tag Then
+            If pic.Tag = 2 Then
+                If mousePicTag = 3 Then pixelViewerRect.X += camPic(0).Width / ratio
                 g.DrawRectangle(myPen, CInt(pixelViewerRect.X * ratio), CInt(pixelViewerRect.Y * ratio),
                                        CInt(pixelViewerRect.Width * ratio), CInt(pixelViewerRect.Height * ratio))
             End If

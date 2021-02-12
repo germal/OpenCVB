@@ -85,6 +85,10 @@ Public Class CameraOakD
             Marshal.Copy(rightBuffer, 0, rightView.Data, rightBuffer.Length)
             Marshal.Copy(depthBuffer, 0, depth16.Data, depthBuffer.Length)
             Marshal.Copy(rgbBuffer, 0, color.Data, rgbBuffer.Length)
+
+            cv.Cv2.Flip(leftView, leftView, cv.FlipMode.Y)
+            cv.Cv2.Flip(rightView, rightView, cv.FlipMode.Y)
+
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End SyncLock
 
