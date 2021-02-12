@@ -85,7 +85,7 @@ while True:
     if in_left is None: continue
     if in_right is None: continue 
     if in_depth is None: continue
-
+    
     shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
     pipeOut.write(bytearray(in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)))
 
@@ -93,5 +93,10 @@ while True:
     pipeOut.write(bytearray(in_left.getData().reshape(shape).astype(np.uint8)))
     pipeOut.write(bytearray(in_right.getData().reshape(shape).astype(np.uint8)))
     pipeOut.write(bytearray(in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)))
+
+    frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
+    frame_depth = np.ascontiguousarray(frame_depth)
+    frame_depth = cv.applyColorMap(frame_depth, cv.COLORMAP_HSV)
+    pipeOut.write(np.asarray(frame_depth))
 
     frameIndex = pipeIn.read(1)

@@ -31,7 +31,7 @@ Public Class Pixel_Viewer
             End If
 
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
-            pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType + " - updates are no more than 1 per second"
+            pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
 
             Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * pixels.Width / 650 + 3
             Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1))

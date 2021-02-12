@@ -16,9 +16,6 @@ parser.add_argument('--Height', type=int, default=720, help='Image height expect
 parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
 args = parser.parse_args()
 
-pipeName = '//./pipe/' + args.pipeName
-pipeOut = open(pipeName, 'wb')
-
 pipeline = dai.Pipeline()
 
 left = pipeline.createMonoCamera()
@@ -85,42 +82,11 @@ while True:
     if in_right is None: continue 
     if in_depth is None: continue
 
-    shape = (1, in_left.getHeight() * in_left.getWidth())
-    #frame_left = in_left.getData().reshape(shape).astype(np.uint8)
-    #frame_left = np.ascontiguousarray(frame_left)
-    a = bytearray(in_left.getData().reshape(shape).astype(np.uint8))
-    pipeOut.write(a)
-
-    a = bytearray(in_right.getData().reshape(shape).astype(np.uint8))
-    pipeOut.write(a)
-    #shape = (in_right.getHeight(), in_right.getWidth())
-    #frame_right = in_right.getData().reshape(shape).astype(np.uint8)
-    #frame_right = np.ascontiguousarray(frame_right)
-
-    a = bytearray(in_depth.getData().reshape(shape).astype(np.uint16))
-    pipeOut.write(a)
-    #frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
-    #frame_depth = np.ascontiguousarray(frame_depth)
-    #frame_depth = cv.applyColorMap(frame_depth, cv.COLORMAP_HSV)
-
-    #if frame_left is not None:
-    #    cv.imshow("rectif_left", frame_left)
-
-    #if frame_right is not None:
-    #    cv.imshow("rectif_right", frame_right)
-
-    #if frame_depth is not None:
-    #    cv.imshow("depth", frame_depth)
-
-    # data is originally represented as a flat 1D array, it needs to be converted into HxWxC form
-    shape = (3, in_left.getHeight() * in_left.getWidth())
-    a = bytearray(in_depth.getData().reshape(shape).astype(np.uint8))
-    pipeOut.write(a)
-    #shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
-    #frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
-    #frame_rgb = np.ascontiguousarray(frame_rgb)
-    # frame is transformed and ready to be shown
-    #cv.imshow("rgb", frame_rgb)
-
-    #if cv.waitKey(1) == ord('q'):
-    #    break
+    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
+    shape = (in_right.getHeight(), in_right.getWidth())
+    frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
+    frame_depth = np.ascontiguousarray(frame_depth)
+    frame_depth = cv.applyColorMap(frame_depth, cv.COLORMAP_HSV)
+    cv.imshow("depthRGB", frame_depth)
+    if cv.waitKey(1) == ord('q'):
+        break
