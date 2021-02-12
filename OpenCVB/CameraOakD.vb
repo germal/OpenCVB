@@ -51,14 +51,14 @@ Public Class CameraOakD
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.In)
         pipeSync = New NamedPipeServerStream(pipeName + "in", PipeDirection.Out)
 
-        Dim pythonApp = New FileInfo(OpenCVB.HomeDir.FullName + "VB_Classes/CameraOakD.py")
+        Dim pythonApp = New FileInfo(OpenCVB.HomeDir.FullName + "OpenCVB/CameraOakD.py")
 
         If pythonApp.Exists Then
             OakProcess = New Process
             OakProcess.StartInfo.FileName = OpenCVB.optionsForm.PythonExeName.Text
             OakProcess.StartInfo.WorkingDirectory = pythonApp.DirectoryName
             OakProcess.StartInfo.Arguments = """" + pythonApp.Name + """" + " --Width=" + CStr(width) + " --Height=" + CStr(height) + " --pipeName=" + pipeName
-            ' OakProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+            OakProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             If OakProcess.Start() = False Then
                 MsgBox("The Python script for the Oak-D interface failed to start.  Review " + pythonApp.Name)
             Else
