@@ -1177,10 +1177,8 @@ Public Class OpenCVB
             While 1
                 If saveAlgorithmName <> algName Or saveAlgorithmName = "" Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
-                If camera.newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
-                    Dim dataReady As Boolean = False
-                    On Error Resume Next
-                    SyncLock bufferLock
+                SyncLock bufferLock
+                    If camera.newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.Resize(resolutionXY)
                         task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
@@ -1228,10 +1226,9 @@ Public Class OpenCVB
                         mouseClickFlag = False
 
                         task.fileStarted = openFileStarted ' UI may have stopped play.
-                        dataReady = True
-                    End SyncLock
-                    If dataReady Then Exit While
-                End If
+                        Exit While
+                    End If
+                End SyncLock
             End While
 
             task.RunAlgorithm()
