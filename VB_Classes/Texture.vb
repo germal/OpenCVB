@@ -18,7 +18,6 @@ Public Class Texture_Basics
         grid.Run()
 
         ellipse = New Draw_Ellipses()
-        If standalone = False Then hideForm("Draw_Ellipses Slider Options")
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
     End Sub
     Public Sub Run()

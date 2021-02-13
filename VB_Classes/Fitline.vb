@@ -8,7 +8,6 @@ Public Class Fitline_Basics
         initParent()
         draw = New Draw_Line()
         draw.sliders.trackbar(0).Value = 2
-        hideForm("Draw_Line Slider Options")
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

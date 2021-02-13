@@ -273,7 +273,6 @@ Public Class PhotoShop_PlotHist
 
         hist1 = New Histogram_Basics
         hist2 = New Histogram_Basics
-        hideForm("Histogram_Basics Slider Options")
         mat2to1 = New Mat_2to1()
 
         task.desc = "Plot the histogram of the before and after white balancing"
@@ -410,7 +409,6 @@ Public Class PhotoShop_EmbossAll
         End If
         sizeSlider = findSlider("Emboss Kernel Size")
         sizeSlider.Value = 5
-        hideForm("PhotoShop_Emboss Radio Options")
 
         label1 = "The combination of all angles"
         label2 = "bottom left, bottom right, top left, top right"

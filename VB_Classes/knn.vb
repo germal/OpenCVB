@@ -137,7 +137,7 @@ Public Class KNN_1_to_1
         initParent()
 
         basics = New KNN_Basics()
-        If standalone Then basics.knnQT.useRandomData = True Else hideForm("KNN_QueryTrain Slider Options") ' with 1:1, no need to adjust train/query counts.
+        If standalone Then basics.knnQT.useRandomData = True
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"

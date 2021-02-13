@@ -449,7 +449,6 @@ Public Class Palette_Consistency
 
         hist = New Histogram_Simple()
         hist.sliders.trackbar(0).Value = 255
-        hideForm("Histogram_Simple Slider Options")
 
         lut = New LUT_Rebuild()
 
@@ -505,7 +504,6 @@ Public Class Palette_ObjectColors
         initParent()
 
         palette = New Palette_Basics()
-        hideForm("Palette_BuildGradientColorMap Slider Options")
         reduction = New Reduction_KNN_Color()
 
         task.maxRangeSlider.Value = task.maxRangeSlider.Maximum
@@ -536,9 +534,9 @@ Public Class Palette_ObjectColors
                 If countDepthPixels > 30 Then
                     Dim depth = task.depth32f(r).Mean(mask)
                     If blobList.ContainsKey(depth.Item(0)) = False Then
-                        If depth.Item(0) > minDepth And depth.Item(0) <maxDepth Then blobList.Add(depth.Item(0), i)
+                        If depth.Item(0) > minDepth And depth.Item(0) < maxDepth Then blobList.Add(depth.Item(0), i)
                     End If
-        End If
+                End If
             End If
         Next
 

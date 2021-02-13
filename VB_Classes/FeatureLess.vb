@@ -238,10 +238,10 @@ Public Class FeatureLess_Highlights
     Public Sub New()
         initParent()
         fLessP = New FeatureLess_PointTracker()
-        hideForm("Palette_BuildGradientColorMap Slider Options")
-        hideForm("Palette_Basics Radio Options")
+        Dim randomRadio = findRadio("Random - use slider to adjust")
+        randomRadio.Checked = True
         addW = New AddWeighted_Basics()
-        task.desc = "Highlight the featureless region in an RGB image"
+        task.desc = "Highlight the featureless regions in an RGB image"
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me

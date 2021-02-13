@@ -74,17 +74,6 @@ Module Algorithm_Module
         End While
         Return Nothing
     End Function
-    Public Sub hideForm(title As String)
-        'If aOptions.optionsTitle.Contains(title) Then
-        '    For i = 0 To aOptions.optionsTitle.Count - 1
-        '        If aOptions.optionsTitle(i) = title Then
-        '            aOptions.optionsTitle.RemoveAt(i)
-        '            Exit For
-        '        End If
-        '    Next
-        'End If
-        'aOptions.hiddenOptions.Add(title)
-    End Sub
     Public Function findSlider(opt As String) As TrackBar
         Try
             For Each frm In Application.OpenForms
