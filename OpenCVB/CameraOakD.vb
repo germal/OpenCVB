@@ -79,14 +79,14 @@ Public Class CameraOakD
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
     End Sub
     Public Sub GetNextFrame()
-        If pipelineClosed Then Exit Sub
-
-        If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
-        If depthBuffer.Length <> depth8bit.Total Then ReDim depthBuffer(depth8bit.Total - 1)
-        If depthRGBBuffer.Length <> RGBDepth.Total * RGBDepth.ElemSize Then ReDim depthRGBBuffer(RGBDepth.Total * RGBDepth.ElemSize - 1)
-        If leftBuffer.Length <> leftView.Total Then ReDim leftBuffer(leftView.Total - 1)
-        If rightBuffer.Length <> rightView.Total Then ReDim rightBuffer(rightView.Total - 1)
         SyncLock bufferLock
+            If pipelineClosed Then Exit Sub
+
+            If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
+            If depthBuffer.Length <> depth8bit.Total Then ReDim depthBuffer(depth8bit.Total - 1)
+            If depthRGBBuffer.Length <> RGBDepth.Total * RGBDepth.ElemSize Then ReDim depthRGBBuffer(RGBDepth.Total * RGBDepth.ElemSize - 1)
+            If leftBuffer.Length <> leftView.Total Then ReDim leftBuffer(leftView.Total - 1)
+            If rightBuffer.Length <> rightView.Total Then ReDim rightBuffer(rightView.Total - 1)
             pipeImages.Read(rgbBuffer, 0, rgbBuffer.Length)
             pipeImages.Read(leftBuffer, 0, leftBuffer.Length)
             pipeImages.Read(rightBuffer, 0, rightBuffer.Length)

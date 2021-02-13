@@ -110,36 +110,36 @@ Public Class CameraKinect
     End Sub
 
     Public Sub GetNextFrame()
-        Dim imuFrame As IntPtr
-        If pipelineClosed Or cPtr = 0 Then Exit Sub
-        imuFrame = KinectWaitFrame(cPtr)
-        If imuFrame = 0 Then
-            Console.WriteLine("KinectWaitFrame has returned without any image.")
-            failedImageCount += 1
-            Exit Sub ' just process the existing images again?  
-        Else
-            Dim imuOutput = Marshal.PtrToStructure(Of imuData)(imuFrame)
-            IMU_AngularVelocity = imuOutput.imu_Gyro
-            IMU_Acceleration = imuOutput.imuAccel
+        SyncLock bufferLock
+            Dim imuFrame As IntPtr
+            If pipelineClosed Or cPtr = 0 Then Exit Sub
+            imuFrame = KinectWaitFrame(cPtr)
+            If imuFrame = 0 Then
+                Console.WriteLine("KinectWaitFrame has returned without any image.")
+                failedImageCount += 1
+                Exit Sub ' just process the existing images again?  
+            Else
+                Dim imuOutput = Marshal.PtrToStructure(Of imuData)(imuFrame)
+                IMU_AngularVelocity = imuOutput.imu_Gyro
+                IMU_Acceleration = imuOutput.imuAccel
 
-            ' make the imu data consistent with the Intel IMU...
-            Dim tmpVal = IMU_Acceleration.Z
-            IMU_Acceleration.Z = IMU_Acceleration.X
-            IMU_Acceleration.X = -IMU_Acceleration.Y
-            IMU_Acceleration.Y = tmpVal
+                ' make the imu data consistent with the Intel IMU...
+                Dim tmpVal = IMU_Acceleration.Z
+                IMU_Acceleration.Z = IMU_Acceleration.X
+                IMU_Acceleration.X = -IMU_Acceleration.Y
+                IMU_Acceleration.Y = tmpVal
 
-            tmpVal = IMU_AngularVelocity.Z
-            IMU_AngularVelocity.Z = -IMU_AngularVelocity.X
-            IMU_AngularVelocity.X = -IMU_AngularVelocity.Y
-            IMU_AngularVelocity.Y = tmpVal
+                tmpVal = IMU_AngularVelocity.Z
+                IMU_AngularVelocity.Z = -IMU_AngularVelocity.X
+                IMU_AngularVelocity.X = -IMU_AngularVelocity.Y
+                IMU_AngularVelocity.Y = tmpVal
 
-            IMU_TimeStamp = imuOutput.accelTimeStamp / 1000
-        End If
+                IMU_TimeStamp = imuOutput.accelTimeStamp / 1000
+            End If
 
-        Dim colorBuffer = KinectRGBA(cPtr)
-        If colorBuffer <> 0 Then ' it can be zero on startup...
-            Dim colorRGBA = New cv.Mat(height, width, cv.MatType.CV_8UC4, colorBuffer)
-            SyncLock bufferLock
+            Dim colorBuffer = KinectRGBA(cPtr)
+            If colorBuffer <> 0 Then ' it can be zero on startup...
+                Dim colorRGBA = New cv.Mat(height, width, cv.MatType.CV_8UC4, colorBuffer)
                 color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                 depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, KinectRawDepth(cPtr)).Clone()
                 RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, KinectRGBdepth(cPtr)).Clone()
@@ -151,8 +151,8 @@ Public Class CameraKinect
                 ' This is less efficient than using 16-bit pixels but consistent with the other cameras
                 pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
-            End SyncLock
-        End If
+            End If
+        End SyncLock
     End Sub
     Public Sub stopCamera()
         SyncLock bufferLock

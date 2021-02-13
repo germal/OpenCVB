@@ -594,7 +594,7 @@ Public Class LineDetector_Reduction
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
         reduction.Run()
-        dst2 = lDetect.dst1
+        dst2 = reduction.dst1
 
         lDetect.src = reduction.dst1
         lDetect.Run()

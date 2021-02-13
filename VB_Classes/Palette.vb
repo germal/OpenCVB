@@ -46,12 +46,10 @@ Public Class Palette_Basics
         Static saveColorMap As Integer = -1
         If colormap = 20 Then
             saveColorMap = colormap
-            gradMap.changeColorMap = True
             gradMap.Run()
         End If
         If saveColorMap <> colormap Then
             saveColorMap = colormap
-            gradMap.changeColorMap = True
             Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
             ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
@@ -348,7 +346,6 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits VBparent
     Public gradientColorMap As New cv.Mat
-    Public changeColorMap = True
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -360,29 +357,26 @@ Public Class Palette_BuildGradientColorMap
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If changeColorMap Or standalone Then
-            changeColorMap = False
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
+        Static transitionCount As Integer = -1
+        If standalone Or transitionCount <> paletteSlider.value Then
+            transitionCount = paletteSlider.value
 
             Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-            Static transitionSlider = findSlider("Number of color transitions (Used only with Random)")
-            Static transitionCount As Integer = -1
-            If transitionCount <> transitionSlider.value Then
-                transitionCount = transitionSlider.value
-                Dim gradMat As New cv.Mat
-                For i = 0 To transitionCount - 1
-                    gradMat = colorTransition(color1, color2, src.Width)
-                    color2 = color1
-                    color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-                    If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
-                Next
-                gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
-                If standalone Or task.intermediateReview = caller Then dst2 = gradientColorMap
-            End If
-            gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
-            dst1 = Palette_Custom_Apply(src.Clone, gradientColorMap)
+            Dim gradMat As New cv.Mat
+            For i = 0 To transitionCount - 1
+                gradMat = colorTransition(color1, color2, src.Width)
+                color2 = color1
+                color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+                If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+            Next
+            gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
+            If standalone Or task.intermediateReview = caller Then dst2 = gradientColorMap
         End If
+        gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
+        dst1 = Palette_Custom_Apply(src.Clone, gradientColorMap)
     End Sub
 End Class
 

@@ -361,8 +361,8 @@ Public Class Edges_Palette
         palette = New Palette_Basics
         Dim randomRadio = findRadio("Random - use slider to adjust")
         randomRadio.Checked = True
-        Dim randomSlider = findSlider("Number of color transitions (Used only with Random)")
-        randomSlider.Value = 2
+        Dim paletteSlider = findSlider("Number of color transitions (Used only with Random)")
+        paletteSlider.Value = 2
 
         label1 = "Edges found using grayscale image"
         label2 = "Edges found after palettizing grayscale image"

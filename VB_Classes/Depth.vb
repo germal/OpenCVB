@@ -1011,11 +1011,6 @@ Public Class Depth_TooClose
     Public depth32f As cv.Mat
     Public Sub New()
         initParent()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Amount of depth padded to minimum depth (mm)", 1, 4000, 1000)
-        End If
         label2 = "Non-Zero depth mask"
         task.desc = "Tests to determine if the camera is too close"
     End Sub
@@ -1024,10 +1019,7 @@ Public Class Depth_TooClose
         depth32f = task.depth32f
         Dim maxval As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
-        dst2 = task.inrange.depthMask
-        depth32f.MinMaxLoc(minVal, maxval, minLoc, maxLoc, dst2)
-        cv.Cv2.InRange(depth32f, cv.Scalar.All(minVal), cv.Scalar.All(minVal + sliders.trackbar(0).Value), dst1)
-
+        dst1 = task.inrange.depthMask
         depth32f.MinMaxLoc(minVal, maxval, minLoc, maxLoc, dst1)
         label1 = "Min Z = " + Format(minVal, "#0") + " Max Z = " + Format(maxval, "#0")
     End Sub
@@ -1042,17 +1034,13 @@ Public Class Depth_NoiseRemovalMask
     Inherits VBparent
     Public noise As Depth_TooClose
     Public flood As FloodFill_8Bit
-    Dim padSlider As System.Windows.Forms.TrackBar
-    Public depth32fNoiseRemoved As New cv.Mat
-    Public noiseMask As cv.Mat
     Public Sub New()
         initParent()
         flood = New FloodFill_8Bit()
         noise = New Depth_TooClose()
-        padSlider = findSlider("Amount of depth padded to minimum depth (mm)")
-        hideForm("Palette_BuildGradientColorMap Slider Options")
-        hideForm("Palette_Basics Radio Options")
 
+        label1 = "Mask of all inrange depth"
+        label1 = "Solid inrange depth - noise removed"
         task.desc = "Use the 'Too Close' test to remove (some) noisy depth"
     End Sub
     Public Sub Run()
@@ -1062,15 +1050,7 @@ Public Class Depth_NoiseRemovalMask
 
         flood.src = dst1
         flood.Run()
-        dst2 = flood.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
-
-        depth32fNoiseRemoved = noise.depth32f
-        noiseMask = dst1.Clone
-        noiseMask.SetTo(0, dst2)
-        depth32fNoiseRemoved.SetTo(0, noiseMask)
-
-        label1 = "Depth values between " + Format(noise.minVal, "#0") + " and " + Format(padSlider.Value + noise.minVal, "#0")
-        label2 = "Mask of solid depth < " + CStr(padSlider.Value)
+        dst2 = flood.basics.dst2
     End Sub
 End Class
 
@@ -1080,111 +1060,25 @@ End Class
 
 
 
-Public Class Depth_TooCloseCentroids
+Public Class Depth_Noise
     Inherits VBparent
-    Dim depth As Depth_NoiseRemovalMask
-    Public tooClosePoints As New List(Of cv.Point2f)
+    Dim noiseRemover As Depth_NoiseRemovalMask
     Public Sub New()
         initParent()
-        depth = New Depth_NoiseRemovalMask()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Size of rejected rects that are likely too close", 1, 500, 250)
-            sliders.setupTrackBar(1, "Percent of zero depth in rejected rect", 1, 100, 20) ' Empircally determined - subject to change!
-        End If
-        task.desc = "Plot the rejected centroids and rects in FloodFill - search for points that are too close"
+        noiseRemover = New Depth_NoiseRemovalMask()
+        label1 = "Just the noise in the depth"
+        label2 = "Solid depth with noise removed"
+        task.desc = "Show depth with and without the depth noise from being too close."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        depth.Run()
-        dst2 = depth.noiseMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst1 = depth.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For Each pt In depth.flood.basics.rejectedCentroids
-            If pt <> New cv.Point Then dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Next
-
-        Static maxPixelSlider = findSlider("Size of rejected rects that are likely too close")
-        Static percentSlider = findSlider("Percent of zero depth in rejected rect")
-        Dim maxPixels = maxPixelSlider.value
-        Dim holes As cv.Mat = task.inrange.noDepthMask
-        Dim percentThreshold = percentSlider.value / 100
-        tooClosePoints.Clear()
-        For Each r In depth.flood.basics.rejectedRects
-            If r.Width * r.Height < maxPixels And r.Width > 0 And r.Height > 0 Then
-                ' if the rect is surrounded by largely zero depth, then it is likely noise from being too close
-                Dim percentZero = holes(r).CountNonZero() / (r.Width * r.Height)
-                If percentZero > percentThreshold Then
-                    dst2.Rectangle(r, cv.Scalar.Red, -1)
-                    tooClosePoints.Add(New cv.Point2f(r.X + r.Width / 2, r.Y + r.Height / 2))
-                End If
-            End If
-        Next
+        noiseRemover.Run()
+        dst1 = noiseRemover.dst1
+        dst2 = noiseRemover.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(0, dst2)
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Depth_TooCloseCluster
-    Inherits VBparent
-    Dim rejects As Depth_TooCloseCentroids
-    Dim knn2d As KNN_Point2d
-    Public Sub New()
-        initParent()
-        knn2d = New KNN_Point2d()
-        rejects = New Depth_TooCloseCentroids()
-        label2 = "Red are recent rejects, white older"
-        task.desc = "Cluster rejected rect's in area too close to the camera"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        rejects.Run()
-        dst1 = rejects.dst2
-
-        knn2d.knn.knnQT.trainingPoints = New List(Of cv.Point2f)(knn2d.knn.knnQT.queryPoints)
-        knn2d.knn.knnQT.queryPoints = New List(Of cv.Point2f)(rejects.tooClosePoints)
-        knn2d.Run()
-        If ocvb.frameCount Mod 10 = 0 Then dst2.SetTo(0)
-        For i = 0 To knn2d.knn.knnQT.queryPoints.Count - 1
-            Dim qPoint = knn2d.knn.knnQT.queryPoints.ElementAt(i)
-            cv.Cv2.Circle(dst2, qPoint, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-            Dim pt = knn2d.knn.knnQT.trainingPoints.ElementAt(knn2d.knn.neighbors.Get(Of Single)(i, 0))
-            cv.Cv2.Circle(dst2, pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-            Dim distance = Math.Sqrt((pt.X - qPoint.X) * (pt.X - qPoint.X) + (pt.Y - qPoint.Y) * (pt.Y - qPoint.Y))
-            If distance < src.Width / 10 Then dst2.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Depth_NoiseRemovedAndColorized
-    Inherits VBparent
-    Dim colorize As Depth_Colorizer_CPP
-    Dim depth As Depth_NoiseRemovalMask
-    Public Sub New()
-        initParent()
-        colorize = New Depth_Colorizer_CPP()
-        depth = New Depth_NoiseRemovalMask()
-        label2 = "Solid depth (white) with likely noise (white pixels)"
-        task.desc = "Colorize Depth after some noise has been removed."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        depth.Run()
-        dst2 = depth.dst1
-
-        colorize.src = depth.depth32fNoiseRemoved
-        colorize.Run()
-        dst1 = colorize.dst1
-    End Sub
-End Class
 
 
 

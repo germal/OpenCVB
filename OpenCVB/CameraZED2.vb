@@ -160,10 +160,10 @@ Public Class CameraZED2
     End Sub
 
     Public Sub GetNextFrame()
-        If pipelineClosed Or cPtr = 0 Then Exit Sub
         Zed2WaitForFrame(cPtr)
 
         SyncLock bufferLock
+            If pipelineClosed Or cPtr = 0 Then Exit Sub
             Zed2GetData(cPtr)
 
             color = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()

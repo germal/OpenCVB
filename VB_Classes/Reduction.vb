@@ -7,6 +7,7 @@ Public Class Reduction_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Reduction factor", 0, 4096, 64)
+            sliders.setupTrackBar(1, "Bits to remove in bitwise reduction", 0, 7, 3)
         End If
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -23,31 +24,18 @@ Public Class Reduction_Basics
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         Dim reductionVal = CInt(reductionSlider.Value)
-        Dim power As Integer
-        label2 = ""
-        If radio.check(0).Checked Then
-            Dim nearestPowerOf2 = Math.Round(Math.Log(reductionVal, 2))
-            If nearestPowerOf2 = Double.NegativeInfinity Then nearestPowerOf2 = 0
-            power = Choose(nearestPowerOf2 + 1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096)
-            maskVal = power - 1
-            If src.Type = cv.MatType.CV_32S Then maskVal = Integer.MaxValue - power + 1
-            Dim tmp = New cv.Mat(src.Size, src.Type, cv.Scalar.All(maskval))
+        Static bitwiseCheck = findRadio("Use bitwise reduction")
+        Static simpleCheck = findRadio("Use simple reduction")
+        If bitwiseCheck.Checked Then
+            Static bitSlider = findSlider("Bits to remove in bitwise reduction")
+            Dim zeroBits = Math.Pow(2, bitSlider.value) - 1
+            Dim tmp = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
             cv.Cv2.BitwiseAnd(src, tmp, dst1)
-        ElseIf radio.check(1).Checked Then
+        ElseIf simpleCheck.Checked Then
             If reductionVal = 0 Then reductionVal = 1
             dst1 = src / reductionVal
             dst1 *= reductionVal
-            If dst1.Type = cv.MatType.CV_8U Or dst1.Type = cv.MatType.CV_8UC3 Then
-                Dim gray = If(dst1.Channels = 3, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst1)
-                Static lastFrame As cv.Mat = gray
-                cv.Cv2.Absdiff(gray, lastFrame, dst2)
-                dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-                lastFrame = gray
-                label1 = If(radio.check(1).Checked, "Reduced image - factor = " + CStr(reductionVal), "Reduced color image after zero'ing bit(s) 0x" + Hex(power))
-                label2 = "Unstable after reduction"
-            Else
-                label1 = "Reduced 32S image after zero'ing bit(s) 0x" + Hex(power)
-            End If
+            label1 = "Reduced image - factor = " + CStr(reductionVal)
         Else
             dst1 = src
             label1 = "No reduction requested"
@@ -256,7 +244,8 @@ Public Class Reduction_PointCloud
         initParent()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
-        label1 = "dst1 = reduced depth, dst2 = reduced pointcloud"
+        label1 = "Reduced depth"
+        label2 = "Pointcloud with reduced z-Depth"
         task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run()
