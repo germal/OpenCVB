@@ -2057,6 +2057,7 @@ ntuple_list LineSegmentDetection( image_double image, double scale,
  */
 ntuple_list lsd_scale(image_double image, double scale)
 {
+    printf("test3\n");
     /* LSD parameters */
     double sigma_scale = 0.6; /* Sigma for Gaussian filter is computed as
                                 sigma = sigma_scale/scale.                    */
@@ -2081,6 +2082,7 @@ ntuple_list lsd_scale(image_double image, double scale)
  */
 ntuple_list lsd(image_double image)
 {
+    printf("test2\n");
     /* LSD parameters */
     double scale = 0.8;       /* Scale the image by Gaussian filter to 'scale'. */
 
@@ -2106,6 +2108,8 @@ void writeNtl(ntuple_list ntl, char* file)
 }
 
 void lsdGet(double* src, int rows, int cols, char* file) {
+    while (1)
+        printf("test1\n");
     image_double image = new_image_double(cols, rows);
     image->data = src;
     ntuple_list ntl = lsd(image);

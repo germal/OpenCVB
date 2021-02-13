@@ -1177,60 +1177,58 @@ Public Class OpenCVB
             While 1
                 If saveAlgorithmName <> algName Or saveAlgorithmName = "" Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
-                If camera.newImagesAvailable And pauseAlgorithmThread = False Then
+                If camera.newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
                     Dim dataReady As Boolean = False
                     On Error Resume Next
                     SyncLock bufferLock
                         ' bring the data into the algorithm task.
                         task.color = camera.color.Resize(resolutionXY)
-                        If task.color.Width > 0 Then
-                            task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
-                            task.leftView = camera.leftView.Resize(resolutionXY)
-                            task.rightView = camera.rightView.Resize(resolutionXY)
-                            task.pointCloud = camera.PointCloud.clone.resize(resolutionXY)
-                            task.depth16 = camera.depth16.clone
+                        task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
+                        task.leftView = camera.leftView.Resize(resolutionXY)
+                        task.rightView = camera.rightView.Resize(resolutionXY)
+                        task.pointCloud = camera.PointCloud.clone.resize(resolutionXY)
+                        task.depth16 = camera.depth16.clone
 
-                            task.transformationMatrix = camera.transformationMatrix
-                            task.IMU_TimeStamp = camera.IMU_TimeStamp
-                            task.IMU_Barometer = camera.IMU_Barometer
-                            task.IMU_Magnetometer = camera.IMU_Magnetometer
-                            task.IMU_Temperature = camera.IMU_Temperature
-                            task.IMU_Rotation = camera.IMU_Rotation
-                            task.IMU_Translation = camera.IMU_Translation
-                            task.IMU_Acceleration = camera.IMU_Acceleration
-                            task.IMU_Velocity = camera.IMU_Velocity
-                            task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                            task.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                            task.IMU_FrameTime = camera.IMU_FrameTime
-                            task.CPU_TimeStamp = camera.CPU_TimeStamp
-                            task.CPU_FrameTime = camera.CPU_FrameTime
-                            task.intermediateReview = intermediateReview
-                            task.ratioImageToCampic = ratioImageToCampic
-                            task.pixelViewerOn = pixelViewerOn
-                            camera.newImagesAvailable = False
+                        task.transformationMatrix = camera.transformationMatrix
+                        task.IMU_TimeStamp = camera.IMU_TimeStamp
+                        task.IMU_Barometer = camera.IMU_Barometer
+                        task.IMU_Magnetometer = camera.IMU_Magnetometer
+                        task.IMU_Temperature = camera.IMU_Temperature
+                        task.IMU_Rotation = camera.IMU_Rotation
+                        task.IMU_Translation = camera.IMU_Translation
+                        task.IMU_Acceleration = camera.IMU_Acceleration
+                        task.IMU_Velocity = camera.IMU_Velocity
+                        task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                        task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                        task.IMU_FrameTime = camera.IMU_FrameTime
+                        task.CPU_TimeStamp = camera.CPU_TimeStamp
+                        task.CPU_FrameTime = camera.CPU_FrameTime
+                        task.intermediateReview = intermediateReview
+                        task.ratioImageToCampic = ratioImageToCampic
+                        task.pixelViewerOn = pixelViewerOn
+                        camera.newImagesAvailable = False
 
-                            If GrabRectangleData Then
-                                GrabRectangleData = False
-                                Dim ratio = ratioImageToCampic
-                                task.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-                                If task.drawRect.Width <= 2 Then task.drawRect.Width = 0 ' too small?
-                                Dim w = task.color.Width
-                                If task.drawRect.X > w Then task.drawRect.X -= w
-                                If task.drawRect.X < w And task.drawRect.X + task.drawRect.Width > w Then
-                                    task.drawRect.Width = w - task.drawRect.X
-                                End If
-                                BothFirstAndLastReady = False
+                        If GrabRectangleData Then
+                            GrabRectangleData = False
+                            Dim ratio = ratioImageToCampic
+                            task.drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                            If task.drawRect.Width <= 2 Then task.drawRect.Width = 0 ' too small?
+                            Dim w = task.color.Width
+                            If task.drawRect.X > w Then task.drawRect.X -= w
+                            If task.drawRect.X < w And task.drawRect.X + task.drawRect.Width > w Then
+                                task.drawRect.Width = w - task.drawRect.X
                             End If
-
-                            task.mousePoint = mousePoint
-                            task.mousePicTag = mousePicTag
-                            task.mouseClickFlag = mouseClickFlag
-                            If mouseClickFlag Then task.mouseClickPoint = mousePoint
-                            mouseClickFlag = False
-
-                            task.fileStarted = openFileStarted ' UI may have stopped play.
-                            dataReady = True
+                            BothFirstAndLastReady = False
                         End If
+
+                        task.mousePoint = mousePoint
+                        task.mousePicTag = mousePicTag
+                        task.mouseClickFlag = mouseClickFlag
+                        If mouseClickFlag Then task.mouseClickPoint = mousePoint
+                        mouseClickFlag = False
+
+                        task.fileStarted = openFileStarted ' UI may have stopped play.
+                        dataReady = True
                     End SyncLock
                     If dataReady Then Exit While
                 End If
