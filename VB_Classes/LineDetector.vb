@@ -16,7 +16,7 @@ Public Class LineDetector_Basics
             sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
         End If
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        label1 = "Manually drawn"
+        label1 = "Yellow > length threshold, red < length threshold"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run()

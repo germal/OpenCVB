@@ -9,22 +9,26 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     rows, cols = gray.shape
     gray64 = np.float64(gray)
     gray64 = gray64.reshape(1, gray.shape[0] * gray.shape[1]).tolist()[0]
-    temp = 'c:/temp/testLSD.txt' # os.path.abspath(str(np.random.randint(1, 1000000)) + 'ntl.txt').replace('\\', '/')
 
     lens = len(gray64)
     gray64 = (ctypes.c_double * lens)(*gray64)
-    lsdlib.lsdGet(gray64, ctypes.c_int(rows), ctypes.c_int(cols), temp)
+    lsdlib.lsdGet(gray64, ctypes.c_int(rows), ctypes.c_int(cols))
 
-    fp = open(temp, 'r')
+    fp = open("c:/temp/ntuples.txt", 'r')
     cnt = fp.read().strip().split(' ')
     fp.close()
-    os.remove(temp)
-    print(gray.shape)
+    os.remove("c:/temp/ntuples.txt")
 
     count = int(cnt[0])
     dim = int(cnt[1])
     lines = np.array([float(each) for each in cnt[2:]])
     lines = lines.reshape(count, dim)
+    for i in range(lines.shape[0]):
+        pt1 = (int(lines[i, 0]), int(lines[i, 1]))
+        pt2 = (int(lines[i, 2]), int(lines[i, 3]))
+        width = lines[i, 4]
+        cv.line(imgRGB, pt1, pt2, (0, 0, 255), int(np.ceil(width / 2)))
+    cv.imshow("LineDetector_PS.py", imgRGB)
 
 from PyStream import PyStreamRun
 cv.namedWindow(title_window)

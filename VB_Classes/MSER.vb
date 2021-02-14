@@ -95,7 +95,7 @@ Public Class MSER_Options
             sliders.setupTrackBar(5, "MSER Max Evolution", 1, 1000, 200)
             sliders.setupTrackBar(6, "MSER Area Threshold", 1, 101, 101)
             sliders.setupTrackBar(7, "MSER Min Margin", 1, 100, 3)
-            sliders.setupTrackBar(8, "MSER Edge Blursize", 1, 20, 5)
+            sliders.setupTrackBar(8, "MSER Edge BlurSize", 1, 20, 5)
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -126,8 +126,8 @@ Public Class MSER_Options
         Dim changedParms As Boolean
         For i = 0 To saveParms.Length - 1
             Dim nextVal = Choose(i + 1, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value,
-                                          sliders.trackbar(4).Value, sliders.trackbar(5).Value, sliders.trackbar(6).Value, sliders.trackbar(7).Value,
-                                          sliders.trackbar(8).Value, check.Box(0).Checked)
+                                        sliders.trackbar(4).Value, sliders.trackbar(5).Value, sliders.trackbar(6).Value, sliders.trackbar(7).Value,
+                                        sliders.trackbar(8).Value, check.Box(0).Checked)
             If nextVal <> saveParms(i) Then changedParms = True
             saveParms(i) = nextVal
         Next
