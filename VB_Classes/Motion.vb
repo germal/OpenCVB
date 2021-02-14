@@ -296,9 +296,11 @@ End Class
 Public Class Motion_DepthShadow
     Inherits VBparent
     Dim motion As Motion_Basics
+    Dim noiseRemover As Depth_NoiseRemovalMask
     Dim dMin As Depth_SmoothMin
     Public Sub New()
         initParent()
+        noiseRemover = New Depth_NoiseRemovalMask
         motion = New Motion_Basics
         dMin = New Depth_SmoothMin
 
@@ -312,17 +314,19 @@ Public Class Motion_DepthShadow
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        noiseRemover.src = src
+        noiseRemover.Run()
 
-        task.inrange.nodepthMask.convertto(dMin.src, cv.MatType.CV_32F)
+        ' task.inrange.nodepthMask.convertto(dMin.src, cv.MatType.CV_32F)
+        dMin.src = noiseRemover.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dMin.Run()
-        dst2 = dMin.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = dMin.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         motion.src = dst2
         motion.Run()
         dst1 = motion.dst2
 
-        Dim tmp = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        label2 = "Shadow that is consistently present. " + CStr(tmp.CountNonZero) + " pixels"
+        label2 = "Shadow that is consistently present. " + Format(dst2.CountNonZero / 1000, "#,##0") + "k pixels"
     End Sub
 End Class
 
@@ -366,9 +370,8 @@ Public Class Motion_ThruCorrelation
         Dim stdevThreshold = stdevSlider.value
 
         dst2.SetTo(0)
-        'Parallel.For(0, grid.roiList.Count,
-        'Sub(i)
-        For i = 0 To grid.roiList.Count - 1
+        Parallel.For(0, grid.roiList.Count,
+        Sub(i)
             Dim roi = grid.roiList(i)
             Dim correlation As New cv.Mat
             Dim mean As Single, stdev As Single
@@ -378,25 +381,22 @@ Public Class Motion_ThruCorrelation
                 Dim minVal As Single, maxVal As Single
                 correlation.MinMaxLoc(minVal, maxVal)
                 If maxVal < ccThreshold / 1000 Then
-                    If i Mod grid.tilesPerRow <> 0 Then dst2(grid.roiList(i - 1)).SetTo(255)
-                    If i Mod grid.tilesPerRow < (grid.tilesPerRow - 1) Then dst2(grid.roiList(i + 1)).SetTo(255)
+                    If (i Mod grid.tilesPerRow) <> 0 Then dst2(grid.roiList(i - 1)).SetTo(255)
+                    If (i Mod grid.tilesPerRow) < grid.tilesPerRow Then dst2(grid.roiList(i + 1)).SetTo(255)
                     If i > grid.tilesPerRow Then
                         dst2(grid.roiList(i - grid.tilesPerRow)).SetTo(255)
-                        dst2(grid.roiList(i - grid.tilesPerRow - 1)).SetTo(255)
                         dst2(grid.roiList(i - grid.tilesPerRow + 1)).SetTo(255)
                     End If
                     If i < (grid.roiList.Count - grid.tilesPerRow - 1) Then
                         dst2(grid.roiList(i + grid.tilesPerRow)).SetTo(255)
-                        dst2(grid.roiList(i + grid.tilesPerRow - 1)).SetTo(255)
                         dst2(grid.roiList(i + grid.tilesPerRow + 1)).SetTo(255)
                     End If
                     dst2(roi).SetTo(255)
                 End If
             End If
-        Next
-        ' End Sub)
+        End Sub)
 
-        lastFrame = input.Clone
+            lastFrame = input.Clone
 
         If standalone Then
             addw.src = input
