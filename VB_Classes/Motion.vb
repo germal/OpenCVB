@@ -366,8 +366,9 @@ Public Class Motion_ThruCorrelation
         Dim stdevThreshold = stdevSlider.value
 
         dst2.SetTo(0)
-        Parallel.For(0, grid.roiList.Count,
-        Sub(i)
+        'Parallel.For(0, grid.roiList.Count,
+        'Sub(i)
+        For i = 0 To grid.roiList.Count - 1
             Dim roi = grid.roiList(i)
             Dim correlation As New cv.Mat
             Dim mean As Single, stdev As Single
@@ -384,7 +385,7 @@ Public Class Motion_ThruCorrelation
                         dst2(grid.roiList(i - grid.tilesPerRow - 1)).SetTo(255)
                         dst2(grid.roiList(i - grid.tilesPerRow + 1)).SetTo(255)
                     End If
-                    If i < (grid.roiList.Count - grid.tilesPerRow) Then
+                    If i < (grid.roiList.Count - grid.tilesPerRow - 1) Then
                         dst2(grid.roiList(i + grid.tilesPerRow)).SetTo(255)
                         dst2(grid.roiList(i + grid.tilesPerRow - 1)).SetTo(255)
                         dst2(grid.roiList(i + grid.tilesPerRow + 1)).SetTo(255)
@@ -392,7 +393,8 @@ Public Class Motion_ThruCorrelation
                     dst2(roi).SetTo(255)
                 End If
             End If
-        End Sub)
+        Next
+        ' End Sub)
 
         lastFrame = input.Clone
 
