@@ -498,7 +498,8 @@ Public Class OpenCVB
     Private Sub startCamera()
         If cameraTaskHandle IsNot Nothing Then
             stopCameraThread = True
-            cameraTaskHandle = Nothing
+            camera.stopCamera()
+            cameraTaskHandle.Abort()
         End If
 
         ' order is same as in optionsdialog enum
@@ -522,7 +523,6 @@ Public Class OpenCVB
                 End SyncLock
                 cameraRefresh = True ' trigger the paint 
                 newImagesAvailable = True ' trigger the algorithm task
-                If stopCameraThread Then Exit While
                 Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
                 Me.Invoke(delegateX)
 
@@ -531,7 +531,6 @@ Public Class OpenCVB
                 GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
             End While
         End SyncLock
-        taskCam.stopCamera()
     End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         TreeButton.Checked = Not TreeButton.Checked
