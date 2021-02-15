@@ -2106,7 +2106,6 @@ void writeNtl(ntuple_list ntl, wchar_t *file)
 using namespace std;
 extern "C" __declspec(dllexport)
 void lsdGet(double* src, int rows, int cols, wchar_t *file) {
-    printf("input name = %ls\n", file);
     image_double image = new_image_double(cols, rows);
     image->data = src;
     ntuple_list ntl = lsd(image);
