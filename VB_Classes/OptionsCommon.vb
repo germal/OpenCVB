@@ -78,7 +78,7 @@ Public Class OptionsCommon_Depth
         cv.Cv2.InRange(task.depth32f, minVal, maxVal, depthMask)
         cv.Cv2.BitwiseNot(depthMask, noDepthMask)
         dst1 = task.depth32f.SetTo(0, noDepthMask)
-        task.pointCloud.SetTo(0, noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
+        If task.pointCloud.Width = noDepthMask.Width Then task.pointCloud.SetTo(0, noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
     End Sub
 End Class
 
