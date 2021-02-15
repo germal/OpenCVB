@@ -2,7 +2,6 @@
 Imports System.Numerics
 Imports rs = Intel.Realsense
 Public Class Camera
-    Public pipelineClosed As Boolean = False
     Public transformationMatrix() As Single
     Public IMU_Barometer As Single
     Public IMU_Magnetometer As cv.Point3f
@@ -47,7 +46,6 @@ Public Class Camera
     Public failedImageCount As Integer
     Public modelInverse As Boolean
     Public newImagesAvailable As Boolean
-    Public cPtr As IntPtr
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single

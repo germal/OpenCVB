@@ -72,6 +72,7 @@ Public Class CameraRS2
     Dim intrinsicsLeft As rs.Intrinsics
     Public cameraName As String
     Dim depthScale As Single
+    Public cPtr As IntPtr
     Public Sub New()
     End Sub
     Public Function queryDeviceCount() As Integer
@@ -106,10 +107,9 @@ Public Class CameraRS2
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
     End Sub
     Public Sub GetNextFrame()
-        RS2WaitForFrame(cPtr)
-
         SyncLock bufferLock
-            If pipelineClosed Or cPtr = 0 Then Exit Sub
+            If cPtr = 0 Then Exit Sub
+            RS2WaitForFrame(cPtr)
             color = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone()
 
             Dim accelFrame = RS2Accel(cPtr)
@@ -132,7 +132,6 @@ Public Class CameraRS2
     End Sub
     Public Sub stopCamera()
         SyncLock bufferLock
-            pipelineClosed = True
             Application.DoEvents()
             RS2Stop(cPtr)
             frameCount = 0

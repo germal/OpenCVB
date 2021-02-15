@@ -29,6 +29,7 @@ Public Class CameraOakD
     Public cameraName As String
     Dim depth8bit As New cv.Mat()
     Dim OakProcess As Process
+    Dim pipelineClosed As Boolean = True
     Public Sub New()
     End Sub
     Public Function queryDeviceCount() As Integer
@@ -77,11 +78,11 @@ Public Class CameraOakD
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U)
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U)
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
+        pipelineClosed = False
     End Sub
     Public Sub GetNextFrame()
         SyncLock bufferLock
             If pipelineClosed Then Exit Sub
-
             If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
             If depthBuffer.Length <> depth8bit.Total Then ReDim depthBuffer(depth8bit.Total - 1)
             If depthRGBBuffer.Length <> RGBDepth.Total * RGBDepth.ElemSize Then ReDim depthRGBBuffer(RGBDepth.Total * RGBDepth.ElemSize - 1)

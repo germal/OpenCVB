@@ -71,6 +71,7 @@ End Module
 Public Class CameraMyntD
     Inherits Camera
     Public cameraName As String
+    Public cPtr As IntPtr
     Structure MyntIntrinsics
         Dim width As UShort
         Dim height As UShort
@@ -161,7 +162,7 @@ Public Class CameraMyntD
     Public Sub GetNextFrame()
         If frameCount = 10 And width = 640 Then initialize(640, 480, 30)
         SyncLock bufferLock
-            If pipelineClosed Or cPtr = 0 Then Exit Sub
+            If cPtr = 0 Then Exit Sub
             Dim imagePtr = MyntDWaitFrame(cPtr)
             Dim acc = MyntDAcceleration(cPtr)
             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
@@ -193,7 +194,6 @@ Public Class CameraMyntD
     End Sub
     Public Sub stopCamera()
         SyncLock bufferLock
-            pipelineClosed = True
             Application.DoEvents()
             frameCount = 0
             cPtr = 0

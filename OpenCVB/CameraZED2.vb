@@ -87,6 +87,7 @@ End Module
 Public Class CameraZED2
     Inherits Camera
     Public cameraName As String
+    Public cPtr As IntPtr
     Structure intrinsicsLeftZed
         Dim fx As Single ' Focal length x */
         Dim fy As Single ' Focal length y */
@@ -163,7 +164,7 @@ Public Class CameraZED2
         Zed2WaitForFrame(cPtr)
 
         SyncLock bufferLock
-            If pipelineClosed Or cPtr = 0 Then Exit Sub
+            If cPtr = 0 Then Exit Sub
             Zed2GetData(cPtr)
 
             color = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()
@@ -214,8 +215,6 @@ Public Class CameraZED2
     End Sub
     Public Sub stopCamera()
         SyncLock bufferLock
-            pipelineClosed = True
-            Application.DoEvents()
             frameCount = 0
             cPtr = 0
         End SyncLock

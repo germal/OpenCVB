@@ -45,6 +45,7 @@ End Module
 Public Class CameraKinect
     Inherits Camera
     Public cameraName As String
+    Public cPtr As IntPtr
     Structure imuData
         Dim temperature As Single
         Dim imuAccel As cv.Point3f
@@ -80,7 +81,6 @@ Public Class CameraKinect
             deviceCount = KinectDeviceCount(cPtr)
             Dim strPtr = KinectDeviceName(cPtr) ' The width and height of the image are set in the constructor.
             serialNumber = Marshal.PtrToStringAnsi(strPtr)
-            leftView = New cv.Mat
 
             Dim ptr = KinectExtrinsics(cPtr)
             Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(ptr)
@@ -105,14 +105,13 @@ Public Class CameraKinect
             intrinsicsRight_VB = intrinsicsLeft_VB ' there is no right lens - just copy for compatibility.
 
             ReDim RGBDepthBytes(width * height * 3 - 1)
-            pointCloud = New cv.Mat()
         End If
     End Sub
 
     Public Sub GetNextFrame()
         SyncLock bufferLock
             Dim imuFrame As IntPtr
-            If pipelineClosed Or cPtr = 0 Then Exit Sub
+            If cPtr = 0 Then Exit Sub
             imuFrame = KinectWaitFrame(cPtr)
             If imuFrame = 0 Then
                 Console.WriteLine("KinectWaitFrame has returned without any image.")
@@ -145,18 +144,24 @@ Public Class CameraKinect
                 RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, KinectRGBdepth(cPtr)).Clone()
                 ' if you normalize here instead of just a fixed multiply, the image will pulse with different brightness values.  Not pretty.
                 leftView = (New cv.Mat(height, width, cv.MatType.CV_16U, KinectLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs() ' so depth data fits into 0-255 (approximately)
-                rightView = leftView
+                rightView = leftView.Clone()
 
                 Dim pc = New cv.Mat(height, width, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
                 ' This is less efficient than using 16-bit pixels but consistent with the other cameras
                 pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
+            Else
+                color = New cv.Mat(height, width, cv.MatType.CV_8UC3)
+                depth16 = New cv.Mat(height, width, cv.MatType.CV_16U)
+                RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3)
+                leftView = New cv.Mat(height, width, cv.MatType.CV_8UC1)
+                rightView = New cv.Mat(height, width, cv.MatType.CV_8UC1)
+                pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
             End If
         End SyncLock
     End Sub
     Public Sub stopCamera()
         SyncLock bufferLock
-            pipelineClosed = True
             Application.DoEvents()
             KinectClose(cPtr)
             frameCount = 0

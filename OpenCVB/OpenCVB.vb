@@ -270,7 +270,7 @@ Public Class OpenCVB
         cameraMyntD = New CameraMyntD
         cameraOakD = New CameraOakD
 
-        updateCamera()
+        startCamera()
 
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
         optionsForm.enableCameras()
@@ -460,12 +460,13 @@ Public Class OpenCVB
             AvailableAlgorithms.SelectedItem = item.Name
         End If
     End Sub
-    Private Sub RestartCamera()
-        cameraTaskHandle = Nothing
-        updateCamera()
-    End Sub
-    Public Sub updateCamera()
-        If camera IsNot Nothing Then camera.stopCamera()
+    Private Sub startCamera()
+        If cameraTaskHandle IsNot Nothing Then
+            stopCameraThread = True
+            Thread.Sleep(200)
+            cameraTaskHandle = Nothing
+            camera.stopCamera()
+        End If
 
         ' order is same as in optionsdialog enum
         Try
@@ -479,7 +480,11 @@ Public Class OpenCVB
         End If
         camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
 
-        camera.pipelineclosed = False
+        cameraTaskHandle = New Thread(AddressOf CameraTask)
+        cameraTaskHandle.Name = "CameraTask"
+        cameraTaskHandle.Priority = ThreadPriority.Highest
+        cameraTaskHandle.Start()
+
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
@@ -973,7 +978,6 @@ Public Class OpenCVB
         Clipboard.SetImage(img)
     End Sub
     Private Sub CameraTask()
-        stopCameraThread = True ' stop the current camera task
         SyncLock cameraThreadLock
             stopCameraThread = False
             While stopCameraThread = False
@@ -989,7 +993,6 @@ Public Class OpenCVB
                 totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
                 GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
             End While
-            camera.frameCount = 0
         End SyncLock
     End Sub
 
@@ -1032,7 +1035,7 @@ Public Class OpenCVB
                 Next
                 If saveCameraIndex <> cameraIndex Then
                     optionsForm.cameraIndex = cameraIndex
-                    RestartCamera()
+                    StartCamera()
                 End If
             End If
         End If
@@ -1060,7 +1063,7 @@ Public Class OpenCVB
         If OKcancel = DialogResult.OK Then
             optionsForm.saveResolution()
             optionsForm.TestEnableNumPy()
-            If saveCurrentCamera <> optionsForm.cameraIndex Or camera.width <> resolutionXY.Width Then RestartCamera()
+            If saveCurrentCamera <> optionsForm.cameraIndex Or camera.width <> resolutionXY.Width Then StartCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
             LineUpCamPics(resizing:=False)
@@ -1102,13 +1105,6 @@ Public Class OpenCVB
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
-
-        If cameraTaskHandle Is Nothing Then
-            cameraTaskHandle = New Thread(AddressOf CameraTask)
-            cameraTaskHandle.Name = "CameraTask"
-            cameraTaskHandle.Priority = ThreadPriority.Highest
-            cameraTaskHandle.Start()
-        End If
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         saveAlgorithmName = AvailableAlgorithms.Text
@@ -1179,6 +1175,7 @@ Public Class OpenCVB
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 SyncLock bufferLock
                     If camera.newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
+                        camera.newImagesAvailable = False
                         ' bring the data into the algorithm task.
                         task.color = camera.color.Resize(resolutionXY)
                         task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
@@ -1204,7 +1201,6 @@ Public Class OpenCVB
                         task.intermediateReview = intermediateReview
                         task.ratioImageToCampic = ratioImageToCampic
                         task.pixelViewerOn = pixelViewerOn
-                        camera.newImagesAvailable = False
 
                         If GrabRectangleData Then
                             GrabRectangleData = False
