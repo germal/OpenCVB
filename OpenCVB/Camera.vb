@@ -45,7 +45,6 @@ Public Class Camera
     Public deviceIndex As Integer
     Public failedImageCount As Integer
     Public modelInverse As Boolean
-    Public newImagesAvailable As Boolean
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -109,6 +108,5 @@ Public Class Camera
         lastCPUTime = CPU_TimeStamp
 
         frameCount += 1
-        newImagesAvailable = True
     End Sub
 End Class

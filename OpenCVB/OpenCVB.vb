@@ -38,6 +38,7 @@ Public Class OpenCVB
     Dim cameraTaskHandle As Thread
     Dim camPic(3 - 1) As PictureBox
     Dim cameraRefresh As Boolean
+    Dim newImagesAvailable As Boolean
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Integer
     Dim DrawingRectangle As Boolean
@@ -66,7 +67,7 @@ Public Class OpenCVB
     Dim openFileForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
-    Public resolutionXY As cv.Size
+    Public workingRes As cv.Size
     Dim stopCameraThread As Boolean
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
@@ -463,22 +464,12 @@ Public Class OpenCVB
     Private Sub startCamera()
         If cameraTaskHandle IsNot Nothing Then
             stopCameraThread = True
-            Thread.Sleep(200)
             cameraTaskHandle = Nothing
-            camera.stopCamera()
         End If
 
         ' order is same as in optionsdialog enum
-        Try
-            camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
-        Catch ex As Exception
-            camera = cameraKinect
-        End Try
-        If camera Is Nothing Then
-            camera = cameraKinect
-            optionsForm.cameraIndex = 0
-        End If
-        camera.initialize(resolutionXY.Width, resolutionXY.Height, fps)
+        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
+        camera.initialize(workingRes.Width, workingRes.Height, fps)
 
         cameraTaskHandle = New Thread(AddressOf CameraTask)
         cameraTaskHandle.Name = "CameraTask"
@@ -486,6 +477,27 @@ Public Class OpenCVB
         cameraTaskHandle.Start()
 
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
+    End Sub
+    Private Sub CameraTask()
+        Dim taskCam = camera
+        SyncLock cameraThreadLock
+            stopCameraThread = False
+            While stopCameraThread = False
+                SyncLock bufferLock
+                    taskCam.GetNextFrame()
+                End SyncLock
+                cameraRefresh = True ' trigger the paint 
+                newImagesAvailable = True ' trigger the algorithm task
+                If stopCameraThread Then Exit While
+                Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
+                Me.Invoke(delegateX)
+
+                Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+                totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
+                GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
+            End While
+        End SyncLock
+        taskCam.stopCamera()
     End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         TreeButton.Checked = Not TreeButton.Checked
@@ -555,8 +567,8 @@ Public Class OpenCVB
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
 
-        Dim defaultWidth = resolutionXY.Width * 2 + border * 7
-        Dim defaultHeight = resolutionXY.Height * 2 + ToolStrip1.Height + border * 12
+        Dim defaultWidth = workingRes.Width * 2 + border * 7
+        Dim defaultHeight = workingRes.Height * 2 + ToolStrip1.Height + border * 12
         Me.Width = GetSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", defaultWidth)
         Me.Height = GetSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", defaultHeight)
         If Me.Height < 50 Then
@@ -568,7 +580,7 @@ Public Class OpenCVB
 
         For i = 0 To camPic.Length - 1
             If camPic(i) Is Nothing Then camPic(i) = New PictureBox()
-            camPic(i).Size = New Size(If(i < 2, resolutionXY.Width, resolutionXY.Width * 2), resolutionXY.Height)
+            camPic(i).Size = New Size(If(i < 2, workingRes.Width, workingRes.Width * 2), workingRes.Height)
             AddHandler camPic(i).DoubleClick, AddressOf campic_DoubleClick
             AddHandler camPic(i).Click, AddressOf campic_Click
             AddHandler camPic(i).Paint, AddressOf campic_Paint
@@ -588,7 +600,7 @@ Public Class OpenCVB
     Private Sub LineUpCamPics(resizing As Boolean)
         If resizing = False Then
             If optionsForm.SnapToGrid.Checked Then
-                Select Case resolutionXY.Height
+                Select Case workingRes.Height
                     Case 240
                         Me.Width = 683
                         Me.Height = 592
@@ -603,9 +615,9 @@ Public Class OpenCVB
         End If
 
         Dim width = CInt((Me.Width - 42) / 2)
-        Dim height = CInt(width * resolutionXY.Height / resolutionXY.Width)
-        If Math.Abs(width - resolutionXY.Width / 2) < 2 Then width = resolutionXY.Width / 2
-        If Math.Abs(height - resolutionXY.Height / 2) < 2 Then height = resolutionXY.Height / 2
+        Dim height = CInt(width * workingRes.Height / workingRes.Width)
+        If Math.Abs(width - workingRes.Width / 2) < 2 Then width = workingRes.Width / 2
+        If Math.Abs(height - workingRes.Height / 2) < 2 Then height = workingRes.Height / 2
         Dim padX = 12
         Dim padY = 60
         camPic(0).Size = New Size(width, height)
@@ -810,8 +822,8 @@ Public Class OpenCVB
                 drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                 drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                If drawRect.X + drawRect.Width > resolutionXY.Width Then drawRect.Width = resolutionXY.Width - drawRect.X
-                If drawRect.Y + drawRect.Height > resolutionXY.Height Then drawRect.Height = resolutionXY.Height - drawRect.Y
+                If drawRect.X + drawRect.Width > workingRes.Width Then drawRect.Width = workingRes.Width - drawRect.X
+                If drawRect.Y + drawRect.Height > workingRes.Height Then drawRect.Height = workingRes.Height - drawRect.Y
                 BothFirstAndLastReady = True
             End If
             mousePicTag = pic.Tag
@@ -821,7 +833,7 @@ Public Class OpenCVB
                 mousePoint.X -= camPic(0).Width
                 mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
             End If
-            mousePoint *= resolutionXY.Width / camPic(0).Width
+            mousePoint *= workingRes.Width / camPic(0).Width
 
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
@@ -977,25 +989,6 @@ Public Class OpenCVB
         img = cv.Extensions.BitmapConverter.ToBitmap(resultMat)
         Clipboard.SetImage(img)
     End Sub
-    Private Sub CameraTask()
-        SyncLock cameraThreadLock
-            stopCameraThread = False
-            While stopCameraThread = False
-                SyncLock bufferLock
-                    camera.GetNextFrame()
-                End SyncLock
-                cameraRefresh = True
-
-                Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
-                Me.Invoke(delegateX)
-
-                Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-                totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-                GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
-            End While
-        End SyncLock
-    End Sub
-
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         ' run at all the different resolutions...
         Dim specialSingleCount = AvailableAlgorithms.Items.Count = 1
@@ -1035,7 +1028,7 @@ Public Class OpenCVB
                 Next
                 If saveCameraIndex <> cameraIndex Then
                     optionsForm.cameraIndex = cameraIndex
-                    StartCamera()
+                    startCamera()
                 End If
             End If
         End If
@@ -1063,7 +1056,7 @@ Public Class OpenCVB
         If OKcancel = DialogResult.OK Then
             optionsForm.saveResolution()
             optionsForm.TestEnableNumPy()
-            If saveCurrentCamera <> optionsForm.cameraIndex Or camera.width <> resolutionXY.Width Then StartCamera()
+            If saveCurrentCamera <> optionsForm.cameraIndex Or camera.width <> workingRes.Width Then startCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
             LineUpCamPics(resizing:=False)
@@ -1101,7 +1094,7 @@ Public Class OpenCVB
 
         PausePlayButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
 
-        Dim imgSize = New cv.Size(CInt(resolutionXY.Width * 2), CInt(resolutionXY.Height))
+        Dim imgSize = New cv.Size(CInt(workingRes.Width * 2), CInt(workingRes.Height))
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
@@ -1122,7 +1115,7 @@ Public Class OpenCVB
             If algName = "" Then Exit Sub
 
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, resolutionXY, algName, resolutionXY.Width, resolutionXY.Height, myLocation)
+            Dim task = New VB_Classes.ActiveTask(parms, workingRes, algName, workingRes.Width, workingRes.Height, myLocation)
             textDesc = task.desc
             openFileInitialDirectory = task.openFileInitialDirectory
             openFileDialogRequested = task.openFileDialogRequested
@@ -1137,7 +1130,7 @@ Public Class OpenCVB
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName)
-            Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(resolutionXY.Width) + "x" + CStr(resolutionXY.Height) + vbCrLf)
+            Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
 
             If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
 
@@ -1175,14 +1168,14 @@ Public Class OpenCVB
                 If saveAlgorithmName <> algName Or saveAlgorithmName = "" Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 SyncLock bufferLock
-                    If camera.newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
-                        camera.newImagesAvailable = False
+                    If newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
+                        newImagesAvailable = False
                         ' bring the data into the algorithm task.
-                        task.color = camera.color.Resize(resolutionXY)
-                        task.RGBDepth = camera.RGBDepth.Resize(resolutionXY)
-                        task.leftView = camera.leftView.Resize(resolutionXY)
-                        task.rightView = camera.rightView.Resize(resolutionXY)
-                        task.pointCloud = camera.PointCloud.clone.resize(resolutionXY)
+                        task.color = camera.color.Resize(workingRes)
+                        task.RGBDepth = camera.RGBDepth.Resize(workingRes)
+                        task.leftView = camera.leftView.Resize(workingRes)
+                        task.rightView = camera.rightView.Resize(workingRes)
+                        task.pointCloud = camera.PointCloud.clone.resize(workingRes)
                         task.depth16 = camera.depth16.clone
 
                         task.transformationMatrix = camera.transformationMatrix
