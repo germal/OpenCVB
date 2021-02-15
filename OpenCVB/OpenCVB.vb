@@ -100,6 +100,7 @@ Public Class OpenCVB
     Dim runPlay As Bitmap
     Dim stopTest As Bitmap
     Dim testAll As Bitmap
+    Dim testAllRunning As Boolean
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -913,6 +914,7 @@ Public Class OpenCVB
             TestAllButton.Text = "Test All"
             If logActive Then logAlgorithms.Close()
             TestAllButton.Image = testAll
+            StartAlgorithmTask()
         End If
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -951,7 +953,8 @@ Public Class OpenCVB
 
         Me.Text = "OpenCVB (" + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " + CStr(CInt(CodeLineCount / AlgorithmCount)) +
                   " lines per) - " + optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + " - " + Format(cameraFPS, "#0.0") +
-                  "/" + Format(algorithmFPS, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set)"
+                  "/" + Format(algorithmFPS, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set) with " +
+                  CStr(Process.GetCurrentProcess().Threads.Count) + " threads"
     End Sub
     Private Sub saveLayout()
         optionsForm.saveResolution()
@@ -1067,7 +1070,8 @@ Public Class OpenCVB
         parms.PythonExe = optionsForm.PythonExeName.Text
 
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
-        parms.testAllRunning = TestAllButton.Text = "Stop Test"
+        testAllRunning = TestAllButton.Text = "Stop Test"
+        parms.testAllRunning = testAllRunning
         parms.externalPythonInvocation = externalPythonInvocation
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
         parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
@@ -1180,7 +1184,7 @@ Public Class OpenCVB
                         task.CPU_FrameTime = camera.CPU_FrameTime
                         task.intermediateReview = intermediateReview
                         task.ratioImageToCampic = ratioImageToCampic
-                        task.pixelViewerOn = pixelViewerOn
+                        task.pixelViewerOn = If(testallrunning, False, pixelViewerOn)
 
                         If GrabRectangleData Then
                             GrabRectangleData = False
