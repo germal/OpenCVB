@@ -12,12 +12,13 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 
     lens = len(gray64)
     gray64 = (ctypes.c_double * lens)(*gray64)
-    lsdlib.lsdGet(gray64, ctypes.c_int(rows), ctypes.c_int(cols))
+    fileName =  "..\\Data\\ntuples.txt"
+    lsdlib.lsdGet(gray64, ctypes.c_int(rows), ctypes.c_int(cols), fileName)
 
-    fp = open("c:/temp/ntuples.txt", 'r')
+    fp = open("..\\Data\\ntuples.txt", 'r')
     cnt = fp.read().strip().split(' ')
     fp.close()
-    os.remove("c:/temp/ntuples.txt")
+    os.remove("..\\Data\\ntuples.txt")
 
     count = int(cnt[0])
     dim = int(cnt[1])

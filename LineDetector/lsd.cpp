@@ -68,13 +68,14 @@
     @author rafael grompone von gioi (grompone@gmail.com)
  */
 /*----------------------------------------------------------------------------*/
-
+ 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 #include <math.h>
 #include <limits.h>
 #include <float.h>
-#include <lsd.h>
+#include "../LineDetector/lsd.h"
 
 /** ln(10) */
 #ifndef M_LN10
@@ -134,7 +135,7 @@ struct point
 /*----------------------------------------------------------------------------*/
 /** Fatal error, print a message to standard-error output and exit.
  */
-static void error(char *msg)
+static void error(const char * msg)
 {
     fprintf(stderr, "LSD Error: %s\n", msg);
     exit(EXIT_FAILURE);
@@ -2048,6 +2049,8 @@ ntuple_list LineSegmentDetection( image_double image, double scale,
     return out;
 }
 
+
+
 /*----------------------------------------------------------------------------*/
 /** LSD Simple Interface with Scale.
  */
@@ -2068,10 +2071,9 @@ ntuple_list lsd_scale(image_double image, double scale)
                                gradient modulus on images with gray
                                levels in [0,255].                             */
 
-    return LineSegmentDetection( image, scale, sigma_scale, quant, ang_th, eps,
-                                 density_th, n_bins, max_grad, NULL );
+    return LineSegmentDetection(image, scale, sigma_scale, quant, ang_th, eps, density_th, n_bins, max_grad, NULL);
 }
-
+ 
 /*----------------------------------------------------------------------------*/
 /** LSD Simple Interface.
  */
@@ -2084,10 +2086,10 @@ ntuple_list lsd(image_double image)
 }
 /*----------------------------------------------------------------------------*/
 
-void writeNtl(ntuple_list ntl, char *file)
+void writeNtl(ntuple_list ntl, wchar_t *file)
 {
     FILE *fp;
-    if ((fp = fopen(file, "w")) == NULL)
+    if ((fp = _wfopen(file, L"w")) == NULL)
     {
         printf("cannot open file\n");
         return;
@@ -2101,11 +2103,70 @@ void writeNtl(ntuple_list ntl, char *file)
     fclose(fp);
 }
 
-void lsdGet(double* src, int rows, int cols, char *fileNot) {
-    char* file = "c:/temp/ntuples.txt";
+using namespace std;
+extern "C" __declspec(dllexport)
+void lsdGet(double* src, int rows, int cols, wchar_t *file) {
+    printf("input name = %ls\n", file);
     image_double image = new_image_double(cols, rows);
     image->data = src;
     ntuple_list ntl = lsd(image);
     writeNtl(ntl, file);
     free_ntuple_list(ntl);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ntuple_list ntl;
+bool disposeNeeded = false;
+
+/*----------------------------------------------------------------------------*/
+/** LSD Simple Interface with Scale.
+ */
+extern "C" __declspec(dllexport)
+int lsd_scaleVB(double* gray64, int rows, int cols, double scale)
+{
+    if (disposeNeeded) free_ntuple_list(ntl);
+    disposeNeeded = true;
+    image_double image = new_image_double(cols, rows);
+    image->data = gray64;
+
+    /* LSD parameters */
+    double sigma_scale = 0.6; /* Sigma for Gaussian filter is computed as
+                                sigma = sigma_scale/scale.                    */
+    double quant = 2.0;       /* Bound to the quantization error on the
+                                gradient norm.                                */
+    double ang_th = 22.5;     /* Gradient angle tolerance in degrees.           */
+    double eps = 0.0;         /* Detection threshold, -log10(NFA).              */
+    double density_th = 0.7;  /* Minimal density of region points in rectangle. */
+    int n_bins = 1024;        /* Number of bins in pseudo-ordering of gradient
+                               modulus.                                       */
+    double max_grad = 255.0;  /* Gradient modulus in the highest bin. The
+                               default value corresponds to the highest
+                               gradient modulus on images with gray
+                               levels in [0,255].                             */
+
+    ntl = LineSegmentDetection(image, scale, sigma_scale, quant, ang_th, eps, density_th, n_bins, max_grad, NULL);
+    return ntl->size;
+}
+
+extern "C" __declspec(dllexport)
+double *lsd_lines()
+{
+    return &ntl->values[0];
 }

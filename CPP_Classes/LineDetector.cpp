@@ -12,7 +12,6 @@ using namespace std;
 using namespace cv;
 using namespace cv::ximgproc;
 
-// why allocate that here?  Because the intptr returned will allow VB.Net to marshal the contents back to managed code.
 vector<Vec4f> lines;
 
 extern "C" __declspec(dllexport)
@@ -23,18 +22,6 @@ int lineDetectorFast_Run(int *grayInput, int rows, int cols, int length_threshol
 
 	lines.clear();
 	fld->detect(image, lines);
-
-	return (int)lines.size();
-}
-
-extern "C" __declspec(dllexport)
-int lineDetector_Run(int *grayInput, int rows, int cols)
-{
-	Ptr<LineSegmentDetector> lsd = createLineSegmentDetector();
-	Mat image = Mat(rows, cols, CV_8UC1, grayInput);
-
-	lines.clear();
-	lsd->detect(image, lines);
 
 	return (int)lines.size();
 }
