@@ -96,6 +96,10 @@ Public Class OpenCVB
     Dim meActivateNeeded As Boolean
     Dim pixelViewerOn As Boolean
     Dim pixelViewerRect As cv.Rect
+    Dim PausePlay As Bitmap
+    Dim runPlay As Bitmap
+    Dim stopTest As Bitmap
+    Dim testAll As Bitmap
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -117,6 +121,11 @@ Public Class OpenCVB
         Else
             HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
         End If
+
+        PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
+        stopTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
+        testAll = New Bitmap(HomeDir.FullName + "OpenCVB/Data/testall.png")
+        runPlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButtonRun.png")
 
         setupRecentList()
 
@@ -882,19 +891,19 @@ Public Class OpenCVB
             PausePlayButton.Text = "Pause"
             pauseAlgorithmThread = False
             If saveTestAllState Then testAllButton_Click(sender, e)
-            PausePlayButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
+            PausePlayButton.Image = PausePlay
         Else
             PausePlayButton.Text = "Run"
             pauseAlgorithmThread = True
             saveTestAllState = TestAllTimer.Enabled
             If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
-            PausePlayButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/PauseButtonRun.png")
+            PausePlayButton.Image = PausePlay
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
-            TestAllButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
+            TestAllButton.Image = stopTest
             If logActive Then logAlgorithms = New StreamWriter("C:\Temp\logAlgorithms.csv")
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
@@ -903,7 +912,7 @@ Public Class OpenCVB
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
             If logActive Then logAlgorithms.Close()
-            TestAllButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/testall.png")
+            TestAllButton.Image = testAll
         End If
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -1069,7 +1078,7 @@ Public Class OpenCVB
         parms.homeDir = HomeDir.FullName
         parms.VTK_Present = VTK_Present
 
-        PausePlayButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
+        PausePlayButton.Image = PausePlay
 
         Dim imgSize = New cv.Size(CInt(workingRes.Width * 2), CInt(workingRes.Height))
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)

@@ -104,6 +104,13 @@ Public Class CameraKinect
 
             intrinsicsRight_VB = intrinsicsLeft_VB ' there is no right lens - just copy for compatibility.
 
+            color = New cv.Mat(height, width, cv.MatType.CV_8UC3)
+            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U)
+            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3)
+            leftView = New cv.Mat(height, width, cv.MatType.CV_8UC1)
+            rightView = New cv.Mat(height, width, cv.MatType.CV_8UC1)
+            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
+
             ReDim RGBDepthBytes(width * height * 3 - 1)
         End If
     End Sub
@@ -150,13 +157,6 @@ Public Class CameraKinect
                 ' This is less efficient than using 16-bit pixels but consistent with the other cameras
                 pc.ConvertTo(pointCloud, cv.MatType.CV_32FC3, 0.001) ' convert to meters...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
-            Else
-                color = New cv.Mat(height, width, cv.MatType.CV_8UC3)
-                depth16 = New cv.Mat(height, width, cv.MatType.CV_16U)
-                RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3)
-                leftView = New cv.Mat(height, width, cv.MatType.CV_8UC1)
-                rightView = New cv.Mat(height, width, cv.MatType.CV_8UC1)
-                pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
             End If
         End SyncLock
     End Sub
