@@ -461,6 +461,39 @@ Public Class OpenCVB
             AvailableAlgorithms.SelectedItem = item.Name
         End If
     End Sub
+    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
+            If optionsForm.resolution640.Enabled And optionsForm.resolution640.Checked = False Then
+                optionsForm.resolution640.Checked = True
+                LineUpCamPics(False)
+                startCamera()
+            Else
+                Dim cameraIndex = optionsForm.cameraIndex + 1
+                For i = 0 To optionsForm.cameraRadioButton.Count - 1
+                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                        optionsForm.cameraIndex = cameraIndex
+                        LineUpCamPics(False)
+                        startCamera()
+                        Exit For
+                    Else
+                        cameraIndex += 1
+                    End If
+                Next
+            End If
+        End If
+
+        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
+            AvailableAlgorithms.SelectedIndex += 1
+        Else
+            If AvailableAlgorithms.Items.Count = 1 Then ' selection index won't change if there is only one algorithm in the list.
+                StartAlgorithmTask()
+            Else
+                AvailableAlgorithms.SelectedIndex = 0
+            End If
+        End If
+    End Sub
     Private Sub startCamera()
         If cameraTaskHandle IsNot Nothing Then
             stopCameraThread = True
@@ -469,7 +502,6 @@ Public Class OpenCVB
 
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
-        camera.initialize(workingRes.Width, workingRes.Height, fps)
 
         cameraTaskHandle = New Thread(AddressOf CameraTask)
         cameraTaskHandle.Name = "CameraTask"
@@ -481,6 +513,7 @@ Public Class OpenCVB
     Private Sub CameraTask()
         Dim taskCam = camera
         SyncLock cameraThreadLock
+            taskCam.initialize(workingRes.Width, workingRes.Height, fps)
             stopCameraThread = False
             While stopCameraThread = False
                 SyncLock bufferLock
@@ -860,7 +893,6 @@ Public Class OpenCVB
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         If TestAllButton.Text = "Test All" Then
-            AlgorithmTestCount = 0
             TestAllButton.Text = "Stop Test"
             TestAllButton.Image = Image.FromFile(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
             If logActive Then logAlgorithms = New StreamWriter("C:\Temp\logAlgorithms.csv")
@@ -989,61 +1021,6 @@ Public Class OpenCVB
         img = cv.Extensions.BitmapConverter.ToBitmap(resultMat)
         Clipboard.SetImage(img)
     End Sub
-    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        ' run at all the different resolutions...
-        Dim specialSingleCount = AvailableAlgorithms.Items.Count = 1
-        If specialSingleCount Then saveAlgorithmName = "" ' stop the current algorith which we will restart below (only 1 algorithm in the list.)
-        Dim only1Resolution As Boolean
-        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Or specialSingleCount Then
-            If OptionsDialog.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Or
-               OptionsDialog.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Or
-               OptionsDialog.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
-
-                only1Resolution = True
-            Else
-                If optionsForm.resolution640.Checked Then
-                    optionsForm.resolution1280.Checked = True
-                ElseIf optionsForm.resolution1280.Checked Then
-                    optionsForm.resolution640.Checked = True
-                End If
-            End If
-            saveLayout()
-        End If
-
-        If optionsForm.resolution640.Checked Or only1Resolution Then ' only change cameras when in medium resolution or when only 1 resolution
-            ' after sweeping through resolutions, sweep through the cameras as well...
-            If (AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0) Or specialSingleCount Then
-                Dim cameraIndex = optionsForm.cameraIndex
-                Dim saveCameraIndex = optionsForm.cameraIndex
-                cameraIndex += 1
-                If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                For i = 0 To optionsForm.cameraRadioButton.Count - 1
-                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                        Exit For
-                    Else
-                        cameraIndex += 1
-                        If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                    End If
-                Next
-                If saveCameraIndex <> cameraIndex Then
-                    optionsForm.cameraIndex = cameraIndex
-                    startCamera()
-                End If
-            End If
-        End If
-
-        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
-            AvailableAlgorithms.SelectedIndex += 1
-        Else
-            If AvailableAlgorithms.Items.Count = 1 Then ' selection index won't change if there is only one algorithm in the list.
-                StartAlgorithmTask()
-            Else
-                AvailableAlgorithms.SelectedIndex = 0
-            End If
-        End If
-    End Sub
-
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
         TestAllTimer.Enabled = False
