@@ -463,11 +463,12 @@ Public Class OpenCVB
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            If optionsForm.resolution640.Enabled And optionsForm.resolution640.Checked = False Then
+            If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
                 optionsForm.resolution640.Checked = True
                 LineUpCamPics(False)
                 startCamera()
             Else
+                optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
                 Dim cameraIndex = optionsForm.cameraIndex + 1
                 For i = 0 To optionsForm.cameraRadioButton.Count - 1
                     If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
