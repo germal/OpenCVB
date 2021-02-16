@@ -112,6 +112,7 @@
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
     <Compile Include="OptionsCommon.vb" />
+    <Compile Include="PhaseCorrelate.vb" />
     <Compile Include="PhotoShop.vb" />
     <Compile Include="PixelViewerForm.Designer.vb">
       <DependentUpon>PixelViewerForm.vb</DependentUpon>
