@@ -1119,7 +1119,8 @@ Public Class OpenCVB
             intermediateReview = ""
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName)
+            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName +
+                              " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
             Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
 
             If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
