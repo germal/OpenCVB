@@ -506,19 +506,20 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub startCamera()
-        If cameraTaskHandle IsNot Nothing Then
-            stopCameraThread = True
-            camera.stopCamera()
-            cameraTaskHandle.Abort()
-        End If
+        stopCameraThread = True
+        If cameraTaskHandle IsNot Nothing Then camera.stopCamera()
 
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
 
-        cameraTaskHandle = New Thread(AddressOf CameraTask)
-        cameraTaskHandle.Name = "CameraTask"
-        cameraTaskHandle.Priority = ThreadPriority.Highest
-        cameraTaskHandle.Start()
+        SyncLock cameraThreadLock
+            cameraRefresh = False
+            newImagesAvailable = False
+            cameraTaskHandle = New Thread(AddressOf CameraTask)
+            cameraTaskHandle.Name = "CameraTask"
+            cameraTaskHandle.Priority = ThreadPriority.Highest
+            cameraTaskHandle.Start()
+        End SyncLock
 
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
@@ -914,7 +915,7 @@ Public Class OpenCVB
             TestAllButton.Text = "Test All"
             If logActive Then logAlgorithms.Close()
             TestAllButton.Image = testAll
-            StartAlgorithmTask()
+            If saveAlgorithmName <> "" Then StartAlgorithmTask()
         End If
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -984,6 +985,7 @@ Public Class OpenCVB
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         textDesc = ""
         saveLayout()
+        Console.WriteLine("exit_clidk complete")
         Application.DoEvents()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
@@ -1098,7 +1100,6 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
-            If saveAlgorithmName = "" Then Exit Sub ' shutting down the app...
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
             Dim algName = algorithmTaskHandle.Name
@@ -1160,7 +1161,6 @@ Public Class OpenCVB
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 SyncLock bufferLock
                     If newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
-                        newImagesAvailable = False
                         ' bring the data into the algorithm task.
                         task.color = camera.color.Resize(workingRes)
                         task.RGBDepth = camera.RGBDepth.Resize(workingRes)
@@ -1207,6 +1207,7 @@ Public Class OpenCVB
                         mouseClickFlag = False
 
                         task.fileStarted = openFileStarted ' UI may have stopped play.
+                        newImagesAvailable = False
                         Exit While
                     End If
                 End SyncLock
