@@ -1,12 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
-#If USE_NUMPY Then
-Imports Numpy
-Imports py = Python.Runtime
-#End If
 Public Class OptionsDialog
-    Dim numPyEnabled As Boolean = False
-
     Public cameraIndex As Integer ' an index into the cameraRadioButton array.
 
     Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) As Integer
@@ -29,7 +23,6 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "SnapToGrid", "SnapToGrid", SnapToGrid.Checked)
         SaveSetting("OpenCVB", "PythonExe", "PythonExe", PythonExeName.Text)
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
-        SaveSetting("OpenCVB", "EnableNumPy", "EnableNumPy", EnableNumPy.Checked)
         SaveSetting("OpenCVB", "FontName", "FontName", fontInfo.Font.Name)
         SaveSetting("OpenCVB", "FontSize", "FontSize", fontInfo.Font.Size)
 
@@ -66,21 +59,6 @@ Public Class OptionsDialog
                 resolutionName = "High"
         End Select
     End Sub
-    Public Sub TestEnableNumPy()
-#If USE_NUMPY Then
-               If EnableNumPy.Checked Then
-            If numPyEnabled = False Then
-                numPyEnabled = True
-                ' This allows the VB_Classes to use NumPy and then reuse it.  OpenCVB.exe does not use NumPy but must do this to allow the child threads to use NumPy
-                ' see https://github.com/SciSharp/Numpy.NET
-                np.arange(1)
-                py.PythonEngine.BeginAllowThreads()
-            End If
-        End If
-#Else
-        numPyEnabled = False
-#End If
-    End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         For i = 0 To cameraRadioButton.Count - 1
             cameraRadioButton(i) = New RadioButton
@@ -109,7 +87,6 @@ Public Class OptionsDialog
                                    GetSetting("OpenCVB", "TestAllDuration", "TestAllDuration", 2))
         SnapToGrid.Checked = GetSetting("OpenCVB", "SnapToGrid", "SnapToGrid", True)
         ShowConsoleLog.Checked = GetSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", False)
-        EnableNumPy.Checked = False ' GetSetting("OpenCVB", "EnableNumPy", "EnableNumPy", False)
 
         Dim defaultSize = GetSetting("OpenCVB", "FontSize", "FontSize", 8)
         Dim DefaultFont = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
@@ -122,7 +99,6 @@ Public Class OptionsDialog
             selectionInfo = New FileInfo(selectionName)
             PythonExeName.Text = selectionInfo.FullName
         End If
-        TestEnableNumPy()
     End Sub
     Private Sub OptionsDialog_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)

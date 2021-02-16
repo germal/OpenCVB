@@ -1046,7 +1046,6 @@ Public Class OpenCVB
 
         If OKcancel = DialogResult.OK Then
             optionsForm.saveResolution()
-            optionsForm.TestEnableNumPy()
             If saveCurrentCamera <> optionsForm.cameraIndex Or camera.width <> workingRes.Width Then startCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
@@ -1076,7 +1075,6 @@ Public Class OpenCVB
         parms.testAllRunning = testAllRunning
         parms.externalPythonInvocation = externalPythonInvocation
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
-        parms.NumPyEnabled = optionsForm.EnableNumPy.Checked
 
         parms.intrinsicsLeft = camera.intrinsicsLeft_VB
         parms.intrinsicsRight = camera.intrinsicsRight_VB
@@ -1137,17 +1135,9 @@ Public Class OpenCVB
 
             BothFirstAndLastReady = False
             frameCount = 0 ' restart the count...
-#If USE_NUMPY Then
-            If task.ocvb.parms.NumPyEnabled Then
-                Using py.Py.GIL() ' for explanation see http://pythonnet.github.io/ and https://github.com/SciSharp/Numpy.NET (see multi-threading (Must read!))
-                    Run(task, algName)
-                End Using
-            Else
-                Run(task, algName)
-            End If
-#Else
+
             Run(task, algName)
-#End If
+
             task.Dispose()
             frameCount = 0
             If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)

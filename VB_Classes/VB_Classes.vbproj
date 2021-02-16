@@ -252,7 +252,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="NumPy.vb" />
     <Compile Include="Objects.vb" />
     <Compile Include="OilPaint.vb" />
     <Compile Include="OpenCVGL.vb" />

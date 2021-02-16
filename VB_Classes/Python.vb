@@ -5,8 +5,7 @@ Imports System.IO.Pipes
 
 Module Python_Module
     Public Function checkPythonPackage( packageName As String) As Boolean
-        ' make sure that opencv-python and numpy are installed on this system.
-        If ocvb.parms.pythonExe = "" Then
+        If ocvb.parms.PythonExe = "" Then
             ocvb.trueText("Python is not present and needs to be installed." + vbCrLf +
                                                   "Get Python 3.7+ with Visual Studio's Install app.")
             Return False

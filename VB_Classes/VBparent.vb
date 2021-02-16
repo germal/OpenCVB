@@ -1,7 +1,4 @@
-﻿#If USE_NUMPY Then
-Imports Numpy
-#End If
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
 Imports cv = OpenCvSharp
 Imports System.IO
 Public Class TTtext
@@ -109,17 +106,6 @@ Public Class VBparent : Implements IDisposable
         If p.Y > dst1.Height Then p.Y = dst1.Height - 1
         Return p
     End Function
-#If USE_NUMPY Then
-    Public Function MatToNumPyFloat(mat As cv.Mat) As NDarray
-        Dim array(mat.Total - 1) As Single
-        Marshal.Copy(mat.Data, array, 0, array.Length)
-        Dim ndarray = Numpy.np.asarray(Of Single)(array)
-        Return ndarray
-    End Function
-    Public Sub NumPyFloatToMat(array As NDarray, ByRef mat As cv.Mat)
-        Marshal.Copy(array.GetData(Of Single), 0, mat.Data, mat.Total)
-    End Sub
-#End If
     Public Sub New()
         algorithm = Me
         caller = Me.GetType.Name

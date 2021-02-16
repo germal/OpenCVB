@@ -34,7 +34,6 @@ Partial Class OptionsDialog
         Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
-        Me.EnableNumPy = New System.Windows.Forms.CheckBox()
         Me.PythonExeName = New System.Windows.Forms.TextBox()
         Me.SelectPythonFile = New System.Windows.Forms.Button()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -172,26 +171,15 @@ Partial Class OptionsDialog
         '
         'GroupBox6
         '
-        Me.GroupBox6.Controls.Add(Me.EnableNumPy)
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
         Me.GroupBox6.Controls.Add(Me.Label2)
-        Me.GroupBox6.Location = New System.Drawing.Point(21, 600)
+        Me.GroupBox6.Location = New System.Drawing.Point(21, 623)
         Me.GroupBox6.Name = "GroupBox6"
-        Me.GroupBox6.Size = New System.Drawing.Size(936, 146)
+        Me.GroupBox6.Size = New System.Drawing.Size(936, 123)
         Me.GroupBox6.TabIndex = 9
         Me.GroupBox6.TabStop = False
         Me.GroupBox6.Text = "Python "
-        '
-        'EnableNumPy
-        '
-        Me.EnableNumPy.AutoSize = True
-        Me.EnableNumPy.Location = New System.Drawing.Point(77, 106)
-        Me.EnableNumPy.Name = "EnableNumPy"
-        Me.EnableNumPy.Size = New System.Drawing.Size(608, 24)
-        Me.EnableNumPy.TabIndex = 8
-        Me.EnableNumPy.Text = "Enable Embedded Python/NumPy in VB.Net.   (It reduces memory footprint if off.) "
-        Me.EnableNumPy.UseVisualStyleBackColor = True
         '
         'PythonExeName
         '
@@ -336,6 +324,5 @@ Partial Class OptionsDialog
     Friend WithEvents Label4 As Label
     Friend WithEvents fontInfo As Label
     Friend WithEvents FontDialog1 As FontDialog
-    Friend WithEvents EnableNumPy As CheckBox
     Friend WithEvents SnapToGrid As CheckBox
 End Class

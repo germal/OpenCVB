@@ -199,7 +199,6 @@ Public Class ActiveTask : Implements IDisposable
         Public useRecordedData As Boolean
         Public externalPythonInvocation As Boolean ' OpenCVB was initialized remotely...
         Public ShowConsoleLog As Boolean
-        Public NumPyEnabled As Boolean
         Public testAllRunning As Boolean
         Public IMU_RotationMatrix() As Single
         Public IMU_RotationVector As cv.Point3f

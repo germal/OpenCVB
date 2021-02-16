@@ -1,36 +1,30 @@
-Recent Changes - 1/12/2021
+Recent Changes – 2/15/2021
 ==========================
 
--   Over 870 algorithms – almost all less than a page of code.
+-   Over 900 algorithms – almost all less than a page of code
 
--   The new “Best Of” module contains the best example of common techniques.
-    Need an example of contours, look in the BestOf.vb first.
+-   New pixel viewer to inspect image pixels in 8UC1, 8UC3, 32F, and 32FC3
+    formats
 
--   OpenCV’s new Oak-D camera has arrived. Some python scripts were added for
-    users that have installed it.
+-   Versioning policy set – The Release IS The Repository, The Repository IS The
+    Release - TRISTR
 
-    -   <https://docs.luxonis.com/en/latest/pages/api/> - to get the official
-        support.
+-   Improved threading support for switching between camera interfaces
 
--   Motion detection is easier to use with an “AllRect” cv.rect that encompass
-    all RGB changes.
+-   Oak-D camera support is working – still missing IMU and point cloud support
 
--   Image segmentation is more stable and consistent from frame to frame. See
-    ImageSeg.vb.
+-   VTK support was improved – still optional (it is a lot to install)
 
--   OptionsCommon.vb defines options common to all algorithms.
+-   Upgraded to the latest RealSense2 and Kinect4Azure drivers
 
--   StructuredDepth shows promise as a path to exploiting structured light
-    technology.
-
--   PythonDebug project is now integrated into the OpenCVB.sln. Python debugging
-    is easier.
+-   Motion Filtered Data series of algorithms – an attempt at reducing data
+    analysis at input
 
 Introduction
 ============
 
 There is no better documentation of an algorithm than a working example. Now
-imagine over 800 OpenCV examples in a single app where each algorithm is less
+imagine over 900 OpenCV examples in a single app where each algorithm is less
 than a page of code and is in a familiar language – C++, C\#, Python, or VB.Net.
 And each algorithm is *just the algorithm* without the baggage from a user
 interface. Each algorithm is reusable. New algorithms can reuse existing
@@ -75,6 +69,8 @@ Here are the requirements:
     -   Intel RealSense D455 – the latest in the series of Intel RealSense
         cameras
 
+    -   OpenCV Oak-D camera (still to come: IMU and point cloud support)
+
 All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft
 Kinect for Azure has the best depth accuracy but requires more power and is not
 as portable as the Intel cameras. All the cameras use USB-C to provide data to
@@ -91,17 +87,11 @@ many almost trivial algorithms working together. Is the combined effort of many
 small operations what produces understanding? It make take years to answer that
 question.
 
-One key to this approach is each algorithm presents its own options
-(sliders/check boxes/radio buttons/text boxes) for the different choices that
-come with the algorithm. A property with a measure is at the root of every
-concept.
-
 OpenCVB is targeting only cameras that produce depth and color and have an IMU
 to detect gravity and motion. These newer cameras have prompted a review of
 existing vision algorithms to see how they can be improved if depth is known. To
 enable revisiting many existing algorithms, this software provides a single
-application that can run hundreds of OpenCV algorithms on any of the cameras
-listed above.
+application that can run OpenCV algorithms on any of the cameras listed above.
 
 There are many computer vision examples on the web but too often something is
 missing. OpenCVB is designed to collect these algorithms into a single
@@ -109,10 +99,10 @@ application and guarantee that each will build and run. In addition, software
 automation and aids simplify the process of adding variants and experiments.
 
 The languages used are those often found in OpenCV projects - C++, C\#, Python
-and even VB.Net. Secondly, it is important to get access to multiple libraries -
-OpenCV, OpenCVSharp, OpenGL, Emgu, NumPy, NAudio, and OpenMP. And lastly, it is
-important to enable all possible image representations - 3D, bitmaps, plots, bar
-charts, spreadsheets, or text.
+and VB.Net. Secondly, it is important to get access to multiple libraries -
+OpenCV, OpenCVSharp, OpenGL, Emgu, NumPy, NAudio, VTK, and OpenMP. And lastly,
+it is important to enable all possible image representations - 3D, bitmaps,
+plots, bar charts, spreadsheets, and text.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for OpenCVB algorithms. Implementing
@@ -147,11 +137,10 @@ easy adaptation to other environments or platforms.
 Pre-Install Notes
 =================
 
-You will need to download and install the following before starting:
+You should be familiar with the following software. Each is free and easily
+downloaded for Windows 10:
 
 -   Microsoft Visual Studio 2019 Community Edition (Free)
-
-    -   OpenCVB works with any recent Visual Studio.
 
     -   Download: <https://visualstudio.microsoft.com/downloads/>
 
@@ -170,14 +159,16 @@ You will need to download and install the following before starting:
 Installation – Quick Reference
 ==============================
 
-This is the short description of install process:
+This is the short description of install process. It is not as simple as cloning
+and then opening the OpenCVB.sln file but it is not much more than just
+“PrepareTree.bat” and then open and run the OpenCVB.sln file.
 
 -   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
     and run CMake for needed libraries. After building it will occupy about 18Gb
     of disk space – plan accordingly.
 
     -   This will take the majority of time for the install depending on the
-        network speed.
+        network and system.
 
     -   After “PrepareTree.bat” completes, Visual Studio projects will open. Run
         “Batch Build” and “Select All” in each Visual Studio project.
@@ -188,7 +179,8 @@ This is the short description of install process:
 -   <https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download> –
     Select “Windows Installer” to get proprietary Kinect4Azure support.
 
--   Build and run OpenCVB.sln – set OpenCVB as the “Startup Project”
+-   Build and run OpenCVB.sln – set OpenCVB as the “Startup Project” (GitHub
+    seems to forget the startup project.)
 
 Installation – Full Description with Discussion
 ===============================================
@@ -215,21 +207,22 @@ The first step is to download OpenCVB from GitHub:
 >   OpenCV, librealsense, and Kinect4Azure for OpenCVB’s use. The script will
 >   then open Visual Studio for each solution file. Build the Debug and Release
 >   versions of each with the “Build/Batch Build” Visual Studio menu entry. The
->   steps to download and run CMake take about 20 minutes depending on the speed
->   of the network connection. The Visual Studio builds may take an equal amount
->   of time depending on the speed of the machine.
+>   steps to download and run CMake take about 20 minutes depending on the
+>   network and system. The Visual Studio builds may take a comparable amount of
+>   time.
 
 1.  After all the packages have been built, then there is one environmental
     variable that needs to be set and it will depend on which version of OpenCV
     was just downloaded and built.
 
--   Environmental variable “OpenCV_Version” should be set to 450
+    -   Environmental variable “OpenCV_Version” should be set to 450
 
--   The currently available OpenCV download is 4.50 so setting OpenCV_Version to
-    450 reflects that but note that OpenCV is updated several times a year and
-    the environmental variable may need to be updated.
+    -   The currently available OpenCV download is 4.50 so setting
+        OpenCV_Version to 450 reflects that but note that OpenCV is updated
+        several times a year and the environmental variable may need to be
+        updated.
 
-1.  The last step before building OpenCVB is to download the proprietary
+2.  The last step before building OpenCVB is to download the proprietary
     binaries from Microsoft for their Kinect4Azure camera. The “PrepareTree.bat”
     script built the open source portion of the Kinect4Azure camera but this
     step will complete the installation of the Kinect4Azure camera:
@@ -239,18 +232,18 @@ The first step is to download OpenCVB from GitHub:
     -   Click “Microsoft Installer” to download and install the proprietary
         Kinect code from Microsoft
 
-2.  The last step is to open the OpenCVB.sln file and build OpenCVB.
+3.  The last step is to open the OpenCVB.sln file and build OpenCVB.
 
     -   Support for some optional cameras can be easily added:
 
         -   For the StereoLabs ZED 2 camera (released Q1 2020), install the
             StereoLabs SDK from
 
-        -   <https://www.stereolabs.com/>
+            -   <https://www.stereolabs.com/>
 
         -   For the Mynt Eye D 1000 camera, download the SDK from:
 
-        -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
+            -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
 
     -   Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
         StereoLabs Zed 2 or Mynt Eye D 1000 support.
@@ -274,8 +267,8 @@ Some typical problems with new installations:
     “PythonPackages.py” in OpenCVB to verify that all the necessary packages are
     installed. If still failing, check the Python setting in the Options (click
     the Settings icon for OpenCVB.) Make sure it points to a Python 3.x version.
-    Test Python scripts independently using \<OpenCVB Home
-    Directory\>/VB_Classes/Python/PythonDebug.sln.
+    Test Python scripts by setting “PythonDebug” as the Startup Project in
+    Visual Studio and update the PythonDebug.py file.
 
 Build New Experiments
 =====================
@@ -362,16 +355,16 @@ Why VB.Net?
 VB.Net is not a language associated with computer vision algorithms. But the
 abundance of examples in OpenCVB suggests this may be an oversight. Even the
 seasoned developer should recognize what is obvious to the beginner: VB.Net can
-keep the code simple to read and write. Many papers and software articles will
+keep the code simple to read and write. Papers and articles on software will
 often use something called “pseudo-code” to present an algorithm. In many
-respects, VB.Net code often resembles pseudo-code except that it is an actual
-working implementation of the algorithm.
+respects, VB.Net code resembles pseudo-code except it is an actual working
+implementation of the algorithm.
 
 VB.Net provides a full-featured language just like C\# with lambda functions and
 multi-threading except VB.Net uses only a small subset of the keys available on
 the standard keyboard. Contrasted with Python or C++, VB.Net need make no
-apologies for using real keywords instead of the arbitrary meanings assigned to
-all the special keys. VB.Net includes user interface tools that are flexible and
+apologies for using real words instead of the keyboard hieroglyphics defined in
+Python or C++. VB.Net includes user interface tools that are flexible and
 complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) -
 options missing from OpenCV's popular HighGUI library. (All existing HighGUI
 interfaces are still supported in OpenCVB.)
@@ -389,9 +382,7 @@ to other platforms. Only individual algorithms will need to be ported after they
 are debugged and polished, Most algorithms consist almost entirely of OpenCV
 APIs which are already available everywhere. OpenCVB’s value lies in the ability
 to experiment and finish an OpenCV algorithm before even starting a port to a
-different platform. Confining development to OpenCVB’s C++ interface should
-provide the most portable version of any algorithm but even VB.Net code can be
-ported to a variety of non-Windows platforms.
+different platform.
 
 Camera Interface
 ================
@@ -399,17 +390,18 @@ Camera Interface
 All the camera code is isolated in the “camera” class – see cameraRS2.vb,
 cameraKinect.vb, cameraMynt.vb, or cameraZed2.vb. There are no references to
 camera interfaces anywhere else in the code. Isolating the camera support from
-the algorithms strips the code to just the essential OpenCV API’s needed.
+the algorithms strips the algorithm code to just the essential OpenCV API’s
+needed.
 
 For example, the Kinect for Azure camera support is isolated to the
-cameraKinect.vb class and a supporting Kinect4Azure DLL that provides all the
+cameraKinect.vb class and a supporting Kinect4Azure DLL that provides the
 interface code to the Kinect for Azure libraries. Since there is likely to be
 little interest in debugging the Kinect4Azure DLL, the Release version is used
 even in the Debug configuration. If it is necessary to debug the camera
-interface, set any Build Configuration components to the Debug version.
-Optimizations enable a higher framerate than when running the Debug
-configuration of the Kinect camera DLL. As a result, the VB.Net code in Debug
-mode often runs as fast as the Release configuration.
+interface, set any Build Configuration components to the Debug version. Using
+Release versions naturally enables a higher framerate. As a result, the VB.Net
+code – which is always in Debug mode - runs almost as fast as the Release
+configuration.
 
 OpenGL Interface
 ================
@@ -419,13 +411,13 @@ but none is used here. OpenGL is simply run in a separate process. To
 accommodate running separately, a named-pipe moves the image data to the
 separate process and a memory-mapped file provides a control interface. The
 result is both robust and economical leaving the OpenGL C++ code independent of
-hardware specifics. The VB.Net code for the OpenGL interface is less than a page
-and does not require much memory or CPU usage. The OpenGL C++ code provided with
-OpenCVB is customized for specific applications in a format that should be
-familiar to OpenGL developers. There are several examples – displaying RGB and
-Depth, 3D histograms, 3D drawing, and IMU usage. A code snippet (See ‘Build New
-Experiments’ above) provides everything needed to add a new OpenGL algorithm
-that will consume RGB and a point cloud.
+camera hardware specifics. The VB.Net code for the OpenGL interface is less than
+a page and does not require much memory or CPU usage. The OpenGL C++ code
+provided with OpenCVB is customized for specific applications in a format that
+should be familiar to OpenGL developers. There are several examples – displaying
+RGB and Depth, 3D histograms, 3D drawing, and IMU usage. A code snippet (See
+‘Build New Experiments’ above) provides everything needed to add a new OpenGL
+algorithm that will consume RGB and a point cloud.
 
 NOTE: it is easy to forget to include any new OpenGL project in the Project
 Dependencies. This can be confusing because the new project will not build
@@ -441,9 +433,10 @@ OpenCV’s OpenGL Interface
 
 The “PrepareTree.bat” script will have configured OpenCV with OpenGL support.
 OpenCVB can use this OpenGL interface – see the OpenCVGL algorithm. The
-interface is sluggish and looks different from most OpenGL applications so the
-alternative interface to OpenGL (discussed above) is preferred. Both interfaces
-use the same sliders and options to control the OpenGL interface.
+interface is sluggish and the C++ code looks different from most OpenGL
+applications so the alternative interface to OpenGL (discussed above) is
+preferred. Both interfaces use the same sliders and options to control the
+OpenGL interface.
 
 NOTE: why use sliders instead of OpenGL mouse or keyboard callbacks? The answer
 in a single word is precision. It is often desirable to set appropriate defaults
@@ -453,8 +446,8 @@ effect. Preconfiguring the sliders allows the user to program a specific setup
 for viewing 3D data.
 
 OpenGL mouse and keyboard callbacks are also available. An example
-“OpenGL_Callbacks” provides everything needed. The snippets for OpenCVB can
-setup a new OpenGL example with callbacks as well.
+“OpenGL_Callbacks” provides everything needed. The snippets for OpenCVB setup
+any new OpenGL example with callbacks as well.
 
 Python Interface
 ================
@@ -474,7 +467,8 @@ AddWeighted_Trackbar_PS.py or Camshift_PS.py. The “_PS” suffix is an OpenCVB
 convention that indicates it is a Python Streaming script that expects a stream
 of RGB and Depth images. NOTE: The Python script name MUST END WITH \_PS for
 PyStream.py to work. To see the list of all the Python Streaming scripts, select
-the pre-defined subset group called “\<PyStream\>”.
+the pre-defined subset group called “\<PyStream\>”. Subset groups are selected
+using the combo box in the user interface.
 
 Python scripts show up in the list of algorithms in the OpenCVB user interface
 and each Python script will be run when performing the regression tests. To
@@ -497,39 +491,32 @@ Visual Studio menu:
 To check that all the necessary packages are installed, run the
 ‘PythonPackages.py’ algorithm from OpenCVB’s user interface.
 
-NumPy is included in the list of NuGet packages that come with OpenCVB but the
-code has not been stable. Using Python as it is normally consumed – with Python
-scripts running in their own process – means that the script will be reusable
-elsewhere. There is a check box in the Global Options dialog box to allow new
-versions of NumPy to be tested with the existing NumPy algorithms. Because it
-has been unreliable, the enabled setting is not saved when OpenCVB is closed.
-
 Python Debugging
 ================
 
 Python scripts are run in a separate address space when invoked by OpenCVB just
-like the OpenGL interface in OpenCVB. Visual Studio’s Python debug environment
-is not available directly from OpenCVB. When a Python script fails in OpenCVB,
-it may be debugged in the PythonDebug project. Here are the steps to debug
-Python:
+like the OpenGL. Visual Studio’s Python debugging environment is not available
+directly when running OpenCVB. When a Python script fails in OpenCVB, it will
+just disappear but it may be debugged if the PythonDebug project is the Startup
+Project in Visual Studio. Here are the steps to debug Python:
 
 -   In OpenCVB, set the startup project as “PythonDebug”
 
 -   Include the failing Python script in the PythonDebug project
 
--   Set the Python script that was just included as the “Startup File” in the
-    PythonDebug Properties/General
+-   Run and debug the Python script
 
-Then running the PythonDebug project will test the Python script in the same
+When tested in the PythonDebug project, the Python script will run in the same
 environment as if it were invoked from OpenCVB except the Python debugger will
-be active and single-stepping through the script will be possible.
+be active and single-stepping through the script and reading the error messages
+will be possible.
 
 All OpenCVB Python scripts can be debugged with the PythonDebug project
 including those that stream data from OpenCVB. For Python scripts requiring a
-stream of images or point clouds, the process is reversed and the OpenCVB
-executable is invoked automatically and run in a separate address space. Images
-and point clouds can then be streamed to the Python script running in the
-debugger.
+stream of images or point clouds, the startup process is reversed and the
+OpenCVB executable is invoked automatically from Python and run in a separate
+address space. Images and point clouds can then be streamed to the Python script
+running in the debugger.
 
 Visual Studio C++ Debugging
 ===========================
@@ -614,7 +601,7 @@ VTK Support
 ===========
 
 It takes some time to get VTK (the Visualization Took Kit) working with OpenCV.
-These instructions to install VTK are here:
+The instructions to install VTK are here:
 
 <https://vtk.org/Wiki/VTK/Configure_and_Build>
 
@@ -641,7 +628,7 @@ Some notes on preparing VTK for use with OpenCV and OpenCVB:
 -   Validate that VTK was correctly installed by looking at the
     OpenCVB/opencv/Build/Bin/Debug
 
-    -   And make sure that the opencv_viz\* dll’s are present
+    -   Make sure that the opencv_viz\* dll’s are present
 
 -   In OpenCVB’s VTKDataExample, open the VTK.h file and uncomment the first
     line “\#define WITH_VTK”
@@ -649,18 +636,23 @@ Some notes on preparing VTK for use with OpenCV and OpenCVB:
     -   Rebuild OpenCVB and the VTK algorithms will run (they all start with
         “VTK”)
 
-Release vs. Beta
-================
+TRISTR – The Release IS The Repository
+======================================
 
-There are no release versions of OpenCVB. The infrastructure for OpenCVB – see
-the OpenCVB project – is stable and likely to just be tweaked with support for
-new cameras. The objective is continuing development of algorithms where each
-algorithm is independent. New algorithms are tested thoroughly before being
-added but even if a new algorithm fails, the vast majority of algorithms will
-continue to work. All algorithms are subject to continual overnight testing that
-should highlight deficiencies in any algorithm run with default settings. The
-plan is that release is beta and beta is release – there will be no distinction
-– and any download will work.
+Evolution would have been easier for Darwin to discover if nature had provided
+versioning. Software applications always have a version identifier but OpenCVB
+is attempting something different. Older algorithms are not deleted but carried
+forward as new algorithms appear and improve. The core infrastructure is
+functional enough to support all algorithms, old and new, and continuous testing
+ensures that all algorithms are supported equally.
+
+What this means is that the repository is the release – TRISTR. If there is a
+problem with a recent download, “Sync” with the repository, build OpenCVB, and
+test again. If the problem is still there, post an issue. There will be problems
+with the infrastructure supporting the algorithms, but the greater likelihood is
+that specific algorithms will have deficiencies. The value of avoiding
+versioning is that issues will produce fixes that will flow immediately into the
+repository.
 
 How to Contribute
 =================
@@ -670,7 +662,7 @@ effort. There are plenty of examples to use as a model but there are also
 snippets that assist in the process of adding new examples. Any pull request
 that adds an algorithm will be welcome and quickly reviewed. Changes to the
 OpenCVB infrastructure – not the algorithms – is discouraged but always welcome.
-(See previous section on “Release vs. Beta” to understand why.)
+(See previous section to understand why.)
 
 Sample Results
 ==============
@@ -680,6 +672,14 @@ The following images are a preview of some algorithms’ output.
 In the OpenCVB user interface, the top left image is the RGB and top right is
 depth. Algorithm results are in the bottom left and right or additional OpenGL,
 Python, or HighGUI windows.
+
+![](media/6666d6c75a8aad1eeb8c26bfa0baca74.png)
+
+*The MSER (Maximally Stable Extremal Regions) algorithm identifies regions which
+look like objects. The lower right image shows all the objects identified – with
+all the duplicates and small regions. The lower left image shows the objects
+identified after consolidating the overlapping rectangles and filtering for the
+smaller regions.*
 
 ![](media/4460c4f42f9eea5f23fe1cd19da22346.png)
 
@@ -1175,8 +1175,8 @@ Addendum 2: Some Thoughts
     sync the presentation of the RGB and RGB Depth images like the dst1 and dst2
     images.
 
-Addendum 3: Log of Recent Changes
-=================================
+Addendum 3: Change Log
+======================
 
 Recent Changes 9/15/2020:
 =========================
@@ -1206,3 +1206,31 @@ Recent Changes - 12/12/2020
 
 -   Intel Realsense cameras are supported in native 640x480 modes (as well as
     1280x720.)
+
+Recent Changes - 1/12/2021
+==========================
+
+-   Over 870 algorithms – almost all less than a page of code.
+
+-   The new “Best Of” module contains the best example of common techniques.
+    Need an example of contours, look in the BestOf.vb first.
+
+-   OpenCV’s new Oak-D camera has arrived. Some python scripts were added for
+    users that have installed it.
+
+    -   <https://docs.luxonis.com/en/latest/pages/api/> - to get the official
+        support.
+
+-   Motion detection is easier to use with an “AllRect” cv.rect that encompass
+    all RGB changes.
+
+-   Image segmentation is more stable and consistent from frame to frame. See
+    ImageSeg.vb.
+
+-   OptionsCommon.vb defines options common to all algorithms.
+
+-   StructuredDepth shows promise as a path to exploiting structured light
+    technology.
+
+-   PythonDebug project is now integrated into the OpenCVB.sln. Python debugging
+    is easier.
