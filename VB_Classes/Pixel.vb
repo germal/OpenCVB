@@ -50,6 +50,7 @@ Public Class Pixel_Viewer
             End If
 
             task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
+            task.pixelViewTag = task.mousePicTag
             Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
             If dw.X < 0 Then dw.X = 0
             If dw.Y < 0 Then dw.Y = 0

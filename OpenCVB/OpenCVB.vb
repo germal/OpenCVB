@@ -96,6 +96,7 @@ Public Class OpenCVB
     Dim meActivateNeeded As Boolean
     Dim pixelViewerOn As Boolean
     Dim pixelViewerRect As cv.Rect
+    Dim pixelViewTag As Integer
     Dim PausePlay As Bitmap
     Dim runPlay As Bitmap
     Dim stopTest As Bitmap
@@ -302,39 +303,31 @@ Public Class OpenCVB
         g.DrawImage(pic.Image, 0, 0)
 
         If pixelViewerOn Then
-            Dim picTagOk As Boolean
-            If pic.Tag = 2 Then
-                If mousePicTag = 3 Then
-                    pixelViewerRect.X += camPic(0).Width / ratio
-                    picTagOk = True
-                End If
-            End If
-            If mousePicTag = pic.Tag Or picTagOk Then
-                g.DrawRectangle(myPen, CInt(pixelViewerRect.X * ratio), CInt(pixelViewerRect.Y * ratio),
+            Dim pic3Offset As Integer
+            If pixelViewTag = 3 Then pic3Offset = imgResult.Width / 2
+            g.DrawRectangle(myPen, CInt((pixelViewerRect.X + pic3Offset) * ratio), CInt(pixelViewerRect.Y * ratio),
                                        CInt(pixelViewerRect.Width * ratio), CInt(pixelViewerRect.Height * ratio))
-            End If
         End If
+
         If drawRect.Width > 0 And drawRect.Height > 0 Then
             g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
             If pic.Tag = 2 Then
                 g.DrawRectangle(myPen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
             End If
         End If
-            If algorithmRefresh And (pic.Tag = 2) Then
+
+        If algorithmRefresh And (pic.Tag = 2) Then
             algorithmRefresh = False
             SyncLock imgResult
                 Try
-                    If imgResult.Width <> camPic(2).Width Or imgResult.Height <> camPic(2).Height Then
-                        Dim result = imgResult.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
-                        cvext.BitmapConverter.ToBitmap(result, camPic(2).Image)
-                    Else
-                        cvext.BitmapConverter.ToBitmap(imgResult, camPic(2).Image)
-                    End If
+                    Dim result = imgResult.Resize(New cv.Size(camPic(2).Size.Width, camPic(2).Size.Height))
+                    cvext.BitmapConverter.ToBitmap(result, camPic(2).Image)
                 Catch ex As Exception
                     Console.WriteLine("OpenCVB: Error in OpenCVB/Paint updating dst output: " + ex.Message)
                 End Try
             End SyncLock
         End If
+
         If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
             cameraRefresh = False
             If camera.color IsNot Nothing Then
@@ -350,6 +343,7 @@ Public Class OpenCVB
                 End If
             End If
         End If
+
         ' draw any TrueType font data on the image 
         Dim maxline = 21
         SyncLock ttTextData
@@ -1212,6 +1206,7 @@ Public Class OpenCVB
             End If
 
             pixelViewerRect = task.pixelViewerRect
+            pixelViewTag = task.pixelViewTag
 
             If openFileDialogName <> "" Then
                 If openFileDialogName <> task.openFileDialogName Or openFileStarted <> task.fileStarted Then

@@ -158,6 +158,7 @@ Public Class ActiveTask : Implements IDisposable
     Public drawRectUpdated As Boolean
 
     Public pixelViewerRect As cv.Rect
+    Public pixelViewTag As Integer
 
     Public label1 As String
     Public label2 As String
