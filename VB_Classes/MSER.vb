@@ -6,7 +6,6 @@ Public Class MSER_Basics
     Public containers As New List(Of cv.Rect)
     Dim options As MSER_Options
     Dim maxSlider As Windows.Forms.TrackBar
-    Dim mser = cv.MSER.Create()
     Public Sub New()
         initParent()
         options = New MSER_Options
@@ -17,17 +16,14 @@ Public Class MSER_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim regions()() As cv.Point = Nothing
-        Dim boxes() As cv.Rect = Nothing
-        mser.DetectRegions(input, regions, boxes)
+        options.src = src
+        options.Run()
 
         dst1 = src.Clone
         dst2 = src.Clone
 
         sortedBoxes.Clear()
-        For Each box In boxes
+        For Each box In options.boxes
             sortedBoxes.Add(box.Width * box.Height, box)
         Next
 
@@ -59,8 +55,10 @@ Public Class MSER_Basics
             Next
         End While
 
+        Static minSlider = findSlider("MSER Min Area")
+        Dim minArea = minSlider.value
         For Each rect In containers
-            dst1.Rectangle(rect, cv.Scalar.Yellow, If(src.Width = 1280, 2, 1))
+            If rect.Width * rect.Height > minArea Then dst1.Rectangle(rect, cv.Scalar.Yellow, If(src.Width = 1280, 2, 1))
         Next
 
         label1 = CStr(containers.Count) + " consolidated regions of interest located"
@@ -79,16 +77,16 @@ End Class
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Options
     Inherits VBparent
-    Public zone() As cv.Rect = Nothing
-    Public region()() As cv.Point = Nothing
+    Public boxes() As cv.Rect = Nothing
+    Public regions()() As cv.Point = Nothing
     Dim saveParms() As Integer
-    Dim mser As cv.MSER
+    Public mser = cv.MSER.Create
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 9)
             sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
-            sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 60)
+            sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 2500)
             sliders.setupTrackBar(2, "MSER Max Area", 1000, 100000, 100000)
             sliders.setupTrackBar(3, "MSER Max Variation", 1, 100, 25)
             sliders.setupTrackBar(4, "Min Diversity", 0, 100, 20)
@@ -99,13 +97,13 @@ Public Class MSER_Options
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+            check.Setup(caller, 3)
             check.Box(0).Text = "Pass2Only"
             check.Box(1).Text = "Use Grayscale, not color input (default)"
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
+            check.Box(2).Text = "Use all default options - ignore all but min and max area"
+            check.Box(2).Checked = True
         End If
-        ReDim saveParms(11 - 1) ' 4 sliders + 4 sliders + 1 slider + 2 checkboxes
+        ReDim saveParms(sliders.trackbar.Count + check.Box.Count - 1)
         task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image using all the available options."
     End Sub
     Public Sub Run()
@@ -127,24 +125,24 @@ Public Class MSER_Options
         For i = 0 To saveParms.Length - 1
             Dim nextVal = Choose(i + 1, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value,
                                         sliders.trackbar(4).Value, sliders.trackbar(5).Value, sliders.trackbar(6).Value, sliders.trackbar(7).Value,
-                                        sliders.trackbar(8).Value, check.Box(0).Checked)
+                                        sliders.trackbar(8).Value, check.Box(0).Checked, check.Box(1).Checked, check.Box(2).Checked)
             If nextVal <> saveParms(i) Then changedParms = True
             saveParms(i) = nextVal
         Next
 
-        If changedParms Then
+        If changedParms And check.Box(2).Checked = False Then
             mser = cv.MSER.Create(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize)
             mser.Pass2Only = check.Box(0).Checked
         End If
 
-        Dim input = src.Blur(New cv.Size(edgeBlurSize, edgeBlurSize))
-        If check.Box(1).Checked Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        mser.DetectRegions(input, region, zone)
+        Dim input = src
+        If check.Box(1).Checked Then Input = Input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        mser.DetectRegions(Input, regions, boxes)
 
         If standalone Or task.intermediateReview = caller Then
             dst1 = src.Clone
-            For Each z In zone
-                dst1.Rectangle(z, cv.Scalar.Yellow, 1)
+            For Each z In boxes
+                If z.Size.Width * z.Size.Height > minArea Then dst1.Rectangle(z, cv.Scalar.Yellow, 1)
             Next
         End If
     End Sub
@@ -209,10 +207,10 @@ Public Class MSER_TestSynthetic
         mser.Run()
 
         Dim pixels As integer
-        Dim regionCount As integer
-        For i = 0 To mser.region.Length - 1
+        Dim regionCount As Integer
+        For i = 0 To mser.regions.Length - 1
             regionCount += 1
-            Dim nextRegion = mser.region(i)
+            Dim nextRegion = mser.regions(i)
             For Each pt In nextRegion
                 img.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.vecColors(i Mod ocvb.vecColors.Length))
                 pixels += 1
@@ -307,8 +305,8 @@ Public Class MSER_Contours
         Dim pixels As integer
         dst1 = src
         Dim hull() As cv.Point
-        For i = 0 To mser.region.Length - 1
-            Dim nextRegion = mser.region(i)
+        For i = 0 To mser.regions.Length - 1
+            Dim nextRegion = mser.regions(i)
             pixels += nextRegion.Length
             hull = cv.Cv2.ConvexHull(nextRegion, True)
             Dim listOfPoints = New List(Of List(Of cv.Point))
@@ -320,7 +318,7 @@ Public Class MSER_Contours
             dst1.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
         Next
 
-        label1 = CStr(mser.region.Length) + " Regions " + Format(pixels / mser.region.Length, "#0.0") + " pixels/region (avg)"
+        label1 = CStr(mser.regions.Length) + " Regions " + Format(pixels / mser.regions.Length, "#0.0") + " pixels/region (avg)"
     End Sub
 End Class
 
