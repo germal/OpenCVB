@@ -989,14 +989,12 @@ Public Class OpenCVB
         Application.DoEvents()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
-        MsgBox("The objective is to solve many small computer vision problems" + vbCrLf +
-               "and do so in a way that enables any of the solutions " + vbCrLf +
-               "to be reused. The result is a toolkit for solving " + vbCrLf +
-               "ever bigger and more difficult problems. The " + vbCrLf +
-               "philosophy behind this approach is that human vision " + vbCrLf +
-               "is not computationally intensive but is built " + vbCrLf +
-               "on many almost trivial algorithms working together.  " + vbCrLf + vbCrLf +
-               "Fall 2020 Fremont CA")
+        MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
+               "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
+               "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
+               "problems.  The philosophy behind this approach is that human vision" + vbCrLf +
+               "is not computationally intensive but is built on many almost trivial" + vbCrLf +
+               "algorithms working together." + vbCrLf)
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Exit_Click(sender, e)

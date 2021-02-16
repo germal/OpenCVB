@@ -814,13 +814,13 @@ no depth data is available.*
 to be the face – the highest point of the nearest depth fields (shown in a box
 in the lower right.)*
 
-![](media/1c93b65678b1664d6f8c6b95eb1dfde6.png)
+![](media/baeaff26dce7eb4c28dc6dce3b62cae5.png)
 
 *Algorithms may optionally work on only a selected region. Here the oil paint
 effect is applied only to the region selected by drawing a rectangle on the
 output image (lower left.) The lower right image is an intermediate stage with
-only edges. All algorithms may draw a rectangle with a right-mouse to open a
-spreadsheet with the data selected in the rectangle.*
+only edges. All algorithms may review the pixel details at any location with the
+pixel viewer icon in the toolbar (the Microscope icon.)*
 
 ![](media/ec6993a1021d7e22891e6c1575edd88c.png)
 
