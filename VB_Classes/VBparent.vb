@@ -161,8 +161,10 @@ Public Class VBparent : Implements IDisposable
         Dim proc = Process.GetProcessesByName("python")
         For i = 0 To proc.Count - 1
             ' the Oak-D interface runs as a Python script - so don't kill that one.  No one else can run with high priority.
-            If proc(i).PriorityClass <> ProcessPriorityClass.High Then proc(i).Kill()
-        Next i
+            If proc(i).HasExited = False Then
+                If proc(i).PriorityClass <> ProcessPriorityClass.High Then proc(i).Kill()
+            End If
+        Next
         If pyStream IsNot Nothing Then pyStream.Dispose()
         Dim type As Type = algorithm.GetType()
         If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
