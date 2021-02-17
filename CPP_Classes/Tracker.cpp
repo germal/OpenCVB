@@ -51,14 +51,14 @@ public:
             tracker->init(src, bbox);
         }
         else {
-            bool ok = tracker->update(src, bbox);
-            if (ok)
-            {
-                rectangle(src, bbox, Scalar(255, 255, 255), 2, 1);
-            } else {
-                putText(src, "Tracking failure detected", Point(100, 80), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 2);
-                bboxInitialized = false;
-            }
+            //bool ok = tracker->update(src, bbox);
+            //if (ok)
+            //{
+            //    rectangle(src, bbox, Scalar(255, 255, 255), 2, 1);
+            //} else {
+            //    putText(src, "Tracking failure detected", Point(100, 80), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 2);
+            //    bboxInitialized = false;
+            //}
         }
     }
 };
