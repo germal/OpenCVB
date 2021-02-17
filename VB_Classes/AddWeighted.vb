@@ -55,3 +55,28 @@ Public Class AddWeighted_Edges
 End Class
 
 
+
+
+
+
+
+Public Class AddWeighted_ImageAccumulate
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Accumulation weight of each image X100", 1, 100, 10)
+        End If
+
+        task.desc = "Update a running average of the image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
+        Static weightSlider = findSlider("Accumulation weight of each image X100")
+        cv.Cv2.AccumulateWeighted(task.depth32f, dst1, weightSlider.value / 100, New cv.Mat)
+    End Sub
+End Class

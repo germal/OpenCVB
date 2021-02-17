@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/phase_corr.cpp
+' https://docs.opencv.org/master/d7/df3/group__imgproc__motion.html
 Public Class PhaseCorrelate_Basics
     Inherits VBparent
     Dim hanning As New cv.Mat
@@ -150,6 +151,7 @@ End Class
 
 
 
+' https://docs.opencv.org/master/d7/df3/group__imgproc__motion.html
 Public Class PhaseCorrelate_HanningWindow
     Inherits VBparent
     Public Sub New()
