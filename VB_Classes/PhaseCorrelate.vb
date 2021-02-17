@@ -143,3 +143,22 @@ Public Class PhaseCorrelate_Depth
         dst2.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class PhaseCorrelate_HanningWindow
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        label1 = "Looking down on a bell curve in 2 dimensions"
+        task.desc = "Show what a Hanning window looks like"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        cv.Cv2.CreateHanningWindow(dst1, src.Size, cv.MatType.CV_32F)
+    End Sub
+End Class

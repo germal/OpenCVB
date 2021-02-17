@@ -60,7 +60,6 @@ Public Class OpenCVB
     Dim mouseMovePoint As New cv.Point
     Dim mousePoint As New cv.Point
     Dim myBrush = New SolidBrush(Color.White)
-    Dim myPen As New Pen(Color.White)
     Dim openCVKeywords As New List(Of String)
     Public optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
@@ -302,17 +301,22 @@ Public Class OpenCVB
         g.ScaleTransform(1, 1)
         g.DrawImage(pic.Image, 0, 0)
 
-        If pixelViewerOn Then
+        Static myWhitePen As New Pen(Color.White)
+        Static myBlackPen As New Pen(Color.Black)
+
+        If pixelViewerOn And (mousePicTag = pic.Tag Or (pixelViewTag = 3 And pic.Tag = 2)) Then
             Dim pic3Offset As Integer
             If pixelViewTag = 3 Then pic3Offset = imgResult.Width / 2
-            g.DrawRectangle(myPen, CInt((pixelViewerRect.X + pic3Offset) * ratio), CInt(pixelViewerRect.Y * ratio),
-                                       CInt(pixelViewerRect.Width * ratio), CInt(pixelViewerRect.Height * ratio))
+            Dim r = pixelViewerRect
+            Dim rect = New cv.Rect(CInt((r.X + pic3Offset) * ratio), CInt(r.Y * ratio), CInt(r.Width * ratio), CInt(r.Height * ratio))
+            g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
+            g.DrawRectangle(myBlackPen, Math.Max(0, rect.X - 1), Math.Max(0, rect.Y - 1), Math.Min(rect.Width + 2, camPic(0).Width - 1), Math.Min(rect.Height + 2, camPic(0).Height - 1))
         End If
 
         If drawRect.Width > 0 And drawRect.Height > 0 Then
-            g.DrawRectangle(myPen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            g.DrawRectangle(myWhitePen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
             If pic.Tag = 2 Then
-                g.DrawRectangle(myPen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
+                g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y, drawRect.Width, drawRect.Height)
             End If
         End If
 
