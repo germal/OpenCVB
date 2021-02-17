@@ -66,31 +66,33 @@ End Module
 
 Public Class AnyName_CPP
     Inherits VBparent
-    Dim anyname As IntPtr
+    Dim cPtr As IntPtr
     Public Sub New()
         initParent()
         
-        anyname = Anyname_Open()
+        cPtr = Anyname_Open()
         task.desc = "description"
 	  End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         
-        Dim src = task.color
-        Dim srcData(src.Total * src.ElemSize) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim srcData(input.Total * input.ElemSize) As Byte
+        Marshal.Copy(input.Data, srcData, 0, srcData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Dim imagePtr = Anyname_Run(anyname, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = Anyname_Run(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, input.Channels)
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            Dim dstData(src.Total * src.ElemSize - 1) As Byte
+            Dim dstData(input.Total * input.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(src.Rows, src.Cols, IIf(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
+            dst1 = New cv.Mat(input.Rows, input.Cols, If(input.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
         End If
     End Sub
     Public Sub Close() 
-        Anyname_Close(anyname)
+        Anyname_Close(cPtr)
     End Sub
 End Class
 ]]>

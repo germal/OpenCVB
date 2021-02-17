@@ -26,6 +26,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_IMU", "OpenGL_Algorithms\OpenGL_IMU\OpenGL_IMU.vcxproj", "{E72A020D-1299-4A21-A3EB-EDD4D9BE1C4E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPP_Classes", "CPP_Classes\CPP_Classes.vcxproj", "{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B974EC0D-14DD-3E39-ABEE-EA30BC21FF7B} = {B974EC0D-14DD-3E39-ABEE-EA30BC21FF7B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGL_Voxels", "OpenGL_Algorithms\OpenGL_Voxels\OpenGL_Voxels.vcxproj", "{72F8E385-9410-47D4-889F-FFDD40BAE38D}"
 EndProject
