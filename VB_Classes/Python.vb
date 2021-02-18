@@ -67,6 +67,7 @@ End Module
 Public Class Python_Run
     Inherits VBparent
     Dim tryCount As Integer
+    Dim backEndPython As Boolean
     Public Sub New()
         initParent()
         If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PythonPackages.py"
@@ -74,6 +75,9 @@ Public Class Python_Run
 
         If pythonApp.Name.EndsWith("_PS.py") Then
             pyStream = New PyStream_Basics()
+        ElseIf pythonApp.Name.EndsWith("_PS2.py") Then
+            pyStream = New PyStream_2()
+            backEndPython = True
         Else
             StartPython("")
         End If
@@ -86,6 +90,12 @@ Public Class Python_Run
         If pyStream IsNot Nothing Then
             pyStream.src = src
             pyStream.Run()
+            If backEndPython Then
+                dst1 = pyStream.dst1
+                dst2 = pyStream.dst2
+                label1 = pyStream.label1
+                label2 = pyStream.label2
+            End If
         Else
             Dim proc = Process.GetProcessesByName("python")
             If proc.Count = 0 Then
@@ -105,7 +115,7 @@ Public Class Python_MemMap
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
-    Public memMapValues(49) As Double ' more than we need - buffer for growth
+    Public memMapValues(50 - 1) As Double ' more than we need - buffer for growth.  PyStream assumes 400 bytes length!  Do not change...
     Public memMapbufferSize As Integer
     Public Sub New()
         initParent()

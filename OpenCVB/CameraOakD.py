@@ -10,7 +10,7 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser = argparse.ArgumentParser(description='Pass in width and height of buffers.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--Width', type=int, default=1280, help='Image width expected by OpenCVB')
 parser.add_argument('--Height', type=int, default=720, help='Image height expected by OpenCVB')
 parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')

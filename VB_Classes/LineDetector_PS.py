@@ -33,4 +33,4 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 
 from PyStream import PyStreamRun
 cv.namedWindow(title_window)
-PyStreamRun(OpenCVCode, 'LineDetector_PS.py')
+PyStreamRun(OpenCVCode, title_window)

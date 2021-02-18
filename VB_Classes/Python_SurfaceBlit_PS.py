@@ -36,4 +36,4 @@ print('This script is not working because the surface blit call does not work in
 print('The Python_SurfaceBlit.py script works because the blit is inline - not in a callback.')
 print('To see the problem uncomment the lines above to see the hang...')
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'Python_SurfaceBlit_PS.py')
+PyStreamRun(OpenCVCode, title_window)

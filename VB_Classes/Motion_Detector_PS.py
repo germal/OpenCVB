@@ -140,4 +140,4 @@ movement_persistent_counter = 0
 font = cv.FONT_HERSHEY_SIMPLEX
 delay_counter = 0
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'Motion_Detector_PS.py')
+PyStreamRun(OpenCVCode, title_window)

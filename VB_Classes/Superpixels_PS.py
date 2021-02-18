@@ -63,4 +63,4 @@ if __name__ == '__main__':
     num_levels = 4
     num_histogram_bins = 5
     from PyStream import PyStreamRun
-    PyStreamRun(OpenCVCode, 'SuperPixels_PS.py')
+    PyStreamRun(OpenCVCode, title_window)

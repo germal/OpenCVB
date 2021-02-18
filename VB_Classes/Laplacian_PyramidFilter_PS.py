@@ -50,4 +50,4 @@ if __name__ == '__main__':
 
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'LaPlacian_PyramidFilter_PS.py')
+PyStreamRun(OpenCVCode, title_window)

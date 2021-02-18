@@ -25,7 +25,7 @@ Public Class VBparent : Implements IDisposable
     Public radio As New OptionsRadioButtons
     Public radio1 As New OptionsRadioButtons
     Public sliders As New OptionsSliders
-    Public pyStream As PyStream_Basics = Nothing
+    Public pyStream As Object
     Public standalone As Boolean
     Public src As cv.Mat
     Public dst1 As cv.Mat

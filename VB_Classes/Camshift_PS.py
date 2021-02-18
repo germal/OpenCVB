@@ -67,7 +67,7 @@ class App(object):
         self.img = None
         print(__doc__)
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'Camshift_PY.py')
+        PyStreamRun(self.OpenCVCode, title_window)
 
     def OpenCVCode(self, vis, depth_colormap, frameCount):
         if self.initialized == False:

@@ -37,7 +37,7 @@ class App:
         self.frame_idx = 0
         print(__doc__)
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'lk_track_PS.py')
+        PyStreamRun(self.OpenCVCode, title_window)
 
     def OpenCVCode(self, frame, depth_colormap, frameCount):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)

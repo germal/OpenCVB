@@ -90,4 +90,4 @@ if __name__ == '__main__':
         model.load_(classifier_fn) #Known bug: https://github.com/opencv/opencv/issues/4969
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'SVM_Digits_PS.py')
+PyStreamRun(OpenCVCode, title_window)

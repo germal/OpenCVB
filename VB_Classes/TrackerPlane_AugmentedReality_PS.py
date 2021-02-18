@@ -24,7 +24,7 @@ import cv2 as cv
 import common
 from TrackerPlane_PS import PlaneTracker
 import sys
-title_window = "Plane_ar.py"
+title_window = "TrackerPlane_Reality_PS.py"
 
 # Simple model of a house - cube with a triangular prism "roof"
 ar_verts = np.float32([[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0],
@@ -45,7 +45,7 @@ class App:
         cv.createTrackbar('focal', title_window, 25, 50, common.nothing)
         self.rect_sel = common.RectSelector(title_window, self.on_rect)
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'TrackerPlane_AugmentedReality_PS.py')
+        PyStreamRun(self.OpenCVCode,  title_window)
 
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)

@@ -140,7 +140,7 @@ class App:
         self.rect_sel = RectSelector(title_window, self.onrect)
         self.trackers = []
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'Tracker_Mosse_PS.py')
+        PyStreamRun(self.OpenCVCode, title_window)
 
     def onrect(self, rect):
         frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
@@ -170,5 +170,5 @@ class App:
 if __name__ == '__main__':
     print (__doc__)
     import sys
-    title_window = "Tracker_PS.py - Draw rectangles around multiple objects to be tracked!"
+    title_window = "Tracker_PS.py"
     App().Open()

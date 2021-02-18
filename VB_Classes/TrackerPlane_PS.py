@@ -137,7 +137,7 @@ class App:
         cv.namedWindow(title_window)
         self.rect_sel = common.RectSelector(title_window, self.on_rect)
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'TrackerPlane_PS.py')
+        PyStreamRun(self.OpenCVCode, title_window)
 
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)

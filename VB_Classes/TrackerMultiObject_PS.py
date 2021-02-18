@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
 import sys
-title_window = "MultiTracker_PS.py - draw a rectangle and hit 'enter'"
+title_window = "MultiTracker_PS.py"
 # https://docs.opencv.org/3.4/d8/d77/classcv_1_1MultiTracker.html
 print('Select an object to be tracked by drawing a rectangle around it')
 
@@ -26,5 +26,5 @@ def OpenCVCode(image, depth_colormap, frameCount):
     cv.imshow(title_window, image)
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'TrackerMultiObject_PS.py')
+PyStreamRun(OpenCVCode, title_window)
 

@@ -8,7 +8,7 @@ import sys
 from vcam import vcam,meshGen
 saveMode=0
 
-title_window = 'FunnyMirror_PS.py - Distort video stream'
+title_window = 'FunnyMirror_PS.py'
 def on_trackbar(val):
 	global saveMode 
 	saveMode = val 
@@ -65,4 +65,4 @@ cv.createTrackbar(trackbar_name, title_window, saveMode, 7, on_trackbar)
 on_trackbar(saveMode)
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'FunnyMirror_PS.py')
+PyStreamRun(OpenCVCode, title_window)

@@ -51,7 +51,7 @@ class App:
         self.use_ransac = True
         print(__doc__)
         from PyStream import PyStreamRun
-        PyStreamRun(self.OpenCVCode, 'lk_homography_PS.py')
+        PyStreamRun(self.OpenCVCode, title_window)
 
     def OpenCVCode(self, frame, depth_colormap, frameCount):
             frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)

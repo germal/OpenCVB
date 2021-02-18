@@ -6,4 +6,4 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     cv.imshow("RGB and Depth Images", images)
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'Depth_RGB_PS.py')
+PyStreamRun(OpenCVCode, title_window)

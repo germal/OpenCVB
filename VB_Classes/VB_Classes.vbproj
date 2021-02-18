@@ -395,7 +395,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AddWeightedTest.py" />
-    <Content Include="AddWeighted_Trackbar_PS.py" />
+    <Content Include="PutText_PS2.py" />
+    <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />
     <Content Include="Facedetect_PS.py" />
     <Content Include="LineDetector_PS.py" />
@@ -425,6 +426,7 @@
     <Content Include="MSER_PS.py" />
     <Content Include="ICP_SyntheticExample.py" />
     <Content Include="ICP_Models.py" />
+    <Content Include="PyStream2.py" />
     <Content Include="Reg_shift.py" />
     <Content Include="RotateImage.py" />
     <Content Include="SelectiveSearchSegmentation_Demo.py" />
@@ -449,6 +451,7 @@
     <Content Include="Depth_RGB_PS.py" />
     <Content Include="Python_SurfaceBlit.py" />
     <Content Include="Sobel_AnisotropicSegmentation.py" />
+    <Content Include="Tracker_PS2.py" />
     <Content Include="Turing.py" />
     <Content Include="WarpAffine_SIFT.py" />
     <Content Include="PythonPackages.py" />

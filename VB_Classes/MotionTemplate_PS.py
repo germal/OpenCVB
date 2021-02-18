@@ -78,4 +78,4 @@ visuals = ['input', 'frame_diff', 'motion_hist', 'grad_orient']
 cv.createTrackbar('visual', title_window, 2, len(visuals)-1, nothing)
 cv.createTrackbar('threshold', title_window, DEFAULT_THRESHOLD, 255, nothing)
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'MotionTemplate_PS.py')
+PyStreamRun(OpenCVCode, title_window)

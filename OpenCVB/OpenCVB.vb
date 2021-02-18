@@ -109,13 +109,14 @@ Public Class OpenCVB
         If args.Length > 1 Then
             Dim algorithm As String = ""
             SaveSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", "<All>") ' this will guarantee the algorithm is available (if spelled correctly!)
-            If args.Length > 2 Then ' arguments from python os.spawnv are passed as one character at a time.  
+            If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
                 For i = 0 To args.Length - 1
                     algorithm += args(i)
                 Next
             Else
                 algorithm = args(1)
             End If
+            Console.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
             SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
             externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
             HomeDir = New DirectoryInfo(CurDir() + "\..\")
@@ -758,7 +759,9 @@ Public Class OpenCVB
             Next
             AvailableAlgorithms.Enabled = True
         End If
+
         AvailableAlgorithms.Text = GetSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Items(0))
+
         Dim index = AvailableAlgorithms.Items.IndexOf(AvailableAlgorithms.Text)
         If index < 0 Then AvailableAlgorithms.SelectedIndex = 0 Else AvailableAlgorithms.SelectedIndex = index
         SaveSetting("OpenCVB", "OpenCVkeyword", "OpenCVkeyword", OpenCVkeyword.Text)

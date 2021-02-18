@@ -35,4 +35,4 @@ hist_scale = 10
 cv.createTrackbar('scale', 'hist', hist_scale, 32, set_scale)
 
 from PyStream import PyStreamRun
-PyStreamRun(OpenCVCode, 'Histogram_Color_PY.py')
+PyStreamRun(OpenCVCode, title_window)

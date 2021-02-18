@@ -138,6 +138,7 @@ End Module
 
 
 
+' https://learnopencv.com/object-tracking-using-opencv-cpp-python/
 Public Class Tracker_Basics
     Inherits VBparent
     Dim cPtr As IntPtr
@@ -155,7 +156,7 @@ Public Class Tracker_Basics
             radio.check(5).Text = "GoTurn"
             radio.check(6).Text = "Mosse"
             radio.check(7).Text = "TrackerCSRT - Channel and Spatial Reliability Tracker"
-            radio.check(0).Checked = True ' TrackerMIL is the default
+            radio.check(7).Checked = True ' TrackerMIL is the default
         End If
 
         task.desc = "Use C++ to track objects"

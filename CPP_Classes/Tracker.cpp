@@ -24,22 +24,24 @@ public:
         // switch is based on the older tracking alternatives.  Some are disabled in the user interface for now.
         switch (trackType)
         {
-        case 0: // Boosting
-            break;
+        //case 0: // Boosting
+        //    break;
         case 1: // MIL
             tracker = cv::TrackerMIL::create();
             break;
         case 2: // KCF
             tracker = cv::TrackerKCF::create();
             break;
-        case 3: // TLD
-            break;
-        case 4: // MEDIANFLOW
-            break;
+        //case 3: // TLD
+        //    break;
+        //case 4: // MEDIANFLOW
+        //    break;
         case 5: // GOTURN
             tracker = cv::TrackerGOTURN::create();
             break;
-        case 6: // CSRT
+        //case 6: // MOSSE
+        //    break;
+        default: // CSRT
             tracker = cv::TrackerCSRT::create();
             break;
         }
@@ -48,7 +50,7 @@ public:
         if (bboxInitialized == false)
         {
             bboxInitialized = true;
-            tracker->init(src, bbox);
+            //tracker->init(src, bbox);
         }
         else {
             //bool ok = tracker->update(src, bbox);
