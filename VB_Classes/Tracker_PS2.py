@@ -48,11 +48,10 @@ def OpenCVCode(imgRGB, frameCount):
             p1 = (int(rect[0]), int(rect[1]))
             p2 = (int(rect[0] + rect[2]), int(rect[1] + rect[3]))
             cv.rectangle(imgRGB, p1, p2, (255,0,0), 2, 1)
+            # Display tracker type on imgRGB
+            cv.putText(imgRGB, tracker_type + " Tracker", (40,100), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
         else :
             # Tracking failure
             cv.putText(imgRGB, "Tracking failure detected", (100,80), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
- 
-        # Display tracker type on imgRGB
-        cv.putText(imgRGB, tracker_type + " Tracker", (40,100), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
 
 PyStreamRun(OpenCVCode, title_window)

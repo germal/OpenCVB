@@ -426,7 +426,6 @@
     <Content Include="MSER_PS.py" />
     <Content Include="ICP_SyntheticExample.py" />
     <Content Include="ICP_Models.py" />
-    <Content Include="PyStream2.py" />
     <Content Include="Reg_shift.py" />
     <Content Include="RotateImage.py" />
     <Content Include="SelectiveSearchSegmentation_Demo.py" />
@@ -509,7 +508,6 @@
     <Content Include="ML_letters.py" />
     <Content Include="Mat_mask_operations.py" />
     <Content Include="Python_SurfaceBlit_PS.py" />
-    <Content Include="Python_MemMap.py" />
     <Content Include="Moments_demo.py" />
     <Content Include="Morphology.py" />
     <Content Include="Morphology_1.py" />
